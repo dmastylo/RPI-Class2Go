@@ -30,14 +30,14 @@ $(function() {
     $( "#wrong-dialog" ).dialog({
 	autoOpen:false,
 	modal: false,
-	minWidth:380,
+	minWidth:350,
 	buttons: {
 
 	    "Show Explanation": function() {
 		showExplanation();
 	    },
 
-	    "Try again": function() {
+	    "Try Again": function() {
 		$( this ).dialog( "close" );
 		$('div.inVidExplanation').html("");
 	    }
@@ -46,7 +46,7 @@ $(function() {
     $( "#skip-dialog" ).dialog({
 	autoOpen:false,
 	modal: false,
-	minWidth:380,
+	minWidth:350,
 	buttons: {
 	    "Show Explanation": function() {
 		showExplanation();
@@ -149,7 +149,7 @@ function setupQPane(qTime) {
 
     if (curQ.qType=="m-c") {
 	//qInst.innerHTML='<div id="dNd" class="bottomAlign"><h4>'+typeString+'</h4></div>';
-	qDiv.innerHTML='<div id="qaSpace"><textarea readonly="readonly" id="questionText" rows="2"></textarea></div>';
+	qDiv.innerHTML='<div id="qaSpace"><div id="questionText"></div></div>';
 	addChoices(curQ);
 	$('table').css('border','none');
 	$('tr').css('border','none');
@@ -157,10 +157,10 @@ function setupQPane(qTime) {
     }
     else { //Short answer
 	//qInst.innerHTML='<div id="dNd" class="bottomAlign"><h4>'+typeString+'</h4></div>';
-	qDiv.innerHTML='<div id="qaSpace"><textarea readonly="readonly" id="questionText" rows="3"></textarea><br /></div><div id="saSpace"><br /><textarea id="answerTemplate" row="2" placeholder="Answer"></textarea><br /></div>';
+	qDiv.innerHTML='<div id="qaSpace"><div id="questionText"></div></div><div id="saSpace"><br /><textarea id="answerTemplate" row="2" placeholder="Answer"></textarea><br /></div>';
     }
 
-    document.getElementById('questionText').value=curQ.qText;    
+    document.getElementById('questionText').innerHTML=curQ.qText;    
     if (curQ.qText=="")
 	document.getElementById('questionText').style.display="none";
 
@@ -168,7 +168,7 @@ function setupQPane(qTime) {
     var buttonDiv = document.createElement('div');
     buttonDiv.setAttribute('id','buttonDiv');
     buttonDiv.setAttribute('class','bottomAlign');
-    buttonDiv.innerHTML = "<button onclick='submitAns("+qTime+")'>Submit</button> <button onclick='closeQPane()'>Skip</button><br />";
+    buttonDiv.innerHTML = "<button onclick='submitAns("+qTime+")'>Submit</button> <button onclick='closeQPane()'>Close</button><br />";
     qDiv.appendChild(buttonDiv);    
     $("button").button();
 
@@ -197,6 +197,9 @@ function setupQPane(qTime) {
 	$('#answerTemplate').css('height',stripPx(curQ.aPos.height)*hRatio);
 	$('#answerTemplate')[0].focus();
     } 
+
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"questionPane"]);
+
 }
 
 function stripPx(sizeWithPx) {
@@ -205,6 +208,8 @@ function stripPx(sizeWithPx) {
 
 function addChoices(curQ) {
     var i = 1;
+
+
     for (j in curQ.answers) {
 	var qTable = document.createElement('table')
 	qTable.setAttribute('id','choice'+i);
@@ -216,11 +221,11 @@ function addChoices(curQ) {
 	tr.setAttribute("id","ansID" + i);
 	var td1 = document.createElement('td');
 	td1.setAttribute('class','qTableCheck');
-	td1.innerHTML='<input id="check'+i+'" type="checkbox" /><label class="checkButton"  id="label'+i+'"  for="check'+i+'"></label>';
+	td1.innerHTML='<input class="choices" id="check'+i+'" type="checkbox" /><label class="checkButton"  id="label'+i+'"  for="check'+i+'"></label>';
 	var td2 = document.createElement('td');
 	td2.setAttribute('id', 'textCell'+i);
 	td2.setAttribute('class','qTableAns');
-	td2.innerHTML='<textarea class="mcAns"  rows="2" readonly="readonly" id="ansText'+i+'"></textarea>';
+	td2.innerHTML='<div class="mcAns" id="ansText'+i+'"></div>';
 	tr.appendChild(td1);
 	tr.appendChild(td2);
 	qTable.appendChild(tr);
@@ -236,15 +241,17 @@ function addChoices(curQ) {
 	$("#check"+i).button({text:false, icons: {primary: "ui-icon-blank"}, label:"Check if choice is correct"});	
 
 	//Handle the toggling graphics (showing check or not)
-	$("#check"+i).change( function (evt) {showCorrect(evt.target);});
+	$("#check"+i).change( function (evt) {handleChange(evt.target);});
 
-	document.getElementById('ansText'+i).value=curQ.answers[j].text;
+	document.getElementById('ansText'+i).innerHTML=curQ.answers[j].text;
 	if (curQ.answers[j].text==""){
 	    
 	    document.getElementById('ansText'+i).style.opacity=0;
 	}
 	i+=1;
     }
+
+
 }
 
 
@@ -283,16 +290,38 @@ function closeQPane() {
 }
 
 
+function handleChange(input) {
 
-
-function showCorrect(input) {
-     if (input.checked) {
-        $(input).button('option','icons', {primary: "ui-icon-check"});
+    if (questions[globalQTime].hasOwnProperty('mcType') && questions[globalQTime].mcType.toLowerCase()=="radio") {
+	//Radio Button Behavior
+	if (input.checked) {
+	    $(".choices").attr('checked',false).button('option','icons', {primary: "ui-icon-blank"}); //unselect all
+	    input.checked=true;  //reselect this
+	    $(input).button('option','icons', {primary: "ui-icon-check"});
+	}
+	else {
+	    //When someone clicks on an already selected radio button
+	    //Behavior is exact same as previous case
+	    $(".choices").attr('checked',false).button('option','icons', {primary: "ui-icon-blank"}); //unselect all
+	    input.checked=true;
+	    $(input).button('option','icons', {primary: "ui-icon-check"});
+	}
     }
-    else { 
-        $(input).button('option','icons', {primary: "ui-icon-blank"});
+
+    else {
+	//Default Behavior -- Checkbox
+	if (input.checked) {
+            $(input).button('option','icons', {primary: "ui-icon-check"});
+	}
+	else { 
+            $(input).button('option','icons', {primary: "ui-icon-blank"});
+	}
     }
 }
+
+
+
+
 
 
 function submitAns(qTime) {
@@ -335,9 +364,45 @@ function submitAns(qTime) {
     }
 }
 
-function showExplanation(idname) {
-    $('div.inVidExplanation').html("Explanation will follow in video.");
+function showExplanation() {
+    var explanation="";
+    try {
+	explanation=questions[globalQTime].qExplanation;
+    } catch(e) {
+	explanation="";
+    }
+    $('div.inVidExplanation').html(explanation);
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"correct-dialog"]);
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"wrong-dialog"]);
+/*
+    $('#wrong-dialog').dialog('option', 'buttons',	
+			      {
+				  "Try Again": function() {
+				      $( this ).dialog( "close" );
+				      $('div.inVidExplanation').html("");
+				      
+				      // reset buttons again
+				      $('#wrong-dialog').dialog('option','buttons',{
+					  "Show Explanation": function() {
+					      showExplanation();
+					  },
+					  "Try Again": function() {
+					      $( this ).dialog( "close" );
+					      $('div.inVidExplanation').html("");
+					      
+					  }
+				      });
+				  },
+				  "Continue Video": function() {
+				      $( this ).dialog( "close" );
+				      $('div.inVidExplanation').html("");
+				      closeQPane();
+				  }
+			      }
+			     );
+*/
 }
+
 
 function timeDisplay(timeInSec) {
     var min = Math.floor(timeInSec/60);
@@ -429,7 +494,10 @@ function setupNavPanel(){
     }
     var sorted = merged.sort(function(a,b){return parseInt(a)-parseInt(b)});
 
+    var lastTime=-1;
+
     for (i in sorted) {
+    if (sorted[i] != lastTime) {
 	if (slideIndices.hasOwnProperty(sorted[i])) {
 	    addSlideIndex(sorted[i]);
 	}
@@ -437,6 +505,8 @@ function setupNavPanel(){
 	    var tmpDiv=addQuizSlide(sorted[i]);
 	    slideIndices[sorted[i]]={displayDiv: tmpDiv};
 	}
+    }
+    lastTime=sorted[i];
     }
 }
 
