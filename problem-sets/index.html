@@ -291,6 +291,9 @@
                 for (q = 0; q < questionsArr.length; q += 1) {
                     renderQuestion(questionsArr[q]["question"], 'Q_' + (q + 1), questionsArr[q]["preamble"]);
                 } 
+
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
             };
 
             $(document).ready(function() {
