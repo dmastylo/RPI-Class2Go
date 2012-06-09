@@ -8,7 +8,7 @@ foreach ($dirs_ary as $dir) {
   $textarea = $dom->getElementById('quiz_xml');
   if ($textarea) {
     if($xml = $textarea->childNodes->item(0))
-       file_put_contents($dir.'/question.xml', html_entity_decode($xml->C14N()));
+       file_put_contents($dir.'/question.xml', html_entity_decode(utf8_decode($xml->C14N())));
   }
 }
 ?>
