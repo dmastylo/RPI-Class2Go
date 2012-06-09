@@ -1,5 +1,6 @@
 <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
                                extensions: ["tex2jax.js"],
@@ -130,22 +131,20 @@
     <body>
         <div class="quiz_question_body">
             <form id="problem-set-form" name="problem-set-form" method="post" action="index.html">
-            <div class="question_number_area">
-            </div>
-            <div class="quiz_question_text"> 
-                
-            </div>
-            <div class="quiz_options">
-            </div>
-            <div class="quiz_question_body">
-                <!--<div class="question_number_area" id="div_q2"><span class="quiz_question_number">Question 2</span><div class="question_feedback" id="q2Feedback"></div><div class="question_explanation" id="q2Explanation"></div>-->
+                <div class="question_number_area">
                 </div>
-                
-            </div>  
-            <input id="qsubmit" type="submit" value="Submit My Answers" />
-            <input id="qexplain" type="submit" value="Show Explanations" />
+                <div class="quiz_question_text"> 
+                </div>
+                <div class="quiz_options">
+                </div>
+                <div class="quiz_question_body">
+                </div>
+                <input id="qsubmit" type="submit" value="Submit My Answers" />
+                <input id="qexplain" type="submit" value="Show Explanations" />
             </form>    
-            <script>
+        </div>  
+
+        <script>
             var ansKey = {};
 
             var renderQuestion = function (questionObj, questionId, preamble) {
@@ -161,6 +160,7 @@
                 if (preamble) {
                     $('#' + questionId).append(preamble);
                 }
+	        //console.log(myQ["data"]["text"]);
                 $('#' + questionId).append(myQ["data"]["text"]);
                 $('#' + questionId).append('<div id="'+ questionId + '_X" class="question-expl"></div>');
                 $('#' + questionId + '_X').append(myQ["data"]["explanation"]);
@@ -208,6 +208,10 @@
                             var curAnsText = curAns[0]["text"];
                             var curAnsExpl = curAns[0]["explanation"];
 
+                            if ($.isEmptyObject(curAnsExpl) || curAnsExpl.toLowerCase() == "option explanation") {
+                                curAnsExpl = "No explanation available";
+                            }
+
                             if (curAnsScore == 1) {
                                 ansKey[questionId]["correct"] = curAnsId;
                             }
@@ -229,6 +233,10 @@
                             var curAnsText = curAns[0]["text"];
                             var curAnsExpl = curAns[0]["explanation"];
 
+                            if ($.isEmptyObject(curAnsExpl) || curAnsExpl.toLowerCase() == "option explanation") {
+                                curAnsExpl = "No explanation available";
+                            }
+
                             if (curAnsScore == 1) {
                                 ansKey[questionId]["correct"] = curAnsId;
                             }
@@ -246,6 +254,10 @@
                             var curAnsText = optionObj["option"][i]["text"];
                             var curAnsExpl = optionObj["option"][i]["explanation"];
 
+                            if ($.isEmptyObject(curAnsExpl) || curAnsExpl.toLowerCase() == "option explanation") {
+                                curAnsExpl = "No explanation available";
+                            }
+
                             //console.log(curAnsExpl);
                             //if (!$.isEmptyObject(curAnsExpl) && curAnsExpl.toLowerCase().indexOf("correct") != -1) {
                             if (curAnsScore == 1) {
@@ -257,6 +269,10 @@
                         var curAnsScore = optionObj["option"]["@attributes"]["selected_score"];
                         var curAnsText = optionObj["option"]["text"];
                         var curAnsExpl = optionObj["option"]["explanation"];
+
+                        if ($.isEmptyObject(curAnsExpl) || curAnsExpl.toLowerCase() == "option explanation") {
+                            curAnsExpl = "No explanation available";
+                        }
 
                         //if (curAnsExpl && curAnsExpl.toLowerCase().indexOf("correct") != -1) {
                         if (curAnsScore == 1) {
@@ -285,11 +301,22 @@
                 } else {
                     psJsonPath = 'json/Text-Processing-And-Edit-Distance/question.json'; 
                 }
+	        /*
                 $.get(psJsonPath, 
                         function (data, message, jqXHR) {
                             renderQuiz(data);
-                            console.log(ansKey);
+                            //console.log(ansKey);
                         }, 'json');
+		*/
+		$.ajax({
+                  url: psJsonPath,
+		  dataType: 'json',
+                  success: function(data, message, jqXHR) {
+			  renderQuiz(data);
+                          //console.log(ansKey); 
+                      }
+                  });
+		
 
                 $("#qsubmit").button();
                 $("#qsubmit").click(checkAnswers);
@@ -325,14 +352,14 @@
                 var quizLen = $('.question-unit').length;
                 for (var q = 1; q <= quizLen; q += 1) {
                     var answerInput = $('[name*="Q_' + q + '_input"]');
-                    console.log(answerInput);
-                    console.log($('#Q_' + q + '_input'));
+                    //console.log(answerInput);
+                    //console.log($('#Q_' + q + '_input'));
                     switch (answerInput[0].tagName.toLowerCase()) {
                         case "input":
                             var questionStatus = false;
                             for (var i = 0; i < answerInput.length; i += 1) {
-                                console.log(answerInput[i].id + ": " + answerInput[i].checked);
-                                console.log(answerInput[i].id == ansKey["Q_" + q]["correct"]);
+                                //console.log(answerInput[i].id + ": " + answerInput[i].checked);
+                                //console.log(answerInput[i].id == ansKey["Q_" + q]["correct"]);
                                 if (answerInput[i].checked) {
                                     questionStatus = ansKey["Q_" + q]["correct"] == answerInput[i].id;
                                 }
@@ -365,39 +392,7 @@
 
                 }
                 
-                /*
-                if (checkq2()) {
-                    $('#q2Feedback').html("<img src='../css/images/correct.png' />");
-                    $('#q2Explanation').html("<div class='correct_question'>Explanation: $$x = (7-2) \\times 3^{-1} \\in \\mathbb{Z}_{19}$$</div>");
-                    MathJax.Hub.Queue(["Typeset",MathJax.Hub,'q2Explanation']);
-                } else {
-                    $('#q2Feedback').html('<img src="../css/images/wrong.png" />');
-                    tryQ2 = true;
-                }
-
-                if (tryQ1 || tryQ2) {
-                }
-                */
             }
-                
-            /*
-            function checkq1() {
-                if ($('#q1a')[0].checked!=false) return false;
-                if ($('#q1b')[0].checked!=true) return false;
-                if ($('#q1c')[0].checked!=false) return false;
-                if ($('#q1d')[0].checked!=true) return false;
-                if ($('#q1e')[0].checked!=true) return false;
-                if ($('#q1f')[0].checked!=false) return false;
-                if ($('#q1g')[0].checked!=true) return false;
-                if ($('#q1h')[0].checked!=false) return false; 
-                return true;
-            }
-                
-            function checkq2() {
-                var patt = /\b\s*8\s*\b/i;
-                return patt.test($('#q2ans').val());
-            }
-            */
                 
             function explainAll(event) {
 
@@ -410,47 +405,12 @@
                 if (!explained) {
                         
                     explained=true;
-                    $('#div_q1a').addClass('incorrect_choice');
-                    $('#div_q1b').addClass('correct_choice');
-                    $('#div_q1c').addClass('incorrect_choice');
-                    $('#div_q1d').addClass('correct_choice');
-                    $('#div_q1e').addClass('correct_choice');
-                    $('#div_q1f').addClass('incorrect_choice');
-                    $('#div_q1g').addClass('correct_choice');
-                    $('#div_q1h').addClass('incorrect_choice');
 
                     $('.question-expl').show();
                     $('.answer-expl').show();
                     
-                    /*
-                    $('#div_q1a').prepend(typesetExplanation(''))
-                    .prepend(triggerFactory());
-                    $('#div_q1b').prepend(typesetExplanation("You cannot encrypt $$k$$ under the root, but 1's children must be able to decrypt $$k$$."))
-                    .prepend(triggerFactory());
-                    $('#div_q1c').prepend(typesetExplanation(""))
-                    .prepend(triggerFactory());
-                    $('#div_q1d').prepend(typesetExplanation("You cannot encrypt $$k$$ under any key on the path from the root to node 25. Therefore 26 can only decrypt if you encrypt $$k$$ under key $$k_{26}$$."))
-                    .prepend(triggerFactory());
-                    $('#div_q1e').prepend(typesetExplanation("You cannot encrypt $$k$$ under key 5, but 11's children must be able to decrypt $$k$$."))
-                    .prepend(triggerFactory());
-                    
-                    $('#div_q1f').prepend(typesetExplanation(""))
-                    .prepend(triggerFactory());
-                    
-                    $('#div_q1g').prepend(typesetExplanation("You cannot encrypt $$k$$ under 2, but 6's children must be able to decrypt $$k$$."))
-                    .prepend(triggerFactory());
-                    
-                    $('#div_q1h').prepend(typesetExplanation(""))
-                    .prepend(triggerFactory());
-
-                    $('.explanation_trigger').tooltip({'position':'top right', 'opacity':1});  
-                    */
                 }
                                                 
-
-                //$('#q1Explanation').html("<div class='correct_question'>Question Explanation: See individual choice explanations</div>");
-
-                //$('#q2Explanation').html(" <div class='correct_question'>Question Explanation: $$x = (7-2) \\times 3^{-1} \\in \\mathbb{Z}_{19}$$</div>");
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub,'q2Explanation']);
 
                 $('#qexplain').val('Continue');                        
@@ -471,6 +431,6 @@
                 return explanationDiv;
             }
                 
-            </script>
+        </script>
     </body>
 </html>

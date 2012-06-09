@@ -206,6 +206,9 @@ body .content {
     text-decoration: none;
 }
 
+#toc div.addendum h4 {cursor: pointer;}
+#toc ul#offline-downloads {background: transparent;}
+
 #slideIndex {
   height: 135px;
   width: 710px;

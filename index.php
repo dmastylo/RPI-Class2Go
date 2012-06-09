@@ -9,9 +9,10 @@
     <title><?php echo $course_name; ?></title>
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/smoothness/jquery-ui.css" type="text/css" media="all" />
     <link rel="stylesheet" href="css/quiz.css" />
-
+    <link rel="icon" href="favicon.ico" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="js/c2gSections.js" type="text/javascript"></script>
     <script src="js/demorun.js" type="text/javascript"></script>
     <script src="../js/jquery.blockUI.js" type="text/javascript"></script>
     <script type="text/javascript" src="../js/hotkey.js"> </script>
@@ -30,7 +31,7 @@
 	      <h1>Stanford University</h1> <h2><?php echo $course_name; ?></h2>
 	    </div>
         <div class="other-links">
-            <a href="https://piazza.com/stanford/winter2012/crypto101" target="forum">Discussion Forums</a>
+            <a href="http://piazza.com/stanford/winter2012/nlp" target="forum">Discussion Forums</a>
         </div>
 </header>
 
