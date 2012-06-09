@@ -1,0 +1,121 @@
+{
+    "PS": {
+        "id": "cd9085a882a058faec3b0b8d4a9260ad",
+        "type": "GS_Choice_Answer_Question",
+        "data": {
+                    "text": "Suppose we build a maxent model for part of speech tagging a word ($$x$$), over a set of just $$3$$ parts of speech ($$y$$): $$Noun$$, $$Verb$$, and $$Other$$. Our model has just one feature:<br /> <pre> f(x,y) = [x=\"make\" & y=\"Verb\"] </pre> Our training data consists of $$5$$ observations:<br /> <br /> <pre> [x=\"make\" & y=\"Verb\"] [x=\"make\" & y=\"Verb\"] [x=\"make\" & y=\"Verb\"] [x=\"make\" & y=\"Verb\"] [x=\"make\" & y=\"Noun\"] </pre> <br /> The maxent model will be trained in the usual way to give the feature $$f$$ a weight $$\lambda$$, so that the model expectation for the feature matches its empirical expectation.<br /> <br /> The weight of the feature will be $$\log X$$ (natural log).<br /> <br /> What is $$X$$?",
+                    "explanation": "The empirical expectation of $$f$$ is $$4$$ from $$5$$ identical observed data $$x$$. So $$P(Verb|make) = 0.8$$.<br /> <br /> $$P(Verb|make) = 0.8 = e^\lambda/(e^\lambda + e^0 + e^0) = e^\lambda/(e^\lambda + 2)$$<br /> <br /> So:<br/> <br /> $$0.8[e^\lambda + 2] = e^\lambda$$<br /> $$1.6 = 0.2e^\lambda$$<br /> $$8 = e^\lambda$$<br /> $$\lambda = \log 8$$<br />",
+                    "option_groups": {
+                        "randomize": true,
+                        "option_group": {
+                            "select": "all",
+                            "option": {
+                                "id": "56efeba2398a301f231f4624f9fadf5d",
+                                "selected_score": 1,
+                                "unselected_score": 0,
+                                "text": "$$8$$",
+                                "explanation": "Correct!"
+                            }
+                        },
+                        "option_group": {
+                            "select": 3,
+                            "option": {
+                                "id": "27289cca724eca79ed7592f9409778f5",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$3$$",
+                                "explanation": "Incorrect"
+                            },
+                            "option": {
+                                "id": "8ae2dee191f00a041e61f3b8426d75e0",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$4/5$$"
+                                "explanation": "Incorrect.<br />That is the probability $$P(Verb|make)$$, which is not the same as the feature's weight."
+                            },
+                            "option": {
+                                "id": "6fc660f2f90626693c84d3116fafb023",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$1$$",
+                                "explanation": "Incorrect"
+                            },
+                            "option": {
+                                "id": "e087ff4547ce9d2785f029d594f220cf",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$4$$",
+                                "explanation": "Incorrect. Just because the feature shows up $$4$$ times in the training set does not mean it gets the weight $$\log 4$$."
+                            },
+                            "option": {
+                                "id": "2394cc372d61ca91583ed030946f81b",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$5/4$$",
+                                "explanation": "Incorrect"
+                            }
+                        }
+                    }
+                },
+    },
+    {
+        "id": "b385aa9f52cf5b1c9a5310c18f3ad5af",
+        "type": "GS_Choice_Answer_Question",
+        "data": {
+                    "text": "Suppose we build a maxent model for part of speech tagging a word ($$x$$), over a set of just $$3$$ parts of speech ($$y$$): $$Noun$$, $$Verb$$, and $$Other$$. Our model has just one feature:<br /> <pre> f(x,y) = [x=\"breeze\" & y=\"Noun\"] </pre> Our training data consists of $$5$$ observations:<br /> <br /> <pre> [x=\"breeze\" & y=\"Verb\"] [x=\"breeze\" & y=\"Verb\"] [x=\"breeze\" & y=\"Verb\"] [x=\"breeze\" & y=\"Noun\"] [x=\"breeze\" & y=\"Noun\"] </pre> <br /> The maxent model will be trained in the usual way to give the feature $$f$$ a weight $$\lambda$$, so that the model expectation for the feature matches its empirical expectation.<br /> <br /> The weight of the feature will be $$\log X$$ (natural log).<br /> <br /> What is $$X$$?",
+                    "explanation": "The empirical expectation of $$f$$ is $$2$$ from $$5$$ identical observed data $$x$$. So $$P(Noun|breeze) = 0.4$$.<br /> <br /> $$P(Noun|breeze) = 0.4 = e^\lambda/(e^\lambda + e^0 + e^0) = e^\lambda/(e^\lambda + 2)$$<br /> <br /> So:<br/> <br /> $$0.4[e^\lambda + 2] = e^\lambda$$<br /> $$0.8 = 0.6e^\lambda$$<br /> $$4/3 = e^\lambda$$<br /> $$\lambda = \log (4/3)$$<br />",
+                    "option_groups": {
+                        "randomize" true,
+                        "option_group": {
+                            "select": "all",
+                            "option": {
+                                "id": "5d0a6597e6a0db41bb4799313ffb035e",
+                                "selected_score": 1,
+                                "unselected_score": 0,
+                                "text": "$$4/3$$",
+                                "explanation": "Correct!"
+                            }
+                        },
+                        "option_group": {
+                            "select": 3,
+                            "option": {
+                                "id": "9d969f8e17742970dac6f6307f50b515",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$3$$",
+                                "explanation": "Incorrect"
+                            },
+                            "option": {
+                                "id": "75aacb9417b53161f1af653e6cdf7781",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$2/5$$",
+                                "explanation": "Incorrect.<br /> That is the probability $$P(Noun|breeze)$$, which is not the same as the feature's weight"
+                            },
+                            "option": {
+                                "id": "720050860b1a80b88b05e9304e48a67c",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$3/5$$",
+                                "explanation": "Incorrect"
+                            }, 
+                            "option": {
+                                "id": "6f6a6e15c286583d41d1c50f382e194d",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$15$$",
+                                "explanation": "Incorrect"
+                            }, 
+                            "option": {
+                                "id": "860b66e8d9c1b8eb497e4f91dcc3ba7c",
+                                "selected_score": 0,
+                                "unselected_score": 0,
+                                "text": "$$2$$",
+                                "explanation": "Incorrect. Just because the feature shows up $$2$$ times in the training set does not mean it gets the weight $$\log 2$$."
+                            } 
+                        }
+                    }
+                }
+
+    }
+}
