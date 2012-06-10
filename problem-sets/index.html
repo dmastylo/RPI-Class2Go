@@ -145,6 +145,17 @@
         </div>  
 
         <script>
+            var nextObj = {
+                'Text-Processing-And-Edit-Distance': 'Edit-Distance/Defining-Minimum-Edit-Distance/',
+                'Language-Modeling-And-Spelling-Correction': 'Text-Classification/What-is-Text-Classification/',
+                'Text-Classification-And-Sentiment-Analysis': 'Discriminative-classifiers--Maximum-Entropy-classifiers/Maxent-Models-and-Discriminative-Estimation/',
+                'Maxent-Model-And-Named-Entity-Recognition': 'Advanced-Maximum-Entropy-Models/The-Maximum-Entropy-Model-Presentation/',
+                'Advanced-Maxent': 'Instructor-Chat-I/Instructor-Chat/',
+                'Parsing': 'Information-Retrieval/Introduction-to-Information-Retrieval/',
+                'Information-Retrieval': 'Semantics/Word-Senses-and-Word-Relations/',
+                'Lexical-Semantics-And-Question-Answering': 'Summarization/Introduction-to-Summarization/'
+            };
+
             var ansKey = {};
 
             var renderQuestion = function (questionObj, questionId, preamble) {
@@ -402,7 +413,9 @@
                 event.preventDefault();
 
                 if (event.currentTarget.value == "Continue") {
-                    $(document).attr('location').href = "../week1/Defining-Minimum-Edit-Distance/";
+                    //console.log(location.search.split("ps=")[1]);
+                    var PS = location.search.split("ps=")[1];
+                    $(document).attr('location').href = "../videos/" + nextObj[PS] + "index.html";
                 }
 
                 if (!explained) {
