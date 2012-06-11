@@ -72,7 +72,7 @@ class Announcements(models.Model):
     title = models.TextField(blank=True)
     description = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'announcements'
 
@@ -81,7 +81,7 @@ class AssignmentCategories(models.Model):
     time_created = models.DateField(auto_now=False, auto_now_add=True)
     course_id = models.BigIntegerField()
     title = models.TextField(blank=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'assignment_categories'
 
@@ -92,7 +92,7 @@ class AssignmentGrades(models.Model):
     user_id = models.BigIntegerField(null=True, blank=True)
     json = models.TextField()
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'assignment_grades'
 
@@ -103,7 +103,7 @@ class AssignmentSubmissions(models.Model):
     assn_id = models.BigIntegerField()
     json = models.TextField()
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'assignment_submissions'
 
@@ -118,7 +118,7 @@ class Assignments(models.Model):
     due_date = models.BigIntegerField(null=True, blank=True)
     close_date = models.BigIntegerField(null=True, blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'assignments'
 
@@ -128,7 +128,7 @@ class CourseAnalytics(models.Model):
     user_id = models.BigIntegerField(null=True, blank=True)
     json = models.TextField()
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'course_analytics'
 
@@ -137,7 +137,7 @@ class CourseMaps(models.Model):
     course_id = models.BigIntegerField()
     json = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'course_maps'
 
@@ -150,7 +150,7 @@ class Files(models.Model):
     title = models.TextField(blank=True)
     description = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'files'
 
@@ -162,7 +162,7 @@ class ForumPostReplies(models.Model):
     description = models.TextField(blank=True)
     rating_data = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'forum_post_replies'
 
@@ -174,7 +174,7 @@ class ForumPosts(models.Model):
     description = models.TextField(blank=True)
     rating_data = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'forum_posts'
 
@@ -185,7 +185,7 @@ class Forums(models.Model):
     title = models.TextField(blank=True)
     description = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'forums'
 
@@ -201,7 +201,7 @@ class Lectures(models.Model):
     calendar_start = models.BigIntegerField(null=True, blank=True)
     calendar_end = models.BigIntegerField(null=True, blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'lectures'
 
@@ -214,7 +214,7 @@ class Officehours(models.Model):
     calendar_start = models.BigIntegerField(null=True, blank=True)
     calendar_end = models.BigIntegerField(null=True, blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'officehours'
 
@@ -227,7 +227,7 @@ class Roles(models.Model):
     holder_ids = models.TextField(blank=True)
     holder_count = models.BigIntegerField(null=True, blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'roles'
 
@@ -238,7 +238,7 @@ class Sections(models.Model):
     membership = models.TextField(blank=True)
     members = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'sections'
 
@@ -252,7 +252,7 @@ class SharingPermissions(models.Model):
     cond_nd = models.IntegerField(null=True, blank=True)
     cond_sa = models.IntegerField(null=True, blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'sharing_permissions'
 
@@ -262,7 +262,7 @@ class UserCourseData(models.Model):
     user_id = models.BigIntegerField()
     json = models.TextField()
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'user_course_data'
 
@@ -286,7 +286,7 @@ class VideoAnnotations(models.Model):
     title = models.TextField(blank=True)
     description = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'video_annotations'
 
@@ -296,7 +296,7 @@ class VideoQuizSubmissions(models.Model):
     video_id = models.BigIntegerField()
     json = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'video_quiz_submissions'
 
@@ -307,7 +307,7 @@ class VideoQuizzes(models.Model):
     video_id = models.BigIntegerField()
     json = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'video_quizzes'
 
@@ -321,7 +321,7 @@ class Videos(models.Model):
     index = models.IntegerField(null=True, blank=True)
     segments = models.TextField(blank=True)
     time_created = models.DateField(auto_now=False, auto_now_add=True)
-last_updated = models.DateField(auto_now=True, auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'videos'
 
