@@ -28,16 +28,16 @@ class Institution(models.Model):
 
 class Course(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    institution = models.ForeignKey(Institution)
+    institution = models.ForeignKey(Institution, db_index=True)
     code = models.TextField(blank=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     listing_description = models.TextField(blank=True)
     mode = models.TextField(blank=True)
     description = models.TextField(blank=True)
     staff_emails = models.TextField(blank=True)
-    instructors = models.ManyToManyField(User) #many-to-many
-    tas = models.ManyToManyField(User, null=True) #many-to-many
-    readonly_tas = models.ManyToManyField(User, null=True) #many-to-many
+    instructors = models.ManyToManyField(User, related_name='instructors') #many-to-many
+    tas = models.ManyToManyField(User, related_name='tas', null=True) #many-to-many
+    readonly_tas = models.ManyToManyField(User, related_name='readonly_tas', null=True) #many-to-many
     term = models.TextField(blank=True)
     year = models.IntegerField(null=True, blank=True)
     calendar_start = models.DateField(null=True, blank=True)
@@ -60,7 +60,7 @@ class Course(models.Model):
 class AdditionalPage(models.Model):
     id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, db_index=True)
     access_id = models.TextField(blank=True)
     write_access = models.TextField(blank=True)
     title = models.CharField(max_length=511, null=True, blank=True)
@@ -76,7 +76,7 @@ class AdditionalPage(models.Model):
 class Announcement(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, db_index=True)
     access_id = models.TextField(blank=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     description = models.TextField(blank=True)
@@ -90,7 +90,7 @@ class Announcement(models.Model):
 #Assignments, AssigmentGrades, AssignmentSubmissions might need ondelete for User
 class AssignmentCategory(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Courses)
+    course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -102,8 +102,8 @@ class AssignmentCategory(models.Model):
 class Assignment(models.Model):
     id = models.BigIntegerField(primary_key=True)
     #owner_id = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
-    category_id = models.ForeignKey(AssignmentCategory)
+    course = models.ForeignKey(Course, db_index=True)
+    category_id = models.ForeignKey(AssignmentCategory, db_index=True)
     access_id = models.TextField(blank=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     description = models.TextField(blank=True)
@@ -115,11 +115,12 @@ class Assignment(models.Model):
         db_table = u'assignments'
 
 #deleted course
+#Need to have a double-column (assignment, user) index here
 class AssignmentGrade(models.Model):
-    #course = models.ForeignKey(Courses)
+    #course = models.ForeignKey(Course)
     id = models.BigIntegerField(primary_key=True)
     assignment = models.ForeignKey(Assignment)
-    gradee = models.ForeignKey(User)
+    user = models.ForeignKey(User)
     json = models.TextField()
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -127,11 +128,12 @@ class AssignmentGrade(models.Model):
         db_table = u'assignment_grades'
 
 #deleted course
+#Need to have a double-column (assignmer, owner) index here
 class AssignmentSubmission(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
-    assignmet = models.ForeignKey(Assignment)
-    #course = models.ForeignKey(Courses)
+    assignment = models.ForeignKey(Assignment)
+    #course = models.ForeignKey(Course)
     json = models.TextField()
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -141,6 +143,7 @@ class AssignmentSubmission(models.Model):
 
 #what's the difference between this and UserCourseData
 #they have the same fields
+#need to have (course, user) index here
 class CourseAnalytics(models.Model):
     id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course)
@@ -153,7 +156,7 @@ class CourseAnalytics(models.Model):
 
 class CourseMap(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, db_index=True)
     json = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -161,6 +164,7 @@ class CourseMap(models.Model):
         db_table = u'course_maps'
 
 #Let's use django file support or something else instead, but keep for now
+#Need (course, user) index here
 class File(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
@@ -216,7 +220,7 @@ class Lecture(models.Model):
     id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User)
     access_id = models.TextField(blank=True)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     description = models.TextField(blank=True)
     calendar_start = models.DateTimeField(null=True, blank=True)
@@ -242,7 +246,7 @@ class Officehour(models.Model):
 
 class StudentSection(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     capacity = models.IntegerField(default=999)
     members = models.ManyToManyField(User)
@@ -269,7 +273,7 @@ class UserCourseData(models.Model):
 #https://docs.djangoproject.com/en/dev/topics/auth/#django.contrib.auth.models.User
 class UserProfile(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, db_index=True)
     is_instructor = models.IntegerField(null=True, blank=True)
     site_data = models.TextField(blank=True)
     class Meta:
@@ -278,12 +282,12 @@ class UserProfile(models.Model):
 
 class VideoTopic(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)    
     class Meta:
-        db_table = u'video_topics
+        db_table = u'video_topics'
 
 #do Videos need owners?  What are index and segments and why are they text fields
 #commenting out for now
@@ -291,8 +295,8 @@ class Video(models.Model):
     id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(Usernull=True, blank=True)
     access_id = models.TextField(blank=True)
-    course = models.ForeignKey(Courses)
-    topic = models.ForeignKey(VideoTopic, null=True)
+    course = models.ForeignKey(Course, db_index=True)
+    topic = models.ForeignKey(VideoTopic, null=True, db_index=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     description = models.TextField(blank=True)
     #index = models.IntegerField(null=True, blank=True)
@@ -305,7 +309,7 @@ class Video(models.Model):
 #video quizzes do not need owners or access
 class VideoQuiz(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    video = models.ForeignKey(Video)
+    video = models.ForeignKey(Video, db_index=True)
     json = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -314,13 +318,15 @@ class VideoQuiz(models.Model):
 
 class VideoQuizQuestion(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    video_quiz = models.ForeignKey(VideoQuiz)
+    video_quiz = models.ForeignKey(VideoQuiz, db_index=True)
     time_in_video = models.IntegerField(default=0)
     title = models.CharField(max_length=511, null=True, blank=True)
     json = models.TextField(blank=True)
     class Meta:
         db_table = u'video_quiz_questions'
 
+
+#Need (video,user) index
 class VideoQuizSubmission(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
@@ -335,6 +341,7 @@ class VideoQuizSubmission(models.Model):
 
 
 #video annotations may not need access_id
+#need (video,owner) index
 class VideoAnnotations(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User, null=True, blank=True)
@@ -355,7 +362,7 @@ class VideoAnnotations(models.Model):
 #what custom features do we actually need here?
 class Roles(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Courses)
+    course = models.ForeignKey(Course)
     title = models.CharField(max_length=765)
     is_staff = models.IntegerField(null=True, blank=True)
     privileges = models.TextField(blank=True)
