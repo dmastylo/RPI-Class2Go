@@ -416,33 +416,31 @@ function showExplanation() {
     $('div.inVidExplanation').html(explanation);
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,"correct-dialog"]);
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,"wrong-dialog"]);
-/*
+
     $('#wrong-dialog').dialog('option', 'buttons',	
-			      {
-				  "Try Again": function() {
-				      $( this ).dialog( "close" );
-				      $('div.inVidExplanation').html("");
-				      
-				      // reset buttons again
-				      $('#wrong-dialog').dialog('option','buttons',{
-					  "Show Explanation": function() {
-					      showExplanation();
-					  },
-					  "Try Again": function() {
-					      $( this ).dialog( "close" );
-					      $('div.inVidExplanation').html("");
-					      
-					  }
-				      });
-				  },
-				  "Continue Video": function() {
-				      $( this ).dialog( "close" );
-				      $('div.inVidExplanation').html("");
-				      closeQPane();
-				  }
-			      }
-			     );
-*/
+        {
+        "Try Again": function() {
+            $( this ).dialog( "close" );
+            $('div.inVidExplanation').html("");
+
+            // reset buttons again
+            $('#wrong-dialog').dialog('option','buttons',{
+                "Show Explanation": function() {
+                  showExplanation();
+                },
+                "Try Again": function() {
+                  $( this ).dialog( "close" );
+                  $('div.inVidExplanation').html("");
+                }
+            });
+            },
+        "Continue Video": function() {
+            $( this ).dialog( "close" );
+            $('div.inVidExplanation').html("");
+            closeQPane();
+            }
+        }
+    );
 }
 
 function skipQ() {
