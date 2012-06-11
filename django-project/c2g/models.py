@@ -117,10 +117,10 @@ class Assignment(models.Model):
 #deleted course
 #Need to have a double-column (assignment, user) index here
 class AssignmentGrade(models.Model):
-    #course = models.ForeignKey(Course)
     id = models.BigIntegerField(primary_key=True)
-    assignment = models.ForeignKey(Assignment)
     user = models.ForeignKey(User)
+    #course = models.ForeignKey(Course)
+    assignment = models.ForeignKey(Assignment)
     json = models.TextField()
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -132,8 +132,8 @@ class AssignmentGrade(models.Model):
 class AssignmentSubmission(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
-    assignment = models.ForeignKey(Assignment)
     #course = models.ForeignKey(Course)
+    assignment = models.ForeignKey(Assignment)
     json = models.TextField()
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -143,11 +143,11 @@ class AssignmentSubmission(models.Model):
 
 #what's the difference between this and UserCourseData
 #they have the same fields
-#need to have (course, user) index here
+#need to have (user,course) index here
 class CourseAnalytics(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course)
     user = models.ForeignKey(User, null=True)
+    course = models.ForeignKey(Course)
     json = models.TextField()
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -164,7 +164,7 @@ class CourseMap(models.Model):
         db_table = u'course_maps'
 
 #Let's use django file support or something else instead, but keep for now
-#Need (course, user) index here
+#Need (owner,course) index here
 class File(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
@@ -219,8 +219,8 @@ class File(models.Model):
 class Lecture(models.Model):
     id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User)
-    access_id = models.TextField(blank=True)
     course = models.ForeignKey(Course, db_index=True)
+    access_id = models.TextField(blank=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     description = models.TextField(blank=True)
     calendar_start = models.DateTimeField(null=True, blank=True)
@@ -260,8 +260,8 @@ class StudentSection(models.Model):
 #they have the same fields
 class UserCourseData(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course)
     user = models.ForeignKey(User)
+    course = models.ForeignKey(Course)
     json = models.TextField()
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -293,10 +293,10 @@ class VideoTopic(models.Model):
 #commenting out for now
 class Video(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    #owner = models.ForeignKey(Usernull=True, blank=True)
-    access_id = models.TextField(blank=True)
+    #owner = models.ForeignKey(User, null=True, blank=True)
     course = models.ForeignKey(Course, db_index=True)
     topic = models.ForeignKey(VideoTopic, null=True, db_index=True)
+    access_id = models.TextField(blank=True)
     title = models.CharField(max_length=511, null=True, blank=True)
     description = models.TextField(blank=True)
     #index = models.IntegerField(null=True, blank=True)
@@ -326,7 +326,7 @@ class VideoQuizQuestion(models.Model):
         db_table = u'video_quiz_questions'
 
 
-#Need (video,user) index
+#Need (owner, question) index
 class VideoQuizSubmission(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
@@ -341,7 +341,7 @@ class VideoQuizSubmission(models.Model):
 
 
 #video annotations may not need access_id
-#need (video,owner) index
+#need (owner,video) index
 class VideoAnnotations(models.Model):
     id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User, null=True, blank=True)
@@ -376,7 +376,7 @@ class Roles(models.Model):
 
 class SharingPermissions(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.BigIntegerField()
+    object_id = models.BigIntegerField(db_index=True)
     type = models.TextField(blank=True)
     licensee_id = models.BigIntegerField()
     cond_by = models.IntegerField(null=True, blank=True)
