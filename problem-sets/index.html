@@ -429,7 +429,10 @@
                                                 
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub,'q2Explanation']);
 
-                $('#qexplain').val('Continue');                        
+                /* Changing to "Continue" at this point is unnecessary, as lecture/slide content
+                does not have a "Continue" button. We just hide the "Show Explanation" button */
+                //$('#qexplain').val('Continue');                        
+                $('#qexplain').hide();                        
                     
             }
                 
