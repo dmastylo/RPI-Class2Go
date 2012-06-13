@@ -1,5 +1,6 @@
 <?php
 
+
 $xmlString = file_get_contents('nlp_example_quiz.xml');
 $xmlObj = simplexml_load_string($xmlString,"SimpleXMLElement", LIBXML_NOCDATA);
 
