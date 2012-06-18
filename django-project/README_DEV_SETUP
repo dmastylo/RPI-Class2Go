@@ -56,20 +56,20 @@ prefix for these.
     You can tell this because is puts an environment indicator at
     the beginning of your prompt
 
-9. Install django itself (this will be inside the virtualenv)
+10. Install django itself (this will be inside the virtualenv)
     pip install django
 
-10. Install MySQL-python (this will be inside the virtualenv)
+11. Install MySQL-python (this will be inside the virtualenv)
     pip install MySQL-python
 
-11. Install python image library (this will be inside the virtualenv)
+12. Install python image library (this will be inside the virtualenv)
     pip install PIL
 
-12. Install South, the database schema migration tool: (this will
+13. Install South, the database schema migration tool: (this will
     be inside the virtualenv)
     easy_install South
 
-13. Setup initial db.
+14. Setup initial db.
     ./manage.py syncdb
     ./manage.py migrate
 
