@@ -10,6 +10,11 @@ General Instructions
 For MAC OS-X Lion: Instructions mainly taken from 
 http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-and-homebrew/
 
+Some people don't have their normal user set up with write permissions
+for all these commands that modify the environment (brew, easy_install,
+pip).  For all of those you should plan on running your own sudo
+prefix for these.
+
 =========================================
 
 1. Install XCode 
