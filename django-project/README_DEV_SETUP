@@ -7,15 +7,15 @@ General Instructions
 * Set-up Django
 * Set-up Mysql
 
-
 For MAC OS-X Lion: Instructions mainly taken from 
 http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-and-homebrew/
 
+=========================================
 
-1. Install XCode -- Apple App Store
+1. Install XCode 
+    Apple App Store
 
 2. Within XCode, add the command line tools
-
     Preferences -> Download Item -> "Command Line Tools" Install button
 
 3. Install Homebrew:
@@ -37,26 +37,36 @@ http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-an
 7. Install python's virtual env
     pip install virtualenv 
 
-8. Use the class2go virtual env 
-    - django-class2go directory under the directory where this README is found
-    - hopefully this will make steps 9-11 already complete when you
-      check out the git repo.  You can run the commands for 9-11.
-      The repo will at least save you some downloads, hopefully).
-      source django-class2go/bin/activate
+8. Create the class2go virtual env 
+    virtualenv django-class2go --no-site-packages    
+
+    This should create the django-class2go directory under the
+    directory where this README is found.  All our django stuff
+    will happen in there now.
+
+9. Start using the virtual environment that we just created.  
+    . ./django-class2go/bin/activate
+
+    WARNING: you need to do this from whatever shell you're using.
+    You can tell this because is puts an environment indicator at
+    the beginning of your prompt
 
 9. Install django itself (this will be inside the virtualenv)
     pip install django
 
 10. Install MySQL-python (this will be inside the virtualenv)
-    pip install http://downloads.sourceforge.net/project/mysql-python/mysql-python-test/1.2.3c1/MySQL-python-1.2.3c1.tar.gz?use_mirror=cdnetworks-us-2 
+    pip install MySQL-python
 
 11. Install python image library (this will be inside the virtualenv)
     pip install PIL
 
-12. Install South, the database schema migration tool: (this will be inside the virtualenv)
+12. Install South, the database schema migration tool: (this will
+    be inside the virtualenv)
     easy_install South
 
 13. Setup initial db.
     ./manage.py syncdb
     ./manage.py migrate
 
+At this point you should be able to look at the django database in
+your local mysql and see a bunch of c2g_* tables.  Yay.
