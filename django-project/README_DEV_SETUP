@@ -37,26 +37,26 @@ http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-an
 7. Install python's virtual env
     pip install virtualenv 
 
-7. Use the class2go virtual env 
+8. Use the class2go virtual env 
     - django-class2go directory under the directory where this README is found
-    - hopefully this will make steps 7-10 already complete when you
-      check out the git repo.  You can run the commands for 7-10.
+    - hopefully this will make steps 9-11 already complete when you
+      check out the git repo.  You can run the commands for 9-11.
       The repo will at least save you some downloads, hopefully).
       source django-class2go/bin/activate
 
-7. Install django itself (this will be inside the virtualenv)
+9. Install django itself (this will be inside the virtualenv)
     pip install django
 
-8. Install MySQL-python (this will be inside the virtualenv)
+10. Install MySQL-python (this will be inside the virtualenv)
     pip install http://downloads.sourceforge.net/project/mysql-python/mysql-python-test/1.2.3c1/MySQL-python-1.2.3c1.tar.gz?use_mirror=cdnetworks-us-2 
 
-9. Install python image library (this will be inside the virtualenv)
+11. Install python image library (this will be inside the virtualenv)
     pip install PIL
 
-10. Install South, the database schema migration tool: (this will be inside the virtualenv)
+12. Install South, the database schema migration tool: (this will be inside the virtualenv)
     easy_install South
 
-11. Setup initial db.
+13. Setup initial db.
     ./manage.py syncdb
     ./manage.py migrate
 
