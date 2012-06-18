@@ -1,0 +1,54 @@
+Setting up a dev environment for class2go
+=========================================
+
+General Instructions
+* Set-up Python
+* Set-up Python's virtual env
+* Set-up Django
+* Set-up Mysql
+
+
+
+For MAC OS-X Lion: Instructions mainly taken from 
+http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-and-homebrew/
+
+1. Install Homebrew:
+/usr/bin/ruby -e "$(/usr/bin/curl -fksSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)"
+
+2. Install Python:
+brew install readline sqlite gdbm 
+brew install python --universal --framework 
+
+3. Install mysql
+brew install mysql
+(Optional but useful for looking at the database)
+Install phpmyadmin (?!) following the directions here:
+http://www.djangoapp.com/blog/2011/07/24/installing-phpmyadmin-on-mac-os-x-lion/
+
+4. Install pip, a python package manager
+easy_install pip
+
+5. Install python's virtual env
+pip install virtualenv 
+
+6. Use the class2go virtual env (django-class2go directory under the directory where this README is found)
+(hopefully this will make steps 7-10 already complete when you check out the git repo.  You can run the 
+commands for 7-10.  The repo will at least save you some downloads, hopefully).
+source django-class2go/bin/activate 
+
+7. Install django itself (this will be inside the virtualenv)
+pip install django
+
+8. Install MySQL-python (this will be inside the virtualenv)
+pip install http://downloads.sourceforge.net/project/mysql-python/mysql-python-test/1.2.3c1/MySQL-python-1.2.3c1.tar.gz?use_mirror=cdnetworks-us-2 
+
+9. Install python image library (this will be inside the virtualenv)
+pip install PIL
+
+10. Install South, the database schema migration tool: (this will be inside the virtualenv)
+easy_install South
+
+11. Setup initial db.
+./manage.py syncdb
+./manage.py migrate
+
