@@ -15,6 +15,8 @@ for all these commands that modify the environment (brew, easy_install,
 pip).  For all of those you should plan on running your own sudo
 prefix for these.
 
+For Windows with Eclipse: see below.
+
 =========================================
 
 1. Install XCode 
@@ -75,3 +77,80 @@ prefix for these.
 
 At this point you should be able to look at the django database in
 your local mysql and see a bunch of c2g_* tables.  Yay.
+
+
+=========================================
+
+For Windows with Eclipse and WAMP (just in case your already using this for other projects. If you have any
+questions you can always ask me: (David))
+
+The following versions seem to be compatible:
+
+Python: 2.7.3
+Eclipse for PHP: Helios (http://download.eclipse.org/releases/helios)
+PyDev plugin for Eclipse: 2.5.0 (http://pydev.org/updates)
+Egit plugin for Eclipse: (http://download.eclipse.org/egit/updates)
+WAMPServer: 2.1 
+
+General process is:
+1. Install Eclipse
+
+2. Install Egit and configure it to the github repos (https://github.com/jbau/class2go)
+	For this you would need Jason to set you up with access to this repos.
+	Note, when configuring the Remote Push Url you'll need to add ".git" on the end:
+	(https://github.com/jbau/class2go.git)
+	
+3. Check out the repos to a local clone using import.
+
+4. Install Python
+
+5. Install PyDev
+
+6. Install pip
+   (http://pypi.python.org/pypi/setuptools) Choose latest appropriate for your Python version
+   Install it.
+   Add c:\Python27\Scripts to your PATH
+   Open Cygwin and run: easy_install pip
+   
+7. Install python's virtual env
+    pip install virtualenv 
+
+8. Create the class2go virtual env 
+    virtualenv django-class2go --no-site-packages    
+
+    This should create the django-class2go directory under the
+    directory where this README is found.  All our django stuff
+    will happen in there now.
+
+9. Start using the virtual environment that we just created.  
+    . ./django-class2go/bin/activate
+
+    WARNING: you need to do this from whatever shell you're using.
+    You can tell this because is puts an environment indicator at
+    the beginning of your prompt
+   
+10. Install Django
+	pip install django
+	
+11. Install MySQL-python (this will be inside the virtualenv)
+    pip install MySQL-python
+ 
+12. Install python image library (this will be inside the virtualenv)
+    pip install PIL
+
+13. Install South, the database schema migration tool: (this will
+    be inside the virtualenv)
+    easy_install South
+
+14. Setup initial db.
+	Before doing the following steps you'll need to:
+	- Create a new db in MySQL
+	- Using the file database_example.py as an example, create a file named "database.py" 
+	at the same level and put your db connect info in there.
+
+	Also, the following didn't work for me in a Cygwin window (syncdb wasn't able to output to the window) 
+	so this may be best done at the dos prompt. 
+	If it doesn't work first time you can always delete the db and try again.
+	
+    ./manage.py syncdb
+    ./manage.py migrate
