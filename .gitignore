@@ -1,0 +1,17 @@
+django-project/database.py
+
+*~
+
+*.pyc
+
+.DS_Store
+
+js/demorun.js~
+
+js/quizrun.js~
+
+problem-sets/from-cware-dev2/problem_set_json.tgz
+
+problem-sets/quizzes/Advanced-Maxent/test_json_load.html~
+
+django-project/django-class2go

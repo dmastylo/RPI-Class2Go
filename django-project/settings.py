@@ -1,6 +1,7 @@
 # Django settings for class2go project.
 
 from database import DATABASES
+from os import path
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -74,8 +75,7 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'i-+@&1udfb#1s*ita_n0qtbs-rj)y0so5lh*7z7mw!$j=9@r18'
+
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -92,9 +92,16 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
+<<<<<<< HEAD
 ROOT_URLCONF = 'django-project.urls'
+=======
+ROOT_URLCONF = 'urls'
 
+>>>>>>> cbcd615057832bbfafcde350fda8cb457b446f70
+
+thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
+    thispath+'/templates'
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -108,11 +115,18 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
+<<<<<<< HEAD
     # 'django.contrib.admindocs',
     #'south',
+=======
+    'django.contrib.admindocs',
+    'south',
+>>>>>>> cbcd615057832bbfafcde350fda8cb457b446f70
     'c2g',
+    #'users',
+    'accounts',
 )
 
 # A sample logging configuration. The only tangible logging
