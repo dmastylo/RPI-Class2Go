@@ -14,9 +14,10 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 class Institution(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+#    #id = models.BigIntegerField(primary_key=True)
     title = models.TextField()
     country = models.TextField(blank=True)
     city = models.TextField(blank=True)
@@ -27,7 +28,7 @@ class Institution(models.Model):
         db_table = u'c2g_institutions'
 
 class Course(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+#    #id = models.BigIntegerField(primary_key=True)
     institution = models.ForeignKey(Institution, db_index=True)
     code = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -58,7 +59,7 @@ class Course(models.Model):
 #here, so not every item need an owner.
 #why overlap of write_access and access_id?
 class AdditionalPage(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+#   #id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     access_id = models.TextField(blank=True)
@@ -74,7 +75,7 @@ class AdditionalPage(models.Model):
 #owner is person who posted
 #does it need access_id?
 class Announcement(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     access_id = models.TextField(blank=True)
@@ -89,7 +90,7 @@ class Announcement(models.Model):
 ##ASSIGNMENTS SECTION####
 #Assignments, AssigmentGrades, AssignmentSubmissions might need ondelete for User
 class AssignmentCategory(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -100,7 +101,7 @@ class AssignmentCategory(models.Model):
 #do we really need both an owner_id and an access_id?  There's no social network
 #here, so not every item need an owner.
 class Assignment(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     #owner_id = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     category_id = models.ForeignKey(AssignmentCategory, db_index=True)
@@ -117,7 +118,7 @@ class Assignment(models.Model):
 #deleted course
 #Need to have a double-column (assignment, user) index here
 class AssignmentGrade(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     user = models.ForeignKey(User)
     #course = models.ForeignKey(Course)
     assignment = models.ForeignKey(Assignment)
@@ -130,7 +131,7 @@ class AssignmentGrade(models.Model):
 #deleted course
 #Need to have a double-column (assignmer, owner) index here
 class AssignmentSubmission(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     #course = models.ForeignKey(Course)
     assignment = models.ForeignKey(Assignment)
@@ -145,7 +146,7 @@ class AssignmentSubmission(models.Model):
 #they have the same fields
 #need to have (user,course) index here
 class CourseAnalytics(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     user = models.ForeignKey(User, null=True)
     course = models.ForeignKey(Course)
     json = models.TextField()
@@ -155,7 +156,7 @@ class CourseAnalytics(models.Model):
         db_table = u'c2g_course_analytics'
 
 class CourseMap(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     json = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -166,7 +167,7 @@ class CourseMap(models.Model):
 #Let's use django file support or something else instead, but keep for now
 #Need (owner,course) index here
 class File(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course)
     access_id = models.TextField(blank=True)
@@ -180,7 +181,7 @@ class File(models.Model):
 #Let's completely delegate Forums elsewhere
 #I have not edited these at all
 #class ForumPostReplies(models.Model):
-#    id = models.BigIntegerField(primary_key=True)
+#    #id = models.BigIntegerField(primary_key=True)
 #    owner_id = models.IntegerField(null=True, blank=True)
 #    forum_id = models.BigIntegerField()
 #    forum_post_id = models.BigIntegerField()
@@ -192,7 +193,7 @@ class File(models.Model):
 #        db_table = u'c2g_forum_post_replies'
 #
 #class ForumPosts(models.Model):
-#    id = models.BigIntegerField(primary_key=True)
+#    #id = models.BigIntegerField(primary_key=True)
 #    owner_id = models.IntegerField(null=True, blank=True)
 #    forum_id = models.BigIntegerField()
 #    title = models.CharField(max_length=255, null=True, blank=True)
@@ -204,7 +205,7 @@ class File(models.Model):
 #        db_table = u'c2g_forum_posts'
 #
 #class Forums(models.Model):
-#    id = models.BigIntegerField(primary_key=True)
+#    #id = models.BigIntegerField(primary_key=True)
 #    access_id = models.TextField(blank=True)
 #    course = models.BigIntegerField()
 #    title = models.CharField(max_length=255, null=True, blank=True)
@@ -217,7 +218,7 @@ class File(models.Model):
 
 #Again, do lectures need owners?
 class Lecture(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     access_id = models.TextField(blank=True)
@@ -231,7 +232,7 @@ class Lecture(models.Model):
         db_table = u'c2g_lectures'
 
 class Officehour(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -245,7 +246,7 @@ class Officehour(models.Model):
 
 
 class StudentSection(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     capacity = models.IntegerField(default=999)
@@ -259,7 +260,7 @@ class StudentSection(models.Model):
 #what's the difference between this and CourseAnalytics
 #they have the same fields
 class UserCourseData(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     user = models.ForeignKey(User)
     course = models.ForeignKey(Course)
     json = models.TextField()
@@ -272,16 +273,21 @@ class UserCourseData(models.Model):
 #Uses one-to-one as per django recommendations at
 #https://docs.djangoproject.com/en/dev/topics/auth/#django.contrib.auth.models.User
 class UserProfile(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, db_index=True)
-    is_instructor = models.IntegerField(null=True, blank=True)
+    is_instructor = models.IntegerField(default=False, blank=True)
     site_data = models.TextField(blank=True)
     class Meta:
         db_table = u'c2g_user_profiles'
 
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance, site_data='')
+
+post_save.connect(create_user_profile, sender=User)
 
 class VideoTopic(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -292,7 +298,7 @@ class VideoTopic(models.Model):
 #do Videos need owners?  What are index and segments and why are they text fields
 #commenting out for now
 class Video(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User, null=True, blank=True)
     course = models.ForeignKey(Course, db_index=True)
     topic = models.ForeignKey(VideoTopic, null=True, db_index=True)
@@ -308,7 +314,7 @@ class Video(models.Model):
 
 #video quizzes do not need owners or access
 class VideoQuiz(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     video = models.ForeignKey(Video, db_index=True)
     json = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -317,7 +323,7 @@ class VideoQuiz(models.Model):
         db_table = u'c2g_video_quizzes'
 
 class VideoQuizQuestion(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     video_quiz = models.ForeignKey(VideoQuiz, db_index=True)
     time_in_video = models.IntegerField(default=0)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -328,7 +334,7 @@ class VideoQuizQuestion(models.Model):
 
 #Need (owner, question) index
 class VideoQuizSubmission(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     question = models.ForeignKey(VideoQuizQuestion) #
     time_in_video = models.IntegerField(default=0)
@@ -343,7 +349,7 @@ class VideoQuizSubmission(models.Model):
 #video annotations may not need access_id
 #need (owner,video) index
 class VideoAnnotation(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User, null=True, blank=True)
     #access_id = models.TextField(blank=True)
     video = models.ForeignKey(Video)
@@ -361,7 +367,7 @@ class VideoAnnotation(models.Model):
 #For roles, can we make do somehow with built-in django permissions
 #what custom features do we actually need here?
 class Role(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course)
     title = models.CharField(max_length=255)
     is_staff = models.IntegerField(null=True, blank=True)
@@ -375,7 +381,7 @@ class Role(models.Model):
 
 
 class SharingPermission(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    #id = models.BigIntegerField(primary_key=True)
     object_id = models.BigIntegerField(db_index=True)
     type = models.TextField(blank=True)
     licensee_id = models.BigIntegerField()

@@ -6,13 +6,14 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^$', 'c2g.views.home'),
+                       #url(r'^$', 'c2g.views.home'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
 
+    url(r'^accounts/', include('registration.backends.simple.urls')),
                        
     # accounts app for user management
-    url(r'^accounts/', include('accounts.urls')),
+    #url(r'^accounts/', include('accounts.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
