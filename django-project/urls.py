@@ -6,6 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
+    url(r'^$', 'c2g.views.home'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
 
@@ -18,7 +19,5 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-
-    url(r'^$', 'c2g.views.home', name='home'),
 
 )
