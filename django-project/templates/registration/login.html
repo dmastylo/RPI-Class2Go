@@ -7,6 +7,13 @@
 <p>Your username and password didn't match a credential in our system. Please try again.</p>
 {% endif %}
 
+
+{% if user.is_authenticated %}
+
+<p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+
+{% else %}
+
 <form method="post" action="{% url 'auth_login' %}">  
 {% csrf_token %}
 <table>
@@ -24,4 +31,6 @@
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
+{% endif %}
 {% endblock %}
+ 
