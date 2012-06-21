@@ -6,4 +6,6 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('',
     url(r'^$', 'accounts.views.index'),
     url(r'^login/', 'django.contrib.auth.views.login', {'template_name':'accounts/login.html'}, name="login-form"),
+    url(r'^logout/', 'django.contrib.auth.views.logout'),
+
 )
