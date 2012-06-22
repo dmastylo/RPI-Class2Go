@@ -1,4 +1,9 @@
 from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from django.template import Context, loader
+from django.template import RequestContext
+import json
+
 import c2g.lib.page_factory
 import c2g.templates.core.topbars
 
@@ -23,21 +28,18 @@ def home(request):
 		
 		'content': {
 			'l': {
-				'width': 200,
 				'content': "<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>",
 			},
 			'm': {
-				#'width': 800,
-				'min-width': 400,
-				'max-width': 800,
 				'content': "<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>",
 			},
 			'r': {
-				'width': 200,
 				'content': "<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>",
 			},
 		},
 	}
 	
-	html = GenPageHTML(head, body)
-	return HttpResponse(html)
+	#html = GenPageHTML(head, body)
+	#return HttpResponse(html)
+	layout = {'l': 200, 'm': 800, 'r': 200}
+	return render_to_response('base.html', {'SITE_URL': SITE_URL, 'STATIC_URL': STATIC_URL, 'head': head, 'body': body, 'layout': json.dumps(layout), 'request': request}, context_instance=RequestContext(request))

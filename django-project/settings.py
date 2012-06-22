@@ -1,6 +1,6 @@
 # Django settings for class2go project.
 
-from database import DATABASES
+from database import DATABASES, SECRET_KEY
 from os import path
 
 DEBUG = True
@@ -92,12 +92,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-<<<<<<< HEAD
-ROOT_URLCONF = 'django-project.urls'
-=======
 ROOT_URLCONF = 'urls'
-
->>>>>>> cbcd615057832bbfafcde350fda8cb457b446f70
 
 thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
@@ -105,6 +100,10 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+	'django.contrib.auth.context_processors.auth',
 )
 
 INSTALLED_APPS = (
@@ -117,13 +116,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-<<<<<<< HEAD
-    # 'django.contrib.admindocs',
-    #'south',
-=======
     'django.contrib.admindocs',
     'south',
->>>>>>> cbcd615057832bbfafcde350fda8cb457b446f70
     'c2g',
     #'users',
     'accounts',
