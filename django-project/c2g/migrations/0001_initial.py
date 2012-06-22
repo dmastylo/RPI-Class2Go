@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Institution'
         db.create_table(u'c2g_institutions', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.TextField')()),
             ('country', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('city', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -22,7 +22,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Course'
         db.create_table(u'c2g_courses', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('institution', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Institution'])),
             ('code', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
@@ -70,7 +70,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'AdditionalPage'
         db.create_table(u'c2g_additional_pages', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('access_id', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('write_access', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -84,7 +84,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Announcement'
         db.create_table(u'c2g_announcements', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('access_id', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -97,7 +97,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'AssignmentCategory'
         db.create_table(u'c2g_assignment_categories', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
@@ -107,7 +107,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Assignment'
         db.create_table(u'c2g_assignments', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('category_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.AssignmentCategory'])),
             ('access_id', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -122,7 +122,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'AssignmentGrade'
         db.create_table(u'c2g_assignment_grades', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('assignment', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Assignment'])),
             ('json', self.gf('django.db.models.fields.TextField')()),
@@ -133,7 +133,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'AssignmentSubmission'
         db.create_table(u'c2g_assignment_submissions', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('assignment', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Assignment'])),
             ('json', self.gf('django.db.models.fields.TextField')()),
@@ -144,7 +144,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'CourseAnalytics'
         db.create_table(u'c2g_course_analytics', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('json', self.gf('django.db.models.fields.TextField')()),
@@ -155,7 +155,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'CourseMap'
         db.create_table(u'c2g_course_maps', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('json', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
@@ -165,7 +165,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'File'
         db.create_table(u'c2g_files', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('access_id', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -178,7 +178,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Lecture'
         db.create_table(u'c2g_lectures', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('access_id', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
@@ -192,7 +192,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Officehour'
         db.create_table(u'c2g_officehours', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
@@ -206,7 +206,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'StudentSection'
         db.create_table(u'c2g_sections', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('capacity', self.gf('django.db.models.fields.IntegerField')(default=999)),
@@ -225,7 +225,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'UserCourseData'
         db.create_table(u'c2g_user_course_data', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('json', self.gf('django.db.models.fields.TextField')()),
@@ -236,16 +236,16 @@ class Migration(SchemaMigration):
 
         # Adding model 'UserProfile'
         db.create_table(u'c2g_user_profiles', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('is_instructor', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('is_instructor', self.gf('django.db.models.fields.IntegerField')(default=False, blank=True)),
             ('site_data', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
         db.send_create_signal('c2g', ['UserProfile'])
 
         # Adding model 'VideoTopic'
         db.create_table(u'c2g_video_topics', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
@@ -255,7 +255,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Video'
         db.create_table(u'c2g_videos', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('topic', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.VideoTopic'], null=True)),
             ('access_id', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -268,7 +268,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'VideoQuiz'
         db.create_table(u'c2g_video_quizzes', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('video', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Video'])),
             ('json', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
@@ -278,7 +278,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'VideoQuizQuestion'
         db.create_table(u'c2g_video_quiz_questions', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('video_quiz', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.VideoQuiz'])),
             ('time_in_video', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
@@ -288,7 +288,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'VideoQuizSubmission'
         db.create_table(u'c2g_video_quiz_submissions', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.VideoQuizQuestion'])),
             ('time_in_video', self.gf('django.db.models.fields.IntegerField')(default=0)),
@@ -301,7 +301,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'VideoAnnotation'
         db.create_table(u'c2g_video_annotations', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
             ('video', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Video'])),
             ('time_in_video', self.gf('django.db.models.fields.IntegerField')(default=0)),
@@ -314,7 +314,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Role'
         db.create_table(u'c2g_roles', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('is_staff', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
@@ -328,7 +328,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'SharingPermission'
         db.create_table(u'c2g_sharing_permissions', (
-            ('id', self.gf('django.db.models.fields.BigIntegerField')(primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('object_id', self.gf('django.db.models.fields.BigIntegerField')(db_index=True)),
             ('type', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('licensee_id', self.gf('django.db.models.fields.BigIntegerField')()),
@@ -463,7 +463,7 @@ class Migration(SchemaMigration):
             'access_id': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -475,7 +475,7 @@ class Migration(SchemaMigration):
             'access_id': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -489,7 +489,7 @@ class Migration(SchemaMigration):
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'due_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
@@ -497,7 +497,7 @@ class Migration(SchemaMigration):
         'c2g.assignmentcategory': {
             'Meta': {'object_name': 'AssignmentCategory', 'db_table': "u'c2g_assignment_categories'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
@@ -505,7 +505,7 @@ class Migration(SchemaMigration):
         'c2g.assignmentgrade': {
             'Meta': {'object_name': 'AssignmentGrade', 'db_table': "u'c2g_assignment_grades'"},
             'assignment': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Assignment']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -514,7 +514,7 @@ class Migration(SchemaMigration):
         'c2g.assignmentsubmission': {
             'Meta': {'object_name': 'AssignmentSubmission', 'db_table': "u'c2g_assignment_submissions'"},
             'assignment': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Assignment']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
@@ -527,7 +527,7 @@ class Migration(SchemaMigration):
             'code': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'feature_settings': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'institution': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Institution']"}),
             'instructors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'instructors'", 'symmetrical': 'False', 'to': "orm['auth.User']"}),
             'join_password': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -548,7 +548,7 @@ class Migration(SchemaMigration):
         'c2g.courseanalytics': {
             'Meta': {'object_name': 'CourseAnalytics', 'db_table': "u'c2g_course_analytics'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -557,7 +557,7 @@ class Migration(SchemaMigration):
         'c2g.coursemap': {
             'Meta': {'object_name': 'CourseMap', 'db_table': "u'c2g_course_maps'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
@@ -567,7 +567,7 @@ class Migration(SchemaMigration):
             'access_id': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -578,7 +578,7 @@ class Migration(SchemaMigration):
             'city': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'country': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'domains': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.TextField', [], {})
@@ -590,7 +590,7 @@ class Migration(SchemaMigration):
             'calendar_start': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
@@ -601,7 +601,7 @@ class Migration(SchemaMigration):
             'calendar_start': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -612,7 +612,7 @@ class Migration(SchemaMigration):
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'holder_count': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'holder_ids': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_staff': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'privileges': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -625,7 +625,7 @@ class Migration(SchemaMigration):
             'cond_nc': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'cond_nd': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'cond_sa': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'licensee_id': ('django.db.models.fields.BigIntegerField', [], {}),
             'object_id': ('django.db.models.fields.BigIntegerField', [], {'db_index': 'True'}),
@@ -636,7 +636,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'StudentSection', 'db_table': "u'c2g_sections'"},
             'capacity': ('django.db.models.fields.IntegerField', [], {'default': '999'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'members': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'symmetrical': 'False'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -645,7 +645,7 @@ class Migration(SchemaMigration):
         'c2g.usercoursedata': {
             'Meta': {'object_name': 'UserCourseData', 'db_table': "u'c2g_user_course_data'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -653,8 +653,8 @@ class Migration(SchemaMigration):
         },
         'c2g.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "u'c2g_user_profiles'"},
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
-            'is_instructor': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_instructor': ('django.db.models.fields.IntegerField', [], {'default': 'False', 'blank': 'True'}),
             'site_data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
@@ -663,7 +663,7 @@ class Migration(SchemaMigration):
             'access_id': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -672,7 +672,7 @@ class Migration(SchemaMigration):
         'c2g.videoannotation': {
             'Meta': {'object_name': 'VideoAnnotation', 'db_table': "u'c2g_video_annotations'"},
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -682,7 +682,7 @@ class Migration(SchemaMigration):
         },
         'c2g.videoquiz': {
             'Meta': {'object_name': 'VideoQuiz', 'db_table': "u'c2g_video_quizzes'"},
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -690,7 +690,7 @@ class Migration(SchemaMigration):
         },
         'c2g.videoquizquestion': {
             'Meta': {'object_name': 'VideoQuizQuestion', 'db_table': "u'c2g_video_quiz_questions'"},
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'time_in_video': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -698,7 +698,7 @@ class Migration(SchemaMigration):
         },
         'c2g.videoquizsubmission': {
             'Meta': {'object_name': 'VideoQuizSubmission', 'db_table': "u'c2g_video_quiz_submissions'"},
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
@@ -710,7 +710,7 @@ class Migration(SchemaMigration):
         'c2g.videotopic': {
             'Meta': {'object_name': 'VideoTopic', 'db_table': "u'c2g_video_topics'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})

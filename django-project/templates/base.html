@@ -49,7 +49,7 @@
 		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
 		<div id="loginreg_container">
 			<div id="reg_container">
-				<form action="{{ SITE_URL }}accounts/" method="PUT">
+				<form action="{{ SITE_URL }}accounts/register/" method="POST">
 					<h2 style='color:#800000;'>Registration</h2>
 					<table>
 						<tr>
@@ -70,14 +70,14 @@
 						</tr>
 						<tr>
 							<td><label for='reg_password'>Password:</label></td>
-							<td><input type='password' name='password' id='reg_password' style='width:180px;'></td>
+							<td><input type='password' name='password1' id='reg_password' style='width:180px;'></td>
 						</tr>
 						<tr>
 							<td><label for='reg_password2'>Re-enter password:</label></td>
-							<td><input type='password' id='reg_password2' style='width:180px;'></td>
+							<td><input type='password' name='password2' id='reg_password2' style='width:180px;'></td>
 						</tr>
 					</table>
-					<input type='submit' class='cw_button' value='Register' style='margin: 10px; float: right;'/>
+					<input type='submit' class='cw_button' value='Submit' style='margin: 10px; float: right;'/>
 					{% csrf_token %}
 				</form>
 			</div>

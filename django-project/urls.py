@@ -10,7 +10,9 @@ urlpatterns = patterns('',
     # url(r'^class2go/', include('class2go.foo.urls')),
 
     # accounts app for user management
-    url(r'^accounts/', include('accounts.urls')),
+    #url(r'^accounts/', include('accounts.urls')),
+	url(r'^accounts/profile/', 'accounts.views.profile'),
+	url(r'^accounts/', include('registration.backends.simple.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
