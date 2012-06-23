@@ -28,60 +28,30 @@
 				</div>
 			{% else %}
 				<input type='button' id='login_button' class='cw_button' value='Login' style='border: 0px; position: absolute; right: 30px; top: 12px; padding-bottom: 3px; width: 120px; font-size: 9pt;' onclick="$('#loginreg_canvas').show()"/>
+				<a href="{{ SITE_URL }}accounts/register/" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
 			{% endif %}
 		</div>
-		{% if 'l' in body.content %}
+		{% block content %}
+		{% if 'l' in layout %}
 		<div id="c2g_layout_l_column">
 			{% block l_column_content %}<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>{% endblock %}
 		</div>
 		{% endif %}
 		<div id="c2g_layout_m_column">
 			{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}
+			{{STATIC_URL}}
 		</div>
-		{% if 'r' in body.content %}
+		{% if 'r' in layout %}
 		<div id="c2g_layout_r_column">
 			{% block r_column_content %}<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>{% endblock %}
 		</div>
 		{% endif %}
+		{% endblock content %}
     </div>
 	
 	<div id="loginreg_canvas">
 		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
 		<div id="loginreg_container">
-			<div id="reg_container">
-				<form action="{{ SITE_URL }}accounts/register/" method="POST">
-					<h2 style='color:#800000;'>Registration</h2>
-					<table>
-						<tr>
-							<td><label for='reg_first_name'>First name:</label></td>
-							<td><input name='first_name' id='reg_first_name' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='reg_last_name'>Last name:</label></td>
-							<td><input name='last_name' id='reg_last_name' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='reg_email'>Email:</label></td>
-							<td><input name='email' id='reg_email' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='reg_username'>Username:</label></td>
-							<td><input name='username' id='reg_username' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='reg_password'>Password:</label></td>
-							<td><input type='password' name='password1' id='reg_password' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='reg_password2'>Re-enter password:</label></td>
-							<td><input type='password' name='password2' id='reg_password2' style='width:180px;'></td>
-						</tr>
-					</table>
-					<input type='submit' class='cw_button' value='Submit' style='margin: 10px; float: right;'/>
-					{% csrf_token %}
-				</form>
-			</div>
-			<div id="loginreg_separator"></div>
 			<div id="login_container">
 				<form action="{{ SITE_URL }}accounts/login/" method="POST">
 					<h2 style='color:#800000;'>Login</h2>

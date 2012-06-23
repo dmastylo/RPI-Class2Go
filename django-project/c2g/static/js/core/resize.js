@@ -51,8 +51,8 @@ function resize_page_contents() {
 	// Login-Reg Form Canvas
 	loginreg_container = document.getElementById('loginreg_container');
 	if (loginreg_container) {
-		loginreg_container.style.marginLeft = 0.5*(viewport_width - 600) + 'px';
-		loginreg_container.style.marginTop = 0.5*(viewport_height - 300) + 'px';
+		loginreg_container.style.marginLeft = 0.5*(viewport_width - 300) + 'px';
+		loginreg_container.style.marginTop = 0.5*(viewport_height - 170) + 'px';
 	}
 }
 

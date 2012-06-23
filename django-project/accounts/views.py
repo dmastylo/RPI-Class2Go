@@ -17,11 +17,11 @@ def index(request):
 
 def profile(request):
 	return redirect('c2g.views.home')
-"""	
+
 def logout(request):
 	logout(request)
 	return redirect('c2g.views.home')
-"""
+
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
