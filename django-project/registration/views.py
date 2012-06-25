@@ -10,6 +10,10 @@ from django.template import RequestContext
 
 from registration.backends import get_backend
 
+from django.contrib.sites.models import Site
+import settings
+import json
+
 
 def activate(request, backend,
              template_name='registration/activate.html',
@@ -199,6 +203,5 @@ def register(request, backend, success_url=None, form_class=None,
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
 
-    return render_to_response(template_name,
-                              {'form': form},
-                              context_instance=context)
+    layout = {'m': 800}
+    return render_to_response(template_name, {'form': form, 'SITE_URL': Site.objects.get_current().domain, 'STATIC_URL': settings.STATIC_URL, 'layout': json.dumps(layout), 'request': request}, context_instance=context)
