@@ -53,7 +53,11 @@
 		<div id="loginreg_container">
 			<div id="login_container">
 				<form action="{{ SITE_URL }}accounts/login/" method="POST">
-					<h2 style='color:#800000;'>Login</h2>
+					<table style='width: 250px;'><tr>
+						<td style='width: 200px;'><h2 style='color:#800000;'>Login</h2></td>
+						<td style='text-align: right;width: 50px;'><a href="javascript:$('#loginreg_canvas').hide()" style='float: right;'>Close</a></td>
+					</tr></table>
+					
 					<table>
 						<tr>
 							<td><label for='login_username'>Username:</label></td>
@@ -67,6 +71,8 @@
 					<input type='submit' class='cw_button' value='Login' style='margin: 10px; float: right;'/>
 					{% csrf_token %}
 				</form>
+				<br/><br/>
+				<label>Do not have a Class2Go account?</label>&nbsp;<a href='/accounts/register/'>Register</a>
 			</div>
 		</div>
 	</div>
