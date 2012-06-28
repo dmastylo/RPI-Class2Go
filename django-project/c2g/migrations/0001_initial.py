@@ -109,7 +109,7 @@ class Migration(SchemaMigration):
         db.create_table(u'c2g_assignments', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
-            ('category_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.AssignmentCategory'])),
+            ('category', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.AssignmentCategory'])),
             ('access_id', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -484,7 +484,7 @@ class Migration(SchemaMigration):
         'c2g.assignment': {
             'Meta': {'object_name': 'Assignment', 'db_table': "u'c2g_assignments'"},
             'access_id': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'category_id': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.AssignmentCategory']"}),
+            'category': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.AssignmentCategory']"}),
             'close_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),

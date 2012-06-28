@@ -94,10 +94,7 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'urls'
 
-<<<<<<< HEAD:django-project/settings.py
-=======
 
->>>>>>> 1a6f07f0fd2d954badaf100d75b3972355aa8fb4:django-project/settings_example.py
 thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
     thispath+'/templates'
