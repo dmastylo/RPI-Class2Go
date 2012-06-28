@@ -4,7 +4,7 @@
 {% block m_column_content %}
 
 
-<form action="{% url 'registration.views.register' %}" method="post">
+<form action="{{ SITE_URL }}/accounts/register/" method="post">
     {% csrf_token %}
     <table>
     {{ form.as_table }}
