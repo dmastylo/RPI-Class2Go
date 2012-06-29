@@ -202,5 +202,5 @@ def register(request, backend, success_url=None, form_class=None,
 
     layout = {'m': 800}
     return render_to_response(template_name,
-                              {'form': form, 'layout': json.dumps(layout),'STATIC_URL': settings.STATIC_URL},
+                              {'form': form, 'layout': json.dumps(layout)},
                               context_instance=context)

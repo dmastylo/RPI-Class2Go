@@ -80,8 +80,11 @@
 		</div>
 	</div>
 	<script type='text/javascript'>
+        layout_widths={m: 800};
         {% autoescape off %}
+        {% if layout %}
 		layout_widths = {{ layout }};
+        {% endif %}
         {% endautoescape %}
 		resize_page_contents();
 	</script>

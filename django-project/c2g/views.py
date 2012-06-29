@@ -11,4 +11,4 @@ import settings
 
 def home(request):
 	layout = {'l': 200, 'm': 800, 'r': 200}
-	return render_to_response('base.html', {'STATIC_URL': settings.STATIC_URL, 'layout': json.dumps(layout), 'request': request}, context_instance=RequestContext(request))
+	return render_to_response('base.html', {'layout': json.dumps(layout), 'request': request}, context_instance=RequestContext(request))
