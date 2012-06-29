@@ -31,4 +31,8 @@ urlpatterns = patterns('',
 	url(r'^officehours/', include('officehours.urls')),
 	url(r'^sections/', include('sections.urls')),
 	url(r'^videos/', include('videos.urls')),
+    
+    # Developer utility to populate db with test data.
+    url(r'^db_populate$', 'c2g.views.db_populate'),
+
 )

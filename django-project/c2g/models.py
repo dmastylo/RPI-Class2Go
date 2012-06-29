@@ -13,7 +13,7 @@
 # <location to be inserted>
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
 
 class Institution(models.Model):
@@ -30,6 +30,7 @@ class Institution(models.Model):
 class Course(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
     institution = models.ForeignKey(Institution, db_index=True)
+    group = models.ForeignKey(Group, default=False, db_index=True)
     code = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     listing_description = models.TextField(blank=True)
