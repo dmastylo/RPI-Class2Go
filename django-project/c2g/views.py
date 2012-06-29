@@ -34,3 +34,4 @@ def db_populate(request):
 
         return render_to_response('base.html', {'SITE_URL': Site.objects.get_current().domain, 'STATIC_URL': settings.STATIC_URL, 'layout': json.dumps(layout), 'request': request}, context_instance=RequestContext(request))
 
+
