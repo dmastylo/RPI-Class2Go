@@ -9,11 +9,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from registration.backends import get_backend
-
-from django.contrib.sites.models import Site
-import settings
 import json
-
+import settings
 
 def activate(request, backend,
              template_name='registration/activate.html',
@@ -204,4 +201,6 @@ def register(request, backend, success_url=None, form_class=None,
         context[key] = callable(value) and value() or value
 
     layout = {'m': 800}
-    return render_to_response(template_name, {'form': form, 'SITE_URL': Site.objects.get_current().domain, 'STATIC_URL': settings.STATIC_URL, 'layout': json.dumps(layout), 'request': request}, context_instance=context)
+    return render_to_response(template_name,
+                              {'form': form, 'layout': json.dumps(layout),'STATIC_URL': settings.STATIC_URL},
+                              context_instance=context)

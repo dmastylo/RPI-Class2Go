@@ -3,10 +3,9 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 
-from django.contrib.sites.models import Site
-
 from registration import signals
 from registration.forms import RegistrationForm
+
 
 class SimpleBackend(object):
     """
@@ -58,11 +57,10 @@ class SimpleBackend(object):
 
     def post_registration_redirect(self, request, user):
         """
-        After registration, redirect to the user's account page.
+        After registration, redirect to the home ("/") page.
         
         """
-        return (Site.objects.get_current().domain, (), {})
-        #return (user.get_absolute_url(), (), {})
+        return ('/', (), {})
 
     def post_activation_redirect(self, request, user):
         raise NotImplementedError

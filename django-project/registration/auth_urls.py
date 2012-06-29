@@ -24,10 +24,8 @@ consult a specific backend's documentation for details.
 """
 
 from django.conf.urls.defaults import *
-from django.contrib.sites.models import Site
 
 from django.contrib.auth import views as auth_views
-
 
 urlpatterns = patterns('',
                        url(r'^login/$',
@@ -37,7 +35,7 @@ urlpatterns = patterns('',
                        url(r'^logout/$',
                            auth_views.logout,
                            {'template_name': 'registration/logout.html',
-						    'next_page': Site.objects.get_current().domain},
+                           'next_page': '/'},
                            name='auth_logout'),
                        url(r'^password/change/$',
                            auth_views.password_change,
