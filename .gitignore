@@ -21,3 +21,7 @@ django-project/settings.py
 django-project/c2g/__init__.pyc
 
 django-project/c2g/models.pyc
+
+django-project/settings.py.bak
+
+django-project/templates/base_c2g.html

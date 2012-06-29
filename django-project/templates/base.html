@@ -1,4 +1,5 @@
 {% load url from future %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +18,7 @@
 <body>
     <div id="viewport">
 		<div id="c2g_layout_topbar">
-			<a href="{{SITE_URL}}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
+			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
 			{% if request.user.id %}
 				<div style='position: absolute; right: 30px; top: 12px;'>
 					<label style='color: white;'>Welcome <b>{{ user.username }}</b></label>
@@ -28,7 +29,8 @@
 				</div>
 			{% else %}
 				<input type='button' id='login_button' class='cw_button' value='Login' style='border: 0px; position: absolute; right: 30px; top: 12px; padding-bottom: 3px; width: 120px; font-size: 9pt;' onclick="$('#loginreg_canvas').show()"/>
-				<a href="{% url 'registration.views.register' %}" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
+
+				<a href="{% url 'registration_register' %}" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
 			{% endif %}
 		</div>
 		{% block content %}
@@ -73,7 +75,7 @@
 					{% csrf_token %}
 				</form>
 				<br/><br/>
-				<label>Do not have a Class2Go account?</label>&nbsp;<a href='/accounts/register/'>Register</a>
+        <label>Do not have a Class2Go account?</label>&nbsp;<a href="{% url 'registration_register' %}">Register</a>
 			</div>
 		</div>
 	</div>
