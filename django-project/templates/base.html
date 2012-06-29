@@ -1,4 +1,4 @@
-{% autoescape off %}
+{% load url from future %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +8,8 @@
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" />
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/loginreg.css" />
 
-	<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
-	<script type='text/javascript' src='{{ STATIC_URL }}js/core/resize.js'></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script>
 	
     <title>{% block title %}Class2Go{% endblock %}</title>
 </head>
@@ -21,14 +21,14 @@
 			{% if request.user.id %}
 				<div style='position: absolute; right: 30px; top: 12px;'>
 					<label style='color: white;'>Welcome <b>{{ user.username }}</b></label>
-					<form style='display: inline; margin-left: 30px;' action="{{ SITE_URL }}accounts/logout/" method="POST">
+					<form style='display: inline; margin-left: 30px;' action="{% url 'auth_logout' %}" method="POST">
 						<input type='submit' id='login_button' class='cw_button' value='Logout' style='display: inline; border: 0px; padding-bottom: 3px; width: 120px; font-size: 9pt;'/>
 						{% csrf_token %}
 					</form>
 				</div>
 			{% else %}
 				<input type='button' id='login_button' class='cw_button' value='Login' style='border: 0px; position: absolute; right: 30px; top: 12px; padding-bottom: 3px; width: 120px; font-size: 9pt;' onclick="$('#loginreg_canvas').show()"/>
-				<a href="{{ SITE_URL }}accounts/register/" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
+				<a href="{% url 'registration.views.register' %}" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
 			{% endif %}
 		</div>
 		{% block content %}
@@ -52,7 +52,7 @@
 		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
 		<div id="loginreg_container">
 			<div id="login_container">
-				<form action="{{ SITE_URL }}accounts/login/" method="POST">
+				<form action="{% url 'auth_login' %}" method="POST">
 					<h2 style='color:#800000;'>Login</h2>
 					<table>
 						<tr>
@@ -71,9 +71,10 @@
 		</div>
 	</div>
 	<script type='text/javascript'>
+        {% autoescape off %}
 		layout_widths = {{ layout }};
+        {% endautoescape %}
 		resize_page_contents();
 	</script>
 </body>
 </html>
-{% endautoescape %}
