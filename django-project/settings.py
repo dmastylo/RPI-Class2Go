@@ -123,6 +123,8 @@ INSTALLED_APPS = (
     'south',
     'c2g',
     'additional_pages',
+	'announcements',
+	#'assignments',
     #'users',
     #'accounts',
 )
