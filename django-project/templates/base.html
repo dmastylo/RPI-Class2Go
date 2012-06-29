@@ -17,7 +17,7 @@
 <body>
     <div id="viewport">
 		<div id="c2g_layout_topbar">
-			<a><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
+			<a href="{{SITE_URL}}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
 			{% if request.user.id %}
 				<div style='position: absolute; right: 30px; top: 12px;'>
 					<label style='color: white;'>Welcome <b>{{ user.username }}</b></label>
@@ -52,8 +52,13 @@
 		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
 		<div id="loginreg_container">
 			<div id="login_container">
+
 				<form action="{% url 'auth_login' %}" method="POST">
-					<h2 style='color:#800000;'>Login</h2>
+					<table style='width: 250px;'><tr>
+						<td style='width: 200px;'><h2 style='color:#800000;'>Login</h2></td>
+						<td style='text-align: right;width: 50px;'><a href="javascript:$('#loginreg_canvas').hide()" style='float: right;'>Close</a></td>
+					</tr></table>
+					
 					<table>
 						<tr>
 							<td><label for='login_username'>Username:</label></td>
@@ -67,6 +72,8 @@
 					<input type='submit' class='cw_button' value='Login' style='margin: 10px; float: right;'/>
 					{% csrf_token %}
 				</form>
+				<br/><br/>
+				<label>Do not have a Class2Go account?</label>&nbsp;<a href='/accounts/register/'>Register</a>
 			</div>
 		</div>
 	</div>

@@ -104,7 +104,7 @@ class Assignment(models.Model):
     #id = models.BigIntegerField(primary_key=True)
     #owner_id = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
-    category_id = models.ForeignKey(AssignmentCategory, db_index=True)
+    category = models.ForeignKey(AssignmentCategory, db_index=True)
     access_id = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
