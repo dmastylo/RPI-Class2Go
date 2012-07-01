@@ -19,14 +19,5 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 	
-	url(r'^additional_pages/', include('additional_pages.urls')),
-	url(r'^announcements/', include('announcements.urls')),
-	url(r'^assignments/', include('assignments.urls')),
-	url(r'^courses/', include('courses.urls')),
-	url(r'^files/', include('files.urls')),
-	url(r'^forums/', include('forums.urls')),
-	url(r'^lectures/', include('lectures.urls')),
-	url(r'^officehours/', include('officehours.urls')),
-	url(r'^sections/', include('sections.urls')),
-	url(r'^videos/', include('videos.urls')),
+	url(r'.*', include('courses.urls')),
 )

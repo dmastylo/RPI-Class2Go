@@ -104,7 +104,8 @@ TEMPLATE_DIRS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-	'django.contrib.auth.context_processors.auth',
+'django.contrib.auth.context_processors.auth',
+'django.core.context_processors.static',
 )
 
 INSTALLED_APPS = (
@@ -118,11 +119,18 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
+    'registration',
     'south',
     'c2g',
-    #'users',
-    'accounts',
+    'courses',
 )
+
+
+#This states that app c2g's UserProfile model is the profile for this site.
+AUTH_PROFILE_MODULE = 'c2g.UserProfile'
+
+ACCOUNT_ACTIVATION_DAYS = 7 #used by registration
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
