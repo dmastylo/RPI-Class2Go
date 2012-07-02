@@ -4,4 +4,28 @@
 
 <h2>List all courses </h2>
 
+<div>
+
+<table border="1"">
+<tr>
+<th>Institution</th>
+<th>Course Code</th>
+<th>Course Title</th>
+<th>Year</th>
+<th>Term</th>
+</tr>
+
+{% for item in course_list %}
+<tr>
+<td>{{ item.institution.title}}</td>
+<td>{{ item.code}}</td>
+<td>{{item.title}}</td>
+<td>{{item.year}}</td>
+<td>{{item.term}}</td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+
 {% endblock m_column_content %}
