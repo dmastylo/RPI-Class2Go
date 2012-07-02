@@ -12,5 +12,5 @@ def current(request):
 def mine(request):
 	return render_to_response('courses/mine.html', {'request': request}, context_instance=RequestContext(request))
 	
-def view(request):
-	return render_to_response('courses/view.html', {'request': request}, context_instance=RequestContext(request))
+def view(request, course_id):
+	return render_to_response('courses/view.html', {'course_id': course_id, 'request': request}, context_instance=RequestContext(request))

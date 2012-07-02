@@ -15,7 +15,7 @@ urlpatterns = patterns('',
 	url(r'^(?P<course_id>\d+)/(?P<branch_id>\d+)/admin', 'courses.branches.views.admin'),
 	
 	# Additional Pages
-	url(r'^(?P<course_id>\d+)/(?P<branch_id>\d+)/additional_pages', 'courses.additional_pages.views.list'),
+	url(r'^(?P<course_id>[a-z0-9_]+)/(?P<branch_id>[a-z0-9_]+)/additional_pages/?$', 'courses.additional_pages.views.list'),
 	url(r'^(?P<course_id>\d+)/(?P<branch_id>\d+)/additional_pages/admin', 'courses.additional_pages.views.admin'),
 	url(r'^(?P<course_id>\d+)/(?P<branch_id>\d+)/additional_pages/(?P<additional_page_id>\d+)', 'courses.additional_pages.views.view'),
 	url(r'^(?P<course_id>\d+)/(?P<branch_id>\d+)/additional_pages/(?P<additional_page_id>\d+)/edit', 'courses.additional_pages.views.edit'),

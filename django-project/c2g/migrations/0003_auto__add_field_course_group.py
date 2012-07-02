@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'Course.group'
         db.add_column(u'c2g_courses', 'group',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=False, to=orm['auth.Group']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=-1, to=orm['auth.Group']),
                       keep_default=False)
 
 
