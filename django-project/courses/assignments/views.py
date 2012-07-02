@@ -9,11 +9,11 @@ def list(request, course_id, branch_id):
 def admin(request, course_id, branch_id):
 	return render_to_response('assignments/admin.html', {'course_id': course_id, 'branch_id': branch_id, 'request': request}, context_instance=RequestContext(request))
 	
-def view(request, course_id, branch_id):
-	return render_to_response('assignments/view.html', {'course_id': course_id, 'branch_id': branch_id, 'request': request}, context_instance=RequestContext(request))
+def view(request, course_id, branch_id, assignment_id):
+	return render_to_response('assignments/view.html', {'course_id': course_id, 'branch_id': branch_id, 'assignment_id':assignment_id, 'request': request}, context_instance=RequestContext(request))
 	
-def edit(request, course_id, branch_id):
+def edit(request, course_id, branch_id, assignment_id):
 	return render_to_response('assignments/edit.html', {'course_id': course_id, 'branch_id': branch_id, 'request': request}, context_instance=RequestContext(request))
 	
-def grade(request, course_id, branch_id):
-	return render_to_response('assignments/grade.html', {'course_id': course_id, 'branch_id': branch_id, 'request': request}, context_instance=RequestContext(request))
+def grade(request, course_id, branch_id, assignment_id):
+	return render_to_response('assignments/grade.html', {'course_id': course_id, 'branch_id': branch_id, 'assignment_id':assignment_id, 'request': request}, context_instance=RequestContext(request))
