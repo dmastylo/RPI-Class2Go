@@ -122,9 +122,7 @@ INSTALLED_APPS = (
     'registration',
     'south',
     'c2g',
-    'additional_pages',
-    #'users',
-    #'accounts',
+    'courses',
 )
 
 
