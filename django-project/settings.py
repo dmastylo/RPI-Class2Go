@@ -154,3 +154,6 @@ LOGGING = {
         },
     }
 }
+
+# Session Settings
+SESSION_COOKIE_AGE = 3*30*24*3600
