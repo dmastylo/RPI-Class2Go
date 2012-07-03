@@ -1073,8 +1073,11 @@ var Khan = (function() {
         }
 
             
-            console.log(problem);
-            
+        //console.log(problem);
+            KhanTest.problemID = id;
+            KhanTest.randomSeed = randomSeed;
+            console.log(id);
+            console.log(randomSeed);
         problemID = id;
 
         // Find which exercise this problem is from
@@ -2507,9 +2510,11 @@ var Khan = (function() {
 
             // testMode automatically advances to the next problem --
             // integrated mode just listens and waits for renderNextProblem
+            /*  JASON BAU COMMENTED OUT
             $(Khan).bind("gotoNextProblem", function() {
                 renderNextProblem();
             });
+             */
 
         }
 
