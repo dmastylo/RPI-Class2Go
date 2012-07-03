@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'south',
     'c2g',
     'courses',
+    'khan',
 )
 
 
