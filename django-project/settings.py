@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'south',
     'c2g',
     'courses',
+    'khan',
 )
 
 
@@ -154,3 +155,6 @@ LOGGING = {
         },
     }
 }
+
+# Session Settings
+SESSION_COOKIE_AGE = 3*30*24*3600
