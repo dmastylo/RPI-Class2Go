@@ -416,6 +416,10 @@ $.extend(Khan.answerTypes, {
     decimal: function(solutionarea, solution, fallback) {
         return Khan.answerTypes.number(solutionarea, solution, fallback, "decimal");
     },
+    
+    integer: function(solutionarea, solution, fallback) {
+	return Khan.answerTypes.number(solutionarea, solution, fallback, "integer");
+    },
 
     rational: function(solutionarea, solution, fallback) {
         return Khan.answerTypes.number(solutionarea, solution, fallback, "integer, proper, improper, mixed");
