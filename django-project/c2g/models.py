@@ -24,6 +24,10 @@ class Institution(models.Model):
     domains = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+
+    def __unicode__(self):
+        return self.title
+
     class Meta:
         db_table = u'c2g_institutions'
 
@@ -51,6 +55,10 @@ class Course(models.Model):
     list_publicly = models.IntegerField(null=True, blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+    
+    def __unicode__(self):
+        return self.title
+
     class Meta:
         db_table = u'c2g_courses'
 
@@ -293,6 +301,10 @@ class VideoTopic(models.Model):
     title = models.CharField(max_length=255)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)    
+    
+    def __unicode__(self):
+        return self.title    
+    
     class Meta:
         db_table = u'c2g_video_topics'
 
@@ -310,6 +322,10 @@ class Video(models.Model):
     #segments = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+
+    def __unicode__(self):
+        return self.title
+
     class Meta:
         db_table = u'c2g_videos'
 
