@@ -73,3 +73,136 @@ def create_institutions(create_course_data, create_user_data):
                         #Create the user
                         user = User.objects.create_user('test_' + str(course.id) + '_' + str(q))
                         group.user_set.add(user)
+
+
+def create_nlp_course():
+    
+        #Create the Institution
+        title = "Stanford University"
+        country = 'USA'
+        city = 'Palo Alto'
+        domains = 'stanford.edu'
+
+        institution = Institution(title = title,
+                                  country = country,
+                                  city = city,
+                                  domains = domains)
+
+        institution.save()
+        
+        #Create the course
+        institution_id = institution.id
+        code = 'CS1234'
+        title = 'Natural Language Processing'
+        listing_description = 'This course covers a broad range of topics in natural language processing, including word and sentence tokenization, text classification and sentiment analysis, spelling correction, information extraction, parsing, meaning extraction, and question answering, We will also introduce the underlying theory from probability, statistics, and machine learning that are crucial for the field, and cover fundamental algorithms like n-gram language modeling, naive bayes and maxent classifiers, sequence models like Hidden Markov Models, probabilistic dependency and constituent parsing, and vector-space models of meaning.We are offering this course on Natural Language Processing free and online to students worldwide, continuing Stanford\'s exciting forays into large scale online instruction. Students have access to screencast lecture videos, are given quiz questions, assignments and exams, receive regular feedback on progress, and can participate in a discussion forum. Those who successfully complete the course will receive a statement of accomplishment. Taught by Professors Jurafsky and Manning, the curriculum draws from Stanford\'s courses in Natural Language Processing. You will need a decent internet connection for accessing course materials, but should be able to watch the videos on your smartphone.'
+        mode = 'live'
+        description = 'Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people\'s opinions about products or services to extracting appointments from your email. In this class, you\'ll learn the fundamental algorithms and mathematical models for human language processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.'
+        staff_emails = 'aa@stanford.edu*, bb@stanford.edu*'
+        term = 'Fall'
+        year = '2012'
+        calendar_start = '2012-07-24'
+        calendar_end = '2012-09-24'
+        meeting_info = 'There are no upcoming office hours'
+        feature_settings = 'assignments=on,lectures=on,videos=on'
+        membership_control = '1,2,3'
+        list_publicly = '1'
+
+        #Create the Groups
+        student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
+        instructor_group = Group.objects.create(name="Instructor Group for class2go course " + code + str(institution.id))
+        tas_group = Group.objects.create(name="TAS Group for class2go course " + code + str(institution.id))
+        readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + code + str(institution.id))
+        
+        #Create the Course
+        course = Course(institution_id = institution_id,
+                        code = code,
+                        title = title,
+                        listing_description = listing_description,
+                        mode = mode,
+                        description = description,
+                        staff_emails = staff_emails,
+                        term = term,
+                        year = year,
+                        calendar_start = calendar_start,
+                        calendar_end = calendar_end,
+                        meeting_info = meeting_info,
+                        feature_settings = feature_settings,
+                        membership_control = membership_control,
+                        list_publicly = list_publicly,
+                        student_group_id = student_group.id,
+                        instructor_group_id = instructor_group.id,
+                        tas_group_id = tas_group.id,
+                        readonly_tas_group_id = readonly_tas_group.id)
+
+        course.save()
+
+        #Create the Video Topics
+        course_id = course.id
+        title = 'Section 1 Download'
+        save_video_topic (course_id, title)
+        
+        title = '1.1 Course Intro'
+        save_video_topic (course_id, title)
+        
+        title = '1.2 History of Field'
+        save_video_topic (course_id, title)
+        
+        title = '1.3 Big Issues'
+        save_video_topic (course_id, title)
+        
+        #Create Additional Pages
+        course_id = course_id
+        access_id = '123'
+        write_access = '1,2'
+        
+        
+        title = 'Syllabus'
+        description = 'description of Syllabus'
+        save_additional_page(course_id, access_id, write_access, title, description)
+        
+        title = 'Other Static Page 1'
+        description = 'description of other static page 1'
+        save_additional_page(course_id, access_id, write_access, title, description)
+        
+        title = 'Other Static Page 2'
+        description = 'description of other static page 2'
+        save_additional_page(course_id, access_id, write_access, title, description)        
+        
+        
+        #Create some Student Users
+        for q in range(0,10):
+
+            user = User.objects.create_user('nlp_' + str(q))
+            user.set_password('class2go')
+            user.save()
+            student_group.user_set.add(user)
+
+        
+
+def save_video_topic(course_id, title):
+    
+        video_topic = VideoTopic(course_id = course_id,
+                                  title = title)
+        
+        video_topic.save()
+
+def save_video(course_id, topic_id, access_id, title, description):
+        
+        video = Video(course_id = course_id,
+        topic_id = topic_id,
+        access_id = access_id,
+        title = title,
+        description = description)        
+        
+        video.save()
+        
+def save_additional_page(course_id, access_id, write_access, title, description):
+    
+        additional_page = AdditionalPage(course_id = course_id,
+                                         access_id = access_id,
+                                         write_access = write_access,
+                                         title = title,
+                                         description = description)
+        
+        additional_page.save()
+        
