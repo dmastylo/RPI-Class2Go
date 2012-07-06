@@ -47,36 +47,6 @@
 		</div>
 		{% endblock content %}
     </div>
-	
-	<div id="loginreg_canvas">
-		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
-		<div id="loginreg_container">
-			<div id="login_container">
-
-				<form action="{% url 'auth_login' %}" method="POST">
-					<table style='width: 250px;'><tr>
-						<td style='width: 200px;'><h2 style='color:#800000;'>Login</h2></td>
-						<td style='text-align: right;width: 50px;'><a href="javascript:$('#loginreg_canvas').hide()" style='float: right;'>Close</a></td>
-					</tr></table>
-					
-					<table>
-						<tr>
-							<td><label for='login_username'>Username:</label></td>
-							<td><input name='username' id='login_username' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='login_password'>Password:</label></td>
-							<td><input type='password' name='password' id='login_password' style='width:180px;'></td>
-						</tr>
-					</table>
-					<input type='submit' class='cw_button' value='Login' style='margin: 10px; float: right;'/>
-					{% csrf_token %}
-				</form>
-				<br/><br/>
-        <label>Do not have a Class2Go account?</label>&nbsp;<a href="{% url 'registration_register' %}">Register</a>
-			</div>
-		</div>
-	</div>
 
 	<div id="login-modal" class="modal fade">
 	    <div class="modal-header">
