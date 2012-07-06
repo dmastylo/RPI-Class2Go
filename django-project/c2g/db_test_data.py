@@ -107,8 +107,11 @@ def create_nlp_course():
         membership_control = '1,2,3'
         list_publicly = '1'
 
-        #Create the Group
-        group = Group.objects.create(name="Group for class2go course " + code + str(institution.id))
+        #Create the Groups
+        student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
+        instructor_group = Group.objects.create(name="Instructor Group for class2go course " + code + str(institution.id))
+        tas_group = Group.objects.create(name="TAS Group for class2go course " + code + str(institution.id))
+        readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + code + str(institution.id))
         
         #Create the Course
         course = Course(institution_id = institution_id,
@@ -126,7 +129,10 @@ def create_nlp_course():
                         feature_settings = feature_settings,
                         membership_control = membership_control,
                         list_publicly = list_publicly,
-                        group_id = group.id)
+                        student_group_id = student_group.id,
+                        instructor_group_id = instructor_group.id,
+                        tas_group_id = tas_group.id,
+                        readonly_tas_group_id = readonly_tas_group.id)
 
         course.save()
 
@@ -163,13 +169,13 @@ def create_nlp_course():
         save_additional_page(course_id, access_id, write_access, title, description)        
         
         
-        #Create some Users
+        #Create some Student Users
         for q in range(0,10):
 
             user = User.objects.create_user('nlp_' + str(q))
             user.set_password('class2go')
             user.save()
-            group.user_set.add(user)
+            student_group.user_set.add(user)
 
         
 
