@@ -4,4 +4,14 @@
 
 <h2>Homepage for {{course_id}} </h2>
 
+<h3>Recent Announcements</h3>
+
+{% for announcement in announcement_list %}
+
+    <h4> {{announcement.title}} </h4>
+    <p> {{announcement.description}} </p>
+    <p align="right"> {{announcement.last_updated}} by {{announcement.owner}} </p>
+
+{% endfor %}
+
 {% endblock m_column_content %}

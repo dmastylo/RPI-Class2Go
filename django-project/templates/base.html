@@ -18,7 +18,7 @@
 <body>
     <div id="viewport">
 		<div id="c2g_layout_topbar">
-			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
+            <a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
 			{% if request.user.id %}
 				<div style='position: absolute; right: 30px; top: 12px;'>
 					<label style='color: white;'>Welcome <b>{{ user.username }}</b></label>

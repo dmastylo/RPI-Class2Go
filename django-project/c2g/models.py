@@ -95,6 +95,9 @@ class Announcement(models.Model):
     class Meta:
         db_table = u'c2g_announcements'
 
+    def __unicode__(self):
+        return self.title
+
 
 ##ASSIGNMENTS SECTION####
 #Assignments, AssigmentGrades, AssignmentSubmissions might need ondelete for User
