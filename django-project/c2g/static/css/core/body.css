@@ -1,1 +1,4 @@
-body { margin: 0px; font-family: Arial; font-size: 10pt;}
+/* Bootstrap overrides */
+.modal form {
+	margin-bottom:0;
+}
