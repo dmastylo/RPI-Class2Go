@@ -9,9 +9,6 @@
 	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" /-->
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" />
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/loginreg.css" />
-
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<!--script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script-->
 	
     <title>{% block title %}Class2Go{% endblock %}</title>
 </head>
@@ -29,9 +26,9 @@
 					</form>
 				</div>
 			{% else %}
-				<input type='button' id='login_button' class='cw_button' value='Login' style='border: 0px; position: absolute; right: 30px; top: 12px; padding-bottom: 3px; width: 120px; font-size: 9pt;' onclick="$('#loginreg_canvas').show()"/>
+				<a id="login_button" class="cw_button btn" data-toggle="modal" href="#login-modal">Login</a>
 
-				<a href="{% url 'registration_register' %}" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
+				<a href="{% url 'registration_register' %}" style="border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;">Register</a>
 			{% endif %}
 		</div>
 		{% block content %}
@@ -80,6 +77,40 @@
 			</div>
 		</div>
 	</div>
+
+	<div id="login-modal" class="modal fade">
+	    <div class="modal-header">
+		    <a class="close" data-dismiss="modal">×</a>
+		    <h3>Login</h3>
+	    </div>
+	    <form action="{% url 'auth_login' %}" method="POST" class="form-horizontal">
+	    <div class="modal-body">
+	    	<fieldset>
+		    	<div class="control-group">
+		    		<label for="login_username" class="control-label">Username:</label>
+		    		<div class="controls">
+		    			<input type="text" name="username" id="login_username" />
+		    		</div>
+		    	</div>
+		    	<div class="control-group">
+		    		<label for="login_password" class="control-label">Password:</label>
+		    		<div class="controls">
+		    			<input type="password" name="password" id="login_password" />
+		    		</div>
+		    	</div>
+				{% csrf_token %}
+			</fieldset>
+	    </div>
+	    <div class="modal-footer">
+		    <a href="{% url 'registration_register' %}" class="btn">Register</a>
+		    <input type='submit' class="btn btn-primary" value="Login" />
+	    </div>
+	    </form>
+	</div>
+
+	<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
+	<!--script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script-->
 	<!--script type='text/javascript'>
 		resize_page_contents();
 	</script-->

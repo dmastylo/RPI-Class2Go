@@ -17,6 +17,16 @@
 	font-weight: bold;
 }
 
+#login_button {
+	border: 0px; 
+	position: absolute; 
+	right: 20px; 
+	top: 8px; 
+	padding-bottom: 3px; 
+	width: 120px; 
+	font-size: 9pt;
+}
+
 .cw_button:hover {
 	background: rgb(150,0,0);
 }
