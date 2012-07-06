@@ -3,14 +3,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/buttons.css" />
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" />
+	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" /-->
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" />
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/loginreg.css" />
 
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script>
+	<!--script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script-->
 	
     <title>{% block title %}Class2Go{% endblock %}</title>
 </head>
@@ -34,14 +35,18 @@
 			{% endif %}
 		</div>
 		{% block content %}
-		<div id="c2g_layout_l_column">
-			{% block l_column_content %}<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>{% endblock %}
-		</div>
-		<div id="c2g_layout_m_column">
-			{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}
-		</div>
-		<div id="c2g_layout_r_column">
-			{% block r_column_content %}<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>{% endblock %}
+		<div class="container-fluid">
+			<div class="row-fluid">
+				<div id="c2g_layout_l_column" class="span3">
+					{% block l_column_content %}<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>{% endblock %}
+				</div>
+				<div id="c2g_layout_m_column" class="span6">
+					{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}
+				</div>
+				<div id="c2g_layout_r_column" class="span3">
+					{% block r_column_content %}<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>{% endblock %}
+				</div>
+			</div>
 		</div>
 		{% endblock content %}
     </div>
@@ -75,8 +80,8 @@
 			</div>
 		</div>
 	</div>
-	<script type='text/javascript'>
+	<!--script type='text/javascript'>
 		resize_page_contents();
-	</script>
+	</script-->
 </body>
 </html>
