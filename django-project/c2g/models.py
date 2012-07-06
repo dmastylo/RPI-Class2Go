@@ -34,16 +34,16 @@ class Institution(models.Model):
 class Course(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
     institution = models.ForeignKey(Institution, db_index=True)
-    group = models.ForeignKey(Group, default=False, db_index=True)
+    student_group = models.ForeignKey(Group, related_name="student_group", default=False, db_index=True)
+    instructor_group = models.ForeignKey(Group, related_name="instructor_group", default=False, db_index=True)
+    tas_group = models.ForeignKey(Group, related_name="tas_group", default=False, db_index=True)
+    readonly_tas_group = models.ForeignKey(Group, related_name="readonly_tas_group", default=False, db_index=True)
     code = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     listing_description = models.TextField(blank=True)
     mode = models.TextField(blank=True)
     description = models.TextField(blank=True)
     staff_emails = models.TextField(blank=True)
-    instructors = models.ManyToManyField(User, related_name='instructors') #many-to-many
-    tas = models.ManyToManyField(User, related_name='tas', null=True) #many-to-many
-    readonly_tas = models.ManyToManyField(User, related_name='readonly_tas', null=True) #many-to-many
     term = models.TextField(blank=True)
     year = models.IntegerField(null=True, blank=True)
     calendar_start = models.DateField(null=True, blank=True)
@@ -413,4 +413,22 @@ class SharingPermission(models.Model):
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_sharing_permissions'
+        
+#class ProcessedExercises(models.Model):
+#    complete = models.IntegerField(null=True, blank=True)
+#    count_hints = models.IntegerField(null=True, blank=True)
+#    time_taken = models.IntegerField(null=True, blank=True)
+#    attempt_number = models.IntegerField(null=True, blank=True)
+#    sha1 = models.TextField(blank=True)
+#    seed = models.TextField(blank=True)
+#    problem_type = models.TextField(blank=True)
+#    review_mode = models.IntegerField(null=True, blank=True)
+#    topic_mode = models.IntegerField(null=True, blank=True)
+#    casing = models.TextField(blank=True)
+#    card = models.TextField(blank=True)
+#    topic_id = models.ForeignKey(VideoTopic, db_index=True)
+#    cards_done = models.IntegerField(null=True, blank=True)
+#    cards_left = models.IntegerField(null=True, blank=True)
+#    class Meta:
+#        db_table = u'c2g_processed_exercises'
 
