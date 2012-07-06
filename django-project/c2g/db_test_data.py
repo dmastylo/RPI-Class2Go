@@ -106,6 +106,7 @@ def create_nlp_course():
         feature_settings = 'assignments=on,lectures=on,videos=on'
         membership_control = '1,2,3'
         list_publicly = '1'
+        course_prefix = 'nlp'
 
         #Create the Groups
         student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
@@ -132,7 +133,8 @@ def create_nlp_course():
                         student_group_id = student_group.id,
                         instructor_group_id = instructor_group.id,
                         tas_group_id = tas_group.id,
-                        readonly_tas_group_id = readonly_tas_group.id)
+                        readonly_tas_group_id = readonly_tas_group.id,
+                        course_prefix = course_prefix)
 
         course.save()
 
