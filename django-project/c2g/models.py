@@ -323,6 +323,8 @@ class Video(models.Model):
     #segments = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+    type = models.CharField(max_length=30, default="youtube")
+    url = models.CharField(max_length=255, null=True)
 
     def __unicode__(self):
         return self.title
