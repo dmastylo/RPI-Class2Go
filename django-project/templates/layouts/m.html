@@ -44,34 +44,34 @@
 		{% endblock content %}
     </div>
 	
-	<div id="loginreg_canvas">
-		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
-		<div id="loginreg_container">
-			<div id="login_container">
-
-				<form action="{% url 'auth_login' %}" method="POST">
-					<table style='width: 250px;'><tr>
-						<td style='width: 200px;'><h2 style='color:#800000;'>Login</h2></td>
-						<td style='text-align: right;width: 50px;'><a href="javascript:$('#loginreg_canvas').hide()" style='float: right;'>Close</a></td>
-					</tr></table>
-					
-					<table>
-						<tr>
-							<td><label for='login_username'>Username:</label></td>
-							<td><input name='username' id='login_username' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='login_password'>Password:</label></td>
-							<td><input type='password' name='password' id='login_password' style='width:180px;'></td>
-						</tr>
-					</table>
-					<input type='submit' class='cw_button' value='Login' style='margin: 10px; float: right;'/>
-					{% csrf_token %}
-				</form>
-				<br/><br/>
-        <label>Do not have a Class2Go account?</label>&nbsp;<a href="{% url 'registration_register' %}">Register</a>
-			</div>
-		</div>
+	<div id="login-modal" class="modal fade">
+	    <div class="modal-header">
+		    <a class="close" data-dismiss="modal">×</a>
+		    <h3>Login</h3>
+	    </div>
+	    <form action="{% url 'auth_login' %}" method="POST" class="form-horizontal">
+	    <div class="modal-body">
+	    	<fieldset>
+		    	<div class="control-group">
+		    		<label for="login_username" class="control-label">Username:</label>
+		    		<div class="controls">
+		    			<input type="text" name="username" id="login_username" />
+		    		</div>
+		    	</div>
+		    	<div class="control-group">
+		    		<label for="login_password" class="control-label">Password:</label>
+		    		<div class="controls">
+		    			<input type="password" name="password" id="login_password" />
+		    		</div>
+		    	</div>
+				{% csrf_token %}
+			</fieldset>
+	    </div>
+	    <div class="modal-footer">
+		    <a href="{% url 'registration_register' %}" class="btn">Register</a>
+		    <input type='submit' class="btn btn-primary" value="Login" />
+	    </div>
+	    </form>
 	</div>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
