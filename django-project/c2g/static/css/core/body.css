@@ -1,4 +1,65 @@
-/* Bootstrap overrides */
+/* Bootstrap overrides
+-------------------------------------------------- */
 .modal form {
 	margin-bottom:0;
+}
+
+.well {
+	padding:8px;
+}
+
+.btn {
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	-o-border-radius: 10px;
+}
+
+
+/* Header
+-------------------------------------------------- */
+.top-nav {
+	position:absolute;
+	top:25px;
+	right:20px;
+}
+.top-nav li {
+	float:right;
+	list-style-type:none;
+	margin-left:10px;
+}
+.top-nav li .btn {
+	padding-left:25px;
+	padding-right:25px;
+	background: rgb(100,0,0);
+	color:white;
+	border:0;
+}
+.top-nav li .btn:hover {
+	background: rgb(120,0,0);
+}
+.top-nav li span {
+	color:white;
+	padding:4px 5px;
+	display:block;
+}
+.register {
+	border: 0px;
+	color: white; 
+	font-weight: bold; 
+	font-size: 9pt;
+}
+
+
+/* Footer
+-------------------------------------------------- */
+.footer {
+  margin-top: 45px;
+  padding: 35px 0 36px;
+  border-top: 1px solid #e5e5e5;
+}
+.footer p {
+  margin-bottom: 0;
+  color: #555;
 }

@@ -17,32 +17,107 @@
     <div id="viewport">
 		<div id="c2g_layout_topbar">
 			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
+			<div class="top-nav">
 			{% if request.user.id %}
-				<div style='position: absolute; right: 30px; top: 12px;'>
-					<label style='color: white;'>Welcome <b>{{ user.username }}</b></label>
-					<form style='display: inline; margin-left: 30px;' action="{% url 'auth_logout' %}" method="POST">
-						<input type='submit' id='login_button' class='cw_button' value='Logout' style='display: inline; border: 0px; padding-bottom: 3px; width: 120px; font-size: 9pt;'/>
+				<li>
+					<form action="{% url 'auth_logout' %}" method="POST">
+						<input type="submit" id="login_button" class="btn" value="Logout" />
 						{% csrf_token %}
 					</form>
-				</div>
+				</li>
+				<li><span>Welcome <b>{{ user.username }}</b>!</span></li>
 			{% else %}
-				<a id="login_button" class="cw_button btn" data-toggle="modal" href="#login-modal">Login</a>
-
-				<a href="{% url 'registration_register' %}" style="border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;">Register</a>
+				<li><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
+				<li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
 			{% endif %}
+			</div>
 		</div>
 		{% block content %}
 		<div class="container-fluid">
 			<div class="row-fluid">
 				<div id="c2g_layout_l_column" class="span3">
-					{% block l_column_content %}<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>{% endblock %}
+					{% block l_column_content %}
+					<div class="well">
+						<ul class="nav nav-list">
+							<li class="nav-header">Nav list header</li>
+	 						<li class="active"><a href="#">Nav Item 1</a></li>
+	 						<li><a href="#">Nav Item 2</a></li>
+	 						<li><a href="#">Nav Item 3</a></li>
+	 						<li><a href="#">Nav Item 4</a></li>
+	 						<li class="nav-header">Another list header</li>
+	 						<li><a href="#">Nav Item 1</a></li>
+	 						<li><a href="#">Nav Item 2</a></li>
+	 						<li><a href="#">Nav Item 3</a></li>
+	 						<li><a href="#">Nav Item 4</a></li>
+	 						<li class="divider"></li>
+	 						<li><a href="#">Help</a></li>
+	 						<li><a href="#">Contact us</a></li>
+						</ul>
+					</div>
+					{% endblock %}
 				</div>
 				<div id="c2g_layout_m_column" class="span6">
-					{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}
+					{% block m_column_content %}
+					<ul class="breadcrumb">
+						<li>
+							<a href="#">Home</a> <span class="divider">/</span>
+						</li>
+						<li>
+							<a href="#">Library</a> <span class="divider">/</span>
+						</li>
+						<li class="active">Data</li>
+					</ul>
+					<h1>Heading 1 </h1>
+					<ul class="thumbnails">
+						<li class="span10">
+							<a href="#" class="thumbnail">
+								<iframe width="100%" height="315" src="http://www.youtube.com/embed/BJiVRIPVNxU" frameborder="0" allowfullscreen></iframe>
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+					</ul>
+					<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+					<h2>Heading 2</h2>
+					<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+					<ul>
+						<li>Sed ut perspiciatis unde omnis iste natus error</li> 
+						<li>Sed ut perspiciatis unde omnis iste natus error</li> 
+						<li>Sed ut perspiciatis unde omnis iste natus error</li> 
+					</ul>
+					<h3>Heading 3</h3>
+					<p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. <a href="#">This is a link</a> ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam</p>
+					<h4>Heading 4</h4>
+					<p>Nisi ut aliquid ex ea commodi consequatur? <a href="#">This is a link</a> reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
+					{% endblock %}
 				</div>
 				<div id="c2g_layout_r_column" class="span3">
-					{% block r_column_content %}<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>{% endblock %}
+					{% block r_column_content %}
+					<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
+					{% endblock %}
 				</div>
+			</div>
+			<div class="footer">
+				<p class="pull-right"><a href="#">Back to top</a></p>
+		        <p>&copy; Stanford University. 450 Serra Mall, Stanford, CA 94305. (650) 723-2300. | <a href="#">Terms of service</a> | <a href="#">Privacy policy</a></p>
 			</div>
 		</div>
 		{% endblock content %}
@@ -77,6 +152,8 @@
 	    </div>
 	    </form>
 	</div>
+
+	
 
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
