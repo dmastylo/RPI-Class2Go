@@ -1,17 +1,11 @@
 /* Bootstrap overrides
 -------------------------------------------------- */
-.modal form {
-	margin-bottom:0;
-}
 
-.well {
-	padding:8px;
-}
-
-.btn {
-	font-weight:bold;
-}
-
+a {color:#820000;}
+a:hover {color:#820000;}
+.modal form {margin-bottom:0;}
+.well {padding:8px;}
+.btn {font-weight:bold;}
 
 .btn-primary {
   background-color: #8f2618;
@@ -43,8 +37,6 @@
   background-color: #66190f \9;
 }
 
-
-
 .modal {
 	border-radius: 10px;
 	-moz-border-radius: 10px;
@@ -55,6 +47,19 @@
 	background: #f4f4e0;
 	background: -moz-linear-gradient(top, #f4f4e0, #ffffff);
 	background: -webkit-gradient(linear, left top, left bottom, from(#f4f4e0), to(#ffffff));
+}
+
+.nav-list > .active > a, .nav-list > .active > a:hover {
+	background-color:#820000;
+}
+.nav > li > a:hover {
+	background-color:white;
+	color:#333;
+	cursor: pointer;
+}
+
+a.thumbnail:hover {
+	border-color:#8F2718;
 }
 
 
@@ -98,6 +103,12 @@
 	color:white;
 	padding:4px 5px;
 	display:block;
+}
+
+/* Thumbnails
+-------------------------------------------------- */
+.thumbnails .selected .thumbnail:hover {
+	border-color:#ddd;
 }
 
 /* Registration
