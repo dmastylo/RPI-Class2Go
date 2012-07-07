@@ -6,12 +6,10 @@
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/buttons.css" />
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" />
+	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" /-->
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" />
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/loginreg.css" />
 
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script>
 	
     <title>{% block title %}Class2Go{% endblock %}</title>
 </head>
@@ -20,23 +18,28 @@
     <div id="viewport">
 		<div id="c2g_layout_topbar">
 			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
+			<div class="top-nav">
 			{% if request.user.id %}
-				<div style='position: absolute; right: 30px; top: 12px;'>
-					<label style='color: white;'>Welcome <b>{{ user.username }}</b></label>
-					<form style='display: inline; margin-left: 30px;' action="{% url 'auth_logout' %}" method="POST">
-						<input type='submit' id='login_button' class='cw_button' value='Logout' style='display: inline; border: 0px; padding-bottom: 3px; width: 120px; font-size: 9pt;'/>
+				<li>
+					<form action="{% url 'auth_logout' %}" method="POST">
+						<input type="submit" id="login_button" class="btn" value="Logout" />
 						{% csrf_token %}
 					</form>
-				</div>
+				</li>
+				<li><span>Welcome <b>{{ user.username }}</b>!</span></li>
 			{% else %}
-				<input type='button' id='login_button' class='cw_button' value='Login' style='border: 0px; position: absolute; right: 30px; top: 12px; padding-bottom: 3px; width: 120px; font-size: 9pt;' onclick="$('#loginreg_canvas').show()"/>
-
-				<a href="{% url 'registration_register' %}" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
+				<li><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
+				<li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
 			{% endif %}
+			</div>
 		</div>
 		{% block content %}
-		<div id="c2g_layout_m_column">
-			{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}
+		<div class="container-fluid">
+			<div class="row-fluid">
+				<div id="c2g_layout_m_column" class="span12">
+					{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}
+				</div>
+			</div>
 		</div>
 		{% endblock content %}
     </div>
@@ -70,8 +73,11 @@
 			</div>
 		</div>
 	</div>
-	<script type='text/javascript'>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
+	<!--script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script-->
+	<!--script type='text/javascript'>
 		resize_page_contents();
-	</script>
+	</script-->
 </body>
 </html>

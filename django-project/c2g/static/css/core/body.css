@@ -51,6 +51,25 @@
 	font-size: 9pt;
 }
 
+/* Registration
+-------------------------------------------------- */
+.registration .well {
+	margin:0 auto;
+	width:400px;
+	padding:20px;
+	background:white;
+}
+.registration .well form,.registration .well .form-actions {
+	margin-bottom:0;
+}
+.registration .well label {
+	text-align:left;
+	width:150px;
+}
+.registration h1 {
+	margin-bottom:1em;
+	text-align:center;
+}
 
 /* Footer
 -------------------------------------------------- */
