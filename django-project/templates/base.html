@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
 	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/buttons.css" /-->
 	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" /-->
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" />
+	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" /-->
 	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/loginreg.css" /-->
 	
     <title>{% block title %}Class2Go{% endblock %}</title>
@@ -115,10 +115,7 @@
 					{% endblock %}
 				</div>
 			</div>
-			<div class="footer">
-				<p class="pull-right"><a href="#">Back to top</a></p>
-		        <p>&copy; Stanford University. 450 Serra Mall, Stanford, CA 94305. (650) 723-2300. | <a href="#">Terms of service</a> | <a href="#">Privacy policy</a></p>
-			</div>
+			{% include "footer.html" %}
 		</div>
 		{% endblock content %}
     </div>

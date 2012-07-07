@@ -60,6 +60,15 @@
 
 /* Header
 -------------------------------------------------- */
+#c2g_layout_topbar {
+	padding:0px; 
+	height: 80px;
+	margin-bottom:20px;
+	background:#8f2718;
+	border-bottom:1px solid #54170e;
+}
+.small_logo {position: absolute; top: 25px; left: 4px; border: 0px;}
+
 .top-nav {
 	position:absolute;
 	top:25px;
