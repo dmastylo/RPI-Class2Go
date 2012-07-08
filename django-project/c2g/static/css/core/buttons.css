@@ -1,34 +1,19 @@
 .cw_button {
 	border: 1px solid transparent;
-	
 	border-radius: 10px;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
 	-khtml-border-radius: 10px;
 	-o-border-radius: 10px;
-
 	background: rgb(100,0,0);
-
-	min-width: 100px;
-	
 	cursor: Pointer;
-	
 	color: white;
 	font-weight: bold;
 }
 
-#login_button {
-	border: 0px; 
-	position: absolute; 
-	right: 20px; 
-	top: 8px; 
-	padding-bottom: 3px; 
-	width: 120px; 
-	font-size: 9pt;
-}
-
 .cw_button:hover {
-	background: rgb(150,0,0);
+	color:white;
+	background: rgb(120,0,0);
 }
 
 .cw_delete_button { padding: 0px; width: 19px; height: 18; cursor: pointer; background-color: transparent; background-image: url(<?php echo $CONFIG->siteroot ?>static/graphics/icons/trash_icon.png); background-position: 2px 0px; background-repeat: no-repeat;}
