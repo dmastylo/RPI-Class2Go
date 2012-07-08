@@ -3,23 +3,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
     <!--[if IE 7]>
 	  <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome-ie7.css">
 	<![endif]-->
-	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/buttons.css" /-->
-	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" /-->
-	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" /-->
-	<!--link rel="stylesheet" href="{{ STATIC_URL }}css/core/loginreg.css" /-->
-	
     <title>{% block title %}Class2Go{% endblock %}</title>
 </head>
 
 <body>
     <div id="viewport">
 		<div id="c2g_layout_topbar">
-			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/c2g-logo.png" alt="Class2Go by Stanford University"></a>
+			<h1><a href="{% url 'c2g.views.home' %}" class="logo">Class2Go by Stanford University</a></h1>
 			<div class="top-nav">
 			{% if request.user.id %}
 				<li>
@@ -34,9 +31,20 @@
 				<li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
 			{% endif %}
 			</div>
+			<!--div class="navbar navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container-fluid">
+						<ul class="nav">
+							<li class="active"><a href="#">Home</a></li>
+							<li><a href="#">Link</a></li>
+							<li><a href="#">Link</a></li>
+						</ul>
+					</div>
+				</div>
+			</div-->
 		</div>
 		{% block content %}
-		<div class="container-fluid">
+		<div class="container-fluid body-content">
 			<div class="row-fluid">
 				<div id="c2g_layout_l_column" class="span3">
 					{% block l_column_content %}
@@ -154,14 +162,7 @@
 	    </div>
 	    </form>
 	</div>
-
-	
-
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
-	<!--script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script-->
-	<!--script type='text/javascript'>
-		resize_page_contents();
-	</script-->
 </body>
 </html>
