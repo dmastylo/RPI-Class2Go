@@ -164,9 +164,7 @@ var Khan = (function() {
     exerciseId = ((/([^\/.]+)(?:\.html)?$/.exec(window.location.pathname) || [])[1]) || "",
     exerciseFile = exerciseId + ".html",
     exerciseName = deslugify(exerciseId),
-            
-            
-   
+
     // Bin users into a certain number of realms so that
     // there is some level of reproducability in their questions
     bins = 200,
@@ -309,7 +307,7 @@ var Khan = (function() {
             "mean-and-median": ["stat"],
             "math-model": ["ast"],
             "simplify": ["math-model", "ast", "expr-helpers", "expr-normal-form", "steps-helpers"],
-            "angsegcongruency": ["angles", "interactive"]
+            "congruency": ["angles", "interactive"]
         },
 
         warnTimeout: function() {
@@ -725,7 +723,7 @@ var Khan = (function() {
         /****************End   JASON BAU 6-29-12 Testing**************/
 
         if (testMode) {
-            Khan.require(["../jquery-ui"]);
+            Khan.require(["../jquery-ui", "../jquery.qtip"]);
         }
 
         // Base modules required for every problem
@@ -1039,7 +1037,7 @@ var Khan = (function() {
 
         // In either of these testing situations,
         } else if ((testMode && Khan.query.test != null) || user == null) {
-            problemSeed = randomSeed;
+            problemSeed = randomSeed % bins;
         }
 
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
@@ -1677,6 +1675,13 @@ var Khan = (function() {
         }
 
 
+        if (userExercise == null || Khan.query.debug != null) {
+            $("#problem-permalink").text("Permalink: "
+                + problemID + " #"
+                + problemSeed)
+                .attr("href", window.location.protocol + "//" + window.location.host + window.location.pathname + "?debug&problem=" + problemID + "&seed=" + problemSeed);
+        }
+
         // Show the debug info
         if (testMode && Khan.query.debug != null) {
             $(document).keypress(function(e) {
@@ -1702,31 +1707,39 @@ var Khan = (function() {
             }
 
             var links = $("<p>").appendTo(debugWrap);
-            $("<a>Problem permalink</a>")
-                .attr("href", debugURL + "&seed=" + problemSeed)
-                .appendTo(links);
-
 
             if (!Khan.query.activity) {
-                links.append("<br>");
                 var historyURL = debugURL + "&seed=" + problemSeed + "&activity=";
                 $("<a>Problem history</a>").attr("href", "javascript:").click(function(event) {
                     window.location.href = historyURL + encodeURIComponent(JSON.stringify(userActivityLog));
                 }).appendTo(links);
             } else {
-                links.append("<br>");
                 $("<a>Random problem</a>")
-                    .attr("href", debugURL)
+                    .attr("href", window.location.protocol + "//" + window.location.host + window.location.pathname + "?debug")
                     .appendTo(links);
             }
 
-            links.append("<br>");
-            links.append("Problem type: ");
+            links.append("<br><b>Problem types:</b><br>");
 
-            $("<a>")
-                .text(problemID)
-                .attr("href", debugURL)
-                .appendTo(links);
+            exercises.children(".problems").children().each(function(n, prob) {
+                var probID = $(prob).attr("id") || n;
+                links.append($("<div>")
+                    .css({
+                        "width": "200px",
+                        "padding-left": "20px",
+                        "outline":
+                            (problemID === probID || problemID === '' + n) ?
+                            "1px dashed gray" : ""
+                    })
+                    .append($("<span>").text(n + ": "))
+                    .append($("<a>")
+                        .text(probID)
+                        .attr("href", window.location.protocol + "//" +
+                            window.location.host + window.location.pathname +
+                            "?debug&problem=" + probID)
+                    ));
+            });
+
 
             if (exercise.data("name") != null) {
                 links.append("<br>");
@@ -1814,8 +1827,6 @@ var Khan = (function() {
 
         return answerType;
     }
-            
-    
 
     function clearExistingProblem() {
         enableCheckAnswer();
@@ -1841,7 +1852,6 @@ var Khan = (function() {
     KhanTest.makeProblemBag=makeProblemBag;
     KhanTest.clearExistingProblem=clearExistingProblem  ;
 
-            
     function renderNextProblem(nextUserExercise) {
         clearExistingProblem();
 
@@ -1882,8 +1892,7 @@ var Khan = (function() {
 
     function prepareSite() {
         // TODO(david): Don't add homepage elements with "exercise" class
-            
-        //exercises = exercises.add($("div.exercise").detach());
+        exercises = exercises.add($("div.exercise").detach());
 
         // Setup appropriate img URLs
         $("#issue-throbber")
@@ -1966,7 +1975,6 @@ var Khan = (function() {
         function handleSubmit() {
             var pass = validator();
 
-        
             // Stop if the user didn't enter a response
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
@@ -1976,7 +1984,6 @@ var Khan = (function() {
             } else {
                 guessLog.push(validator.guess);
             }
-            
 
             // Stop if the form is already disabled and we're waiting for a response.
             if ($("#answercontent input").not("#hint,#next-question-button").is(":disabled")) {
@@ -2030,7 +2037,15 @@ var Khan = (function() {
                 // TODO: Save locally if offline
                 $(Khan).trigger("attemptSaved");
 
-            }, function() {
+            }, function(xhr) {
+
+                if (xhr.readyState == 0) {
+                    // Ignore errors caused by a broken pipe during page unload
+                    // (browser navigating away during ajax request).
+                    // See http://stackoverflow.com/questions/1370322/jquery-ajax-fires-error-callback-on-window-unload
+                    return;
+                }
+
                 // Error during submit. Disable the page and ask users to
                 // reload in an attempt to get updated data.
 
@@ -2061,7 +2076,6 @@ var Khan = (function() {
                         .focus();
                     $("#positive-reinforcement").show();
                 }
-                nextProblem(1);
             } else {
                 // Wrong answer. Enable all the input elements
                 $("#answercontent input").not("#hint")
@@ -2082,6 +2096,7 @@ var Khan = (function() {
 
         // Watch for when the next button is clicked
         $("#next-question-button").click(function(ev) {
+            nextProblem(1);
             $(Khan).trigger("gotoNextProblem");
 
             // Disable next question button until next time
@@ -2655,7 +2670,7 @@ var Khan = (function() {
             },
 
             // Handle error edge case
-            error: function() {
+            error: function(xhr) {
                 // Clear the queue so we don't spit out a bunch of
                 // queued up requests after the error
                 if (queue && requestQueue[queue]) {
@@ -2665,7 +2680,7 @@ var Khan = (function() {
                 /*
 
                 if ($.isFunction(fnError)) {
-                    fnError();
+                    fnError(xhr);
                 }
                 */
             }
@@ -2759,7 +2774,6 @@ var Khan = (function() {
             // TODO(david): Make sure weights work for recursively-loaded exercises.
             newContents.data("name", id).data("fileName", fileName).data("weight", weight);
 
-        
             // Add the new exercise elements to the exercises DOM set
             exercises = exercises.add(newContents);
 
@@ -2838,7 +2852,7 @@ var Khan = (function() {
                                 dataType: "text",
                                 success: function(htmlExercise) {
 /******JASON BAU******/
-                                   
+                                   /*
                                    var exerciseElem = $("<div>")
                                    .data("name", "regex")
                                    .data("displayName", "Regular Expressions")
@@ -2848,6 +2862,8 @@ var Khan = (function() {
                                    loadExercise.call(exerciseElem, function() {
                                         injectTestModeSite(html, htmlExercise);
                                                      });
+                                    */
+                                   injectTestModeSite(html, htmlExercise);
 
                                 }
                             });
@@ -2864,8 +2880,9 @@ var Khan = (function() {
 
         function injectTestModeSite(html, htmlExercise) {
             $("body").prepend(html);
-            $("#container").html("<h2 id='exerciseTitle' style='padding-left: 20px; margin-left: 80px;'>" +
-                    document.title + "</h2>" + htmlExercise);
+            $("#container .exercises-header h2").append(document.title);
+            $("#container .exercises-body .current-card-contents").html(
+                htmlExercise);
 
             if (Khan.query.layout === "lite") {
                 $("html").addClass("lite");
@@ -2898,6 +2915,3 @@ var Khan = (function() {
 
 // Make this publicly accessible
 var KhanUtil = Khan.Util;
-                                                                
-                                        
-                                                                    
