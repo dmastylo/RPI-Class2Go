@@ -421,7 +421,16 @@ class instance_status(models.Model):
     current_staging = models.ForeignKey(Course, related_name="current_staging", null=True, db_index=True)
     class Meta:
         db_table = u'c2g_instance_status'
-        
+
+class ProblemSet(models.Model):
+    course = models.ForeignKey(Course)
+    title = models.CharField(max_length=255)
+    path = models.CharField(max_length=255)
+    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+    class Meta:
+        db_table = u'c2g_problem_sets'
+
 #class ProcessedExercises(models.Model):
 #    complete = models.IntegerField(null=True, blank=True)
 #    count_hints = models.IntegerField(null=True, blank=True)

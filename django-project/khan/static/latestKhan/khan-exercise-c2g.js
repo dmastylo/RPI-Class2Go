@@ -2621,6 +2621,8 @@ var Khan = (function() {
     }
 
     function request(method, data, fn, fnError, queue) {
+        
+        /*                                  
         if (testMode) {
             // Pretend we have success
             if ($.isFunction(fn)) {
@@ -2629,6 +2631,7 @@ var Khan = (function() {
 
             return;
         }
+        */
 
         var xhrFields = {};
         if (typeof XMLHTTPRequest !== "undefined") {
