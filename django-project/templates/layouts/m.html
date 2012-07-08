@@ -18,7 +18,7 @@
 <body>
     <div id="viewport">
 		<div id="c2g_layout_topbar">
-			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
+			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/c2g-logo.png" alt="Class2Go by Stanford University"></a>
 			<div class="top-nav">
 			{% if request.user.id %}
 				<li>
@@ -53,6 +53,9 @@
 	    </div>
 	    <form action="{% url 'auth_login' %}" method="POST" class="form-horizontal">
 	    <div class="modal-body">
+	    	<div class="alert alert-info">
+				<i class="icon-info-sign"></i>New to Class2Go? <strong><a href="{% url 'registration_register' %}">Register here</a></strong>.
+			</div>
 	    	<fieldset>
 		    	<div class="control-group">
 		    		<label for="login_username" class="control-label">Username:</label>
@@ -70,7 +73,6 @@
 			</fieldset>
 	    </div>
 	    <div class="modal-footer">
-		    <a href="{% url 'registration_register' %}" class="btn">Register</a>
 		    <input type='submit' class="btn btn-primary" value="Login" />
 	    </div>
 	    </form>
