@@ -4,14 +4,14 @@
 	overflow: auto;
 }
 
-#c2g_layout_l_column {
+#l_column {
 	position: absolute; top: 60px;
 }
 
-#c2g_layout_m_column {
+#m_column {
 	position: absolute; top: 60px;
 }
 
-#c2g_layout_r_column {
+#r_column {
 	position: absolute; top: 60px;
 }

@@ -17,7 +17,7 @@
 
 <body>
     <div id="viewport">
-		<div id="c2g_layout_topbar">
+		<div id="topbar">
 			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
 			{% if request.user.id %}
 				<div style='position: absolute; right: 30px; top: 12px;'>
@@ -29,22 +29,29 @@
 				</div>
 			{% else %}
 				<input type='button' id='login_button' class='cw_button' value='Login' style='border: 0px; position: absolute; right: 30px; top: 12px; padding-bottom: 3px; width: 120px; font-size: 9pt;' onclick="$('#loginreg_canvas').show()"/>
-
 				<a href="{% url 'registration_register' %}" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
 			{% endif %}
 		</div>
+		
+		{% block navbar %}
+			<div id='navbar'>
+				
+			</div>
+		{% endblock navbar %}
+		
 		{% block content %}
-		<div id="c2g_layout_l_column">
-			{% block l_column_content %}<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>{% endblock %}
-		</div>
-		<div id="c2g_layout_m_column">
-			{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}
-		</div>
-		<div id="c2g_layout_r_column">
-			{% block r_column_content %}<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>{% endblock %}
-		</div>
+		<div id='content'>
+			
+			<div id="l_column">{% block l_column_content %}<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>{% endblock %}</div>
+			
+			<div id="m_column">{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}</div>
+			
+			<div id="r_column">{% block r_column_content %}<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>{% endblock %}</div>
+			
 		{% endblock content %}
+		</div>
     </div>
+	
 	
 	<div id="loginreg_canvas">
 		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
