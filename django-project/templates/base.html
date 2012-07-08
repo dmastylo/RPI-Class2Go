@@ -31,17 +31,23 @@
 				<li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
 			{% endif %}
 			</div>
-			<!--div class="navbar navbar-fixed-top">
+			<div class="navbar navbar-fixed-top">
 				<div class="navbar-inner">
 					<div class="container-fluid">
 						<ul class="nav">
 							<li class="active"><a href="#">Home</a></li>
-							<li><a href="#">Link</a></li>
-							<li><a href="#">Link</a></li>
+							<li><a href="#">Classes</a></li>
+							<li><a href="#">Search</a></li>
 						</ul>
+						<form class="navbar-search hidden-phone" action="">
+							<div class="input-append">
+								<input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
+								<button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
+							</div>
+						</form>
 					</div>
 				</div>
-			</div-->
+			</div>
 		</div>
 		{% block content %}
 		<div class="container-fluid body-content">
@@ -75,7 +81,7 @@
 							<a href="#">Home</a> <span class="divider">/</span>
 						</li>
 						<li>
-							<a href="#">Courses</a> <span class="divider">/</span>
+							<a href="#">Classes</a> <span class="divider">/</span>
 						</li>
 						<li class="active">National Lagnuage Processing</li>
 					</ul>
