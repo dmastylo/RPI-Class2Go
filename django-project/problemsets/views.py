@@ -5,7 +5,9 @@ from django.template import RequestContext
 
 # Create your views here.
 def list(request, course_prefix, course_suffix):
-    psets = ProblemSet.objects.all()
+    course_handle = course_prefix + "-" + course_suffix
+    course = Course.objects.get(handle=course_handle)
+    psets = course.problemset_set.all()
     return render_to_response('problemsets/list.html',
                               {'request': request,
                                'course_prefix': course_prefix,
