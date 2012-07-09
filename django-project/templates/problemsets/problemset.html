@@ -47,15 +47,20 @@
     </div>
 </div>
 
+<div id="loadedExercises"></div>
+
 {% endblock content %}
 
 
 {% block addl_scripts %}
+<div id="scripts">
+</div>
 <script>
 $(function() {
+  /*
     $.ajax({
            url: "{{ pset_url }}",
-           dataType: "text",
+           dataType: "html",
            success: function(htmlExercise) {
                 var shadowDOM=document.createElement('html');
                 shadowDOM.innerHTML=htmlExercise;
@@ -65,6 +70,15 @@ $(function() {
                 document.head.appendChild(kScript);
            }
     });
+   */
+  $("#loadedExercises").load("{{ pset_url }}", function(text,status) {
+                    if(status=="success"){
+                        var kScript = document.createElement('script');
+                        kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js";
+                        document.head.appendChild(kScript);
+                    }
+                 });
+  
   });
 </script>  
 
