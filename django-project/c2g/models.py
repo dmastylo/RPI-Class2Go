@@ -59,7 +59,7 @@ class Course(models.Model):
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     
     def __unicode__(self):
-        return self.handle
+        return self.title
 
     class Meta:
         db_table = u'c2g_courses'
