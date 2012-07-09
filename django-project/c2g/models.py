@@ -427,21 +427,23 @@ class ProblemSet(models.Model):
     class Meta:
         db_table = u'c2g_problem_sets'
 
-#class ProcessedExercises(models.Model):
-#    complete = models.IntegerField(null=True, blank=True)
-#    count_hints = models.IntegerField(null=True, blank=True)
-#    time_taken = models.IntegerField(null=True, blank=True)
-#    attempt_number = models.IntegerField(null=True, blank=True)
-#    sha1 = models.TextField(blank=True)
-#    seed = models.TextField(blank=True)
-#    problem_type = models.TextField(blank=True)
-#    review_mode = models.IntegerField(null=True, blank=True)
-#    topic_mode = models.IntegerField(null=True, blank=True)
-#    casing = models.TextField(blank=True)
-#    card = models.TextField(blank=True)
-#    topic_id = models.ForeignKey(VideoTopic, db_index=True)
-#    cards_done = models.IntegerField(null=True, blank=True)
-#    cards_left = models.IntegerField(null=True, blank=True)
-#    class Meta:
-#        db_table = u'c2g_processed_exercises'
+class ProblemActivity(models.Model):
+     student = models.ForeignKey(User)
+     course = models.ForeignKey(Course)
+     complete = models.IntegerField(null=True, blank=True)
+     count_hints = models.IntegerField(null=True, blank=True)
+     time_taken = models.IntegerField(null=True, blank=True)
+     attempt_number = models.IntegerField(null=True, blank=True)
+     sha1 = models.TextField(blank=True)
+     seed = models.TextField(blank=True)
+     problem_type = models.TextField(blank=True)
+     review_mode = models.IntegerField(null=True, blank=True)
+     topic_mode = models.IntegerField(null=True, blank=True)
+     casing = models.TextField(blank=True)
+     card = models.TextField(blank=True)
+     topic_id = models.ForeignKey(VideoTopic, db_index=True)
+     cards_done = models.IntegerField(null=True, blank=True)
+     cards_left = models.IntegerField(null=True, blank=True)
+     class Meta:
+        db_table = u'c2g_problem_activity'
 
