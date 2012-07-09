@@ -15,6 +15,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 
 class Institution(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
@@ -62,6 +63,17 @@ class Course(models.Model):
 
     class Meta:
         db_table = u'c2g_courses'
+
+
+def DefineUserGroupsForCourse(sender, **kwargs):
+        instance = kwargs.get('instance')
+        instance.student_group = Group.objects.create( name="Student Group for " + instance.handle)
+        instance.instructor_group = Group.objects.create(name="Instructor Group for " + instance.handle)
+        instance.tas_group = Group.objects.create(name="TAS Group for " + instance.handle)
+        instance.readonly_tas_group = Group.objects.create(name="Readonly TAS Group for " + instance.handle)
+            
+
+pre_save.connect(DefineUserGroupsForCourse, sender=Course)
 
 
 #does additional pages need an owner?
