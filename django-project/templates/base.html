@@ -16,12 +16,8 @@
 <body>
     <div id="viewport">
 		<div id="c2g_layout_topbar">
-<<<<<<< HEAD
-            <a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
-=======
 			<h1><a href="{% url 'c2g.views.home' %}" class="logo">Class2Go by Stanford University</a></h1>
 			<div class="top-nav">
->>>>>>> f0a03f2645e15f457f68b6de60c3b3b4bf4a0f62
 			{% if request.user.id %}
 				<li>
 					<form action="{% url 'auth_logout' %}" method="POST">

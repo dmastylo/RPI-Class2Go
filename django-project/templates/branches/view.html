@@ -2,7 +2,7 @@
 
 {% block m_column_content %}
 
-<h2>Homepage for {{course_id}} ({{branch_id}}) </h2>
+<h2> {{course.title}} </h2>
 
 <h3>Recent Announcements</h3>
 
@@ -10,11 +10,9 @@
     
     <h4> {{announcement.title}} </h4>
     <p> {{announcement.description}} </p>
-    <p align="right"> {{announcement.last_updated}} by {{announcement.owner}} </p>
+    <p align="right"> {{announcement.time_created}} by {{announcement.owner}} </p>
+    <hr>
 
 {% endfor %}
-
-<h1> {{branch_id}} </h1>
-
 
 {% endblock m_column_content %}
