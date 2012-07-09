@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block m_column_content %}
+
+<h2>Problem sets for course "{{course_prefix}} ({{course_suffix}})" </h2>
+
+<ul>
+{% for pset in psets %}
+  <li><a href="{{pset.title}}">{{pset.title}}</a>
+  </li>
+{% endfor %}
+</ul>
+
+{% endblock m_column_content %}
