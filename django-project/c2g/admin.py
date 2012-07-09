@@ -1,5 +1,5 @@
 from django.contrib import admin
-from c2g.models import Institution, Course, Video, AdditionalPage, Announcement, VideoTopic, VideoQuiz, VideoQuizQuestion, VideoQuizSubmission, AssignmentCategory, Assignment, AssignmentSubmission
+from c2g.models import Institution, Course, Video, AdditionalPage, Announcement, VideoTopic, VideoQuiz, VideoQuizQuestion, VideoQuizSubmission, AssignmentCategory, Assignment, AssignmentSubmission, ProblemSet
 
 admin.site.register(Institution)
 admin.site.register(Course)
@@ -10,7 +10,5 @@ admin.site.register(VideoTopic)
 admin.site.register(VideoQuiz)
 admin.site.register(VideoQuizQuestion)
 admin.site.register(VideoQuizSubmission)
-admin.site.register(AssignmentCategory)
-admin.site.register(Assignment)
-admin.site.register(AssignmentSubmission)
+admin.site.register(ProblemSet)
 

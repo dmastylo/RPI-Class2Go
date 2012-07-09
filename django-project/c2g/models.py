@@ -431,6 +431,8 @@ class ProblemSet(models.Model):
     path = models.CharField(max_length=255)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+    def __unicode__(self):
+        return self.title
     class Meta:
         db_table = u'c2g_problem_sets'
 
