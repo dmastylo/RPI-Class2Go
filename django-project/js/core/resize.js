@@ -10,21 +10,14 @@ function resize_page_contents() {
 	viewport.style.height = viewport_height.toString() + 'px';
 	
 	// Position and resize the content divs
-	var l_column = document.getElementById('c2g_layout_l_column');
-	var m_column = document.getElementById('c2g_layout_m_column');
-	var r_column = document.getElementById('c2g_layout_r_column');
+	var l_column = document.getElementById('l_column');
+	var m_column = document.getElementById('m_column');
+	var r_column = document.getElementById('r_column');
 	
 	var total_width = 0;
 	if (l_column) total_width += layout_widths['l'] + 10;
 	if (r_column) total_width += layout_widths['r'] + 10;
-	if (layout_widths['m']) {
-		m_width = layout_widths['m'];
-	} else {
-		m_width = viewport_width - 20 - total_width;
-		if (layout_widths['m_min'] && m_width < layout_widths['m_min']) m_width = layout_widths['m_min'];
-		if (layout_widths['m_max'] && m_width > layout_widths['m_max']) m_width = layout_widths['m_max'];
-	}
-	total_width += m_width;
+	total_width += layout_widths['m'];
 	var left = 0.5*(viewport_width - total_width); if (left < 10) left = 10;
 	
 	// Left column
@@ -36,8 +29,8 @@ function resize_page_contents() {
 	
 	// Middle column
 	m_column.style.left = left + 'px';
-	m_column.style.width = m_width + 'px';
-	left += (m_width + 10);
+	m_column.style.width = layout_widths['m'] + 'px';
+	left += (layout_widths['m'] + 10);
 	
 	// Right column
 	if (r_column) {
@@ -46,7 +39,7 @@ function resize_page_contents() {
 	}
 	
 	// resize the topbar
-	topbar = document.getElementById('c2g_layout_topbar');
+	topbar = document.getElementById('topbar');
 	if (viewport_width < total_width + 10) { topbar.style.width = (total_width+10) + 'px';}
 	else { topbar.style.width = viewport_width + 'px';}
 	

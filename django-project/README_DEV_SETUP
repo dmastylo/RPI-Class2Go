@@ -1,6 +1,10 @@
 Setting up a dev environment for class2go
 =========================================
 
+#########################
+#        For Mac        #
+#########################
+
 General Instructions
 * Set-up Python
 * Set-up Python's virtual env
@@ -14,10 +18,6 @@ Some people don't have their normal user set up with write permissions
 for all these commands that modify the environment (brew, easy_install,
 pip).  For all of those you should plan on running your own sudo
 prefix for these.
-
-For Windows with Eclipse: see below.
-
-=========================================
 
 1. Install XCode 
     Apple App Store
@@ -78,79 +78,177 @@ For Windows with Eclipse: see below.
 At this point you should be able to look at the django database in
 your local mysql and see a bunch of c2g_* tables.  Yay.
 
+#########################
+#      For Windows      #
+#########################
 
-=========================================
+	Eclipse Users and/or WAMP users:
+	---------------------------------
+		The following versions seem to be compatible:
+		Python: 2.7.3
+		Eclipse for PHP: Helios (http://download.eclipse.org/releases/helios)
+		PyDev plugin for Eclipse: 2.5.0 (http://pydev.org/updates)
+		Egit plugin for Eclipse: (http://download.eclipse.org/egit/updates)
+		WAMPServer: 2.1 
+	
+	1. Install Eclipse
 
-For Windows with Eclipse and WAMP (just in case your already using this for other projects. If you have any
-questions you can always ask me: (David))
-
-The following versions seem to be compatible:
-
-Python: 2.7.3
-Eclipse for PHP: Helios (http://download.eclipse.org/releases/helios)
-PyDev plugin for Eclipse: 2.5.0 (http://pydev.org/updates)
-Egit plugin for Eclipse: (http://download.eclipse.org/egit/updates)
-WAMPServer: 2.1 
-
-General process is:
-1. Install Eclipse
-
-2. Install Egit and configure it to the github repos (https://github.com/jbau/class2go)
+	2. Install Egit and configure it to the github repos (https://github.com/jbau/class2go)
 	For this you would need Jason to set you up with access to this repos.
 	Note, when configuring the Remote Push Url you'll need to add ".git" on the end:
 	(https://github.com/jbau/class2go.git)
-	
-3. Check out the repos to a local clone using import.
 
-4. Install Python
 
-5. Install PyDev
+Everyone:
+----------
 
-6. Install pip
-   (http://pypi.python.org/pypi/setuptools) Choose latest appropriate for your Python version
-   Install it.
-   Add c:\Python27\Scripts to your PATH
-   Open Cygwin and run: easy_install pip
-   
-7. Install python's virtual env
-    pip install virtualenv 
+Requirements
+-------------
+01. Prereqs: 
+	If you do not have the following, install them:
+		python 2.7
+		django
+		easy_install
+		pip
+		python image library (pip install PIL)
 
-8. Create the class2go virtual env 
-    virtualenv django-class2go --no-site-packages    
-
-    This should create the django-class2go directory under the
-    directory where this README is found.  All our django stuff
-    will happen in there now.
-
-9. Start using the virtual environment that we just created.  
-    . ./django-class2go/bin/activate
-
-    WARNING: you need to do this from whatever shell you're using.
-    You can tell this because is puts an environment indicator at
-    the beginning of your prompt
-   
-10. Install Django
-	pip install django
-	
-11. Install MySQL-python (this will be inside the virtualenv)
-    pip install MySQL-python
- 
-12. Install python image library (this will be inside the virtualenv)
-    pip install PIL
-
-13. Install South, the database schema migration tool: (this will
-    be inside the virtualenv)
+02. Install South, the database schema migration tool: (this will be inside the virtualenv)
     easy_install South
 
-14. Setup initial db.
-	Before doing the following steps you'll need to:
-	- Create a new db in MySQL
-	- Using the file database_example.py as an example, create a file named "database.py" 
-	at the same level and put your db connect info in there.
+03. Create a database called c2g (for example).
 
-	Also, the following didn't work for me in a Cygwin window (syncdb wasn't able to output to the window) 
-	so this may be best done at the dos prompt. 
-	If it doesn't work first time you can always delete the db and try again.
-	
-    ./manage.py syncdb
-    ./manage.py migrate
+04. Copy database.example.py to database.py.
+
+05. In database.py, append ‘mysql’ to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user ‘root’ and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
+
+06. Make sure you’re in the src/class2go/django-project directory (wherever that is for you)
+
+07. ‘python manage.py syncdb’ followed by ‘python manage.py migrate’ to create the required database tables and make sure the schema is up to date.
+You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
+
+08. XX -- ‘python manage.py collectstatic    ’ to copy all static files to the directory specified in settings.py.
+
+09. ‘python manage.py runserver xxxx’ to run a dev server on port number xxxx. Example: xxxx = 8000
+
+10. Visit localhost:xxxx in your web browser and confirm that you get a C2G page.
+
+#########################
+#      For Linux	#
+#########################
+N.B. This assumes you have mysql and python installed, and you've logged into mysql and created the c2g database ('create database c2g;'). 
+These instructions also include info for virtualenvwrapper, which contains useful tools for virtualenv. virtualenvwrapper can also be installed for Mac (and probably Windows too)
+
+1. Install pip:
+sudo apt-get install python-pip
+
+2. Install virtualenv:
+sudo pip install virtualenv
+
+3. Install virtualenvwrapper:
+sudo pip install virtualenvwrapper
+
+4. Verify installation location of virtualenv and virtualenvwrapper:
+ls /usr/local/bin/
+
+5. Edit login script:
+vim .bashrc
+
+6. ...and add the following:
+# virtualenv setup -- use Distribute by default
+export VIRTUALENV_DISTRIBUTE=true
+
+# virtualenvwrapper setup
+export WORKON_HOME=~/DevEnvs 
+export PROJECT_HOME=~/DevProjects
+export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+source /usr/local/bin/virtualenvwrapper.sh
+
+7. Source login script so env vars take effect:
+source ~/.bashrc
+(Sourcing should auto-create your virtual environment base dir)
+
+8. Check out new virtual base directory:
+ls -l DevEnvs/
+
+9. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
+echo $PATH
+(If not, add "export PATH=/usr/local/bin:$PATH" to your .bashrc)
+
+10. Make sure PROJECT_HOME is defined 
+echo $PROJECT_HOME
+
+11. Make new project directory:
+mkdir -p $PROJECT_HOME 
+
+12. Issue command to set up new project subdirectory and link it to virtual env:
+mkproject class2go
+
+13. Once inside virtual env/project directory, install django:
+pip install django
+
+14. Clone class2go repo from github:
+git clone https://github.com/jbau/class2go.git .
+
+15. Check out where your mysql is installed, make sure mysql_config exists in the dir:
+which mysql
+ls /usr/local/mysql (or whichever directory "which mysql" gives you)
+
+16. Need to install mysql_config if it's not there:
+sudo apt-get install libmysqlclient-dev
+(For Macs, brew install mysql should give you the equivalent of this)
+
+17. Might need some extra python developer stuff:
+sudo apt-get install python-dev
+
+18. Install python hooks for MySQL:
+pip install MySQL-python
+
+19. Install Python Imaging Lib:
+pip install PIL
+
+20. Install South db stuff:
+pip install South
+
+21. Go to django-project dir and copy over database settings file:
+cd django-project/
+cp database_example.py database.py
+
+22. Edit file and add db name, username and password:
+vim database.py 
+
+23. Run syncdb to create database tables 
+./manage.py syncdb
+Might need to issue "syncdb" command a couple times if there are errors; The first time, it will ask you for username and password for the database 
+
+24. Migrate user stuff over: 
+./manage.py migrate
+
+25. Update settings file and add "static/" for STATIC_ROOT_DIR:
+vim settings.py
+
+26. Make sure directory exists, or create it:
+mkdir static
+
+27. Run collectstatic to copy stuff into your dir:
+./manage.py collectstatic
+
+28. Run server on whatever port you want:
+python manage.py runserver 8100
+
+
+When you want to start working on your project, just do the following:
+workon class2go
+cdproject (shouldn't be necessary, as workon command will automatically cd to project dir, but use it if you need to)
+python manage.py runserver 8100
+
+
+##########################
+#  Generating Test Data  #
+##########################
+
+01. Some schema mods were made so run: manage.py migrate
+
+02. Take a look in c2g/views.py as there are some parameters that affect which data gets created. Note, if you choose the delete_current_data option it will delete your current django users so you’ll have to recreate those users if you want.
+
+03. To run the script that populates the data run the url: http://localhost:8080/db_populate or whatever your version is.

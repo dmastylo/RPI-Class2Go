@@ -49,6 +49,13 @@
 				</div>
 			</div>
 		</div>
+		
+		{% block navbar %}
+			<div id='navbar'>
+				
+			</div>
+		{% endblock navbar %}
+		
 		{% block content %}
 		<div class="container-fluid body-content">
 			<div class="row-fluid">
@@ -138,6 +145,7 @@
 			{% include "footer.html" %}
 		</div>
 		{% endblock content %}
+		</div>
     </div>
 
 	<div id="login-modal" class="modal fade">
