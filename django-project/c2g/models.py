@@ -34,10 +34,10 @@ class Institution(models.Model):
 class Course(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
     institution = models.ForeignKey(Institution, db_index=True)
-    student_group = models.ForeignKey(Group, related_name="student_group", default=False, db_index=True)
-    instructor_group = models.ForeignKey(Group, related_name="instructor_group", default=False, db_index=True)
-    tas_group = models.ForeignKey(Group, related_name="tas_group", default=False, db_index=True)
-    readonly_tas_group = models.ForeignKey(Group, related_name="readonly_tas_group", default=False, db_index=True)
+    student_group = models.ForeignKey(Group, related_name="student_group", db_index=True)
+    instructor_group = models.ForeignKey(Group, related_name="instructor_group", db_index=True)
+    tas_group = models.ForeignKey(Group, related_name="tas_group", db_index=True)
+    readonly_tas_group = models.ForeignKey(Group, related_name="readonly_tas_group", db_index=True)
     code = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     listing_description = models.TextField(blank=True)
@@ -53,6 +53,7 @@ class Course(models.Model):
     membership_control = models.TextField(blank=True)
     join_password = models.TextField(blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
+    course_prefix = models.CharField(max_length=30, null=True, db_index=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     
@@ -325,6 +326,8 @@ class Video(models.Model):
     #segments = models.TextField(blank=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+    type = models.CharField(max_length=30, default="youtube")
+    url = models.CharField(max_length=255, null=True)
 
     def __unicode__(self):
         return self.title
@@ -414,6 +417,23 @@ class SharingPermission(models.Model):
     class Meta:
         db_table = u'c2g_sharing_permissions'
         
+        
+class instance_status(models.Model):
+    prefix = models.CharField(max_length=30, null=True, db_index=True)
+    current_prod = models.ForeignKey(Course, related_name="current_prod", null=True, db_index=True)
+    current_staging = models.ForeignKey(Course, related_name="current_staging", null=True, db_index=True)
+    class Meta:
+        db_table = u'c2g_instance_status'
+
+class ProblemSet(models.Model):
+    course = models.ForeignKey(Course)
+    title = models.CharField(max_length=255)
+    path = models.CharField(max_length=255)
+    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+    class Meta:
+        db_table = u'c2g_problem_sets'
+
 #class ProcessedExercises(models.Model):
 #    complete = models.IntegerField(null=True, blank=True)
 #    count_hints = models.IntegerField(null=True, blank=True)
