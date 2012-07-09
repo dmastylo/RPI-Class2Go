@@ -54,6 +54,7 @@ class Course(models.Model):
     join_password = models.TextField(blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     course_prefix = models.CharField(max_length=30, null=True, db_index=True)
+    course_instance = models.CharField(max_length=30, null=True, db_index=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     
