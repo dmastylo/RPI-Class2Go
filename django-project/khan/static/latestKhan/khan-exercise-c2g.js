@@ -231,9 +231,12 @@ var Khan = (function() {
     // pending in the middle of a load.
     loadingExercises = {},
 
+    urlBaseOverride="/static/latestKhan/",
     urlBase = typeof urlBaseOverride !== "undefined" ? urlBaseOverride :
         testMode ? "../" : "/khan-exercises/",
 
+    
+            
     lastFocusedSolutionInput = null,
 
     issueError = "Communication with GitHub isn't working. Please file " +
@@ -1120,11 +1123,16 @@ var Khan = (function() {
         // Remove and store hints to delay running modules on it
         hints = problem.children(".hints").remove();
 
-        // Remove the hint box if there are no hints in the problem
-        if (hints.length === 0) {
-            $(".hint-box").remove();
-        }
+        // Hide the hint box if there are no hints in the problem
+        
+            //console.log(problem);
+        $(".hint-box").show();
 
+        if (hints.length === 0) {
+            $(".hint-box").hide();
+        }
+         
+    
         // Evaluate any inline script tags in this exercise's source
         $.each(exercise.data("script") || [], function(i, scriptContents) {
             $.globalEval(scriptContents);
@@ -2829,46 +2837,63 @@ var Khan = (function() {
             $(function() {
                 // Inject the site markup, if it doesn't exist
                 if ($("#answer_area").length === 0) {
+                    /*
                     $.ajax({
                         url: urlBase + "exercises/khan-site.html",
                         dataType: "html",
                         success: function(html) {
+                     */
 
                             $.ajax({
                                 url: urlBase + "exercises/khan-exercise.html",
                                 dataType: "text",
                                 success: function(htmlExercise) {
 
-                                    injectTestModeSite(html, htmlExercise);
+                                    //injectTestModeSite(html, htmlExercise);
+                                   injectExerciseFrameMarkup(htmlExercise);
+                                   finishSitePrep();
 
                                 }
                             });
-
+                     /*
                         }
                     });
+                      */
                 } else {
                     if (modulesDeferred) {
                         modulesDeferred.resolve();
                     }
+                  finishSitePrep();
                 }
             });
         });
 
+        function injectExerciseFrameMarkup(htmlExercise) {
+        
+            $("#container .exercises-body .current-card-contents").html(htmlExercise);
+                                                                    
+        }
+                                                                    
         function injectTestModeSite(html, htmlExercise) {
             $("body").prepend(html);
             
             $("#container .exercises-header h2").append($('<span>').html(document.title));
-            $("#container .exercises-body .current-card-contents").html(
-                htmlExercise);
+            injectExerciseFrameMarkup(htmlExercise);
 
             if (Khan.query.layout === "lite") {
                 $("html").addClass("lite");
             }
 
+            finishSitePrep();
+                                                                    
+        }
+                                                                    
+        function finishSitePrep() {
+                                                                    
             prepareSite();
             
             initC2GStacks(exercises);
-
+            
             var problems = exercises.children(".problems").children();
             globalProblems=problems;
             globalExercises=exercises;
@@ -2877,17 +2902,18 @@ var Khan = (function() {
             // calls KhanUtil.random() and changes the seed)
             
             if (Khan.query.problem == null) {
-                weighExercises(problems);
-                problemBag = makeProblemBag(problems, 10);
+              weighExercises(problems);
+              problemBag = makeProblemBag(problems, 10);
             }
-             
-
+            
+            
             // Generate the initial problem when dependencies are done being loaded
             //var answerType = makeProblem();
-                                                                
+            
             var first = $('#questions-to-do li:last-child');
             makeProblem(first.data('problem'), first.data('randseed'))
-                                                                    
+
+
         }
                                                                     
         
