@@ -454,3 +454,12 @@ class ProblemSet(models.Model):
 #    class Meta:
 #        db_table = u'c2g_processed_exercises'
 
+class NewsEvent(models.Model):
+    course = models.ForeignKey(Course)
+    event = models.CharField(max_length=255)
+    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    def __unicode__(self):
+        return self.event
+    class Meta:
+        db_table = u'c2g_news_events'
