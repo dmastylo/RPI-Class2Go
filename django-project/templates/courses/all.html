@@ -13,6 +13,8 @@
 <th>Course Title</th>
 <th>Year</th>
 <th>Term</th>
+<th>Starts</th>
+<th>Ends</th>
 </tr>
 
 {% for item in course_list %}
@@ -22,6 +24,8 @@
 <td>{{item.title}}</td>
 <td>{{item.year}}</td>
 <td>{{item.term}}</td>
+<td>{{item.calendar_start}}</td>
+<td>{{item.calendar_end}}</td>
 </tr>
 {% endfor %}
 </table>

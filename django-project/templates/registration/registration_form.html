@@ -3,13 +3,19 @@
 
 {% block m_column_content %}
 
-
-<form action="{% url 'registration_register' %}" method="post">
-    {% csrf_token %}
-    <table>
-    {{ form.as_table }}
-    </table>
-    <input type="submit" value="Submit" />
-</form>
+<div class="registration">
+	<h1>Register for Class2Go</h1>
+	<div class="well">
+		<form action="{% url 'registration_register' %}" method="post">
+		    {% csrf_token %}
+		    <table>
+		    {{ form.as_table }}
+		    </table>
+		    <div class="form-actions">
+		    	<input type="submit" value="Register" class="btn btn-primary btn-large" />
+			</div>
+		</form>
+	</div>
+</div>
 
 {% endblock m_column_content %}

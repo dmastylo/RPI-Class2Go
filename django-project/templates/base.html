@@ -3,34 +3,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
+	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/buttons.css" />
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/layout.css" />
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/topbar.css" />
-	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/loginreg.css" />
-
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script type='text/javascript' src="{{ STATIC_URL }}js/core/resize.js"></script>
-	
+    <!--[if IE 7]>
+	  <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome-ie7.css">
+	<![endif]-->
     <title>{% block title %}Class2Go{% endblock %}</title>
 </head>
 
 <body>
     <div id="viewport">
-		<div id="topbar">
-			<a href="{% url 'c2g.views.home' %}"><img class="small_logo" src="{{ STATIC_URL }}graphics/core/logo_160_35.png"></a>
+		<div id="c2g_layout_topbar">
+			<h1><a href="{% url 'c2g.views.home' %}" class="logo">Class2Go by Stanford University</a></h1>
+			<div class="top-nav">
 			{% if request.user.id %}
-				<div style='position: absolute; right: 30px; top: 12px;'>
-					<label style='color: white;'>Welcome <b>{{ user.username }}</b></label>
-					<form style='display: inline; margin-left: 30px;' action="{% url 'auth_logout' %}" method="POST">
-						<input type='submit' id='login_button' class='cw_button' value='Logout' style='display: inline; border: 0px; padding-bottom: 3px; width: 120px; font-size: 9pt;'/>
+				<li>
+					<form action="{% url 'auth_logout' %}" method="POST">
+						<input type="submit" id="login_button" class="btn" value="Logout" />
 						{% csrf_token %}
 					</form>
-				</div>
+				</li>
+				<li><span>Welcome <b>{{ user.username }}</b>!</span></li>
 			{% else %}
-				<input type='button' id='login_button' class='cw_button' value='Login' style='border: 0px; position: absolute; right: 30px; top: 12px; padding-bottom: 3px; width: 120px; font-size: 9pt;' onclick="$('#loginreg_canvas').show()"/>
-				<a href="{% url 'registration_register' %}" style='border: 0px; position: absolute; right: 180px; top: 12px; color: white; font-weight: bold; font-size: 9pt;'>Register</a>
+				<li><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
+				<li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
 			{% endif %}
+			</div>
+			<div class="navbar navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container-fluid">
+						<ul class="nav">
+							<li class="active"><a href="#">Home</a></li>
+							<li><a href="#">Classes</a></li>
+							<li><a href="#">Search</a></li>
+						</ul>
+						<form class="navbar-search hidden-phone" action="">
+							<div class="input-append">
+								<input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
+								<button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 		{% block navbar %}
@@ -40,50 +57,129 @@
 		{% endblock navbar %}
 		
 		{% block content %}
-		<div id='content'>
-			
-			<div id="l_column">{% block l_column_content %}<span style='color: red;'>Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column... Left_column</span>{% endblock %}</div>
-			
-			<div id="m_column">{% block m_column_content %}<span style='color: green;'>Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column... Middle_column</span>{% endblock %}</div>
-			
-			<div id="r_column">{% block r_column_content %}<span style='color: red;'>Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column... Right_column</span>{% endblock %}</div>
-			
+		<div class="container-fluid body-content">
+			<div class="row-fluid">
+				<div id="c2g_layout_l_column" class="span3">
+					{% block l_column_content %}
+					<div class="well tight">
+						<ul class="nav nav-list">
+							<li class="nav-header">Videos</li>
+	 						<li class="active"><a href="#">1.1 Course Intro</a></li>
+	 						<li><a href="#">1.2 History of Field</a></li>
+	 						<li><a href="#">1.3 Big Issues</a></li>
+	 						<li><a href="#">1.4 Another nav item</a></li>
+	 						<li><a href="#">1.5 Another nav item</a></li>
+	 						<li class="nav-header">Problem Sets</li>
+	 						<li><a href="#">Problem set 1</a></li>
+	 						<li><a href="#">Problem set 2</a></li>
+	 						<li><a href="#">Problem set 3</a></li>
+	 						<li><a href="#">Problem set 4</a></li>
+	 						<li class="divider"></li>
+	 						<li><a href="#"><i class="icon-flag"></i>Help</a></li>
+	 						<li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
+						</ul>
+					</div>
+					{% endblock %}
+				</div>
+				<div id="c2g_layout_m_column" class="span6">
+					{% block m_column_content %}
+					<ul class="breadcrumb">
+						<li>
+							<a href="#">Home</a> <span class="divider">/</span>
+						</li>
+						<li>
+							<a href="#">Classes</a> <span class="divider">/</span>
+						</li>
+						<li class="active">National Lagnuage Processing</li>
+					</ul>
+					<h1>Natural Language Processing (H1)</h1>
+					<ul class="thumbnails">
+						<li class="span10 selected">
+							<a href="#" class="thumbnail">
+								<iframe width="100%" height="315" src="http://www.youtube.com/embed/BJiVRIPVNxU" frameborder="0" allowfullscreen></iframe>
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+						<li class="span2">
+							<a href="#" class="thumbnail">
+								<img src="http://placehold.it/160x120" alt="">
+							</a>
+						</li>
+					</ul>
+					<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+					<h2>Heading 2</h2>
+					<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+					<ul>
+						<li>Sed ut perspiciatis unde omnis iste natus error</li> 
+						<li>Sed ut perspiciatis unde omnis iste natus error</li> 
+						<li>Sed ut perspiciatis unde omnis iste natus error</li> 
+					</ul>
+					<h3>Heading 3</h3>
+					<p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. <a href="#">This is a link</a> ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam</p>
+					<h4>Heading 4</h4>
+					<p>Nisi ut aliquid ex ea commodi consequatur? <a href="#">This is a link</a> reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
+					{% endblock %}
+				</div>
+				<div id="c2g_layout_r_column" class="span3">
+					{% block r_column_content %}
+					<h3>Course Info</h3>
+					<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+					<p><a href="#" class="btn btn-primary"><i class="icon-download"></i>Download Syllabus</a></p>
+					{% endblock %}
+				</div>
+			</div>
+			{% include "footer.html" %}
+		</div>
 		{% endblock content %}
 		</div>
     </div>
-	
-	
-	<div id="loginreg_canvas">
-		<div id="loginreg_background" onclick="$('#loginreg_canvas').hide()"></div>
-		<div id="loginreg_container">
-			<div id="login_container">
 
-				<form action="{% url 'auth_login' %}" method="POST">
-					<table style='width: 250px;'><tr>
-						<td style='width: 200px;'><h2 style='color:#800000;'>Login</h2></td>
-						<td style='text-align: right;width: 50px;'><a href="javascript:$('#loginreg_canvas').hide()" style='float: right;'>Close</a></td>
-					</tr></table>
-					
-					<table>
-						<tr>
-							<td><label for='login_username'>Username:</label></td>
-							<td><input name='username' id='login_username' style='width:180px;'></td>
-						</tr>
-						<tr>
-							<td><label for='login_password'>Password:</label></td>
-							<td><input type='password' name='password' id='login_password' style='width:180px;'></td>
-						</tr>
-					</table>
-					<input type='submit' class='cw_button' value='Login' style='margin: 10px; float: right;'/>
-					{% csrf_token %}
-				</form>
-				<br/><br/>
-        <label>Do not have a Class2Go account?</label>&nbsp;<a href="{% url 'registration_register' %}">Register</a>
+	<div id="login-modal" class="modal fade">
+	    <div class="modal-header">
+		    <a class="close" data-dismiss="modal">×</a>
+		    <h3>Login</h3>
+	    </div>
+	    <form action="{% url 'auth_login' %}" method="POST" class="form-horizontal">
+	    <div class="modal-body">
+	    	<div class="alert alert-info">
+				<i class="icon-info-sign"></i>New to Class2Go? <strong><a href="{% url 'registration_register' %}">Register here</a></strong>.
 			</div>
-		</div>
+	    	<fieldset>
+		    	<div class="control-group">
+		    		<label for="login_username" class="control-label">Username:</label>
+		    		<div class="controls">
+		    			<input type="text" name="username" id="login_username" />
+		    		</div>
+		    	</div>
+		    	<div class="control-group">
+		    		<label for="login_password" class="control-label">Password:</label>
+		    		<div class="controls">
+		    			<input type="password" name="password" id="login_password" />
+		    		</div>
+		    	</div>
+				{% csrf_token %}
+			</fieldset>
+	    </div>
+	    <div class="modal-footer">
+		    <input type='submit' class="btn btn-primary" value="Login" />
+	    </div>
+	    </form>
 	</div>
-	<script type='text/javascript'>
-		resize_page_contents();
-	</script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
 </body>
 </html>
