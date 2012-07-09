@@ -297,7 +297,6 @@ class UserCourseData(models.Model):
 class UserProfile(models.Model):
     #id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, db_index=True)
-    is_instructor = models.IntegerField(default=False, blank=True)
     site_data = models.TextField(blank=True)
     class Meta:
         db_table = u'c2g_user_profiles'
@@ -393,23 +392,6 @@ class VideoAnnotation(models.Model):
     class Meta:
         db_table = u'c2g_video_annotations'
 
-
-
-
-#For roles, can we make do somehow with built-in django permissions
-#what custom features do we actually need here?
-class Role(models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course)
-    title = models.CharField(max_length=255)
-    is_staff = models.IntegerField(null=True, blank=True)
-    privileges = models.TextField(blank=True)
-    holder_ids = models.TextField(blank=True)
-    holder_count = models.BigIntegerField(null=True, blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
-    class Meta:
-        db_table = u'c2g_roles'
 
 
 class SharingPermission(models.Model):
