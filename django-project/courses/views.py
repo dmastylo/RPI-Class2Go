@@ -1,8 +1,8 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
-from c2g.models import Course, Announcement
+from c2g.models import Course, Announcement, NewsEvent
 
 def all(request):
 	course_list = Course.objects.select_related('institution').all()
@@ -15,5 +15,10 @@ def mine(request):
 	return render_to_response('courses/mine.html', {'request': request}, context_instance=RequestContext(request))
 	
 def view(request, course_prefix, course_suffix):
-	announcement_list = Announcement.objects.all().order_by('-last_updated')
-	return render_to_response('courses/view.html', {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'announcement_list': announcement_list, 'request': request}, context_instance=RequestContext(request))
+    try:
+        course = Course.objects.get(handle=course_prefix+"-"+course_suffix)
+    except:
+        raise Http404
+    announcement_list = course.announcement_set.all().order_by('-time_created')
+    news_list = course.newsevent_set.all().order_by('-time_created')[0:5]
+    return render_to_response('branches/view.html', {'course': course, 'announcement_list': announcement_list, 'news_list': news_list, 'request': request}, context_instance=RequestContext(request))
