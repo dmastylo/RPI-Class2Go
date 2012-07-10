@@ -10,6 +10,7 @@ from c2g.models import Institution, Course
 from django.contrib.auth.models import Group 
 
 class C2GUnitTests(TestCase):
+    fixtures = ['db_snapshot.json']
     def test_basic_addition(self):
         """
         Tests that 1 + 1 always equals 2.
