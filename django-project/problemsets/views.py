@@ -22,8 +22,9 @@ def show(request, course_prefix, course_suffix, pset ):
     ps = course.problemset_set.get(title=pset)
     #path = ProblemSet.objects(
     return render_to_response('problemsets/problemset.html', 
-                              {'request': request, 
-                               'course_handle': course_handle,
+                              {'request': request,
+                               'course_prefix': course_prefix,
+                               'course_suffix': course_suffix,
                                'pset': pset,
                                'pset_url':ps.path,
                               }, 
