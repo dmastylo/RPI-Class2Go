@@ -14,6 +14,6 @@ def current(request):
 def mine(request):
 	return render_to_response('courses/mine.html', {'request': request}, context_instance=RequestContext(request))
 	
-def view(request, course_id):
-    announcement_list = Announcement.objects.all().order_by('-last_updated')
-    return render_to_response('courses/view.html', {'course_id': course_id, 'announcement_list': announcement_list, 'request': request}, context_instance=RequestContext(request))
+def view(request, course_prefix, course_suffix):
+	announcement_list = Announcement.objects.all().order_by('-last_updated')
+	return render_to_response('courses/view.html', {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'announcement_list': announcement_list, 'request': request}, context_instance=RequestContext(request))
