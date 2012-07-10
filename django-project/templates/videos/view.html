@@ -2,6 +2,8 @@
 
 {% block m_column_content %}
 
-<h2>Show video "{{video_id}}" for course "{{course_id}} ({{branch_id}})" </h2>
+<h2>Show video {{video.id}} for course {{course_id}}-{{branch_id}}</h2>
+<br />
+<iframe width="480" height="360" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
 
 {% endblock m_column_content %}

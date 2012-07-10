@@ -2,6 +2,17 @@
 
 {% block m_column_content %}
 
-<h2>List videos for course "{{course_id}} ({{branch_id}})" </h2>
+<h1>List videos for course {{course_id}}-{{branch_id}}</h1>
+
+<br/>
+
+{% for topic in topics %}
+  <h2>{{topic.title}}</h2>
+    <ul>
+    {% for video in topic.video_set.all %}
+      <li><a href="{{video.id}}">{{video.title}}</a></li>
+    {% endfor %}
+    </ul>
+{% endfor %}
 
 {% endblock m_column_content %}
