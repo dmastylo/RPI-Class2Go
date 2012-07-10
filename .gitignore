@@ -8,6 +8,10 @@ django-class2go/*
 
 *.pyc
 
+#*#
+
+*.swp
+
 .DS_Store
 
 js/demorun.js~
@@ -17,6 +21,8 @@ js/quizrun.js~
 problem-sets/from-cware-dev2/problem_set_json.tgz
 
 problem-sets/quizzes/Advanced-Maxent/test_json_load.html~
+
+django-project/new-class2go
 
 django-project/django-class2go
 

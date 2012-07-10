@@ -218,24 +218,32 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
+        u'c2g.problemactivity': {
+            'Meta': {'object_name': 'ProblemActivity', 'db_table': "u'c2g_problem_activity'"},
+            'attempt_number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'card': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'cards_done': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'cards_left': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'casing': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'complete': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'count_hints': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['c2g.Course']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'problem_type': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'review_mode': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'seed': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'sha1': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
+            'time_taken': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'topic_id': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['c2g.VideoTopic']"}),
+            'topic_mode': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+        },
         u'c2g.problemset': {
             'Meta': {'object_name': 'ProblemSet', 'db_table': "u'c2g_problem_sets'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['c2g.Course']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'path': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        u'c2g.role': {
-            'Meta': {'object_name': 'Role', 'db_table': "u'c2g_roles'"},
-            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['c2g.Course']"}),
-            'holder_count': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'holder_ids': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_staff': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'privileges': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
@@ -274,7 +282,6 @@ class Migration(SchemaMigration):
         u'c2g.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "u'c2g_user_profiles'"},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_instructor': ('django.db.models.fields.IntegerField', [], {'default': 'False', 'blank': 'True'}),
             'site_data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'})
         },
