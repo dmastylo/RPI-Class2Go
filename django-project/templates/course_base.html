@@ -5,10 +5,18 @@
 	<div class="navbar-inner">
 		<div class="container-fluid">
 			<ul class="nav">
-				<li class="active"><a href="{% url 'courses.assignments.views.list' course_prefix course_suffix %}">Home</a></li>
-				<li><a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a></li>
-				<li><a href="{% url 'courses.assignments.views.list' course_prefix course_suffix %}">Problem Sets</a></li>
-				<li><a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a></li>
+				<li {% block home_link_class %}{% endblock home_link_class %}>
+					<a href="{% url 'courses.views.view' course_prefix course_suffix %}">Home</a>
+				</li>
+				<li {% block forums_link_class %}{% endblock forums_link_class %}>
+					<a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a>
+				</li>
+				<li class="dropdown"{% block assignments_link_class %}{% endblock assignments_link_class %}>
+					<a href="{% url 'courses.assignments.views.list' course_prefix course_suffix %}">Problem Sets</a>
+				</li>
+				<li class="dropdown"{% block videos_link_class %}{% endblock videos_link_class %}>
+					<a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a>
+				</li>
 			</ul>
 			<form class="navbar-search hidden-phone" action="">
 				<div class="input-append">
