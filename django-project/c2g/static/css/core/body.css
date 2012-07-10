@@ -192,6 +192,25 @@ a.thumbnail:hover {
 	text-align:center;
 }
 
+/* Video - added by Kevin
+-------------------------------------------------- */
+.progress-bar {
+  height: 15px;
+  padding: 0;
+  position: relative;
+  border: 1px solid #BBB;
+}
+
+.progress-bar .fill {
+  display: block;
+  height: 100%;
+  position: relative;
+}
+
+.progress-bar .fill.red {
+  background-color: #820000;
+}
+
 /* Footer
 -------------------------------------------------- */
 .footer {
