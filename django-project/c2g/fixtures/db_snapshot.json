@@ -1,0 +1,357 @@
+[
+    {
+        "pk": 7, 
+        "model": "c2g.institution", 
+        "fields": {
+            "city": "Palo Alto", 
+            "last_updated": "2012-07-10T14:40:59", 
+            "title": "Stanford University", 
+            "country": "USA", 
+            "time_created": "2012-07-10T14:40:59", 
+            "domains": "stanford.edu"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "c2g.course", 
+        "fields": {
+            "code": "CS1234", 
+            "last_updated": "2012-07-10T14:40:59", 
+            "feature_settings": "assignments=on,lectures=on,videos=on", 
+            "time_created": "2012-07-10T14:40:59", 
+            "readonly_tas_group": 32, 
+            "year": 2012, 
+            "membership_control": "1,2,3", 
+            "title": "Natural Language Processing", 
+            "calendar_start": "2012-07-24", 
+            "meeting_info": "There are no upcoming office hours", 
+            "list_publicly": 1, 
+            "handle": "nlp-Fall2012", 
+            "description": "Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people's opinions about products or services to extracting appointments from your email. In this class, you'll learn the fundamental algorithms and mathematical models for human alanguage processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.", 
+            "listing_description": "This course covers a broad range of topics in natural language processing, including word and sentence tokenization, text classification and sentiment analysis, spelling correction, information extraction, parsing, meaning extraction, and question answering, We will also introduce the underlying theory from probability, statistics, and machine learning that are crucial for the field, and cover fundamental algorithms like n-gram language modeling, naive bayes and maxent classifiers, sequence models like Hidden Markov Models, probabilistic dependency and constituent parsing, and vector-space models of meaning.We are offering this course on Natural Language Processing free and online to students worldwide, continuing Stanford's exciting forays into large scale online instruction. Students have access to screencast lecture videos, are given quiz questions, assignments and exams, receive regular feedback on progress, and can participate in a discussion forum. Those who successfully complete the course will receive a statement of accomplishment. Taught by Professors Jurafsky and Manning, the curriculum draws from Stanford's courses in Natural Language Processing. You will need a decent internet connection for accessing course materials, but should be able to watch the videos on your smartphone.", 
+            "instructor_group": 30, 
+            "student_group": 29, 
+            "institution": 7, 
+            "term": "Fall", 
+            "tas_group": 31, 
+            "calendar_end": "2012-09-24", 
+            "mode": "live", 
+            "join_password": "", 
+            "staff_emails": "aa@stanford.edu*, bb@stanford.edu*"
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "c2g.additionalpage", 
+        "fields": {
+            "last_updated": "2012-07-10T14:40:59", 
+            "description": "description of Syllabus", 
+            "title": "Syllabus", 
+            "update_log": "", 
+            "time_created": "2012-07-10T14:40:59", 
+            "course": 7, 
+            "access_id": "123", 
+            "write_access": "1,2"
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "c2g.additionalpage", 
+        "fields": {
+            "last_updated": "2012-07-10T14:40:59", 
+            "description": "description of other static page 1", 
+            "title": "Other Static Page 1", 
+            "update_log": "", 
+            "time_created": "2012-07-10T14:40:59", 
+            "course": 7, 
+            "access_id": "123", 
+            "write_access": "1,2"
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "c2g.additionalpage", 
+        "fields": {
+            "last_updated": "2012-07-10T14:40:59", 
+            "description": "description of other static page 2", 
+            "title": "Other Static Page 2", 
+            "update_log": "", 
+            "time_created": "2012-07-10T14:40:59", 
+            "course": 7, 
+            "access_id": "123", 
+            "write_access": "1,2"
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "c2g.announcement", 
+        "fields": {
+            "last_updated": "2012-07-10T14:41:01", 
+            "description": "Welcome to the course! Check out the links to announcements, news events, assignments and grades.", 
+            "title": "Welcome to Natural Language Processing!", 
+            "time_created": "2012-07-10T14:41:01", 
+            "course": 7, 
+            "access_id": "123", 
+            "owner": 68
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "c2g.announcement", 
+        "fields": {
+            "last_updated": "2012-07-10T14:41:01", 
+            "description": "The first assignment has been posted.  Visit the assignments link to see the list of assignments and instructions for each assignment.  Be sure to check the additional pages for additional help. If you have any question email us at nlp@stanford.edu.", 
+            "title": "Assignment 1 Out", 
+            "time_created": "2012-07-10T14:41:01", 
+            "course": 7, 
+            "access_id": "123", 
+            "owner": 68
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "c2g.announcement", 
+        "fields": {
+            "last_updated": "2012-07-10T14:41:01", 
+            "description": "Because this Friday is Friday the 13th, we do not want to take any chances so class is cancelled. Post any questions on the discussion forum if you have any questions", 
+            "title": "Friday Lecture for 7/13 cancelled", 
+            "time_created": "2012-07-10T14:41:01", 
+            "course": 7, 
+            "access_id": "123", 
+            "owner": 68
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "c2g.announcement", 
+        "fields": {
+            "last_updated": "2012-07-10T14:41:01", 
+            "description": "We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!", 
+            "title": "Lecture Room Moved", 
+            "time_created": "2012-07-10T14:41:01", 
+            "course": 7, 
+            "access_id": "123", 
+            "owner": 68
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "c2g.assignmentcategory", 
+        "fields": {
+            "course": 7, 
+            "last_updated": "2012-07-10T14:40:59", 
+            "time_created": "2012-07-10T14:40:59", 
+            "title": "handouts"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "c2g.assignment", 
+        "fields": {
+            "category": 2, 
+            "due_date": null, 
+            "last_updated": "2012-07-10T14:40:59", 
+            "description": "Handout 1", 
+            "title": "Handout 1", 
+            "time_created": "2012-07-10T14:40:59", 
+            "course": 7, 
+            "close_date": null, 
+            "access_id": ""
+        }
+    }, 
+    {
+        "pk": 57, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 58, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 58, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 59, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 59, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 60, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 60, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 61, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 61, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 62, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 62, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 63, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 63, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 64, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 64, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 65, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 65, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 66, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 66, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 67, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 67, 
+        "model": "c2g.userprofile", 
+        "fields": {
+            "user": 68, 
+            "site_data": ""
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "c2g.videotopic", 
+        "fields": {
+            "course": 7, 
+            "last_updated": "2012-07-10T14:40:59", 
+            "time_created": "2012-07-10T14:40:59", 
+            "title": "Section 1 Download"
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "c2g.videotopic", 
+        "fields": {
+            "course": 7, 
+            "last_updated": "2012-07-10T14:40:59", 
+            "time_created": "2012-07-10T14:40:59", 
+            "title": "1.1 Course Intro"
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "c2g.videotopic", 
+        "fields": {
+            "course": 7, 
+            "last_updated": "2012-07-10T14:40:59", 
+            "time_created": "2012-07-10T14:40:59", 
+            "title": "1.2 History of Field"
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "c2g.videotopic", 
+        "fields": {
+            "course": 7, 
+            "last_updated": "2012-07-10T14:40:59", 
+            "time_created": "2012-07-10T14:40:59", 
+            "title": "1.3 Big Issues"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "c2g.problemset", 
+        "fields": {
+            "course": 7, 
+            "path": "/static/latestKhan/exercises/P1.html", 
+            "last_updated": "2012-07-10T14:40:59", 
+            "time_created": "2012-07-10T14:40:59", 
+            "title": "P1"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "c2g.problemset", 
+        "fields": {
+            "course": 7, 
+            "path": "/static/latestKhan/exercises/P2.html", 
+            "last_updated": "2012-07-10T14:40:59", 
+            "time_created": "2012-07-10T14:40:59", 
+            "title": "P2"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "c2g.newsevent", 
+        "fields": {
+            "course": 7, 
+            "event": "Assignment Added: Assignment 1 NLP", 
+            "time_created": "2012-07-10T14:41:01"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "c2g.newsevent", 
+        "fields": {
+            "course": 7, 
+            "event": "Grades Added: Assignment 0 NLP", 
+            "time_created": "2012-07-10T14:41:01"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "c2g.newsevent", 
+        "fields": {
+            "course": 7, 
+            "event": "Video Added: NLP Lecture 5", 
+            "time_created": "2012-07-10T14:41:01"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "c2g.newsevent", 
+        "fields": {
+            "course": 7, 
+            "event": "Assignment Changed: Assignment 1 NLP", 
+            "time_created": "2012-07-10T14:41:01"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "c2g.newsevent", 
+        "fields": {
+            "course": 7, 
+            "event": "Additional Page Added: Syllabus", 
+            "time_created": "2012-07-10T14:41:01"
+        }
+    }
+]
