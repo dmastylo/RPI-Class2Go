@@ -4,16 +4,31 @@
 
 <h2>{{course.title}}</h2>
 
-<h3>Recent Announcements</h3>
+<div class = "announcements">
 
-{% for announcement in announcement_list %}
+    <h3>Recent Announcements</h3>
+
+    {% for announcement in announcement_list %}
     
-    <h4>{{announcement.title}}</h4>
-    <p>{{announcement.description}}</p>
-    <palign="right"> {{announcement.time_created}} by {{announcement.owner}}</p>
-    <hr>
+        <h4>{{announcement.title}}</h4>
+        <p>{{announcement.description}}</p>
+        <p align="right"> {{announcement.time_created}} by {{announcement.owner}}</p>
+        <hr>
 
-{% endfor %}
+    {% endfor %}
+
+</div>
+
+<hr noshade size=7 align="left">
+
+<div class = "course_description">
+
+    <h3>Course Description</h3>
+
+    <p>{{course.description}}</p>
+
+</div>
+
 {% endblock m_column_content %}
 
 

@@ -2,3 +2,5 @@
 
 alias staging="ssh -A ubuntu@app4.stage.c2gops.com"
 alias stagingdb="ssh -At ubuntu@app4.stage.c2gops.com \"class2go/django-project/manage.py dbshell\""
+
+alias localdb="~/src/class2go/django-project/manage.py dbshell"
