@@ -196,6 +196,24 @@ def create_nlp_course():
         description = 'We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!'
         save_announcement(instructor, course_id, access_id, title, description)
 
+        #Create some News Events
+        
+        event = "Assignment Added: Assignment 1 NLP"
+        save_news_event(course_id, event)
+
+        event = "Grades Added: Assignment 0 NLP"
+        save_news_event(course_id, event)
+
+        event = "Video Added: NLP Lecture 5"
+        save_news_event(course_id, event)
+
+        event = "Assignment Changed: Assignment 1 NLP"
+        save_news_event(course_id, event)
+
+        event = "Additional Page Added: Syllabus"
+        save_news_event(course_id, event)
+
+
 def save_video_topic(course_id, title):
     
         video_topic = VideoTopic(course_id = course_id,
@@ -232,4 +250,10 @@ def save_announcement(owner, course_id, access_id, title, description):
                                 description = description)
 
         announcement.save()
-        
+       
+def save_news_event(course_id, event):
+
+        news_event = NewsEvent(course_id = course_id,
+                               event = event)
+
+        news_event.save()
