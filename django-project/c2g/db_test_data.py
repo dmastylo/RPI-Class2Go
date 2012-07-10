@@ -196,6 +196,65 @@ def create_nlp_course():
         description = 'We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!'
         save_announcement(instructor, course_id, access_id, title, description)
 
+		#Create some Assignments
+		
+        title = 'Problem sets'
+        assignment_category1 = save_assignment_category(course_id, title)
+        
+        title = 'Quizzes'
+        assignment_category2 = save_assignment_category(course_id, title)
+        
+        title = 'Programming Assignments'
+        assignment_category3 = save_assignment_category(course_id, title)
+        
+        title = 'Problem set 01'
+        description = 'Tokenization and Lemmatization'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Problem set 02'
+        description = 'Hidden Markov Models'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Problem set 03'
+        description = 'Part of Speech Tagging'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Problem set 04'
+        description = 'Semantic Parsing'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Quiz 01'
+        description = 'Tokenization and Lemmatization'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Quiz 02'
+        description = 'Hidden Markov Models'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Quiz 03'
+        description = 'Part of Speech Tagging'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Quiz 04'
+        description = 'Semantic Parsing'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Programming Assignment 01'
+        description = 'Tokenization and Lemmatization'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+        
+        title = 'Programming Assignment 02'
+        description = 'Hidden Markov Models'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+        
+        title = 'Programming Assignment 03'
+        description = 'Part of Speech Tagging'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+        
+        title = 'Programming Assignment 04'
+        description = 'Semantic Parsing'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+
         #Create some News Events
         
         event = "Assignment Added: Assignment 1 NLP"
@@ -250,6 +309,24 @@ def save_announcement(owner, course_id, access_id, title, description):
                                 description = description)
 
         announcement.save()
+
+def save_assignment(course_id, category_id, access_id, title, description):
+
+        assignment = Assignment(course_id = course_id,
+								category_id = category_id,
+                                access_id = access_id,
+                                title = title,
+                                description = description)
+
+        assignment.save()
+		
+def save_assignment_category(course_id, title):
+
+        assignment_category = AssignmentCategory(course_id = course_id, title = title)
+
+        assignment_category.save()
+		
+        return assignment_category
        
 def save_news_event(course_id, event):
 

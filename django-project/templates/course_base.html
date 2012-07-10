@@ -11,10 +11,15 @@
 				<li {% block forums_link_class %}{% endblock forums_link_class %}>
 					<a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a>
 				</li>
-				<li class="dropdown"{% block assignments_link_class %}{% endblock assignments_link_class %}>
-					<a href="{% url 'courses.assignments.views.list' course_prefix course_suffix %}">Problem Sets</a>
+				<li {% block assignments_link_class %}class="dropdown"{% endblock assignments_link_class %}>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Problem Sets<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a href="{% url 'courses.assignments.views.view' course_prefix course_suffix 'problem_set_01' %}">Problem Set 01</a></li>
+						<li><a href="{% url 'courses.assignments.views.view' course_prefix course_suffix 'problem_set_02' %}">Problem Set 02</a></li>
+						<li><a href="{% url 'courses.assignments.views.view' course_prefix course_suffix 'problem_set_03' %}">Problem Set 03</a></li>
+					</ul>
 				</li>
-				<li class="dropdown"{% block videos_link_class %}{% endblock videos_link_class %}>
+				<li {% block videos_link_class %}{% endblock videos_link_class %}>
 					<a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a>
 				</li>
 			</ul>
