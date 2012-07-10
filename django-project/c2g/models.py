@@ -96,6 +96,9 @@ class Announcement(models.Model):
     class Meta:
         db_table = u'c2g_announcements'
 
+    def __unicode__(self):
+        return self.title
+
 
 ##ASSIGNMENTS SECTION####
 #Assignments, AssigmentGrades, AssignmentSubmissions might need ondelete for User
@@ -433,21 +436,32 @@ class ProblemSet(models.Model):
     class Meta:
         db_table = u'c2g_problem_sets'
 
-#class ProcessedExercises(models.Model):
-#    complete = models.IntegerField(null=True, blank=True)
-#    count_hints = models.IntegerField(null=True, blank=True)
-#    time_taken = models.IntegerField(null=True, blank=True)
-#    attempt_number = models.IntegerField(null=True, blank=True)
-#    sha1 = models.TextField(blank=True)
-#    seed = models.TextField(blank=True)
-#    problem_type = models.TextField(blank=True)
-#    review_mode = models.IntegerField(null=True, blank=True)
-#    topic_mode = models.IntegerField(null=True, blank=True)
-#    casing = models.TextField(blank=True)
-#    card = models.TextField(blank=True)
-#    topic_id = models.ForeignKey(VideoTopic, db_index=True)
-#    cards_done = models.IntegerField(null=True, blank=True)
-#    cards_left = models.IntegerField(null=True, blank=True)
-#    class Meta:
-#        db_table = u'c2g_processed_exercises'
+class ProblemActivity(models.Model):
+     student = models.ForeignKey(User)
+     course = models.ForeignKey(Course)
+     complete = models.IntegerField(null=True, blank=True)
+     count_hints = models.IntegerField(null=True, blank=True)
+     time_taken = models.IntegerField(null=True, blank=True)
+     attempt_number = models.IntegerField(null=True, blank=True)
+     sha1 = models.TextField(blank=True)
+     seed = models.TextField(blank=True)
+     problem_type = models.TextField(blank=True)
+     review_mode = models.IntegerField(null=True, blank=True)
+     topic_mode = models.IntegerField(null=True, blank=True)
+     casing = models.TextField(blank=True)
+     card = models.TextField(blank=True)
+     topic_id = models.ForeignKey(VideoTopic, db_index=True)
+     cards_done = models.IntegerField(null=True, blank=True)
+     cards_left = models.IntegerField(null=True, blank=True)
+     class Meta:
+        db_table = u'c2g_problem_activity'
 
+class NewsEvent(models.Model):
+    course = models.ForeignKey(Course)
+    event = models.CharField(max_length=255)
+    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    def __unicode__(self):
+        return self.event
+    class Meta:
+        db_table = u'c2g_news_events'

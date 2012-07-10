@@ -6,6 +6,7 @@
 		<div class="container-fluid">
 			<ul class="nav">
 				<li class="active"><a href="{% url 'courses.assignments.views.list' course_prefix course_suffix %}">Home</a></li>
+				<li><a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a></li>
 				<li><a href="{% url 'courses.assignments.views.list' course_prefix course_suffix %}">Problem Sets</a></li>
 				<li><a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a></li>
 			</ul>
