@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     'c2g',
     'courses',
     'khan',
+    'problemsets',
 )
 
 
