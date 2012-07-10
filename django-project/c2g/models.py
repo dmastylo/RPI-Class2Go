@@ -17,6 +17,8 @@ from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
 
+import datetime
+
 class Institution(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
     title = models.TextField()
@@ -335,7 +337,8 @@ class Video(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     type = models.CharField(max_length=30, default="youtube")
-    url = models.CharField(max_length=255, null=True)
+    url = models.URLField(max_length=255, null=True)
+    start_time = models.TimeField(default=datetime.time())
 
     def __unicode__(self):
         return self.title

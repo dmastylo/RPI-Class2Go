@@ -8,6 +8,10 @@ django-class2go/*
 
 *.pyc
 
+#*#
+
+*.swp
+
 .DS_Store
 
 js/demorun.js~
