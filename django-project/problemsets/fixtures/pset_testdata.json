@@ -1,0 +1,65 @@
+[
+    {
+        "pk": 1, 
+        "model": "c2g.institution", 
+        "fields": {
+            "city": "", 
+            "last_updated": "2012-07-10T00:30:24", 
+            "title": "Stanford University", 
+            "country": "", 
+            "time_created": "2012-07-10T00:30:24", 
+            "domains": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "c2g.course", 
+        "fields": {
+            "code": "", 
+            "last_updated": "2012-07-10T00:30:24", 
+            "feature_settings": "", 
+            "time_created": "2012-07-10T00:30:24", 
+            "readonly_tas_group": 8, 
+            "year": null, 
+            "membership_control": "", 
+            "title": "Natural Language Processing", 
+            "calendar_start": null, 
+            "meeting_info": "", 
+            "list_publicly": null, 
+            "handle": "nlp-staging", 
+            "description": "", 
+            "listing_description": "", 
+            "instructor_group": 6, 
+            "student_group": 5, 
+            "institution": 1, 
+            "term": "", 
+            "tas_group": 7, 
+            "calendar_end": null, 
+            "mode": "", 
+            "join_password": "", 
+            "staff_emails": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "c2g.problemset", 
+        "fields": {
+            "course": 1, 
+            "path": "/static/latestKhan/exercises/P1.html", 
+            "last_updated": "2012-07-10T00:30:24", 
+            "time_created": "2012-07-10T00:30:24", 
+            "title": "P1"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "c2g.problemset", 
+        "fields": {
+            "course": 1, 
+            "path": "/static/latestKhan/exercises/P2.html", 
+            "last_updated": "2012-07-10T00:30:24", 
+            "time_created": "2012-07-10T00:30:24", 
+            "title": "P2"
+        }
+    }
+]
