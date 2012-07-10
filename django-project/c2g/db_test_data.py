@@ -174,12 +174,35 @@ def create_nlp_course():
         #Create some Student Users
         for q in range(0,10):
 
-            user = User.objects.create_user('nlp_' + str(q))
+            user = User.objects.create_user('nlp_student_' + str(q))
             user.set_password('class2go')
             user.save()
             course.student_group.user_set.add(user)
 
-        
+        #Create an Instructor User
+
+        instructor = User.objects.create_user('Professor 1')
+        instructor.set_password('class2go')
+        instructor.save()
+        course.instructor_group.user_set.add(instructor)
+
+        #Create some Announcements
+
+        title = 'Welcome to Natural Language Processing!'
+        description = 'Welcome to the course! Check out the links to announcements, news events, assignments and grades.'
+        save_announcement(instructor, course_id, access_id, title, description)
+
+        title = 'Assignment 1 Out'
+        description = 'The first assignment has been posted.  Visit the assignments link to see the list of assignments and instructions for each assignment.  Be sure to check the additional pages for additional help. If you have any question email us at nlp@stanford.edu.'
+        save_announcement(instructor, course_id, access_id, title, description)
+
+        title = 'Friday Lecture for 7/13 cancelled'
+        description = 'Because this Friday is Friday the 13th, we do not want to take any chances so class is cancelled. Post any questions on the discussion forum if you have any questions'
+        save_announcement(instructor, course_id, access_id, title, description)
+
+        title = 'Lecture Room Moved'
+        description = 'We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!'
+        save_announcement(instructor, course_id, access_id, title, description)
 
 def save_video_topic(course_id, title):
     
@@ -207,4 +230,14 @@ def save_additional_page(course_id, access_id, write_access, title, description)
                                          description = description)
         
         additional_page.save()
+
+def save_announcement(owner, course_id, access_id, title, description):
+
+        announcement = Announcement(owner = owner,
+                                course_id = course_id,
+                                access_id = access_id,
+                                title = title,
+                                description = description)
+
+        announcement.save()
         
