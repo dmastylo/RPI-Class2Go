@@ -48,7 +48,9 @@ def create_institutions(create_course_data, create_user_data):
                 feature_settings = 'assignments=on,lectures=off'
                 membership_control = '1,2,3'
                 list_publicly = '0'
-                handle = str(code) + str(term) + str(year) + str(institution_id)
+
+                #Create the Group
+                group = Group.objects.create(name="Group for class2go course " + code + str(institution.id))
 
                 course = Course(institution_id = institution_id,
                                 code = code,
@@ -65,7 +67,7 @@ def create_institutions(create_course_data, create_user_data):
                                 feature_settings = feature_settings,
                                 membership_control = membership_control,
                                 list_publicly = list_publicly,
-                                handle = handle)
+                                group_id = group.id)
 
                 course.save()
 
@@ -74,7 +76,7 @@ def create_institutions(create_course_data, create_user_data):
 
                         #Create the user
                         user = User.objects.create_user('test_' + str(course.id) + '_' + str(q))
-                        course.student_group.user_set.add(user)
+                        group.user_set.add(user)
 
 
 def create_nlp_course():
@@ -98,7 +100,7 @@ def create_nlp_course():
         title = 'Natural Language Processing'
         listing_description = 'This course covers a broad range of topics in natural language processing, including word and sentence tokenization, text classification and sentiment analysis, spelling correction, information extraction, parsing, meaning extraction, and question answering, We will also introduce the underlying theory from probability, statistics, and machine learning that are crucial for the field, and cover fundamental algorithms like n-gram language modeling, naive bayes and maxent classifiers, sequence models like Hidden Markov Models, probabilistic dependency and constituent parsing, and vector-space models of meaning.We are offering this course on Natural Language Processing free and online to students worldwide, continuing Stanford\'s exciting forays into large scale online instruction. Students have access to screencast lecture videos, are given quiz questions, assignments and exams, receive regular feedback on progress, and can participate in a discussion forum. Those who successfully complete the course will receive a statement of accomplishment. Taught by Professors Jurafsky and Manning, the curriculum draws from Stanford\'s courses in Natural Language Processing. You will need a decent internet connection for accessing course materials, but should be able to watch the videos on your smartphone.'
         mode = 'live'
-        description = 'Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people\'s opinions about products or services to extracting appointments from your email. In this class, you\'ll learn the fundamental algorithms and mathematical models for human language processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.'
+        description = 'Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people\'s opinions about products or services to extracting appointments from your email. In this class, you\'ll learn the fundamental algorithms and mathematical models for human alanguage processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.'
         staff_emails = 'aa@stanford.edu*, bb@stanford.edu*'
         term = 'Fall'
         year = '2012'
@@ -109,6 +111,12 @@ def create_nlp_course():
         membership_control = '1,2,3'
         list_publicly = '1'
         handle = 'nlp-Fall2012'
+
+        #Create the Groups
+      #  student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
+      #  instructor_group = Group.objects.create(name="Instructor Group for class2go course " + code + str(institution.id))
+      #  tas_group = Group.objects.create(name="TAS Group for class2go course " + code + str(institution.id))
+      #  readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + code + str(institution.id))
         
         #Create the Course
         course = Course(institution_id = institution_id,
@@ -126,12 +134,28 @@ def create_nlp_course():
                         feature_settings = feature_settings,
                         membership_control = membership_control,
                         list_publicly = list_publicly,
+        #                student_group_id = student_group.id,
+        #                instructor_group_id = instructor_group.id,
+        #                tas_group_id = tas_group.id,
+        #                readonly_tas_group_id = readonly_tas_group.id,
                         handle = handle)
 
         course.save()
 
-        #Create the Video Topics
+        #Create problemsets
         course_id = course.id
+        p1 = ProblemSet(course=course,title='P1',path='/static/latestKhan/exercises/P1.html')
+        p2 = ProblemSet(course=course,title='P2',path='/static/latestKhan/exercises/P2.html')
+        p1.save()
+        p2.save()
+            
+        #Create assignments
+        assnCat = AssignmentCategory(course=course,title='handouts')
+        assnCat.save()
+        a1 = Assignment(course=course, category=assnCat, title='Handout 1', description='Handout 1')
+        a1.save()
+    
+        #Create the Video Topics
         title = 'Section 1 Download'
         save_video_topic (course_id, title)
         

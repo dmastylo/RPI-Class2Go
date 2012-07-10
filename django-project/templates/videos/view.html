@@ -1,5 +1,5 @@
 {% extends "course_base.html" %}
-
+{% load url from future %}
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
 	<div class="well tight">
@@ -24,7 +24,9 @@
 {% endblock %}
 
 {% block m_column_content %}
-
-<h2>Show video "{{video_id}}" for course "{{course_prefix}} ({{course_suffix}})" </h2>
-
+<div id="c2g_layout_m_column" class="span6">
+  <h2>Show video {{video.id}} for course {{course_prefix}} {{course_suffix}}</h2>
+  <br />
+  <iframe width="480" height="360" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+</div>
 {% endblock m_column_content %}
