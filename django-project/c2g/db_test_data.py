@@ -7,7 +7,11 @@ def delete_db_data():
     #Since all tables are foreign key related, this deletes all data in all c2g tables
     Institution.objects.all().delete()
 
-    # Nuke the django tables
+    # Nuke the data that we create below.  Order doesn't seem to matter.
+    Course.objects.all().delete()
+    Announcement.objects.all().delete()
+    NewsEvent.objects.all().delete()
+
     Group.objects.all().delete()
     User.objects.all().delete()
 
