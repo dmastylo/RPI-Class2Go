@@ -48,7 +48,9 @@ def create_institutions(create_course_data, create_user_data):
                 feature_settings = 'assignments=on,lectures=off'
                 membership_control = '1,2,3'
                 list_publicly = '0'
-                handle = str(code) + str(term) + str(year) + str(institution_id)
+
+                #Create the Group
+                group = Group.objects.create(name="Group for class2go course " + code + str(institution.id))
 
                 course = Course(institution_id = institution_id,
                                 code = code,
@@ -65,7 +67,7 @@ def create_institutions(create_course_data, create_user_data):
                                 feature_settings = feature_settings,
                                 membership_control = membership_control,
                                 list_publicly = list_publicly,
-                                handle = handle)
+                                group_id = group.id)
 
                 course.save()
 
@@ -74,7 +76,7 @@ def create_institutions(create_course_data, create_user_data):
 
                         #Create the user
                         user = User.objects.create_user('test_' + str(course.id) + '_' + str(q))
-                        course.student_group.user_set.add(user)
+                        group.user_set.add(user)
 
 
 def create_nlp_course():
@@ -109,6 +111,12 @@ def create_nlp_course():
         membership_control = '1,2,3'
         list_publicly = '1'
         handle = 'nlp-Fall2012'
+
+        #Create the Groups
+      #  student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
+      #  instructor_group = Group.objects.create(name="Instructor Group for class2go course " + code + str(institution.id))
+      #  tas_group = Group.objects.create(name="TAS Group for class2go course " + code + str(institution.id))
+      #  readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + code + str(institution.id))
         
         #Create the Course
         course = Course(institution_id = institution_id,
@@ -126,6 +134,10 @@ def create_nlp_course():
                         feature_settings = feature_settings,
                         membership_control = membership_control,
                         list_publicly = list_publicly,
+        #                student_group_id = student_group.id,
+        #                instructor_group_id = instructor_group.id,
+        #                tas_group_id = tas_group.id,
+        #                readonly_tas_group_id = readonly_tas_group.id,
                         handle = handle)
 
         course.save()
