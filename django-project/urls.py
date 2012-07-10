@@ -32,7 +32,7 @@ urlpatterns = patterns('',
 	url(r'^courses/current/?', 'courses.views.current'),
 	url(r'^courses/mine/?', 'courses.views.mine'),
 	
-	url(r'^(?P<course_id>[a-zA-Z0-9_]+)/?$', 'courses.views.view'),
+                       #url(r'^(?P<course_id>[a-zA-Z0-9_]+)/?$', 'courses.views.view'),
 	url(r'^(?P<course_id>[a-zA-Z0-9_]+)/admin/?', 'courses.admin_views.admin'),
 	url(r'^(?P<course_id>[a-zA-Z0-9_]+)/staff/?', 'courses.admin_views.staff'),
 	
