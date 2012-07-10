@@ -69,10 +69,10 @@ class Course(models.Model):
 
 def DefineUserGroupsForCourse(sender, **kwargs):
         instance = kwargs.get('instance')
-        instance.student_group = Group.objects.create( name="Student Group for " + instance.handle)
-        instance.instructor_group = Group.objects.create(name="Instructor Group for " + instance.handle)
-        instance.tas_group = Group.objects.create(name="TAS Group for " + instance.handle)
-        instance.readonly_tas_group = Group.objects.create(name="Readonly TAS Group for " + instance.handle)
+        instance.student_group = Group.objects.create( name="Student Group for " + instance.handle + "_" + str(instance.institution.id))
+        instance.instructor_group = Group.objects.create(name="Instructor Group for " + instance.handle + "_" + str(instance.institution.id))
+        instance.tas_group = Group.objects.create(name="TAS Group for " + instance.handle + "_" + str(instance.institution.id))
+        instance.readonly_tas_group = Group.objects.create(name="Readonly TAS Group for " + instance.handle + "_" + str(instance.institution.id))
             
 
 pre_save.connect(DefineUserGroupsForCourse, sender=Course)
