@@ -13,22 +13,22 @@ class Migration(SchemaMigration):
 
         # Adding field 'Course.student_group'
         db.add_column(u'c2g_courses', 'student_group',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=False, related_name='student_group', to=orm['auth.Group']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=-1, related_name='student_group', to=orm['auth.Group']),
                       keep_default=False)
 
         # Adding field 'Course.instructor_group'
         db.add_column(u'c2g_courses', 'instructor_group',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=False, related_name='instructor_group', to=orm['auth.Group']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=-1, related_name='instructor_group', to=orm['auth.Group']),
                       keep_default=False)
 
         # Adding field 'Course.tas_group'
         db.add_column(u'c2g_courses', 'tas_group',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=False, related_name='tas_group', to=orm['auth.Group']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=-1, related_name='tas_group', to=orm['auth.Group']),
                       keep_default=False)
 
         # Adding field 'Course.readonly_tas_group'
         db.add_column(u'c2g_courses', 'readonly_tas_group',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=False, related_name='readonly_tas_group', to=orm['auth.Group']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=-1, related_name='readonly_tas_group', to=orm['auth.Group']),
                       keep_default=False)
 
         # Removing M2M table for field tas on 'Course'

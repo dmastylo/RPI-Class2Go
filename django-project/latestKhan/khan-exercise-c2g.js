@@ -2,7 +2,7 @@
 
     The main entry point here is actually the loadScripts method which is defined
     as Khan.loadScripts and then evaluated around line 500.
- 
+
     When this loadScripts is called, it loads in many of the pre-reqs and then
     calls, one way or another, setUserExercise concurrently with loadModules.
 
@@ -58,9 +58,7 @@
       and is being used by khan-exercises, either via the result of an API
       call or initialization
 */
-
-var KhanTest={};                                                                    
-
+var KhanC2G={};
 
 var Khan = (function() {
     function warn(message, showClose) {
@@ -233,9 +231,12 @@ var Khan = (function() {
     // pending in the middle of a load.
     loadingExercises = {},
 
+    urlBaseOverride="/static/latestKhan/",
     urlBase = typeof urlBaseOverride !== "undefined" ? urlBaseOverride :
         testMode ? "../" : "/khan-exercises/",
 
+    
+            
     lastFocusedSolutionInput = null,
 
     issueError = "Communication with GitHub isn't working. Please file " +
@@ -274,6 +275,11 @@ var Khan = (function() {
             link = document.createElement("link");
             link.rel = "stylesheet";
             link.href = urlBase + "css/khan-exercise.css";
+            document.getElementsByTagName("head")[0].appendChild(link);
+         
+            link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = urlBase + "css/c2g-khan.css";
             document.getElementsByTagName("head")[0].appendChild(link);
         })();
     }
@@ -717,11 +723,6 @@ var Khan = (function() {
     // Actually load the scripts. This is getting evaluated when the file is loaded.
     Khan.loadScripts(scripts, function() {
 
-            
-        /****************Start JASON BAU 6-29-12 Testing**************/
-        //Khan.require(['../khan-event-hooks']);
-        /****************End   JASON BAU 6-29-12 Testing**************/
-
         if (testMode) {
             Khan.require(["../jquery-ui", "../jquery.qtip"]);
         }
@@ -1027,6 +1028,7 @@ var Khan = (function() {
     }
 
     function makeProblem(id, seed) {
+            
 
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
@@ -1070,16 +1072,13 @@ var Khan = (function() {
             return;
         }
 
-            
-        //console.log(problem);
-            KhanTest.problemID = id;
-            KhanTest.randomSeed = randomSeed;
-            console.log(id);
-            console.log(randomSeed);
         problemID = id;
 
         // Find which exercise this problem is from
         exercise = problem.parents("div.exercise").eq(0);
+            
+        // JASON BAU -- for C2G problems sets we want to display the exercise title
+            $("#container .exercises-header h2").children().last().text(exercise.data('title')[0]);
 
         // Work with a clone to avoid modifying the original
         problem = problem.clone();
@@ -1124,11 +1123,16 @@ var Khan = (function() {
         // Remove and store hints to delay running modules on it
         hints = problem.children(".hints").remove();
 
-        // Remove the hint box if there are no hints in the problem
-        if (hints.length === 0) {
-            $(".hint-box").remove();
-        }
+        // Hide the hint box if there are no hints in the problem
+        
+            //console.log(problem);
+        $(".hint-box").show();
 
+        if (hints.length === 0) {
+            $(".hint-box").hide();
+        }
+         
+    
         // Evaluate any inline script tags in this exercise's source
         $.each(exercise.data("script") || [], function(i, scriptContents) {
             $.globalEval(scriptContents);
@@ -1676,10 +1680,12 @@ var Khan = (function() {
 
 
         if (userExercise == null || Khan.query.debug != null) {
+            /* JASON BAU COMMENT OUT -- here because the permalinks won't be correct in problem sets
             $("#problem-permalink").text("Permalink: "
                 + problemID + " #"
                 + problemSeed)
                 .attr("href", window.location.protocol + "//" + window.location.host + window.location.pathname + "?debug&problem=" + problemID + "&seed=" + problemSeed);
+             */
         }
 
         // Show the debug info
@@ -1829,6 +1835,8 @@ var Khan = (function() {
     }
 
     function clearExistingProblem() {
+        $("#solutionarea").html("");
+
         enableCheckAnswer();
 
         $("#happy").hide();
@@ -1847,11 +1855,11 @@ var Khan = (function() {
 
         Khan.scratchpad.clear();
     }
-            
-    KhanTest.makeProblem=makeProblem;
-    KhanTest.makeProblemBag=makeProblemBag;
-    KhanTest.clearExistingProblem=clearExistingProblem  ;
 
+    KhanC2G.clearExistingProblem=clearExistingProblem;
+    KhanC2G.makeProblem=makeProblem;
+    KhanC2G.makeProblemBag=makeProblemBag;
+            
     function renderNextProblem(nextUserExercise) {
         clearExistingProblem();
 
@@ -1875,10 +1883,6 @@ var Khan = (function() {
             $("#sidebar").hide();
 
         } else {
-            
-            /*********JASON BAU HERE IS THE LOGIC FOR THE NEXT EXERCISE *******/
-            
-            
 
             if (testMode) {
                 // Just generate a new problem from existing exercise
@@ -2525,11 +2529,12 @@ var Khan = (function() {
 
             // testMode automatically advances to the next problem --
             // integrated mode just listens and waits for renderNextProblem
-            /*  JASON BAU COMMENTED OUT
+                                          
+            /* JASON BAU COMMENTED OUT
             $(Khan).bind("gotoNextProblem", function() {
                 renderNextProblem();
             });
-             */
+            */
 
         }
 
@@ -2624,9 +2629,8 @@ var Khan = (function() {
     }
 
     function request(method, data, fn, fnError, queue) {
-
-        /*
         
+        /*                                  
         if (testMode) {
             // Pretend we have success
             if ($.isFunction(fn)) {
@@ -2635,7 +2639,7 @@ var Khan = (function() {
 
             return;
         }
-         */
+        */
 
         var xhrFields = {};
         if (typeof XMLHTTPRequest !== "undefined") {
@@ -2646,8 +2650,7 @@ var Khan = (function() {
 
         var request = {
             // Do a request to the server API
-            //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
-            url: "/api/v1/user/exercises/" + exerciseId + "/" + method,
+            url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
             type: "POST",
             data: data,
             dataType: "json",
@@ -2676,13 +2679,10 @@ var Khan = (function() {
                 if (queue && requestQueue[queue]) {
                     requestQueue[queue].clearQueue();
                 }
-            
-                /*
 
                 if ($.isFunction(fnError)) {
                     fnError(xhr);
                 }
-                */
             }
         };
 
@@ -2777,8 +2777,6 @@ var Khan = (function() {
             // Add the new exercise elements to the exercises DOM set
             exercises = exercises.add(newContents);
 
-              
-              console.log(exercises);
             // Extract data-require
             var requires = data.match(/<html(?:[^>]+)data-require=(['"])((?:(?!\1).)*)\1/);
 
@@ -2817,11 +2815,8 @@ var Khan = (function() {
                     loadModules();
                 }
 
-                if (callback && modulesDeferred) {
+                if (callback) {
                     modulesDeferred.done(callback);
-                }
-                else if(callback) {
-                       callback();
                 }
 
             }
@@ -2842,76 +2837,192 @@ var Khan = (function() {
             $(function() {
                 // Inject the site markup, if it doesn't exist
                 if ($("#answer_area").length === 0) {
+                    /*
                     $.ajax({
                         url: urlBase + "exercises/khan-site.html",
                         dataType: "html",
                         success: function(html) {
+                     */
 
                             $.ajax({
                                 url: urlBase + "exercises/khan-exercise.html",
                                 dataType: "text",
                                 success: function(htmlExercise) {
-/******JASON BAU******/
-                                   /*
-                                   var exerciseElem = $("<div>")
-                                   .data("name", "regex")
-                                   .data("displayName", "Regular Expressions")
-                                   .data("fileName", "regex1.html")
-                                   .data("rootName", "regex1");
 
-                                   loadExercise.call(exerciseElem, function() {
-                                        injectTestModeSite(html, htmlExercise);
-                                                     });
-                                    */
-                                   injectTestModeSite(html, htmlExercise);
+                                    //injectTestModeSite(html, htmlExercise);
+                                   injectExerciseFrameMarkup(htmlExercise);
+                                   finishSitePrep();
 
                                 }
                             });
-
+                     /*
                         }
                     });
+                      */
                 } else {
                     if (modulesDeferred) {
                         modulesDeferred.resolve();
                     }
+                  finishSitePrep();
                 }
             });
         });
 
+        function injectExerciseFrameMarkup(htmlExercise) {
+        
+            $("#container .exercises-body .current-card-contents").html(htmlExercise);
+                                                                    
+        }
+                                                                    
         function injectTestModeSite(html, htmlExercise) {
             $("body").prepend(html);
-            $("#container .exercises-header h2").append(document.title);
-            $("#container .exercises-body .current-card-contents").html(
-                htmlExercise);
+            
+            $("#container .exercises-header h2").append($('<span>').html(document.title));
+            injectExerciseFrameMarkup(htmlExercise);
 
             if (Khan.query.layout === "lite") {
                 $("html").addClass("lite");
             }
 
-            prepareSite();
-            console.log(exercises);
-            
-            $('#exerciseTitle').text(exercises[1].innerText);
+            finishSitePrep();
                                                                     
+        }
+                                                                    
+        function finishSitePrep() {
+                                                                    
+            prepareSite();
+            
+            initC2GStacks(exercises);
+            
             var problems = exercises.children(".problems").children();
-
+            globalProblems=problems;
+            globalExercises=exercises;
             // Don't make the problem bag when a specific problem is specified
             // because it messes up problem permalinks (because makeProblemBag
             // calls KhanUtil.random() and changes the seed)
+            
             if (Khan.query.problem == null) {
-                weighExercises(problems);
-                problemBag = makeProblemBag(problems, 10);
+              weighExercises(problems);
+              problemBag = makeProblemBag(problems, 10);
             }
-
+            
+            
             // Generate the initial problem when dependencies are done being loaded
-            var answerType = makeProblem();
-        }
+            //var answerType = makeProblem();
+            
+            var first = $('#questions-to-do li:last-child');
+            makeProblem(first.data('problem'), first.data('randseed'))
 
+
+        }
+                                                                    
+        
+
+    }
+                                                                    
+    //var c2gProblemBag;
+    
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+    function initC2GStacks(exercises) {
+        //console.log(exercises);                                                           
+
+        //Setup 2 stack structures: questions-to-do and questions-done, as children
+        //of <div id="problem-and-answer">
+        $('#problem-and-answer').css('position', 'relative');
+        
+        $('#problem-and-answer').append($('<div id="questions-to-do"><ol></ol></div>'));
+        $('#problem-and-answer').append($('<div id="questions-done"><ol></ol></div>'));
+                                                                
+        $('#questions-to-do').css('position', 'absolute');
+        $('#questions-done').css('position', 'absolute');
+
+        //populate 1 questions-to-do for each exercise
+        var curNumProbs=0;
+        $(exercises).filter(".exercise").each(
+                          function(i,v){
+                                //Figure out how many problems there are in this exercise
+                                var probsInExercise=$(v).children('.problems').children().length;
+                                $(v).data('problemsStartAtIndex',curNumProbs);
+                                $(v).data('numberOfProblems',probsInExercise);
+                                var li = $("<li>");
+                                
+                                li.text("Q" + (i+1));
+                                //this data 'problem' will be used to index into the problems array
+                                //the problems array is a flat array containing all problems from all exercises
+                                //we do the counting above to get a problem index in the right range for this exercise
+                                li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
+                                li.data('randseed',Math.floor(Math.random()*100000));
+                                $('#questions-to-do ol').prepend(li);
+                                curNumProbs+=probsInExercise;
+                                                                                
+                          });
+                                    
+                                                                    
+        
+                
+            
+        /* Commenting out these because using :hover css selector instead
+        $('#questions-to-do').find('li').mouseover(function (ev) {
+                                                   //$(this).css('border-color', '#000');
+                                                   //$(this).css('color', '#000');
+                                                   });
+        $('#questions-to-do').find('li').mouseout(function (ev) {
+                                                  //$(this).css('border-color', '#ccc');
+                                                  //$(this).css('color', '#999');
+                                                  });
+        */
+                                                                    
+        $('#questions-to-do').find('li').click(todoClickHandler);
+        
+        $('#next-question-button').click(function () {
+                                         $('#questions-to-do li:last-child').trigger('mouseout');
+                                         $('#questions-to-do li:last-child').unbind('click');
+                                         $('#questions-to-do li:last-child').click(doneClickHandler);
+                                         $('#questions-to-do li:last-child').appendTo($('#questions-done').children('ol'));
+                                         var next = $('#questions-to-do li:last-child');
+                                         clearExistingProblem();
+                                         if (next.length)
+                                              makeProblem(next.data('problem'), next.data('randseed'));
+                                         
+                                         });
+        
+        $('#questions-to-do').fadeIn('slow');
+        $('#questions-done').fadeIn('slow');
+        
+        
+        
+        function todoClickHandler(ev) {
+            
+            $(this).trigger('mouseout');
+            $(this).appendTo($('#questions-done').children('ol'));
+            $(this).unbind('click');
+            $(this).click(doneClickHandler);
+            var next = $('#questions-to-do li:last-child');
+            clearExistingProblem();
+            if (next.length)
+                makeProblem(next.data('problem'), next.data('randseed'));
+        };
+        
+        function doneClickHandler(ev) {
+            $(this).trigger('mouseout');
+            $(this).appendTo($('#questions-to-do').children('ol')); 
+            $(this).unbind('click');
+            $(this).click(todoClickHandler);
+            clearExistingProblem();
+            makeProblem($(this).data('problem'), $(this).data('randseed'));
+        
+        };
+        
+                                                                    
     }
 
     return Khan;
 
 })();
 
+var globalProblems, globalExercises;
 // Make this publicly accessible
 var KhanUtil = Khan.Util;
