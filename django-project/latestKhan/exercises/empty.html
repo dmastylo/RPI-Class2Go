@@ -6,10 +6,10 @@
           <style>
               #top-header, #footer {display:none;}
               #outer-wrapper, #page-container {background:#fff;}
-              #questions-to-do {display: none; font-size: 150%; top: 0; left: -4em;}
+              #questions-to-do {display: none; font-size: 150%; top: 30px; left: 1px; z-index:5}
               #questions-to-do ol li { background-color: #fff; border: 2px solid #ccc; border-radius: 3px; color: #999; cursor: pointer; margin-top: -.5em; padding: 0 .5em; -webkit-transform:rotate(-17deg); -ms-transform:rotate(-17deg); -moz-transform:rotate(-17deg); -o-transform:rotate(-17deg) }
               
-              #questions-done {display: none; font-size: 150%; top: 0; right: -4em;}
+              #questions-done {display: none; font-size: 150%; top: 30px; right: 1px; z-index:5}
               #questions-done ol li { background-color: #fff; border: 2px solid #ccc; border-radius: 3px; color: #999; cursor: pointer; margin-top: -.5em; padding: 0 .5em; -webkit-transform:rotate(17deg); -ms-transform:rotate(17deg); -moz-transform:rotate(17deg); -o-transform:rotate(17deg) }
            </style>
 
@@ -54,11 +54,11 @@
       
       <script>
           var initStacks = function () {
-              $('#problem-and-answer').css('position', 'relative');
+              $('#content').css('position', 'relative');
               
-              $('#problem-and-answer').append($('#questions-to-do'));
+              $('#content').append($('#questions-to-do'));
               $('#questions-to-do').css('position', 'absolute');
-              $('#problem-and-answer').append($('#questions-done'));
+              $('#content').append($('#questions-done'));
               $('#questions-done').css('position', 'absolute');
               
               $('#questions-to-do').find('li').each(
@@ -66,6 +66,10 @@
                                                     $.data(v,'problem',Math.floor(Math.random()*2));
                                                     $.data(v,'randseed',Math.floor(Math.random()*1000000000));
                                                     });
+
+              //set the first card to equal initial problemID and seed
+              $('#questions-to-do li:last-child').data('problem',KhanTest.problemID);
+              $('#questions-to-do li:last-child').data('randseed',KhanTest.randomSeed);
 
               
               $('#questions-to-do').find('li').mouseover(function (ev) {
@@ -81,7 +85,13 @@
               
               $('#next-question-button').click(function () {
                                                $('#questions-to-do li:last-child').trigger('mouseout');
+                                               $('#questions-to-do li:last-child').unbind('click');
+                                               $('#questions-to-do li:last-child').click(doneClickHandler);
                                                $('#questions-to-do li:last-child').appendTo($('#questions-done').children('ol'));
+                                               var next = $('#questions-to-do li:last-child');
+                                               KhanTest.clearExistingProblem();
+                                               KhanTest.makeProblem(next.data('problem'), next.data('randseed'))
+                                               
                                                });
               
               $('#questions-to-do').fadeIn('slow');
@@ -93,7 +103,7 @@
               
               $(this).trigger('mouseout');
               $(this).appendTo($('#questions-done').children('ol'));
-              $(this).unbind();
+              $(this).unbind('click');
               $(this).click(doneClickHandler);
               var next = $('#questions-to-do li:last-child');
               KhanTest.clearExistingProblem();
@@ -103,7 +113,7 @@
           var doneClickHandler = function(ev) {
               $(this).trigger('mouseout');
               $(this).appendTo($('#questions-to-do').children('ol')); 
-              $(this).unbind();
+              $(this).unbind('click');
               $(this).click(todoClickHandler);
               KhanTest.clearExistingProblem();
               KhanTest.makeProblem($(this).data('problem'), $(this).data('randseed'))
@@ -112,6 +122,7 @@
           
           document.ready=function () {
                             window.setTimeout(initStacks, 2000);
+                            
           };
           </script>
 
