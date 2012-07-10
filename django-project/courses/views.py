@@ -21,4 +21,4 @@ def view(request, course_prefix, course_suffix):
         raise Http404
     announcement_list = course.announcement_set.all().order_by('-time_created')
     news_list = course.newsevent_set.all().order_by('-time_created')[0:5]
-    return render_to_response('branches/view.html', {'course': course, 'announcement_list': announcement_list, 'news_list': news_list, 'request': request}, context_instance=RequestContext(request))
+    return render_to_response('courses/view.html', {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'course': course, 'announcement_list': announcement_list, 'news_list': news_list, 'request': request}, context_instance=RequestContext(request))
