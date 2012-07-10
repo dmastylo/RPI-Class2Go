@@ -347,7 +347,7 @@ class Video(models.Model):
 
     def percent_done(self):
         start_seconds = self.start_time.hour*3600 + self.start_time.minute*60 + self.start_time.second
-        return start_seconds/self.duration
+        return float(start_seconds*100)/self.duration
 
     def __unicode__(self):
         return self.title

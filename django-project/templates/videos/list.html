@@ -34,10 +34,9 @@
     <ul>
       {% for video in topic.video_set.all %}
       <li>
-	<a href="{{video.id}}">{{video.title}}</a>
+	<a href="videos/{{video.id}}">{{video.title}}</a>
 	<div class="progress-bar">
-	  <!-- div class="fill red" style="width:{{></div -->
-	  <div class="fill red" style="width:33%"></div>
+	  <div class="fill red" style="width:{{video.percent_done}}%"></div>
 	</div>
       </li>
       {% endfor %}
