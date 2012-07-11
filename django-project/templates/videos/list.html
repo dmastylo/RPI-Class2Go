@@ -1,7 +1,46 @@
-{% extends "base.html" %}
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block l_column_content %}
+<div id="c2g_layout_l_column" class="span3">
+        <div class="well tight">
+                <ul class="nav nav-list">
+                        <li class="nav-header">Videos</li>
+                        <li class="active"><a href="#">1.1 Course Intro</a></li>
+                        <li><a href="#">1.2 History of Field</a></li>
+                        <li><a href="#">1.3 Big Issues</a></li>
+                        <li><a href="#">1.4 Another nav item</a></li>
+                        <li><a href="#">1.5 Another nav item</a></li>
+                        <li class="nav-header">Problem Sets</li>
+                        <li><a href="#">Problem set 1</a></li>
+                        <li><a href="#">Problem set 2</a></li>
+                        <li><a href="#">Problem set 3</a></li>
+                        <li><a href="#">Problem set 4</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#"><i class="icon-flag"></i>Help</a></li>
+                        <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
+                </ul>
+        </div>
+</div>
+{% endblock %}
 
 {% block m_column_content %}
+<div id="c2g_layout_m_column" class="span6">
+  <h1>List videos for course {{course_prefix}} {{course_suffix}}</h1>
 
-<h2>List videos for course "{{course_id}} ({{branch_id}})" </h2>
+  <br/>
 
+  {% for topic in topics %}
+  <h2>{{topic.title}}</h2>
+    <ul>
+      {% for video in topic.video_set.all %}
+      <li>
+	<a href="videos/{{video.id}}">{{video.title}}</a>
+	<div class="progress-bar">
+	  <div class="fill red" style="width:{{video.percent_done}}%"></div>
+	</div>
+      </li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+</div>
 {% endblock m_column_content %}

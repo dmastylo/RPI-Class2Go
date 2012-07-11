@@ -1,8 +1,16 @@
 django-project/database.py
 
+django-class2go
+
+django-class2go/*
+
 *~
 
 *.pyc
+
+#*#
+
+*.swp
 
 .DS_Store
 
@@ -14,9 +22,11 @@ problem-sets/from-cware-dev2/problem_set_json.tgz
 
 problem-sets/quizzes/Advanced-Maxent/test_json_load.html~
 
+django-project/new-class2go
+
 django-project/django-class2go
 
-django-project/settings.py
+django-project/static
 
 django-project/c2g/__init__.pyc
 

@@ -7,7 +7,11 @@ def delete_db_data():
     #Since all tables are foreign key related, this deletes all data in all c2g tables
     Institution.objects.all().delete()
 
-    # Nuke the django tables
+    # Nuke the data that we create below.  Order doesn't seem to matter.
+    Course.objects.all().delete()
+    Announcement.objects.all().delete()
+    NewsEvent.objects.all().delete()
+
     Group.objects.all().delete()
     User.objects.all().delete()
 
@@ -96,7 +100,7 @@ def create_nlp_course():
         title = 'Natural Language Processing'
         listing_description = 'This course covers a broad range of topics in natural language processing, including word and sentence tokenization, text classification and sentiment analysis, spelling correction, information extraction, parsing, meaning extraction, and question answering, We will also introduce the underlying theory from probability, statistics, and machine learning that are crucial for the field, and cover fundamental algorithms like n-gram language modeling, naive bayes and maxent classifiers, sequence models like Hidden Markov Models, probabilistic dependency and constituent parsing, and vector-space models of meaning.We are offering this course on Natural Language Processing free and online to students worldwide, continuing Stanford\'s exciting forays into large scale online instruction. Students have access to screencast lecture videos, are given quiz questions, assignments and exams, receive regular feedback on progress, and can participate in a discussion forum. Those who successfully complete the course will receive a statement of accomplishment. Taught by Professors Jurafsky and Manning, the curriculum draws from Stanford\'s courses in Natural Language Processing. You will need a decent internet connection for accessing course materials, but should be able to watch the videos on your smartphone.'
         mode = 'live'
-        description = 'Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people\'s opinions about products or services to extracting appointments from your email. In this class, you\'ll learn the fundamental algorithms and mathematical models for human language processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.'
+        description = 'Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people\'s opinions about products or services to extracting appointments from your email. In this class, you\'ll learn the fundamental algorithms and mathematical models for human alanguage processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.'
         staff_emails = 'aa@stanford.edu*, bb@stanford.edu*'
         term = 'Fall'
         year = '2012'
@@ -106,13 +110,13 @@ def create_nlp_course():
         feature_settings = 'assignments=on,lectures=on,videos=on'
         membership_control = '1,2,3'
         list_publicly = '1'
-        course_prefix = 'nlp'
+        handle = 'nlp-Fall2012'
 
         #Create the Groups
-        student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
-        instructor_group = Group.objects.create(name="Instructor Group for class2go course " + code + str(institution.id))
-        tas_group = Group.objects.create(name="TAS Group for class2go course " + code + str(institution.id))
-        readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + code + str(institution.id))
+      #  student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
+      #  instructor_group = Group.objects.create(name="Instructor Group for class2go course " + code + str(institution.id))
+      #  tas_group = Group.objects.create(name="TAS Group for class2go course " + code + str(institution.id))
+      #  readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + code + str(institution.id))
         
         #Create the Course
         course = Course(institution_id = institution_id,
@@ -130,16 +134,28 @@ def create_nlp_course():
                         feature_settings = feature_settings,
                         membership_control = membership_control,
                         list_publicly = list_publicly,
-                        student_group_id = student_group.id,
-                        instructor_group_id = instructor_group.id,
-                        tas_group_id = tas_group.id,
-                        readonly_tas_group_id = readonly_tas_group.id,
-                        course_prefix = course_prefix)
+        #                student_group_id = student_group.id,
+        #                instructor_group_id = instructor_group.id,
+        #                tas_group_id = tas_group.id,
+        #                readonly_tas_group_id = readonly_tas_group.id,
+                        handle = handle)
 
         course.save()
 
-        #Create the Video Topics
+        #Create problemsets
         course_id = course.id
+        p1 = ProblemSet(course=course,title='P1',path='/static/latestKhan/exercises/P1.html')
+        p2 = ProblemSet(course=course,title='P2',path='/static/latestKhan/exercises/P2.html')
+        p1.save()
+        p2.save()
+            
+        #Create assignments
+        assnCat = AssignmentCategory(course=course,title='handouts')
+        assnCat.save()
+        a1 = Assignment(course=course, category=assnCat, title='Handout 1', description='Handout 1')
+        a1.save()
+    
+        #Create the Video Topics
         title = 'Section 1 Download'
         save_video_topic (course_id, title)
         
@@ -174,12 +190,112 @@ def create_nlp_course():
         #Create some Student Users
         for q in range(0,10):
 
-            user = User.objects.create_user('nlp_' + str(q))
+            user = User.objects.create_user('nlp_student_' + str(q))
             user.set_password('class2go')
             user.save()
-            student_group.user_set.add(user)
+            course.student_group.user_set.add(user)
 
+        #Create an Instructor User
+
+        instructor = User.objects.create_user('Professor 1')
+        instructor.set_password('class2go')
+        instructor.save()
+        course.instructor_group.user_set.add(instructor)
+
+        #Create some Announcements
+
+        title = 'Welcome to Natural Language Processing!'
+        description = 'Welcome to the course! Check out the links to announcements, news events, assignments and grades.'
+        save_announcement(instructor, course_id, access_id, title, description)
+
+        title = 'Assignment 1 Out'
+        description = 'The first assignment has been posted.  Visit the assignments link to see the list of assignments and instructions for each assignment.  Be sure to check the additional pages for additional help. If you have any question email us at nlp@stanford.edu.'
+        save_announcement(instructor, course_id, access_id, title, description)
+
+        title = 'Friday Lecture for 7/13 cancelled'
+        description = 'Because this Friday is Friday the 13th, we do not want to take any chances so class is cancelled. Post any questions on the discussion forum if you have any questions'
+        save_announcement(instructor, course_id, access_id, title, description)
+
+        title = 'Lecture Room Moved'
+        description = 'We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!'
+        save_announcement(instructor, course_id, access_id, title, description)
+
+		#Create some Assignments
+		
+        title = 'Problem sets'
+        assignment_category1 = save_assignment_category(course_id, title)
         
+        title = 'Quizzes'
+        assignment_category2 = save_assignment_category(course_id, title)
+        
+        title = 'Programming Assignments'
+        assignment_category3 = save_assignment_category(course_id, title)
+        
+        title = 'Problem set 01'
+        description = 'Tokenization and Lemmatization'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Problem set 02'
+        description = 'Hidden Markov Models'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Problem set 03'
+        description = 'Part of Speech Tagging'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Problem set 04'
+        description = 'Semantic Parsing'
+        save_assignment(course_id, assignment_category1.id, access_id, title, description)
+        
+        title = 'Quiz 01'
+        description = 'Tokenization and Lemmatization'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Quiz 02'
+        description = 'Hidden Markov Models'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Quiz 03'
+        description = 'Part of Speech Tagging'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Quiz 04'
+        description = 'Semantic Parsing'
+        save_assignment(course_id, assignment_category2.id, access_id, title, description)
+        
+        title = 'Programming Assignment 01'
+        description = 'Tokenization and Lemmatization'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+        
+        title = 'Programming Assignment 02'
+        description = 'Hidden Markov Models'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+        
+        title = 'Programming Assignment 03'
+        description = 'Part of Speech Tagging'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+        
+        title = 'Programming Assignment 04'
+        description = 'Semantic Parsing'
+        save_assignment(course_id, assignment_category3.id, access_id, title, description)
+
+        #Create some News Events
+        
+        event = "Assignment Added: Assignment 1 NLP"
+        save_news_event(course_id, event)
+
+        event = "Grades Added: Assignment 0 NLP"
+        save_news_event(course_id, event)
+
+        event = "Video Added: NLP Lecture 5"
+        save_news_event(course_id, event)
+
+        event = "Assignment Changed: Assignment 1 NLP"
+        save_news_event(course_id, event)
+
+        event = "Additional Page Added: Syllabus"
+        save_news_event(course_id, event)
+
 
 def save_video_topic(course_id, title):
     
@@ -207,4 +323,38 @@ def save_additional_page(course_id, access_id, write_access, title, description)
                                          description = description)
         
         additional_page.save()
-        
+
+def save_announcement(owner, course_id, access_id, title, description):
+
+        announcement = Announcement(owner = owner,
+                                course_id = course_id,
+                                access_id = access_id,
+                                title = title,
+                                description = description)
+
+        announcement.save()
+
+def save_assignment(course_id, category_id, access_id, title, description):
+
+        assignment = Assignment(course_id = course_id,
+								category_id = category_id,
+                                access_id = access_id,
+                                title = title,
+                                description = description)
+
+        assignment.save()
+		
+def save_assignment_category(course_id, title):
+
+        assignment_category = AssignmentCategory(course_id = course_id, title = title)
+
+        assignment_category.save()
+		
+        return assignment_category
+       
+def save_news_event(course_id, event):
+
+        news_event = NewsEvent(course_id = course_id,
+                               event = event)
+
+        news_event.save()

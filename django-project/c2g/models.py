@@ -15,6 +15,9 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
+
+import datetime
 
 class Institution(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
@@ -53,7 +56,7 @@ class Course(models.Model):
     membership_control = models.TextField(blank=True)
     join_password = models.TextField(blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
-    course_prefix = models.CharField(max_length=30, null=True, db_index=True)
+    handle = models.CharField(max_length=255, null=True, unique=True, db_index=True)
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     
@@ -62,6 +65,17 @@ class Course(models.Model):
 
     class Meta:
         db_table = u'c2g_courses'
+
+
+def DefineUserGroupsForCourse(sender, **kwargs):
+        instance = kwargs.get('instance')
+        instance.student_group = Group.objects.create( name="Student Group for " + instance.handle + "_" + str(instance.institution.id))
+        instance.instructor_group = Group.objects.create(name="Instructor Group for " + instance.handle + "_" + str(instance.institution.id))
+        instance.tas_group = Group.objects.create(name="TAS Group for " + instance.handle + "_" + str(instance.institution.id))
+        instance.readonly_tas_group = Group.objects.create(name="Readonly TAS Group for " + instance.handle + "_" + str(instance.institution.id))
+            
+
+pre_save.connect(DefineUserGroupsForCourse, sender=Course)
 
 
 #does additional pages need an owner?
@@ -217,7 +231,7 @@ class File(models.Model):
 #class Forums(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
 #    access_id = models.TextField(blank=True)
-#    course = models.BigIntegerField()
+#    coure = models.BigIntegerField()
 #    title = models.CharField(max_length=255, null=True, blank=True)
 #    description = models.TextField(blank=True)
 #    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -285,7 +299,6 @@ class UserCourseData(models.Model):
 class UserProfile(models.Model):
     #id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, db_index=True)
-    is_instructor = models.IntegerField(default=False, blank=True)
     site_data = models.TextField(blank=True)
     class Meta:
         db_table = u'c2g_user_profiles'
@@ -309,6 +322,10 @@ class VideoTopic(models.Model):
     class Meta:
         db_table = u'c2g_video_topics'
 
+
+def get_length(url):
+    return 0
+
 #do Videos need owners?  What are index and segments and why are they text fields
 #commenting out for now
 class Video(models.Model):
@@ -325,6 +342,12 @@ class Video(models.Model):
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
+    start_time = models.TimeField(default=datetime.time())
+    duration = models.IntegerField(default=get_length(url))
+
+    def percent_done(self):
+        start_seconds = self.start_time.hour*3600 + self.start_time.minute*60 + self.start_time.second
+        return float(start_seconds*100)/self.duration
 
     def __unicode__(self):
         return self.title
@@ -383,23 +406,6 @@ class VideoAnnotation(models.Model):
 
 
 
-
-#For roles, can we make do somehow with built-in django permissions
-#what custom features do we actually need here?
-class Role(models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course)
-    title = models.CharField(max_length=255)
-    is_staff = models.IntegerField(null=True, blank=True)
-    privileges = models.TextField(blank=True)
-    holder_ids = models.TextField(blank=True)
-    holder_count = models.BigIntegerField(null=True, blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
-    class Meta:
-        db_table = u'c2g_roles'
-
-
 class SharingPermission(models.Model):
     #id = models.BigIntegerField(primary_key=True)
     object_id = models.BigIntegerField(db_index=True)
@@ -421,22 +427,44 @@ class instance_status(models.Model):
     current_staging = models.ForeignKey(Course, related_name="current_staging", null=True, db_index=True)
     class Meta:
         db_table = u'c2g_instance_status'
-        
-#class ProcessedExercises(models.Model):
-#    complete = models.IntegerField(null=True, blank=True)
-#    count_hints = models.IntegerField(null=True, blank=True)
-#    time_taken = models.IntegerField(null=True, blank=True)
-#    attempt_number = models.IntegerField(null=True, blank=True)
-#    sha1 = models.TextField(blank=True)
-#    seed = models.TextField(blank=True)
-#    problem_type = models.TextField(blank=True)
-#    review_mode = models.IntegerField(null=True, blank=True)
-#    topic_mode = models.IntegerField(null=True, blank=True)
-#    casing = models.TextField(blank=True)
-#    card = models.TextField(blank=True)
-#    topic_id = models.ForeignKey(VideoTopic, db_index=True)
-#    cards_done = models.IntegerField(null=True, blank=True)
-#    cards_left = models.IntegerField(null=True, blank=True)
-#    class Meta:
-#        db_table = u'c2g_processed_exercises'
 
+class ProblemSet(models.Model):
+    course = models.ForeignKey(Course)
+    title = models.CharField(max_length=255)
+    path = models.CharField(max_length=255)
+    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+    def __unicode__(self):
+        return self.title
+    class Meta:
+        db_table = u'c2g_problem_sets'
+
+class ProblemActivity(models.Model):
+     student = models.ForeignKey(User)
+     course = models.ForeignKey(Course)
+     complete = models.IntegerField(null=True, blank=True)
+     count_hints = models.IntegerField(null=True, blank=True)
+     time_taken = models.IntegerField(null=True, blank=True)
+     attempt_number = models.IntegerField(null=True, blank=True)
+     sha1 = models.TextField(blank=True)
+     seed = models.TextField(blank=True)
+     problem_type = models.TextField(blank=True)
+     review_mode = models.IntegerField(null=True, blank=True)
+     topic_mode = models.IntegerField(null=True, blank=True)
+     casing = models.TextField(blank=True)
+     card = models.TextField(blank=True)
+     topic_id = models.ForeignKey(VideoTopic, db_index=True)
+     cards_done = models.IntegerField(null=True, blank=True)
+     cards_left = models.IntegerField(null=True, blank=True)
+     class Meta:
+        db_table = u'c2g_problem_activity'
+
+class NewsEvent(models.Model):
+    course = models.ForeignKey(Course)
+    event = models.CharField(max_length=255)
+    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    def __unicode__(self):
+        return self.event
+    class Meta:
+        db_table = u'c2g_news_events'
