@@ -36,6 +36,9 @@ urlpatterns = patterns('',
 	url(r'^courses/mine/?', 'courses.views.mine'),
 	
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/?$', 'courses.views.view'),
+	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/info/?$', 'courses.views.info'),
+	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/syllabus/?$', 'courses.views.syllabus'),
+	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/prereqs/?$', 'courses.views.prereqs'),
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/admin/?', 'courses.admin_views.admin'),
 	
 	# Additional Pages

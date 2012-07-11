@@ -10,27 +10,30 @@
 				<li {% block home_link_class %}{% endblock home_link_class %}>
 					<a href="{% url 'courses.views.view' course_prefix course_suffix %}">Home</a>
 				</li>
+				<li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a href="{% url 'courses.views.info' course_prefix course_suffix %}">Course Info</a></li>
+						<li><a href="{% url 'courses.views.syllabus' course_prefix course_suffix %}">Syllabus</a></li>
+						<li><a href="{% url 'courses.views.prereqs' course_prefix course_suffix %}">Prerequisites</a></li>
+					</ul>
+				</li>
 				<li {% block forums_link_class %}{% endblock forums_link_class %}>
 					<a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a>
 				</li>
-				<li {% block assignments_link_class %}class="dropdown"{% endblock assignments_link_class %}>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Problem Sets<b class="caret"></b></a>
-					<ul class="dropdown-menu">
-						<li><a href="{% url 'courses.assignments.views.view' course_prefix course_suffix 'problem_set_01' %}">Problem Set 01</a></li>
-						<li><a href="{% url 'courses.assignments.views.view' course_prefix course_suffix 'problem_set_02' %}">Problem Set 02</a></li>
-						<li><a href="{% url 'courses.assignments.views.view' course_prefix course_suffix 'problem_set_03' %}">Problem Set 03</a></li>
-					</ul>
+				<li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
+					<a href="{% url 'problemsets.views.list' course_prefix course_suffix %}">Problem Sets</a>
 				</li>
 				<li {% block videos_link_class %}{% endblock videos_link_class %}>
 					<a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a>
 				</li>
 			</ul>
-			<form class="navbar-search hidden-phone" action="">
+			<!--form class="navbar-search hidden-phone" action="">
 				<div class="input-append">
 					<input class="span2 search-query" placeholder="Search course" id="appendedInputButton" size="16" type="text">
 					<button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
 				</div>
-			</form>
+			</form-->
 		</div>
 	</div>
 </div>
