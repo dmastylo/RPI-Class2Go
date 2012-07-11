@@ -231,7 +231,7 @@ class File(models.Model):
 #class Forums(models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
 #    access_id = models.TextField(blank=True)
-#    course = models.BigIntegerField()
+#    coure = models.BigIntegerField()
 #    title = models.CharField(max_length=255, null=True, blank=True)
 #    description = models.TextField(blank=True)
 #    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -322,6 +322,10 @@ class VideoTopic(models.Model):
     class Meta:
         db_table = u'c2g_video_topics'
 
+
+def get_length(url):
+    return 0
+
 #do Videos need owners?  What are index and segments and why are they text fields
 #commenting out for now
 class Video(models.Model):
@@ -337,8 +341,13 @@ class Video(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     type = models.CharField(max_length=30, default="youtube")
-    url = models.URLField(max_length=255, null=True)
+    url = models.CharField(max_length=255, null=True)
     start_time = models.TimeField(default=datetime.time())
+    duration = models.IntegerField(default=get_length(url))
+
+    def percent_done(self):
+        start_seconds = self.start_time.hour*3600 + self.start_time.minute*60 + self.start_time.second
+        return float(start_seconds*100)/self.duration
 
     def __unicode__(self):
         return self.title
