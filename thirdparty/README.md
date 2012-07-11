@@ -5,10 +5,10 @@ LTI:       http://www.imsglobal.org/
 Library:   http://pypi.python.org/pypi/ims_lti_py/0.4
 
 Requires for unit testing
-    sudo pip install nose
+- sudo pip install nose
 
 Requires for running
-    sudo pip install lxml
-    sudo pip install oauth2
+- sudo pip install lxml
+- sudo pip install oauth2
 
 
