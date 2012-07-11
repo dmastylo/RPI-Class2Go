@@ -243,6 +243,7 @@ a.thumbnail:hover {
   font-style: normal;
   display: inline-block;
   text-decoration: inherit;
+  background:none;
 }
 a [class^="icon-"],
 a [class*=" icon-"] {
