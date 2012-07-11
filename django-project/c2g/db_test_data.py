@@ -157,73 +157,93 @@ def create_nlp_course():
         a1.save()
     
         #Create the Video Topics
-        title = 'Section 1 - Intro Material'
-        topic1 = save_video_topic (course_id, title)
-        
-        title = '1.1 Getting Started'
-        topic2 = save_video_topic (course_id, title)
-        
-        title = '1.2 History of Field'
-        topic3 = save_video_topic (course_id, title)
-        
-        title = '1.3 Big Issues'
-        topic4 = save_video_topic (course_id, title)
+        title = 'Course Introduction'
+        topic = save_video_topic (course_id, title)
 
-        #Create the Videos
-        topic_id = topic1
-        access_id = '123'
-        title = "Changeable video title #1"
-        description = "Description goes here #1"
-        url = "WIKt-vD95nI"
-        start_time = time(0, 0, 5)
-        duration = 135
-        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
-
-        topic_id = topic1
-        access_id = '123'
-        title = "Changeable video title #2"
-        description = "Description goes here #2"
-        url = "SxkI2dbqv8w"
-        start_time = time(0, 1, 0)
-        duration = 160
-        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
-
-        topic_id = topic2
-        access_id = '123'
-        title = "Introduction to Natural Language Processing"
-        description = "Intro video by Professor Dan Jurafsky & Chris Manning"
-        url = "nfoudtpBV68"
-        start_time = time(0, 10, 5)
+        topic_id = topic
+        title = "Course Introduction"
+        description = "Intro video by Professor Dan Jurafsky and Chris Manning"
+        url = "BJiVRIPVNxU"
+        start_time = time()
         duration = 772
-        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url, start_time, duration)
 
-        topic_id = topic2
-        access_id = '123'
-        title = "Changeable video title #3"
-        description = "Description goes here #3"
-        url = "yfi0Fsb6lNY"
-        start_time = time(0, 0, 30)
-        duration = 301
-        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+        title = 'Basic Text Processing'
+        topic = save_video_topic (course_id, title)
 
-        topic_id = topic3
-        access_id = '123'
-        title = "Changeable video title #4"
-        description = "Description goes here #4"
-        url = "07fhOVQ9wEA"
-        start_time = time(0, 0, 50)
-        duration = 142
-        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+        topic_id = topic
+        title = "Regular Expressions"
+        description = "Intro to regular expressions"
+        url = "dBVlwb15SBM"
+        start_time = time()
+        duration = 686
+        save_video (course_id, topic_id, title, description, url, start_time, duration)
 
-        topic_id = topic4
-        access_id = '123'
-        title = "Changeable video title #5"
-        description = "Description goes here #5"
-        url = "3h039oXUuMY"
-        start_time = time(0, 2, 10)
-        duration = 230
-        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+        topic_id = topic
+        title = "Regular Expressions in Practical NLP"
+        description = "Video on regexp in practical NLP"
+        url = "zJSqHRuD2C4"
+        start_time = time()
+        duration = 365
+        save_video (course_id, topic_id, title, description, url, start_time, duration)
 
+        topic_id = topic
+        title = "Word Tokenization"
+        description = "Video on word tokenization"
+        url = "WMC3AjgYf3A"
+        start_time = time()
+        duration = 866
+        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        
+        title = 'Edit Distance'
+        topic = save_video_topic (course_id, title)
+        
+        topic_id = topic
+        title = "Defining Minimum Edit Distance"
+        description = "Video explaining minimum edit distance"
+        url = "xOfEYI61f3k"
+        start_time = time()
+        duration = 425
+        save_video (course_id, topic_id, title, description, url, start_time, duration)
+
+        topic_id = topic
+        title = "Computing Minimum Edit Distance"
+        description = "Video on computing minimum edit distance"
+        url = "Gh63CeMzav8"
+        start_time = time()
+        duration = 355
+        save_video (course_id, topic_id, title, description, url, start_time, duration)
+
+        title = 'Language Modeling'
+        topic = save_video_topic (course_id, title)
+
+        topic_id = topic
+        title = "Introduction to N-grams"
+        description = "Video introducting N-grams"
+        url = "LRq7om7vMEc"
+        start_time = time()
+        duration = 522
+        save_video (course_id, topic_id, title, description, url, start_time, duration)
+
+        title = 'Spelling Correction'
+        topic = save_video_topic (course_id, title)
+
+        title = 'Text Classification'
+        topic = save_video_topic (course_id, title)
+
+        title = 'Sentiment Analysis'
+        topic = save_video_topic (course_id, title)
+
+        title = 'Discriminative classifiers: Maximum Entropy classifiers'
+        topic = save_video_topic (course_id, title)
+
+        title = 'Named entity recognition and Maximum Entropy Sequence Models'
+        topic = save_video_topic (course_id, title)
+
+        title = 'Relation Extraction'
+        topic = save_video_topic (course_id, title)
+
+        #Create the Videos (moved to create by Video Topic)
 
         #Create Additional Pages
         course_id = course_id
@@ -363,11 +383,10 @@ def save_video_topic(course_id, title):
 
         return video_topic.id
 
-def save_video(course_id, topic_id, access_id, title, description, url, start_time, duration):
+def save_video(course_id, topic_id, title, description, url, start_time, duration):
         
         video = Video(course_id = course_id,
         topic_id = topic_id,
-        access_id = access_id,
         title = title,
         description = description,
         url = url,
