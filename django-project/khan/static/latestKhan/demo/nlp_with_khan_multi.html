@@ -268,6 +268,15 @@ var initStacks = function () {
     $('#hintsarea').addClass('video-overlay-hint');
     $('#examples-show').hide();
 
+    var skipBtn = document.createElement('input');
+    $(skipBtn).attr('id', 'skip-button');
+    $(skipBtn).attr('type', 'button');
+    $(skipBtn).attr('value', 'Skip Question');
+    $(skipBtn).attr('title', 'Skip this question and return to the video');
+    $(skipBtn).addClass('simple-button').addClass('green').addClass('full-width');
+    $('#check-answer-button').after($(skipBtn));
+    $(skipBtn).click(function () { $('#next-question-button').trigger('click'); })
+
     $('#next-question-button').unbind('click');
     $('#next-question-button').click(function () {
 
