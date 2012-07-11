@@ -157,10 +157,10 @@ def create_nlp_course():
         a1.save()
     
         #Create the Video Topics
-        title = 'Section 1 Download'
+        title = 'Section 1 - Intro Material'
         topic1 = save_video_topic (course_id, title)
         
-        title = '1.1 Course Intro'
+        title = '1.1 Getting Started'
         topic2 = save_video_topic (course_id, title)
         
         title = '1.2 History of Field'
