@@ -1,5 +1,8 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+
+{% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
+
 {% block m_column_content %}
 
 <h2>Problem sets for course "{{course_prefix}} ({{course_suffix}})" </h2>
