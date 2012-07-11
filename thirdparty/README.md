@@ -1,4 +1,4 @@
-** IMS LTI **
+## IMS LTI ##
 
 This is a library for integrating with Piazza using the LTI protocol
 LTI:       http://www.imsglobal.org/
