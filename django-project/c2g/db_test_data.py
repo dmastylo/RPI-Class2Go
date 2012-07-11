@@ -1,6 +1,7 @@
 from c2g.models import *
 from django.contrib.auth.models import User,Group
 
+from datetime import time
 
 def delete_db_data():
 
@@ -157,17 +158,73 @@ def create_nlp_course():
     
         #Create the Video Topics
         title = 'Section 1 Download'
-        save_video_topic (course_id, title)
+        topic1 = save_video_topic (course_id, title)
         
         title = '1.1 Course Intro'
-        save_video_topic (course_id, title)
+        topic2 = save_video_topic (course_id, title)
         
         title = '1.2 History of Field'
-        save_video_topic (course_id, title)
+        topic3 = save_video_topic (course_id, title)
         
         title = '1.3 Big Issues'
-        save_video_topic (course_id, title)
-        
+        topic4 = save_video_topic (course_id, title)
+
+        #Create the Videos
+        topic_id = topic1
+        access_id = '123'
+        title = "Changeable video title #1"
+        description = "Description goes here #1"
+        url = "WIKt-vD95nI"
+        start_time = time(0, 0, 5)
+        duration = 135
+        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+
+        topic_id = topic1
+        access_id = '123'
+        title = "Changeable video title #2"
+        description = "Description goes here #2"
+        url = "SxkI2dbqv8w"
+        start_time = time(0, 1, 0)
+        duration = 160
+        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+
+        topic_id = topic2
+        access_id = '123'
+        title = "Introduction to Natural Language Processing"
+        description = "Intro video by Professor Dan Jurafsky & Chris Manning"
+        url = "nfoudtpBV68"
+        start_time = time(0, 10, 5)
+        duration = 772
+        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+
+        topic_id = topic2
+        access_id = '123'
+        title = "Changeable video title #3"
+        description = "Description goes here #3"
+        url = "yfi0Fsb6lNY"
+        start_time = time(0, 0, 30)
+        duration = 301
+        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+
+        topic_id = topic3
+        access_id = '123'
+        title = "Changeable video title #4"
+        description = "Description goes here #4"
+        url = "07fhOVQ9wEA"
+        start_time = time(0, 0, 50)
+        duration = 142
+        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+
+        topic_id = topic4
+        access_id = '123'
+        title = "Changeable video title #5"
+        description = "Description goes here #5"
+        url = "3h039oXUuMY"
+        start_time = time(0, 2, 10)
+        duration = 230
+        save_video (course_id, topic_id, access_id, title, description, url, start_time, duration)
+
+
         #Create Additional Pages
         course_id = course_id
         access_id = '123'
@@ -298,19 +355,24 @@ def create_nlp_course():
 
 
 def save_video_topic(course_id, title):
-    
+
         video_topic = VideoTopic(course_id = course_id,
                                   title = title)
         
         video_topic.save()
 
-def save_video(course_id, topic_id, access_id, title, description):
+        return video_topic.id
+
+def save_video(course_id, topic_id, access_id, title, description, url, start_time, duration):
         
         video = Video(course_id = course_id,
         topic_id = topic_id,
         access_id = access_id,
         title = title,
-        description = description)        
+        description = description,
+        url = url,
+        start_time = start_time,
+        duration = duration)        
         
         video.save()
         
