@@ -24,6 +24,10 @@ class Migration(SchemaMigration):
         db.create_table(u'c2g_courses', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('institution', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Institution'])),
+            ('student_group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='student_group', to=orm['auth.Group'])),
+            ('instructor_group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='instructor_group', to=orm['auth.Group'])),
+            ('tas_group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='tas_group', to=orm['auth.Group'])),
+            ('readonly_tas_group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='readonly_tas_group', to=orm['auth.Group'])),
             ('code', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('listing_description', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -39,34 +43,11 @@ class Migration(SchemaMigration):
             ('membership_control', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('join_password', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('list_publicly', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('handle', self.gf('django.db.models.fields.CharField')(max_length=255, unique=True, null=True, db_index=True)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
         ))
         db.send_create_signal('c2g', ['Course'])
-
-        # Adding M2M table for field instructors on 'Course'
-        db.create_table(u'c2g_courses_instructors', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('course', models.ForeignKey(orm['c2g.course'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique(u'c2g_courses_instructors', ['course_id', 'user_id'])
-
-        # Adding M2M table for field tas on 'Course'
-        db.create_table(u'c2g_courses_tas', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('course', models.ForeignKey(orm['c2g.course'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique(u'c2g_courses_tas', ['course_id', 'user_id'])
-
-        # Adding M2M table for field readonly_tas on 'Course'
-        db.create_table(u'c2g_courses_readonly_tas', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('course', models.ForeignKey(orm['c2g.course'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique(u'c2g_courses_readonly_tas', ['course_id', 'user_id'])
 
         # Adding model 'AdditionalPage'
         db.create_table(u'c2g_additional_pages', (
@@ -238,7 +219,6 @@ class Migration(SchemaMigration):
         db.create_table(u'c2g_user_profiles', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('is_instructor', self.gf('django.db.models.fields.IntegerField')(default=False, blank=True)),
             ('site_data', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
         db.send_create_signal('c2g', ['UserProfile'])
@@ -263,6 +243,10 @@ class Migration(SchemaMigration):
             ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+            ('type', self.gf('django.db.models.fields.CharField')(default='youtube', max_length=30)),
+            ('url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
+            ('start_time', self.gf('django.db.models.fields.TimeField')(default=datetime.time(0, 0))),
+            ('duration', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('c2g', ['Video'])
 
@@ -312,20 +296,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('c2g', ['VideoAnnotation'])
 
-        # Adding model 'Role'
-        db.create_table(u'c2g_roles', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('is_staff', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('privileges', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('holder_ids', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('holder_count', self.gf('django.db.models.fields.BigIntegerField')(null=True, blank=True)),
-            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal('c2g', ['Role'])
-
         # Adding model 'SharingPermission'
         db.create_table(u'c2g_sharing_permissions', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -341,6 +311,57 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('c2g', ['SharingPermission'])
 
+        # Adding model 'instance_status'
+        db.create_table(u'c2g_instance_status', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('prefix', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, db_index=True)),
+            ('current_prod', self.gf('django.db.models.fields.related.ForeignKey')(related_name='current_prod', null=True, to=orm['c2g.Course'])),
+            ('current_staging', self.gf('django.db.models.fields.related.ForeignKey')(related_name='current_staging', null=True, to=orm['c2g.Course'])),
+        ))
+        db.send_create_signal('c2g', ['instance_status'])
+
+        # Adding model 'ProblemSet'
+        db.create_table(u'c2g_problem_sets', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('path', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal('c2g', ['ProblemSet'])
+
+        # Adding model 'ProblemActivity'
+        db.create_table(u'c2g_problem_activity', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
+            ('complete', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('count_hints', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('time_taken', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('attempt_number', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('sha1', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('seed', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('problem_type', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('review_mode', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('topic_mode', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('casing', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('card', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('topic_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.VideoTopic'])),
+            ('cards_done', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('cards_left', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('c2g', ['ProblemActivity'])
+
+        # Adding model 'NewsEvent'
+        db.create_table(u'c2g_news_events', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
+            ('event', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        ))
+        db.send_create_signal('c2g', ['NewsEvent'])
+
 
     def backwards(self, orm):
         # Deleting model 'Institution'
@@ -348,15 +369,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Course'
         db.delete_table(u'c2g_courses')
-
-        # Removing M2M table for field instructors on 'Course'
-        db.delete_table('c2g_courses_instructors')
-
-        # Removing M2M table for field tas on 'Course'
-        db.delete_table('c2g_courses_tas')
-
-        # Removing M2M table for field readonly_tas on 'Course'
-        db.delete_table('c2g_courses_readonly_tas')
 
         # Deleting model 'AdditionalPage'
         db.delete_table(u'c2g_additional_pages')
@@ -421,11 +433,20 @@ class Migration(SchemaMigration):
         # Deleting model 'VideoAnnotation'
         db.delete_table(u'c2g_video_annotations')
 
-        # Deleting model 'Role'
-        db.delete_table(u'c2g_roles')
-
         # Deleting model 'SharingPermission'
         db.delete_table(u'c2g_sharing_permissions')
+
+        # Deleting model 'instance_status'
+        db.delete_table(u'c2g_instance_status')
+
+        # Deleting model 'ProblemSet'
+        db.delete_table(u'c2g_problem_sets')
+
+        # Deleting model 'ProblemActivity'
+        db.delete_table(u'c2g_problem_activity')
+
+        # Deleting model 'NewsEvent'
+        db.delete_table(u'c2g_news_events')
 
 
     models = {
@@ -527,9 +548,10 @@ class Migration(SchemaMigration):
             'code': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'feature_settings': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'unique': 'True', 'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'institution': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Institution']"}),
-            'instructors': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'instructors'", 'symmetrical': 'False', 'to': "orm['auth.User']"}),
+            'instructor_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'instructor_group'", 'to': "orm['auth.Group']"}),
             'join_password': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'list_publicly': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -537,9 +559,10 @@ class Migration(SchemaMigration):
             'meeting_info': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'membership_control': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'readonly_tas': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'readonly_tas'", 'null': 'True', 'to': "orm['auth.User']"}),
+            'readonly_tas_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'readonly_tas_group'", 'to': "orm['auth.Group']"}),
             'staff_emails': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'tas': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'tas'", 'null': 'True', 'to': "orm['auth.User']"}),
+            'student_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'student_group'", 'to': "orm['auth.Group']"}),
+            'tas_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tas_group'", 'to': "orm['auth.Group']"}),
             'term': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -573,6 +596,13 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
+        'c2g.instance_status': {
+            'Meta': {'object_name': 'instance_status'},
+            'current_prod': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'current_prod'", 'null': 'True', 'to': "orm['c2g.Course']"}),
+            'current_staging': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'current_staging'", 'null': 'True', 'to': "orm['c2g.Course']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'prefix': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'db_index': 'True'})
+        },
         'c2g.institution': {
             'Meta': {'object_name': 'Institution', 'db_table': "u'c2g_institutions'"},
             'city': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -595,6 +625,13 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
+        'c2g.newsevent': {
+            'Meta': {'object_name': 'NewsEvent', 'db_table': "u'c2g_news_events'"},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'event': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
         'c2g.officehour': {
             'Meta': {'object_name': 'Officehour', 'db_table': "u'c2g_officehours'"},
             'calendar_end': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
@@ -607,15 +644,32 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
-        'c2g.role': {
-            'Meta': {'object_name': 'Role', 'db_table': "u'c2g_roles'"},
+        'c2g.problemactivity': {
+            'Meta': {'object_name': 'ProblemActivity', 'db_table': "u'c2g_problem_activity'"},
+            'attempt_number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'card': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'cards_done': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'cards_left': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'casing': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'complete': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'count_hints': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'holder_count': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'holder_ids': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_staff': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'problem_type': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'review_mode': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'seed': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'sha1': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'time_taken': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'topic_id': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.VideoTopic']"}),
+            'topic_mode': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+        },
+        'c2g.problemset': {
+            'Meta': {'object_name': 'ProblemSet', 'db_table': "u'c2g_problem_sets'"},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'privileges': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'path': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
@@ -654,7 +708,6 @@ class Migration(SchemaMigration):
         'c2g.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "u'c2g_user_profiles'"},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_instructor': ('django.db.models.fields.IntegerField', [], {'default': 'False', 'blank': 'True'}),
             'site_data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
@@ -663,11 +716,15 @@ class Migration(SchemaMigration):
             'access_id': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'duration': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'start_time': ('django.db.models.fields.TimeField', [], {'default': 'datetime.time(0, 0)'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'topic': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.VideoTopic']", 'null': 'True'})
+            'topic': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.VideoTopic']", 'null': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'default': "'youtube'", 'max_length': '30'}),
+            'url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True'})
         },
         'c2g.videoannotation': {
             'Meta': {'object_name': 'VideoAnnotation', 'db_table': "u'c2g_video_annotations'"},
