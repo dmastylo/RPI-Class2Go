@@ -33,3 +33,7 @@ def piazza(request):
    t = loader.get_template('piazza.html')
    c = RequestContext(request, {'foo': 'bar'})
    return HttpResponse(t.render(c))
+
+def healthcheck(request):
+    return HttpResponse("I'm alive!")
+
