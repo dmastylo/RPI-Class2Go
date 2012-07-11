@@ -1,12 +1,20 @@
 from django.conf.urls.defaults import patterns, include, url
+from django.views.generic.simple import redirect_to
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+
+    # Home page redirects to our one course page for now.  We will want to remove
+    # this before we go to production of course.
+    url(r'^$', redirect_to, {'url': '/nlp/Fall2012/'}),
+    url(r'^nlp$', redirect_to, {'url': '/nlp/Fall2012/'}),
+    # url(r'^nlp', redirect_to, {'url': '/nlp/Fall2012/'}),
+
     # Examples:
-    url(r'^$', 'c2g.views.home'),
+    url(r'^courses$', 'c2g.views.home'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
     # accounts app for user management
