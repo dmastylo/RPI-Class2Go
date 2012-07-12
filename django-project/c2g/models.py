@@ -14,19 +14,27 @@
 
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save, post_init
 
 import datetime
 
-class Institution(models.Model):
+class TimestampMixin(models.Model):
+    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
+
+    def tellMeWhen(self):
+       print ("Created: " + self.time_created.__str__() + "  Updated: " + self.last_updated.__str__())
+    
+    class Meta:
+       abstract = True
+
+
+class Institution(TimestampMixin, models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
     title = models.TextField()
     country = models.TextField(blank=True)
     city = models.TextField(blank=True)
     domains = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
 
     def __unicode__(self):
         return self.title
@@ -34,7 +42,7 @@ class Institution(models.Model):
     class Meta:
         db_table = u'c2g_institutions'
 
-class Course(models.Model):
+class Course(TimestampMixin, models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
     institution = models.ForeignKey(Institution, db_index=True)
     student_group = models.ForeignKey(Group, related_name="student_group", db_index=True)
@@ -57,8 +65,6 @@ class Course(models.Model):
     join_password = models.TextField(blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, unique=True, db_index=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     
     def __unicode__(self):
         return self.title
@@ -67,22 +73,28 @@ class Course(models.Model):
         db_table = u'c2g_courses'
 
 
-def DefineUserGroupsForCourse(sender, **kwargs):
-        instance = kwargs.get('instance')
+def defineUserGroupsForCourse(sender, **kwargs):
+    instance = kwargs.get('instance')
+    if (not hasattr(instance,'student_group')):
         instance.student_group = Group.objects.create( name="Student Group for " + instance.handle + "_" + str(instance.institution.id))
+    if (not hasattr(instance,'instructor_group')):
         instance.instructor_group = Group.objects.create(name="Instructor Group for " + instance.handle + "_" + str(instance.institution.id))
+    if (not hasattr(instance,'tas_group')):
         instance.tas_group = Group.objects.create(name="TAS Group for " + instance.handle + "_" + str(instance.institution.id))
+    if (not hasattr(instance,'readonly_tas_group')):
         instance.readonly_tas_group = Group.objects.create(name="Readonly TAS Group for " + instance.handle + "_" + str(instance.institution.id))
             
 
-pre_save.connect(DefineUserGroupsForCourse, sender=Course)
+pre_save.connect(defineUserGroupsForCourse, sender=Course)
+
+
 
 
 #does additional pages need an owner?
 #There's no social network
 #here, so not every item need an owner.
 #why overlap of write_access and access_id?
-class AdditionalPage(models.Model):
+class AdditionalPage(TimestampMixin, models.Model):
 #   #id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
@@ -91,40 +103,34 @@ class AdditionalPage(models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     update_log = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_additional_pages'
 
 #owner is person who posted
 #does it need access_id?
-class Announcement(models.Model):
+class Announcement(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     access_id = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_announcements'
 
 
 ##ASSIGNMENTS SECTION####
 #Assignments, AssigmentGrades, AssignmentSubmissions might need ondelete for User
-class AssignmentCategory(models.Model):
+class AssignmentCategory(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_assignment_categories'
 
 #do we really need both an owner_id and an access_id?  There's no social network
 #here, so not every item need an owner.
-class Assignment(models.Model):
+class Assignment(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     #owner_id = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
@@ -134,34 +140,28 @@ class Assignment(models.Model):
     description = models.TextField(blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     close_date = models.DateTimeField(null=True, blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_assignments'
 
 #deleted course
 #Need to have a double-column (assignment, user) index here
-class AssignmentGrade(models.Model):
+class AssignmentGrade(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     user = models.ForeignKey(User)
     #course = models.ForeignKey(Course)
     assignment = models.ForeignKey(Assignment)
     json = models.TextField()
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_assignment_grades'
 
 #deleted course
 #Need to have a double-column (assignmer, owner) index here
-class AssignmentSubmission(models.Model):
+class AssignmentSubmission(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     #course = models.ForeignKey(Course)
     assignment = models.ForeignKey(Assignment)
     json = models.TextField()
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_assignment_submissions'
 
@@ -169,36 +169,30 @@ class AssignmentSubmission(models.Model):
 #what's the difference between this and UserCourseData
 #they have the same fields
 #need to have (user,course) index here
-class CourseAnalytics(models.Model):
+class CourseAnalytics(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     user = models.ForeignKey(User, null=True)
     course = models.ForeignKey(Course)
     json = models.TextField()
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_course_analytics'
 
-class CourseMap(models.Model):
+class CourseMap(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     json = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_course_maps'
 
 #Let's use django file support or something else instead, but keep for now
 #Need (owner,course) index here
-class File(models.Model):
+class File(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course)
     access_id = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_files'
 
@@ -241,7 +235,7 @@ class File(models.Model):
 
 
 #Again, do lectures need owners?
-class Lecture(models.Model):
+class Lecture(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
@@ -250,12 +244,10 @@ class Lecture(models.Model):
     description = models.TextField(blank=True)
     calendar_start = models.DateTimeField(null=True, blank=True)
     calendar_end = models.DateTimeField(null=True, blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_lectures'
 
-class Officehour(models.Model):
+class Officehour(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course)
@@ -263,33 +255,27 @@ class Officehour(models.Model):
     description = models.TextField(blank=True)
     calendar_start = models.DateTimeField(null=True, blank=True)
     calendar_end = models.DateTimeField(null=True, blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_officehours'
 
 
-class StudentSection(models.Model):
+class StudentSection(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     capacity = models.IntegerField(default=999)
     members = models.ManyToManyField(User)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_sections'
 
 
 #what's the difference between this and CourseAnalytics
 #they have the same fields
-class UserCourseData(models.Model):
+class UserCourseData(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     user = models.ForeignKey(User)
     course = models.ForeignKey(Course)
     json = models.TextField()
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_user_course_data'
 
@@ -303,18 +289,16 @@ class UserProfile(models.Model):
     class Meta:
         db_table = u'c2g_user_profiles'
 
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance, site_data='')
+def create_user_profile(sender, instance, created, raw, **kwargs):
+    if created and not raw:  #create means that a new DB entry is created, raw is set when fixtures are being loaded
+        UserProfile.objects.create(user=instance)
 
 post_save.connect(create_user_profile, sender=User)
 
-class VideoTopic(models.Model):
+class VideoTopic(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)    
     
     def __unicode__(self):
         return self.title    
@@ -328,7 +312,7 @@ def get_length(url):
 
 #do Videos need owners?  What are index and segments and why are they text fields
 #commenting out for now
-class Video(models.Model):
+class Video(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     #owner = models.ForeignKey(User, null=True, blank=True)
     course = models.ForeignKey(Course, db_index=True)
@@ -338,8 +322,6 @@ class Video(models.Model):
     description = models.TextField(blank=True)
     #index = models.IntegerField(null=True, blank=True)
     #segments = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
     start_time = models.TimeField(default=datetime.time())
@@ -356,12 +338,10 @@ class Video(models.Model):
         db_table = u'c2g_videos'
 
 #video quizzes do not need owners or access
-class VideoQuiz(models.Model):
+class VideoQuiz(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     video = models.ForeignKey(Video, db_index=True)
     json = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_video_quizzes'
 
@@ -376,22 +356,20 @@ class VideoQuizQuestion(models.Model):
 
 
 #Need (owner, question) index
-class VideoQuizSubmission(models.Model):
+class VideoQuizSubmission(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User)
     question = models.ForeignKey(VideoQuizQuestion) #
     time_in_video = models.IntegerField(default=0)
     video_metadata = models.IntegerField(null=True) # might use this for YouTube ID
     json = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_video_quiz_submissions'
 
 
 #video annotations may not need access_id
 #need (owner,video) index
-class VideoAnnotation(models.Model):
+class VideoAnnotation(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     owner = models.ForeignKey(User, null=True, blank=True)
     #access_id = models.TextField(blank=True)
@@ -399,14 +377,12 @@ class VideoAnnotation(models.Model):
     time_in_video = models.IntegerField(default=0)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_video_annotations'
 
 
 
-class SharingPermission(models.Model):
+class SharingPermission(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     object_id = models.BigIntegerField(db_index=True)
     type = models.TextField(blank=True)
@@ -415,8 +391,6 @@ class SharingPermission(models.Model):
     cond_nc = models.IntegerField(null=True, blank=True)
     cond_nd = models.IntegerField(null=True, blank=True)
     cond_sa = models.IntegerField(null=True, blank=True)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     class Meta:
         db_table = u'c2g_sharing_permissions'
         
@@ -428,12 +402,10 @@ class instance_status(models.Model):
     class Meta:
         db_table = u'c2g_instance_status'
 
-class ProblemSet(models.Model):
+class ProblemSet(TimestampMixin, models.Model):
     course = models.ForeignKey(Course)
     title = models.CharField(max_length=255)
     path = models.CharField(max_length=255)
-    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
     def __unicode__(self):
         return self.title
     class Meta:
