@@ -416,11 +416,12 @@ $.extend(Khan.answerTypes, {
     decimal: function(solutionarea, solution, fallback) {
         return Khan.answerTypes.number(solutionarea, solution, fallback, "decimal");
     },
-    
+
+    //added by Kevin, doesn't seem to work though
     integer: function(solutionarea, solution, fallback) {
 	return Khan.answerTypes.number(solutionarea, solution, fallback, "integer");
     },
-
+    
     rational: function(solutionarea, solution, fallback) {
         return Khan.answerTypes.number(solutionarea, solution, fallback, "integer, proper, improper, mixed");
     },
