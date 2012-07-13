@@ -251,4 +251,4 @@ python manage.py runserver 8100
 
 02. Take a look in c2g/views.py as there are some parameters that affect which data gets created. Note, if you choose the delete_current_data option it will delete your current django users so you’ll have to recreate those users if you want.
 
-03. To run the script that populates the data run the url: http://localhost:8080/db_populate or whatever your version is.
+03. To run the script that populates the data do "manage.py help db_populate" first. This will tell you where to setup the params for the test data. 
