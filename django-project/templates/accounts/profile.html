@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load url from future %}
+ 
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span6">
+    <h2>Profile Information</h2>
+    <p> Username: {{ user.username }} <br>
+        First Name: {{ user.first_name }} <br>
+        Last Name: {{ user.last_name }} <br>
+        Email: {{ user.email }} <br>
+        <a href="{% url 'accounts.views.edit' %}">Change Info</a> <br>
+        <a href="#">Change Password</a>
+    </p>
+</div>
+{% endblock m_column_content %}
