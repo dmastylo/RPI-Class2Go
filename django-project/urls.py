@@ -33,8 +33,6 @@ urlpatterns = patterns('',
     # Piazza integration
 	url(r'^forums$', 'c2g.views.piazza'),
 
-	# Developer utility to populate db with test data.
-	url(r'^db_populate$', 'c2g.views.db_populate'),
 	
 	# The following line is temprarily commented out until we figure out how django cascades its URL matching operations.
 	# After this is figured out, the rest of the matches below shall be moved to courses.url.
