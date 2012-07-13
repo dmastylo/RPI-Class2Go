@@ -157,6 +157,7 @@ def create_nlp_course():
         a1.save()
     
         #Create the Video Topics
+<<<<<<< HEAD
         title = 'Course Introduction'
         topic = save_video_topic (course_id, title)
 
@@ -194,6 +195,13 @@ def create_nlp_course():
         start_time = time()
         duration = 866
         save_video (course_id, topic_id, title, description, url, start_time, duration)
+=======
+        title = 'Section 1 Download'
+        topic1 = save_video_topic (course_id, title)
+        
+        title = '1.1 Course Intro'
+        topic2 = save_video_topic (course_id, title)
+>>>>>>> parent of f2a2f94... Better video titles for sprint3 demo.
         
         title = 'Edit Distance'
         topic = save_video_topic (course_id, title)
