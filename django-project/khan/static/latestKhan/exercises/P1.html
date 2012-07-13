@@ -5,8 +5,270 @@
 
 </head>
 <body>
-      <div class="exercise" data-name="P1_Levenshtein" data-weight="1"></div>  
-      <div class="exercise" data-name="P1_Regexp" data-weight="1"></div>  
-      <div class="exercise" data-name="P1_Tokenize" data-weight="1"></div>  
+      <div class="exercise" <!-- data-name="P1_Levenshtein" --> data-weight="1">
+          <style>
+              td {
+                  border: 1px solid black;
+              }
+           </style>
+          
+          <div class="problems">
+              
+              <div data-weight="1">
+                  <div class="question">
+                      
+                      What is the value in the marked cell of
+                      the following Levenshtein distance (substitutions cost 2) table
+                      below: <br><br>
+                      
+                      <table><tr>
+                          <!-- row 5 -->
+                          <td width="20"> e </td>
+                          <td width="20"> 4 </td>
+                          <td width="20">  </td>
+                          <td width="20">  </td>
+                          <td width="20">  </td>
+                          <td width="20">  </td>
+                      </tr>
+                          
+                          <tr>
+                              <!-- row 4 -->
+                              <td width="20"> n </td>
+                              <td width="20"> 3 </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 3 -->
+                              <td width="20"> a </td>
+                              <td width="20"> 2 </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td bgcolor="#FF0000"> X </tr>
+                          
+                          <tr>
+                              <!-- row 2 -->
+                              <td width="20"> b </td>
+                              <td width="20"> 1 </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 1 -->
+                              <td width="20"> - </td>
+                              <td width="20"> 0 </td>
+                              <td width="20"> 1 </td>
+                              <td width="20"> 2 </td>
+                              <td width="20"> 3 </td>
+                              <td width="20"> 4 </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 0 -->
+                              <td width="20"> / </td>
+                              <td width="20"> - </td>
+                              <td width="20"> b </td>
+                              <td width="20"> a </td>
+                              <td width="20"> r </td>
+                              <td width="20"> n </td>
+                          </tr>
+                          
+                      </table>  
+                  </div> <!-- question -->
+                  
+                  <div class="solution">2</div>
+                  
+              </div> <!-- data-weight-->
+              
+              <div data-weight="1">
+                  <div class="question">
+                      
+                      What is the value in the marked cell of
+                      the following Levenshtein distance (substitutions cost 2) table
+                      below: <br><br>
+                      
+                      <table><tr>
+                          <!-- row 6 -->
+                          <td width="20"> e </td>
+                          <td width="20"> 5 </td>
+                          <td width="20">  </td>
+                          <td width="20">  </td>
+                          <td width="20">  </td>
+                          <td width="20">  </td>
+                      </tr>
+                          
+                          <tr>
+                              <!-- row 5 -->
+                              <td width="20"> v </td>
+                              <td width="20"> 4 </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 4 -->
+                              <td width="20"> r </td>
+                              <td width="20"> 3 </td>
+                              <td bgcolor="#FF0000"> X </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 3 -->
+                              <td width="20"> a </td>
+                              <td width="20"> 2 </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 2 -->
+                              <td width="20"> c </td>
+                              <td width="20"> 1 </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                              <td width="20">  </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 1 -->
+                              <td width="20"> - </td>
+                              <td width="20"> 0 </td>
+                              <td width="20"> 1 </td>
+                              <td width="20"> 2 </td>
+                              <td width="20"> 3 </td>
+                              <td width="20"> 4 </td>
+                          </tr>
+                          
+                          <tr>
+                              <!-- row 0 -->
+                              <td width="20"> / </td>
+                              <td width="20"> - </td>
+                              <td width="20"> c </td>
+                              <td width="20"> o </td>
+                              <td width="20"> n </td>
+                              <td width="20"> e </td>
+                          </tr>
+                          
+                      </table>
+                      
+                      
+                  </div> <!-- question-->
+                  
+                  <div class="solution">2</div>
+                  
+              </div> <!-- data weight-->
+              
+          </div>     <!--problems-->
+
+      </div>  
+      <div class="exercise" <!-- data-name="P1_Regexp" --> data-weight="1">
+          <div class="problems">
+              <div id="prob1">
+                  <div class="question">
+                      <p>Which of the following strings doesn't match the regex: <br><br><pre>/[a-z]+'[a-z]+/</pre>
+					  </p>
+                  </div>
+                  <div class="vars">
+                      <var id="ANS">randFromArray(["you'd've", "We'd", "rock 'n' roll", "'tis", "I'm"])</var>
+                  </div>
+                  <div class="solution"><var>ANS</var></div>
+                  
+                  <ul class="choices" data-show="5" data-none="true">
+                      <li>he'd</li>
+                      <li>it's</li>
+                      <li>cat's</li>
+                      <li>isn't</li>
+                      <li>won't</li>
+                      <li>oughtn't</li>
+                      <li>shan't</li>
+                      <li>mightn't</li>
+                      <li>we're</li>
+                  </ul>
+                  </ul>
+                  
+                  
+                  
+                  <div class="hints">
+                      <p>
+                      Answers are matched when they are all lower-case, and contain alphabetical characters on each side of a single apostrophe.
+                      </p>
+                  </div> <!--hints-->
+              </div> <!--prob1-->
+          </div> <!--problems-->
+          
+      </div>  
+      <div class="exercise" <!-- data-name="P1_Tokenize" --> data-weight="1">
+          <div class="problems">
+              <div>
+                  <div class="question">
+                      <p> Download either the Java or Python implementations of the porter
+                      stemmer from:<br> <br> 
+                      <a
+                          href="http://tartarus.org/martin/PorterStemmer/">http://tartarus.org/
+                          martin/PorterStemmer/</a>
+                      <br> <br> 
+                      Any implementation should work, but
+                      only Python and Java have been tested.  Stem the following excerpt
+                      from Wikipedia:
+                      <br> <br> 
+                      <b> In linguistic morphology and information
+                          retrieval, stemming is the process for reducing inflected words to
+                          their stem, base or root form-generally a written word form. The stem
+                          need not be identical to the morphological root of the word; it is
+                          usually sufficient that related words map to the same stem, even if
+                          this stem is not in itself a valid root. Algorithms for stemming have
+                          been studied in computer science since 1968. Many search engines treat
+                          words with the same stem as synonyms as a kind of query broadening, a
+                          process called conflation. </b> </p>
+                  </div>
+                  <p class="extra-info">To use the java file:<br>
+                  <pre>
+                      $ wget http://spark-university.s3.amazonaws.com/stanford-lang2info/quiz/w1_redo/stem.txt
+                      $ wget http://tartarus.org/martin/PorterStemmer/java.txt
+                      $ mv java.txt Porter.java
+                      $ javac Porter.java
+                      $ java Porter stem.txt > stem.stemmed.txt
+                      $ cat stem.stemmed.txt
+                  </pre>
+                  
+                  to use the python version:<br>
+                  <br>
+                  <pre>
+                      $ wget http://spark-university.s3.amazonaws.com/stanford-lang2info/quiz/w1_redo/stem.txt
+                      $ wget http://tartarus.org/martin/PorterStemmer/python.txt
+                      $ mv python.txt porter.py
+                      $ python porter.py stem.txt > stem.stemmed.txt
+                      $ cat stem.stemmed.txt
+                  </pre>
+                  </p>
+                  
+                  <div class="solution" data-type="regex">/in linguist morpholog and inform
+                      retriev, stem is the process for reduc inflect word to their stem, base or
+                      root form-gener a written word form. the stem need not be ident to the
+                      morpholog root of the word; it is usual suffici that relat word map to the
+                      same stem, even if thi stem is not in itself a valid root. algorithm for
+                      stem have been studi in comput scienc sinc 1968. mani search engin treat
+                      word with the same stem as synonym as a kind of queri broaden, a process
+                      call conflat./</div><!--solution-->
+                  
+              </div>
+          </div> <!--problems-->
+                   
+      </div>  
 </body>
 </html>
