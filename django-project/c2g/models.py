@@ -17,7 +17,9 @@ from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save, pre_save, post_init
 from django import forms
 
-import datetime
+from datetime import time
+import gdata.youtube
+import gdata.youtube.service
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -308,9 +310,6 @@ class VideoTopic(TimestampMixin, models.Model):
         db_table = u'c2g_video_topics'
 
 
-def get_length(url):
-    return 0
-
 #do Videos need owners?  What are index and segments and why are they text fields
 #commenting out for now
 class Video(TimestampMixin, models.Model):
@@ -325,8 +324,16 @@ class Video(TimestampMixin, models.Model):
     #segments = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
-    start_time = models.TimeField(default=datetime.time())
-    duration = models.IntegerField(default=get_length(url))
+    start_time = models.TimeField(default=time())
+    duration = models.IntegerField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.type == "youtube":
+            if not self.duration:
+                yt_service = gdata.youtube.service.YouTubeService()
+                entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
+                self.duration = entry.media.duration.seconds
+        super(Video, self).save(*args, **kwargs)
 
     def percent_done(self):
         start_seconds = self.start_time.hour*3600 + self.start_time.minute*60 + self.start_time.second
