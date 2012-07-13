@@ -21,7 +21,9 @@ urlpatterns = patterns('',
     # url(r'^class2go/', include('class2go.foo.urls')),
 
     # accounts app for user management
-	url(r'^accounts/profile/', 'accounts.views.profile'),
+	url(r'^accounts/profile/?$', 'accounts.views.profile'),
+    url(r'^accounts/profile/edit/?', 'accounts.views.edit'),
+    url(r'^accounts/profile/save_edits/?', 'accounts.views.save_edits'),
 	url(r'^accounts/', include('registration.backends.simple.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

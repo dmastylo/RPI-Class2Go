@@ -15,6 +15,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save, pre_save, post_init
+from django import forms
 
 import datetime
 
@@ -406,6 +407,8 @@ class ProblemSet(TimestampMixin, models.Model):
     course = models.ForeignKey(Course)
     title = models.CharField(max_length=255)
     path = models.CharField(max_length=255)
+    #soft_deadline = models.DateTimeField(null=True, blank=True)
+    #hard_deadline = models.DateTimeField(null=True, blank=True)
     def __unicode__(self):
         return self.title
     class Meta:
@@ -440,3 +443,8 @@ class NewsEvent(models.Model):
         return self.event
     class Meta:
         db_table = u'c2g_news_events'
+
+class EditProfileForm(forms.Form):
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    email = forms.CharField(max_length=30)
