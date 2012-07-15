@@ -183,6 +183,42 @@ small.date {
 	top:56px;
 }
 
+.navbar-inner {
+  background-color: #e0d096;
+  background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
+  background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e0d096), to(#cabb84));
+  background-image: -webkit-linear-gradient(top, #e0d096, #cabb84);
+  background-image: -o-linear-gradient(top, #e0d096, #cabb84);
+  background-image: linear-gradient(top, #e0d096, #cabb84);
+  background-repeat: repeat-x;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+.navbar-inner {
+  background:url('../../graphics/core/bg-nav.png') repeat-x bottom center;
+}
+.navbar .nav {
+  border-left:1px solid #999;
+}
+.navbar .nav > li > a {
+  color:#333;
+}
+.navbar .nav .active > a, .navbar .nav .active > a:hover {
+  color:#820000;
+  background:#eadeb9;
+  background:url('../../graphics/core/bg-nav-selected.png') repeat-x bottom center;
+}
+.navbar .nav > li > a {
+  padding: 11px 10px 9px;
+  border-right:1px solid #999;
+}
+
 
 /* Thumbnails
 -------------------------------------------------- */
