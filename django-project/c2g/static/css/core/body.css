@@ -129,7 +129,7 @@ small.date {
 -------------------------------------------------- */
 #c2g_layout_topbar {
 	padding:0px; 
-	height: 80px;
+	height: 55px;
 	margin-bottom:20px;
 	background:#8f2719;
 	border-bottom:1px solid #480b0b;
@@ -150,7 +150,7 @@ small.date {
 
 .top-nav {
 	position:absolute;
-	top:25px;
+	top:16px;
 	right:20px;
 }
 .top-nav li {
@@ -180,14 +180,14 @@ small.date {
 }
 
 .navbar-fixed-top {
-	top:80px;
+	top:56px;
 }
 
 
 /* Thumbnails
 -------------------------------------------------- */
 .body-content {
-	padding-top:150px;
+	padding-top:116px;
 }
 
 /* Thumbnails
