@@ -30,9 +30,6 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 	
-    # Piazza integration
-	url(r'^forums$', 'c2g.views.piazza'),
-
 	
 	# The following line is temprarily commented out until we figure out how django cascades its URL matching operations.
 	# After this is figured out, the rest of the matches below shall be moved to courses.url.
