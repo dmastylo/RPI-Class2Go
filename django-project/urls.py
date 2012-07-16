@@ -93,7 +93,10 @@ urlpatterns = patterns('',
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.videos.views.view'),
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_id>[a-zA-Z0-9_]+)/edit/?', 'courses.videos.views.edit'),
                        
-        #Problem Sets
+	# Video Exercises
+	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.video_exercises.views.view'),
+
+    #Problem Sets
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/?$', 'problemsets.views.list'),
         url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset>[a-zA-Z0-9_]+)?$', 'problemsets.views.show'),
 )
