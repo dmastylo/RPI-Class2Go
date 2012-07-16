@@ -1078,8 +1078,10 @@ var Khan = (function() {
         exercise = problem.parents("div.exercise").eq(0);
             
         // JASON BAU -- for C2G problems sets we want to display the exercise title
+        if (exercise.data('title'))
             $("#container .exercises-header h2").children().last().text(exercise.data('title')[0]);
-
+        else
+            $("#container .exercises-header h2").children().last().text(exercise.attr('title'));
         // Work with a clone to avoid modifying the original
         problem = problem.clone();
 

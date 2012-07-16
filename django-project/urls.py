@@ -17,11 +17,11 @@ urlpatterns = patterns('',
     url(r'_health$', 'c2g.views.healthcheck'),
 
     # Examples:
-    url(r'^courses$', 'c2g.views.home'),
+    url(r'^courses$', 'c2g.views.home', name='c2g_home'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
     # accounts app for user management
-	url(r'^accounts/profile/', 'accounts.views.profile'),
+	url(r'^accounts/profile/', 'accounts.views.profile', name='accounts_profile'),
 	url(r'^accounts/', include('registration.backends.simple.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

@@ -8,10 +8,19 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from c2g.models import Institution, Course
 from django.contrib.auth.models import Group 
+from db_test_data.management.commands.db_populate import Command 
 
 class C2GUnitTests(TestCase):
     
-    fixtures=['db_snapshot.json']
+    pop_command = Command()
+    #fixtures=['db_snapshot.json']
+    
+    def setUp(self):
+        self.pop_command.handle()
+
+    
+    def tearDown(self):
+        pass
     
     def test_multisave(self):
         """

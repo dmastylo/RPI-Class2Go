@@ -78,6 +78,12 @@ class DefaultBackend(object):
         new_user = RegistrationProfile.objects.create_inactive_user(username, email,
                                                                     password, site)
     
+        if (not hasattr(kwargs,'first_name')):
+          kwargs['first_name']='first' 
+
+        if (not hasattr(kwargs,'last_name')):
+          kwargs['last_name']='last'    
+    
         new_user.first_name, new_user.last_name = kwargs['first_name'], kwargs['last_name']
         new_user.save()
         signals.user_registered.send(sender=self.__class__,

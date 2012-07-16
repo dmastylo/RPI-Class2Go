@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 
-from c2g.db_test_data import *
+#from c2g.db_test_data import *
 
 ### C2G Core Views ###
 
