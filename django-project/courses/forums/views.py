@@ -16,8 +16,8 @@ def view(request, course_prefix, course_suffix):
     # for OAuth
     # TODO: DO NOT CHECK IN UNTIL MOVE SECRET OUT OF HERE!!
 
-    # url_full='https://piazza.com/basic_lti'
-    # signatures = {'consumer_key': 'class2go', 'shared_secret': 'xxxxx'}
+    url_full='https://piazza.com/basic_lti'
+    signatures = {'consumer_key': 'class2go', 'shared_secret': 'piazza_zl1-6af3'}
 
     url_full='http://dr-chuck.com/ims/php-simple/tool.php'
     signatures = {'consumer_key': '12345', 'shared_secret': 'secret'}
@@ -52,6 +52,13 @@ def view(request, course_prefix, course_suffix):
           "oauth_callback": "about:blank",
     }
 
+    # lti_params = {
+          # "lti_message_type": "basic-lti-launch-request",
+          # "lti_version": "LTI-1p0",
+          # "resource_link_id": "120988f929-274612",
+          # "oauth-token": "",
+    # }
+
     oauthsimple = OAuthSimple()
     sign = oauthsimple.sign({ 'path': url_full,
         'parameters': lti_params,
@@ -59,8 +66,7 @@ def view(request, course_prefix, course_suffix):
     signed_encoded_body = urllib.urlencode(sign['parameters']);
 
     headers = {'Content-type': 'application/x-www-form-urlencoded',
-            'Cache-Control': 'max-age=0', 
-            'Authorization': sign['header']}
+            'Cache-Control': 'max-age=0'};
 
     if url_parsed.scheme == 'https':
         conn = httplib.HTTPSConnection(url_parsed.netloc)
