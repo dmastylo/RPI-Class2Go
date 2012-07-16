@@ -4,14 +4,20 @@
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 
 {% block m_column_content %}
+<div id="c2g_layout_m_column" class="span6">
 
-<h2>Problem sets for course "{{course_prefix}} ({{course_suffix}})" </h2>
+<h2>Problem Sets</h2>
 
-<ul>
-{% for pset in psets %}
-  <li><a href="problemsets/{{pset.title}}">{{pset.title}}</a>
-  </li>
+{% for pset, progress in pset_and_progress.iteritems %}
+    <h4><a href="problemsets/{{pset.title}}">{{pset.title}}</a></h4>
+    <p>{{pset.description}}</p>
+    <p align="right">Soft Deadline:{{pset.soft_deadline}}, Hard Deadline:{{pset.hard_deadline}}</p>
+    <h5>Progress</h5>
+    <div class="progress-bar">
+            <div class="fill red" style="width:{{progress}}%"></div>
+    </div>
+    <hr>
 {% endfor %}
-</ul>
 
+</div>
 {% endblock m_column_content %}

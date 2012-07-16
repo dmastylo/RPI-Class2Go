@@ -9,7 +9,7 @@
         Last Name: {{ user.last_name }} <br>
         Email: {{ user.email }} <br>
         <a href="{% url 'accounts.views.edit' %}">Change Info</a> <br>
-        <a href="#">Change Password</a>
+        <a href="{% url 'auth_password_change' %}">Change Password</a>
     </p>
 </div>
 {% endblock m_column_content %}
