@@ -212,7 +212,7 @@ small.date {
 .navbar .nav .active > a, .navbar .nav .active > a:hover {
   color:#820000;
   background:#eadeb9;
-  background:url('../../graphics/core/bg-nav-selected.png') repeat-x bottom center;
+  background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -10px;
 }
 .navbar .nav > li > a {
   padding: 11px 10px 9px;
