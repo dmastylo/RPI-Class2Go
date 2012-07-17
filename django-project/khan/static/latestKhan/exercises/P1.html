@@ -1,11 +1,11 @@
-<html>
+<!DOCTYPE html>
+<html data-require="word-problems math">
 <head>
-<script src="../khan-exercise-c2g.js"></script>
-
-
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="../khan-exercise-c2g.js"></script>
 </head>
 <body>
-      <div class="exercise" <!-- data-name="P1_Levenshtein" --> data-weight="1">
+      <div class="exercise" data-weight="1" title="Levenshtein Distance">
           <style>
               td {
                   border: 1px solid black;
@@ -176,12 +176,12 @@
           </div>     <!--problems-->
 
       </div>  
-      <div class="exercise" <!-- data-name="P1_Regexp" --> data-weight="1">
+      <div class="exercise" data-weight="1" title="Regular Expressions">
           <div class="problems">
               <div id="prob1">
                   <div class="question">
-                      <p>Which of the following strings doesn't match the regex: <br><br><pre>/[a-z]+'[a-z]+/</pre>
-					  </p>
+                      <p>Which of the following strings doesn't match the regex: <br /><br /><pre>/[a-z]+'[a-z]+/</pre>
+                      </p>
                   </div>
                   <div class="vars">
                       <var id="ANS">randFromArray(["you'd've", "We'd", "rock 'n' roll", "'tis", "I'm"])</var>
@@ -199,7 +199,6 @@
                       <li>mightn't</li>
                       <li>we're</li>
                   </ul>
-                  </ul>
                   
                   
                   
@@ -210,65 +209,63 @@
                   </div> <!--hints-->
               </div> <!--prob1-->
           </div> <!--problems-->
-          
       </div>  
-      <div class="exercise" <!-- data-name="P1_Tokenize" --> data-weight="1">
-          <div class="problems">
-              <div>
-                  <div class="question">
-                      <p> Download either the Java or Python implementations of the porter
-                      stemmer from:<br> <br> 
-                      <a
-                          href="http://tartarus.org/martin/PorterStemmer/">http://tartarus.org/
-                          martin/PorterStemmer/</a>
-                      <br> <br> 
-                      Any implementation should work, but
-                      only Python and Java have been tested.  Stem the following excerpt
-                      from Wikipedia:
-                      <br> <br> 
-                      <b> In linguistic morphology and information
-                          retrieval, stemming is the process for reducing inflected words to
-                          their stem, base or root form-generally a written word form. The stem
-                          need not be identical to the morphological root of the word; it is
-                          usually sufficient that related words map to the same stem, even if
-                          this stem is not in itself a valid root. Algorithms for stemming have
-                          been studied in computer science since 1968. Many search engines treat
-                          words with the same stem as synonyms as a kind of query broadening, a
-                          process called conflation. </b> </p>
-                  </div>
-                  <p class="extra-info">To use the java file:<br>
-                  <pre>
-                      $ wget http://spark-university.s3.amazonaws.com/stanford-lang2info/quiz/w1_redo/stem.txt
-                      $ wget http://tartarus.org/martin/PorterStemmer/java.txt
-                      $ mv java.txt Porter.java
-                      $ javac Porter.java
-                      $ java Porter stem.txt > stem.stemmed.txt
-                      $ cat stem.stemmed.txt
-                  </pre>
-                  
-                  to use the python version:<br>
-                  <br>
-                  <pre>
-                      $ wget http://spark-university.s3.amazonaws.com/stanford-lang2info/quiz/w1_redo/stem.txt
-                      $ wget http://tartarus.org/martin/PorterStemmer/python.txt
-                      $ mv python.txt porter.py
-                      $ python porter.py stem.txt > stem.stemmed.txt
-                      $ cat stem.stemmed.txt
-                  </pre>
-                  </p>
-                  
-                  <div class="solution" data-type="regex">/in linguist morpholog and inform
-                      retriev, stem is the process for reduc inflect word to their stem, base or
-                      root form-gener a written word form. the stem need not be ident to the
-                      morpholog root of the word; it is usual suffici that relat word map to the
-                      same stem, even if thi stem is not in itself a valid root. algorithm for
-                      stem have been studi in comput scienc sinc 1968. mani search engin treat
-                      word with the same stem as synonym as a kind of queri broaden, a process
-                      call conflat./</div><!--solution-->
-                  
-              </div>
-          </div> <!--problems-->
-                   
-      </div>  
+    <div class="exercise"  data-weight="1" title="Tokenization">
+        <div class="problems">
+            <div id="prob1">
+                <div class="question">
+                    <p> A simple way to tokenize a document is to split on any
+                    non-alphabetical character.  However, this sometimes has the
+                    undesirable consequence of removing any numerical information.  Use
+                    the unix command line utilities to find the number of tokens in the
+                    following excerpt from a Wikipedia article on Astronomical Units
+                    (AUs), splitting on all non-alpha-numericalcharacters:<br>
+                    <br> <b> The AU was originally defined as the length of the semi-major
+                        axis of the Earth's elliptical orbit around the Sun. In 1976 the
+                        International Astronomical Union revised the definition of the AU for
+                        greater precision, defining it as that length for which the Gaussian
+                        gravitational constant (k) takes the value 0.017 202 098 95 when the
+                        units of measurement are the astronomical units of length, mass and
+                        time.[5][6][7] An equivalent definition is the radius of an
+                        unperturbed circular Newtonian orbit about the Sun of a particle
+                        having infinitesimal mass, moving with an angular frequency of 0.017
+                        202 098 95 radians per day,[2] or that length for which the
+                        heliocentric gravitational constant (the product GM) is equal to
+                        (0.017 202 098 95)2 AU3/d2. It is approximately equal to the mean
+                        Earth-Sun distance. </b>
+                    
+                    <br> <br> Take special care to avoid treating two consecutive
+                    non-alpha-numerical characters as delimiting an empty token (see the
+                    <code>-s</code> flag for <code>tr</code>)		    </p>
+                </div> <!-- question -->
+                
+                <div class="solution">143</div> <!--solution-->
+                
+                <div class="hints">
+                    <p>You should be using the utilities <code>tr</code> and
+                    <code>wc</code>.  In general the manual page is your best friend
+                    for problems like these.  At a unix-like command line type: <br /> <br />
+                    $ man NAME-OF-PROGRAM <br /><br />
+                    
+                    First, download or copy the file: <br /><br />
+                    $ wget INSERT LINK TO FILE HERE <br /> <br />
+                    
+                    Then, for the BSD version of <code>tr</code> the following code should
+                    work: <br /> <br />
+                    
+                    $ tr -sc '[:alnum:]' '\n' < au.txt | wc -l
+                    <br />
+                    <br />
+                    
+                    In general the manual page is your best friend for problems like
+                    these.  At a unix-like command line type: <br /> <br />
+                    
+                    $ man NAME-OF-PROGRAM
+                    </p>
+                    
+                </div> <!--hints-->    
+            </div> <!--prob1-->
+        </div> <!-- problems-->
+    </div>  
 </body>
 </html>

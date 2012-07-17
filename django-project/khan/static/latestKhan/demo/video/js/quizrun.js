@@ -16,86 +16,33 @@ var videoWidth = vidPlayerWidth;
 var hRatio=1; //ratios for the screen size on which the overlay was made to that on which it will be displayed
 var wRatio=1; //defaults to 1, calculated when the questions json object is loaded
 
-$(function() {
-    $( "#correct-dialog" ).dialog({
-    autoOpen:false,
-    modal: false,
-    minWidth:380,
-    buttons: {
-        "Show Explanation": function() {
-        showExplanation();
-        },
-        "Continue Video": function() {
-        $( this ).dialog( "close" );
-        $('div.inVidExplanation').html("");
-        closeQPane();
-        }
-    }
-    });
-    $( "#wrong-dialog" ).dialog({
-    autoOpen:false,
-    modal: false,
-    minWidth:350,
-    buttons: {
-        "Show Explanation": function() {
-        showExplanation();
-        },
-        "Try Again": function() {
-        $( this ).dialog( "close" );
-        $('div.inVidExplanation').html("");
-
-        }
-    }
-    });
-    $( "#skip-dialog" ).dialog({
-    autoOpen:false,
-    modal: false,
-    minWidth:350,
-    buttons: {
-        "Show Explanation": function() {
-        showExplanation();
-        },
-        "OK": function() {
-        $( this ).dialog( "close" );
-        $('div.inVidExplanation').html("");
-
-        }
-    }
-    });
-    $("input:submit").button();
-});
-
-
 function onYouTubePlayerAPIReady() {
     //document.getElementById('startmsg').style.display='block';
     getVidID();
 }
 
-
-
 function getVidID() {
-    $.getJSON("vidID.json", function(data) {
-    vidName=data;
-    runQuiz()
-    });
+    vidName="xOfEYI61f3k";
+    setTimeout(function () { runQuiz(); }, 1000);
 }
 
 
 function runQuiz() {
 
-    $.getJSON('indices.json',function(data) {
-        slideIndices=data;
-    });
+    //$.getJSON('indices.json',function(data) {
+        slideIndices = {"0":{"imgsrc":"lecture-0.jpg"},"5":{"imgsrc":"lecture-1.jpg"},"61":{"imgsrc":"lecture-2.jpg"},"86":{"imgsrc":"lecture-3.jpg"},"110":{"imgsrc":"lecture-4.jpg"},"163":{"imgsrc":"lecture-5.jpg"},"201":{"imgsrc":"lecture-6.jpg"},"284":{"imgsrc":"lecture-7.jpg"},"342":{"imgsrc":"lecture-8.jpg"},"374":{"imgsrc":"lecture-9.jpg"},"418":{"imgsrc":"lecture-10.jpg"}};
+    //});
 
-    $.ajax({
-        url: 'questions.json',
-        dataType:'json',
-        cache:false,
-        error: function(a,b,c) {
-            alert('An error occurred while connecting with the question storage server.');
-        },
-        success: function(data) {
-            questions=data;
+
+    //$.ajax({
+    //    url: 'questions.json',
+    //    dataType:'json',
+    //    cache:false,
+    //    error: function(a,b,c) {
+    //        alert('An error occurred while connecting with the question storage server.');
+    //    },
+    //    success: function(data) {
+            questions = {"videoWidth":960,"videoHeight":540,"162":{"time":162,"bgOpacity":"1","fontColor":"rgb(0,0,0)","buttonPos":{"left":"720px","top":"490px"},"qPos":{"left":"35px","top":"35px","width":"800px","height":"50px"},"qText":"What is the Levenshtein distance between ANTS and GNU?","qExplanation":"The only overlapping letter is 'N. If we align ANTS and GNU so that the 'N's match up, we must substitute the 'A' for a 'G' and the 'T' for a 'U'.  Each of these operations has a cost of 2.  Finally we need to delete the 'S' costing us 1.","qType":"m-c","mcType":"radio","answers":{"1":{"text":"6","correct":false,"tablePos":{"left":"84px","top":"191px"},"aSize":{"width":"700px","height":"30px"}},"2":{"text":"5","correct":true,"tablePos":{"left":"84px","top":"261px"},"aSize":{"width":"700px","height":"30px"}},"3":{"text":"4","correct":false,"tablePos":{"left":"84px","top":"336px"},"aSize":{"width":"700px","height":"30px"}},"4":{"text":"3","correct":false,"tablePos":{"left":"84px","top":"406px"},"aSize":{"width":"700px","height":"30px"}}}}};
             for (j in questions) {
                 questions[j].done = false;
             }
@@ -110,11 +57,8 @@ function runQuiz() {
             if (questions.videoWidth) {
                 wRatio = videoWidth / questions.videoWidth; 
             }
-            //console.log("In runQuiz AJAX success callback");
-            //console.log(player);
-            //console.log(player.playVideo);
-        }
-    });
+    //  }
+    //});
 
 }
 

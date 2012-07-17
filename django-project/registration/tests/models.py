@@ -20,6 +20,7 @@ class RegistrationModelTests(TestCase):
     user_info = {'username': 'alice',
                  'password': 'swordfish',
                  'email': 'alice@example.com'}
+    urls = 'registration.tests.urls'
     
     def setUp(self):
         self.old_activation = getattr(settings, 'ACCOUNT_ACTIVATION_DAYS', None)
