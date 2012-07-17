@@ -10,7 +10,7 @@
         {% for dictionary in package %}
             <h4><a href="problemsets/{{dictionary.pset.title}}">{{dictionary.pset.name}}</a></h4>
             <p>{{dictionary.pset.description}}</p>
-            <p align="right">Soft Deadline: {{dictionary.pset.soft_deadline}}, Hard Deadline: {{dictionary.pset.hard_deadline}}</p>
+            <p align="right">Full Credit Deadline: {{dictionary.pset.soft_deadline}}, Partial Credit Deadline: {{dictionary.pset.hard_deadline}}</p>
             <h5>Progress</h5>
             <div class="progress-bar">
                 <div class="fill red" style="width:{{dictionary.progress}}%"></div>
