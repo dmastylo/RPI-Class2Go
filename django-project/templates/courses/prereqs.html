@@ -5,10 +5,6 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-	<h2>{{course.title}}</h2>
-	
-  <h3>Prerequisites</h3>
-  <p>Course pre-requisites to be listed here</p>
-
+{% autoescape off %}{{ content }}{% endautoescape %}
 </div>
 {% endblock m_column_content %}

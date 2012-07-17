@@ -23,7 +23,7 @@
 {% endblock l_column_content %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
+<!--div id="c2g_layout_m_column" class="span6">
 	<h2>{{course.title}}</h2>
 	<h3>Recent Announcements</h3>
 	
@@ -36,7 +36,8 @@
   <h3>Course Description</h3>
   <p>{{course.description}}</p>
 
-</div>
+</div-->
+<div id="c2g_layout_m_column" class="span6">{% autoescape off %}{{middle_content}}{% endautoescape %}</div>
 {% endblock m_column_content %}
 
 {%block r_column_content %}

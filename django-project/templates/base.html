@@ -10,6 +10,7 @@
     <!--[if IE 7]>
 	  <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome-ie7.css">
 	<![endif]-->
+	{% block addl_stylesheets %}{% endblock addl_stylesheets %}
     <title>{% block title %}Class2Go{% endblock %}</title>
 </head>
 
@@ -36,16 +37,23 @@
 				<div class="navbar-inner">
 					<div class="container-fluid">
 						<ul class="nav">
-							<li class="active"><a href="#">Home</a></li>
+							<li><a href="#">Home</a></li>
 							<li><a href="#">Classes</a></li>
 							<li><a href="#">Search</a></li>
 						</ul>
-						<form class="navbar-search hidden-phone" action="">
+						
+						{% ifequal user.is_staff True %}
+						<ul class="nav pull-right">
+							<li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
+						</ul>
+						{% endifequal %}
+						<!--S. Halawa: Temporarily commented out the search  form until it is back-end supported. -->
+						<!--form class="navbar-search hidden-phone" action="">
 							<div class="input-append">
 								<input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
 								<button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
 							</div>
-						</form>
+						</form-->
 					</div>
 				</div>
 			</div>
@@ -101,6 +109,7 @@
 		</form>
 	</div>
 	
+	<script type="text/javascript" src="{{ STATIC_URL }}js/core/render.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
     {% block addl_scripts %}

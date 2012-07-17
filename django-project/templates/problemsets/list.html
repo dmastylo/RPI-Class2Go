@@ -1,17 +1,15 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 
+{% block l_column_content %}
+<div id="c2g_layout_m_column" class="span3">
+{% autoescape off %}{{ l_content }}{% endautoescape %}
+</div>
+{% endblock l_column_content %}
+
 {% block m_column_content %}
-
-<h2>Problem sets for course "{{course_prefix}} ({{course_suffix}})" </h2>
-
-<ul>
-{% for pset in psets %}
-  <li><a href="problemsets/{{pset.title}}">{{pset.title}}</a>
-  </li>
-{% endfor %}
-</ul>
-
+<div id="c2g_layout_m_column" class="span6">
+{% autoescape off %}{{ m_content }}{% endautoescape %}
+</div>
 {% endblock m_column_content %}

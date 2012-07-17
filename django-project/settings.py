@@ -1,6 +1,6 @@
 # Django settings for class2go project.
 
-from database import DATABASES, SECRET_KEY
+from database import *
 from os import path
 
 DEBUG = True
