@@ -418,7 +418,6 @@ class ProblemSet(TimestampMixin, models.Model):
     path = models.CharField(max_length=255)
     soft_deadline = models.DateTimeField(null=True, blank=True)
     hard_deadline = models.DateTimeField(null=True, blank=True)
-    question_count = models.IntegerField()
     def __unicode__(self):
         return self.title
     class Meta:

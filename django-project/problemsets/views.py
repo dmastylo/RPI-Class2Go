@@ -7,7 +7,7 @@ def list(request, course_prefix, course_suffix):
     course_handle = course_prefix + "-" + course_suffix
     course = Course.objects.get(handle=course_handle)
     psets = course.problemset_set.all()
-    pset_and_progress = {}
+    package = []
 
     if not request.user.is_authenticated():
         return render_to_response('problemsets/list.html',
@@ -18,17 +18,17 @@ def list(request, course_prefix, course_suffix):
                                 context_instance=RequestContext(request))
 
     for pset in psets:
-        completed = course.problemactivity_set.filter(student=request.user).filter(problem_set=pset)
-        numCompleted = len(completed)
-        progress = 100.0*numCompleted/pset.question_count
-        pset_and_progress[pset] = progress
+        numQuestions= len(pset.problem_set.all())
+        numCompleted = len(course.problemactivity_set.filter(student=request.user).filter(problem_set=pset))
+        progress = 100.0*numCompleted/numQuestions
+        dictionary = {"pset": pset, "numQuestions": numQuestions, "numCompleted": numCompleted, "progress": progress}
+        package.append(dictionary)
 
     return render_to_response('problemsets/list.html',
                               {'request': request,
                                'course_prefix': course_prefix,
                                'course_suffix': course_suffix,
-                               'psets': psets,
-                               'pset_and_progress': pset_and_progress,
+                               'package': package,
                               },
                               context_instance=RequestContext(request))
 
