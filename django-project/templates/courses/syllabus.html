@@ -9,6 +9,19 @@
 	
   <h3>Syllabus</h3>
   <p>Course syllabus to be displayed here</p>
-
+  <div id="loadedSyllabus"></div>
+    
 </div>
 {% endblock m_column_content %}
+
+
+{% block addl_scripts %}
+<script>
+    $("#loadedSyllabus").load("/static/content/testsyllabus.html", function(text,status) {
+                               if(status!="success"){
+                                   alert('syllabus loading failed!');
+                              }});
+
+    
+</script>
+{% endblock addl_scripts %}
