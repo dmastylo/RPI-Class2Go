@@ -9,6 +9,14 @@ def list(request, course_prefix, course_suffix):
     psets = course.problemset_set.all()
     pset_and_progress = {}
 
+    if not request.user.is_authenticated():
+        return render_to_response('problemsets/list.html',
+                                {'request': request,
+                                'course_prefix': course_prefix,
+                                'course_suffix': course_suffix,
+                                },
+                                context_instance=RequestContext(request))
+
     for pset in psets:
         completed = course.problemactivity_set.filter(student=request.user).filter(problem_set=pset)
         numCompleted = len(completed)

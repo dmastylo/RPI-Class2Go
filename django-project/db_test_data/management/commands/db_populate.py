@@ -176,23 +176,25 @@ def create_nlp_course():
 
         #Create problemsets
 
-        title='Problem Set 1: Regular Expressions'
+        title='P1'
+        name = 'Problem Set 1: Regular Expressions'
         path='/static/latestKhan/exercises/P1.html'
         soft_deadline='2012-07-20'
         hard_deadline='2012-07-27'
         question_count=3
         description = 'This is the first problem set. Practice some question on Regular Expressions. Remember to work your problems out on a separate piece of paper first because you only get one try on these. Miss on and you have a D!'
 
-        pset1 = save_problem_set(course_id, title, path, soft_deadline, hard_deadline, question_count, description)
+        pset1 = save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline, question_count, description)
 
-        title='Problem Set 2: Joint Probability'
+        title='P2'
+        name='Problem Set 2: Joint Probability'
         path='/static/latestKhan/exercises/P2.html'
         soft_deadline='2012-07-27'
         hard_deadline='2012-08-03'
         question_count=5
         description = 'This problem set will test your knowledge of Joint Probability. Each question is worth one point and your final exam is worth 100 points so these questions are basically useless. But you have to do them because an incomplete assignment disallows you from passing the class. Have fun with this problem set!'
 
-        pset2 = save_problem_set(course_id, title, path, soft_deadline, hard_deadline, question_count, description)
+        pset2 = save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline, question_count, description)
 
 
         #Create problems
@@ -492,9 +494,10 @@ def save_news_event(course_id, event):
 
         news_event.save()
 
-def save_problem_set(course_id, title, path, soft_deadline, hard_deadline, question_count, description):
+def save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline, question_count, description):
     problem_set = ProblemSet(course_id = course_id,
                                 title = title,
+                                name = name,
                                 path = path,
                                 soft_deadline = soft_deadline,
                                 hard_deadline = hard_deadline,

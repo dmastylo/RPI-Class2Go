@@ -5,19 +5,21 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-
-<h2>Problem Sets</h2>
-
-{% for pset, progress in pset_and_progress.iteritems %}
-    <h4><a href="problemsets/{{pset.title}}">{{pset.title}}</a></h4>
-    <p>{{pset.description}}</p>
-    <p align="right">Soft Deadline:{{pset.soft_deadline}}, Hard Deadline:{{pset.hard_deadline}}</p>
-    <h5>Progress</h5>
-    <div class="progress-bar">
-            <div class="fill red" style="width:{{progress}}%"></div>
-    </div>
-    <hr>
-{% endfor %}
+    {% if user.is_authenticated %}
+        <h2>Problem Sets</h2>
+        {% for pset, progress in pset_and_progress.iteritems %}
+            <h4><a href="problemsets/{{pset.title}}">{{pset.name}}</a></h4>
+            <p>{{pset.description}}</p>
+            <p align="right">Soft Deadline:{{pset.soft_deadline}}, Hard Deadline:{{pset.hard_deadline}}</p>
+            <h5>Progress</h5>
+            <div class="progress-bar">
+                <div class="fill red" style="width:{{progress}}%"></div>
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <h4>Please log in to see assignment information</h4>
+    {% endif %}
 
 </div>
 {% endblock m_column_content %}

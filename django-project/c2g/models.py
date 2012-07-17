@@ -413,6 +413,7 @@ class instance_status(models.Model):
 class ProblemSet(TimestampMixin, models.Model):
     course = models.ForeignKey(Course)
     title = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
     soft_deadline = models.DateTimeField(null=True, blank=True)
