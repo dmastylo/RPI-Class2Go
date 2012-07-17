@@ -1,2242 +1,2268 @@
 [
-    {
-        "pk": 12, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "additionalpage", 
-            "name": "additional page", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 13, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "announcement", 
-            "name": "announcement", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 15, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "assignment", 
-            "name": "assignment", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 14, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "assignmentcategory", 
-            "name": "assignment category", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 16, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "assignmentgrade", 
-            "name": "assignment grade", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 17, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "assignmentsubmission", 
-            "name": "assignment submission", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "contenttype", 
-            "name": "content type", 
-            "app_label": "contenttypes"
-        }
-    }, 
-    {
-        "pk": 11, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "course", 
-            "name": "course", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 18, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "courseanalytics", 
-            "name": "course analytics", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 19, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "coursemap", 
-            "name": "course map", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 20, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "file", 
-            "name": "file", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "group", 
-            "name": "group", 
-            "app_label": "auth"
-        }
-    }, 
-    {
-        "pk": 33, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "instance_status", 
-            "name": "instance_status", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 10, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "institution", 
-            "name": "institution", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 21, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "lecture", 
-            "name": "lecture", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 7, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "logentry", 
-            "name": "log entry", 
-            "app_label": "admin"
-        }
-    }, 
-    {
-        "pk": 9, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "migrationhistory", 
-            "name": "migration history", 
-            "app_label": "south"
-        }
-    }, 
-    {
-        "pk": 36, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "newsevent", 
-            "name": "news event", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 22, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "officehour", 
-            "name": "officehour", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "permission", 
-            "name": "permission", 
-            "app_label": "auth"
-        }
-    }, 
-    {
-        "pk": 35, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "problemactivity", 
-            "name": "problem activity", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 34, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "problemset", 
-            "name": "problem set", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 8, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "registrationprofile", 
-            "name": "registration profile", 
-            "app_label": "registration"
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "session", 
-            "name": "session", 
-            "app_label": "sessions"
-        }
-    }, 
-    {
-        "pk": 32, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "sharingpermission", 
-            "name": "sharing permission", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "site", 
-            "name": "site", 
-            "app_label": "sites"
-        }
-    }, 
-    {
-        "pk": 23, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "studentsection", 
-            "name": "student section", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "user", 
-            "name": "user", 
-            "app_label": "auth"
-        }
-    }, 
-    {
-        "pk": 24, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "usercoursedata", 
-            "name": "user course data", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 25, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "userprofile", 
-            "name": "user profile", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 27, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "video", 
-            "name": "video", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 31, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "videoannotation", 
-            "name": "video annotation", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 28, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "videoquiz", 
-            "name": "video quiz", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 29, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "videoquizquestion", 
-            "name": "video quiz question", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 30, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "videoquizsubmission", 
-            "name": "video quiz submission", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": 26, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "videotopic", 
-            "name": "video topic", 
-            "app_label": "c2g"
-        }
-    }, 
-    {
-        "pk": "e71f4eef7bac0de31d5b6833360e1248", 
-        "model": "sessions.session", 
-        "fields": {
-            "expire_date": "2012-10-09T14:43:27", 
-            "session_data": "MjRkNGQ4OGViYjIyM2YxNjIwNDVjZWE2MmE4ZGI3MWUwYTBlNWMxMTqAAn1xAS4=\n"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "sites.site", 
-        "fields": {
-            "domain": "example.com", 
-            "name": "example.com"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "south.migrationhistory", 
-        "fields": {
-            "applied": "2012-07-11T14:42:54", 
-            "app_name": "c2g", 
-            "migration": "0001_initial"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.institution", 
-        "fields": {
-            "city": "Palo Alto", 
-            "last_updated": "2012-07-11T14:43:25", 
-            "title": "Stanford University", 
-            "country": "USA", 
-            "time_created": "2012-07-11T14:43:25", 
-            "domains": "stanford.edu"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.additionalpage", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "description of Syllabus", 
-            "title": "Syllabus", 
-            "update_log": "", 
-            "time_created": "2012-07-11T14:43:25", 
-            "course": 1, 
-            "access_id": "123", 
-            "write_access": "1,2"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.additionalpage", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "description of other static page 1", 
-            "title": "Other Static Page 1", 
-            "update_log": "", 
-            "time_created": "2012-07-11T14:43:25", 
-            "course": 1, 
-            "access_id": "123", 
-            "write_access": "1,2"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.additionalpage", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "description of other static page 2", 
-            "title": "Other Static Page 2", 
-            "update_log": "", 
-            "time_created": "2012-07-11T14:43:25", 
-            "course": 1, 
-            "access_id": "123", 
-            "write_access": "1,2"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.assignmentcategory", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:25", 
-            "time_created": "2012-07-11T14:43:25", 
-            "title": "handouts"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.assignmentcategory", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "time_created": "2012-07-11T14:43:26", 
-            "title": "Problem sets"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.assignmentcategory", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "time_created": "2012-07-11T14:43:26", 
-            "title": "Quizzes"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "c2g.assignmentcategory", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "time_created": "2012-07-11T14:43:26", 
-            "title": "Programming Assignments"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 1, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "Handout 1", 
-            "title": "Handout 1", 
-            "time_created": "2012-07-11T14:43:25", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": ""
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 2, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Tokenization and Lemmatization", 
-            "title": "Problem set 01", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 2, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Hidden Markov Models", 
-            "title": "Problem set 02", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 2, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Part of Speech Tagging", 
-            "title": "Problem set 03", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 2, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Semantic Parsing", 
-            "title": "Problem set 04", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 3, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Tokenization and Lemmatization", 
-            "title": "Quiz 01", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 7, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 3, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Hidden Markov Models", 
-            "title": "Quiz 02", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 8, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 3, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Part of Speech Tagging", 
-            "title": "Quiz 03", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 9, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 3, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Semantic Parsing", 
-            "title": "Quiz 04", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 10, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 4, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Tokenization and Lemmatization", 
-            "title": "Programming Assignment 01", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 11, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 4, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Hidden Markov Models", 
-            "title": "Programming Assignment 02", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 12, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 4, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Part of Speech Tagging", 
-            "title": "Programming Assignment 03", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 13, 
-        "model": "c2g.assignment", 
-        "fields": {
-            "category": 4, 
-            "due_date": null, 
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Semantic Parsing", 
-            "title": "Programming Assignment 04", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "close_date": null, 
-            "access_id": "123"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.videotopic", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:25", 
-            "time_created": "2012-07-11T14:43:25", 
-            "title": "Section 1 - Intro Material"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.videotopic", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:25", 
-            "time_created": "2012-07-11T14:43:25", 
-            "title": "1.1 Getting Started"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.videotopic", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:25", 
-            "time_created": "2012-07-11T14:43:25", 
-            "title": "1.2 History of Field"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "c2g.videotopic", 
-        "fields": {
-            "course": 1, 
-            "last_updated": "2012-07-11T14:43:25", 
-            "time_created": "2012-07-11T14:43:25", 
-            "title": "1.3 Big Issues"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.video", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "Description goes here #1", 
-            "title": "Changeable video title #1", 
-            "url": "WIKt-vD95nI", 
-            "start_time": "00:00:05", 
-            "time_created": "2012-07-11T14:43:25", 
-            "topic": 1, 
-            "course": 1, 
-            "access_id": "123", 
-            "duration": 135, 
-            "type": "youtube"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.video", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "Description goes here #2", 
-            "title": "Changeable video title #2", 
-            "url": "SxkI2dbqv8w", 
-            "start_time": "00:01:00", 
-            "time_created": "2012-07-11T14:43:25", 
-            "topic": 1, 
-            "course": 1, 
-            "access_id": "123", 
-            "duration": 160, 
-            "type": "youtube"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.video", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "Intro video by Professor Dan Jurafsky & Chris Manning", 
-            "title": "Introduction to Natural Language Processing", 
-            "url": "nfoudtpBV68", 
-            "start_time": "00:10:05", 
-            "time_created": "2012-07-11T14:43:25", 
-            "topic": 2, 
-            "course": 1, 
-            "access_id": "123", 
-            "duration": 772, 
-            "type": "youtube"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "c2g.video", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "Description goes here #3", 
-            "title": "Changeable video title #3", 
-            "url": "yfi0Fsb6lNY", 
-            "start_time": "00:00:30", 
-            "time_created": "2012-07-11T14:43:25", 
-            "topic": 2, 
-            "course": 1, 
-            "access_id": "123", 
-            "duration": 301, 
-            "type": "youtube"
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "c2g.video", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "Description goes here #4", 
-            "title": "Changeable video title #4", 
-            "url": "07fhOVQ9wEA", 
-            "start_time": "00:00:50", 
-            "time_created": "2012-07-11T14:43:25", 
-            "topic": 3, 
-            "course": 1, 
-            "access_id": "123", 
-            "duration": 142, 
-            "type": "youtube"
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "c2g.video", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:25", 
-            "description": "Description goes here #5", 
-            "title": "Changeable video title #5", 
-            "url": "3h039oXUuMY", 
-            "start_time": "00:02:10", 
-            "time_created": "2012-07-11T14:43:25", 
-            "topic": 4, 
-            "course": 1, 
-            "access_id": "123", 
-            "duration": 230, 
-            "type": "youtube"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.problemset", 
-        "fields": {
-            "course": 1, 
-            "path": "/static/latestKhan/exercises/P1.html", 
-            "last_updated": "2012-07-11T14:43:25", 
-            "time_created": "2012-07-11T14:43:25", 
-            "title": "P1"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.problemset", 
-        "fields": {
-            "course": 1, 
-            "path": "/static/latestKhan/exercises/P2.html", 
-            "last_updated": "2012-07-11T14:43:25", 
-            "time_created": "2012-07-11T14:43:25", 
-            "title": "P2"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.newsevent", 
-        "fields": {
-            "course": 1, 
-            "event": "Assignment Added: Assignment 1 NLP", 
-            "time_created": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.newsevent", 
-        "fields": {
-            "course": 1, 
-            "event": "Grades Added: Assignment 0 NLP", 
-            "time_created": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.newsevent", 
-        "fields": {
-            "course": 1, 
-            "event": "Video Added: NLP Lecture 5", 
-            "time_created": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "c2g.newsevent", 
-        "fields": {
-            "course": 1, 
-            "event": "Assignment Changed: Assignment 1 NLP", 
-            "time_created": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "c2g.newsevent", 
-        "fields": {
-            "course": 1, 
-            "event": "Additional Page Added: Syllabus", 
-            "time_created": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 19, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_logentry", 
-            "name": "Can add log entry", 
-            "content_type": 7
-        }
-    }, 
-    {
-        "pk": 20, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_logentry", 
-            "name": "Can change log entry", 
-            "content_type": 7
-        }
-    }, 
-    {
-        "pk": 21, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_logentry", 
-            "name": "Can delete log entry", 
-            "content_type": 7
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_group", 
-            "name": "Can add group", 
-            "content_type": 2
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_group", 
-            "name": "Can change group", 
-            "content_type": 2
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_group", 
-            "name": "Can delete group", 
-            "content_type": 2
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_permission", 
-            "name": "Can add permission", 
-            "content_type": 1
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_permission", 
-            "name": "Can change permission", 
-            "content_type": 1
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_permission", 
-            "name": "Can delete permission", 
-            "content_type": 1
-        }
-    }, 
-    {
-        "pk": 7, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_user", 
-            "name": "Can add user", 
-            "content_type": 3
-        }
-    }, 
-    {
-        "pk": 8, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_user", 
-            "name": "Can change user", 
-            "content_type": 3
-        }
-    }, 
-    {
-        "pk": 9, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_user", 
-            "name": "Can delete user", 
-            "content_type": 3
-        }
-    }, 
-    {
-        "pk": 34, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_additionalpage", 
-            "name": "Can add additional page", 
-            "content_type": 12
-        }
-    }, 
-    {
-        "pk": 35, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_additionalpage", 
-            "name": "Can change additional page", 
-            "content_type": 12
-        }
-    }, 
-    {
-        "pk": 36, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_additionalpage", 
-            "name": "Can delete additional page", 
-            "content_type": 12
-        }
-    }, 
-    {
-        "pk": 37, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_announcement", 
-            "name": "Can add announcement", 
-            "content_type": 13
-        }
-    }, 
-    {
-        "pk": 38, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_announcement", 
-            "name": "Can change announcement", 
-            "content_type": 13
-        }
-    }, 
-    {
-        "pk": 39, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_announcement", 
-            "name": "Can delete announcement", 
-            "content_type": 13
-        }
-    }, 
-    {
-        "pk": 43, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_assignment", 
-            "name": "Can add assignment", 
-            "content_type": 15
-        }
-    }, 
-    {
-        "pk": 44, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_assignment", 
-            "name": "Can change assignment", 
-            "content_type": 15
-        }
-    }, 
-    {
-        "pk": 45, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_assignment", 
-            "name": "Can delete assignment", 
-            "content_type": 15
-        }
-    }, 
-    {
-        "pk": 40, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_assignmentcategory", 
-            "name": "Can add assignment category", 
-            "content_type": 14
-        }
-    }, 
-    {
-        "pk": 41, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_assignmentcategory", 
-            "name": "Can change assignment category", 
-            "content_type": 14
-        }
-    }, 
-    {
-        "pk": 42, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_assignmentcategory", 
-            "name": "Can delete assignment category", 
-            "content_type": 14
-        }
-    }, 
-    {
-        "pk": 46, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_assignmentgrade", 
-            "name": "Can add assignment grade", 
-            "content_type": 16
-        }
-    }, 
-    {
-        "pk": 47, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_assignmentgrade", 
-            "name": "Can change assignment grade", 
-            "content_type": 16
-        }
-    }, 
-    {
-        "pk": 48, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_assignmentgrade", 
-            "name": "Can delete assignment grade", 
-            "content_type": 16
-        }
-    }, 
-    {
-        "pk": 49, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_assignmentsubmission", 
-            "name": "Can add assignment submission", 
-            "content_type": 17
-        }
-    }, 
-    {
-        "pk": 50, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_assignmentsubmission", 
-            "name": "Can change assignment submission", 
-            "content_type": 17
-        }
-    }, 
-    {
-        "pk": 51, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_assignmentsubmission", 
-            "name": "Can delete assignment submission", 
-            "content_type": 17
-        }
-    }, 
-    {
-        "pk": 31, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_course", 
-            "name": "Can add course", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 32, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_course", 
-            "name": "Can change course", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 33, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_course", 
-            "name": "Can delete course", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 52, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_courseanalytics", 
-            "name": "Can add course analytics", 
-            "content_type": 18
-        }
-    }, 
-    {
-        "pk": 53, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_courseanalytics", 
-            "name": "Can change course analytics", 
-            "content_type": 18
-        }
-    }, 
-    {
-        "pk": 54, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_courseanalytics", 
-            "name": "Can delete course analytics", 
-            "content_type": 18
-        }
-    }, 
-    {
-        "pk": 55, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_coursemap", 
-            "name": "Can add course map", 
-            "content_type": 19
-        }
-    }, 
-    {
-        "pk": 56, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_coursemap", 
-            "name": "Can change course map", 
-            "content_type": 19
-        }
-    }, 
-    {
-        "pk": 57, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_coursemap", 
-            "name": "Can delete course map", 
-            "content_type": 19
-        }
-    }, 
-    {
-        "pk": 58, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_file", 
-            "name": "Can add file", 
-            "content_type": 20
-        }
-    }, 
-    {
-        "pk": 59, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_file", 
-            "name": "Can change file", 
-            "content_type": 20
-        }
-    }, 
-    {
-        "pk": 60, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_file", 
-            "name": "Can delete file", 
-            "content_type": 20
-        }
-    }, 
-    {
-        "pk": 97, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_instance_status", 
-            "name": "Can add instance_status", 
-            "content_type": 33
-        }
-    }, 
-    {
-        "pk": 98, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_instance_status", 
-            "name": "Can change instance_status", 
-            "content_type": 33
-        }
-    }, 
-    {
-        "pk": 99, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_instance_status", 
-            "name": "Can delete instance_status", 
-            "content_type": 33
-        }
-    }, 
-    {
-        "pk": 28, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_institution", 
-            "name": "Can add institution", 
-            "content_type": 10
-        }
-    }, 
-    {
-        "pk": 29, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_institution", 
-            "name": "Can change institution", 
-            "content_type": 10
-        }
-    }, 
-    {
-        "pk": 30, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_institution", 
-            "name": "Can delete institution", 
-            "content_type": 10
-        }
-    }, 
-    {
-        "pk": 61, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_lecture", 
-            "name": "Can add lecture", 
-            "content_type": 21
-        }
-    }, 
-    {
-        "pk": 62, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_lecture", 
-            "name": "Can change lecture", 
-            "content_type": 21
-        }
-    }, 
-    {
-        "pk": 63, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_lecture", 
-            "name": "Can delete lecture", 
-            "content_type": 21
-        }
-    }, 
-    {
-        "pk": 106, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_newsevent", 
-            "name": "Can add news event", 
-            "content_type": 36
-        }
-    }, 
-    {
-        "pk": 107, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_newsevent", 
-            "name": "Can change news event", 
-            "content_type": 36
-        }
-    }, 
-    {
-        "pk": 108, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_newsevent", 
-            "name": "Can delete news event", 
-            "content_type": 36
-        }
-    }, 
-    {
-        "pk": 64, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_officehour", 
-            "name": "Can add officehour", 
-            "content_type": 22
-        }
-    }, 
-    {
-        "pk": 65, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_officehour", 
-            "name": "Can change officehour", 
-            "content_type": 22
-        }
-    }, 
-    {
-        "pk": 66, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_officehour", 
-            "name": "Can delete officehour", 
-            "content_type": 22
-        }
-    }, 
-    {
-        "pk": 103, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_problemactivity", 
-            "name": "Can add problem activity", 
-            "content_type": 35
-        }
-    }, 
-    {
-        "pk": 104, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_problemactivity", 
-            "name": "Can change problem activity", 
-            "content_type": 35
-        }
-    }, 
-    {
-        "pk": 105, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_problemactivity", 
-            "name": "Can delete problem activity", 
-            "content_type": 35
-        }
-    }, 
-    {
-        "pk": 100, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_problemset", 
-            "name": "Can add problem set", 
-            "content_type": 34
-        }
-    }, 
-    {
-        "pk": 101, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_problemset", 
-            "name": "Can change problem set", 
-            "content_type": 34
-        }
-    }, 
-    {
-        "pk": 102, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_problemset", 
-            "name": "Can delete problem set", 
-            "content_type": 34
-        }
-    }, 
-    {
-        "pk": 94, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_sharingpermission", 
-            "name": "Can add sharing permission", 
-            "content_type": 32
-        }
-    }, 
-    {
-        "pk": 95, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_sharingpermission", 
-            "name": "Can change sharing permission", 
-            "content_type": 32
-        }
-    }, 
-    {
-        "pk": 96, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_sharingpermission", 
-            "name": "Can delete sharing permission", 
-            "content_type": 32
-        }
-    }, 
-    {
-        "pk": 67, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_studentsection", 
-            "name": "Can add student section", 
-            "content_type": 23
-        }
-    }, 
-    {
-        "pk": 68, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_studentsection", 
-            "name": "Can change student section", 
-            "content_type": 23
-        }
-    }, 
-    {
-        "pk": 69, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_studentsection", 
-            "name": "Can delete student section", 
-            "content_type": 23
-        }
-    }, 
-    {
-        "pk": 70, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_usercoursedata", 
-            "name": "Can add user course data", 
-            "content_type": 24
-        }
-    }, 
-    {
-        "pk": 71, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_usercoursedata", 
-            "name": "Can change user course data", 
-            "content_type": 24
-        }
-    }, 
-    {
-        "pk": 72, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_usercoursedata", 
-            "name": "Can delete user course data", 
-            "content_type": 24
-        }
-    }, 
-    {
-        "pk": 73, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_userprofile", 
-            "name": "Can add user profile", 
-            "content_type": 25
-        }
-    }, 
-    {
-        "pk": 74, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_userprofile", 
-            "name": "Can change user profile", 
-            "content_type": 25
-        }
-    }, 
-    {
-        "pk": 75, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_userprofile", 
-            "name": "Can delete user profile", 
-            "content_type": 25
-        }
-    }, 
-    {
-        "pk": 79, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_video", 
-            "name": "Can add video", 
-            "content_type": 27
-        }
-    }, 
-    {
-        "pk": 80, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_video", 
-            "name": "Can change video", 
-            "content_type": 27
-        }
-    }, 
-    {
-        "pk": 81, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_video", 
-            "name": "Can delete video", 
-            "content_type": 27
-        }
-    }, 
-    {
-        "pk": 91, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_videoannotation", 
-            "name": "Can add video annotation", 
-            "content_type": 31
-        }
-    }, 
-    {
-        "pk": 92, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_videoannotation", 
-            "name": "Can change video annotation", 
-            "content_type": 31
-        }
-    }, 
-    {
-        "pk": 93, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_videoannotation", 
-            "name": "Can delete video annotation", 
-            "content_type": 31
-        }
-    }, 
-    {
-        "pk": 82, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_videoquiz", 
-            "name": "Can add video quiz", 
-            "content_type": 28
-        }
-    }, 
-    {
-        "pk": 83, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_videoquiz", 
-            "name": "Can change video quiz", 
-            "content_type": 28
-        }
-    }, 
-    {
-        "pk": 84, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_videoquiz", 
-            "name": "Can delete video quiz", 
-            "content_type": 28
-        }
-    }, 
-    {
-        "pk": 85, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_videoquizquestion", 
-            "name": "Can add video quiz question", 
-            "content_type": 29
-        }
-    }, 
-    {
-        "pk": 86, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_videoquizquestion", 
-            "name": "Can change video quiz question", 
-            "content_type": 29
-        }
-    }, 
-    {
-        "pk": 87, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_videoquizquestion", 
-            "name": "Can delete video quiz question", 
-            "content_type": 29
-        }
-    }, 
-    {
-        "pk": 88, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_videoquizsubmission", 
-            "name": "Can add video quiz submission", 
-            "content_type": 30
-        }
-    }, 
-    {
-        "pk": 89, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_videoquizsubmission", 
-            "name": "Can change video quiz submission", 
-            "content_type": 30
-        }
-    }, 
-    {
-        "pk": 90, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_videoquizsubmission", 
-            "name": "Can delete video quiz submission", 
-            "content_type": 30
-        }
-    }, 
-    {
-        "pk": 76, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_videotopic", 
-            "name": "Can add video topic", 
-            "content_type": 26
-        }
-    }, 
-    {
-        "pk": 77, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_videotopic", 
-            "name": "Can change video topic", 
-            "content_type": 26
-        }
-    }, 
-    {
-        "pk": 78, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_videotopic", 
-            "name": "Can delete video topic", 
-            "content_type": 26
-        }
-    }, 
-    {
-        "pk": 10, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_contenttype", 
-            "name": "Can add content type", 
-            "content_type": 4
-        }
-    }, 
-    {
-        "pk": 11, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_contenttype", 
-            "name": "Can change content type", 
-            "content_type": 4
-        }
-    }, 
-    {
-        "pk": 12, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_contenttype", 
-            "name": "Can delete content type", 
-            "content_type": 4
-        }
-    }, 
-    {
-        "pk": 22, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_registrationprofile", 
-            "name": "Can add registration profile", 
-            "content_type": 8
-        }
-    }, 
-    {
-        "pk": 23, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_registrationprofile", 
-            "name": "Can change registration profile", 
-            "content_type": 8
-        }
-    }, 
-    {
-        "pk": 24, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_registrationprofile", 
-            "name": "Can delete registration profile", 
-            "content_type": 8
-        }
-    }, 
-    {
-        "pk": 13, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_session", 
-            "name": "Can add session", 
-            "content_type": 5
-        }
-    }, 
-    {
-        "pk": 14, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_session", 
-            "name": "Can change session", 
-            "content_type": 5
-        }
-    }, 
-    {
-        "pk": 15, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_session", 
-            "name": "Can delete session", 
-            "content_type": 5
-        }
-    }, 
-    {
-        "pk": 16, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_site", 
-            "name": "Can add site", 
-            "content_type": 6
-        }
-    }, 
-    {
-        "pk": 17, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_site", 
-            "name": "Can change site", 
-            "content_type": 6
-        }
-    }, 
-    {
-        "pk": 18, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_site", 
-            "name": "Can delete site", 
-            "content_type": 6
-        }
-    }, 
-    {
-        "pk": 25, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_migrationhistory", 
-            "name": "Can add migration history", 
-            "content_type": 9
-        }
-    }, 
-    {
-        "pk": 26, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_migrationhistory", 
-            "name": "Can change migration history", 
-            "content_type": 9
-        }
-    }, 
-    {
-        "pk": 27, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_migrationhistory", 
-            "name": "Can delete migration history", 
-            "content_type": 9
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "auth.group", 
-        "fields": {
-            "name": "Instructor Group for nlp-Fall2012_1", 
-            "permissions": []
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "auth.group", 
-        "fields": {
-            "name": "Readonly TAS Group for nlp-Fall2012_1", 
-            "permissions": []
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "auth.group", 
-        "fields": {
-            "name": "Student Group for nlp-Fall2012_1", 
-            "permissions": []
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "auth.group", 
-        "fields": {
-            "name": "TAS Group for nlp-Fall2012_1", 
-            "permissions": []
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_0", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:25", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$i2FqohVLqRmv$vBzIGOgUhDU2lT5RSHp4fLmt13ZR4BR5pjWm0cGDVrw=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:25"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_1", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:25", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$CLJF2ulf0RZK$2l+V2EQoZYW/APFQED7+x74RnqjcF8rEPgGRD4VbAsY=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:25"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_2", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:25", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$jZ2kcwBcTvP8$uRMivHOXGSNSnKEKuCCQBOL3wPEiig16D5nK8fB8Jsk=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:25"
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_3", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:25", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$zyV2j8wd77ri$oCY6NeBGMPx91cD6D+9F1iyzGAKaMoVSPcZQ2Va6QDY=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:25"
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_4", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:25", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$03NWq18dwPZK$RfUAsBnNk64yamDZ3yV6VtVrL3JH5JmEzq6PJdMDn9g=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:25"
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_5", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:25", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$2RG3lOTWOnh2$RarXSRvA4vOZSnsbKrZltDIjHdNzh3s2W6OTILLBtJA=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:25"
-        }
-    }, 
-    {
-        "pk": 7, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_6", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:26", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$s4LmptryqeWx$0nddiOEU7Qcw0bgcZ8qHIxozh9MnYD9Dc3432qFWDfM=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 8, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_7", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:26", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$jldctpLQ0iA1$8OeLKjs3guu9FrRWQ3njl3rGcN+8WL40sZcVWvnUINo=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 9, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_8", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:26", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$t45crcrmhDmM$J9aUQg/4S4iRumo4KHhWYXK4iwLwPB99o6vlW2q/F1g=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 10, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "nlp_student_9", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:26", 
-            "groups": [
-                1
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$dfZhOLxUCYbq$yhnhHZ7+hL0SQWmy8QtduvxYkaRSeuRGpbfB5HHXpCA=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 11, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "Professor 1", 
-            "first_name": "", 
-            "last_name": "", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2012-07-11T14:43:26", 
-            "groups": [
-                2
-            ], 
-            "user_permissions": [], 
-            "password": "pbkdf2_sha256$10000$gMorGWcD1sK3$iw4kxQFW7wsopcr+JxdTm6IJBG2BfH/1DreAJGjSZyQ=", 
-            "email": "", 
-            "date_joined": "2012-07-11T14:43:26"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.course", 
-        "fields": {
-            "code": "CS1234", 
-            "last_updated": "2012-07-11T14:43:25", 
-            "feature_settings": "assignments=on,lectures=on,videos=on", 
-            "time_created": "2012-07-11T14:43:25", 
-            "readonly_tas_group": 4, 
-            "year": 2012, 
-            "membership_control": "1,2,3", 
-            "title": "Natural Language Processing", 
-            "calendar_start": "2012-07-24", 
-            "meeting_info": "There are no upcoming office hours", 
-            "list_publicly": 1, 
-            "handle": "nlp-Fall2012", 
-            "description": "Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people's opinions about products or services to extracting appointments from your email. In this class, you'll learn the fundamental algorithms and mathematical models for human alanguage processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.", 
-            "listing_description": "This course covers a broad range of topics in natural language processing, including word and sentence tokenization, text classification and sentiment analysis, spelling correction, information extraction, parsing, meaning extraction, and question answering, We will also introduce the underlying theory from probability, statistics, and machine learning that are crucial for the field, and cover fundamental algorithms like n-gram language modeling, naive bayes and maxent classifiers, sequence models like Hidden Markov Models, probabilistic dependency and constituent parsing, and vector-space models of meaning.We are offering this course on Natural Language Processing free and online to students worldwide, continuing Stanford's exciting forays into large scale online instruction. Students have access to screencast lecture videos, are given quiz questions, assignments and exams, receive regular feedback on progress, and can participate in a discussion forum. Those who successfully complete the course will receive a statement of accomplishment. Taught by Professors Jurafsky and Manning, the curriculum draws from Stanford's courses in Natural Language Processing. You will need a decent internet connection for accessing course materials, but should be able to watch the videos on your smartphone.", 
-            "instructor_group": 2, 
-            "student_group": 1, 
-            "institution": 1, 
-            "term": "Fall", 
-            "tas_group": 3, 
-            "calendar_end": "2012-09-24", 
-            "mode": "live", 
-            "join_password": "", 
-            "staff_emails": "aa@stanford.edu*, bb@stanford.edu*"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.announcement", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Welcome to the course! Check out the links to announcements, news events, assignments and grades.", 
-            "title": "Welcome to Natural Language Processing!", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "access_id": "123", 
-            "owner": 11
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.announcement", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "The first assignment has been posted.  Visit the assignments link to see the list of assignments and instructions for each assignment.  Be sure to check the additional pages for additional help. If you have any question email us at nlp@stanford.edu.", 
-            "title": "Assignment 1 Out", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "access_id": "123", 
-            "owner": 11
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.announcement", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "Because this Friday is Friday the 13th, we do not want to take any chances so class is cancelled. Post any questions on the discussion forum if you have any questions", 
-            "title": "Friday Lecture for 7/13 cancelled", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "access_id": "123", 
-            "owner": 11
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "c2g.announcement", 
-        "fields": {
-            "last_updated": "2012-07-11T14:43:26", 
-            "description": "We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!", 
-            "title": "Lecture Room Moved", 
-            "time_created": "2012-07-11T14:43:26", 
-            "course": 1, 
-            "access_id": "123", 
-            "owner": 11
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 1, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 2, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 3, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 4, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 4, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 5, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 6, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 7, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 7, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 8, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 8, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 9, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 9, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 10, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 10, 
-            "site_data": ""
-        }
-    }, 
-    {
-        "pk": 11, 
-        "model": "c2g.userprofile", 
-        "fields": {
-            "user": 11, 
-            "site_data": ""
-        }
+  {
+    "pk": 12, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "additionalpage", 
+      "name": "additional page", 
+      "app_label": "c2g"
     }
+  }, 
+  {
+    "pk": 13, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "announcement", 
+      "name": "announcement", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 15, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "assignment", 
+      "name": "assignment", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 14, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "assignmentcategory", 
+      "name": "assignment category", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 16, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "assignmentgrade", 
+      "name": "assignment grade", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 17, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "assignmentsubmission", 
+      "name": "assignment submission", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "contenttype", 
+      "name": "content type", 
+      "app_label": "contenttypes"
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "course", 
+      "name": "course", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 18, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "courseanalytics", 
+      "name": "course analytics", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 19, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "coursemap", 
+      "name": "course map", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 20, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "file", 
+      "name": "file", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "group", 
+      "name": "group", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": 33, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "instance_status", 
+      "name": "instance_status", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "institution", 
+      "name": "institution", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 21, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "lecture", 
+      "name": "lecture", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "logentry", 
+      "name": "log entry", 
+      "app_label": "admin"
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "migrationhistory", 
+      "name": "migration history", 
+      "app_label": "south"
+    }
+  }, 
+  {
+    "pk": 36, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "newsevent", 
+      "name": "news event", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 22, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "officehour", 
+      "name": "officehour", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "permission", 
+      "name": "permission", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": 35, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "problemactivity", 
+      "name": "problem activity", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 34, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "problemset", 
+      "name": "problem set", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "registrationprofile", 
+      "name": "registration profile", 
+      "app_label": "registration"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "session", 
+      "name": "session", 
+      "app_label": "sessions"
+    }
+  }, 
+  {
+    "pk": 32, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "sharingpermission", 
+      "name": "sharing permission", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "site", 
+      "name": "site", 
+      "app_label": "sites"
+    }
+  }, 
+  {
+    "pk": 23, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "studentsection", 
+      "name": "student section", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "user", 
+      "name": "user", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": 24, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "usercoursedata", 
+      "name": "user course data", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 25, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "userprofile", 
+      "name": "user profile", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 27, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "video", 
+      "name": "video", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 31, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "videoannotation", 
+      "name": "video annotation", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 28, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "videoquiz", 
+      "name": "video quiz", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 29, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "videoquizquestion", 
+      "name": "video quiz question", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 30, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "videoquizsubmission", 
+      "name": "video quiz submission", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": 26, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "videotopic", 
+      "name": "video topic", 
+      "app_label": "c2g"
+    }
+  }, 
+  {
+    "pk": "dd097cfea188b35232dd49463fe959e3", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2012-10-09T16:56:54", 
+      "session_data": "NjJmMTI4YjgxOTdmYzQ5ZDQ2ZDc2NDhmNzQwM2VhOWNjOGFiYTFlNDqAAn1xAShVCnRlc3Rjb29r\naWVVBndvcmtlZHECVQ1fYXV0aF91c2VyX2lkigEBVRJfYXV0aF91c2VyX2JhY2tlbmRVKWRqYW5n\nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kdS4=\n"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "sites.site", 
+    "fields": {
+      "domain": "example.com", 
+      "name": "example.com"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "south.migrationhistory", 
+    "fields": {
+      "applied": "2012-07-11T14:42:54", 
+      "app_name": "c2g", 
+      "migration": "0001_initial"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.institution", 
+    "fields": {
+      "city": "Palo Alto", 
+      "last_updated": "2012-07-11T14:43:25", 
+      "title": "Stanford University", 
+      "country": "USA", 
+      "time_created": "2012-07-11T14:43:25", 
+      "domains": "stanford.edu"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.additionalpage", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "description of Syllabus", 
+      "title": "Syllabus", 
+      "update_log": "", 
+      "time_created": "2012-07-11T14:43:25", 
+      "course": 1, 
+      "access_id": "123", 
+      "write_access": "1,2"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.additionalpage", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "description of other static page 1", 
+      "title": "Other Static Page 1", 
+      "update_log": "", 
+      "time_created": "2012-07-11T14:43:25", 
+      "course": 1, 
+      "access_id": "123", 
+      "write_access": "1,2"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.additionalpage", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "description of other static page 2", 
+      "title": "Other Static Page 2", 
+      "update_log": "", 
+      "time_created": "2012-07-11T14:43:25", 
+      "course": 1, 
+      "access_id": "123", 
+      "write_access": "1,2"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.assignmentcategory", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:25", 
+      "time_created": "2012-07-11T14:43:25", 
+      "title": "handouts"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.assignmentcategory", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "time_created": "2012-07-11T14:43:26", 
+      "title": "Problem sets"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.assignmentcategory", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "time_created": "2012-07-11T14:43:26", 
+      "title": "Quizzes"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "c2g.assignmentcategory", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "time_created": "2012-07-11T14:43:26", 
+      "title": "Programming Assignments"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 1, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "Handout 1", 
+      "title": "Handout 1", 
+      "time_created": "2012-07-11T14:43:25", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": ""
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 2, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Tokenization and Lemmatization", 
+      "title": "Problem set 01", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 2, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Hidden Markov Models", 
+      "title": "Problem set 02", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 2, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Part of Speech Tagging", 
+      "title": "Problem set 03", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 2, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Semantic Parsing", 
+      "title": "Problem set 04", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 3, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Tokenization and Lemmatization", 
+      "title": "Quiz 01", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 3, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Hidden Markov Models", 
+      "title": "Quiz 02", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 3, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Part of Speech Tagging", 
+      "title": "Quiz 03", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 3, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Semantic Parsing", 
+      "title": "Quiz 04", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 4, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Tokenization and Lemmatization", 
+      "title": "Programming Assignment 01", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 4, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Hidden Markov Models", 
+      "title": "Programming Assignment 02", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 4, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Part of Speech Tagging", 
+      "title": "Programming Assignment 03", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 13, 
+    "model": "c2g.assignment", 
+    "fields": {
+      "category": 4, 
+      "due_date": null, 
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Semantic Parsing", 
+      "title": "Programming Assignment 04", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "close_date": null, 
+      "access_id": "123"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.videotopic", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:25", 
+      "time_created": "2012-07-11T14:43:25", 
+      "title": "Section 1 - Intro Material"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.videotopic", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:25", 
+      "time_created": "2012-07-11T14:43:25", 
+      "title": "1.1 Getting Started"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.videotopic", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:25", 
+      "time_created": "2012-07-11T14:43:25", 
+      "title": "1.2 History of Field"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "c2g.videotopic", 
+    "fields": {
+      "course": 1, 
+      "last_updated": "2012-07-11T14:43:25", 
+      "time_created": "2012-07-11T14:43:25", 
+      "title": "1.3 Big Issues"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.video", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "Description goes here #1", 
+      "title": "Changeable video title #1", 
+      "url": "WIKt-vD95nI", 
+      "start_time": "00:00:05", 
+      "time_created": "2012-07-11T14:43:25", 
+      "topic": 1, 
+      "course": 1, 
+      "access_id": "123", 
+      "duration": 135, 
+      "type": "youtube"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.video", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "Description goes here #2", 
+      "title": "Changeable video title #2", 
+      "url": "SxkI2dbqv8w", 
+      "start_time": "00:01:00", 
+      "time_created": "2012-07-11T14:43:25", 
+      "topic": 1, 
+      "course": 1, 
+      "access_id": "123", 
+      "duration": 160, 
+      "type": "youtube"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.video", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "Intro video by Professor Dan Jurafsky & Chris Manning", 
+      "title": "Introduction to Natural Language Processing", 
+      "url": "nfoudtpBV68", 
+      "start_time": "00:10:05", 
+      "time_created": "2012-07-11T14:43:25", 
+      "topic": 2, 
+      "course": 1, 
+      "access_id": "123", 
+      "duration": 772, 
+      "type": "youtube"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "c2g.video", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "Description goes here #3", 
+      "title": "Changeable video title #3", 
+      "url": "yfi0Fsb6lNY", 
+      "start_time": "00:00:30", 
+      "time_created": "2012-07-11T14:43:25", 
+      "topic": 2, 
+      "course": 1, 
+      "access_id": "123", 
+      "duration": 301, 
+      "type": "youtube"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "c2g.video", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "Description goes here #4", 
+      "title": "Changeable video title #4", 
+      "url": "07fhOVQ9wEA", 
+      "start_time": "00:00:50", 
+      "time_created": "2012-07-11T14:43:25", 
+      "topic": 3, 
+      "course": 1, 
+      "access_id": "123", 
+      "duration": 142, 
+      "type": "youtube"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "c2g.video", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:25", 
+      "description": "Description goes here #5", 
+      "title": "Changeable video title #5", 
+      "url": "3h039oXUuMY", 
+      "start_time": "00:02:10", 
+      "time_created": "2012-07-11T14:43:25", 
+      "topic": 4, 
+      "course": 1, 
+      "access_id": "123", 
+      "duration": 230, 
+      "type": "youtube"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.problemset", 
+    "fields": {
+      "course": 1, 
+      "path": "/static/latestKhan/exercises/P1.html", 
+      "last_updated": "2012-07-11T14:43:25", 
+      "time_created": "2012-07-11T14:43:25", 
+      "title": "P1"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.problemset", 
+    "fields": {
+      "course": 1, 
+      "path": "/static/latestKhan/exercises/P2.html", 
+      "last_updated": "2012-07-11T14:43:25", 
+      "time_created": "2012-07-11T14:43:25", 
+      "title": "P2"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.newsevent", 
+    "fields": {
+      "course": 1, 
+      "event": "Assignment Added: Assignment 1 NLP", 
+      "time_created": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.newsevent", 
+    "fields": {
+      "course": 1, 
+      "event": "Grades Added: Assignment 0 NLP", 
+      "time_created": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.newsevent", 
+    "fields": {
+      "course": 1, 
+      "event": "Video Added: NLP Lecture 5", 
+      "time_created": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "c2g.newsevent", 
+    "fields": {
+      "course": 1, 
+      "event": "Assignment Changed: Assignment 1 NLP", 
+      "time_created": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "c2g.newsevent", 
+    "fields": {
+      "course": 1, 
+      "event": "Additional Page Added: Syllabus", 
+      "time_created": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 19, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_logentry", 
+      "name": "Can add log entry", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 20, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_logentry", 
+      "name": "Can change log entry", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 21, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_logentry", 
+      "name": "Can delete log entry", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_group", 
+      "name": "Can add group", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_group", 
+      "name": "Can change group", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_group", 
+      "name": "Can delete group", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_permission", 
+      "name": "Can add permission", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_permission", 
+      "name": "Can change permission", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_permission", 
+      "name": "Can delete permission", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_user", 
+      "name": "Can add user", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_user", 
+      "name": "Can change user", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_user", 
+      "name": "Can delete user", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 34, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_additionalpage", 
+      "name": "Can add additional page", 
+      "content_type": 12
+    }
+  }, 
+  {
+    "pk": 35, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_additionalpage", 
+      "name": "Can change additional page", 
+      "content_type": 12
+    }
+  }, 
+  {
+    "pk": 36, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_additionalpage", 
+      "name": "Can delete additional page", 
+      "content_type": 12
+    }
+  }, 
+  {
+    "pk": 37, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_announcement", 
+      "name": "Can add announcement", 
+      "content_type": 13
+    }
+  }, 
+  {
+    "pk": 38, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_announcement", 
+      "name": "Can change announcement", 
+      "content_type": 13
+    }
+  }, 
+  {
+    "pk": 39, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_announcement", 
+      "name": "Can delete announcement", 
+      "content_type": 13
+    }
+  }, 
+  {
+    "pk": 43, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_assignment", 
+      "name": "Can add assignment", 
+      "content_type": 15
+    }
+  }, 
+  {
+    "pk": 44, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_assignment", 
+      "name": "Can change assignment", 
+      "content_type": 15
+    }
+  }, 
+  {
+    "pk": 45, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_assignment", 
+      "name": "Can delete assignment", 
+      "content_type": 15
+    }
+  }, 
+  {
+    "pk": 40, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_assignmentcategory", 
+      "name": "Can add assignment category", 
+      "content_type": 14
+    }
+  }, 
+  {
+    "pk": 41, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_assignmentcategory", 
+      "name": "Can change assignment category", 
+      "content_type": 14
+    }
+  }, 
+  {
+    "pk": 42, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_assignmentcategory", 
+      "name": "Can delete assignment category", 
+      "content_type": 14
+    }
+  }, 
+  {
+    "pk": 46, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_assignmentgrade", 
+      "name": "Can add assignment grade", 
+      "content_type": 16
+    }
+  }, 
+  {
+    "pk": 47, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_assignmentgrade", 
+      "name": "Can change assignment grade", 
+      "content_type": 16
+    }
+  }, 
+  {
+    "pk": 48, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_assignmentgrade", 
+      "name": "Can delete assignment grade", 
+      "content_type": 16
+    }
+  }, 
+  {
+    "pk": 49, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_assignmentsubmission", 
+      "name": "Can add assignment submission", 
+      "content_type": 17
+    }
+  }, 
+  {
+    "pk": 50, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_assignmentsubmission", 
+      "name": "Can change assignment submission", 
+      "content_type": 17
+    }
+  }, 
+  {
+    "pk": 51, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_assignmentsubmission", 
+      "name": "Can delete assignment submission", 
+      "content_type": 17
+    }
+  }, 
+  {
+    "pk": 31, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_course", 
+      "name": "Can add course", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 32, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_course", 
+      "name": "Can change course", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 33, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_course", 
+      "name": "Can delete course", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 52, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_courseanalytics", 
+      "name": "Can add course analytics", 
+      "content_type": 18
+    }
+  }, 
+  {
+    "pk": 53, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_courseanalytics", 
+      "name": "Can change course analytics", 
+      "content_type": 18
+    }
+  }, 
+  {
+    "pk": 54, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_courseanalytics", 
+      "name": "Can delete course analytics", 
+      "content_type": 18
+    }
+  }, 
+  {
+    "pk": 55, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_coursemap", 
+      "name": "Can add course map", 
+      "content_type": 19
+    }
+  }, 
+  {
+    "pk": 56, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_coursemap", 
+      "name": "Can change course map", 
+      "content_type": 19
+    }
+  }, 
+  {
+    "pk": 57, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_coursemap", 
+      "name": "Can delete course map", 
+      "content_type": 19
+    }
+  }, 
+  {
+    "pk": 58, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_file", 
+      "name": "Can add file", 
+      "content_type": 20
+    }
+  }, 
+  {
+    "pk": 59, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_file", 
+      "name": "Can change file", 
+      "content_type": 20
+    }
+  }, 
+  {
+    "pk": 60, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_file", 
+      "name": "Can delete file", 
+      "content_type": 20
+    }
+  }, 
+  {
+    "pk": 97, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_instance_status", 
+      "name": "Can add instance_status", 
+      "content_type": 33
+    }
+  }, 
+  {
+    "pk": 98, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_instance_status", 
+      "name": "Can change instance_status", 
+      "content_type": 33
+    }
+  }, 
+  {
+    "pk": 99, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_instance_status", 
+      "name": "Can delete instance_status", 
+      "content_type": 33
+    }
+  }, 
+  {
+    "pk": 28, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_institution", 
+      "name": "Can add institution", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 29, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_institution", 
+      "name": "Can change institution", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 30, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_institution", 
+      "name": "Can delete institution", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 61, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_lecture", 
+      "name": "Can add lecture", 
+      "content_type": 21
+    }
+  }, 
+  {
+    "pk": 62, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_lecture", 
+      "name": "Can change lecture", 
+      "content_type": 21
+    }
+  }, 
+  {
+    "pk": 63, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_lecture", 
+      "name": "Can delete lecture", 
+      "content_type": 21
+    }
+  }, 
+  {
+    "pk": 106, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_newsevent", 
+      "name": "Can add news event", 
+      "content_type": 36
+    }
+  }, 
+  {
+    "pk": 107, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_newsevent", 
+      "name": "Can change news event", 
+      "content_type": 36
+    }
+  }, 
+  {
+    "pk": 108, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_newsevent", 
+      "name": "Can delete news event", 
+      "content_type": 36
+    }
+  }, 
+  {
+    "pk": 64, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_officehour", 
+      "name": "Can add officehour", 
+      "content_type": 22
+    }
+  }, 
+  {
+    "pk": 65, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_officehour", 
+      "name": "Can change officehour", 
+      "content_type": 22
+    }
+  }, 
+  {
+    "pk": 66, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_officehour", 
+      "name": "Can delete officehour", 
+      "content_type": 22
+    }
+  }, 
+  {
+    "pk": 103, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_problemactivity", 
+      "name": "Can add problem activity", 
+      "content_type": 35
+    }
+  }, 
+  {
+    "pk": 104, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_problemactivity", 
+      "name": "Can change problem activity", 
+      "content_type": 35
+    }
+  }, 
+  {
+    "pk": 105, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_problemactivity", 
+      "name": "Can delete problem activity", 
+      "content_type": 35
+    }
+  }, 
+  {
+    "pk": 100, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_problemset", 
+      "name": "Can add problem set", 
+      "content_type": 34
+    }
+  }, 
+  {
+    "pk": 101, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_problemset", 
+      "name": "Can change problem set", 
+      "content_type": 34
+    }
+  }, 
+  {
+    "pk": 102, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_problemset", 
+      "name": "Can delete problem set", 
+      "content_type": 34
+    }
+  }, 
+  {
+    "pk": 94, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_sharingpermission", 
+      "name": "Can add sharing permission", 
+      "content_type": 32
+    }
+  }, 
+  {
+    "pk": 95, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_sharingpermission", 
+      "name": "Can change sharing permission", 
+      "content_type": 32
+    }
+  }, 
+  {
+    "pk": 96, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_sharingpermission", 
+      "name": "Can delete sharing permission", 
+      "content_type": 32
+    }
+  }, 
+  {
+    "pk": 67, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_studentsection", 
+      "name": "Can add student section", 
+      "content_type": 23
+    }
+  }, 
+  {
+    "pk": 68, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_studentsection", 
+      "name": "Can change student section", 
+      "content_type": 23
+    }
+  }, 
+  {
+    "pk": 69, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_studentsection", 
+      "name": "Can delete student section", 
+      "content_type": 23
+    }
+  }, 
+  {
+    "pk": 70, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_usercoursedata", 
+      "name": "Can add user course data", 
+      "content_type": 24
+    }
+  }, 
+  {
+    "pk": 71, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_usercoursedata", 
+      "name": "Can change user course data", 
+      "content_type": 24
+    }
+  }, 
+  {
+    "pk": 72, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_usercoursedata", 
+      "name": "Can delete user course data", 
+      "content_type": 24
+    }
+  }, 
+  {
+    "pk": 73, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_userprofile", 
+      "name": "Can add user profile", 
+      "content_type": 25
+    }
+  }, 
+  {
+    "pk": 74, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_userprofile", 
+      "name": "Can change user profile", 
+      "content_type": 25
+    }
+  }, 
+  {
+    "pk": 75, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_userprofile", 
+      "name": "Can delete user profile", 
+      "content_type": 25
+    }
+  }, 
+  {
+    "pk": 79, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_video", 
+      "name": "Can add video", 
+      "content_type": 27
+    }
+  }, 
+  {
+    "pk": 80, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_video", 
+      "name": "Can change video", 
+      "content_type": 27
+    }
+  }, 
+  {
+    "pk": 81, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_video", 
+      "name": "Can delete video", 
+      "content_type": 27
+    }
+  }, 
+  {
+    "pk": 91, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_videoannotation", 
+      "name": "Can add video annotation", 
+      "content_type": 31
+    }
+  }, 
+  {
+    "pk": 92, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_videoannotation", 
+      "name": "Can change video annotation", 
+      "content_type": 31
+    }
+  }, 
+  {
+    "pk": 93, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_videoannotation", 
+      "name": "Can delete video annotation", 
+      "content_type": 31
+    }
+  }, 
+  {
+    "pk": 82, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_videoquiz", 
+      "name": "Can add video quiz", 
+      "content_type": 28
+    }
+  }, 
+  {
+    "pk": 83, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_videoquiz", 
+      "name": "Can change video quiz", 
+      "content_type": 28
+    }
+  }, 
+  {
+    "pk": 84, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_videoquiz", 
+      "name": "Can delete video quiz", 
+      "content_type": 28
+    }
+  }, 
+  {
+    "pk": 85, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_videoquizquestion", 
+      "name": "Can add video quiz question", 
+      "content_type": 29
+    }
+  }, 
+  {
+    "pk": 86, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_videoquizquestion", 
+      "name": "Can change video quiz question", 
+      "content_type": 29
+    }
+  }, 
+  {
+    "pk": 87, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_videoquizquestion", 
+      "name": "Can delete video quiz question", 
+      "content_type": 29
+    }
+  }, 
+  {
+    "pk": 88, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_videoquizsubmission", 
+      "name": "Can add video quiz submission", 
+      "content_type": 30
+    }
+  }, 
+  {
+    "pk": 89, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_videoquizsubmission", 
+      "name": "Can change video quiz submission", 
+      "content_type": 30
+    }
+  }, 
+  {
+    "pk": 90, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_videoquizsubmission", 
+      "name": "Can delete video quiz submission", 
+      "content_type": 30
+    }
+  }, 
+  {
+    "pk": 76, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_videotopic", 
+      "name": "Can add video topic", 
+      "content_type": 26
+    }
+  }, 
+  {
+    "pk": 77, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_videotopic", 
+      "name": "Can change video topic", 
+      "content_type": 26
+    }
+  }, 
+  {
+    "pk": 78, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_videotopic", 
+      "name": "Can delete video topic", 
+      "content_type": 26
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_contenttype", 
+      "name": "Can add content type", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_contenttype", 
+      "name": "Can change content type", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_contenttype", 
+      "name": "Can delete content type", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 22, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_registrationprofile", 
+      "name": "Can add registration profile", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 23, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_registrationprofile", 
+      "name": "Can change registration profile", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 24, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_registrationprofile", 
+      "name": "Can delete registration profile", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 13, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_session", 
+      "name": "Can add session", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 14, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_session", 
+      "name": "Can change session", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 15, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_session", 
+      "name": "Can delete session", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 16, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_site", 
+      "name": "Can add site", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 17, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_site", 
+      "name": "Can change site", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 18, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_site", 
+      "name": "Can delete site", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 25, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_migrationhistory", 
+      "name": "Can add migration history", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 26, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_migrationhistory", 
+      "name": "Can change migration history", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 27, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_migrationhistory", 
+      "name": "Can delete migration history", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "auth.group", 
+    "fields": {
+      "name": "Instructor Group for nlp-Fall2012_1", 
+      "permissions": []
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "auth.group", 
+    "fields": {
+      "name": "Readonly TAS Group for nlp-Fall2012_1", 
+      "permissions": []
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "auth.group", 
+    "fields": {
+      "name": "Student Group for nlp-Fall2012_1", 
+      "permissions": []
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "auth.group", 
+    "fields": {
+      "name": "TAS Group for nlp-Fall2012_1", 
+      "permissions": []
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_0", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T16:51:20", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$XsLpZQqoYexf$Kftp/7A7WiuLuP916S+Y8S9Hzf5t67Na4Z3tC1uYt7Y=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:25"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_1", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:25", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$CLJF2ulf0RZK$2l+V2EQoZYW/APFQED7+x74RnqjcF8rEPgGRD4VbAsY=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:25"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_2", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:25", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$jZ2kcwBcTvP8$uRMivHOXGSNSnKEKuCCQBOL3wPEiig16D5nK8fB8Jsk=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:25"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_3", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:25", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$zyV2j8wd77ri$oCY6NeBGMPx91cD6D+9F1iyzGAKaMoVSPcZQ2Va6QDY=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:25"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_4", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:25", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$03NWq18dwPZK$RfUAsBnNk64yamDZ3yV6VtVrL3JH5JmEzq6PJdMDn9g=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:25"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_5", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:25", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$2RG3lOTWOnh2$RarXSRvA4vOZSnsbKrZltDIjHdNzh3s2W6OTILLBtJA=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:25"
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_6", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:26", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$s4LmptryqeWx$0nddiOEU7Qcw0bgcZ8qHIxozh9MnYD9Dc3432qFWDfM=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_7", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:26", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$jldctpLQ0iA1$8OeLKjs3guu9FrRWQ3njl3rGcN+8WL40sZcVWvnUINo=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_8", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:26", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$t45crcrmhDmM$J9aUQg/4S4iRumo4KHhWYXK4iwLwPB99o6vlW2q/F1g=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "nlp_student_9", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:26", 
+      "groups": [
+        1
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$dfZhOLxUCYbq$yhnhHZ7+hL0SQWmy8QtduvxYkaRSeuRGpbfB5HHXpCA=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "Professor 1", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": false, 
+      "last_login": "2012-07-11T14:43:26", 
+      "groups": [
+        2
+      ], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$gMorGWcD1sK3$iw4kxQFW7wsopcr+JxdTm6IJBG2BfH/1DreAJGjSZyQ=", 
+      "email": "", 
+      "date_joined": "2012-07-11T14:43:26"
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "jbau", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": true, 
+      "is_staff": true, 
+      "last_login": "2012-07-11T16:36:19", 
+      "groups": [], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$lZE2MRVpbPDS$kPQEN0r9wYzRIHXDRb1zK9J77fe7pe9muwiOUKmgWUs=", 
+      "email": "jbau@stanford.edu", 
+      "date_joined": "2012-07-11T16:36:15"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.course", 
+    "fields": {
+      "code": "CS1234", 
+      "last_updated": "2012-07-11T14:43:25", 
+      "feature_settings": "assignments=on,lectures=on,videos=on", 
+      "time_created": "2012-07-11T14:43:25", 
+      "readonly_tas_group": 4, 
+      "year": 2012, 
+      "membership_control": "1,2,3", 
+      "title": "Natural Language Processing", 
+      "calendar_start": "2012-07-24", 
+      "meeting_info": "There are no upcoming office hours", 
+      "list_publicly": 1, 
+      "handle": "nlp-Fall2012", 
+      "description": "Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people's opinions about products or services to extracting appointments from your email. In this class, you'll learn the fundamental algorithms and mathematical models for human alanguage processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.", 
+      "listing_description": "This course covers a broad range of topics in natural language processing, including word and sentence tokenization, text classification and sentiment analysis, spelling correction, information extraction, parsing, meaning extraction, and question answering, We will also introduce the underlying theory from probability, statistics, and machine learning that are crucial for the field, and cover fundamental algorithms like n-gram language modeling, naive bayes and maxent classifiers, sequence models like Hidden Markov Models, probabilistic dependency and constituent parsing, and vector-space models of meaning.We are offering this course on Natural Language Processing free and online to students worldwide, continuing Stanford's exciting forays into large scale online instruction. Students have access to screencast lecture videos, are given quiz questions, assignments and exams, receive regular feedback on progress, and can participate in a discussion forum. Those who successfully complete the course will receive a statement of accomplishment. Taught by Professors Jurafsky and Manning, the curriculum draws from Stanford's courses in Natural Language Processing. You will need a decent internet connection for accessing course materials, but should be able to watch the videos on your smartphone.", 
+      "instructor_group": 2, 
+      "student_group": 1, 
+      "institution": 1, 
+      "term": "Fall", 
+      "tas_group": 3, 
+      "calendar_end": "2012-09-24", 
+      "mode": "live", 
+      "join_password": "", 
+      "staff_emails": "aa@stanford.edu*, bb@stanford.edu*"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.announcement", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Welcome to the course! Check out the links to announcements, news events, assignments and grades.", 
+      "title": "Welcome to Natural Language Processing!", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "access_id": "123", 
+      "owner": 11
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.announcement", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "The first assignment has been posted.  Visit the assignments link to see the list of assignments and instructions for each assignment.  Be sure to check the additional pages for additional help. If you have any question email us at nlp@stanford.edu.", 
+      "title": "Assignment 1 Out", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "access_id": "123", 
+      "owner": 11
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.announcement", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "Because this Friday is Friday the 13th, we do not want to take any chances so class is cancelled. Post any questions on the discussion forum if you have any questions", 
+      "title": "Friday Lecture for 7/13 cancelled", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "access_id": "123", 
+      "owner": 11
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "c2g.announcement", 
+    "fields": {
+      "last_updated": "2012-07-11T14:43:26", 
+      "description": "We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!", 
+      "title": "Lecture Room Moved", 
+      "time_created": "2012-07-11T14:43:26", 
+      "course": 1, 
+      "access_id": "123", 
+      "owner": 11
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 1, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 2, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 3, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 4, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 5, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 6, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 7, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 8, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 9, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 10, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 11, 
+      "site_data": ""
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "c2g.userprofile", 
+    "fields": {
+      "user": 12, 
+      "site_data": ""
+    }
+  }
 ]

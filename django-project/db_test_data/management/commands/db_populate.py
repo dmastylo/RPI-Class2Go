@@ -1,8 +1,32 @@
+from django.core.management.base import BaseCommand, CommandError
 from c2g.models import *
 from django.contrib.auth.models import User,Group
-
 from datetime import time
 
+class Command(BaseCommand):
+    help = "Populates the db with test development data. \n This command is <not> available on production for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
+
+    def handle(self, *args, **options):
+      
+          #Defining settings here for now in the absence of a form
+          delete_current_data = 1
+          create_institution_data = 0
+          create_course_data = 0
+          create_user_data = 0
+          create_nlp_course_data = 1
+
+          if delete_current_data == 1:
+              delete_db_data()
+
+          if create_institution_data == 1:
+              create_institutions(create_course_data, create_user_data)
+
+          if create_nlp_course_data == 1:
+              create_nlp_course()
+
+          print "      Successfully populated the db \r"
+          
+          
 def delete_db_data():
 
     #Since all tables are foreign key related, this deletes all data in all c2g tables
@@ -18,42 +42,40 @@ def delete_db_data():
 
 def create_institutions(create_course_data, create_user_data):
 
-    for n in range(0,10):
-        title = "Institution_" + str(n)
-        country = 'USA'
-        city = 'Palo Alto'
-        domains = 'stanford.edu'
+        for n in range(0,10):
+            title = "Institution_" + str(n)
+            country = 'USA'
+            city = 'Palo Alto'
+            domains = 'stanford.edu'
 
-        institution = Institution(title = title,
-                                  country = country,
-                                  city = city,
-                                  domains = domains)
+            institution = Institution(title = title,
+                                      country = country,
+                                      city = city,
+                                      domains = domains)
 
-        institution.save()
+            institution.save()
 
-        if create_course_data == 1:
-            for p in range(0,10):
+            if create_course_data == 1:
+                for p in range(0,10):
 
-                institution_id = institution.id
-                code = 'CS101_' + str(p)
-                title = 'Introduction to Computers' + str(p)
-                listing_description = 'CS107 is the third course in Stanford\'s introductory programming sequence. \n Our CS106 courses provide students with a solid foundation in programming methodology and abstractions and CS107 follows on to build up their programming maturity and expand breadth and depth of experience. \n\n The course will work from the C programming language down to the microprocessor to de-mystify the machine. With a complete understanding of how computer systems execute programs and manipulate data, you will become a more effective programmer, especially in dealing with issues of debugging, performance, portability, and robustness. Topics covered include: the C programming language, data representation, machine-level code, computer arithmetic, elements of code compilation, performance evaluation and optimization, and memory organization and management.The class has three lectures a week and a weekly lab designed for hands-on learning and experimentation. There will be significant programming assignments and you can expect to work hard and be challenged by this course. Your effort can really pay off - once you master the machine and advance your programming skills to the next level, you will have powerful mojo to bring to any future project!'
-                mode = 'live'
-                description = 'CS107 is the third course in Stanford\'s introductory programming sequence.'
-                staff_emails = 'aa.123.edu,bb.123.edu'
-                term = 'Winter'
-                year = '2012'
-                calendar_start = '2012-07-24'
-                calendar_end = '2012-09-24'
-                meeting_info = 'There are no upcoming office hours'
-                feature_settings = 'assignments=on,lectures=off'
-                membership_control = '1,2,3'
-                list_publicly = '0'
+                    institution_id = institution.id
+                    code = 'CS101_' + str(p)
+                    title = 'Introduction to Computers' + str(p)
+                    listing_description = 'CS107 is the third course in Stanford\'s introductory programming sequence. \n Our CS106 courses provide students with a solid foundation in programming methodology and abstractions and CS107 follows on to build up their programming maturity and expand breadth and depth of experience. \n\n The course will work from the C programming language down to the microprocessor to de-mystify the machine. With a complete understanding of how computer systems execute programs and manipulate data, you will become a more effective programmer, especially in dealing with issues of debugging, performance, portability, and robustness. Topics covered include: the C programming language, data representation, machine-level code, computer arithmetic, elements of code compilation, performance evaluation and optimization, and memory organization and management.The class has three lectures a week and a weekly lab designed for hands-on learning and experimentation. There will be significant programming assignments and you can expect to work hard and be challenged by this course. Your effort can really pay off - once you master the machine and advance your programming skills to the next level, you will have powerful mojo to bring to any future project!'
+                    mode = 'live'
+                    description = 'CS107 is the third course in Stanford\'s introductory programming sequence.'
+                    staff_emails = 'aa.123.edu,bb.123.edu'
+                    term = 'Winter'
+                    year = '2012'
+                    calendar_start = '2012-07-24'
+                    calendar_end = '2012-09-24'
+                    meeting_info = 'There are no upcoming office hours'
+                    feature_settings = 'assignments=on,lectures=off'
+                    membership_control = '1,2,3'
+                    list_publicly = '0'
+                    handle = str(code) + str(term) + str(year) + str(institution_id)
 
-                #Create the Group
-                group = Group.objects.create(name="Group for class2go course " + code + str(institution.id))
-
-                course = Course(institution_id = institution_id,
+                    course = Course(institution_id = institution_id,
                                 code = code,
                                 title = title,
                                 listing_description = listing_description,
@@ -68,16 +90,16 @@ def create_institutions(create_course_data, create_user_data):
                                 feature_settings = feature_settings,
                                 membership_control = membership_control,
                                 list_publicly = list_publicly,
-                                group_id = group.id)
+                                handle = handle)
 
-                course.save()
+                    course.save()
 
-                if create_user_data == 1:
-                    for q in range(0,10):
+                    if create_user_data == 1:
+                        for q in range(0,10):
 
-                        #Create the user
-                        user = User.objects.create_user('test_' + str(course.id) + '_' + str(q))
-                        group.user_set.add(user)
+                            #Create the user
+                            user = User.objects.create_user('test_' + str(course.id) + '_' + str(q))
+                            course.student_group.user_set.add(user)
 
 
 def create_nlp_course():
@@ -112,12 +134,6 @@ def create_nlp_course():
         membership_control = '1,2,3'
         list_publicly = '1'
         handle = 'nlp-Fall2012'
-
-        #Create the Groups
-      #  student_group = Group.objects.create(name="Student Group for class2go course " + code + str(institution.id))
-      #  instructor_group = Group.objects.create(name="Instructor Group for class2go course " + code + str(institution.id))
-      #  tas_group = Group.objects.create(name="TAS Group for class2go course " + code + str(institution.id))
-      #  readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + code + str(institution.id))
         
         #Create the Course
         course = Course(institution_id = institution_id,
@@ -135,10 +151,6 @@ def create_nlp_course():
                         feature_settings = feature_settings,
                         membership_control = membership_control,
                         list_publicly = list_publicly,
-        #                student_group_id = student_group.id,
-        #                instructor_group_id = instructor_group.id,
-        #                tas_group_id = tas_group.id,
-        #                readonly_tas_group_id = readonly_tas_group.id,
                         handle = handle)
 
         course.save()
@@ -297,8 +309,8 @@ def create_nlp_course():
         description = 'We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!'
         save_announcement(instructor, course_id, access_id, title, description)
 
-		#Create some Assignments
-		
+        #Create some Assignments
+        
         title = 'Problem sets'
         assignment_category1 = save_assignment_category(course_id, title)
         
@@ -404,7 +416,7 @@ def save_additional_page(course_id, access_id, write_access, title, description)
                                          description = description)
         
         additional_page.save()
-
+        
 def save_announcement(owner, course_id, access_id, title, description):
 
         announcement = Announcement(owner = owner,
@@ -418,19 +430,19 @@ def save_announcement(owner, course_id, access_id, title, description):
 def save_assignment(course_id, category_id, access_id, title, description):
 
         assignment = Assignment(course_id = course_id,
-								category_id = category_id,
+                                category_id = category_id,
                                 access_id = access_id,
                                 title = title,
                                 description = description)
 
         assignment.save()
-		
+        
 def save_assignment_category(course_id, title):
 
         assignment_category = AssignmentCategory(course_id = course_id, title = title)
 
         assignment_category.save()
-		
+        
         return assignment_category
        
 def save_news_event(course_id, event):

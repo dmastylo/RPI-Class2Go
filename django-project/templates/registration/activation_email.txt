@@ -1,0 +1,12 @@
+{% load url from future %}
+
+
+Welcome to {{site.domain}}!  To activate your account, please click on the link below:
+
+{% url 'registration_activate' activation_key %} 
+
+or copy-and-paste it into your browser's URL bar.
+
+Thanks, and enjoy our site!
+
+The Class2Go team.

@@ -21,6 +21,9 @@ from os import path
 _old = __import__('django-project.urls',globals(),locals(),['urlpatterns'],-1)
 urlpatterns = _old.urlpatterns
 
+_default = __import__('registration.backends.default.urls',globals(),locals(),['urlpatterns'],-1)
+urlpatterns += _default.urlpatterns
+
 urlpatterns += patterns('',
                        # Test the 'activate' view with custom template
                        # name.

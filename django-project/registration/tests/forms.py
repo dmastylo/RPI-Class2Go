@@ -23,18 +23,40 @@ class RegistrationFormTests(TestCase):
             # Non-alphanumeric username.
             {'data': {'username': 'foo/bar',
                       'email': 'foo@example.com',
+                      'first_name': 'boo',
+                      'last_name': 'bar',
                       'password1': 'foo',
                       'password2': 'foo'},
             'error': ('username', [u"This value may contain only letters, numbers and @/./+/-/_ characters."])},
+            # Non-alphanumeric first name.
+            {'data': {'username': 'foo/bar',
+                      'email': 'foo@example.com',
+                      'first_name': 'bo*o',
+                      'last_name': 'bar',
+                      'password1': 'foo',
+                      'password2': 'foo'},
+              'error': ('first_name', [u"This value may contain only letters and numbers."])},
+             # Non-alphanumeric first name.
+            {'data': {'username': 'foo/bar',
+                      'email': 'foo@example.com',
+                      'first_name': 'boo',
+                      'last_name': 'ba}r',
+                      'password1': 'foo',
+                      'password2': 'foo'},
+              'error': ('last_name', [u"This value may contain only letters and numbers."])},
             # Already-existing username.
             {'data': {'username': 'alice',
                       'email': 'alice@example.com',
+                      'first_name': 'alice',
+                      'last_name': 'wonderland',
                       'password1': 'secret',
                       'password2': 'secret'},
             'error': ('username', [u"A user with that username already exists."])},
             # Mismatched passwords.
             {'data': {'username': 'foo',
                       'email': 'foo@example.com',
+                      'first_name': 'alice',
+                      'last_name': 'wonderland',
                       'password1': 'foo',
                       'password2': 'bar'},
             'error': ('__all__', [u"The two password fields didn't match."])},
@@ -48,9 +70,46 @@ class RegistrationFormTests(TestCase):
 
         form = forms.RegistrationForm(data={'username': 'foo',
                                             'email': 'foo@example.com',
+                                            'first_name': 'food',
+                                            'last_name': 'bar',
                                             'password1': 'foo',
                                             'password2': 'foo'})
         self.failUnless(form.is_valid())
+
+            
+    def test_registration_form_first_last(self):
+        """
+        Test that First and Last name fields are required
+        """
+        form = forms.RegistrationForm(data={'username': 'foo',
+                                            'email': 'foo@example.com',
+                                            'first_name': 'first',
+                                            'password1': 'foo',
+                                            'password2': 'foo'})
+        self.failIf(form.is_valid())
+        self.assertEqual(form.errors['last_name'],
+                         [u"This field is required."])
+        form = forms.RegistrationForm(data={'username': 'foo',
+                                            'email': 'foo@example.com',
+                                            'last_name': 'last',
+                                            'password1': 'foo',
+                                            'password2': 'foo'})
+        self.failIf(form.is_valid())
+        self.assertEqual(form.errors['first_name'],
+                         [u"This field is required."])
+
+        
+        form = forms.RegistrationForm(data={'username': 'foo',
+                                            'email': 'foo@example.com',
+                                            'first_name': 'first',
+                                            'last_name': 'last',
+                                            'password1': 'foo',
+                                            'password2': 'foo',
+                                            'tos': 'on'})
+        self.failUnless(form.is_valid())
+
+
+            
 
     def test_registration_form_tos(self):
         """
@@ -60,6 +119,8 @@ class RegistrationFormTests(TestCase):
         """
         form = forms.RegistrationFormTermsOfService(data={'username': 'foo',
                                                           'email': 'foo@example.com',
+                                                          'first_name': 'first',
+                                                          'last_name': 'last',
                                                           'password1': 'foo',
                                                           'password2': 'foo'})
         self.failIf(form.is_valid())
@@ -68,11 +129,14 @@ class RegistrationFormTests(TestCase):
 
         form = forms.RegistrationFormTermsOfService(data={'username': 'foo',
                                                           'email': 'foo@example.com',
+                                                          'first_name': 'first',
+                                                          'last_name': 'last',
                                                           'password1': 'foo',
                                                           'password2': 'foo',
                                                           'tos': 'on'})
         self.failUnless(form.is_valid())
 
+            
     def test_registration_form_unique_email(self):
         """
         Test that ``RegistrationFormUniqueEmail`` validates uniqueness
@@ -85,6 +149,8 @@ class RegistrationFormTests(TestCase):
 
         form = forms.RegistrationFormUniqueEmail(data={'username': 'foo',
                                                        'email': 'alice@example.com',
+                                                       'first_name': 'malice',
+                                                       'last_name': 'palace',
                                                        'password1': 'foo',
                                                        'password2': 'foo'})
         self.failIf(form.is_valid())
@@ -93,6 +159,8 @@ class RegistrationFormTests(TestCase):
 
         form = forms.RegistrationFormUniqueEmail(data={'username': 'foo',
                                                        'email': 'foo@example.com',
+                                                       'first_name': 'first',
+                                                       'last_name': 'last', 
                                                        'password1': 'foo',
                                                        'password2': 'foo'})
         self.failUnless(form.is_valid())
@@ -104,6 +172,8 @@ class RegistrationFormTests(TestCase):
 
         """
         base_data = {'username': 'foo',
+                     'first_name' : 'first',
+                     'last_name': 'last',     
                      'password1': 'foo',
                      'password2': 'foo'}
         for domain in forms.RegistrationFormNoFreeEmail.bad_domains:
