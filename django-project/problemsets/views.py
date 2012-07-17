@@ -6,7 +6,7 @@ from django.template import RequestContext
 def list(request, course_prefix, course_suffix):
     course_handle = course_prefix + "-" + course_suffix
     course = Course.objects.get(handle=course_handle)
-    psets = course.problemset_set.all()
+    psets = course.problemset_set.all().order_by('soft_deadline')
     package = []
 
     if not request.user.is_authenticated():
