@@ -6,30 +6,25 @@ import httplib
 from OAuthSimple import OAuthSimple
 from urlparse import urlparse
 import urllib 
-	
+
+# won't be needed once we remove the dash from the directory name (soon)
+secrets_file = __import__('django-project.database', globals(), locals(), ['PIAZZA_CONSUMER_KEY', 'PIAZZA_OAUTH_SECRET'], -1)
+
+
 def admin(request, course_prefix, course_suffix):
-	return render_to_response('forums/admin.html', {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'request': request}, context_instance=RequestContext(request))
-	
+	return render_to_response('forums/admin.html', 
+            {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'request': request}, 
+            context_instance=RequestContext(request))
+
 
 def view(request, course_prefix, course_suffix):
-
-    # for OAuth
-    # TODO: DO NOT CHECK IN UNTIL MOVE SECRET OUT OF HERE!!
-
+    # settings for OAuth
     url_full='https://piazza.com/basic_lti'
-    signatures = {'consumer_key': 'class2go', 'shared_secret': 'piazza_zl1-6af3'}
-
-    url_full='http://dr-chuck.com/ims/php-simple/tool.php'
-    signatures = {'consumer_key': '12345', 'shared_secret': 'secret'}
-
-    # url_full = 'http://term.ie/oauth/example/request_token.php'
-    # signatures = {'consumer_key': 'key', 'shared_secret': 'secret'}
-
-    # url_full = 'http://localhost:8888/forums'
-    # signatures = {'consumer_key': 'key', 'shared_secret': 'secret'}
-
     url_parsed = urlparse(url_full)
+    signatures = {'consumer_key': secrets_file.PIAZZA_CONSUMER_KEY, 
+            'shared_secret': secrets_file.PIAZZA_OAUTH_SECRET}
     
+    # TODO: make dynamic
     lti_params = {
           "lti_message_type": "basic-lti-launch-request",
           "lti_version": "LTI-1p0",
@@ -52,17 +47,9 @@ def view(request, course_prefix, course_suffix):
           "oauth_callback": "about:blank",
     }
 
-    # lti_params = {
-          # "lti_message_type": "basic-lti-launch-request",
-          # "lti_version": "LTI-1p0",
-          # "resource_link_id": "120988f929-274612",
-          # "oauth-token": "",
-    # }
-
     oauthsimple = OAuthSimple()
-    sign = oauthsimple.sign({ 'path': url_full,
-        'parameters': lti_params,
-        'signatures': signatures})
+    sign = oauthsimple.sign({ 'path': url_full, 'action': 'POST',
+        'parameters': lti_params, 'signatures': signatures})
     signed_encoded_body = urllib.urlencode(sign['parameters']);
 
     headers = {'Content-type': 'application/x-www-form-urlencoded',
@@ -76,16 +63,16 @@ def view(request, course_prefix, course_suffix):
     response = conn.getresponse()
 
     # for now just dump out a bunch of ugly debugging info.  
+    # header_pretty = '<br>'.join('%s: %s' % (key, value) for (key, value) in headers.items())
+    # params_pretty = '<br>'.join('%s = %s' % (key, value) for (key, value) in sign['parameters'].items())
+    # return HttpResponse("HOST=" + url_parsed.netloc
+            # + "<br>PATH=" + url_parsed.path
+            # + "<hr>SBS=" + sign['sbs']
+            # + "<hr>HEADERS<br>" + header_pretty
+            # + "<hr>BODY<br>" + params_pretty
+            # + "<hr>RESPONSE=" + str(response.status) + " " + response.reason
+            # + "<hr>OUTPUT<br>" + response.read()
+            # )
 
-    header_pretty = '<br>'.join('%s: %s' % (key, value) for (key, value) in headers.items())
-    params_pretty = '<br>'.join('%s = %s' % (key, value) for (key, value) in sign['parameters'].items())
-    return HttpResponse("HOST=" + url_parsed.netloc
-            + "<br>PATH=" + url_parsed.path
-            + "<hr>HEADERS<br>" + header_pretty
-            + "<hr>BODY<br>" + params_pretty
-            + "<hr>RESPONSE=" + str(response.status) + " " + response.reason
-            + "<hr>OUTPUT<br>" + response.read()
-            )
-
-    # once we sort out would just want to return the line below in an iframe
-    # return HttpResponse(response.read())
+    # TODO: put in iframe
+    return HttpResponse(response.read())
