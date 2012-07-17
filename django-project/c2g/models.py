@@ -427,7 +427,7 @@ class Problem(TimestampMixin, models.Model):
     problem_set = models.ForeignKey(ProblemSet)
     problem_number = models.IntegerField(null=True, blank=True)
     def __unicode__(self):
-        return self.problem_set.title+self.problem_number
+        return self.problem_number
     class Meta:
         db_table = u'c2g_problems'
 
@@ -447,7 +447,6 @@ class ProblemActivity(models.Model):
      topic_mode = models.IntegerField(null=True, blank=True)
      casing = models.TextField(blank=True)
      card = models.TextField(blank=True)
-     topic_id = models.ForeignKey(VideoTopic, db_index=True)
      cards_done = models.IntegerField(null=True, blank=True)
      cards_left = models.IntegerField(null=True, blank=True)
      def __unicode__(self):

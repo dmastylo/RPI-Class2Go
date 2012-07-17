@@ -1,5 +1,5 @@
 from django.shortcuts import render_to_response
-from c2g.models import Course, ProblemSet, ProblemActivity
+from c2g.models import Course
 from django.template import RequestContext
 
 # Create your views here.

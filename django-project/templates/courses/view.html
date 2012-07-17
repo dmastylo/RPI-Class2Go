@@ -12,13 +12,13 @@
 			{% endfor %}
 			<li class="nav-header">Problem Sets</li>
 			{% for pset in course.problemset_set.all %}
-			  <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset %}">{{pset.title}}</a></li>
+			  <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset.id %}">{{pset.title}}</a></li>
 			{% endfor %}
 			<li class="divider"></li>
 			<li><a href="#"><i class="icon-flag"></i>Help</a></li>
-			<li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
-		</ul>
-	</div>
+            <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
+        </ul>
+    </div>
 </div>
 {% endblock l_column_content %}
 

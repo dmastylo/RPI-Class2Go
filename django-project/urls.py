@@ -33,7 +33,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     # Piazza integration
-	url(r'^forums$', 'c2g.views.piazza'),
+#	url(r'^forums$', 'c2g.views.piazza'),
 
 
 	# The following line is temprarily commented out until we figure out how django cascades its URL matching operations.
@@ -100,5 +100,5 @@ urlpatterns = patterns('',
 
         #Problem Sets
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/?$', 'problemsets.views.list'),
-        url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset>[a-zA-Z0-9_]+)?$', 'problemsets.views.show'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset>[a-zA-Z0-9_]+)?$', 'problemsets.views.show'),
 )
