@@ -24,7 +24,7 @@ class Command(BaseCommand):
           if create_nlp_course_data == 1:
               create_nlp_course()
 
-          self.stdout.write("      Successfully populated the db \r")
+          print "      Successfully populated the db \r"
 
 
 def delete_db_data():

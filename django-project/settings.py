@@ -31,7 +31,7 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = True
+USE_I18N = False
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -105,15 +105,15 @@ TEMPLATE_DIRS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-'django.contrib.auth.context_processors.auth',
-'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.static',
+    'django.contrib.messages.context_processors.messages'
 )
 
 hostname = socket.gethostname()
 #We do not want db_test_data app installed on production.
 
-if (hostname == "productionserver"):
-    INSTALLED_APPS = (
+INSTALLED_APPS = (
                       'django.contrib.auth',
                       'django.contrib.contenttypes',
                       'django.contrib.sessions',
@@ -128,29 +128,17 @@ if (hostname == "productionserver"):
                       'south',
                       'c2g',
                       'courses',
+                      'courses.forums',
+                      'courses.announcements',
+                      'courses.videos',
+                      'courses.video_exercises',
                       'khan',
                       'problemsets',
                       )
-else:
-    INSTALLED_APPS = (
-                      'django.contrib.auth',
-                      'django.contrib.contenttypes',
-                      'django.contrib.sessions',
-                      'django.contrib.sites',
-                      'django.contrib.messages',
-                      'django.contrib.staticfiles',
-                      # Uncomment the next line to enable the admin:
-                      'django.contrib.admin',
-                      # Uncomment the next line to enable admin documentation:
-                      'django.contrib.admindocs',
-                      'registration',
-                      'south',
-                      'c2g',
-                      'courses',
-                      'khan',
-                      'problemsets',
-                      'db_test_data',
-                      )
+if (hostname != "productionserver"):
+    INSTALLED_APPS += (
+                        'db_test_data',
+                       )
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'

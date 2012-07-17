@@ -26,6 +26,14 @@ class SimpleBackend(object):
         # authenticate() always has to be called before login(), and
         # will return the user we just created.
         new_user = authenticate(username=username, password=password)
+        
+        if (not hasattr(kwargs,'first_name')):
+            kwargs['first_name']='first' 
+        
+        if (not hasattr(kwargs,'last_name')):
+            kwargs['last_name']='last'    
+        
+
         new_user.first_name, new_user.last_name = kwargs['first_name'], kwargs['last_name']
         new_user.save()
         login(request, new_user)
@@ -57,10 +65,10 @@ class SimpleBackend(object):
 
     def post_registration_redirect(self, request, user):
         """
-        After registration, redirect to the home ("/") page.
+        After registration, redirect to the home view.
         
         """
-        return ('/', (), {})
+        return ('c2g.views.home', (), {})
 
     def post_activation_redirect(self, request, user):
         raise NotImplementedError

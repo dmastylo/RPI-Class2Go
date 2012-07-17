@@ -8,6 +8,8 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIRequest
+from django.core.urlresolvers import reverse
+
 from django.test import Client
 from django.test import TestCase
 
@@ -116,7 +118,7 @@ class DefaultRegistrationBackendTests(TestCase):
 
     """
     backend = DefaultBackend()
-    
+    urls = 'registration.tests.urls_default'
     def setUp(self):
         """
         Create an instance of the default backend for use in testing,
@@ -146,6 +148,8 @@ class DefaultRegistrationBackendTests(TestCase):
         """
         new_user = self.backend.register(_mock_request(),
                                          username='bob',
+                                         first_name='bob',
+                                         last_name='flambeur',
                                          email='bob@example.com',
                                          password1='secret')
 
@@ -172,6 +176,8 @@ class DefaultRegistrationBackendTests(TestCase):
         Site._meta.installed = False
         new_user = self.backend.register(_mock_request(),
                                          username='bob',
+                                         first_name='bob',
+                                         last_name='flambeur',
                                          email='bob@example.com',
                                          password1='secret')
 
@@ -196,6 +202,8 @@ class DefaultRegistrationBackendTests(TestCase):
         valid_user = self.backend.register(_mock_request(),
                                            username='alice',
                                            email='alice@example.com',
+                                           first_name='alice',
+                                           last_name='wonderland',
                                            password1='swordfish')
 
         valid_profile = RegistrationProfile.objects.get(user=valid_user)
@@ -219,6 +227,8 @@ class DefaultRegistrationBackendTests(TestCase):
         expired_user = self.backend.register(_mock_request(),
                                              username='bob',
                                              email='bob@example.com',
+                                             first_name='bob',
+                                             last_name='flambeur',
                                              password1='secret')
 
         expired_user.date_joined = expired_user.date_joined - datetime.timedelta(days=settings.ACCOUNT_ACTIVATION_DAYS)
@@ -277,6 +287,8 @@ class DefaultRegistrationBackendTests(TestCase):
 
         self.backend.register(_mock_request(),
                               username='bob',
+                              first_name='bob',
+                              last_name='flambeur',
                               email='bob@example.com',
                               password1='secret')
 
@@ -301,6 +313,8 @@ class DefaultRegistrationBackendTests(TestCase):
 
         new_user = self.backend.register(_mock_request(),
                                          username='bob',
+                                         first_name='bob',
+                                         last_name='flambeur',
                                          email='bob@example.com',
                                          password1='secret')
         profile = RegistrationProfile.objects.get(user=new_user)
@@ -322,6 +336,8 @@ class DefaultRegistrationBackendTests(TestCase):
 
         new_user = self.backend.register(_mock_request(),
                                          username='bob',
+                                         first_name='bob',
+                                         last_name='flambeur',
                                          email='bob@example.com',
                                          password1='secret')
         new_user.date_joined -= datetime.timedelta(days=settings.ACCOUNT_ACTIVATION_DAYS + 1)
@@ -340,6 +356,8 @@ class DefaultRegistrationBackendTests(TestCase):
         
         alice = self.backend.register(_mock_request(),
                                       username='alice',
+                                      first_name='alice',
+                                      last_name='wonderland',
                                       email='alice@example.com',
                                       password1='swordfish')
         
@@ -364,6 +382,8 @@ class DefaultRegistrationBackendTests(TestCase):
         
         alice = self.backend.register(_mock_request(),
                                       username='alice',
+                                      first_name='alice',
+                                      last_name='wonderland',
                                       email='alice@example.com',
                                       password1='swordfish')
         
@@ -386,6 +406,8 @@ class DefaultRegistrationBackendTests(TestCase):
 
         alice = self.backend.register(_mock_request(),
                                       username='alice',
+                                      first_name='alice',
+                                      last_name='wonderland',
                                       email='alice@example.com',
                                       password1='swordfish')
 
@@ -412,6 +434,8 @@ class SimpleRegistrationBackendTests(TestCase):
         """
         new_user = self.backend.register(_mock_request(),
                                          username='bob',
+                                         first_name='bob',
+                                         last_name='flambeur',
                                          email='bob@example.com',
                                          password1='secret')
 
@@ -453,11 +477,13 @@ class SimpleRegistrationBackendTests(TestCase):
         """
         new_user = self.backend.register(_mock_request(),
                                          username='bob',
+                                         first_name='bob',
+                                         last_name='flambeur',
                                          email='bob@example.com',
                                          password1='secret')
         
         self.assertEqual(self.backend.post_registration_redirect(_mock_request(), new_user),
-                         (new_user.get_absolute_url(), (), {}))
+                         ('c2g.views.home', (), {}))
 
     def test_registration_signal(self):
         """
@@ -477,6 +503,8 @@ class SimpleRegistrationBackendTests(TestCase):
 
         self.backend.register(_mock_request(),
                               username='bob',
+                              first_name='bob',
+                              last_name='flambeur',
                               email='bob@example.com',
                               password1='secret')
 
