@@ -1,6 +1,13 @@
-# source this from your loging shell
+# source this from your login shell
 
-alias staging="ssh -A ubuntu@app4.stage.c2gops.com"
-alias stagingdb="ssh -At ubuntu@app4.stage.c2gops.com \"class2go/django-project/manage.py dbshell\""
+function staging {
+    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
+    ssh -A ubuntu@app4.stage.c2gops.com
+}
+
+function stagingdb {
+    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
+    ssh -At ubuntu@app4.stage.c2gops.com "class2go/django-project/manage.py dbshell"
+}
 
 alias localdb="~/src/class2go/django-project/manage.py dbshell"
