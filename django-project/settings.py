@@ -129,6 +129,9 @@ INSTALLED_APPS = (
                       'c2g',
                       'courses',
                       'courses.forums',
+                      'courses.announcements',
+                      'courses.videos',
+                      'courses.video_exercises',
                       'khan',
                       'problemsets',
                       )
