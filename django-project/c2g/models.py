@@ -14,7 +14,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save, pre_save, post_init
+from django.db.models.signals import post_save, pre_save
+from django import forms
 
 from datetime import time
 import gdata.youtube
@@ -26,7 +27,7 @@ class TimestampMixin(models.Model):
 
     def tellMeWhen(self):
        print ("Created: " + self.time_created.__str__() + "  Updated: " + self.last_updated.__str__())
-    
+
     class Meta:
        abstract = True
 
@@ -67,7 +68,7 @@ class Course(TimestampMixin, models.Model):
     join_password = models.TextField(blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, unique=True, db_index=True)
-    
+
     def __unicode__(self):
         return self.title
 
@@ -85,7 +86,7 @@ def defineUserGroupsForCourse(sender, **kwargs):
         instance.tas_group = Group.objects.create(name="TAS Group for " + instance.handle + "_" + str(instance.institution.id))
     if (not hasattr(instance,'readonly_tas_group')):
         instance.readonly_tas_group = Group.objects.create(name="Readonly TAS Group for " + instance.handle + "_" + str(instance.institution.id))
-            
+
 
 pre_save.connect(defineUserGroupsForCourse, sender=Course)
 
@@ -301,10 +302,10 @@ class VideoTopic(TimestampMixin, models.Model):
     #id = models.BigIntegerField(primary_key=True)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255)
-    
+
     def __unicode__(self):
-        return self.title    
-    
+        return self.title
+
     class Meta:
         db_table = u'c2g_video_topics'
 
@@ -400,8 +401,8 @@ class SharingPermission(TimestampMixin, models.Model):
     cond_sa = models.IntegerField(null=True, blank=True)
     class Meta:
         db_table = u'c2g_sharing_permissions'
-        
-        
+
+
 class instance_status(models.Model):
     prefix = models.CharField(max_length=30, null=True, db_index=True)
     current_prod = models.ForeignKey(Course, related_name="current_prod", null=True, db_index=True)
@@ -412,15 +413,29 @@ class instance_status(models.Model):
 class ProblemSet(TimestampMixin, models.Model):
     course = models.ForeignKey(Course)
     title = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
+    soft_deadline = models.DateTimeField(null=True, blank=True)
+    hard_deadline = models.DateTimeField(null=True, blank=True)
     def __unicode__(self):
         return self.title
     class Meta:
         db_table = u'c2g_problem_sets'
 
+class Problem(TimestampMixin, models.Model):
+    problem_set = models.ForeignKey(ProblemSet)
+    problem_number = models.IntegerField(null=True, blank=True)
+    def __unicode__(self):
+        return self.problem_number
+    class Meta:
+        db_table = u'c2g_problems'
+
 class ProblemActivity(models.Model):
      student = models.ForeignKey(User)
      course = models.ForeignKey(Course)
+     problem_set = models.ForeignKey(ProblemSet, null=True)
+     problem = models.ForeignKey(Problem, null=True)
      complete = models.IntegerField(null=True, blank=True)
      count_hints = models.IntegerField(null=True, blank=True)
      time_taken = models.IntegerField(null=True, blank=True)
@@ -432,9 +447,10 @@ class ProblemActivity(models.Model):
      topic_mode = models.IntegerField(null=True, blank=True)
      casing = models.TextField(blank=True)
      card = models.TextField(blank=True)
-     topic_id = models.ForeignKey(VideoTopic, db_index=True)
      cards_done = models.IntegerField(null=True, blank=True)
      cards_left = models.IntegerField(null=True, blank=True)
+     def __unicode__(self):
+            return self.student.username
      class Meta:
         db_table = u'c2g_problem_activity'
 
@@ -447,3 +463,8 @@ class NewsEvent(models.Model):
         return self.event
     class Meta:
         db_table = u'c2g_news_events'
+
+class EditProfileForm(forms.Form):
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    email = forms.CharField(max_length=30)

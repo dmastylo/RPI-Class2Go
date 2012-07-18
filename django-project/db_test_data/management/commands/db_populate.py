@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = "Populates the db with test development data. \n This command is <not> available on production for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
 
     def handle(self, *args, **options):
-      
+
           #Defining settings here for now in the absence of a form
           delete_current_data = 1
           create_institution_data = 0
@@ -25,8 +25,8 @@ class Command(BaseCommand):
               create_nlp_course()
 
           print "      Successfully populated the db \r"
-          
-          
+
+
 def delete_db_data():
 
     #Since all tables are foreign key related, this deletes all data in all c2g tables
@@ -103,7 +103,7 @@ def create_institutions(create_course_data, create_user_data):
 
 
 def create_nlp_course():
-    
+
         #Create the Institution
         title = "Stanford University"
         country = 'USA'
@@ -116,7 +116,7 @@ def create_nlp_course():
                                   domains = domains)
 
         institution.save()
-        
+
         #Create the course
         institution_id = institution.id
         code = 'CS1234'
@@ -134,7 +134,7 @@ def create_nlp_course():
         membership_control = '1,2,3'
         list_publicly = '1'
         handle = 'nlp-Fall2012'
-        
+
         #Create the Course
         course = Course(institution_id = institution_id,
                         code = code,
@@ -155,19 +155,73 @@ def create_nlp_course():
 
         course.save()
 
-        #Create problemsets
         course_id = course.id
-        p1 = ProblemSet(course=course,title='P1',path='/static/latestKhan/exercises/P1.html')
-        p2 = ProblemSet(course=course,title='P2',path='/static/latestKhan/exercises/P2.html')
-        p1.save()
-        p2.save()
-            
+
+
+        #Create some Student Users
+        for q in range(0,10):
+
+            user = User.objects.create_user('nlp_student_' + str(q))
+            user.set_password('class2go')
+            user.save()
+            course.student_group.user_set.add(user)
+
+        #Create an Instructor User
+
+        instructor = User.objects.create_user('Professor 1')
+        instructor.set_password('class2go')
+        instructor.save()
+        course.instructor_group.user_set.add(instructor)
+
+
+        #Create problemsets
+
+        title='P1'
+        name = 'Problem Set 1: Regular Expressions'
+        path='/static/latestKhan/exercises/P1.html'
+        soft_deadline='2012-07-20'
+        hard_deadline='2012-07-27'
+        description = 'This is the first problem set. Practice some question on Regular Expressions. Remember to work your problems out on a separate piece of paper first because you only get one try on these. Miss on and you have a D!'
+
+        pset1 = save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline, description)
+
+        title='P2'
+        name='Problem Set 2: Joint Probability'
+        path='/static/latestKhan/exercises/P2.html'
+        soft_deadline='2012-07-27'
+        hard_deadline='2012-08-03'
+        description = 'This problem set will test your knowledge of Joint Probability. Each question is worth one point and your final exam is worth 100 points so these questions are basically useless. But you have to do them because an incomplete assignment disallows you from passing the class. Have fun with this problem set!'
+
+        pset2 = save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline, description)
+
+
+        #Create problems
+
+        problem1_1 = save_problem(pset1, 1)
+        problem1_2 = save_problem(pset1, 2)
+        problem1_3 = save_problem(pset1, 3)
+
+        problem2_1 = save_problem(pset2, 1)
+        problem2_2 = save_problem(pset2, 2)
+        problem2_3 = save_problem(pset2, 3)
+        problem2_4 = save_problem(pset2, 4)
+        problem2_5 = save_problem(pset2, 5)
+
+        #Create problemactivities
+
+        save_problem_activity(user, course_id, problem1_1, pset1)
+        save_problem_activity(user, course_id, problem1_2, pset1)
+        save_problem_activity(user, course_id, problem2_1, pset2)
+        save_problem_activity(user, course_id, problem2_2, pset2)
+        save_problem_activity(user, course_id, problem2_3, pset2)
+        save_problem_activity(user, course_id, problem2_4, pset2)
+
         #Create assignments
         assnCat = AssignmentCategory(course=course,title='handouts')
         assnCat.save()
         a1 = Assignment(course=course, category=assnCat, title='Handout 1', description='Handout 1')
         a1.save()
-    
+
         #Create the Video Topics
         title = 'Course Introduction'
         topic = save_video_topic (course_id, title)
@@ -206,10 +260,10 @@ def create_nlp_course():
         start_time = time()
         duration = 866
         save_video (course_id, topic_id, title, description, url, start_time, duration)
-        
+
         title = 'Edit Distance'
         topic = save_video_topic (course_id, title)
-        
+
         topic_id = topic
         title = "Defining Minimum Edit Distance"
         description = "Video explaining minimum edit distance"
@@ -261,35 +315,21 @@ def create_nlp_course():
         course_id = course_id
         access_id = '123'
         write_access = '1,2'
-        
-        
+
+
         title = 'Syllabus'
         description = 'description of Syllabus'
         save_additional_page(course_id, access_id, write_access, title, description)
-        
+
         title = 'Other Static Page 1'
         description = 'description of other static page 1'
         save_additional_page(course_id, access_id, write_access, title, description)
-        
+
         title = 'Other Static Page 2'
         description = 'description of other static page 2'
-        save_additional_page(course_id, access_id, write_access, title, description)        
-        
-        
-        #Create some Student Users
-        for q in range(0,10):
+        save_additional_page(course_id, access_id, write_access, title, description)
 
-            user = User.objects.create_user('nlp_student_' + str(q))
-            user.set_password('class2go')
-            user.save()
-            course.student_group.user_set.add(user)
 
-        #Create an Instructor User
-
-        instructor = User.objects.create_user('Professor 1')
-        instructor.set_password('class2go')
-        instructor.save()
-        course.instructor_group.user_set.add(instructor)
 
         #Create some Announcements
 
@@ -310,66 +350,66 @@ def create_nlp_course():
         save_announcement(instructor, course_id, access_id, title, description)
 
         #Create some Assignments
-        
+
         title = 'Problem sets'
         assignment_category1 = save_assignment_category(course_id, title)
-        
+
         title = 'Quizzes'
         assignment_category2 = save_assignment_category(course_id, title)
-        
+
         title = 'Programming Assignments'
         assignment_category3 = save_assignment_category(course_id, title)
-        
+
         title = 'Problem set 01'
         description = 'Tokenization and Lemmatization'
         save_assignment(course_id, assignment_category1.id, access_id, title, description)
-        
+
         title = 'Problem set 02'
         description = 'Hidden Markov Models'
         save_assignment(course_id, assignment_category1.id, access_id, title, description)
-        
+
         title = 'Problem set 03'
         description = 'Part of Speech Tagging'
         save_assignment(course_id, assignment_category1.id, access_id, title, description)
-        
+
         title = 'Problem set 04'
         description = 'Semantic Parsing'
         save_assignment(course_id, assignment_category1.id, access_id, title, description)
-        
+
         title = 'Quiz 01'
         description = 'Tokenization and Lemmatization'
         save_assignment(course_id, assignment_category2.id, access_id, title, description)
-        
+
         title = 'Quiz 02'
         description = 'Hidden Markov Models'
         save_assignment(course_id, assignment_category2.id, access_id, title, description)
-        
+
         title = 'Quiz 03'
         description = 'Part of Speech Tagging'
         save_assignment(course_id, assignment_category2.id, access_id, title, description)
-        
+
         title = 'Quiz 04'
         description = 'Semantic Parsing'
         save_assignment(course_id, assignment_category2.id, access_id, title, description)
-        
+
         title = 'Programming Assignment 01'
         description = 'Tokenization and Lemmatization'
         save_assignment(course_id, assignment_category3.id, access_id, title, description)
-        
+
         title = 'Programming Assignment 02'
         description = 'Hidden Markov Models'
         save_assignment(course_id, assignment_category3.id, access_id, title, description)
-        
+
         title = 'Programming Assignment 03'
         description = 'Part of Speech Tagging'
         save_assignment(course_id, assignment_category3.id, access_id, title, description)
-        
+
         title = 'Programming Assignment 04'
         description = 'Semantic Parsing'
         save_assignment(course_id, assignment_category3.id, access_id, title, description)
 
         #Create some News Events
-        
+
         event = "Assignment Added: Assignment 1 NLP"
         save_news_event(course_id, event)
 
@@ -390,33 +430,33 @@ def save_video_topic(course_id, title):
 
         video_topic = VideoTopic(course_id = course_id,
                                   title = title)
-        
+
         video_topic.save()
 
         return video_topic.id
 
 def save_video(course_id, topic_id, title, description, url, start_time, duration):
-        
+
         video = Video(course_id = course_id,
         topic_id = topic_id,
         title = title,
         description = description,
         url = url,
         start_time = start_time,
-        duration = duration)        
-        
+        duration = duration)
+
         video.save()
-        
+
 def save_additional_page(course_id, access_id, write_access, title, description):
-    
+
         additional_page = AdditionalPage(course_id = course_id,
                                          access_id = access_id,
                                          write_access = write_access,
                                          title = title,
                                          description = description)
-        
+
         additional_page.save()
-        
+
 def save_announcement(owner, course_id, access_id, title, description):
 
         announcement = Announcement(owner = owner,
@@ -436,18 +476,44 @@ def save_assignment(course_id, category_id, access_id, title, description):
                                 description = description)
 
         assignment.save()
-        
+
 def save_assignment_category(course_id, title):
 
         assignment_category = AssignmentCategory(course_id = course_id, title = title)
 
         assignment_category.save()
-        
+
         return assignment_category
-       
+
 def save_news_event(course_id, event):
 
         news_event = NewsEvent(course_id = course_id,
                                event = event)
 
         news_event.save()
+
+def save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline, description):
+    problem_set = ProblemSet(course_id = course_id,
+                                title = title,
+                                name = name,
+                                path = path,
+                                soft_deadline = soft_deadline,
+                                hard_deadline = hard_deadline,
+                                description = description)
+
+    problem_set.save()
+    return problem_set
+
+def save_problem(problem_set, problem_number):
+    problem = Problem(problem_set = problem_set,
+                    problem_number = problem_number)
+
+    problem.save()
+
+def save_problem_activity(student, course_id, problem, problem_set):
+    problem_activity = ProblemActivity(student = student,
+                                        course_id = course_id,
+                                        problem = problem,
+                                        problem_set = problem_set)
+
+    problem_activity.save()
