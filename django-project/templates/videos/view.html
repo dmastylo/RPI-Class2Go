@@ -19,9 +19,38 @@
 {% endblock %}
 
 {% block m_column_content %}
+
 <div id="c2g_layout_m_column" class="span6">
-  <h2>Show video {{video.id}} for course {{course_prefix}} {{course_suffix}}</h2>
+  <h2>Show video {{video}} for course {{course_prefix}} {{course_suffix}}</h2>
   <br />
-  <iframe width="480" height="360" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+  <!-- iframe id="myplayer" type="text/html" width="480" height="360" src="https://www.youtube.com/embed/{{video.url}}?rel=0&start={{video.start_seconds}}&enablejsapi=1" frameborder="0" allowfullscreen></iframe -->
+
+  <div id="player"></div>
 </div>
+
+3<script type="text/javascript">
+  // This code loads the IFrame Player API code asynchronously.
+  var tag = document.createElement('script');
+  tag.src = "//www.youtube.com/player_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  // This function creates a YouTube player after the API code downloads.
+  var player;
+  function onYouTubePlayerAPIReady() {
+    player = new YT.Player('player', {
+      height: '360',
+      width: '480',
+      videoId: '{{video.url}}',
+      //videoId: 'dUU5MzI70zQ',
+      playerVars: { 'rel': 0, 'start': {{video.start_seconds}} },
+    });
+  }
+
+  window.onbeforeunload = function() {
+    vidTime = Math.floor(player.getCurrentTime());
+    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {video_id: {{video.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+  }
+</script>
+
 {% endblock m_column_content %}

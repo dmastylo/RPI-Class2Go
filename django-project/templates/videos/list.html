@@ -27,13 +27,15 @@
   {% for topic in topics %}
   <h2>{{topic.title}}</h2>
     <ul>
-      {% for video in topic.video_set.all %}
-      <li>
-	<a href="videos/{{video.id}}">{{video.title}}</a>
-	<div class="progress-bar">
-	  <div class="fill red" style="width:{{video.percent_done}}%"></div>
-	</div>
-      </li>
+      {% for video in videos %}
+        {% if video.topic_id == topic.id %}
+          <li>
+	    <a href="videos/{{video.id}}">{{video.title}}</a>
+	    <div class="progress-bar">
+	      <div class="fill red" style="width:{{video.percent_done}}%"></div>
+	    </div>
+	  </li>
+	{% endif %}
       {% endfor %}
     </ul>
   {% endfor %}

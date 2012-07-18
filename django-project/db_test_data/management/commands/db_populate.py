@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from c2g.models import *
 from django.contrib.auth.models import User,Group
-from datetime import time
 
 class Command(BaseCommand):
     help = "Populates the db with test development data. \n This command is <not> available on production for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
@@ -176,9 +175,7 @@ def create_nlp_course():
         title = "Course Introduction"
         description = "Intro video by Professor Dan Jurafsky and Chris Manning"
         url = "BJiVRIPVNxU"
-        start_time = time()
-        duration = 772
-        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url)
 
         title = 'Basic Text Processing'
         topic = save_video_topic (course_id, title)
@@ -187,25 +184,19 @@ def create_nlp_course():
         title = "Regular Expressions"
         description = "Intro to regular expressions"
         url = "dBVlwb15SBM"
-        start_time = time()
-        duration = 686
-        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url)
 
         topic_id = topic
         title = "Regular Expressions in Practical NLP"
         description = "Video on regexp in practical NLP"
         url = "zJSqHRuD2C4"
-        start_time = time()
-        duration = 365
-        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url)
 
         topic_id = topic
         title = "Word Tokenization"
         description = "Video on word tokenization"
         url = "WMC3AjgYf3A"
-        start_time = time()
-        duration = 866
-        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url)
         
         title = 'Edit Distance'
         topic = save_video_topic (course_id, title)
@@ -214,17 +205,13 @@ def create_nlp_course():
         title = "Defining Minimum Edit Distance"
         description = "Video explaining minimum edit distance"
         url = "xOfEYI61f3k"
-        start_time = time()
-        duration = 425
-        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url)
 
         topic_id = topic
         title = "Computing Minimum Edit Distance"
         description = "Video on computing minimum edit distance"
         url = "Gh63CeMzav8"
-        start_time = time()
-        duration = 355
-        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url)
 
         title = 'Language Modeling'
         topic = save_video_topic (course_id, title)
@@ -233,9 +220,7 @@ def create_nlp_course():
         title = "Introduction to N-grams"
         description = "Video introducting N-grams"
         url = "LRq7om7vMEc"
-        start_time = time()
-        duration = 522
-        save_video (course_id, topic_id, title, description, url, start_time, duration)
+        save_video (course_id, topic_id, title, description, url)
 
         title = 'Spelling Correction'
         topic = save_video_topic (course_id, title)

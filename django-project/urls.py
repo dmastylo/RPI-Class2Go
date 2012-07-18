@@ -20,6 +20,11 @@ urlpatterns = patterns('',
     url(r'^courses$', 'c2g.views.home', name='c2g_home'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
+     #for data collection
+     url(r'^videos/save/', 'courses.videos.views.save'),
+
+
+
     # accounts app for user management
 	url(r'^accounts/profile/', 'accounts.views.profile', name='accounts_profile'),
 	url(r'^accounts/', include('registration.backends.simple.urls')),
@@ -30,6 +35,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 	
+
 	
 	# The following line is temprarily commented out until we figure out how django cascades its URL matching operations.
 	# After this is figured out, the rest of the matches below shall be moved to courses.url.
@@ -61,6 +67,7 @@ urlpatterns = patterns('',
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/admin/?', 'courses.videos.views.admin'),
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.videos.views.view'),
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_id>[a-zA-Z0-9_]+)/edit/?', 'courses.videos.views.edit'),
+
                        
 	# Video Exercises
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.video_exercises.views.view'),

@@ -16,7 +16,6 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save, pre_save, post_init
 
-from datetime import time
 import gdata.youtube
 import gdata.youtube.service
 
@@ -323,20 +322,19 @@ class Video(TimestampMixin, models.Model):
     #segments = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
-    start_time = models.TimeField(default=time())
+    start_seconds = models.IntegerField(default=0, blank=True)
     duration = models.IntegerField(blank=True)
 
     def save(self, *args, **kwargs):
-        if self.type == "youtube":
-            if not self.duration:
+        if not self.duration:
+            if self.type == "youtube":
                 yt_service = gdata.youtube.service.YouTubeService()
                 entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
                 self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
-
+        
     def percent_done(self):
-        start_seconds = self.start_time.hour*3600 + self.start_time.minute*60 + self.start_time.second
-        return float(start_seconds*100)/self.duration
+        return float(self.start_seconds*100)/self.duration
 
     def __unicode__(self):
         return self.title
