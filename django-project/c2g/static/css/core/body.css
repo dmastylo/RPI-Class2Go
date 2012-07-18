@@ -97,6 +97,11 @@ a.thumbnail:hover {
   margin-top:0;
 }
 
+.navbar-fixed-top .navbar-inner {
+  height:34px;
+  min-height:34px;
+}
+
 /* Common
 -------------------------------------------------- */
 .section-title {
@@ -212,10 +217,10 @@ small.date {
 .navbar .nav .active > a, .navbar .nav .active > a:hover {
   color:#820000;
   background:#eadeb9;
-  background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -10px;
+  background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
 }
 .navbar .nav > li > a {
-  padding: 11px 10px 9px;
+  padding: 7px 10px 8px;
   border-right:1px solid #999;
 }
 

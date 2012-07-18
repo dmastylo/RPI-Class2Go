@@ -221,7 +221,7 @@
 
 @media (min-width: 768px) and (max-width: 979px) {
   .logo {
-    width: 297px;
+    width: 308px;
     height:21px;
     text-indent:-999px;
     display:block;
@@ -839,7 +839,7 @@
 
 @media (min-width: 980px) {
   .logo {
-    width: 297px;
+    width: 308px;
     height:21px;
     text-indent:-999px;
     display:block;
