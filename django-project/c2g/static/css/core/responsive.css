@@ -221,13 +221,13 @@
 
 @media (min-width: 768px) and (max-width: 979px) {
   .logo {
-    width: 391px;
-    height:27px;
+    width: 308px;
+    height:21px;
     text-indent:-999px;
     display:block;
-    background: url(/static/graphics/core/c2g-logo.png) no-repeat;
+    background: url(/static/graphics/core/c2g-logo-2.png) no-repeat;
     position: absolute; 
-    top: 25px; 
+    top: 17px; 
     left: 25px;
   }
   .row {
@@ -839,13 +839,13 @@
 
 @media (min-width: 980px) {
   .logo {
-    width: 391px;
-    height:27px;
+    width: 308px;
+    height:21px;
     text-indent:-999px;
     display:block;
-    background: url(/static/graphics/core/c2g-logo.png) no-repeat;
+    background: url(/static/graphics/core/c2g-logo-2.png) no-repeat;
     position: absolute; 
-    top: 25px; 
+    top: 17px; 
     left: 25px;
   }
   .nav-collapse.collapse {

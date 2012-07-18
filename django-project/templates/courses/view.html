@@ -2,6 +2,7 @@
 {% load url from future %}
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
+
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
 	<div class="well tight">
@@ -12,25 +13,25 @@
 			{% endfor %}
 			<li class="nav-header">Problem Sets</li>
 			{% for pset in course.problemset_set.all %}
-			  <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset %}">{{pset.title}}</a></li>
+			  <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset.title %}">{{pset.name}}</a></li>
 			{% endfor %}
 			<li class="divider"></li>
 			<li><a href="#"><i class="icon-flag"></i>Help</a></li>
-			<li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
-		</ul>
-	</div>
+            <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
+        </ul>
+    </div>
 </div>
 {% endblock l_column_content %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-	<h2>{{course.title}}</h2>
-	<h3>Recent Announcements</h3>
-	
+	<h3 class="section-title">Recent Announcements</h3>
 	{% for announcement in announcement_list %}
-		  <h4> {{announcement.title}} </h4>
-		  <p> {{announcement.description}} </p>
-		  <p align="right"> {{announcement.last_updated}} by {{announcement.owner}} </p>
+    <div class="announcement">
+		  <small class="date"> {{announcement.last_updated}} by {{announcement.owner}}</small>
+      <h4>{{announcement.title}}</h4>
+		  <p>{{announcement.description}}</p>
+    </div>
 	{% endfor %}
 	
   <h3>Course Description</h3>
@@ -41,11 +42,12 @@
 
 {%block r_column_content %}
 <div id="c2g_layout_r_column" class="span3">
-    <h3>Recent Events</h3>
+    <h3 class="section-title">Recent Events</h3>
     
     {% for event in news_list %}
-        <p><b>{{event.event}}</b></br>
-            <align="right"><font size=".3">{{event.time_created}}</font></align>
+        <p>
+          <small class="date">{{event.time_created}}</small>
+          <b>{{event.event}}</b>
         </p>
     {% endfor %}
     

@@ -14,8 +14,10 @@
     #top-header, #footer {display:none;}
     #outer-wrapper, #page-container {background:#fff;}
 
+    #qInst {display: none;}
     .video-overlay-question {position: absolute; top: 1em; background:rgba(180,180,180,.7); padding: 1em; display: none;}
-    .video-overlay-hint {position: absolute; top: 5em; left: 0; background:rgba(180,180,180,.7); display: none;}
+    .video-overlay-hint {position: relative; top: -5em; left: 0; background:rgba(180,180,180,.7); display: none;}
+    #hintsarea {position: relative; bottom: 7em; left: 0; /* background:rgba(180,180,180,.7); */}
     #answer_area {display: none;}
     #outer-wrapper #page-container {margin: 0;}
     #container .topic-exercise-badge, #container .exercises-stack {width:0;}
@@ -23,7 +25,8 @@
     </style>
 </head>
 <body style="margin:0;padding:0;">
-<div class="exercise" style="position:absolute;left:0;">
+<!--<div class="exercise" style="position:absolute;left:0;">-->
+<div class="exercise">
         <style>
             td {
                 border: 1px solid black;
@@ -33,7 +36,7 @@
         <div class="problems">
                 
             <div data-weight="1">
-                <div class="question">
+                <div class="question video-overlay-question">
                     
                     What is the value in the marked cell of
                     the following Levenshtein distance (substitutions cost 2) table
@@ -103,10 +106,16 @@
                 
                 <div class="solution">2</div>
 
+                <div class="hints">
+                    <p>The only overlapping letter is 'N.</p> 
+                    <p>If we align ANTS and GNU so that the 'N's match up, we must substitute the 'A' for a 'G' and the 'T' for a 'U'.</p> 
+                    <p>Each of these operations has a cost of 2. Finally we need to delete the 'S' costing us 1.</p>
+                </div>
+
             </div> <!-- data-weight-->
             
             <div data-weight="1">
-                <div class="question">
+                <div class="question video-overlay-question">
          
                     What is the value in the marked cell of
                     the following Levenshtein distance (substitutions cost 2) table
@@ -188,6 +197,12 @@
                 </div> <!-- question-->
     
             <div class="solution">2</div>
+
+            <div class="hints">
+                <p>The only overlapping letter is 'N.</p> 
+                <p>If we align ANTS and GNU so that the 'N's match up, we must substitute the 'A' for a 'G' and the 'T' for a 'U'.</p> 
+                <p>Each of these operations has a cost of 2. Finally we need to delete the 'S' costing us 1.</p>
+            </div>
             
         </div> <!-- data weight-->
             
@@ -225,8 +240,8 @@
 <script>
 var initStacks = function () {
     $('#container').css('padding-top',0);
-    $('.question').addClass('video-overlay-question');
-    $('#hintsarea').addClass('video-overlay-hint');
+    //$('.question').addClass('video-overlay-question');
+    //$('#hintsarea').addClass('video-overlay-hint');
     $('#examples-show').hide();
 
     var skipBtn = document.createElement('input');
@@ -243,6 +258,7 @@ var initStacks = function () {
 
         $('#questionBG').remove();
         $('#questionPane').remove();
+        $('#hintsarea').hide();
 
         $('#playerdiv').fadeTo('slow', 1.0);
         $('.video-overlay-question').hide();

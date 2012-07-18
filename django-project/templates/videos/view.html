@@ -19,16 +19,17 @@
 {% endblock %}
 
 {% block m_column_content %}
-
-<div id="c2g_layout_m_column" class="span6">
-  <h2>Show video {{video}} for course {{course_prefix}} {{course_suffix}}</h2>
-  <br />
-  <!-- iframe id="myplayer" type="text/html" width="480" height="360" src="https://www.youtube.com/embed/{{video.url}}?rel=0&start={{video.start_seconds}}&enablejsapi=1" frameborder="0" allowfullscreen></iframe -->
-
-  <div id="player"></div>
+<div id="c2g_layout_m_column" class="span9">
+    {% if video.title == 'Defining Minimum Edit Distance' %}
+        <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
+    {% else %}
+        <h2>{{video.title}}</h2>
+        <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
+	<div id="player"></div>
+    {% endif %}
 </div>
 
-3<script type="text/javascript">
+<script type="text/javascript">
   // This code loads the IFrame Player API code asynchronously.
   var tag = document.createElement('script');
   tag.src = "//www.youtube.com/player_api";
@@ -39,10 +40,9 @@
   var player;
   function onYouTubePlayerAPIReady() {
     player = new YT.Player('player', {
-      height: '360',
-      width: '480',
+      height: '430',
+      width: '710',
       videoId: '{{video.url}}',
-      //videoId: 'dUU5MzI70zQ',
       playerVars: { 'rel': 0, 'start': {{video.start_seconds}} },
     });
   }
