@@ -13,7 +13,7 @@
 			{% endfor %}
 			<li class="nav-header">Problem Sets</li>
 			{% for pset in course.problemset_set.all %}
-			  <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset.title %}">{{pset.title}}</a></li>
+			  <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset.title %}">{{pset.name}}</a></li>
 			{% endfor %}
 			<li class="divider"></li>
 			<li><a href="#"><i class="icon-flag"></i>Help</a></li>
