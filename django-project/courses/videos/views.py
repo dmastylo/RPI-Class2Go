@@ -20,3 +20,11 @@ def view(request, course_prefix, course_suffix, video_id):
 	
 def edit(request, course_prefix, course_suffix, video_id):
 	return render_to_response('videos/edit.html', {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'video_id': video_id, 'request': request}, context_instance=RequestContext(request))
+
+def save(request):
+	video_id = request.POST['video_id']
+	playTime = request.POST['playTime']
+	video = Video.objects.get(id=video_id)
+	video.start_seconds = playTime
+	video.save()
+	return HttpResponse("saved")
