@@ -10,7 +10,6 @@ import urllib
 # won't be needed once we remove the dash from the directory name (soon)
 secrets_file = __import__('django-project.database', globals(), locals(), ['PIAZZA_CONSUMER_KEY', 'PIAZZA_OAUTH_SECRET'], -1)
 
-
 def admin(request, course_prefix, course_suffix):
 	return render_to_response('forums/admin.html', 
             {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'request': request}, 
@@ -18,6 +17,12 @@ def admin(request, course_prefix, course_suffix):
 
 
 def view(request, course_prefix, course_suffix):
+	return render_to_response('forums/outer.html', 
+            {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'request': request}, 
+            context_instance=RequestContext(request))
+
+
+def piazza_iframe(request, course_prefix, course_suffix):
     # settings for OAuth
     url_full='https://piazza.com/basic_lti'
     url_parsed = urlparse(url_full)
