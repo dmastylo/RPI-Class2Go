@@ -19,9 +19,12 @@
 {% endblock %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
-  <h2>Show video {{video.id}} for course {{course_prefix}} {{course_suffix}}</h2>
-  <br />
-  <iframe width="480" height="360" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+<div id="c2g_layout_m_column" class="span9">
+    {% if video.title == 'Defining Minimum Edit Distance' %}
+        <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
+    {% else %}
+        <h2>{{video.title}}</h2>
+        <iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+    {% endif %}
 </div>
 {% endblock m_column_content %}
