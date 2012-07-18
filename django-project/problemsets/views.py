@@ -20,7 +20,10 @@ def list(request, course_prefix, course_suffix):
     for pset in psets:
         numQuestions= len(pset.problem_set.all())
         numCompleted = len(course.problemactivity_set.filter(student=request.user).filter(problem_set=pset))
-        progress = 100.0*numCompleted/numQuestions
+        if numQuestions == 0:
+            progress = 0
+        else:
+            progress = 100.0*numCompleted/numQuestions
         dictionary = {"pset": pset, "numQuestions": numQuestions, "numCompleted": numCompleted, "progress": progress}
         package.append(dictionary)
 
