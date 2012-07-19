@@ -21,7 +21,6 @@ class SimpleTest(TestCase):
     # Test Cases
 
     def test_course_title_homepage(self):
-        # import pdb;pdb.set_trace()
         try:
             course = Course.objects.get(handle=self.course_prefix+"-"+self.course_suffix)
         except:
