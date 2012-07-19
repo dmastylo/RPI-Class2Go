@@ -18,9 +18,8 @@ class SimpleTest(TestCase):
     def tearDown(self):
         pass
 
-    # Test Cases
-
-    def test_course_title_homepage(self):
+    def render_and_check_template(self, templ):
+        "Render a template and see if the course title is in a header element."
         try:
             course = Course.objects.get(handle=self.course_prefix+"-"+self.course_suffix)
         except:
@@ -28,6 +27,14 @@ class SimpleTest(TestCase):
         template_vars= {'course_prefix': self.course_prefix, 
                 'course_suffix': self.course_suffix, 
                 'course': course}
-        page = render_to_string('courses/view.html', template_vars)
-        self.assertRegexpMatches(page, self.course_title_search_string, msg="Couldn't find course header (%s)" % self.course_title_search_string)
+        page = render_to_string(templ, template_vars)
+        self.assertRegexpMatches(page, self.course_title_search_string, msg="Couldn't find course header (%s) in %s" % (self.course_title_search_string, templ))
 
+    # Test Cases
+
+    def test_course_title_homepage(self):
+        "Iterate through all templates and test each one"
+        targets = ['courses/view.html'] 
+        for templ in targets:
+            self.render_and_check_template(templ)
+        
