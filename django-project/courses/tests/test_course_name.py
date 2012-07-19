@@ -27,5 +27,5 @@ class SimpleTest(TestCase):
         response = view(request, self.course_prefix, self.course_suffix)
         self.assertRegexpMatches(response.content, 
                 self.course_title_search_string,
-                msg="Couldn't find name of course in the page")
+                msg="Couldn't course name in page")
 
