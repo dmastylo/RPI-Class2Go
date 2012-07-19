@@ -40,14 +40,9 @@ urlpatterns = patterns('',
 
 	url(r'^courses/new/?', 'courses.admin_views.new'),
 
-	url(r'^courses/all/?', 'courses.views.all'),
-	url(r'^courses/current/?', 'courses.views.current'),
-	url(r'^courses/mine/?', 'courses.views.mine'),
-
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/?$', 'courses.views.view'),
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/info/?$', 'courses.views.info'),
+	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/?$', 'courses.views.main'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/overview/?$', 'courses.views.overview'),
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/syllabus/?$', 'courses.views.syllabus'),
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/prereqs/?$', 'courses.views.prereqs'),
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/admin/?', 'courses.admin_views.admin'),
 
 	# Announcements
