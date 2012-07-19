@@ -8,14 +8,13 @@
 		<div class="container-fluid">
 			<ul class="nav">
 				<li {% block home_link_class %}{% endblock home_link_class %}>
-					<a href="{% url 'courses.views.view' course_prefix course_suffix %}">Home</a>
+					<a href="{% url 'courses.views.main' course_prefix course_suffix %}">Home</a>
 				</li>
 				<li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
 					<ul class="dropdown-menu">
-						<li><a href="{% url 'courses.views.info' course_prefix course_suffix %}">Course Info</a></li>
+						<li><a href="{% url 'courses.views.overview' course_prefix course_suffix %}">Overview for Non-Members</a></li>
 						<li><a href="{% url 'courses.views.syllabus' course_prefix course_suffix %}">Syllabus</a></li>
-						<li><a href="{% url 'courses.views.prereqs' course_prefix course_suffix %}">Prerequisites</a></li>
 					</ul>
 				</li>
 				<li {% block forums_link_class %}{% endblock forums_link_class %}>
