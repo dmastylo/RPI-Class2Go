@@ -56,9 +56,9 @@ def edit(request, course_prefix, course_suffix, video_id):
             context_instance=RequestContext(request))
 
 def save(request):
-	video_id = request.POST['video_id']
-	playTime = request.POST['playTime']
-	video = VideoActivity.objects.get(student=request.user, video=video_id)
-	video.start_seconds = playTime
-	video.save()
-	return HttpResponse("saved")
+    video_id = request.POST['video_id']
+    playTime = request.POST['playTime']
+    video = VideoActivity.objects.get(student=request.user, video=video_id)
+    video.start_seconds = playTime
+    video.save()
+    return HttpResponse("saved")
