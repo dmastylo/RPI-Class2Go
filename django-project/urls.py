@@ -20,6 +20,11 @@ urlpatterns = patterns('',
     url(r'^courses$', 'c2g.views.home', name='c2g_home'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
+     #for data collection
+     url(r'^videos/save/', 'courses.videos.views.save'),
+
+
+
     # accounts app for user management
     url(r'^accounts/profile/?$', 'accounts.views.profile', name='accounts_profile'),
     url(r'^accounts/profile/edit/?', 'accounts.views.edit'),

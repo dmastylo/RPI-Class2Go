@@ -24,7 +24,33 @@
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
     {% else %}
         <h2>{{video.title}}</h2>
-        <iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+        <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
+	<div id="player"></div>
     {% endif %}
 </div>
+
+<script type="text/javascript">
+  // This code loads the IFrame Player API code asynchronously.
+  var tag = document.createElement('script');
+  tag.src = "//www.youtube.com/player_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  // This function creates a YouTube player after the API code downloads.
+  var player;
+  function onYouTubePlayerAPIReady() {
+    player = new YT.Player('player', {
+      height: '430',
+      width: '710',
+      videoId: '{{video.url}}',
+      playerVars: { 'rel': 0, 'start': {{video.start_seconds}} },
+    });
+  }
+
+  window.onbeforeunload = function() {
+    vidTime = Math.floor(player.getCurrentTime());
+    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {video_id: {{video.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+  }
+</script>
+
 {% endblock m_column_content %}
