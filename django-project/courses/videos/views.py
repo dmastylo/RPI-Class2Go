@@ -14,8 +14,8 @@ def list(request, course_prefix, course_suffix):
 	   }
 
     if request.user.is_authenticated():
-      data['topics'] = course.videotopic_set.all()
-      data['videoRecs'] = request.user.videoactivity_set.filter(course=course)
+        data['topics'] = course.videotopic_set.all()
+        data['videoRecs'] = request.user.videoactivity_set.filter(course=course)
 
     return render_to_response('videos/list.html', 
 			      data, 
@@ -33,16 +33,19 @@ def admin(request, course_prefix, course_suffix):
     
 def view(request, course_prefix, course_suffix, video_id):
     course = Course.objects.get(handle=course_prefix+"-"+course_suffix)
-    video = Video.objects.get(id=video_id)
-    return render_to_response('videos/view.html', {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'video': video, 'request': request}, context_instance=RequestContext(request))
+    data = {'request': request,
+	    'course_prefix': course_prefix,
+	    'course_suffix': course_suffix,
+	    'course': course,
+	   }
+
+    if request.user.is_authenticated():
+        data['videoRec'] = request.user.videoactivity_set.get(video=video_id)
+    #video = Video.objects.get(id=video_id)
+
     return render_to_response('videos/view.html', 
-            {'request': request,
-             'course_prefix': course_prefix, 
-             'course_suffix': course_suffix, 
-             'course': course, 
-             'video': video, 
-             }, 
-            context_instance=RequestContext(request))
+                              data,
+                              context_instance=RequestContext(request))
     
 def edit(request, course_prefix, course_suffix, video_id):
     course = Course.objects.get(handle=course_prefix+"-"+course_suffix)
@@ -56,9 +59,9 @@ def edit(request, course_prefix, course_suffix, video_id):
             context_instance=RequestContext(request))
 
 def save(request):
-    video_id = request.POST['video_id']
+    videoRec = request.POST['videoRec']
     playTime = request.POST['playTime']
-    video = VideoActivity.objects.get(student=request.user, video=video_id)
+    video = VideoActivity.objects.get(id=videoRec)
     video.start_seconds = playTime
     video.save()
     return HttpResponse("saved")
