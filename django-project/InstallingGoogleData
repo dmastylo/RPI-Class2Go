@@ -6,6 +6,7 @@ Mainly taken from https://developers.google.com/gdata/articles/python_client_lib
 
 1. Download the latest version here:
 https://code.google.com/p/gdata-python-client/downloads/list
+(As of now that would be 2.0.17, which is what I got)
 
 2. Unpack it
 

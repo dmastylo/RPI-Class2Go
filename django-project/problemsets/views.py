@@ -3,8 +3,6 @@ from django.shortcuts import render_to_response
 from c2g.models import Course, ProblemSet
 from django.template import RequestContext
 
-from cms import ListProcessor, RestyleForLeftNavBar
-
 # Create your views here.
 def list(request, course_prefix, course_suffix):
     course_handle = course_prefix + "-" + course_suffix
@@ -16,7 +14,7 @@ def list(request, course_prefix, course_suffix):
     f.close()
 	
     m_content = ListProcessor(raw_m_content, course, 'list')
-	l_content = RestyleForLeftNavBar(m_content)
+    l_content = RestyleForLeftNavBar(m_content)
 	
     return render_to_response('problemsets/list.html',
                               {'request': request,

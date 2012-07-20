@@ -4,6 +4,21 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-{% autoescape off %}{{ content }}{% endautoescape %}
+	<div id="loadedSyllabus"></div>
 </div>
 {% endblock m_column_content %}
+
+
+{% block addl_scripts %}
+<script type='text/javascript' src="{{STATIC_URL}}js/courses/process_list.js"></script>
+<script  type='text/javascript'>
+    $("#loadedSyllabus").load("/static/content/testsyllabus.html", function(text,status) {
+	   if(status!="success"){
+		   alert('syllabus loading failed!');
+		} else {
+			processed_text = ProcessList(text);
+			$('#loadedSyllabus').html(processed_text);
+		}
+	});
+</script>
+{% endblock addl_scripts %}

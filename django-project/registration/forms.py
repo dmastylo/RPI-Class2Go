@@ -41,12 +41,12 @@ class RegistrationForm(forms.Form):
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
                                   label=_("First Name"),
-                                  error_messages={'invalid': _("This value may only contain letters and numbers")})
+                                  error_messages={'invalid': _("This value may contain only letters and numbers.")})
     last_name = forms.RegexField(regex=r'^[\w]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
                                   label=_("Last Name"),
-                                  error_messages={'invalid': _("This value may only contain letters and numbers")})
+                                  error_messages={'invalid': _("This value may contain only letters and numbers.")})
     password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password"))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
