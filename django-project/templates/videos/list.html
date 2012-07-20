@@ -31,12 +31,12 @@
         {% for videoRec in videoRecs %}
           {% if videoRec.video.topic_id == topic.id %}
             <li>
-	      <a href="videos/{{videoRec.video.id}}">{{videoRec.video.title}}</a>
-	      <div class="progress-bar">
-	        <div class="fill red" style="width:{{videoRec.percent_done}}%"></div>
-	      </div>
-	    </li>
-	  {% endif %}
+          <a href="videos/{{videoRec.video.id}}">{{videoRec.video.title}}</a>
+          <div class="progress-bar">
+            <div class="fill red" style="width:{{videoRec.percent_done}}%"></div>
+          </div>
+        </li>
+      {% endif %}
         {% endfor %}
       </ul>
     {% endfor %}

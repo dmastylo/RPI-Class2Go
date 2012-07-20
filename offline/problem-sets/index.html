@@ -160,7 +160,7 @@
                 if (preamble) {
                     $('#' + questionId).append(preamble);
                 }
-	        //console.log(myQ["data"]["text"]);
+            //console.log(myQ["data"]["text"]);
                 $('#' + questionId).append(myQ["data"]["text"]);
                 $('#' + questionId).append('<div id="'+ questionId + '_X" class="question-expl"></div>');
                 $('#' + questionId + '_X').append(myQ["data"]["explanation"]);
@@ -291,13 +291,13 @@
                 for (q = 0; q < questionsArr.length; q += 1) {
                     renderQuestion(questionsArr[q]["question"], 'Q_' + (q + 1), questionsArr[q]["preamble"]);
                 } 
-		MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
             };
 
             $(document).ready(function() {
 
                 var psJsonPath = '';
-		var psJSPath='';
+        var psJSPath='';
                 if (location.search.split("ps=")[1]) { 
                     psJsonPath = 'json/' + location.search.split("ps=")[1] + '/question.json';
                     psJSPath = 'json/' + location.search.split("ps=")[1] + '/question.js';
@@ -305,34 +305,34 @@
                     psJsonPath = 'json/Text-Processing-And-Edit-Distance/question.json'; 
                     psJsonPath = 'json/Text-Processing-And-Edit-Distance/question.js'; 
                 }
-	        /*
+            /*
                 $.get(psJsonPath, 
                         function (data, message, jqXHR) {
                             renderQuiz(data);
                             //console.log(ansKey);
                         }, 'json');
-		*/
-		/*
-		$.ajax({
+        */
+        /*
+        $.ajax({
                   url: psJsonPath,
-		  dataType: 'json',
+          dataType: 'json',
                   success: function(data, message, jqXHR) {
-			  renderQuiz(data);
+              renderQuiz(data);
                           //console.log(ansKey); 
                       }
                   });
-		*/
+        */
 
-			
-		//Because XHR does not work for file-urls, we do a hard-coded version of JSON-P
-		//The .json file is converted to .js and the callback to renderQuiz is added by the 
-		//conversion script prep_offline_psets_dir.php
-		var script = document.createElement('script');
-		script.type='text/javascript';
-		script.src=psJSPath;
-		document.head.appendChild(script);
-			
-		
+            
+        //Because XHR does not work for file-urls, we do a hard-coded version of JSON-P
+        //The .json file is converted to .js and the callback to renderQuiz is added by the 
+        //conversion script prep_offline_psets_dir.php
+        var script = document.createElement('script');
+        script.type='text/javascript';
+        script.src=psJSPath;
+        document.head.appendChild(script);
+            
+        
 
                 $("#qsubmit").button();
                 $("#qsubmit").click(checkAnswers);

@@ -262,7 +262,7 @@ var sections = [
                     }
                 ]
                 },
-		/*
+        /*
                 {
                 heading: "Instructor Chat",
                 members: [
@@ -271,7 +271,7 @@ var sections = [
                     contentUrl: "videos/Instructor-Chat-I/Instructor-Chat/index.html"}
                 ]
                 },
-		*/
+        */
                 {
                 heading: "Probabilistic Parsing",
                 members: [
@@ -517,7 +517,7 @@ var sections = [
                     }
                 ]
                 },
-		/*
+        /*
                 {
                 heading: "Instructor Chat II",
                 members: [
@@ -528,5 +528,5 @@ var sections = [
                     }
                 ]
                 }
-		*/
+        */
             ];
