@@ -287,6 +287,19 @@ small.date {
     text-align:center;
 }
 
+/* Profile Info
+-------------------------------------------------- */
+.profile-info {
+    margin-bottom:2em;
+}
+.profile-info li {
+    margin-bottom:5px;
+}
+.profile-info strong {
+    width:90px;
+    display:inline-block;
+}
+
 /* Video - added by Kevin
 -------------------------------------------------- */
 .progress-bar {
