@@ -173,6 +173,9 @@ small.date {
     background: linear-gradient(to bottom,  #8f2719 0%,#731d11 96%,#961012 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8f2719', endColorstr='#961012',GradientType=0 ); /* IE6-8 */
 }
+#c2g_layout_topbar .top-nav a {
+  color:#fff;
+}
 
 .top-nav {
     position:absolute;

@@ -25,7 +25,7 @@
                         {% csrf_token %}
                     </form>
                 </li>
-                <li><span>Welcome <b>{{ user.username }}</b>!</span></li>
+                <li><span>Welcome <b><a href="/accounts/profile">{{ user.username }}</a></b>!</span></li>
             {% else %}
                 <li><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
                 <li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
