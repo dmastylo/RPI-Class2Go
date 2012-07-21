@@ -1,6 +1,9 @@
 /* Bootstrap overrides
 -------------------------------------------------- */
 
+h3 {margin-bottom:.5em;}
+h4 {margin-bottom:.5em;}
+
 a {color:#820000;}
 a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
@@ -121,6 +124,9 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
 }
 .navbar .nav li.dropdown.open ul.dropdown-menu a {
   color: #333;
+}
+.progress {
+    margin-bottom:8px;
 }
 
 /* Common
