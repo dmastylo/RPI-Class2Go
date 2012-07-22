@@ -1,5 +1,10 @@
 # source this from your login shell
 
+function salem {
+    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
+    ssh -A ubuntu@salem.stage.c2gops.com
+}
+
 function staging {
     ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
     ssh -A bitnami@app2.stage.c2gops.com
