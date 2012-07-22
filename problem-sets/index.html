@@ -171,7 +171,7 @@
                 if (preamble) {
                     $('#' + questionId).append(preamble);
                 }
-	        //console.log(myQ["data"]["text"]);
+            //console.log(myQ["data"]["text"]);
                 $('#' + questionId).append(myQ["data"]["text"]);
                 $('#' + questionId).append('<div id="'+ questionId + '_X" class="question-expl"></div>');
                 $('#' + questionId + '_X').append(myQ["data"]["explanation"]);
@@ -315,22 +315,22 @@
                 } else {
                     psJsonPath = 'json/Text-Processing-And-Edit-Distance/question.json'; 
                 }
-	        /*
+            /*
                 $.get(psJsonPath, 
                         function (data, message, jqXHR) {
                             renderQuiz(data);
                             //console.log(ansKey);
                         }, 'json');
-		*/
-		$.ajax({
+        */
+        $.ajax({
                   url: psJsonPath,
-		  dataType: 'json',
+          dataType: 'json',
                   success: function(data, message, jqXHR) {
-			  renderQuiz(data);
+              renderQuiz(data);
                           //console.log(ansKey); 
                       }
                   });
-		
+        
 
                 $("#qsubmit").button();
                 $("#qsubmit").click(checkAnswers);

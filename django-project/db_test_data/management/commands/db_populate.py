@@ -216,6 +216,9 @@ def create_nlp_course():
         a1 = Assignment(course=course, category=assnCat, title='Handout 1', description='Handout 1')
         a1.save()
 
+        #Get set of student users for populating video activities
+        students = User.objects.filter(username__startswith="nlp_student_")
+
         #Create the Video Topics
         title = 'Course Introduction'
         topic = save_video_topic (course_id, title)
@@ -224,7 +227,10 @@ def create_nlp_course():
         title = "Course Introduction"
         description = "Intro video by Professor Dan Jurafsky and Chris Manning"
         url = "BJiVRIPVNxU"
-        save_video (course_id, topic_id, title, description, url)
+        video = save_video (course_id, topic_id, title, description, url)
+
+        for student in students:
+            save_video_activity(student, course_id, video)
 
         title = 'Basic Text Processing'
         topic = save_video_topic (course_id, title)
@@ -233,19 +239,28 @@ def create_nlp_course():
         title = "Regular Expressions"
         description = "Intro to regular expressions"
         url = "dBVlwb15SBM"
-        save_video (course_id, topic_id, title, description, url)
+        video = save_video (course_id, topic_id, title, description, url)
+
+        for student in students:
+            save_video_activity(student, course_id, video)
 
         topic_id = topic
         title = "Regular Expressions in Practical NLP"
         description = "Video on regexp in practical NLP"
         url = "zJSqHRuD2C4"
-        save_video (course_id, topic_id, title, description, url)
+        video = save_video (course_id, topic_id, title, description, url)
+
+        for student in students:
+            save_video_activity(student, course_id, video)
 
         topic_id = topic
         title = "Word Tokenization"
         description = "Video on word tokenization"
         url = "WMC3AjgYf3A"
-        save_video (course_id, topic_id, title, description, url)
+        video = save_video (course_id, topic_id, title, description, url)
+
+        for student in students:
+            save_video_activity(student, course_id, video)
 
         title = 'Edit Distance'
         topic = save_video_topic (course_id, title)
@@ -254,13 +269,19 @@ def create_nlp_course():
         title = "Defining Minimum Edit Distance"
         description = "Video explaining minimum edit distance"
         url = "xOfEYI61f3k"
-        save_video (course_id, topic_id, title, description, url)
+        video = save_video (course_id, topic_id, title, description, url)
+
+        for student in students:
+            save_video_activity(student, course_id, video)
 
         topic_id = topic
         title = "Computing Minimum Edit Distance"
         description = "Video on computing minimum edit distance"
         url = "Gh63CeMzav8"
-        save_video (course_id, topic_id, title, description, url)
+        video = save_video (course_id, topic_id, title, description, url)
+
+        for student in students:
+            save_video_activity(student, course_id, video)
 
         title = 'Language Modeling'
         topic = save_video_topic (course_id, title)
@@ -269,7 +290,10 @@ def create_nlp_course():
         title = "Introduction to N-grams"
         description = "Video introducting N-grams"
         url = "LRq7om7vMEc"
-        save_video (course_id, topic_id, title, description, url)
+        video = save_video (course_id, topic_id, title, description, url)
+
+        for student in students:
+            save_video_activity(student, course_id, video)
 
         title = 'Spelling Correction'
         topic = save_video_topic (course_id, title)
@@ -425,6 +449,13 @@ def save_video(course_id, topic_id, title, description, url):
         )
 
         video.save()
+        return video.id
+
+def save_video_activity(student, course_id, video_id):
+        video_activity = VideoActivity(student = student,
+                                       course_id = course_id,
+                                       video_id = video_id)
+        video_activity.save()
 
 def save_additional_page(course_id, access_id, write_access, title, description):
 

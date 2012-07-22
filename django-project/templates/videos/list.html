@@ -20,24 +20,28 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-  <h1>List videos for course {{course_prefix}} {{course_suffix}}</h1>
+  {% if user.is_authenticated %}
+    <h1>List videos for course {{course_prefix}} {{course_suffix}}</h1>
 
-  <br/>
+    <br/>
 
-  {% for topic in topics %}
-  <h2>{{topic.title}}</h2>
-    <ul>
-      {% for video in videos %}
-        {% if video.topic_id == topic.id %}
-          <li>
-	    <a href="videos/{{video.id}}">{{video.title}}</a>
-	    <div class="progress-bar">
-	      <div class="fill red" style="width:{{video.percent_done}}%"></div>
-	    </div>
-	  </li>
-	{% endif %}
-      {% endfor %}
-    </ul>
-  {% endfor %}
+    {% for topic in topics %}
+    <h2>{{topic.title}}</h2>
+      <ul>
+        {% for videoRec in videoRecs %}
+          {% if videoRec.video.topic_id == topic.id %}
+            <li>
+          <a href="videos/{{videoRec.video.id}}">{{videoRec.video.title}}</a>
+          <div class="progress-bar">
+            <div class="fill red" style="width:{{videoRec.percent_done}}%"></div>
+          </div>
+        </li>
+      {% endif %}
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  {% else %}
+    <h4>Please log in to see video list.</h4>
+  {% endif %}
 </div>
 {% endblock m_column_content %}

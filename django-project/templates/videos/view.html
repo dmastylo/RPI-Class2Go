@@ -2,31 +2,35 @@
 {% load url from future %}
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
-	<div class="well tight">
-		<ul class="nav nav-list">
-			<li class="nav-header">Videos</li>
-			<li class="active"><a href="#">1.1 Course Intro</a></li>
-			<li><a href="#">1.2 History of Field</a></li>
-			<li><a href="#">1.3 Big Issues</a></li>
-			<li><a href="#">1.4 Another nav item</a></li>
-			<li><a href="#">1.5 Another nav item</a></li>
-			<li class="divider"></li>
-			<li><a href="#"><i class="icon-flag"></i>Help</a></li>
-			<li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
-		</ul>
-	</div>
+    <div class="well tight">
+        <ul class="nav nav-list">
+            <li class="nav-header">Videos</li>
+            <li class="active"><a href="#">1.1 Course Intro</a></li>
+            <li><a href="#">1.2 History of Field</a></li>
+            <li><a href="#">1.3 Big Issues</a></li>
+            <li><a href="#">1.4 Another nav item</a></li>
+            <li><a href="#">1.5 Another nav item</a></li>
+            <li class="divider"></li>
+            <li><a href="#"><i class="icon-flag"></i>Help</a></li>
+            <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
+        </ul>
+    </div>
 </div>
 {% endblock %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span9">
-    {% if video.title == 'Defining Minimum Edit Distance' %}
+  {% if user.is_authenticated %}
+    {% if videoRec.video.title == 'Defining Minimum Edit Distance' %}
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
     {% else %}
-        <h2>{{video.title}}</h2>
-        <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
-	<div id="player"></div>
+        <h2>{{videoRec.video.title}}</h2>
+        <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{videoRec.video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
+    <div id="player"></div>
     {% endif %}
+  {% else %}
+    <h4>Please log in to see videos.</h4>
+  {% endif %}
 </div>
 
 <script type="text/javascript">
@@ -42,14 +46,14 @@
     player = new YT.Player('player', {
       height: '430',
       width: '710',
-      videoId: '{{video.url}}',
-      playerVars: { 'rel': 0, 'start': {{video.start_seconds}} },
+      videoId: '{{videoRec.video.url}}',
+      playerVars: { 'rel': 0, 'start': {{videoRec.start_seconds}} },
     });
   }
 
   window.onbeforeunload = function() {
     vidTime = Math.floor(player.getCurrentTime());
-    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {video_id: {{video.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{videoRec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
   }
 </script>
 

@@ -323,7 +323,6 @@ class Video(TimestampMixin, models.Model):
     #segments = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
-    start_seconds = models.IntegerField(default=0, blank=True)
     duration = models.IntegerField(blank=True)
 
     def save(self, *args, **kwargs):
@@ -342,6 +341,21 @@ class Video(TimestampMixin, models.Model):
 
     class Meta:
         db_table = u'c2g_videos'
+
+class VideoActivity(models.Model):
+     student = models.ForeignKey(User)
+     course = models.ForeignKey(Course)
+     video = models.ForeignKey(Video)
+     start_seconds = models.IntegerField(default=0, blank=True)
+     #last_watched = models.DateTimeField(auto_now=True, auto_now_add=False)
+
+     def percent_done(self):
+         return float(self.start_seconds)*100/self.video.duration
+
+     def __unicode__(self):
+            return self.student.username
+     class Meta:
+        db_table = u'c2g_video_activity'
 
 #video quizzes do not need owners or access
 class VideoQuiz(TimestampMixin, models.Model):

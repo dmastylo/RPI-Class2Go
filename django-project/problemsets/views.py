@@ -21,6 +21,7 @@ def list(request, course_prefix, course_suffix):
                                 {'request': request,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
+                                'course': course,
                                 },
                                 context_instance=RequestContext(request))
 
@@ -44,6 +45,7 @@ def list(request, course_prefix, course_suffix):
                               {'request': request,
                                'course_prefix': course_prefix,
                                'course_suffix': course_suffix,
+                                'course': course,
                                'package': package,
                               },
                               context_instance=RequestContext(request))
@@ -57,6 +59,7 @@ def show(request, course_prefix, course_suffix, pset ):
                               {'request': request,
                                'course_prefix': course_prefix,
                                'course_suffix': course_suffix,
+                                'course': course,
                                'pset': pset,
                                'pset_url':ps.path,
                               },

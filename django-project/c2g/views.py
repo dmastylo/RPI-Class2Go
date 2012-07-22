@@ -7,7 +7,7 @@ from django.template import RequestContext
 ### C2G Core Views ###
 
 def home(request):
-	return render_to_response('base.html', {'request': request}, context_instance=RequestContext(request))
+    return render_to_response('base.html', {'request': request}, context_instance=RequestContext(request))
 
 def healthcheck(request):
     return HttpResponse("I'm alive!")
