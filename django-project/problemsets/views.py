@@ -1,8 +1,15 @@
-from django.shortcuts import render_to_response
-from c2g.models import Course
+from django.shortcuts import render_to_response, HttpResponse
+from c2g.models import Course, ProblemActivity
 from django.template import RequestContext
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
+
+# Filters all ProblemActivities by problem set and student. For each problem set, finds out how
+# many questions there are and how many were completed to calculate progress on
+# each problem set. Packages this information along with problem set
+# information about deadlines into a dictionary and passes it to the template.
+
 def list(request, course_prefix, course_suffix):
     course_handle = course_prefix + "-" + course_suffix
     course = Course.objects.get(handle=course_handle)
@@ -19,7 +26,13 @@ def list(request, course_prefix, course_suffix):
 
     for pset in psets:
         numQuestions= len(pset.problem_set.all())
-        numCompleted = len(course.problemactivity_set.filter(student=request.user).filter(problem_set=pset))
+        numCompleted = 0
+        attempts = pset.problemactivity_set.filter(student=request.user)
+        for attempt in attempts:
+            if attempt.attempt_number == 1:
+                numCompleted += 1
+
+        #Divide by zero safety check
         if numQuestions == 0:
             progress = 0
         else:
@@ -48,3 +61,23 @@ def show(request, course_prefix, course_suffix, pset ):
                                'pset_url':ps.path,
                               },
                               context_instance=RequestContext(request))
+
+@csrf_exempt
+def attempt(request, course_prefix, course_suffix, dummy, pset, problemNum):
+    user = request.user
+    course_handle = course_prefix + "-" + course_suffix
+    course = Course.objects.get(handle=course_handle)
+    ps = course.problemset_set.get(title=pset)
+    problem = ps.problem_set.get(problem_number = problemNum)
+    problem_activity = ProblemActivity(student = user,
+                                        problem = problem,
+                                        problem_set = ps,
+                                        complete = request.POST['complete'],
+                                        attempt_content = request.POST['attempt_content'],
+                                        count_hints = request.POST['count_hints'],
+                                        time_taken = request.POST['time_taken'],
+                                        attempt_number = request.POST['attempt_number'],
+                                        problem_type = request.POST['problem_type'])
+
+    problem_activity.save()
+    return HttpResponse("attempt")

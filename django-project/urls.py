@@ -22,6 +22,8 @@ urlpatterns = patterns('',
 
      #for data collection
      url(r'^videos/save/', 'courses.videos.views.save'),
+     #Very long urls for data collection to determine course, problemset and problem info from within javascript
+     url(r'^problemsets/attempt/(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/(?P<dummy>[a-zA-Z0-9_]+)/(?P<pset>[a-zA-Z0-9_]+)?/(?P<problemNum>\d+)/?$', 'problemsets.views.attempt'),
 
 
 

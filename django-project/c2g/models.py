@@ -333,7 +333,7 @@ class Video(TimestampMixin, models.Model):
                 entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
                 self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
-        
+
     def percent_done(self):
         return float(self.start_seconds*100)/self.duration
 
@@ -431,10 +431,10 @@ class Problem(TimestampMixin, models.Model):
 
 class ProblemActivity(models.Model):
      student = models.ForeignKey(User)
-     course = models.ForeignKey(Course)
      problem_set = models.ForeignKey(ProblemSet, null=True)
      problem = models.ForeignKey(Problem, null=True)
      complete = models.IntegerField(null=True, blank=True)
+     attempt_content = models.TextField(null=True, blank=True)
      count_hints = models.IntegerField(null=True, blank=True)
      time_taken = models.IntegerField(null=True, blank=True)
      attempt_number = models.IntegerField(null=True, blank=True)

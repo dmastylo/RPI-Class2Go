@@ -208,12 +208,7 @@ def create_nlp_course():
 
         #Create problemactivities
 
-        save_problem_activity(user, course_id, problem1_1, pset1)
-        save_problem_activity(user, course_id, problem1_2, pset1)
-        save_problem_activity(user, course_id, problem2_1, pset2)
-        save_problem_activity(user, course_id, problem2_2, pset2)
-        save_problem_activity(user, course_id, problem2_3, pset2)
-        save_problem_activity(user, course_id, problem2_4, pset2)
+        #ProblemActivities are already being created
 
         #Create assignments
         assnCat = AssignmentCategory(course=course,title='handouts')
