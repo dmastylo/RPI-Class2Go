@@ -14,7 +14,11 @@
             <h5>Progress</h5>
             <div class="progress-bar">
                 <div class="fill red" style="width:{{dictionary.progress}}%"></div>
-                <p>Completed {{dictionary.numCompleted}} of {{dictionary.numQuestions}}</p>
+                {% if dictionary.numCompleted == dictionary.numQuestions %}
+                    <p>Complete with Score: {{dictionary.numCorrect}} of {{dictionary.numQuestions}}</p>
+                {% else %}
+                    <p>In Progress: {{dictionary.numCompleted}} of {{dictionary.numQuestions}}</p>
+                {% endif %}
             </div>
             <hr>
         {% endfor %}

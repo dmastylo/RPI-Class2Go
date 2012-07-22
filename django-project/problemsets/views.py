@@ -26,19 +26,30 @@ def list(request, course_prefix, course_suffix):
                                 context_instance=RequestContext(request))
 
     for pset in psets:
-        numQuestions= len(pset.problem_set.all())
-        numCompleted = 0
-        attempts = pset.problemactivity_set.filter(student=request.user)
-        for attempt in attempts:
-            if attempt.attempt_number == 1:
-                numCompleted += 1
+        problems = pset.problem_set.all()
+        numCompleted = len(problems)
+        numQuestions = len(problems)
+        numCorrect = 0
+        for problem in problems:
+            attempts = problem.problemactivity_set.filter(student = request.user)
+
+            #Add one to the number of correctly answered questions at the first instance of a correct answer
+            for attempt in attempts:
+                if attempt.complete == 1:
+                    numCorrect += 1
+                    break
+
+            #Counts the completed problems by subtracting all without a student activity recorded for it
+            if len(attempts) == 0:
+                numCompleted -= 1
 
         #Divide by zero safety check
         if numQuestions == 0:
             progress = 0
         else:
             progress = 100.0*numCompleted/numQuestions
-        dictionary = {"pset": pset, "numQuestions": numQuestions, "numCompleted": numCompleted, "progress": progress}
+
+        dictionary = {"pset": pset, "numQuestions": numQuestions, "numCompleted": numCompleted, "progress": progress, "numCorrect": numCorrect}
         package.append(dictionary)
 
     return render_to_response('problemsets/list.html',
