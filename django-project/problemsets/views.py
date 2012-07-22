@@ -27,21 +27,23 @@ def list(request, course_prefix, course_suffix):
 
     for pset in psets:
         problems = pset.problem_set.all()
-        numCompleted = len(problems)
         numQuestions = len(problems)
-        numCorrect = 0
+        #Starting values are total questions and will be subtracted from
+        numCompleted = numQuestions
+        numCorrect = numQuestions
         for problem in problems:
             attempts = problem.problemactivity_set.filter(student = request.user)
-
-            #Add one to the number of correctly answered questions at the first instance of a correct answer
-            for attempt in attempts:
-                if attempt.complete == 1:
-                    numCorrect += 1
-                    break
 
             #Counts the completed problems by subtracting all without a student activity recorded for it
             if len(attempts) == 0:
                 numCompleted -= 1
+
+            #Add one to the number of correctly answered questions if the first attempt is correct
+            attempts.filter(attempt_number = 1)
+            for attempt in attempts:
+                if attempt.complete == 0:
+                    numCorrect -= 1
+                    break
 
         #Divide by zero safety check
         if numQuestions == 0:
