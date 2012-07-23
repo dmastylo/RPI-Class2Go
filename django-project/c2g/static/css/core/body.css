@@ -59,8 +59,7 @@ a:hover {color:#820000;}
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     -khtml-border-radius: 10px;
-    -o-border-radius: 10px;
-    
+    -o-border-radius: 10px; 
     background: #f4f4e0;
     background: -moz-linear-gradient(top, #f4f4e0, #ffffff);
     background: -webkit-gradient(linear, left top, left bottom, from(#f4f4e0), to(#ffffff));
@@ -128,6 +127,7 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
 .progress {
     margin-bottom:8px;
 }
+
 
 /* Common
 -------------------------------------------------- */
@@ -206,7 +206,7 @@ small.date {
     -o-border-radius: 10px;
 }
 .top-nav li .btn:hover {
-    background: rgb(120,0,0);
+    background: rgb(80,0,0);
 }
 .top-nav li span {
     color:white;

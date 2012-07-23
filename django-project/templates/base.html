@@ -21,7 +21,8 @@
             {% if user.is_authenticated %}
                 <li>
                     <form action="{% url 'auth_logout' %}" method="POST">
-                        <input type="submit" id="login_button" class="btn" value="Logout" />
+                        <input type="submit" id="login_button" class="btn logout hidden-phone hidden-tablet" value="Logout" />
+                        <button type="submit" class="btn hidden-desktop visible-phone"><i class="icon-signout logout"></i></button>
                         {% csrf_token %}
                     </form>
                 </li>
