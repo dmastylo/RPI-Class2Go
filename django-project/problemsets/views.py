@@ -77,9 +77,9 @@ def show(request, course_prefix, course_suffix, pset ):
                               context_instance=RequestContext(request))
 
 @csrf_exempt
-def attempt(request, course_prefix, course_suffix, dummy, pset, problemNum):
+def attempt(request, problemId):
     user = request.user
-    problem = Problem.objects.get(pk=problemNum)
+    problem = Problem.objects.get(id=problemId)
     exercise = problem.exercise
     problem_activity = ProblemActivity(student = user,
                                         problem = problem,
