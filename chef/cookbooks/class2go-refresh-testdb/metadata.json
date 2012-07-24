@@ -1,0 +1,29 @@
+{
+  "description": "Installs/Configures class2go-refresh-testdb",
+  "suggestions": {
+  },
+  "platforms": {
+  },
+  "version": "0.0.1",
+  "license": "All rights reserved",
+  "recipes": {
+  },
+  "attributes": {
+  },
+  "providing": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "groupings": {
+  },
+  "dependencies": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "name": "class2go-refresh-testdb",
+  "replacing": {
+  },
+  "conflicting": {
+  },
+  "recommendations": {
+  }
+}
