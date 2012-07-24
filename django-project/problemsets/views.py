@@ -30,7 +30,7 @@ def list(request, course_prefix, course_suffix):
         numCompleted = numQuestions
         numCorrect = numQuestions
         for exercise in exercises:
-            attempts = exercise.problemactivity_set.filter(student = request.user)
+            attempts = exercise.problemactivity_set.filter(student = request.user).exclude(attempt_content="hint")
 
             #Counts the completed problems by subtracting all without a student activity recorded for it
             if len(attempts) == 0:
