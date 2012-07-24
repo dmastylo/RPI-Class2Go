@@ -1,0 +1,13 @@
+Alias /static "/opt/class2go/static"
+
+<Directory '/opt/class2go/static'>
+Order allow,deny
+Allow from all
+</Directory>
+
+WSGIScriptAlias / "/opt/bitnami/apps/django/scripts/django.wsgi"
+
+<Directory '/opt/bitnami/apps/django/scripts'>
+Order allow,deny
+Allow from all
+</Directory>

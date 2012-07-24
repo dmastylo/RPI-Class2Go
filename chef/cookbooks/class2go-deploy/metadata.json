@@ -1,0 +1,29 @@
+{
+  "replacing": {
+  },
+  "groupings": {
+  },
+  "platforms": {
+  },
+  "attributes": {
+  },
+  "conflicting": {
+  },
+  "name": "class2go-deploy",
+  "dependencies": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "version": "0.0.1",
+  "providing": {
+  },
+  "suggestions": {
+  },
+  "recipes": {
+  },
+  "recommendations": {
+  },
+  "license": "All rights reserved",
+  "maintainer_email": "YOUR_EMAIL",
+  "description": "Installs/Configures class2go-deploy"
+}
