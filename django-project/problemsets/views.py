@@ -1,5 +1,5 @@
 from django.shortcuts import render_to_response, HttpResponse
-from c2g.models import Course, ProblemActivity
+from c2g.models import Course, ProblemActivity, Problem
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 
@@ -79,13 +79,11 @@ def show(request, course_prefix, course_suffix, pset ):
 @csrf_exempt
 def attempt(request, course_prefix, course_suffix, dummy, pset, problemNum):
     user = request.user
-    course_handle = course_prefix + "-" + course_suffix
-    course = Course.objects.get(handle=course_handle)
-    ps = course.problemset_set.get(title=pset)
-    problem = ps.problem_set.get(problem_number = problemNum)
+    problem = Problem.objects.get(pk=problemNum)
+    exercise = problem.exercise
     problem_activity = ProblemActivity(student = user,
                                         problem = problem,
-                                        problem_set = ps,
+                                        exercise = exercise,
                                         complete = request.POST['complete'],
                                         attempt_content = request.POST['attempt_content'],
                                         count_hints = request.POST['count_hints'],
