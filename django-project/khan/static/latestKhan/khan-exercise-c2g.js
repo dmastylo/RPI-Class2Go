@@ -235,8 +235,8 @@ var Khan = (function() {
     urlBase = typeof urlBaseOverride !== "undefined" ? urlBaseOverride :
         testMode ? "../" : "/khan-exercises/",
 
-    
-            
+
+
     lastFocusedSolutionInput = null,
 
     issueError = "Communication with GitHub isn't working. Please file " +
@@ -276,7 +276,7 @@ var Khan = (function() {
             link.rel = "stylesheet";
             link.href = urlBase + "css/khan-exercise.css";
             document.getElementsByTagName("head")[0].appendChild(link);
-         
+
             link = document.createElement("link");
             link.rel = "stylesheet";
             link.href = urlBase + "css/c2g-khan.css";
@@ -1028,7 +1028,7 @@ var Khan = (function() {
     }
 
     function makeProblem(id, seed) {
-            
+
 
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
@@ -1076,7 +1076,7 @@ var Khan = (function() {
 
         // Find which exercise this problem is from
         exercise = problem.parents("div.exercise").eq(0);
-            
+
         // JASON BAU -- for C2G problems sets we want to display the exercise title
         if (exercise.data('title'))
             $("#container .exercises-header h2").children().last().text(exercise.data('title')[0]);
@@ -1126,15 +1126,15 @@ var Khan = (function() {
         hints = problem.children(".hints").remove();
 
         // Hide the hint box if there are no hints in the problem
-        
+
             //console.log(problem);
         $(".hint-box").show();
 
         if (hints.length === 0) {
             $(".hint-box").hide();
         }
-         
-    
+
+
         // Evaluate any inline script tags in this exercise's source
         $.each(exercise.data("script") || [], function(i, scriptContents) {
             $.globalEval(scriptContents);
@@ -1861,7 +1861,7 @@ var Khan = (function() {
     KhanC2G.clearExistingProblem=clearExistingProblem;
     KhanC2G.makeProblem=makeProblem;
     KhanC2G.makeProblemBag=makeProblemBag;
-            
+
     function renderNextProblem(nextUserExercise) {
         clearExistingProblem();
 
@@ -2003,7 +2003,7 @@ var Khan = (function() {
             var checkAnswerButton = $("#check-answer-button");
 
             // If incorrect, warn the user and help them in any way we can
-            if (pass !== true) {
+            if (pass != true) {
                 checkAnswerButton
                     .effect("shake", {times: 3, distance: 5}, 80)
                     .val("Try Again");
@@ -2051,7 +2051,8 @@ var Khan = (function() {
                     // See http://stackoverflow.com/questions/1370322/jquery-ajax-fires-error-callback-on-window-unload
                     return;
                 }
-
+/* Kelvin here. I commented this warning out because it kept showing up whenever questions was answered
+ *
                 // Error during submit. Disable the page and ask users to
                 // reload in an attempt to get updated data.
 
@@ -2068,7 +2069,7 @@ var Khan = (function() {
                     "If you think this is a mistake, " +
                     "<a href='http://www.khanacademy.org/reportissue?type=Defect&issue_labels='>tell us</a>."
                 );
-
+*/
             }, "attempt_hint_queue");
 
             if (pass === true) {
@@ -2531,7 +2532,7 @@ var Khan = (function() {
 
             // testMode automatically advances to the next problem --
             // integrated mode just listens and waits for renderNextProblem
-                                          
+
             /* JASON BAU COMMENTED OUT
             $(Khan).bind("gotoNextProblem", function() {
                 renderNextProblem();
@@ -2631,8 +2632,8 @@ var Khan = (function() {
     }
 
     function request(method, data, fn, fnError, queue) {
-        
-        /*                                  
+
+        /*
         if (testMode) {
             // Pretend we have success
             if ($.isFunction(fn)) {
@@ -2650,9 +2651,16 @@ var Khan = (function() {
             xhrFields["withCredentials"] = true;
         }
 
+        //Gets the problem ID which is (problem number)-(variation)
+        problemId = $('#workarea').children('div').attr('id')
+
+        //URL starts with problemsets/attempt to direct to a view to collect data.
+        //Pathname is used to determine course and problemset
+        //ProblemNum is the card number currently being looked at
         var request = {
             // Do a request to the server API
-            url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
+            //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
+            url: "/problemsets/attempt" + location.pathname + "/" + problemId,
             type: "POST",
             data: data,
             dataType: "json",
@@ -2871,14 +2879,14 @@ var Khan = (function() {
         });
 
         function injectExerciseFrameMarkup(htmlExercise) {
-        
+
             $("#container .exercises-body .current-card-contents").html(htmlExercise);
-                                                                    
+
         }
-                                                                    
+
         function injectTestModeSite(html, htmlExercise) {
             $("body").prepend(html);
-            
+
             $("#container .exercises-header h2").append($('<span>').html(document.title));
             injectExerciseFrameMarkup(htmlExercise);
 
@@ -2887,57 +2895,57 @@ var Khan = (function() {
             }
 
             finishSitePrep();
-                                                                    
+
         }
-                                                                    
+
         function finishSitePrep() {
-                                                                    
+
             prepareSite();
-            
+
             initC2GStacks(exercises);
-            
+
             var problems = exercises.children(".problems").children();
             globalProblems=problems;
             globalExercises=exercises;
             // Don't make the problem bag when a specific problem is specified
             // because it messes up problem permalinks (because makeProblemBag
             // calls KhanUtil.random() and changes the seed)
-            
+
             if (Khan.query.problem == null) {
               weighExercises(problems);
               problemBag = makeProblemBag(problems, 10);
             }
-            
-            
+
+
             // Generate the initial problem when dependencies are done being loaded
             //var answerType = makeProblem();
-            
+
             var first = $('#questions-to-do li:last-child');
             makeProblem(first.data('problem'), first.data('randseed'))
 
 
         }
-                                                                    
-        
+
+
 
     }
-                                                                    
+
     //var c2gProblemBag;
-    
-                                                                    
-                                                                    
-                                                                    
-                                                                    
+
+
+
+
+
     function initC2GStacks(exercises) {
-        //console.log(exercises);                                                           
+        //console.log(exercises);
 
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
-        
+
         $('#problem-and-answer').append($('<div id="questions-to-do"><ol></ol></div>'));
         $('#problem-and-answer').append($('<div id="questions-done"><ol></ol></div>'));
-                                                                
+
         $('#questions-to-do').css('position', 'absolute');
         $('#questions-done').css('position', 'absolute');
 
@@ -2950,7 +2958,7 @@ var Khan = (function() {
                                 $(v).data('problemsStartAtIndex',curNumProbs);
                                 $(v).data('numberOfProblems',probsInExercise);
                                 var li = $("<li>");
-                                
+
                                 li.text("Q" + (i+1));
                                 //this data 'problem' will be used to index into the problems array
                                 //the problems array is a flat array containing all problems from all exercises
@@ -2959,13 +2967,13 @@ var Khan = (function() {
                                 li.data('randseed',Math.floor(Math.random()*100000));
                                 $('#questions-to-do ol').prepend(li);
                                 curNumProbs+=probsInExercise;
-                                                                                
+
                           });
-                                    
-                                                                    
-        
-                
-            
+
+
+
+
+
         /* Commenting out these because using :hover css selector instead
         $('#questions-to-do').find('li').mouseover(function (ev) {
                                                    //$(this).css('border-color', '#000');
@@ -2976,9 +2984,9 @@ var Khan = (function() {
                                                   //$(this).css('color', '#999');
                                                   });
         */
-                                                                    
+
         $('#questions-to-do').find('li').click(todoClickHandler);
-        
+
         $('#next-question-button').click(function () {
                                          $('#questions-to-do li:last-child').trigger('mouseout');
                                          $('#questions-to-do li:last-child').unbind('click');
@@ -2988,16 +2996,16 @@ var Khan = (function() {
                                          clearExistingProblem();
                                          if (next.length)
                                               makeProblem(next.data('problem'), next.data('randseed'));
-                                         
+
                                          });
-        
+
         $('#questions-to-do').fadeIn('slow');
         $('#questions-done').fadeIn('slow');
-        
-        
-        
+
+
+
         function todoClickHandler(ev) {
-            
+
             $(this).trigger('mouseout');
             $(this).appendTo($('#questions-done').children('ol'));
             $(this).unbind('click');
@@ -3007,18 +3015,18 @@ var Khan = (function() {
             if (next.length)
                 makeProblem(next.data('problem'), next.data('randseed'));
         };
-        
+
         function doneClickHandler(ev) {
             $(this).trigger('mouseout');
-            $(this).appendTo($('#questions-to-do').children('ol')); 
+            $(this).appendTo($('#questions-to-do').children('ol'));
             $(this).unbind('click');
             $(this).click(todoClickHandler);
             clearExistingProblem();
             makeProblem($(this).data('problem'), $(this).data('randseed'));
-        
+
         };
-        
-                                                                    
+
+
     }
 
     return Khan;
