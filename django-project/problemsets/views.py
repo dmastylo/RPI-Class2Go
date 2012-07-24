@@ -24,13 +24,13 @@ def list(request, course_prefix, course_suffix):
                                 context_instance=RequestContext(request))
 
     for pset in psets:
-        problems = pset.problem_set.all()
-        numQuestions = len(problems)
+        exercises = pset.exercise_set.all()
+        numQuestions = len(exercises)
         #Starting values are total questions and will be subtracted from
         numCompleted = numQuestions
         numCorrect = numQuestions
-        for problem in problems:
-            attempts = problem.problemactivity_set.filter(student = request.user)
+        for exercise in exercises:
+            attempts = exercise.problemactivity_set.filter(student = request.user)
 
             #Counts the completed problems by subtracting all without a student activity recorded for it
             if len(attempts) == 0:

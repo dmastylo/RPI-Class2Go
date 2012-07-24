@@ -453,6 +453,7 @@ class Problem(TimestampMixin, models.Model):
 
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
+     exercise = models.ForeignKey(Exercise, null=True)
      problem = models.ForeignKey(Problem, null=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)
