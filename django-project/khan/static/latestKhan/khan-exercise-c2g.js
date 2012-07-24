@@ -2651,8 +2651,8 @@ var Khan = (function() {
             xhrFields["withCredentials"] = true;
         }
 
-        //Finds the problem number for the problem being answered
-        problemNum = $('#questions-to-do').find('li').last().data('problem')
+        //Gets the problem ID which is (problem number)-(variation)
+        problemId = $('#workarea').children('div').attr('id')
 
         //URL starts with problemsets/attempt to direct to a view to collect data.
         //Pathname is used to determine course and problemset
@@ -2660,7 +2660,7 @@ var Khan = (function() {
         var request = {
             // Do a request to the server API
             //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
-            url: "/problemsets/attempt" + location.pathname + "/" + problemNum,
+            url: "/problemsets/attempt" + location.pathname + "/" + problemId,
             type: "POST",
             data: data,
             dataType: "json",

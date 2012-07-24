@@ -3,8 +3,6 @@ from c2g.models import Course, ProblemActivity
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 
-# Create your views here.
-
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
 # each problem set. Packages this information along with problem set

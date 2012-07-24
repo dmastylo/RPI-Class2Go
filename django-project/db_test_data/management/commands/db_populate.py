@@ -33,6 +33,9 @@ def delete_db_data():
 
     # Nuke the data that we create below.  Order doesn't seem to matter.
     Course.objects.all().delete()
+    Problem.objects.all().delete()
+    Exercise.objects.all().delete()
+    ProblemActivity.objects.all().delete()
     Announcement.objects.all().delete()
     NewsEvent.objects.all().delete()
 
@@ -193,18 +196,31 @@ def create_nlp_course():
 
         pset2 = save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline, description)
 
+        #Create exercises
+
+        exercise1_1 = save_exercise(pset1, 1)
+        exercise1_2 = save_exercise(pset1, 2)
+        exercise1_3 = save_exercise(pset1, 3)
+
+        exercise2_1 = save_exercise(pset2, 1)
+        exercise2_2 = save_exercise(pset2, 2)
+        exercise2_3 = save_exercise(pset2, 3)
+        exercise2_4 = save_exercise(pset2, 4)
+        exercise2_5 = save_exercise(pset2, 5)
 
         #Create problems
 
-        problem1_1 = save_problem(pset1, 1)
-        problem1_2 = save_problem(pset1, 2)
-        problem1_3 = save_problem(pset1, 3)
+        save_problem(exercise1_1, 1)
+        save_problem(exercise1_1, 2)
+        save_problem(exercise1_2, 1)
+        save_problem(exercise1_3, 1)
 
-        problem2_1 = save_problem(pset2, 1)
-        problem2_2 = save_problem(pset2, 2)
-        problem2_3 = save_problem(pset2, 3)
-        problem2_4 = save_problem(pset2, 4)
-        problem2_5 = save_problem(pset2, 5)
+        save_problem(exercise2_1, 1)
+        save_problem(exercise2_1, 2)
+        save_problem(exercise2_2, 1)
+        save_problem(exercise2_3, 1)
+        save_problem(exercise2_4, 1)
+        save_problem(exercise2_5, 1)
 
         #Create problemactivities
 
@@ -514,15 +530,20 @@ def save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline,
     problem_set.save()
     return problem_set
 
-def save_problem(problem_set, problem_number):
-    problem = Problem(problem_set = problem_set,
-                    problem_number = problem_number)
+def save_exercise(problemSet, number):
+    exercise = Exercise(problemSet = problemSet,
+                        number = number)
+    exercise.save()
+    return exercise
+
+def save_problem(exercise, number):
+    problem = Problem(exercise = exercise,
+                    number = number)
 
     problem.save()
 
-def save_problem_activity(student, course_id, problem, problem_set):
+def save_problem_activity(student, problem):
     problem_activity = ProblemActivity(student = student,
-                                        course_id = course_id,
-                                        problem = problem,
-                                        problem_set = problem_set)
+                                        problem = problem)
+
     problem_activity.save()

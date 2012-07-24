@@ -435,17 +435,24 @@ class ProblemSet(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_problem_sets'
 
-class Problem(TimestampMixin, models.Model):
-    problem_set = models.ForeignKey(ProblemSet)
-    problem_number = models.IntegerField(null=True, blank=True)
+class Exercise(TimestampMixin, models.Model):
+    problemSet = models.ForeignKey(ProblemSet)
+    number = models.IntegerField(null=True, blank=True)
     def __unicode__(self):
-        return self.problem_number
+        return self.number
+    class Meta:
+        db_table = u'c2g_exercises'
+
+class Problem(TimestampMixin, models.Model):
+    exercise = models.ForeignKey(Exercise)
+    number = models.IntegerField(null=True, blank=True)
+    def __unicode__(self):
+        return self.number
     class Meta:
         db_table = u'c2g_problems'
 
-class ProblemActivity(models.Model):
+class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
-     problem_set = models.ForeignKey(ProblemSet, null=True)
      problem = models.ForeignKey(Problem, null=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)
