@@ -2655,12 +2655,11 @@ var Khan = (function() {
         problemId = $('#workarea').children('div').attr('id')
 
         //URL starts with problemsets/attempt to direct to a view to collect data.
-        //Pathname is used to determine course and problemset
-        //ProblemNum is the card number currently being looked at
+        //problemId is the id of the problem the information is being created for
         var request = {
             // Do a request to the server API
             //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
-            url: "/problemsets/attempt" + location.pathname + "/" + problemId,
+            url: "/problemsets/attempt/" + problemId,
             type: "POST",
             data: data,
             dataType: "json",
