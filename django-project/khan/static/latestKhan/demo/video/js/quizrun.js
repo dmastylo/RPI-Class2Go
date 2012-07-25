@@ -1,8 +1,10 @@
+// Fetch YouTube Player API as script node
 var tag = document.createElement('script');
 tag.src = "//www.youtube.com/player_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+// Set up global vars
 var questions={};
 var slideIndices = {};
 var vidName;
@@ -17,70 +19,70 @@ var hRatio=1; //ratios for the screen size on which the overlay was made to that
 var wRatio=1; //defaults to 1, calculated when the questions json object is loaded
 
 function onYouTubePlayerAPIReady() {
-    //document.getElementById('startmsg').style.display='block';
     getVidID();
 }
 
 function getVidID() {
     vidName="xOfEYI61f3k";
+
+    // setTimeout necessary here for everything to be ready at the right time
+    // (hacky, but it does the job)
     setTimeout(function () { runQuiz(); }, 1000);
 }
 
 
 function runQuiz() {
 
-    //$.getJSON('indices.json',function(data) {
-        slideIndices = {"0":{"imgsrc":"lecture-0.jpg"},"5":{"imgsrc":"lecture-1.jpg"},"61":{"imgsrc":"lecture-2.jpg"},"86":{"imgsrc":"lecture-3.jpg"},"110":{"imgsrc":"lecture-4.jpg"},"163":{"imgsrc":"lecture-5.jpg"},"201":{"imgsrc":"lecture-6.jpg"},"284":{"imgsrc":"lecture-7.jpg"},"342":{"imgsrc":"lecture-8.jpg"},"374":{"imgsrc":"lecture-9.jpg"},"418":{"imgsrc":"lecture-10.jpg"}};
-    //});
+    // slideIndices for the thumbnails
+    slideIndices = {"0":{"imgsrc":"lecture-0.jpg"},"5":{"imgsrc":"lecture-1.jpg"},"61":{"imgsrc":"lecture-2.jpg"},"86":{"imgsrc":"lecture-3.jpg"},"110":{"imgsrc":"lecture-4.jpg"},"163":{"imgsrc":"lecture-5.jpg"},"201":{"imgsrc":"lecture-6.jpg"},"284":{"imgsrc":"lecture-7.jpg"},"342":{"imgsrc":"lecture-8.jpg"},"374":{"imgsrc":"lecture-9.jpg"},"418":{"imgsrc":"lecture-10.jpg"}};
 
+    // questions for the specific thumbs which invoke an exercise
+    questions = {
+        "162": {"time": 162, "problemDiv": "levenshtein-1"},
+        "163": {"time": 163, "problemDiv": "non-levenshtein"},
+        "164": {"time": 164, "problemDiv": "levenshtein-2"}
+    };
 
-    //$.ajax({
-    //    url: 'questions.json',
-    //    dataType:'json',
-    //    cache:false,
-    //    error: function(a,b,c) {
-    //        alert('An error occurred while connecting with the question storage server.');
-    //    },
-    //    success: function(data) {
-            questions = {"videoWidth":960,"videoHeight":540,"162":{"time":162,"bgOpacity":"1","fontColor":"rgb(0,0,0)","buttonPos":{"left":"720px","top":"490px"},"qPos":{"left":"35px","top":"35px","width":"800px","height":"50px"},"qText":"What is the Levenshtein distance between ANTS and GNU?","qExplanation":"The only overlapping letter is 'N. If we align ANTS and GNU so that the 'N's match up, we must substitute the 'A' for a 'G' and the 'T' for a 'U'.  Each of these operations has a cost of 2.  Finally we need to delete the 'S' costing us 1.","qType":"m-c","mcType":"radio","answers":{"1":{"text":"6","correct":false,"tablePos":{"left":"84px","top":"191px"},"aSize":{"width":"700px","height":"30px"}},"2":{"text":"5","correct":true,"tablePos":{"left":"84px","top":"261px"},"aSize":{"width":"700px","height":"30px"}},"3":{"text":"4","correct":false,"tablePos":{"left":"84px","top":"336px"},"aSize":{"width":"700px","height":"30px"}},"4":{"text":"3","correct":false,"tablePos":{"left":"84px","top":"406px"},"aSize":{"width":"700px","height":"30px"}}}}};
-            for (j in questions) {
-                questions[j].done = false;
-            }
-            var mods = document.getElementsByClassName('quizModule');
-            for (i=0;i<mods.length;i++) {
-                mods[i].style.display='inline';
-            }
-            createPlayer(vidName);
-            if (questions.videoHeight) {
-                hRatio = videoHeight / questions.videoHeight; 
-            }
-            if (questions.videoWidth) {
-                wRatio = videoWidth / questions.videoWidth; 
-            }
-    //  }
-    //});
+    for (j in questions) {
+        questions[j].done = false;
+    }
+
+    var mods = document.getElementsByClassName('quizModule');
+    for (i=0;i<mods.length;i++) {
+        mods[i].style.display='inline';
+    }
+
+    // call function to add YT player
+    createPlayer(vidName);
+
+    if (questions.videoHeight) {
+        hRatio = videoHeight / questions.videoHeight; 
+    }
+
+    if (questions.videoWidth) {
+        wRatio = videoWidth / questions.videoWidth; 
+    }
 
 }
 
+// add player to the page
 function createPlayer(vid) {
-  player = new YT.Player('player', {
-      height: vidPlayerHeight,
-      width: vidPlayerWidth,
-      videoId: vid,
-//  wmode: transparent  makes HTML goes on top of Flash
-//  fs: disable full screen
-      playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0},
-      events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange,
-          'onError': onPlayerError,
-      }
-  });
-//console.log("In createPlayer");
-//console.log(player);
-//console.log(player.playVideo);
-  document.getElementById('player').style['z-index']=-10;
-  document.getElementById('player').style['-webkit-transform']='translateZ(0)';
+    player = new YT.Player('player', {
+        height: vidPlayerHeight,
+        width: vidPlayerWidth,
+        videoId: vid,
+        // wmode: transparent  makes HTML goes on top of Flash
+        // fs: disable full screen
+        playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0},
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+            'onError': onPlayerError,
+        }
+    });
+
+    document.getElementById('player').style['z-index']=-10;
+    document.getElementById('player').style['-webkit-transform']='translateZ(0)';
 }
 
 var globalQTime = -1;
@@ -89,38 +91,18 @@ var globalQTime = -1;
 function setupQPane(qTime) {
     
     globalQTime = qTime;
-    //hide video player
-    //$(player.getIframe()).hide();
-    //$(player.getIframe()).css('height','1px');
-    //$(player.getIframe()).css('width','1px');
 
     $('#playerdiv').fadeTo('slow', .7);
-    $('.video-overlay-question').show();
-    $('.video-overlay-hint').show();
+    //$('.video-overlay-question').show();
+    //$('.video-overlay-hint').show();
+    //console.log(questions[qTime]["problemDiv"]);
+    $('#' + questions[qTime]["problemDiv"]).show();
+    $('#' + questions[qTime]["problemDiv"]).css('z-index', 100);
     $('#answer_area').fadeIn('slow');
 
     //hide index navigation panel
     $("#slideIndex").hide();
 
-    //create background img
-/*
-    var qImg = document.createElement('img');
-    $(qImg).attr('src', 'q_'+qTime+'.jpg').attr('id','qBGImg').css('position','absolute').css('left','0px').css('top','0px').css('z-index','-1');
-    if (questions.videoHeight) {
-    $(qImg).css('height',questions.videoHeight+'px');
-    }
-    else {
-    $(qImg).css('height',450);
-    }
-
-    if (questions.videoWidth){
-    $(qImg).css('width',questions.videoWidth+'px');
-    }
-    else {
-    $(qImg).css('width',800);
-    }
-    document.getElementById('playerdiv').appendChild(qImg);
-  */  
     var curQ = questions[qTime];
     if(curQ.qType=="m-c")
     typeString = "Multiple-choice.  Please check ALL possible correct choices.";
@@ -136,68 +118,6 @@ function setupQPane(qTime) {
     qDiv.setAttribute('id','questionPane');
     $('#questionBG').after(qDiv);
 
-
-
-    /*
-    timelabel = timeDisplay(qTime);
-    //var qInst = document.getElementById('qInst');
-
-    if (curQ.qType=="m-c") {
-    //qInst.innerHTML='<div id="dNd" class="bottomAlign"><h4>'+typeString+'</h4></div>';
-    qDiv.innerHTML='<div id="qaSpace"><div id="questionText"></div></div>';
-    addChoices(curQ);
-    $('table').css('border','none');
-    $('tr').css('border','none');
-    $('td').css('border','none');
-    }
-    else { //Short answer
-    //qInst.innerHTML='<div id="dNd" class="bottomAlign"><h4>'+typeString+'</h4></div>';
-    qDiv.innerHTML='<div id="qaSpace"><div id="questionText"></div></div><div id="saSpace"><br /><textarea id="answerTemplate" row="2" placeholder="Answer"></textarea><br /></div>';
-    }
-
-    document.getElementById('questionText').innerHTML=curQ.qText;    
-    if (curQ.qText=="")
-    document.getElementById('questionText').style.display="none";
-    */
-
-    //Setup Submit / Skip Buttons
-    /*
-    var buttonDiv = document.createElement('div');
-    buttonDiv.setAttribute('id','buttonDiv');
-    buttonDiv.setAttribute('class','bottomAlign');
-    buttonDiv.innerHTML = "<button onclick='submitAns("+qTime+")'>Submit</button> <button onclick='closeQPane()'>Close</button><br />";
-    qDiv.appendChild(buttonDiv);    
-    $("button").button();
-    */
-
-
-    //Position and color everything
-    /*
-    $("#questionBG").css('opacity',curQ.bgOpacity);
-    $('#questionPane').css('color',curQ.fontColor);
-    $('#questionPane textarea').css('color',curQ.fontColor);
-
-    $('#qaSpace').css('position','absolute');
-    $('#qaSpace').css('left',stripPx(curQ.qPos.left)*wRatio);
-    $('#qaSpace').css('top',stripPx(curQ.qPos.top)*hRatio);
-    $('#questionText').css('width',stripPx(curQ.qPos.width)*wRatio);
-    $('#questionText').css('height',stripPx(curQ.qPos.height)*hRatio);
-    
-    $('#buttonDiv').css('position','absolute');
-    $('#buttonDiv').css('left',stripPx(curQ.buttonPos.left)*wRatio);
-    $('#buttonDiv').css('top',stripPx(curQ.buttonPos.top)*hRatio);
-    
-    if(curQ.qType=="s-a") {
-    $('#saSpace').css('position','absolute');
-    $('#saSpace').css('left',stripPx(curQ.aPos.left)*wRatio);
-    $('#saSpace').css('top',stripPx(curQ.aPos.top)*hRatio);
-    $('#answerTemplate').css('width',stripPx(curQ.aPos.width)*wRatio);
-    $('#answerTemplate').css('height',stripPx(curQ.aPos.height)*hRatio);
-    $('#answerTemplate')[0].focus();
-    } 
-
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"questionPane"]);
-    */
 }
 
 function stripPx(sizeWithPx) {
@@ -250,35 +170,10 @@ function addChoices(curQ) {
     i+=1;
     }
 
-
 }
-
 
 function closeQPane() {
     
-    //close background img
-    //$('img#qBGImg').removem();
-    //show player iframe 
-    //var frm = player.getIframe();
-   /*
-    if (questions.videoHeight) {
-    $(frm).css('height',(questions.videoHeight+30)+'px');
-    }
-    else {
-    $(frm).css('height','450px');
-    }
-    if (questions.videoWidth){
-    $(frm).css('width',questions.videoWidth+'px');
-    }
-    else {
-    $(frm).css('width','800px');
-    }
-    */
-    //$(frm).show();
-
-    //Hack test
-    
-
     $("#slideIndex").show();
     
     document.getElementById('qInst').innerHTML="";
@@ -287,9 +182,6 @@ function closeQPane() {
 
     player.playVideo();
 }
-
-
-
 
 function handleChange(input) {
 
@@ -411,10 +303,6 @@ function timeDisplay(timeInSec) {
 
 function onPlayerReady(event) {
   
-    //console.log("In onPlayerReady...");
-    //console.log(player);
-    //console.log(player.playVideo);
-    //event.target.playVideo(); 
     HotKey(player);
     setupNavPanel();
 }
@@ -422,8 +310,6 @@ function onPlayerReady(event) {
 function onPlayerError(event) {
     alert('error');
 }
-
-
 
 var recordMe;
 function onPlayerStateChange(event) {
@@ -453,7 +339,6 @@ function selectSlide(time) {
     $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width())/2);
     }
 }
-
 
 var lastTime = -1;
 
@@ -496,7 +381,7 @@ function processQuiz(curTime) {
 
 function setupNavPanel(){
     var merged=Array();
-    //createIndexPanel();
+
     for (time in slideIndices) {
     merged.push(time)
     }
@@ -556,7 +441,7 @@ function addQuizSlide(idxTime) {
     $(greyDiv).addClass('greyOverlay').html("<br/><br/>Quiz");
     var slideImg = document.createElement('img');
     slideImg.src = 'q_'+idxTime+'.jpg';
-    //questions[idxTime].displayDiv = tempDiv;
+
     tempDiv.appendChild(greyDiv);
     tempDiv.appendChild(slideImg);
 
