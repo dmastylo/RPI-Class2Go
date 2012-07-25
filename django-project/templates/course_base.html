@@ -37,3 +37,22 @@
     </div>
 </div>
 {% endblock navbar %}
+
+{% block content %}
+<div class="container-fluid body-content">
+    <div class="row-fluid page-header">
+        <div class="span12">
+            <h2>{{course.title}}</h2>
+        </div>
+    </div>
+    <div class="row-fluid">
+        {% block l_column_content %}{% endblock %}
+        
+        {% block m_column_content %}{% endblock %}
+        
+        {% block r_column_content %}{% endblock %}
+    </div>
+    {% include "footer.html" %}
+    </div>
+</div>
+{% endblock content %}

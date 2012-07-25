@@ -21,11 +21,12 @@
             {% if user.is_authenticated %}
                 <li>
                     <form action="{% url 'auth_logout' %}" method="POST">
-                        <input type="submit" id="login_button" class="btn" value="Logout" />
+                        <input type="submit" id="login_button" class="btn logout hidden-phone hidden-tablet" value="Logout" />
+                        <button type="submit" class="btn hidden-desktop visible-phone"><i class="icon-signout logout"></i></button>
                         {% csrf_token %}
                     </form>
                 </li>
-                <li><span>Welcome <b>{{ user.username }}</b>!</span></li>
+                <li><span>Welcome <b><a href="/accounts/profile">{{ user.username }}</a></b>!</span></li>
             {% else %}
                 <li><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
                 <li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
@@ -40,12 +41,12 @@
                             <li><a href="#">Classes</a></li>
                             <li><a href="#">Search</a></li>
                         </ul>
-                        <form class="navbar-search hidden-phone" action="">
+                        <!--form class="navbar-search hidden-phone" action="">
                             <div class="input-append">
                                 <input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
                                 <button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
                             </div>
-                        </form>
+                        </form-->
                     </div>
                 </div>
             </div>
@@ -55,11 +56,6 @@
         
         {% block content %}
         <div class="container-fluid body-content">
-            <div class="row-fluid page-header">
-                <div class="span12">
-                    <h2>{{course.title}}</h2>
-                </div>
-            </div>
             <div class="row-fluid">
                 {% block l_column_content %}{% endblock %}
                 
