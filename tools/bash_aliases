@@ -1,7 +1,7 @@
 # source this from your login shell
 
-hoststage="app10"
-hostprod="app10"
+hoststage="app"
+hostprod="app"
 
 function prodapp {
     ssh-add -l | grep -q "c2g-prod" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
