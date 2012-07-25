@@ -1,29 +1,29 @@
 {
-  "name": "class2go-database.py",
-  "dependencies": {
-  },
-  "maintainer_email": "YOUR_EMAIL",
-  "groupings": {
-  },
-  "license": "All rights reserved",
   "attributes": {
-  },
-  "replacing": {
-  },
-  "platforms": {
-  },
-  "maintainer": "YOUR_COMPANY_NAME",
-  "version": "0.0.1",
-  "recipes": {
-  },
-  "providing": {
   },
   "conflicting": {
   },
   "description": "Installs/Configures class2go-class2go-database-configfile",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "recipes": {
+  },
+  "providing": {
+  },
+  "recommendations": {
+  },
+  "dependencies": {
+  },
+  "license": "All rights reserved",
+  "groupings": {
+  },
   "suggestions": {
   },
-  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
-  "recommendations": {
+  "version": "0.0.1",
+  "maintainer_email": "YOUR_EMAIL",
+  "name": "class2go-database.py",
+  "replacing": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "platforms": {
   }
 }

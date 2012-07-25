@@ -1,29 +1,29 @@
 {
-  "replacing": {
+  "providing": {
   },
+  "attributes": {
+  },
+  "version": "0.0.1",
+  "maintainer_email": "YOUR_EMAIL",
+  "suggestions": {
+  },
+  "recommendations": {
+  },
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "maintainer": "YOUR_COMPANY_NAME",
+  "name": "class2go-deploy",
   "groupings": {
   },
   "platforms": {
   },
-  "attributes": {
-  },
   "conflicting": {
   },
-  "name": "class2go-deploy",
-  "dependencies": {
+  "replacing": {
   },
-  "maintainer": "YOUR_COMPANY_NAME",
-  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
-  "version": "0.0.1",
-  "providing": {
-  },
-  "suggestions": {
-  },
+  "description": "Installs/Configures class2go-deploy",
   "recipes": {
   },
-  "recommendations": {
+  "dependencies": {
   },
-  "license": "All rights reserved",
-  "maintainer_email": "YOUR_EMAIL",
-  "description": "Installs/Configures class2go-deploy"
+  "license": "All rights reserved"
 }
