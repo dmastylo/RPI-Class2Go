@@ -332,7 +332,10 @@ class Video(TimestampMixin, models.Model):
                 entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
                 self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
-        
+
+    def percent_done(self):
+        return float(self.start_seconds*100)/self.duration
+
     def __unicode__(self):
         return self.title
 
@@ -432,20 +435,28 @@ class ProblemSet(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_problem_sets'
 
-class Problem(TimestampMixin, models.Model):
-    problem_set = models.ForeignKey(ProblemSet)
-    problem_number = models.IntegerField(null=True, blank=True)
+class Exercise(TimestampMixin, models.Model):
+    problemSet = models.ForeignKey(ProblemSet)
+    number = models.IntegerField(null=True, blank=True)
     def __unicode__(self):
-        return self.problem_number
+        return self.number
+    class Meta:
+        db_table = u'c2g_exercises'
+
+class Problem(TimestampMixin, models.Model):
+    exercise = models.ForeignKey(Exercise)
+    number = models.IntegerField(null=True, blank=True)
+    def __unicode__(self):
+        return self.number
     class Meta:
         db_table = u'c2g_problems'
 
-class ProblemActivity(models.Model):
+class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
-     course = models.ForeignKey(Course)
-     problem_set = models.ForeignKey(ProblemSet, null=True)
+     exercise = models.ForeignKey(Exercise, null=True)
      problem = models.ForeignKey(Problem, null=True)
      complete = models.IntegerField(null=True, blank=True)
+     attempt_content = models.TextField(null=True, blank=True)
      count_hints = models.IntegerField(null=True, blank=True)
      time_taken = models.IntegerField(null=True, blank=True)
      attempt_number = models.IntegerField(null=True, blank=True)

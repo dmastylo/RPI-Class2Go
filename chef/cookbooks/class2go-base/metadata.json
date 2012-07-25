@@ -1,0 +1,29 @@
+{
+  "description": "Installs/Configures class2go-base",
+  "replacing": {
+  },
+  "name": "class2go-base",
+  "maintainer_email": "YOUR_EMAIL",
+  "suggestions": {
+  },
+  "dependencies": {
+  },
+  "version": "0.0.1",
+  "recipes": {
+  },
+  "attributes": {
+  },
+  "conflicting": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "groupings": {
+  },
+  "providing": {
+  },
+  "platforms": {
+  },
+  "license": "All rights reserved",
+  "recommendations": {
+  }
+}
