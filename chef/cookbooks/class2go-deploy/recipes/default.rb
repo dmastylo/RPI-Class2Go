@@ -1,3 +1,12 @@
+#
+# Cookbook Name:: class2go-deploy
+# Recipe:: default
+#
+# Copyright 2012, Stanford Class2Go
+#
+# All rights reserved - Do Not Redistribute
+#
+
 git "/home/bitnami/class2go" do
     repository "https://github.com/jbau/class2go.git"
     user "bitnami"
@@ -17,12 +26,6 @@ directory "/opt/class2go/static" do
     group "root"
     mode "0755"
     action :create
-end
-
-execute "collectstatic" do
-    cwd "/home/bitnami/class2go/django-project"
-    command "python manage.py collectstatic --noinput --clear"
-    user "bitnami"
 end
 
 # eventually use the fancier deployment resources

@@ -1,8 +1,7 @@
+# bash the configuration files provided by bitnami so they are useful
+# for the particular Class2Go EC2 setup.  
 #
-# Cookbook Name:: bitnami-for-class2go
-# Recipe:: default
-#
-# Cribbed from http://reiddraper.com/first-chef-recipe/
+# This is pretty fragile.  Best to be rewritten, see issue #162.
 #
 
 template "httpd.conf" do
@@ -29,18 +28,12 @@ template "django.wsgi" do
     mode "0644"
 end
 
-template "database.py" do
-    path "/home/bitnami/class2go/django-project/database.py"
-    source "database.py.erb"
-    variables(
-        :database_host => "c2g-stage-appdb1.czjqjb57rejd.us-west-2.rds.amazonaws.com"
-    )
-    owner "bitnami"
-    group "bitnami"
-    mode "0644"
+# need to make this directory writeable by all since it's where python
+# eggs get written to.  Both the daemon and bitnami accounts use this.
+directory "python-egg-dir" do
+    path "/opt/bitnami/.tmp"
+    mode "0777"
+    owner "root"
+    action :create
 end
 
-execute "restart-apache" do
-    command "apachectl restart"
-    user "root"
-end
