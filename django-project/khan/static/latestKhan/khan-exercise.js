@@ -2626,7 +2626,7 @@ var Khan = (function() {
 
             // Backup the response locally, for later use
             success: function(data) {
-
+                alert("Hi")
                 // Tell any listeners that khan-exercises has new
                 // userExercise data
                 $(Khan).trigger("updateUserExercise", data);

@@ -92,4 +92,7 @@ def attempt(request, problemId):
                                         problem_type = request.POST['problem_type'])
 
     problem_activity.save()
-    return HttpResponse("attempt")
+    if request.POST['complete'] == "1":
+        return HttpResponse("complete")
+    else:
+        return HttpResponse("wrong")

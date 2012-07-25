@@ -2662,11 +2662,12 @@ var Khan = (function() {
             url: "/problemsets/attempt/" + problemId,
             type: "POST",
             data: data,
-            dataType: "json",
+            dataType: "text",
             xhrFields: xhrFields,
 
             // Backup the response locally, for later use
             success: function(data) {
+                alert(data)
 
                 // Tell any listeners that khan-exercises has new
                 // userExercise data
