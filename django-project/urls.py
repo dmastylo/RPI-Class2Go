@@ -22,7 +22,6 @@ urlpatterns = patterns('',
 
      #for data collection
      url(r'^videos/save/', 'courses.videos.views.save'),
-     #Very long urls for data collection to determine course, problemset and problem info from within javascript
      url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),
 
     # accounts app for user management

@@ -198,29 +198,29 @@ def create_nlp_course():
 
         #Create exercises
 
-        exercise1_1 = save_exercise(pset1, 1)
-        exercise1_2 = save_exercise(pset1, 2)
-        exercise1_3 = save_exercise(pset1, 3)
+        exercise1_1 = save_exercise(pset1, "P1_Levenshtein.html")
+        exercise1_2 = save_exercise(pset1, "P1_Regexp.html")
+        exercise1_3 = save_exercise(pset1, "P1_Tokenize.html")
 
-        exercise2_1 = save_exercise(pset2, 1)
-        exercise2_2 = save_exercise(pset2, 2)
-        exercise2_3 = save_exercise(pset2, 3)
-        exercise2_4 = save_exercise(pset2, 4)
-        exercise2_5 = save_exercise(pset2, 5)
+        exercise2_1 = save_exercise(pset2, "P2_Add_one_smoothing.html")
+        exercise2_2 = save_exercise(pset2, "P2_Joint.html")
+        exercise2_3 = save_exercise(pset2, "P2_Lexical1.html")
+        exercise2_4 = save_exercise(pset2, "P2_NER1.html")
+        exercise2_5 = save_exercise(pset2, "P2_Spelling.html")
 
         #Create problems
 
-        save_problem(exercise1_1, 1)
-        save_problem(exercise1_1, 2)
-        save_problem(exercise1_2, 1)
-        save_problem(exercise1_3, 1)
+        save_problem(exercise1_1, 'p1')
+        save_problem(exercise1_1, 'p2')
+        save_problem(exercise1_2, 'p1')
+        save_problem(exercise1_3, 'p1')
 
-        save_problem(exercise2_1, 1)
-        save_problem(exercise2_1, 2)
-        save_problem(exercise2_2, 1)
-        save_problem(exercise2_3, 1)
-        save_problem(exercise2_4, 1)
-        save_problem(exercise2_5, 1)
+        save_problem(exercise2_1, 'p1')
+        save_problem(exercise2_1, 'p2')
+        save_problem(exercise2_2, 'p1')
+        save_problem(exercise2_3, 'p1')
+        save_problem(exercise2_4, 'p1')
+        save_problem(exercise2_5, 'p1')
 
         #Create problemactivities
 
@@ -530,15 +530,15 @@ def save_problem_set(course_id, title, name, path, soft_deadline, hard_deadline,
     problem_set.save()
     return problem_set
 
-def save_exercise(problemSet, number):
+def save_exercise(problemSet, fileName):
     exercise = Exercise(problemSet = problemSet,
-                        number = number)
+                        fileName = fileName)
     exercise.save()
     return exercise
 
-def save_problem(exercise, number):
+def save_problem(exercise, slug):
     problem = Problem(exercise = exercise,
-                    number = number)
+                    slug = slug)
 
     problem.save()
 

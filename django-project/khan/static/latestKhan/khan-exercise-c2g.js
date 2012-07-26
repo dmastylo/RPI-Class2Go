@@ -2652,14 +2652,19 @@ var Khan = (function() {
         }
 
         //Gets the problem ID which is (problem number)-(variation)
-        problemId = $('#workarea').children('div').attr('id')
+        slug = $('#workarea').children('div').attr('id')
+        exercise_filename = exercise.data('fileName')
+        pset_id = document.getElementById("pset_id").value
+        data = $.extend(data, {"slug": slug})
+        data = $.extend(data, {"exercise_filename": exercise_filename})
+        data = $.extend(data, {"pset_id": pset_id})
 
         //URL starts with problemsets/attempt to direct to a view to collect data.
         //problemId is the id of the problem the information is being created for
         var request = {
             // Do a request to the server API
             //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
-            url: "/problemsets/attempt/" + problemId,
+            url: "/problemsets/attempt/" + "2",
             type: "POST",
             data: data,
             dataType: "text",
@@ -2667,7 +2672,7 @@ var Khan = (function() {
 
             // Backup the response locally, for later use
             success: function(data) {
-                alert(data)
+                //alert(data)
 
                 // Tell any listeners that khan-exercises has new
                 // userExercise data

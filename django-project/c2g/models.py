@@ -437,7 +437,7 @@ class ProblemSet(TimestampMixin, models.Model):
 
 class Exercise(TimestampMixin, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
-    number = models.IntegerField(null=True, blank=True)
+    fileName = models.CharField(max_length=255)
     def __unicode__(self):
         return self.number
     class Meta:
@@ -445,7 +445,7 @@ class Exercise(TimestampMixin, models.Model):
 
 class Problem(TimestampMixin, models.Model):
     exercise = models.ForeignKey(Exercise)
-    number = models.IntegerField(null=True, blank=True)
+    slug = models.CharField(max_length=255)
     def __unicode__(self):
         return self.number
     class Meta:

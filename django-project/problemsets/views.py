@@ -1,5 +1,5 @@
 from django.shortcuts import render_to_response, HttpResponse
-from c2g.models import Course, ProblemActivity, Problem
+from c2g.models import Course, ProblemActivity, ProblemSet
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 
@@ -71,7 +71,7 @@ def show(request, course_prefix, course_suffix, pset ):
                                'course_prefix': course_prefix,
                                'course_suffix': course_suffix,
                                 'course': course,
-                               'pset': pset,
+                               'pset': ps,
                                'pset_url':ps.path,
                               },
                               context_instance=RequestContext(request))
@@ -79,8 +79,9 @@ def show(request, course_prefix, course_suffix, pset ):
 @csrf_exempt
 def attempt(request, problemId):
     user = request.user
-    problem = Problem.objects.get(id=problemId)
-    exercise = problem.exercise
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
+    problem = exercise.problem_set.get(slug=request.POST['slug'])
     problem_activity = ProblemActivity(student = user,
                                         problem = problem,
                                         exercise = exercise,
