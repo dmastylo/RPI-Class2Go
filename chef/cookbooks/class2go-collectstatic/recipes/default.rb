@@ -13,7 +13,3 @@ execute "collectstatic" do
     user "bitnami"
 end
 
-execute "restart-apache" do
-    command "apachectl restart"
-    user "root"
-end

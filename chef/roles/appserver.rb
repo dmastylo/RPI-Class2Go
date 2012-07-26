@@ -12,5 +12,6 @@ run_list(
     "recipe[class2go-bitnami-django]",
     "recipe[class2go-deploy]",
     "recipe[class2go-database.py]",
-    "recipe[class2go-collectstatic]"   # restarts apache
+    "recipe[class2go-collectstatic]",
+    "recipe[class2go-bitnami-apache-restart]"
 )

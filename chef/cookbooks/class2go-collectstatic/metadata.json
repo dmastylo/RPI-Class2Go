@@ -1,29 +1,29 @@
 {
-  "license": "All rights reserved",
-  "maintainer": "YOUR_COMPANY_NAME",
-  "conflicting": {
-  },
-  "suggestions": {
-  },
   "replacing": {
   },
-  "providing": {
-  },
-  "description": "Installs/Configures class2go-collectstatic",
-  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
-  "platforms": {
+  "maintainer": "YOUR_COMPANY_NAME",
+  "groupings": {
   },
   "attributes": {
   },
-  "dependencies": {
-  },
   "version": "0.0.1",
-  "groupings": {
+  "conflicting": {
+  },
+  "description": "Installs/Configures class2go-collectstatic",
+  "suggestions": {
   },
   "recommendations": {
   },
+  "maintainer_email": "YOUR_EMAIL",
   "recipes": {
   },
-  "maintainer_email": "YOUR_EMAIL",
-  "name": "class2go-collectstatic"
+  "dependencies": {
+  },
+  "name": "class2go-collectstatic",
+  "providing": {
+  },
+  "platforms": {
+  },
+  "license": "All rights reserved",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n"
 }

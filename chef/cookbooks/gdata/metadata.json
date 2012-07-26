@@ -1,29 +1,29 @@
 {
-  "dependencies": {
+  "platforms": {
   },
   "description": "Install gdata-python-client",
-  "attributes": {
-  },
-  "replacing": {
+  "long_description": "Description\n===========\n\nInstall the Google client for Google Data.  We copy version 2.0.17 in here for good measure.  For more info, see the project page at [http://code.google.com/p/gdata-python-client/].\n\n",
+  "groupings": {
   },
   "conflicting": {
   },
   "maintainer": "Stanford Class2Go",
-  "version": "0.1.0",
+  "recipes": {
+  },
+  "replacing": {
+  },
+  "maintainer_email": "sef@cs.stanford.edu",
+  "dependencies": {
+  },
+  "name": "gdata",
   "suggestions": {
   },
-  "platforms": {
-  },
-  "license": "All rights reserved",
-  "groupings": {
-  },
-  "name": "install-gdata",
-  "recipes": {
+  "version": "0.1.0",
+  "attributes": {
   },
   "providing": {
   },
-  "long_description": "Description\n===========\n\nInstall the Google client for Google Data.  We copy version 2.0.17 in here for good measure.  For more info, see the project page at [http://code.google.com/p/gdata-python-client/].\n\n",
   "recommendations": {
   },
-  "maintainer_email": "sef@cs.stanford.edu"
+  "license": "All rights reserved"
 }
