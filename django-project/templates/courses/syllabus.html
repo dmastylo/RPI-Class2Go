@@ -6,6 +6,7 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
+<<<<<<< HEAD
     {% if common_page_data.course_mode == 'staging' %}
         {% if common_page_data.production_course.syllabus == common_page_data.staging_course.syllabus %}
             <p style='margin-bottom: 10px;'><span style="color: green;font-weight: bold;">S=P</span> Syllabus same on staging and production.</p>
@@ -36,6 +37,10 @@
     {% else %}
         {% autoescape off %}{{common_page_data.course.syllabus}}{% endautoescape %}
     {% endif %}
+=======
+  <div id="loadedSyllabus"></div>
+    
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 </div>
 {% endblock m_column_content %}
 

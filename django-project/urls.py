@@ -21,9 +21,14 @@ urlpatterns = patterns('',
     # url(r'^class2go/', include('class2go.foo.urls')),
 
      #for data collection
+<<<<<<< HEAD
      url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
 
 
+=======
+     url(r'^videos/save/', 'courses.videos.views.save'),
+     url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 
     # accounts app for user management
     url(r'^accounts/profile/?$', 'accounts.views.profile', name='accounts_profile'),
@@ -40,27 +45,33 @@ urlpatterns = patterns('',
 
 
     # The following line is temprarily commented out until we figure out how django cascades its URL matching operations.
-	# After this is figured out, the rest of the matches below shall be moved to courses.url.
-	#url(r'.*', include('courses.urls')),
+    # After this is figured out, the rest of the matches below shall be moved to courses.url.
+    #url(r'.*', include('courses.urls')),
 
-	url(r'^courses/new/?', 'courses.admin_views.new'),
+    url(r'^courses/new/?', 'courses.admin_views.new'),
 
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/?$', 'courses.views.main'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/?$', 'courses.views.main'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/overview/?$', 'courses.views.overview'),
+<<<<<<< HEAD
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/syllabus/?$', 'courses.views.syllabus'),
     
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/admin/?', 'courses.admin_views.admin'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/switch_mode/?', 'courses.admin_views.switch_mode'),
+=======
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/syllabus/?$', 'courses.views.syllabus'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/admin/?', 'courses.admin_views.admin'),
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 
-	# Announcements
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/?$', 'courses.announcements.views.list'),
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/admin/?', 'courses.announcements.views.admin'),
+    # Announcements
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/?$', 'courses.announcements.views.list'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/admin/?', 'courses.announcements.views.admin'),
 
-	# Forums
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/?$', 'courses.forums.views.view'),
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/admin/?', 'courses.forums.views.admin'),
+    # Forums
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/?$', 'courses.forums.views.view'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/admin/?', 'courses.forums.views.admin'),
 
 
+<<<<<<< HEAD
 	# Videos
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
 	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<slug>[a-zA-Z0-9_]+)/?$', 'courses.videos.views.view'),
@@ -70,11 +81,18 @@ urlpatterns = patterns('',
     url(r'^commit/?', 'courses.videos.actions.commit'),
     url(r'^revert/?', 'courses.videos.actions.revert'),
     url(r'^change_live_datetime/?', 'courses.videos.actions.change_live_datetime'),
+=======
+    # Videos
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/admin/?', 'courses.videos.views.admin'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.videos.views.view'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_id>[a-zA-Z0-9_]+)/edit/?', 'courses.videos.views.edit'),
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 
-	# Video Exercises
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.video_exercises.views.view'),
+    # Video Exercises
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.video_exercises.views.view'),
 
     #Problem Sets
-	url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/?$', 'problemsets.views.list'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/?$', 'problemsets.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset>[a-zA-Z0-9_]+)?$', 'problemsets.views.show'),
 )

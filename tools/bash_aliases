@@ -1,13 +1,26 @@
 # source this from your login shell
 
-function staging {
-    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-    ssh -A ubuntu@app4.stage.c2gops.com
+hoststage="app"
+hostprod="app"
+
+function prodapp {
+    ssh-add -l | grep -q "c2g-prod" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
+    ssh -A bitnami@${hostprod}.prod.c2gops.com
 }
 
-function stagingdb {
+# function proddb {
+#     ssh-add -l | grep -q "c2g-prod" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
+#     ssh -At bitnami@${hostprod}.stage.c2gops.com "class2go/django-project/manage.py dbshell"
+# }
+
+function stageapp {
     ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-    ssh -At ubuntu@app4.stage.c2gops.com "class2go/django-project/manage.py dbshell"
+    ssh -A bitnami@${hoststage}.stage.c2gops.com
 }
+
+# function stagedb {
+#     ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
+#     ssh -At bitnami@${hoststage}.stage.c2gops.com "class2go/django-project/manage.py dbshell"
+# }
 
 alias localdb="~/src/class2go/django-project/manage.py dbshell"

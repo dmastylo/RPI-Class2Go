@@ -118,14 +118,11 @@
   }
   .modal {
     position: absolute;
-    top: 10px;
+    top: 20px;
     right: 10px;
     left: 10px;
     width: auto;
-    margin: 0;
-  }
-  .modal.fade.in {
-    top: auto;
+    margin-left:0;
   }
   .modal-header .close {
     padding: 10px;
@@ -135,26 +132,30 @@
     position: static;
   }
   .logo {
-    width: 183px;
-    height:27px;
+    width:144px;
+    height:21px;
     text-indent:-999px;
     display:block;
     background: url(/static/graphics/core/c2g-logo-mobile.png) no-repeat;
     position: absolute; 
-    top: 25px; 
+    top: 17px; 
     left: 25px;
+  }
+  .top-nav li .btn {
+    padding:8px !important;
+    margin-top:-7px;
   }
 }
 
 @media (max-width: 767px) {
   .logo {
-    width: 183px;
-    height:27px;
+    width:144px;
+    height:21px;
     text-indent:-999px;
     display:block;
     background: url(/static/graphics/core/c2g-logo-mobile.png) no-repeat;
     position: absolute; 
-    top: 25px; 
+    top: 17px; 
     left: 25px;
   }
   body .container-fluid {
@@ -725,7 +726,7 @@
   }
   .navbar-fixed-top .navbar-inner,
   .navbar-fixed-bottom .navbar-inner {
-    padding: 5px;
+    padding: 0;
   }
   .navbar .container {
     width: auto;
@@ -839,7 +840,7 @@
 
 @media (min-width: 980px) {
   .logo {
-    width: 308px;
+    width:308px;
     height:21px;
     text-indent:-999px;
     display:block;

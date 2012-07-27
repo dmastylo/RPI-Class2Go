@@ -30,8 +30,8 @@ def save_edits(request):
     return HttpResponseRedirect(reverse('accounts.views.profile'))
 
 def logout(request):
-	logout(request)
-	return redirect('c2g.views.home')
+    logout(request)
+    return redirect('c2g.views.home')
 
 @sensitive_post_parameters()
 @csrf_protect

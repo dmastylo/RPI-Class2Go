@@ -37,71 +37,71 @@ HotKey = function(playerJSRef) {
     
 
     function keyHandler(evt) {
-	//console.log(evt)
-	//console.log(evt.target.nodeName);
-	if ((evt.target.nodeName == "BODY" ||  //only act if the hotkey was pressed on the page or player, 
-	     evt.target == player)) {                    //not in an actual form or textarea
-	    switch (evt.keyCode) {
-	    case 72: //h: Toggle Shortcut Key Legend
-		toggleLegend();
-		break;
-	    case 37:  //left arrow: Rewind 30 seconds
-		player.seekTo(player.getCurrentTime()-30,true);
-		player.playVideo()
-		break;
-	    case 39:  //right arrow: FF 30 seconds
-		player.seekTo(player.getCurrentTime()+30,true);
-		player.playVideo();
-		break;
-	    case 38:  //up arrow: Volume up 10%
-		player.setVolume(Math.min(player.getVolume()+10,100));
-		break;
-	    case 40: //down arrow: Volume down 10%
-		player.setVolume(Math.max(player.getVolume()-10,0));
-		break;
-	    case 77: //m: Toggle Mute
-		if (player.isMuted()) {
-		    player.unMute();
-		}
-		else {
-		    player.mute();
-		}
-		break;
-	    case 80: //p: Toggle Play/Pause
-		togglePlayback();
-		break;
-	    case 67: //c: Toggle captions (may be difficult to implement)
-		console.log('c');
-		break;
-	    }
-	    
-	};
+    //console.log(evt)
+    //console.log(evt.target.nodeName);
+    if ((evt.target.nodeName == "BODY" ||  //only act if the hotkey was pressed on the page or player, 
+         evt.target == player)) {                    //not in an actual form or textarea
+        switch (evt.keyCode) {
+        case 72: //h: Toggle Shortcut Key Legend
+        toggleLegend();
+        break;
+        case 37:  //left arrow: Rewind 30 seconds
+        player.seekTo(player.getCurrentTime()-30,true);
+        player.playVideo()
+        break;
+        case 39:  //right arrow: FF 30 seconds
+        player.seekTo(player.getCurrentTime()+30,true);
+        player.playVideo();
+        break;
+        case 38:  //up arrow: Volume up 10%
+        player.setVolume(Math.min(player.getVolume()+10,100));
+        break;
+        case 40: //down arrow: Volume down 10%
+        player.setVolume(Math.max(player.getVolume()-10,0));
+        break;
+        case 77: //m: Toggle Mute
+        if (player.isMuted()) {
+            player.unMute();
+        }
+        else {
+            player.mute();
+        }
+        break;
+        case 80: //p: Toggle Play/Pause
+        togglePlayback();
+        break;
+        case 67: //c: Toggle captions (may be difficult to implement)
+        console.log('c');
+        break;
+        }
+        
+    };
 
-	function togglePlayback() {
-	    if (player.getPlayerState() == 1 /*playing*/) {
-		player.pauseVideo();
-	    } else {
-		player.playVideo();
-	    }
+    function togglePlayback() {
+        if (player.getPlayerState() == 1 /*playing*/) {
+        player.pauseVideo();
+        } else {
+        player.playVideo();
+        }
 
-	    
-	}
+        
+    }
 
-	function toggleLegend() {
-	    if (legend.style.display == "none") {
-		legend.style.display = 'block';
-		legend.style.top = (window.pageYOffset + 10) + 'px';
-	    }
-	    else {
-		legend.style.display = 'none';
-	    }
-	}
+    function toggleLegend() {
+        if (legend.style.display == "none") {
+        legend.style.display = 'block';
+        legend.style.top = (window.pageYOffset + 10) + 'px';
+        }
+        else {
+        legend.style.display = 'none';
+        }
+    }
     };
     
     document.addEventListener('keydown',keyHandler,false);
      
     return {
-	player: playerJSRef,
+    player: playerJSRef,
     };
 
 };

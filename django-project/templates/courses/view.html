@@ -5,6 +5,7 @@
 
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
+<<<<<<< HEAD
 	<div class="well tight">
 		<ul class="nav nav-list">
 			<li class="nav-header">Videos</li>
@@ -17,6 +18,20 @@
 			{% endfor %}
 			<li class="divider"></li>
 			<li><a href="#"><i class="icon-flag"></i>Help</a></li>
+=======
+    <div class="well tight">
+        <ul class="nav nav-list">
+            <li class="nav-header">Videos</li>
+            {% for video in course.video_set.all %}
+              <li><a href="{% url 'courses.videos.views.view' course_prefix course_suffix video.id %}">{{video.title}}</a></li>
+            {% endfor %}
+            <li class="nav-header">Problem Sets</li>
+            {% for pset in course.problemset_set.all %}
+              <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset.title %}">{{pset.name}}</a></li>
+            {% endfor %}
+            <li class="divider"></li>
+            <li><a href="#"><i class="icon-flag"></i>Help</a></li>
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
             <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
         </ul>
     </div>
@@ -25,16 +40,23 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-	<h3 class="section-title">Recent Announcements</h3>
-	{% for announcement in announcement_list %}
+    <h3 class="section-title">Recent Announcements</h3>
+    {% for announcement in announcement_list %}
     <div class="announcement">
-		  <small class="date"> {{announcement.last_updated}} by {{announcement.owner}}</small>
+          <small class="date"> {{announcement.last_updated}} by {{announcement.owner}}</small>
       <h4>{{announcement.title}}</h4>
-		  <p>{{announcement.description}}</p>
+          <p>{{announcement.description}}</p>
     </div>
+<<<<<<< HEAD
     {% empty %}
         <p style="margin:20px;">No announcements to display.</p>
 	{% endfor %}
+=======
+    {% endfor %}
+    
+  <h3>Course Description</h3>
+  <p>{{course.description}}</p>
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 
 </div>
 {% endblock m_column_content %}

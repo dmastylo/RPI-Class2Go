@@ -9,6 +9,7 @@ from courses.common_page_data import get_common_page_data
 import datetime
 
 def list(request, course_prefix, course_suffix):
+<<<<<<< HEAD
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -64,11 +65,46 @@ def view(request, course_prefix, course_suffix, slug):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
+=======
+    course = Course.objects.get(handle=course_prefix+"-"+course_suffix)
+    data = {'request': request,
+        'course_prefix': course_prefix,
+        'course_suffix': course_suffix,
+        'course': course,
+       }
+
+    if request.user.is_authenticated():
+        data['topics'] = course.videotopic_set.all()
+        data['videoRecs'] = request.user.videoactivity_set.filter(course=course)
+
+    return render_to_response('videos/list.html',
+                  data,
+                  context_instance=RequestContext(request))
+
+def admin(request, course_prefix, course_suffix):
+    course = Course.objects.get(handle=course_prefix+"-"+course_suffix)
+    return render_to_response('videos/admin.html',
+            {'request': request,
+             'course_prefix': course_prefix,
+             'course_suffix': course_suffix,
+             'course': course,
+             },
+            context_instance=RequestContext(request))
+
+def view(request, course_prefix, course_suffix, video_id):
+    course = Course.objects.get(handle=course_prefix+"-"+course_suffix)
+    data = {'request': request,
+        'course_prefix': course_prefix,
+        'course_suffix': course_suffix,
+        'course': course,
+       }
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 
     if request.user.is_authenticated():
         video = Video.objects.get(course=common_page_data['production_course'], slug=slug)
         video_rec = request.user.videoactivity_set.filter(video=video)
 
+<<<<<<< HEAD
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
     
 def edit(request, course_prefix, course_suffix, video_id):
@@ -78,12 +114,21 @@ def edit(request, course_prefix, course_suffix, video_id):
         raise Http404
         
     return render_to_response('videos/edit.html', 
+=======
+    return render_to_response('videos/view.html',
+                              data,
+                              context_instance=RequestContext(request))
+
+def edit(request, course_prefix, course_suffix, video_id):
+    course = Course.objects.get(handle=course_prefix+"-"+course_suffix)
+    return render_to_response('videos/edit.html',
+>>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
             {'request': request,
-             'course_prefix': course_prefix, 
-             'course_suffix': course_suffix, 
-             'course': course, 
-             'video_id': video_id, 
-             }, 
+             'course_prefix': course_prefix,
+             'course_suffix': course_suffix,
+             'course': course,
+             'video_id': video_id,
+             },
             context_instance=RequestContext(request))
 
 
