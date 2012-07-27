@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
 	<link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
     <!--[if IE 7]>
 	  <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome-ie7.css">
 	<![endif]-->
@@ -64,7 +65,6 @@
 		{% block content %}
 		<div class="container-fluid body-content">
 			<div class="row-fluid">
-				
 				{% block l_column_content %}{% endblock %}
 				
 				{% block m_column_content %}{% endblock %}
@@ -75,7 +75,7 @@
 		</div>
 		{% endblock content %}
 		</div>
-    </div>
+  	</div>
 
 	<div id="login-modal" class="modal fade">
 		<div class="modal-header">

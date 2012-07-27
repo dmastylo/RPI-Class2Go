@@ -1,0 +1,40 @@
+<div class="container shaded" style="margin: 10px; margin-left: 30px;padding: 5px; width: 930px;">
+    <table>
+        <tr>
+            <td style="width: 540px;"><h3>{{topic_structure.topic.title}}</h3></td>
+            <td style="width: 120px;"><button onclick="$('#new_video_form_{{ topic_structure.topic.id }}').toggle()" class="btn">Add video</button></td>
+            <td style="width: 140px;"><a href="javascript:SelectAllChildren('{{ topic_structure.topic.id }}')">Select all children</a></td>
+            <td style="width: 120px;">
+                <button><i class="icon-arrow-up"></i></button>
+                <button><i class="icon-arrow-down"></i></button>
+                <button><i class="icon-trash"></i></button>
+            </td>
+        </tr>
+    </table>
+    
+    <div class="container framed" id="new_video_form_{{ topic_structure.topic.id }}" style="display:none;width: 890px;">
+        <h3>New video</h3>
+        <form action="{% url 'courses.videos.actions.add_video' %}" method="POST">
+            <p style="margin-top: 10px;">
+                <b>Title: </b><input name="title" id="title" style='margin-right: 20px;'/>
+                <b>YouTube ID: </b><input name="yt_id" id="yt_id"  style='margin-right: 20px;'/>
+                <b>Slug: </b><input name="slug" id="slug" />
+            </p>
+            <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+            <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+            <input type="hidden" name="topic_id" value="{{ topic_structure.topic.id }}" />
+            <!--p style="margin-top: 10px;">
+                <b>Description:</b>
+                <textarea class="tinymce" name="description" style="width: 100%;"></textarea><br/>
+            </p-->
+            <input type="submit" value="Create" class="btn" />
+            {% csrf_token %}
+        </form>
+    </div>
+    
+    <ul>
+    {% for video_video_rec in topic_structure.video_video_recs %}
+        {% include "videos/staging/video_topic_item.html" %}
+    {% endfor %}
+    </ul>
+</div>

@@ -2,14 +2,23 @@
 {% load url from future %}
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 
-{% block l_column_content %}
-<div id="c2g_layout_m_column" class="span3">
-{% autoescape off %}{{ l_content }}{% endautoescape %}
-</div>
-{% endblock l_column_content %}
-
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-{% autoescape off %}{{ m_content }}{% endautoescape %}
+    {% if user.is_authenticated %}
+        <h2>Problem Sets</h2>
+        {% for dictionary in package %}
+            <h4><a href="problemsets/{{dictionary.pset.title}}">{{dictionary.pset.name}}</a></h4>
+            <p>{{dictionary.pset.description}}</p>
+            <p align="right">Full Credit Deadline: {{dictionary.pset.soft_deadline}}, Partial Credit Deadline: {{dictionary.pset.hard_deadline}}</p>
+            <h5>Progress</h5>
+            <div class="progress-bar">
+                <div class="fill red" style="width:{{dictionary.progress}}%"></div>
+                <p>Completed {{dictionary.numCompleted}} of {{dictionary.numQuestions}}</p>
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <h4>Please log in to see assignment information</h4>
+    {% endif %}
 </div>
 {% endblock m_column_content %}
