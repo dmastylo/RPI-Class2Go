@@ -4,31 +4,29 @@
 
 {% block navbar %}
 <div class="navbar navbar-fixed-top">
-<<<<<<< HEAD
-	<div class="navbar-inner">
-		<div class="container-fluid">
-			<ul class="nav">
-				<li {% block home_link_class %}{% endblock home_link_class %}>
-					<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
-				</li>
-				<li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
-					<ul class="dropdown-menu">
-						<li><a href="{% url 'courses.views.overview' common_page_data.course_prefix common_page_data.course_suffix %}">Overview</a></li>
-						<li><a href="{% url 'courses.views.syllabus' common_page_data.course_prefix common_page_data.course_suffix %}">Syllabus</a></li>
-					</ul>
-				</li>
-				<li {% block forums_link_class %}{% endblock forums_link_class %}>
-					<a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
-				</li>
-				<li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-					<a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
-				</li>
-				<li {% block videos_link_class %}{% endblock videos_link_class %}>
-					<a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
-				</li>
-			</ul>
-            
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <ul class="nav">
+                <li {% block home_link_class %}{% endblock home_link_class %}>
+                    <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
+                </li>
+                <li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'courses.views.overview' common_page_data.course_prefix common_page_data.course_suffix %}">Overview for Non-Members</a></li>
+                        <li><a href="{% url 'courses.views.syllabus' common_page_data.course_prefix common_page_data.course_suffix %}">Syllabus</a></li>
+                    </ul>
+                </li>
+                <li {% block forums_link_class %}{% endblock forums_link_class %}>
+                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
+                </li>
+                <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
+                    <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
+                </li>
+                <li {% block videos_link_class %}{% endblock videos_link_class %}>
+                    <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
+                </li>
+            </ul>
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
             <ul class="nav pull-right">
                 {% if common_page_data.can_switch_mode %}
@@ -50,38 +48,6 @@
                 {% endif %}
             </ul>
             {% endif %}
-			<!--form class="navbar-search hidden-phone" action="">
-				<div class="input-append">
-					<input class="span2 search-query" placeholder="Search course" id="appendedInputButton" size="16" type="text">
-					<button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
-				</div>
-			</form-->
-		</div>
-	</div>
-=======
-    <div class="navbar-inner">
-        <div class="container-fluid">
-            <ul class="nav">
-                <li {% block home_link_class %}{% endblock home_link_class %}>
-                    <a href="{% url 'courses.views.main' course_prefix course_suffix %}">Home</a>
-                </li>
-                <li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url 'courses.views.overview' course_prefix course_suffix %}">Overview for Non-Members</a></li>
-                        <li><a href="{% url 'courses.views.syllabus' course_prefix course_suffix %}">Syllabus</a></li>
-                    </ul>
-                </li>
-                <li {% block forums_link_class %}{% endblock forums_link_class %}>
-                    <a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a>
-                </li>
-                <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-                    <a href="{% url 'problemsets.views.list' course_prefix course_suffix %}">Problem Sets</a>
-                </li>
-                <li {% block videos_link_class %}{% endblock videos_link_class %}>
-                    <a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a>
-                </li>
-            </ul>
             <!--form class="navbar-search hidden-phone" action="">
                 <div class="input-append">
                     <input class="span2 search-query" placeholder="Search course" id="appendedInputButton" size="16" type="text">
@@ -90,7 +56,6 @@
             </form-->
         </div>
     </div>
->>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 </div>
 {% endblock navbar %}
 
@@ -98,16 +63,9 @@
 <div class="container-fluid body-content">
     <div class="row-fluid page-header">
         <div class="span12">
-<<<<<<< HEAD
             <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
         </div>
     </div>
-
-=======
-            <h2>{{course.title}}</h2>
-        </div>
-    </div>
->>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
     <div class="row-fluid">
         {% block l_column_content %}{% endblock %}
         
@@ -116,11 +74,5 @@
         {% block r_column_content %}{% endblock %}
     </div>
     {% include "footer.html" %}
-<<<<<<< HEAD
 </div>
 {% endblock content %}
-=======
-    </div>
-</div>
-{% endblock content %}
->>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f

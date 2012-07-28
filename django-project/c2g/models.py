@@ -380,12 +380,6 @@ class ProblemSet(TimestampMixin, Stageable, models.Model):
     class Meta:
         db_table = u'c2g_problem_sets'
 
-<<<<<<< HEAD
-class Problem(TimestampMixin, Stageable, models.Model):
-    problem_set = models.ForeignKey(ProblemSet)
-    problem_number = models.IntegerField(null=True, blank=True)
-    
-=======
 class Exercise(TimestampMixin, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     fileName = models.CharField(max_length=255)
@@ -394,10 +388,10 @@ class Exercise(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_exercises'
 
-class Problem(TimestampMixin, models.Model):
+class Problem(TimestampMixin, Stageable, models.Model):
     exercise = models.ForeignKey(Exercise)
     slug = models.CharField(max_length=255)
->>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
+
     def __unicode__(self):
         return self.number
     class Meta:

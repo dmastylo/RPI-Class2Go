@@ -1,20 +1,14 @@
-<<<<<<< HEAD
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from c2g.models import Course
 from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
-=======
-from django.shortcuts import render_to_response, HttpResponse
-from c2g.models import Course, ProblemActivity, ProblemSet
-from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
 # each problem set. Packages this information along with problem set
 # information about deadlines into a dictionary and passes it to the template.
->>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 
 def list(request, course_prefix, course_suffix):
     course_handle = course_prefix + "-" + course_suffix
