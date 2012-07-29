@@ -2164,7 +2164,7 @@ var Khan = (function() {
                 $(this).val($(this).data("buttonText") || "I'd like another hint (" + stepsLeft + ")");
 
                 var problem = $(hint).parent();
-                                
+
                 // Append first so MathJax can sense the surrounding CSS context properly
                 $(hint).appendTo("#hintsarea").runModules(problem);
 
@@ -2176,7 +2176,7 @@ var Khan = (function() {
                     $(hint).addClass("final_answer");
 
                     $(Khan).trigger("allHintsUsed");
-                    
+
                     $(this).attr("disabled", true);
                 }
             }
@@ -2663,6 +2663,7 @@ var Khan = (function() {
     }
 
     function request(method, data, fn, fnError, queue) {
+    /*
         if (testMode) {
             // Pretend we have success
             if ($.isFunction(fn)) {
@@ -2671,7 +2672,7 @@ var Khan = (function() {
 
             return;
         }
-
+    */
         var xhrFields = {};
         if (typeof XMLHTTPRequest !== "undefined") {
             // If we have native XMLHTTPRequest support,
@@ -2931,7 +2932,7 @@ var Khan = (function() {
     c2gKhan.debugLogLog = debugLogLog;
     c2gKhan.hintsCache = {};
     c2gKhan.makeProblem = function (id) {
-        
+
         console.log("making problem for id " + id + "...");
         c2gKhan.hintsCache[id] = c2gKhan.currentHints;
         makeProblem(id);

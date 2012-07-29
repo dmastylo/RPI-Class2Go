@@ -97,3 +97,11 @@ def attempt(request, problemId):
         return HttpResponse("complete")
     else:
         return HttpResponse("wrong")
+
+def create(request, course_prefix, course_suffix):
+    return render_to_response('problemsets/create.html',
+                            {'request': request,
+                                'course_prefix': course_prefix,
+                                'course_suffix': course_suffix,
+                            },
+                            context_instance=RequestContext(request))
