@@ -67,7 +67,7 @@ class Institution(TimestampMixin, models.Model):
         db_table = u'c2g_institutions'
 
 class Course(TimestampMixin, Stageable, models.Model):
-    institution = models.ForeignKey(Institution, db_index=True)
+    institution = models.ForeignKey(Institution, null=True, db_index=True)
     student_group = models.ForeignKey(Group, related_name="student_group", db_index=True)
     instructor_group = models.ForeignKey(Group, related_name="instructor_group", db_index=True)
     tas_group = models.ForeignKey(Group, related_name="tas_group", db_index=True)
@@ -200,23 +200,90 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
 
 #owner is person who posted
 #does it need access_id?
-class Announcement(TimestampMixin, models.Model):
+class Announcement(TimestampMixin, Stageable, models.Model):
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
+    
+    def create_production_instance(self):
+        production_instance = Announcement(
+            course=self.course.image,
+            title=self.title,
+            description=self.description,
+            owner = self.owner,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+        
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+            
+        production_instance.save()
+            
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+            
+        self.save()
+        
     class Meta:
         db_table = u'c2g_announcements'
-
-#Let's use django file support or something else instead, but keep for now
-#Need (owner,course) index here
-class File(TimestampMixin, models.Model):
-    owner = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
+        
+class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
+    
+    def create_production_instance(self):
+        production_instance = ContentSection(
+            course=self.course.image,
+            title=self.title,
+            index=self.index,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+        
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
+            
+        production_instance.save()
+            
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
+            
+        self.save()
+        
     class Meta:
-        db_table = u'c2g_files'
+        db_table = u'c2g_content_sections'
 
 class StudentSection(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -241,55 +308,9 @@ def create_user_profile(sender, instance, created, raw, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
-class VideoTopic(TimestampMixin, Stageable, Sortable, models.Model):
-    course = models.ForeignKey(Course, db_index=True)
-    title = models.CharField(max_length=255)
-    
-    def create_production_instance(self):
-        production_instance = VideoTopic(
-            course=self.course.image,
-            title=self.title,
-            index = self.index,
-            image = self,
-            mode = 'production',
-        )
-
-        production_instance.save()
-        self.image = production_instance
-        self.save()
-        
-    def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-        
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
-        if not clone_fields or 'index' in clone_fields:
-            production_instance.index = self.index
-            
-        production_instance.save()
-            
-    def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
-        
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
-        if not clone_fields or 'index' in clone_fields:
-            self.index = production_instance.index
-            
-        self.save()
-    
-    def __unicode__(self):
-        return self.title
-
-    class Meta:
-        db_table = u'c2g_video_topics'
-
-
 class Video(TimestampMixin, Stageable, Sortable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
-    topic = models.ForeignKey(VideoTopic, null=True, db_index=True)
+    section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
@@ -300,7 +321,7 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
     def create_production_instance(self):
         production_instance = Video(
             course=self.course.image,
-            topic=self.topic.image,
+            section=self.section.image,
             title=self.title,
             description=self.description,
             type=self.type,
@@ -342,9 +363,6 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
                 self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
 
-    def percent_done(self):
-        return float(self.start_seconds*100)/self.duration
-
     def __unicode__(self):
         return self.title
 
@@ -366,15 +384,68 @@ class VideoActivity(models.Model):
      class Meta:
         db_table = u'c2g_video_activity'
 
-class ProblemSet(TimestampMixin, Stageable, models.Model):
+class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     course = models.ForeignKey(Course)
+    section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255)
     name = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
     soft_deadline = models.DateTimeField(null=True, blank=True)
     hard_deadline = models.DateTimeField(null=True, blank=True)
+    slug = models.CharField(max_length=255)
     
+    def create_production_instance(self):
+        production_instance = ProblemSet(
+            course=self.course.image,
+            section=self.section.image,
+            title=self.title,
+            name=self.name,
+            description=self.description,
+            path=self.path,
+            soft_deadline=self.soft_deadline,
+            hard_deadline=self.hard_deadline,
+            slug=self.slug,
+            index=self.index,
+            image = self,
+            mode = 'production',
+        )
+        production_instance.save()
+        self.image = production_instance
+        self.save()
+        
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+        if not clone_fields or 'path' in clone_fields:
+            production_instance.path = self.path
+        if not clone_fields or 'slug' in clone_fields:
+            production_instance.slug = self.slug
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
+            
+        production_instance.save()
+            
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+        if not clone_fields or 'path' in clone_fields:
+            self.path = production_instance.path
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = production_instance.slug
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
+        
     def __unicode__(self):
         return self.title
     class Meta:

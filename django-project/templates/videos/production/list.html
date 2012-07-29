@@ -7,7 +7,7 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% if user.is_authenticated %}
-        {% for topic_structure in topic_structures %}
+        {% for section_structure in section_structures %}
             {% include "videos/production/video_topic.html" %}
         {% empty %}
             <p style='margin: 20px;'>No videos to display.</p>

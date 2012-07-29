@@ -21,6 +21,8 @@
                 <span class="label">In Progress: {{dictionary.numCompleted}} of {{dictionary.numQuestions}}</span>
             {% endif %}
             <hr>
+        {% empty%}
+            <p style='margin: 20px;'>There are no problem sets to display.</p>
         {% endfor %}
     {% else %}
         <h4>Please log in to see assignment information</h4>

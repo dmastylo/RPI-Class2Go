@@ -43,6 +43,12 @@
                             <li><a href="#">Classes</a></li>
                             <li><a href="#">Search</a></li>
                         </ul>
+                        
+                        {% ifequal user.is_staff True %}
+						<ul class="nav pull-right">
+							<li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
+						</ul>
+						{% endifequal %}
                         <!--form class="navbar-search hidden-phone" action="">
                             <div class="input-append">
                                 <input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">

@@ -4,7 +4,7 @@ from django.template import Context, loader
 from c2g.models import Course, Video
 from django.template import RequestContext
 
-from c2g.models import Course, Video, VideoTopic, VideoActivity
+from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
 import datetime
 
@@ -14,18 +14,18 @@ def list(request, course_prefix, course_suffix):
     except:
         raise Http404
 
+    section_structures = []
     if request.user.is_authenticated():
-        topics = common_page_data['course'].videotopic_set.all().order_by('index')
-        videos = Video.objects.filter(course=common_page_data['course']).order_by('topic', 'index')
+        sections = common_page_data['course'].contentsection_set.all().order_by('index')
+        videos = Video.objects.filter(course=common_page_data['course']).order_by('section', 'index')
         video_recs = request.user.videoactivity_set.filter(course=common_page_data['course'])
         
-        topic_structures = []
         index = 0
-        for topic in topics:
-            topic_dict = {'topic':topic, 'video_video_recs':[]}
+        for section in sections:
+            section_dict = {'section':section, 'video_video_recs':[]}
             
             for video in videos:
-                if video.topic_id == topic.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and common_page_data['current_datetime'] > video.live_datetime)):
+                if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and common_page_data['current_datetime'] > video.live_datetime)):
                     current_video_rec = None
                     for video_rec in video_recs:
                         if video_rec.video_id == video.id:
@@ -47,17 +47,17 @@ def list(request, course_prefix, course_suffix):
                             else:
                                 live_status = "<span style='color:green;'>Live</span>"
                                 
-                    topic_dict['video_video_recs'].append({'video':video, 'video_rec':current_video_rec, 'live_status':live_status})
+                    section_dict['video_video_recs'].append({'video':video, 'video_rec':current_video_rec, 'live_status':live_status})
             
-            if common_page_data['course_mode'] == 'staging' or len(topic_dict['video_video_recs']) > 0:
-                topic_structures.append(topic_dict)
+            if common_page_data['course_mode'] == 'staging' or len(section_dict['video_video_recs']) > 0:
+                section_structures.append(section_dict)
                 index += 1
     
     if common_page_data['course_mode'] == 'staging':
         template = 'videos/staging/list.html'
     else:
         template = 'videos/production/list.html'
-    return render_to_response(template, {'common_page_data':common_page_data, 'topic_structures':topic_structures}, context_instance=RequestContext(request))
+    return render_to_response(template, {'common_page_data':common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
     
 def view(request, course_prefix, course_suffix, slug):
     try:

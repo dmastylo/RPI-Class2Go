@@ -4,7 +4,7 @@ from django.template import Context, loader
 from c2g.models import Course, Video
 from django.template import RequestContext
 
-from c2g.models import Course, Video, VideoTopic, VideoActivity
+from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
 
 import datetime

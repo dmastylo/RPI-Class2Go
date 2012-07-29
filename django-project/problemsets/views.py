@@ -11,68 +11,65 @@ from django.views.decorators.csrf import csrf_exempt
 # information about deadlines into a dictionary and passes it to the template.
 
 def list(request, course_prefix, course_suffix):
-    course_handle = course_prefix + "-" + course_suffix
-    course = Course.objects.get(handle=course_handle)
-    psets = course.problemset_set.all().order_by('soft_deadline')
-    package = []
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    
+    if common_page_data['course_mode'] == 'staging':
+        return HttpResponse('Under construction ...')
+    else:
+        psets = common_page_data['production_course'].problemset_set.all().order_by('soft_deadline')
+        package = []
 
-    if not request.user.is_authenticated():
-        return render_to_response('problemsets/list.html',
-                                {'request': request,
-                                'course_prefix': course_prefix,
-                                'course_suffix': course_suffix,
-                                'course': course,
-                                },
-                                context_instance=RequestContext(request))
+        if not request.user.is_authenticated():
+            return render_to_response('problemsets/production/list.html',
+                                    {'common_page_data':common_page_data},
+                                    context_instance=RequestContext(request))
 
-    for pset in psets:
-        exercises = pset.exercise_set.all()
-        numQuestions = len(exercises)
-        #Starting values are total questions and will be subtracted from
-        numCompleted = numQuestions
-        numCorrect = numQuestions
-        for exercise in exercises:
-            attempts = exercise.problemactivity_set.filter(student = request.user).exclude(attempt_content="hint")
+        for pset in psets:
+            exercises = pset.exercise_set.all()
+            numQuestions = len(exercises)
+            #Starting values are total questions and will be subtracted from
+            numCompleted = numQuestions
+            numCorrect = numQuestions
+            for exercise in exercises:
+                attempts = exercise.problemactivity_set.filter(student = request.user).exclude(attempt_content="hint")
 
-            #Counts the completed problems by subtracting all without a student activity recorded for it
-            if len(attempts) == 0:
-                numCompleted -= 1
+                #Counts the completed problems by subtracting all without a student activity recorded for it
+                if len(attempts) == 0:
+                    numCompleted -= 1
 
-            #Add one to the number of correctly answered questions if the first attempt is correct
-            attempts.filter(attempt_number = 1)
-            for attempt in attempts:
-                if attempt.complete == 0:
-                    numCorrect -= 1
-                    break
+                #Add one to the number of correctly answered questions if the first attempt is correct
+                attempts.filter(attempt_number = 1)
+                for attempt in attempts:
+                    if attempt.complete == 0:
+                        numCorrect -= 1
+                        break
 
-        #Divide by zero safety check
-        if numQuestions == 0:
-            progress = 0
-        else:
-            progress = 100.0*numCompleted/numQuestions
+            #Divide by zero safety check
+            if numQuestions == 0:
+                progress = 0
+            else:
+                progress = 100.0*numCompleted/numQuestions
 
-        dictionary = {"pset": pset, "numQuestions": numQuestions, "numCompleted": numCompleted, "progress": progress, "numCorrect": numCorrect}
-        package.append(dictionary)
+            dictionary = {"pset": pset, "numQuestions": numQuestions, "numCompleted": numCompleted, "progress": progress, "numCorrect": numCorrect}
+            package.append(dictionary)
 
-    return render_to_response('problemsets/list.html',
-                              {'request': request,
-                               'course_prefix': course_prefix,
-                               'course_suffix': course_suffix,
-                               'course': course,
-                               'package': package,
-                              },
-                              context_instance=RequestContext(request))
+        return render_to_response('problemsets/production/list.html',
+                                  {'common_page_data':common_page_data,'package': package},
+                                  context_instance=RequestContext(request))
 
 def show(request, course_prefix, course_suffix, pset ):
-    course_handle = course_prefix + "-" + course_suffix
-    course = Course.objects.get(handle=course_handle)
-    ps = course.problemset_set.get(title=pset)
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    ps = common_page_data['course'].problemset_set.get(title=pset)
     #path = ProblemSet.objects(
     return render_to_response('problemsets/problemset.html',
-                              {'request': request,
-                               'course_prefix': course_prefix,
-                               'course_suffix': course_suffix,
-                                'course': course,
+                              {'common_page_data':common_page_data,
                                'pset': ps,
                                'pset_url':ps.path,
                               },
