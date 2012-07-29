@@ -13,7 +13,7 @@ def main(request, course_prefix, course_suffix):
         raise Http404
         
     announcement_list = common_page_data['course'].announcement_set.all().order_by('-time_created')
-    news_list = common_page_data['course'].newsevent_set.all().order_by('-time_created')[0:5]
+    news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
     return render_to_response('courses/view.html', 
             {'common_page_data': common_page_data,
              'announcement_list': announcement_list, 
