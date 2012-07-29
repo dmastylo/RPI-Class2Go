@@ -1,4 +1,5 @@
-from django.shortcuts import render_to_response, HttpResponse
+from django.shortcuts import render_to_response, HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from c2g.models import Course, ProblemActivity, ProblemSet
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
@@ -11,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 def list(request, course_prefix, course_suffix):
     course_handle = course_prefix + "-" + course_suffix
     course = Course.objects.get(handle=course_handle)
-    psets = course.problemset_set.all().order_by('soft_deadline')
+    psets = course.problemset_set.all().order_by('due_date')
     package = []
 
     if not request.user.is_authenticated():
@@ -98,10 +99,36 @@ def attempt(request, problemId):
     else:
         return HttpResponse("wrong")
 
-def create(request, course_prefix, course_suffix):
+def create_form(request, course_prefix, course_suffix):
     return render_to_response('problemsets/create.html',
                             {'request': request,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
                             },
                             context_instance=RequestContext(request))
+
+def create_action(request):
+    course_handle = request.POST['course_prefix'] + "-" + request.POST['course_suffix']
+    course = Course.objects.get(handle=course_handle)
+    randomize = False
+    if request.POST['randomize'] == 'on':
+        randomize = True
+    pset = ProblemSet(course = course,
+                   title = request.POST['title'],
+                   name = request.POST['name'],
+                   description = request.POST['description'],
+                   live_date = request.POST['live_date'],
+                   due_date = request.POST['due_date'],
+                   grace_period = request.POST['grace_period'],
+                   partial_credit_deadline = request.POST['partial_credit_deadline'],
+                   penalty_preference = request.POST['penalty_preference'],
+                   late_penalty = request.POST['late_penalty'],
+                   submissions_permitted = request.POST['submissions_permitted'],
+                   resubmission_penalty = request.POST['resubmission_penalty'],
+                   randomize = randomize)
+    pset.save()
+    return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'],)))
+
+
+
+

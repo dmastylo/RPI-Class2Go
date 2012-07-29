@@ -4,29 +4,36 @@
 <div id="c2g_layout_m_column" class="span6">
     <h2>Create a New Problem Set</h2>
 
-    <form action="#" method="POST">
+    <form action="{% url 'problemsets.views.create_action' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="course_prefix" value={{course_prefix}}>
+        <input trpe="hidden" name="course_suffix" value={{course_suffix}}>
         <h3>Problem Set Details</h3>
-        Problem Set Title* <br>
-        <input type="text" name="title" /> <br>
+        Problem Set ID* (A unique ID consisting of numbers and letters with no spaces to be used in the URL) <br>
+        <input type="text" name="title"> <br>
+        Problem Set Title* (A title that can include spaces that be shown when listing problem sets) <br>
+        <input type="text" name="name" /> <br>
         Section* <br>
         <select name="section">
             <option value="section1"> Section 1 </option>
             <option value="section2"> Section 2 </option>
         </select> <br>
+        Description <br>
+        <textarea row="20" cols="40" name="description"> </textarea> <br>
         When will this problem set go live?* <br>
         <!--These date-times don't really work, can a better one be added? -->
-        <input type="text" name="live_date" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2"> <br>
+        <input type="text" name="live_date" value="2012-01-01 12:00"> <br>
         <h3>Deadlines and Penalties</h3>
         Due Date* <br>
-        <input type="text" name="due_date" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2"> <br>
+        <input type="text" name="due_date" value="2012-01-01 12:00"> <br>
         Penalty Preference <br>
-        <input type="radio" name="penalty_type" value="assessive" /> Assessive
-        <input type="radio" name="penalty_type" value="formative" /> Formative
-        <input type="radio" name="penalty type" value="custom" /> Custom <br>
+        <input type="radio" name="penalty_preference" value="assessive" /> Assessive
+        <input type="radio" name="penalty_preference" value="formative" checked/> Formative
+        <input type="radio" name="penalty preference" value="custom" /> Custom <br>
         Grace Period <br>
-        <input type="text" name="grace_period" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2"> <br>
+        <input type="text" name="grace_period" value="2012-01-01 12:00"> <br>
         Partial Credit Deadline <br>
-        <input type="text" name=partial_credit_deadline" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2"> <br>
+        <input type="text" name="partial_credit_deadline" value="2012-01-01 12:00"> <br>
         <!--This is supposed to have a triangle dropdown-->
         <h4>Advanced Options</h4>
         Late Penalty (Penalty for submitting between grace period and partial credit deadline) <br>

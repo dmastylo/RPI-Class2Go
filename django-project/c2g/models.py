@@ -428,8 +428,16 @@ class ProblemSet(TimestampMixin, models.Model):
     name = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    soft_deadline = models.DateTimeField(null=True, blank=True)
-    hard_deadline = models.DateTimeField(null=True, blank=True)
+    live_date = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    grace_period = models.DateTimeField(null=True, blank=True)
+    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    penalty_preference = models.CharField(max_length=255)
+    late_penalty = models.IntegerField(null=True, blank=True)
+    submissions_permitted = models.IntegerField(null=True, blank=True)
+    resubmission_penalty = models.IntegerField(null=True, blank=True)
+    randomize = models.BooleanField()
+
     def __unicode__(self):
         return self.title
     class Meta:
