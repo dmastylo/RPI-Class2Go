@@ -99,8 +99,13 @@ def attempt(request, problemId):
         return HttpResponse("wrong")
 
 def create_form(request, course_prefix, course_suffix):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
     return render_to_response('problemsets/create.html',
                             {'request': request,
+                                'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
                             },
@@ -109,9 +114,6 @@ def create_form(request, course_prefix, course_suffix):
 def create_action(request):
     course_handle = request.POST['course_prefix'] + "-" + request.POST['course_suffix']
     course = Course.objects.get(handle=course_handle)
-    randomize = False
-    if request.POST['randomize'] == 'on':
-        randomize = True
     pset = ProblemSet(course = course,
                    title = request.POST['title'],
                    name = request.POST['name'],
@@ -123,8 +125,7 @@ def create_action(request):
                    penalty_preference = request.POST['penalty_preference'],
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
-                   resubmission_penalty = request.POST['resubmission_penalty'],
-                   randomize = randomize)
+                   resubmission_penalty = request.POST['resubmission_penalty'])
     pset.save()
     return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'],)))
 
