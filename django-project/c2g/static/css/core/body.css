@@ -348,18 +348,8 @@ small.date {
     margin-bottom: 0;
     color: #555;
 }
-
-/* jQuery UI
--------------------------------------------------- */
-.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-.ui-timepicker-div dl { text-align: left; }
-.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
-.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
-.ui-timepicker-div td { font-size: 90%; }
-.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }​
-
 ul.exercise-list {
-    margin:10px 0;
+    margin:10px 0 !important;
 }
 ul.exercise-list li {
     list-style-type:none;
@@ -374,6 +364,17 @@ ul.exercise-list li:hover {
     height:20px;
     border-style:dashed;
 }
+
+/* jQuery UI
+-------------------------------------------------- */
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }​
+
+
 ​
 ​
 
