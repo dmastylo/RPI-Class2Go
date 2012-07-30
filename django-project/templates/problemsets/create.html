@@ -82,12 +82,27 @@
             <label class="control-label">Add Exercises*</label>
             <div class="controls">
                 <input type="file" name="exercise">
-                <ul class="exercise-list">
-                    <li>EC1.html</li>
-                    <li>EC2.html</li>
-                    <li>EC3.html</li>
-                    <li>EC4.html</li>
-                    <li>EC5.html</li>
+                <ul data-sortablecontainer class="exercise-list">
+                    <li id="exercise_1" class="ui-state-default">
+                        EC1.html
+                        <input type="hidden" name="exercise_order[1]" value="0">
+                    </li>
+                    <li id="exercise_2" class="ui-state-default">
+                        EC2.html
+                        <input type="hidden" name="exercise_order[2]" value="1">
+                    </li>
+                    <li id="exercise_3" class="ui-state-default">
+                        EC3.html
+                        <input type="hidden" name="exercise_order[3]" value="2">
+                    </li>
+                    <li id="exercise_4" class="ui-state-default">
+                        EC4.html
+                        <input type="hidden" name="exercise_order[4]" value="3">
+                    </li>
+                    <li id="exercise_5" class="ui-state-default">
+                        EC5.html
+                        <input type="hidden" name="exercise_order[5]" value="4">
+                    </li>
                 </ul>
             </div>
         </div>
@@ -103,14 +118,3 @@
     </form>
 </div>​
 {% endblock m_column_content %}
-{% block addl_scripts %}
-<script type="text/javascript">
-(function() {
-
-  $('[data-datetimepicker]').datetimepicker({
-    ampm: true
-  });
-    
-})();
-</script>
-{% endblock addl_scripts %}

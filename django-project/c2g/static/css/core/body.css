@@ -367,9 +367,11 @@ ul.exercise-list li {
 ul.exercise-list li:hover {
     border-color:#000;
 }
-ul.exercise-list li.movable {
+.ui-state-highlight {
+    height:20px;
     border-style:dashed;
 }
+​
 ​
 
 
