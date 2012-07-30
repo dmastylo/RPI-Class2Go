@@ -24,14 +24,14 @@
         <div class="control-group">
             <label class="control-label">When will this problem set go live?*</label>
             <div class="controls">
-                <input type="text" name="live_date" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp1">
+                <input type="text" name="live_date" class="span2" value="07/29/2012 12:01 am" data-datetimepicker>
             </div>
         </div>
         <h3>Deadlines and Penalties</h3>
         <div class="control-group">
             <label class="control-label">Due Date*</label>
             <div class="controls">
-                <input type="text" name="due_date" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2">
+                <input type="text" name="due_date" class="span2" value="07/29/2012 12:01 am" data-datetimepicker>
             </div>
         </div>
         <div class="control-group">
@@ -45,13 +45,13 @@
         <div class="control-group">
             <label class="control-label">Grace Period</label>
             <div class="controls">
-                <input type="text" name="grace_period" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2">
+                <input type="text" name="grace_period" class="span2" value="07/29/2012 12:01 am" data-datetimepicker>
             </div>
         </div>
         <div class="control-group">
             <label class="control-label">Partial Credit Deadline</label>
             <div class="controls">
-                <input type="text" name="partial_credit_deadline" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2">
+                <input type="text" name="partial_credit_deadline" class="span2" value="07/29/2012 12:01 am" data-datetimepicker>
             </div>
         </div>
         <h4><a href="#" data-toggle="collapse" data-target="#advanced-options">Advanced Options</a></h4>
@@ -82,6 +82,13 @@
             <label class="control-label">Add Exercises*</label>
             <div class="controls">
                 <input type="file" name="exercise">
+                <ul class="exercise-list">
+                    <li>EC1.html</li>
+                    <li>EC2.html</li>
+                    <li>EC3.html</li>
+                    <li>EC4.html</li>
+                    <li>EC5.html</li>
+                </ul>
             </div>
         </div>
         <div class="control-group">
@@ -94,9 +101,16 @@
             <input type="submit" value="Save" class="btn"> or <a href "#"> Cancel</a>
         </div>
     </form>
-</div>
+</div>​
 {% endblock m_column_content %}
+{% block addl_scripts %}
+<script type="text/javascript">
+(function() {
 
-
-
-
+  $('[data-datetimepicker]').datetimepicker({
+    ampm: true
+  });
+    
+})();
+</script>
+{% endblock addl_scripts %}

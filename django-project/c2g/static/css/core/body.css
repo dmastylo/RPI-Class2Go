@@ -346,6 +346,32 @@ small.date {
     color: #555;
 }
 
+/* jQuery UI
+-------------------------------------------------- */
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }​
+
+ul.exercise-list {
+    margin:10px 0;
+}
+ul.exercise-list li {
+    list-style-type:none;
+    padding:5px;
+    border:1px solid #ccc;
+    margin-bottom:5px;
+}
+ul.exercise-list li:hover {
+    border-color:#000;
+}
+ul.exercise-list li.movable {
+    border-style:dashed;
+}
+​
+
 
 /*  Font Awesome
     the iconic font designed for use with Twitter Bootstrap
