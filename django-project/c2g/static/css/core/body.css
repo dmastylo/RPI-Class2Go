@@ -127,6 +127,9 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
 .progress {
     margin-bottom:8px;
 }
+.help-block {
+   font-size:11px;
+}
 
 
 /* Common
