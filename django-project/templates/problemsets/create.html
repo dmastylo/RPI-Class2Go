@@ -54,24 +54,26 @@
                 <input type="text" name="partial_credit_deadline" class="span2" value="01/01/00" data-date-format="mm/dd/yy" id="dp2">
             </div>
         </div>
-        <h4>Advanced Options</h4>
-        <div class="control-group">
-            <label class="control-label">Late Penalty</label>
-            <div class="controls">
-                <input type="number" name="late_penalty" />% 
-                <span class="help-text">Penalty for submitting between grace period and partial credit deadline</span>
+        <h4><a href="#" data-toggle="collapse" data-target="#advanced-options">Advanced Options</a></h4>
+        <div id="advanced-options" class="collapse in">
+            <div class="control-group">
+                <label class="control-label">Late Penalty</label>
+                <div class="controls">
+                    <input type="number" name="late_penalty" />% 
+                    <span class="help-text">Penalty for submitting between grace period and partial credit deadline</span>
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">Number of Submissions Permitted</label>
-            <div class="controls">
-                <input type="number" name="submissions_permitted">
+            <div class="control-group">
+                <label class="control-label">Number of Submissions Permitted</label>
+                <div class="controls">
+                    <input type="number" name="submissions_permitted">
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">Penalty % per Resubmission</label>
-            <div class="controls">
-                <input type="number" name="resubmission_penalty" />%
+            <div class="control-group">
+                <label class="control-label">Penalty % per Resubmission</label>
+                <div class="controls">
+                    <input type="number" name="resubmission_penalty" />%
+                </div>
             </div>
         </div>
         
