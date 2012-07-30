@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 
-from c2g.models import Video, VideoTopic
+from c2g.models import Video
 
 def view(request, course_prefix, course_suffix, video_id):
     video = Video.objects.get(id=video_id)

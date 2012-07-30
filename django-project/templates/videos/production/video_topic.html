@@ -1,0 +1,8 @@
+<div class="container shaded" style="margin: 10px; margin-left: 30px;padding: 5px; width: 930px;">
+    <h2>{{section_structure.section.title}}</h2>
+    <ul>
+    {% for video_video_rec in section_structure.video_video_recs %}
+        {% include "videos/production/video_topic_item.html" %}
+    {% endfor %}
+    </ul>
+</div>

@@ -8,25 +8,46 @@
         <div class="container-fluid">
             <ul class="nav">
                 <li {% block home_link_class %}{% endblock home_link_class %}>
-                    <a href="{% url 'courses.views.main' course_prefix course_suffix %}">Home</a>
+                    <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
                 </li>
                 <li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'courses.views.overview' course_prefix course_suffix %}">Overview for Non-Members</a></li>
-                        <li><a href="{% url 'courses.views.syllabus' course_prefix course_suffix %}">Syllabus</a></li>
+                        <li><a href="{% url 'courses.views.overview' common_page_data.course_prefix common_page_data.course_suffix %}">Overview for Non-Members</a></li>
+                        <li><a href="{% url 'courses.views.syllabus' common_page_data.course_prefix common_page_data.course_suffix %}">Syllabus</a></li>
                     </ul>
                 </li>
                 <li {% block forums_link_class %}{% endblock forums_link_class %}>
-                    <a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a>
+                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
                 </li>
                 <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-                    <a href="{% url 'problemsets.views.list' course_prefix course_suffix %}">Problem Sets</a>
+                    <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
                 </li>
                 <li {% block videos_link_class %}{% endblock videos_link_class %}>
-                    <a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a>
+                    <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
                 </li>
             </ul>
+            {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
+            <ul class="nav pull-right">
+                {% if common_page_data.can_switch_mode %}
+                <li>
+                    <form style='display:inline;margin-right: 20px;' name="course_mode_switch_form" action="{%url 'courses.admin_views.switch_mode' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+                        View:
+                        <select name="to_mode" onchange="document.forms.course_mode_switch_form.submit();">
+                            <option value="staging" {% ifequal common_page_data.course_mode 'staging' %}selected{% endifequal %}>Staging</option>
+                            <option value="production" {% ifequal common_page_data.course_mode 'production' %}selected{% endifequal %}>Production</option>
+                        </select>
+                        <input type="hidden" name="handle" value="{{common_page_data.course_prefix}}-{{common_page_data.course_suffix}}"/>
+                        {% csrf_token %}
+                    </form>
+                </li>
+                {% endif %}
+                
+                {% if common_page_data.is_course_admin %}
+                <li {% block course_admin_link %}{% endblock course_admin_link %}><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Course Administration</a></li>
+                {% endif %}
+            </ul>
+            {% endif %}
             <!--form class="navbar-search hidden-phone" action="">
                 <div class="input-append">
                     <input class="span2 search-query" placeholder="Search course" id="appendedInputButton" size="16" type="text">
@@ -42,7 +63,7 @@
 <div class="container-fluid body-content">
     <div class="row-fluid page-header">
         <div class="span12">
-            <h2>{{course.title}}</h2>
+            <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
         </div>
     </div>
     <div class="row-fluid">
@@ -53,6 +74,5 @@
         {% block r_column_content %}{% endblock %}
     </div>
     {% include "footer.html" %}
-    </div>
 </div>
 {% endblock content %}

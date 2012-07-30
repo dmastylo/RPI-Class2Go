@@ -1,0 +1,1 @@
+function ProcessList(input, prefix, suffix) {	video_divs = $('.video');	for (var i = 0; i < video_divs.length; i++) {		video_div = video_divs[i];		title = video_div.getAttribute('title');		item_id = video_div.getAttribute('item_id');				video_div.innerHTML = "<a href='http://" + location.host + "'>" + title + "</a>";	}}

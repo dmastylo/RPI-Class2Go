@@ -1,0 +1,31 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span6">
+    {% if user.is_authenticated %}
+        <h3>Problem Sets</h3>
+        {% for dictionary in package %}
+            <h4><a href="problemsets/{{dictionary.pset.title}}">{{dictionary.pset.name}}</a></h4>
+            <p>{{dictionary.pset.description}}</p>
+            <p><strong>Full Credit Deadline:</strong> {{dictionary.pset.due_date}}<br>
+            <strong>Partial Credit Deadline:</strong> {{dictionary.pset.partial_credit_deadline}}</p>
+            <h4>Progress</h4>
+            <div class="progress progress-danger progress-striped">
+                <div class="bar" style="width:{{dictionary.progress}}%"></div>
+            </div>
+            {% if dictionary.numCompleted == dictionary.numQuestions %}
+                <span class="label">Complete with Score: {{dictionary.numCorrect}} of {{dictionary.numQuestions}}</span>
+            {% else %}
+                <span class="label">In Progress: {{dictionary.numCompleted}} of {{dictionary.numQuestions}}</span>
+            {% endif %}
+            <hr>
+        {% empty%}
+            <p style='margin: 20px;'>There are no problem sets to display.</p>
+        {% endfor %}
+    {% else %}
+        <h4>Please log in to see assignment information</h4>
+    {% endif %}
+</div>
+{% endblock m_column_content %}
