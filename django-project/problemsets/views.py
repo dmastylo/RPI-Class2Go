@@ -62,7 +62,7 @@ def list(request, course_prefix, course_suffix):
                                   {'common_page_data':common_page_data,'package': package},
                                   context_instance=RequestContext(request))
 
-def show(request, course_prefix, course_suffix, pset ):
+def show(request, course_prefix, course_suffix, pset):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -133,7 +133,22 @@ def create_action(request):
                    resubmission_penalty = request.POST['resubmission_penalty'])
     pset.save()
     pset.create_production_instance()
-    return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'],)))
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
+
+def manage_exercises(request, course_prefix, course_suffix, pset_name):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    pset = ProblemSet.objects.get(course=common_page_data['course'], title=pset_name)
+    return render_to_response('problemsets/manage_exercises.html',
+                            {'request': request,
+                                'common_page_data': common_page_data,
+                                'course_prefix': course_prefix,
+                                'course_suffix': course_suffix,
+                                'pset': pset
+                            },
+                            context_instance=RequestContext(request))
 
 
 

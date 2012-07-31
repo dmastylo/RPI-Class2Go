@@ -409,7 +409,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
             name=self.name,
             description=self.description,
             path=self.path,
-            live_date=self.live_date,
+            live_datetime=self.live_datetime,
             due_date=self.due_date,
             grace_period=self.grace_period,
             partial_credit_deadline=self.partial_credit_deadline,
@@ -426,6 +426,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
         production_instance.save()
         self.image = production_instance
         self.save()
+        return production_instance
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
