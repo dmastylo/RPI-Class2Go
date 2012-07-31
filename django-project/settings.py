@@ -3,6 +3,9 @@
 from database import *
 from os import path
 import socket
+#ADDED FOR url tag future
+import django.template
+django.template.add_to_builtins('django.templatetags.future')
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
