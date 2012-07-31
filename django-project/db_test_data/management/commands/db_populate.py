@@ -9,13 +9,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         delete_db_data()
-        
+
         # Create users
         users = create_users()
-        
+
         # Create institutions
         institutions = create_institutions()
-        
+
         # Create courses
         create_courses(institutions, users)
 
@@ -46,30 +46,30 @@ def create_users():
         professors[i].set_password('class2go')
         professors[i].is_staff = 1
         professors[i].save()
-        
+
     # Create TA accounts
     tas = []
     for i in range(3):
         tas.append(User.objects.create_user('ta_' + str(i)))
         tas[i].set_password('class2go')
         tas[i].save()
-        
+
     # Create Readonly-TA accounts
     readonly_tas = []
     for i in range(3):
         readonly_tas.append(User.objects.create_user('readonly_ta_' + str(i)))
         readonly_tas[i].set_password('class2go')
         readonly_tas[i].save()
-        
+
     # Create student accounts
     students = []
     for i in range(40):
         students.append(User.objects.create_user('student_' + str(i)))
         students[i].set_password('class2go')
         students[i].save()
-        
+
     return {'professors':professors, 'tas':tas, 'readonly_tas':readonly_tas, 'students':students}
-    
+
 
 def create_institutions():
     institutions = []
@@ -86,9 +86,9 @@ def create_institutions():
             domains = domains
         )
         institution.save()
-        
+
         institutions.append(institution)
-        
+
     return institutions
 
 def create_courses(institutions,users):
@@ -114,7 +114,7 @@ def create_course(data, users):
     instructor_group = Group.objects.create(name="Instructor Group for class2go course " + data['handle'] + " %d" % r)
     tas_group = Group.objects.create(name="TAS Group for class2go course " + data['handle'] + " %d" % r)
     readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + data['handle'] + " %d" % r)
-    
+
     # Join users to their groups
     for professor in users['professors']:
         instructor_group.user_set.add(professor)
@@ -124,7 +124,7 @@ def create_course(data, users):
         readonly_tas_group.user_set.add(readonly_ta)
     for student in users['students']:
         student_group.user_set.add(student)
-    
+
     # Create the course instances
     course = Course(institution = data['institution'],
             student_group = student_group,
@@ -143,7 +143,7 @@ def create_course(data, users):
 
     course.save()
     course.create_production_instance()
-    
+
     # Create announcements
     titles = [
         'Welcome to Natural Language Processing!',
@@ -159,13 +159,13 @@ def create_course(data, users):
     ]
     for i in range(4):
         create_announcement(course, titles[i], descriptions[i], users['professors'][0])
-        
+
     # Create content sections
     titles = ['NLP Introduction and Regular Expressions', 'Tokenizations and Minimum Edit Distance', 'N-Grams']
     sections = []
     for i in range(3):
         sections.append(create_content_section(course, titles[i], i))
-      
+
     # Create videos
     dicts = [
         {'course':course, 'section':sections[0], 'title':'Course Introduction','description':'Intro video by Professor Dan Jurafsky and Chris Manning','type':'youtube','url':'BJiVRIPVNxU','slug':'intro', 'index':0},
@@ -176,10 +176,10 @@ def create_course(data, users):
         {'course':course, 'section':sections[1], 'title':'Computing Minimum Edit Distance','description':'Video on Computing Minimum Edit Distance','type':'youtube','url':'Gh63CeMzav8','slug':'computing_min_edit_distance', 'index':2},
         {'course':course, 'section':sections[2], 'title':'Introduction to N-grams','description':'Video on Introduction to N-grams','type':'youtube','url':'LRq7om7vMEc','slug':'ngrams', 'index':0},
     ]
-    
+
     for i in range(7):
         create_video(dicts[i], users)
-        
+
     # Create problem sets
     data['course'] = course
     data['section'] = sections[0]
@@ -188,8 +188,8 @@ def create_course(data, users):
     data['description'] = 'This is the first problem set. Practice some question on Regular Expressions. Remember to work your problems out on a separate piece of paper first because you only get one try on these. Miss on and you have a D!'
     data['name'] = 'Problem Set 1: Regular Expressions'
     data['path']='/static/latestKhan/exercises/P1.html'
-    data['soft_deadline']='2012-07-20'
-    data['hard_deadline']='2012-07-27'
+    data['due_date']='2012-07-20'
+    data['partial_credit_deadline']='2012-07-27'
 
     pset1 = create_problem_set(data, users)
 
@@ -200,8 +200,8 @@ def create_course(data, users):
     data['description'] = 'This problem set will test your knowledge of Joint Probability. Each question is worth one point and your final exam is worth 100 points so these questions are basically useless. But you have to do them because an incomplete assignment disallows you from passing the class. Have fun with this problem set!'
     data['name']='Problem Set 2: Joint Probability'
     data['path']='/static/latestKhan/exercises/P2.html'
-    data['soft_deadline']='2012-07-27'
-    data['hard_deadline']='2012-08-03'
+    data['due_date']='2012-07-27'
+    data['partial_credit_deadline']='2012-08-03'
 
     pset2 = create_problem_set(data, users)
 
@@ -230,7 +230,7 @@ def create_course(data, users):
     # save_problem(exercise2_3, 'p1')
     # save_problem(exercise2_4, 'p1')
     # save_problem(exercise2_5, 'p1')
-    
+
     # Create news events
     titles = [
         'Assignment 1 solutions and grades released',
@@ -239,9 +239,9 @@ def create_course(data, users):
     ]
     for i in range(3):
         create_news_event(course,titles[i])
-        
-        
-    
+
+
+
 def create_announcement(course, title, description, owner):
     announcement = Announcement(
         course=course,
@@ -252,17 +252,18 @@ def create_announcement(course, title, description, owner):
     )
     announcement.save()
     announcement.create_production_instance()
-    
+
 def create_content_section(course, title, index):
     section = ContentSection(
         course=course,
         title=title,
         index=index,
+        mode='staging',
     )
     section.save()
     section.create_production_instance()
     return section
-    
+
 def create_video(data, users):
     # Also creates random progress for each user for each video
     video = Video(
@@ -278,7 +279,7 @@ def create_video(data, users):
     )
     video.save()
     video.create_production_instance()
-    
+
     for user in users['students']:
         video_activity = VideoActivity(
             student=user,
@@ -295,8 +296,8 @@ def create_news_event(course,title):
     )
     event.save()
     return event
-    
-        
+
+
 def create_problem_set(data, users):
     problem_set = ProblemSet(
         course = data['course'],
@@ -304,8 +305,8 @@ def create_problem_set(data, users):
         title = data['title'],
         name = data['name'],
         path = data['path'],
-        soft_deadline = data['soft_deadline'],
-        hard_deadline = data['hard_deadline'],
+        due_date = data['due_date'],
+        partial_credit_deadline = data['partial_credit_deadline'],
         description = data['description'],
         mode='staging',
         index=data['index'],
@@ -314,9 +315,9 @@ def create_problem_set(data, users):
     problem_set.create_production_instance()
 
     problem_set.save()
-    
+
     # @todo: Create exercises, problems, and user activity for problem sets based on the new staging/production paradigm
-    
+
     return problem_set
 
 

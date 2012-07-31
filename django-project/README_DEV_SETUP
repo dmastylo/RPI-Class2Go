@@ -89,7 +89,7 @@ your local mysql and see a bunch of c2g_* tables.  Yay.
 		Eclipse for PHP: Helios (http://download.eclipse.org/releases/helios)
 		PyDev plugin for Eclipse: 2.5.0 (http://pydev.org/updates)
 		Egit plugin for Eclipse: (http://download.eclipse.org/egit/updates)
-		WAMPServer: 2.1 
+		WAMPServer: 2.1
 	
 	1. Install Eclipse
 

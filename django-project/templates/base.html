@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/ui-lightness/jquery-ui-1.8.22.custom.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
     <!--[if IE 7]>
@@ -109,8 +110,11 @@
         </form>
     </div>
     
-    <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-1.8.22.custom.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
     {% block addl_scripts %}
     {% endblock addl_scripts %}
 </body>
