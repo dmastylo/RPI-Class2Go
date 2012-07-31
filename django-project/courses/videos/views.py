@@ -67,7 +67,9 @@ def view(request, course_prefix, course_suffix, slug):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-
+    
+    video = None
+    video_rec = None
     if request.user.is_authenticated():
         video = Video.objects.get(course=common_page_data['production_course'], slug=slug)
         video_rec = request.user.videoactivity_set.filter(video=video)

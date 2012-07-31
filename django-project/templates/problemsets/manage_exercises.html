@@ -1,0 +1,29 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span6">
+    <h2> Add or Remove Exercises</h2>
+
+    <h3>Upload Exercises</h3>
+    <form action="{% url 'problemsets.views.create_action' %}" method="POST" class="form-vertical">
+        <div class="control-group">
+            <label class="control-label">Add Exercises* (Choose a file and then click Add Exercise)</label>
+            <div class="controls">
+                <input type="file" name="exercise">
+                <input type="submit" value="Add Exercise" class="btn">
+            </div>
+        </div>
+
+    </form>
+    
+    <ul data-sortablecontainer class="exercise-list">
+        {% for exercise in pset.exercise_set.all %}
+            <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
+                {{exercise.fileName}}
+                <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
+            </li>
+        {% empty%}
+            <p style='margin: 20px;'>There are no exercises yet.</p>
+        {% endfor %}
+</div>
+{% endblock m_column_content %}

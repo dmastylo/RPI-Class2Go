@@ -3,7 +3,7 @@
 
     // Datepicker
     $('[data-datetimepicker]').datetimepicker({
-        ampm: true
+        ampm: false
     });
 
     // Exercise list drag and drop
@@ -23,7 +23,7 @@
         var $this = $(this),
             order = $this.sortable("toArray"),
             key;
-          
+
         for (key in order) {
           updateExerciseOrder(key, order, $this);
         }
@@ -31,5 +31,5 @@
       }
     })
     .disableSelection();
-    
+
 })();

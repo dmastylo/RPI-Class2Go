@@ -31,7 +31,7 @@
             <ul class="nav pull-right">
                 {% if common_page_data.can_switch_mode %}
                 <li>
-                    <form style='display:inline;margin-right: 20px;' name="course_mode_switch_form" action="{%url 'courses.admin_views.switch_mode' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+                    <form style='display:inline;margin-right: 20px;' name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
                         View:
                         <select name="to_mode" onchange="document.forms.course_mode_switch_form.submit();">
                             <option value="staging" {% ifequal common_page_data.course_mode 'staging' %}selected{% endifequal %}>Staging</option>
