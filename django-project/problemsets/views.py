@@ -123,7 +123,7 @@ def create_action(request):
                    title = request.POST['title'],
                    name = request.POST['name'],
                    description = request.POST['description'],
-                   live_date = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M'),
+                   live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M'),
                    due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M'),
                    grace_period = datetime.strptime(request.POST['grace_period'],'%m/%d/%Y %H:%M'),
                    partial_credit_deadline = datetime.strptime(request.POST['partial_credit_deadline'],'%m/%d/%Y %H:%M'),

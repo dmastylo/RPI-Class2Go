@@ -391,7 +391,6 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     name = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    live_date = models.DateTimeField(null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
     partial_credit_deadline = models.DateTimeField(null=True, blank=True)
@@ -468,6 +467,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
 class Exercise(TimestampMixin, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     fileName = models.CharField(max_length=255)
+    number = models.IntegerField(null=True, blank=True)
     def __unicode__(self):
         return self.number
     class Meta:
