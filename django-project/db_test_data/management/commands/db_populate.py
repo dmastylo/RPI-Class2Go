@@ -258,6 +258,7 @@ def create_content_section(course, title, index):
         course=course,
         title=title,
         index=index,
+        mode='staging',
     )
     section.save()
     section.create_production_instance()
