@@ -207,15 +207,15 @@ def create_course(data, users):
 
     #Create exercises
 
-    # exercise1_1 = save_exercise(pset1, "P1_Levenshtein.html")
-    # exercise1_2 = save_exercise(pset1, "P1_Regexp.html")
-    # exercise1_3 = save_exercise(pset1, "P1_Tokenize.html")
+#    exercise1_1 = save_exercise(pset1, "P1_Levenshtein.html", 1)
+#    exercise1_2 = save_exercise(pset1, "P1_Regexp.html", 2)
+#    exercise1_3 = save_exercise(pset1, "P1_Tokenize.html", 3)
 
-    # exercise2_1 = save_exercise(pset2, "P2_Add_one_smoothing.html")
-    # exercise2_2 = save_exercise(pset2, "P2_Joint.html")
-    # exercise2_3 = save_exercise(pset2, "P2_Lexical1.html")
-    # exercise2_4 = save_exercise(pset2, "P2_NER1.html")
-    # exercise2_5 = save_exercise(pset2, "P2_Spelling.html")
+#    exercise2_1 = save_exercise(pset2, "P2_Add_one_smoothing.html", 1)
+#    exercise2_2 = save_exercise(pset2, "P2_Joint.html", 2)
+#    exercise2_3 = save_exercise(pset2, "P2_Lexical1.html", 3)
+#    exercise2_4 = save_exercise(pset2, "P2_NER1.html", 4)
+#    exercise2_5 = save_exercise(pset2, "P2_Spelling.html", 5)
 
     #Create problems
 
@@ -312,20 +312,30 @@ def create_problem_set(data, users):
         index=data['index'],
     )
     problem_set.save()
-    problem_set.create_production_instance()
+    prod_instance =  problem_set.create_production_instance()
 
     problem_set.save()
 
     # @todo: Create exercises, problems, and user activity for problem sets based on the new staging/production paradigm
 
+    save_exercise(problem_set, "P1_Levenshtein.html", 1)
+    save_exercise(problem_set, "P1_Regexp.html", 2)
+    save_exercise(problem_set, "P1_Tokenize.html", 3)
+    save_exercise(prod_instance, "P1_Levenshtein.html", 1)
+    save_exercise(prod_instance, "P1_Regexp.html", 2)
+    save_exercise(prod_instance, "P1_Tokenize.html", 3)
+
+
+
     return problem_set
 
 
-# def save_exercise(problemSet, fileName):
-    # exercise = Exercise(problemSet = problemSet,
-                        # fileName = fileName)
-    # exercise.save()
-    # return exercise
+def save_exercise(problemSet, fileName, number):
+    exercise = Exercise(problemSet = problemSet,
+                        fileName = fileName,
+                        number = number)
+    exercise.save()
+    return exercise
 
 # def save_problem(exercise, slug):
     # problem = Problem(exercise = exercise,
