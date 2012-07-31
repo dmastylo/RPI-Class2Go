@@ -4,75 +4,92 @@
 <div id="c2g_layout_m_column" class="span6">
     <h2>Create a New Problem Set</h2>
 
-    <form action="#" method="POST" class="form-vertical">
+    <form action="{% url 'problemsets.views.create_action' %}" method="POST" class="form-vertical">
+        {% csrf_token %}
+        <input type="hidden" name="course_prefix" value={{course_prefix}}>
+        <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <h3>Problem Set Details</h3>
         <div class="control-group">
-            <label class="control-label">Problem Set Title*</label>
+            <label class="control-label">Problem Set ID* (A unique ID consisting of numbers and letters with no spaces to be used in the URL)</label>
             <div class="controls">
                 <input type="text" name="title" />
             </div>
         </div>
         <div class="control-group">
+            <label class="control-label">Problem Set Title* (A title that can include spaces that be shown when listing problem sets)</label>
+            <div class="controls">
+                <input type="text" name="name" />
+            </div>
+        </div>
+        <div class="control-group">
             <label class="control-label">Section*</label>
             <div class="controls">
-                <select name="section">
-                    <option value="section1">Section 1</option>
-                    <option value="section2">Section 2</option>
+                <select name="content_section">
+                    {% for content_section in content_sections %}
+                    <option value={{content_section.id}}>{{content_section.title}}</option>
+                    {% endfor %}
                 </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Description</label>
+            <div class="controls">
+                <textarea row="20" cols="40" name="description"> </textarea>
             </div>
         </div>
         <div class="control-group">
             <label class="control-label">When will this problem set go live?*</label>
             <div class="controls">
-                <input type="text" name="live_date" value="07/29/2012 12:01 am" data-datetimepicker>
+                <input type="datetime" name="live_date" value="07/29/2012 12:01" data-datetimepicker>
             </div>
         </div>
         <h3>Deadlines and Penalties</h3>
         <div class="control-group">
             <label class="control-label">Due Date*</label>
             <div class="controls">
-                <input type="text" name="due_date" value="07/29/2012 12:01 am" data-datetimepicker>
+                <input type="text" name="due_date" value="07/29/2012 12:01" data-datetimepicker>
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label">Penalty Preference</label>
+            <label class="control-label">Multiple Submission Preference</label>
             <div class="controls">
-                <input type="radio" name="penalty_type" value="assessive" /> Assessive
-                <input type="radio" name="penalty_type" value="formative" /> Formative
-                <input type="radio" name="penalty type" value="custom" /> Custom
+                <input type="radio" name="penalty_preference" value="formative" checked/> Formative
+                <input type="radio" name="penalty_preference" value="assessive" /> Assessive
+                <input type="radio" name="penalty_perference" value="custom" /> Custom
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label">Grace Period</label>
+            <label class="control-label">Grace Period End</label>
             <div class="controls">
-                <input type="text" name="grace_period" value="07/29/2012 12:01 am" data-datetimepicker>
+                <input type="text" name="grace_period" value="07/29/2012 12:01" data-datetimepicker>
             </div>
         </div>
         <div class="control-group">
             <label class="control-label">Partial Credit Deadline</label>
             <div class="controls">
-                <input type="text" name="partial_credit_deadline" value="07/29/2012 12:01 am" data-datetimepicker>
+                <input type="text" name="partial_credit_deadline" value="07/29/2012 12:01" data-datetimepicker>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Late Penalty</label>
+            <div class="controls">
+                <input type="number" name="late_penalty" value="30"/>% 
+                <span class="help-block">Penalty for submitting between grace period and partial credit deadline</span>
             </div>
         </div>
         <h4><a data-toggle="collapse" data-target="#advanced-options">Advanced Options</a></h4>
         <div id="advanced-options" class="collapse in">
             <div class="control-group">
-                <label class="control-label">Late Penalty</label>
-                <div class="controls">
-                    <input type="number" name="late_penalty" />% 
-                    <span class="help-block">Penalty for submitting between grace period and partial credit deadline</span>
-                </div>
-            </div>
-            <div class="control-group">
                 <label class="control-label">Number of Submissions Permitted</label>
                 <div class="controls">
-                    <input type="number" name="submissions_permitted">
+                    <input type="number" name="submissions_permitted" value="0"/>
+                    <span class="help-block">Use 0 for unlimited submissions</span>
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label">Penalty % per Resubmission</label>
                 <div class="controls">
-                    <input type="number" name="resubmission_penalty" />%
+                    <input type="number" name="resubmission_penalty" value="0"/>%
                 </div>
             </div>
         </div>
@@ -113,7 +130,7 @@
             </div>
         </div>
         <div class="form-actions">
-            <input type="submit" value="Save" class="btn"> or <a href "#"> Cancel</a>
+            <input type="submit" value="Save" class="btn"> or <a href "#" class="btn"> Cancel</a>
         </div>
     </form>
 </div>​

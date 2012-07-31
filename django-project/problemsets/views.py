@@ -1,10 +1,11 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect
 from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
 from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -20,7 +21,7 @@ def list(request, course_prefix, course_suffix):
     if common_page_data['course_mode'] == 'staging':
         return HttpResponse('Under construction ...')
     else:
-        psets = common_page_data['production_course'].problemset_set.all().order_by('soft_deadline')
+        psets = common_page_data['production_course'].problemset_set.all().order_by('due_date')
         package = []
 
         if not request.user.is_authenticated():
@@ -103,30 +104,35 @@ def create_form(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
+    content_sections = common_page_data['course'].contentsection_set.all()
     return render_to_response('problemsets/create.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
+                                'content_sections': content_sections
                             },
                             context_instance=RequestContext(request))
 
 def create_action(request):
     course_handle = request.POST['course_prefix'] + "-" + request.POST['course_suffix']
-    course = Course.objects.get(handle=course_handle)
+    course = Course.objects.get(handle=course_handle, mode='staging')
+    content_section = ContentSection.objects.get(id=request.POST['content_section'])
     pset = ProblemSet(course = course,
+                    section = content_section,
                    title = request.POST['title'],
                    name = request.POST['name'],
                    description = request.POST['description'],
-                   live_date = request.POST['live_date'],
-                   due_date = request.POST['due_date'],
-                   grace_period = request.POST['grace_period'],
-                   partial_credit_deadline = request.POST['partial_credit_deadline'],
+                   live_date = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M'),
+                   due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M'),
+                   grace_period = datetime.strptime(request.POST['grace_period'],'%m/%d/%Y %H:%M'),
+                   partial_credit_deadline = datetime.strptime(request.POST['partial_credit_deadline'],'%m/%d/%Y %H:%M'),
                    penalty_preference = request.POST['penalty_preference'],
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
                    resubmission_penalty = request.POST['resubmission_penalty'])
     pset.save()
+    pset.create_production_instance()
     return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'],)))
 
 

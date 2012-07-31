@@ -391,8 +391,15 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     name = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    soft_deadline = models.DateTimeField(null=True, blank=True)
-    hard_deadline = models.DateTimeField(null=True, blank=True)
+    live_date = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    grace_period = models.DateTimeField(null=True, blank=True)
+    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    penalty_preference = models.CharField(max_length=255)
+    late_penalty = models.IntegerField(null=True, blank=True)
+    submissions_permitted = models.IntegerField(null=True, blank=True)
+    resubmission_penalty = models.IntegerField(null=True, blank=True)
+    randomize = models.BooleanField()
     slug = models.CharField(max_length=255)
 
     def create_production_instance(self):
@@ -403,8 +410,15 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
             name=self.name,
             description=self.description,
             path=self.path,
-            soft_deadline=self.soft_deadline,
-            hard_deadline=self.hard_deadline,
+            live_date=self.live_date,
+            due_date=self.due_date,
+            grace_period=self.grace_period,
+            partial_credit_deadline=self.partial_credit_deadline,
+            penalty_preference=self.penalty_preference,
+            late_penalty=self.late_penalty,
+            submissions_permitted=self.submissions_permitted,
+            resubmission_penalty=self.resubmission_penalty,
+            randomize=self.randomize,
             slug=self.slug,
             index=self.index,
             image = self,
