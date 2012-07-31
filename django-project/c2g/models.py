@@ -19,7 +19,7 @@ from django import forms
 
 import gdata.youtube
 import gdata.youtube.service
-      
+
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -34,19 +34,19 @@ class Stageable(models.Model):
     mode = models.TextField(blank=True)
     image = models.ForeignKey('self', null=True, related_name="+")
     live_datetime = models.DateTimeField(editable=True, null=True)
-    
+
     class Meta:
        abstract = True
-    
+
 class Sortable(models.Model):
     index=models.IntegerField(null=True, blank=True)
 
     def move_to(self, new_index):
         pass
-        
+
     def move_up_by_one(self):
         pass
-        
+
     def move_down_by_one(self):
        pass
 
@@ -84,7 +84,7 @@ class Course(TimestampMixin, Stageable, models.Model):
 
     def __unicode__(self):
         return self.title
-        
+
     def create_production_instance(self):
         production_instance = Course(institution = self.institution,
             student_group = self.student_group,
@@ -106,10 +106,10 @@ class Course(TimestampMixin, Stageable, models.Model):
         production_instance.save()
         self.image = production_instance
         self.save()
-    
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'institution' in clone_fields:
             production_instance.institution = self.institution
@@ -127,12 +127,12 @@ class Course(TimestampMixin, Stageable, models.Model):
             production_instance.calendar_start = self.calendar_start
         if not clone_fields or 'calendar_end' in clone_fields:
             production_instance.calendar_end = self.calendar_end
-            
+
         production_instance.save()
-        
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'institution' in clone_fields:
             self.institution = production_instance.institution
@@ -150,9 +150,9 @@ class Course(TimestampMixin, Stageable, models.Model):
             self.calendar_start = production_instance.calendar_start
         if not clone_fields or 'calendar_end' in clone_fields:
             self.calendar_end = production_instance.calendar_end
-            
+
         self.save()
-        
+
     class Meta:
         db_table = u'c2g_courses'
 
@@ -160,7 +160,7 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    
+
     def create_production_instance(self):
         production_instance = AdditionalPage(
             course=self.course,
@@ -172,29 +172,29 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
         production_instance.save()
         self.image=production_instance
         self.save()
-        
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
             production_instance.description = self.description
-            
+
         production_instance.save()
-            
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
         if not clone_fields or 'description' in clone_fields:
             self.description = production_instance.description
-            
+
         self.save()
-        
+
     class Meta:
         db_table = u'c2g_additional_pages'
 
@@ -205,7 +205,7 @@ class Announcement(TimestampMixin, Stageable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    
+
     def create_production_instance(self):
         production_instance = Announcement(
             course=self.course.image,
@@ -218,36 +218,36 @@ class Announcement(TimestampMixin, Stageable, models.Model):
         production_instance.save()
         self.image=production_instance
         self.save()
-        
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
             production_instance.description = self.description
-            
+
         production_instance.save()
-            
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
         if not clone_fields or 'description' in clone_fields:
             self.description = production_instance.description
-            
+
         self.save()
-        
+
     class Meta:
         db_table = u'c2g_announcements'
-        
+
 class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
-    
+
     def create_production_instance(self):
         production_instance = ContentSection(
             course=self.course.image,
@@ -259,29 +259,29 @@ class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
         production_instance.save()
         self.image=production_instance
         self.save()
-        
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
         if not clone_fields or 'index' in clone_fields:
             production_instance.index = self.index
-            
+
         production_instance.save()
-            
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
         if not clone_fields or 'index' in clone_fields:
             self.index = production_instance.index
-            
+
         self.save()
-        
+
     class Meta:
         db_table = u'c2g_content_sections'
 
@@ -317,7 +317,7 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
     url = models.CharField(max_length=255, null=True)
     duration = models.IntegerField(blank=True)
     slug = models.CharField(max_length=255, null=True)
-    
+
     def create_production_instance(self):
         production_instance = Video(
             course=self.course.image,
@@ -334,27 +334,27 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
         production_instance.save()
         self.image = production_instance
         self.save()
-        
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
         if not clone_fields or 'index' in clone_fields:
             production_instance.index = self.index
-            
+
         production_instance.save()
-            
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
         if not clone_fields or 'index' in clone_fields:
             self.index = production_instance.index
-    
+
     def save(self, *args, **kwargs):
         if not self.duration:
             if self.type == "youtube":
@@ -391,10 +391,16 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     name = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    soft_deadline = models.DateTimeField(null=True, blank=True)
-    hard_deadline = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    grace_period = models.DateTimeField(null=True, blank=True)
+    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    penalty_preference = models.CharField(max_length=255)
+    late_penalty = models.IntegerField(null=True, blank=True)
+    submissions_permitted = models.IntegerField(null=True, blank=True)
+    resubmission_penalty = models.IntegerField(null=True, blank=True)
+    randomize = models.BooleanField()
     slug = models.CharField(max_length=255)
-    
+
     def create_production_instance(self):
         production_instance = ProblemSet(
             course=self.course.image,
@@ -403,8 +409,15 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
             name=self.name,
             description=self.description,
             path=self.path,
-            soft_deadline=self.soft_deadline,
-            hard_deadline=self.hard_deadline,
+            live_date=self.live_date,
+            due_date=self.due_date,
+            grace_period=self.grace_period,
+            partial_credit_deadline=self.partial_credit_deadline,
+            penalty_preference=self.penalty_preference,
+            late_penalty=self.late_penalty,
+            submissions_permitted=self.submissions_permitted,
+            resubmission_penalty=self.resubmission_penalty,
+            randomize=self.randomize,
             slug=self.slug,
             index=self.index,
             image = self,
@@ -413,10 +426,10 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
         production_instance.save()
         self.image = production_instance
         self.save()
-        
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
@@ -428,12 +441,12 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
             production_instance.slug = self.slug
         if not clone_fields or 'index' in clone_fields:
             production_instance.index = self.index
-            
+
         production_instance.save()
-            
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
-        
+
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
@@ -445,7 +458,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
             self.slug = production_instance.slug
         if not clone_fields or 'index' in clone_fields:
             self.index = production_instance.index
-        
+
     def __unicode__(self):
         return self.title
     class Meta:
@@ -454,6 +467,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
 class Exercise(TimestampMixin, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     fileName = models.CharField(max_length=255)
+    number = models.IntegerField(null=True, blank=True)
     def __unicode__(self):
         return self.number
     class Meta:

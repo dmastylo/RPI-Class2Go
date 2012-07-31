@@ -14,7 +14,7 @@ def main(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-        
+
     announcement_list = common_page_data['course'].announcement_set.all().order_by('-time_created')
     news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
     contentsection_list = common_page_data['course'].contentsection_set.all().order_by('index')
@@ -44,6 +44,7 @@ def main(request, course_prefix, course_suffix):
              'pset_list': pset_list,
              'full_index_list': full_index_list
              }, 
+
             context_instance=RequestContext(request))
 
 def overview(request, course_prefix, course_suffix):
@@ -62,9 +63,9 @@ def overview(request, course_prefix, course_suffix):
             if request.POST.get("commit") == '1':
                 common_page_data['production_course'].description = common_page_data['staging_course'].description
                 common_page_data['production_course'].save()
-        
-    return render_to_response('courses/overview.html', 
-            {'common_page_data': common_page_data}, 
+
+    return render_to_response('courses/overview.html',
+            {'common_page_data': common_page_data},
             context_instance=RequestContext(request))
 
 def syllabus(request, course_prefix, course_suffix):
@@ -83,7 +84,7 @@ def syllabus(request, course_prefix, course_suffix):
             if request.POST.get("commit") == '1':
                 common_page_data['production_course'].syllabus = common_page_data['staging_course'].syllabus
                 common_page_data['production_course'].save()
-        
-    return render_to_response('courses/syllabus.html', 
-            {'common_page_data': common_page_data}, 
+
+    return render_to_response('courses/syllabus.html',
+            {'common_page_data': common_page_data},
             context_instance=RequestContext(request))
