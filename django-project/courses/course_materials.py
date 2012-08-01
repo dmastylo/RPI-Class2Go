@@ -1,4 +1,5 @@
 from c2g.models import *
+import datetime
 
 def get_course_materials(common_page_data, get_video_content=True, get_pset_content=True):
     section_structures = []

@@ -33,7 +33,7 @@ def view(request, course_prefix, course_suffix, slug):
     if request.user.is_authenticated():
         video = Video.objects.get(course=common_page_data['production_course'], slug=slug)
         #video_rec = request.user.videoactivity_set.filter(video=video)
-        video_rec = request.user.videoactivity_set.get(video=video)
+        video_rec = request.user.videoactivity_set.filter(video=video)
 
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
     
