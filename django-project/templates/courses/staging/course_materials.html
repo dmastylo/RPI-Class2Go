@@ -1,18 +1,18 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block videos_link_class %}class="active"{% endblock videos_link_class %}
+{% block course_materials_link_class %}class="active"{% endblock course_materials_link_class %}
 
 {% block course_page_title %}Course Materials (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
-    {% include "courses/staging/content_flow_section.html" %}
+    {% include "courses/staging/content_management_section.html" %}
     {% include "courses/staging/new_section.html" %}
 
     {% for section_structure in section_structures %}
         {% include "courses/staging/section.html" %}
     {% empty %}
-        <p style='margin: 20px;'>No course content to display.</p>
+        <p style='margin: 20px;'>No content to display.</p>
     {% endfor %}
 </div>
 {% endblock m_column_content %}

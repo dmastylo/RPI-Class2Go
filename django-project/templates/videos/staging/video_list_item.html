@@ -1,0 +1,14 @@
+<div class="container" id="video_{{item.video.id}}">
+    <table>
+        <tr>
+            <td style="width: 20px;"><input type="checkbox" name="{{item.video.id}}" id="{{item.video.id}}" /></td>
+            <td style="width: 500px;"><img src="{{ STATIC_URL }}graphics/videos/video_icon.jpg" width="20" height="20" style="margin-right: 10px;" /><h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
+            <td style="width: 255px;">[ <label style="color: green; display:inline;">S=P</label> , {% autoescape off %}{{ item.live_status }}{% endautoescape %} ]</td>
+            <td style="width: 120px;">
+                <button><i class="icon-arrow-up"></i></button>
+                <button><i class="icon-arrow-down"></i></button>
+                <button><i class="icon-trash"></i></button>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,12 @@
+<div class="container" id="video_{{item.video.id}}" style="margin-top: 0px;">
+    <table>
+        <tr>
+            <td style="width: 400px;"><img src="{{ STATIC_URL }}graphics/videos/video_icon.jpg" width="20" height="20" style="margin-right: 10px;" /><h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
+            <td style="width: 120px;">
+                <div class="progress-bar">
+                    <div class="fill red" style="width:0%"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

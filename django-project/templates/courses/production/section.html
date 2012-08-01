@@ -1,8 +1,8 @@
 <div class="container shaded" style="margin: 10px; margin-left: 30px;padding: 5px; width: 930px;">
-    <h2>{{section_structure.section.title}}</h2>
+    <h3>{{section_structure.section.title}}</h3>
     <ul>
     {% for item in section_structure.items %}
-        {% ifequal item.type 'problem_set' %}{% include "problem_sets/production/problem_set_list_item.html" %}{% endifequal %}
+        {% ifequal item.type 'problem_set' %}{% include "problemsets/production/problemset_list_item.html" %}{% endifequal %}
         {% ifequal item.type 'video' %}{% include "videos/production/video_list_item.html" %}{% endifequal %}
     {% endfor %}
     </ul>

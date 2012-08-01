@@ -23,13 +23,19 @@
             <input type="hidden" name="commit" id="commit" value="0" />
             <input type="hidden" name="revert" id="revert" value="0" />
             <input type="button" value="Save" onclick="Save(0,0);" class="btn" />
-            <input type="button" value="Save and Commit" onclick="Save(1,0);" class="btn" />
+            <input type="button" value="Save and Publish" onclick="Save(1,0);" class="btn" />
             <input type="button" value="Revert" onclick="Save(0,1);" class="btn" />
         </form>
         <script type="text/javascript">
             function Save(commit, revert) {
                 if (commit) $("#commit").val(1);
                 if (revert) $("#revert").val(1);
+                
+                if (revert) {
+                    r = confirm("Reverting will cause all changes since the last publish to be lost. Are you sure you want to revert?");
+                    if (!r) return;
+                }
+                
                 document.forms.edit_form.submit();
             }
         </script>
