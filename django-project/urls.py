@@ -62,10 +62,12 @@ urlpatterns = patterns('',
 
     # Videos
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
+   url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/upload/?$', 'courses.videos.views.upload'), ####ADDED BY KEVIN
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<slug>[a-zA-Z0-9_]+)/?$', 'courses.videos.views.view'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<slug>[a-zA-Z0-9_]+)/edit/?', 'courses.videos.views.edit'),
     url(r'^video_topic/?', 'courses.videos.actions.add_video_topic'),
     url(r'^add_video/?', 'courses.videos.actions.add_video'),
+    url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^commit/?', 'courses.videos.actions.commit'),
     url(r'^revert/?', 'courses.videos.actions.revert'),
     url(r'^change_live_datetime/?', 'courses.videos.actions.change_live_datetime'),

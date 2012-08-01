@@ -115,34 +115,15 @@ def upload(request, course_prefix, course_suffix):
 
     if 'token' in request.GET:
         token = request.GET['token']
+        data['token'] = token
 
         yt_service = gdata.youtube.service.YouTubeService()
-        yt_service.developer_key = 'AI39si5GlWcy9S4eVFtajbVZk-DjFEhlM4Zt7CYzJG3f2bwIpsBSaGd8SCWts6V5lbqBHJYXAn73-8emsZg5zWt4EUlJJ4rpQA'
-        yt_service.SetAuthSubToken(token)
-        yt_service.UpgradeToSessionToken()
-
-        my_media_group = gdata.media.Group(
-            title=gdata.media.Title(text='Test Movie'),
-            description=gdata.media.Description(description_type='plain',
-                                                text='Test description'),
-            keywords=gdata.media.Keywords(text='nlp, week 1, introduction'),
-            category=[gdata.media.Category(
-                    text='Education',
-                    label='Eduation')],
-        )
-
-        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
-        response = yt_service.GetFormUploadToken(video_entry)
-
-        post_url = response[0]
-        youtube_token = response[1]
-
-        data['post_url'] = post_url
-        data['youtube_token'] = youtube_token
-        data['next'] = "http://localhost:8000" + request.path
+        #yt_service.developer_key = 'AI39si5GlWcy9S4eVFtajbVZk-DjFEhlM4Zt7CYzJG3f2bwIpsBSaGd8SCWts6V5lbqBHJYXAn73-8emsZg5zWt4EUlJJ4rpQA'
+        #yt_service.SetAuthSubToken(token)
+        #yt_service.UpgradeToSessionToken()
 
         yt_logged_in = True
-        form = VideoUploadForm()
+        form = VideoUploadForm(sections = common_page_data['course'].contentsection_set.all().order_by('index'))
         data['form'] = form
     else:
         # user is not logged into google account for youtube
