@@ -16,10 +16,10 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
                 for video in videos:
                     if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
                         item = {'type':'video', 'video':video, 'completed_percent': 0}
-                        video_rec = VideoActivity.objects.filter(video=video, student=common_page_data['request'].user)
-                        if video_rec:
+                        video_recs = VideoActivity.objects.filter(video=video, student=common_page_data['request'].user)
+                        if len(video_recs)>0:
+                            video_rec = video_recs[0]
                             item['video_rec'] = video_rec
-                            #import pdb; pdb.set_trace();
                             item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
                                 
                         
