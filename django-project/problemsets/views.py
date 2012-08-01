@@ -141,12 +141,14 @@ def manage_exercises(request, course_prefix, course_suffix, pset_name):
     except:
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], title=pset_name)
+    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
-                                'pset': pset
+                                'pset': pset,
+                                'psetToEx': psetToEx
                             },
                             context_instance=RequestContext(request))
 
@@ -156,10 +158,19 @@ def add_exercise(request):
 #    except:
 #        raise Http404
 
-    pset = ProblemSet.objects.get(id=47)
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     exercise = Exercise(fileName=request.POST['exercise'])
     exercise.save()
     index = len(pset.exercise_set.all())
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
     psetToEx.save()
-    return HttpResponseRedirect(reverse('problemsets.views.manage'))
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
+
+def save_order(request):
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
+    for n in range(0,len(psetToEx)):
+        listName = "exercise_order[" + str(n) + "]"
+        psetToEx[n].number = request.POST[listName]
+        psetToEx[n].save()
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))

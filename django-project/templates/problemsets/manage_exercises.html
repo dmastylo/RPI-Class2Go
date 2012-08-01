@@ -4,10 +4,12 @@
 <div id="c2g_layout_m_column" class="span6">
     <h2> Add or Remove Exercises</h2>
 
-    <h3>Upload Exercises</h3>
-    <form action= "{% url 'problemsets.views.add_exercise' %}" method="POST" class="form-vertical">
+    <h3>Upload Exercises to {{pset.name}}</h3>
+    <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
+        <input type="hidden" name="course_prefix" value={{course_prefix}}>
+        <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <div class="control-group">
             <label class="control-label">Add Exercises* (Choose a file and then click Add Exercise)</label>
             <div class="controls">
@@ -16,15 +18,24 @@
             </div>
         </div>
     </form>
-    
-    <ul data-sortablecontainer class="exercise-list">
-        {% for exercise in pset.exercise_set.all %}
-            <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
-                {{exercise.fileName}}
-                <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
-            </li>
-        {% empty%}
-            <p style='margin: 20px;'>There are no exercises yet.</p>
-        {% endfor %}
+
+    <form action= {% url 'problemsets.views.save_order' %} method="POST" class="form-vertical">
+        {% csrf_token %}
+        <input type="hidden" name="pset_id" value={{pset.id}}>
+        <input type="hidden" name="course_prefix" value={{course_prefix}}>
+        <input type="hidden" name="course_suffix" value={{course_suffix}}>
+        <ul data-sortablecontainer class="exercise-list">
+            {% for exercise in psetToEx %}
+                <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
+                    {{exercise.exercise.fileName}}
+                    <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
+                </li>
+            {% empty%}
+                <p style='margin: 20px;'>There are no exercises yet.</p>
+            {% endfor %}
+        </ul>
+        <span class="help-block">After reordering, save before uploading another exercise</span>
+        <input type="submit" value="Save" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+    </form>
 </div>
 {% endblock m_column_content %}
