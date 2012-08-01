@@ -47,13 +47,17 @@
       height: '430',
       width: '710',
       videoId: '{{video.url}}',
-      playerVars: { 'rel': 0, 'start': {{video_rec.start_seconds}} },
+        /* [@wescott] commented out below for Kevin for the 8/1/12 demo */
+      /*playerVars: { 'rel': 0, 'start': {{video_rec.start_seconds}} },*/
+      playerVars: { 'rel': 0, 'start': 0 },
     });
   }
 
   window.onbeforeunload = function() {
     vidTime = Math.floor(player.getCurrentTime());
-    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+    /* [@wescott] commented out below for Kevin for the 8/1/12 demo */
+    /*$.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});*/
+    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: 1, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
   }
 </script>
 

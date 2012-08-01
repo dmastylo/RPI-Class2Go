@@ -6,13 +6,12 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     <a href="videos/upload" class="btn">Upload Video</a>
-    {% include "videos/staging/content_flow_section.html" %}
-    {% include "videos/staging/new_video_topic.html" %}
+    {% include "videos/staging/video_management_section.html" %}
 
     {% for section_structure in section_structures %}
-        {% include "videos/staging/video_topic.html" %}
+        {% include "courses/staging/section.html" %}
     {% empty %}
-        <p style='margin: 20px;'>No videos to display.</p>
+        <p style='margin: 20px;'>No content to display.</p>
     {% endfor %}
 </div>
 {% endblock m_column_content %}

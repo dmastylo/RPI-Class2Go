@@ -2,30 +2,18 @@
 {% load url from future %}
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 
+{% block course_page_title %}Problem Sets (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
+
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
+<div id="c2g_layout_m_column" class="span12">
     {% if user.is_authenticated %}
-        <h3>Problem Sets</h3>
-        {% for dictionary in package %}
-            <h4><a href="problemsets/{{dictionary.pset.title}}">{{dictionary.pset.name}}</a></h4>
-            <p>{{dictionary.pset.description}}</p>
-            <p><strong>Full Credit Deadline:</strong> {{dictionary.pset.due_date}}<br>
-            <strong>Partial Credit Deadline:</strong> {{dictionary.pset.partial_credit_deadline}}</p>
-            <h4>Progress</h4>
-            <div class="progress progress-danger progress-striped">
-                <div class="bar" style="width:{{dictionary.progress}}%"></div>
-            </div>
-            {% if dictionary.numCompleted == dictionary.numQuestions %}
-                <span class="label">Complete with Score: {{dictionary.numCorrect}} of {{dictionary.numQuestions}}</span>
-            {% else %}
-                <span class="label">In Progress: {{dictionary.numCompleted}} of {{dictionary.numQuestions}}</span>
-            {% endif %}
-            <hr>
-        {% empty%}
-            <p style='margin: 20px;'>There are no problem sets to display.</p>
+        {% for section_structure in section_structures %}
+            {% include "courses/production/section.html" %}
+        {% empty %}
+            <p style='margin: 20px;'>No content to display.</p>
         {% endfor %}
     {% else %}
-        <h4>Please log in to see assignment information</h4>
+        <h4>Please log in to see course materials.</h4>
     {% endif %}
 </div>
 {% endblock m_column_content %}
