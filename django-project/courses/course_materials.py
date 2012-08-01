@@ -7,7 +7,6 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
         sections = common_page_data['course'].contentsection_set.all().order_by('index')
         videos = Video.objects.filter(course=common_page_data['course']).order_by('section', 'index')
         problem_sets = ProblemSet.objects.filter(course=common_page_data['course']).order_by('section', 'index')
-        video_recs = common_page_data['request'].user.videoactivity_set.filter(course=common_page_data['course'])
         
         index = 0
         for section in sections:
@@ -15,12 +14,14 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
             
             if get_video_content:
                 for video in videos:
-                    if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and video.live_datetime > common_page_data['effective_current_datetime'])):
-                        item = {'type':'video', 'video':video}
-                        for video_rec in video_recs:
-                            if video_rec.video_id == video.id:
-                                item['video_rec'] = video_rec
-                                break
+                    if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
+                        item = {'type':'video', 'video':video, 'completed_percent': 0}
+                        video_rec = VideoActivity.objects.get(video=video, student=common_page_data['request'].user)
+                        if video_rec:
+                            item['video_rec'] = video_rec
+                            #import pdb; pdb.set_trace();
+                            item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
+                                
                         
                         live_status = ''
                         if common_page_data['course_mode'] == 'staging':
@@ -43,7 +44,7 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
             
             if get_pset_content:
                 for problem_set in problem_sets:
-                    if problem_set.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (problem_set.live_datetime and problem_set.live_datetime > common_page_data['effective_current_datetime'])):
+                    if problem_set.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (problem_set.live_datetime and problem_set.live_datetime < common_page_data['effective_current_datetime'])):
                         item = {'type':'problem_set', 'problem_set':problem_set}
                         
                         exercises = problem_set.exercise_set.all()

@@ -17,7 +17,7 @@ def main(request, course_prefix, course_suffix):
         raise Http404
 
     announcement_list = common_page_data['course'].announcement_set.all().order_by('-time_created')
-    news_list = common_page_data['course'].newsevent_set.all().order_by('-time_created')[0:5]
+    news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
     contentsection_list = common_page_data['course'].contentsection_set.all().order_by('index')
     video_list = common_page_data['course'].video_set.all().order_by('index')
     pset_list =  common_page_data['course'].problemset_set.all().order_by('index')
