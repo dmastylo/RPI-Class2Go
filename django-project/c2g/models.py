@@ -466,13 +466,21 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
         db_table = u'c2g_problem_sets'
 
 class Exercise(TimestampMixin, models.Model):
-    problemSet = models.ForeignKey(ProblemSet)
+    problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
-    number = models.IntegerField(null=True, blank=True)
     def __unicode__(self):
-        return self.number
+        return self.fileName
     class Meta:
         db_table = u'c2g_exercises'
+
+class ProblemSetToExercise(models.Model):
+    problemSet = models.ForeignKey(ProblemSet)
+    exercise = models.ForeignKey(Exercise)
+    number = models.IntegerField(null=True, blank=True)
+    def __unicode__(self):
+        return self.problemSet.title + "-" + self.exercise.fileName
+    class Meta:
+        db_table = u'c2g_problemset_to_exercise'
 
 class Problem(TimestampMixin, Stageable, models.Model):
     exercise = models.ForeignKey(Exercise)

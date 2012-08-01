@@ -331,11 +331,13 @@ def create_problem_set(data, users):
 
 
 def save_exercise(problemSet, fileName, number):
-    exercise = Exercise(problemSet = problemSet,
-                        fileName = fileName,
-                        number = number)
-    exercise.save()
-    return exercise
+    ex = Exercise(fileName = fileName)
+    ex.save()
+    psetToEx = ProblemSetToExercise(problemSet = problemSet,
+                                    exercise = ex,
+                                    number = number)
+    psetToEx.save()
+    return ex
 
 # def save_problem(exercise, slug):
     # problem = Problem(exercise = exercise,

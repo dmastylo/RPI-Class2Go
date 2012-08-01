@@ -1,7 +1,7 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% block l_column_content %}
-<div id="c2g_layout_l_column" class="span3">
+<!-- <div id="c2g_layout_l_column" class="span3">
     <div class="well tight">
         <ul class="nav nav-list">
             <li class="nav-header">Videos</li>
@@ -15,17 +15,17 @@
             <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
         </ul>
     </div>
-</div>
+</div> -->
 {% endblock %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span9">
   {% if user.is_authenticated %}
-    {% if videoRec.video.title == 'Defining Minimum Edit Distance' %}
+    {% if video.title == 'Defining Minimum Edit Distance' %}
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
     {% else %}
-        <h2>{{videoRec.video.title}}</h2>
-        <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{videoRec.video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
+        <h2>{{video.title}}</h2>
+        <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
     <div id="player"></div>
     {% endif %}
   {% else %}
@@ -46,14 +46,14 @@
     player = new YT.Player('player', {
       height: '430',
       width: '710',
-      videoId: '{{videoRec.video.url}}',
-      playerVars: { 'rel': 0, 'start': {{videoRec.start_seconds}} },
+      videoId: '{{video.url}}',
+      playerVars: { 'rel': 0, 'start': {{video_rec.start_seconds}} },
     });
   }
 
   window.onbeforeunload = function() {
     vidTime = Math.floor(player.getCurrentTime());
-    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{videoRec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
   }
 </script>
 

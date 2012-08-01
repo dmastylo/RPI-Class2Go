@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect
 from django.template import RequestContext
@@ -102,15 +102,36 @@ def manage_exercises(request, course_prefix, course_suffix, pset_name):
     except:
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], title=pset_name)
+    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
-                                'pset': pset
+                                'pset': pset,
+                                'psetToEx': psetToEx
                             },
                             context_instance=RequestContext(request))
 
+def add_exercise(request):
+#    try:
+#        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+#    except:
+#        raise Http404
 
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    exercise = Exercise(fileName=request.POST['exercise'])
+    exercise.save()
+    index = len(pset.exercise_set.all())
+    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
+    psetToEx.save()
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
 
-
+def save_order(request):
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
+    for n in range(0,len(psetToEx)):
+        listName = "exercise_order[" + str(n) + "]"
+        psetToEx[n].number = request.POST[listName]
+        psetToEx[n].save()
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
