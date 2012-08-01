@@ -102,7 +102,7 @@
             </div>
         </div>
         <div class="form-actions">
-            <input type="submit" value="Save and Add Exercises" class="btn"> or <a href="#" class="btn"> Cancel</a>
+            <input type="submit" value="Save and Add Exercises" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
         </div>
     </form>
 </div>​

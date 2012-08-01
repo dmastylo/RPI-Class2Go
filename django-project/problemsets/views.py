@@ -150,6 +150,12 @@ def manage_exercises(request, course_prefix, course_suffix, pset_name):
                             },
                             context_instance=RequestContext(request))
 
+def add_exercise(request):
+#    try:
+#        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+#    except:
+#        raise Http404
+    return HttpResponse(request.POST['pset_id'])
 
 
 
