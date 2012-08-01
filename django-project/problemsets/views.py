@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect
 from django.template import RequestContext
@@ -155,7 +155,11 @@ def add_exercise(request):
 #        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
 #    except:
 #        raise Http404
-    return HttpResponse(request.POST['pset_id'])
 
-
-
+    pset = ProblemSet.objects.get(id=47)
+    exercise = Exercise(fileName=request.POST['exercise'])
+    exercise.save()
+    index = len(pset.exercise_set.all())
+    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
+    psetToEx.save()
+    return HttpResponseRedirect(reverse('problemsets.views.manage'))

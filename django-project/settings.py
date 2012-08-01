@@ -137,6 +137,7 @@ INSTALLED_APPS = (
                       'courses.video_exercises',
                       'khan',
                       'problemsets',
+                      'django.contrib.flatpages',
                       )
 if (hostname != "productionserver"):
     INSTALLED_APPS += (
