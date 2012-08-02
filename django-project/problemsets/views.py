@@ -20,9 +20,9 @@ def list(request, course_prefix, course_suffix):
         raise Http404
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
-    
+
     return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
-    
+
 def show(request, course_prefix, course_suffix, pset):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -96,20 +96,35 @@ def create_action(request):
     pset.create_production_instance()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
 
+def edit_form(request, course_prefix, course_suffix, pset_slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    content_sections = common_page_data['course'].contentsection_set.all()
+    return render_to_response('problemsets/create.html',
+                            {'request': request,
+                                'common_page_data': common_page_data,
+                                'course_prefix': course_prefix,
+                                'course_suffix': course_suffix,
+                                'content_sections': content_sections
+                            },
+                            context_instance=RequestContext(request))
+
 def manage_exercises(request, course_prefix, course_suffix, pset_name):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], title=pset_name)
-    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
+    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
                                 'pset': pset,
-                                'psetToEx': psetToEx
+                                'psetToExs': psetToExs
                             },
                             context_instance=RequestContext(request))
 
