@@ -71,7 +71,7 @@ def upload(request):
     yt_service = gdata.youtube.service.YouTubeService()
 
     if request.method == 'POST':
-        form = VideoUploadForm(request.POST)
+        form = VideoUploadForm(request.POST, course=common_page_data['course'])
         if form.is_valid():
             token = request.POST.get("token")
             yt_service.SetAuthSubToken(token)
@@ -81,14 +81,25 @@ def upload(request):
             video_title = form.cleaned_data['title']
             video_description = form.cleaned_data['description']
             video_slug = form.cleaned_data['url_name']
-            video_tags = form.cleaned_data['tags']
             video_section = form.cleaned_data['section']
+
+            video = Video(
+                course=common_page_data['course'],
+                section=video_section,
+                title=video_title,
+                description=video_description,
+                slug=video_slug,
+                duration=1,
+                index=len(Video.objects.filter(course=common_page_data['course'])),
+                mode='staging',
+            )
+            video.save()
 
             my_media_group = gdata.media.Group(
                 title=gdata.media.Title(text=video_title),
                 description=gdata.media.Description(description_type='plain',
                                                     text=video_description),
-                keywords=gdata.media.Keywords(text=video_tags),
+                #keywords=gdata.media.Keywords(text=video_tags),
                 category=[gdata.media.Category(
                         text='Education',
                         label='Education')],
@@ -104,13 +115,17 @@ def upload(request):
 
             data['post_url'] = post_url
             data['youtube_token'] = youtube_token
-            data['next'] = "http://localhost:8000/nlp/Fall2012/"
+            data['next'] = "http://localhost:8000/nlp/Fall2012/videos?vid="+str(video.id)
 
-            data['yt_logged_in'] = True
+
             #return redirect(request.META['HTTP_REFERER'])
     else:
-        form = VideoUploadForm()
-        data['form'] = form
+        form = VideoUploadForm(course=common_page_data['course'])
+    
+    data['token'] = request.POST.get("token")
+    data['form'] = form
+    data['yt_logged_in'] = True
     return render_to_response('videos/upload.html',
                               data,
                               context_instance=RequestContext(request))
+
