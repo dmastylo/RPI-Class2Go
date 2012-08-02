@@ -8,6 +8,7 @@ from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 
+
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
 # each problem set. Packages this information along with problem set
@@ -120,8 +121,15 @@ def add_exercise(request):
 #        raise Http404
 
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    exercise = Exercise(fileName=request.POST['exercise'])
+    
+    file_content = request.FILES['exercise']
+    file_name = file_content.name
+   
+    exercise = Exercise()
+    exercise.fileName = file_name
+    exercise.file.save(file_name, file_content)
     exercise.save()
+    
     index = len(pset.exercise_set.all())
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
     psetToEx.save()

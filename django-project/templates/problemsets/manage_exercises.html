@@ -5,7 +5,7 @@
     <h2> Add or Remove Exercises</h2>
 
     <h3>Upload Exercises to {{pset.name}}</h3>
-    <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical">
+    <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
