@@ -34,9 +34,9 @@
             <ul class="nav pull-right">
                 {% if common_page_data.can_switch_mode %}
                 <li>
-                    <form style='display:inline;margin-right: 20px;' name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
+                    <form style="position: relative;width: 264px;height: 1px;padding: 8px 10px 7px;color: #333;" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
                         View:
-                        <select name="to_mode" onchange="document.forms.course_mode_switch_form.submit();">
+                        <select name="to_mode" style="position: absolute;top: 4px;left: 50px;height: 23px;" onchange="document.forms.course_mode_switch_form.submit();">
                             <option value="staging" {% ifequal common_page_data.course_mode 'staging' %}selected{% endifequal %}>Staging</option>
                             <option value="production" {% ifequal common_page_data.course_mode 'production' %}selected{% endifequal %}>Production</option>
                         </select>
@@ -47,7 +47,7 @@
                 {% endif %}
                 
                 {% if common_page_data.is_course_admin %}
-                <li {% block course_admin_link %}{% endblock course_admin_link %}><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Course Administration</a></li>
+                <li {% block course_admin_link %}{% endblock course_admin_link %}><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}" style="border-right:0;">Course Administration</a></li>
                 {% endif %}
             </ul>
             {% endif %}
