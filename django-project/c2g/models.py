@@ -160,7 +160,7 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-
+    
     def create_production_instance(self):
         production_instance = AdditionalPage(
             course=self.course,

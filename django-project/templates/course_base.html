@@ -15,6 +15,9 @@
                     <ul class="dropdown-menu">
                         <li><a href="{% url 'courses.views.overview' common_page_data.course_prefix common_page_data.course_suffix %}">Overview for Non-Members</a></li>
                         <li><a href="{% url 'courses.views.syllabus' common_page_data.course_prefix common_page_data.course_suffix %}">Syllabus</a></li>
+                        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+                            <li><a href="{% url 'courses.views.edit_course_info_menu_items' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Edit menu items ...</a></li>
+                        {% endif %}
                     </ul>
                 </li>
                 <li {% block course_materials_link_class %}{% endblock course_materials_link_class %}>

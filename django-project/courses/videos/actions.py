@@ -41,6 +41,7 @@ def edit_video(request):
     pass
     
 def save_video_progress(request):
+    import pdb; pdb.set_trace();
     videoRec = request.POST['videoRec']
     playTime = request.POST['playTime']
     video = VideoActivity.objects.get(id=videoRec)

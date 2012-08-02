@@ -99,4 +99,11 @@ def course_materials(request, course_prefix, course_suffix):
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True)
     
     return render_to_response('courses/'+common_page_data['course_mode']+'/course_materials.html', {'common_page_data': common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
-    
+  
+def course_info_page(request, course_prefix, course_suffix, slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+        
+    return render_to_response('courses/course_info_page.html',{'common_page_data': common_page_data, 'page':page},context_instance=RequestContext(request))
