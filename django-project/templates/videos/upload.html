@@ -4,7 +4,7 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
   {% if user.is_authenticated %}
-    <h3>Upload videos</h3>
+    <h2>Upload videos</h2>
     {% if not yt_logged_in %}
       <a href="{{authSubUrl}}">Please login to your Google account</a>
     {% else %}

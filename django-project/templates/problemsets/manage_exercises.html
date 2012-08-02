@@ -4,7 +4,7 @@
 <div id="c2g_layout_m_column" class="span6">
     <h2> Add or Remove Exercises</h2>
 
-    <h3>Upload Exercises to {{pset.name}}</h3>
+    <h3>Upload Exercises to {{pset.title}}</h3>
     <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
@@ -25,9 +25,9 @@
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <ul data-sortablecontainer class="exercise-list">
-            {% for exercise in psetToEx %}
+            {% for psetToEx in psetToExs %}
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
-                    {{exercise.exercise.fileName}}
+                    {{psetToEx.exercise.fileName}}
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
                 </li>
             {% empty%}

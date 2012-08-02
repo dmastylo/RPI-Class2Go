@@ -21,16 +21,16 @@ def list(request, course_prefix, course_suffix):
         raise Http404
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
-    
+
     return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
-    
-def show(request, course_prefix, course_suffix, pset):
+
+def show(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
 
-    ps = common_page_data['course'].problemset_set.get(title=pset)
+    ps = common_page_data['course'].problemset_set.get(slug=pset_slug)
     #path = ProblemSet.objects(
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
@@ -82,8 +82,8 @@ def create_action(request):
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
     pset = ProblemSet(course = course,
                     section = content_section,
+                   slug = request.POST['slug'],
                    title = request.POST['title'],
-                   name = request.POST['name'],
                    description = request.POST['description'],
                    live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M'),
                    due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M'),
@@ -92,25 +92,69 @@ def create_action(request):
                    penalty_preference = request.POST['penalty_preference'],
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
-                   resubmission_penalty = request.POST['resubmission_penalty'])
+                   resubmission_penalty = request.POST['resubmission_penalty'],
+                   mode = 'staging')
     pset.save()
     pset.create_production_instance()
-    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
-def manage_exercises(request, course_prefix, course_suffix, pset_name):
+def edit_form(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    pset = ProblemSet.objects.get(course=common_page_data['course'], title=pset_name)
-    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
+    pset = common_page_data['course'].problemset_set.all().get(slug=pset_slug)
+    content_sections = common_page_data['course'].contentsection_set.all()
+    #datetimes need to be converted to date picker format
+    datetimes = {'live_datetime': pset.live_datetime.strftime('%m/%d/%Y %H:%M'),
+                'due_date': pset.due_date.strftime('%m/%d/%Y %H:%M'),
+                'grace_period': pset.grace_period.strftime('%m/%d/%Y %H:%M'),
+                'partial_credit_deadline': pset.partial_credit_deadline.strftime('%m/%d/%Y %H:%M')}
+
+    return render_to_response('problemsets/edit.html',
+                            {'request': request,
+                                'common_page_data': common_page_data,
+                                'course_prefix': course_prefix,
+                                'course_suffix': course_suffix,
+                                'pset': pset,
+                                'datetimes': datetimes,
+                                'content_sections':content_sections
+                            },
+                            context_instance=RequestContext(request))
+
+def edit_action(request):
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    content_section = ContentSection.objects.get(id=request.POST['content_section'])
+    pset.section = content_section
+    pset.slug = request.POST['slug']
+    pset.title = request.POST['title']
+    pset.description = request.POST['description']
+    pset.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
+    pset.due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M')
+    pset.grace_period = datetime.strptime(request.POST['grace_period'],'%m/%d/%Y %H:%M')
+    pset.partial_credit_deadline = datetime.strptime(request.POST['partial_credit_deadline'],'%m/%d/%Y %H:%M')
+    pset.penalty_preference = request.POST['penalty_preference']
+    pset.late_penalty = request.POST['late_penalty']
+    pset.submissions_permitted = request.POST['submissions_permitted']
+    pset.resubmission_penalty = request.POST['resubmission_penalty']
+    pset.save()
+    return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'], )))
+
+
+def manage_exercises(request, course_prefix, course_suffix, pset_slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
+    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
                                 'pset': pset,
-                                'psetToEx': psetToEx
+                                'psetToExs': psetToExs
                             },
                             context_instance=RequestContext(request))
 
@@ -133,7 +177,7 @@ def add_exercise(request):
     index = len(pset.exercise_set.all())
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
     psetToEx.save()
-    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 def save_order(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
@@ -142,4 +186,4 @@ def save_order(request):
         listName = "exercise_order[" + str(n) + "]"
         psetToEx[n].number = request.POST[listName]
         psetToEx[n].save()
-    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset,)))
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))

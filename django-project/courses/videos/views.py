@@ -18,6 +18,15 @@ def list(request, course_prefix, course_suffix):
     except:
         raise Http404
 
+    if 'id' in request.GET:
+        #process Video model instance with this youtube id
+        #and other stuff
+        video = Video.objects.get(pk=request.GET['vid'])
+        video.url = request.GET['id']
+        video.save()
+        video.create_production_instance()
+        print "WADIDOD"
+
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=False)
     
     return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
@@ -69,10 +78,6 @@ def upload(request, course_prefix, course_suffix):
 
     data = {'common_page_data': common_page_data}
 
-    #if 'id' in request.GET:
-        #process Video model instance with this youtube id
-        #and other stuff
-
     if 'token' in request.GET:
         token = request.GET['token']
         data['token'] = token
@@ -83,7 +88,7 @@ def upload(request, course_prefix, course_suffix):
         #yt_service.UpgradeToSessionToken()
 
         yt_logged_in = True
-        form = VideoUploadForm()
+        form = VideoUploadForm(course=common_page_data['course'])
         data['form'] = form
     else:
         # user is not logged into google account for youtube

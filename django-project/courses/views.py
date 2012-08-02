@@ -21,30 +21,30 @@ def main(request, course_prefix, course_suffix):
     contentsection_list = common_page_data['course'].contentsection_set.all().order_by('index')
     video_list = common_page_data['course'].video_set.all().order_by('index')
     pset_list =  common_page_data['course'].problemset_set.all().order_by('index')
-    
+
     full_index_list = []
     for contentsection in contentsection_list:
         index_list = []
         for video in video_list:
             if video.section.id == contentsection.id:
                 index_list.append(('video', video.index, video.id, contentsection.id, video.slug, video.title))
-            
+
         for pset in pset_list:
             if pset.section.id == contentsection.id:
-                index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.title, pset.name))
-                    
+                index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
+
         index_list.sort(key = index)
         full_index_list.append(index_list)
-    
-    return render_to_response('courses/view.html', 
+
+    return render_to_response('courses/view.html',
             {'common_page_data': common_page_data,
-             'announcement_list': announcement_list, 
+             'announcement_list': announcement_list,
              'news_list': news_list,
              'contentsection_list': contentsection_list,
              'video_list': video_list,
              'pset_list': pset_list,
              'full_index_list': full_index_list
-             }, 
+             },
 
             context_instance=RequestContext(request))
 
@@ -95,8 +95,8 @@ def course_materials(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    
+
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True)
-    
+
     return render_to_response('courses/'+common_page_data['course_mode']+'/course_materials.html', {'common_page_data': common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
-    
+
