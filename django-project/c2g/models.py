@@ -282,6 +282,9 @@ class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
 
         self.save()
 
+    def __unicode__(self):
+        return self.title
+
     class Meta:
         db_table = u'c2g_content_sections'
 
@@ -315,7 +318,7 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
-    duration = models.IntegerField(blank=True)
+    duration = models.IntegerField(null=True)
     slug = models.CharField(max_length=255, null=True)
 
     def create_production_instance(self):
@@ -357,7 +360,7 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.duration:
-            if self.type == "youtube":
+            if self.type == "youtube" and self.url:
                 yt_service = gdata.youtube.service.YouTubeService()
                 entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
                 self.duration = entry.media.duration.seconds
