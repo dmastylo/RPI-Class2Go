@@ -4,7 +4,7 @@
 <div id="c2g_layout_m_column" class="span6">
     <h2> Add or Remove Exercises</h2>
 
-    <h3>Upload Exercises to {{pset.name}}</h3>
+    <h3>Upload Exercises to {{pset.title}}</h3>
     <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>

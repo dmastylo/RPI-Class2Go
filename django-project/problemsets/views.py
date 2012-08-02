@@ -29,7 +29,7 @@ def show(request, course_prefix, course_suffix, pset):
     except:
         raise Http404
 
-    ps = common_page_data['course'].problemset_set.get(title=pset)
+    ps = common_page_data['course'].problemset_set.get(slug=pset)
     #path = ProblemSet.objects(
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
@@ -81,8 +81,8 @@ def create_action(request):
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
     pset = ProblemSet(course = course,
                     section = content_section,
+                   slug = request.POST['slug'],
                    title = request.POST['title'],
-                   name = request.POST['name'],
                    description = request.POST['description'],
                    live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M'),
                    due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M'),
@@ -116,7 +116,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_name):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    pset = ProblemSet.objects.get(course=common_page_data['course'], title=pset_name)
+    pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_name)
     psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
