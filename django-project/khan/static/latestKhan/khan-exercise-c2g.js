@@ -2925,107 +2925,101 @@ var Khan = (function() {
             // Generate the initial problem when dependencies are done being loaded
             //var answerType = makeProblem();
 
-            var first = $('#questions-to-do li:last-child');
+            // [@wescott] moves to viewed list, as it's currently being viewed
+            var first = $('#questions-viewed li:first-child');
             makeProblem(first.data('problem'), first.data('randseed'))
 
 
         }
 
-
-
     }
 
     //var c2gProblemBag;
 
-
-
-
-
     function initC2GStacks(exercises) {
-        //console.log(exercises);
 
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
 
-        $('#problem-and-answer').append($('<div id="questions-to-do"><ol></ol></div>'));
-        $('#problem-and-answer').append($('<div id="questions-done"><ol></ol></div>'));
-
-        $('#questions-to-do').css('position', 'absolute');
-        $('#questions-done').css('position', 'absolute');
+        $('#problem-and-answer').append($('<div id="questions-stack"></div>'));
+        $('#questions-stack').append($('<div id="questions-viewed"><ol></ol></div>'));
+        $('#questions-stack').append($('<div id="questions-unviewed"><ol></ol></div>'));
 
         //populate 1 questions-to-do for each exercise
         var curNumProbs=0;
-        $(exercises).filter(".exercise").each(
-                          function(i,v){
-                                //Figure out how many problems there are in this exercise
-                                var probsInExercise=$(v).children('.problems').children().length;
-                                $(v).data('problemsStartAtIndex',curNumProbs);
-                                $(v).data('numberOfProblems',probsInExercise);
-                                var li = $("<li>");
+        $(exercises).filter(".exercise").each(function(idx, elem) {
 
-                                li.text("Q" + (i+1));
-                                //this data 'problem' will be used to index into the problems array
-                                //the problems array is a flat array containing all problems from all exercises
-                                //we do the counting above to get a problem index in the right range for this exercise
-                                li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
-                                li.data('randseed',Math.floor(Math.random()*100000));
-                                $('#questions-to-do ol').prepend(li);
-                                curNumProbs+=probsInExercise;
+                //Figure out how many problems there are in this exercise
+                var probsInExercise=$(elem).children('.problems').children().length;
+                $(elem).data('problemsStartAtIndex',curNumProbs);
+                $(elem).data('numberOfProblems',probsInExercise);
+                var li = $("<li>");
 
-                          });
+                li.text("Q" + (idx + 1));
+                //this data 'problem' will be used to index into the problems array
+                //the problems array is a flat array containing all problems from all exercises
+                //we do the counting above to get a problem index in the right range for this exercise
+                li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
+                li.data('randseed',Math.floor(Math.random()*100000));
+                if (idx == 0) {
+                    $('#questions-viewed ol').append(li);
+                } else {
+                    $('#questions-unviewed ol').append(li);
+                }
+                curNumProbs+=probsInExercise;
 
+                //console.log('Added ' + curNumProbs + ' to questions stack');
 
+            });
 
+        // set class on last question to show it is the current one
+        $('#questions-viewed li:first-child').addClass('current-question');
 
-
-        /* Commenting out these because using :hover css selector instead
-        $('#questions-to-do').find('li').mouseover(function (ev) {
-                                                   //$(this).css('border-color', '#000');
-                                                   //$(this).css('color', '#000');
-                                                   });
-        $('#questions-to-do').find('li').mouseout(function (ev) {
-                                                  //$(this).css('border-color', '#ccc');
-                                                  //$(this).css('color', '#999');
-                                                  });
-        */
-
-        $('#questions-to-do').find('li').click(todoClickHandler);
+        $('#questions-unviewed').find('li').click(unviewedClickHandler);
+        $('#questions-viewed').find('li').click(viewedClickHandler);
 
         $('#next-question-button').click(function () {
-                                         $('#questions-to-do li:last-child').trigger('mouseout');
-                                         $('#questions-to-do li:last-child').unbind('click');
-                                         $('#questions-to-do li:last-child').click(doneClickHandler);
-                                         $('#questions-to-do li:last-child').appendTo($('#questions-done').children('ol'));
-                                         var next = $('#questions-to-do li:last-child');
-                                         clearExistingProblem();
-                                         if (next.length)
-                                              makeProblem(next.data('problem'), next.data('randseed'));
 
-                                         });
+            $('#questions-viewed li:last-child').removeClass('current-question');
 
-        $('#questions-to-do').fadeIn('slow');
-        $('#questions-done').fadeIn('slow');
+            $('#questions-unviewed li:first-child').trigger('mouseout');
+            $('#questions-unviewed li:first-child').unbind('click');
+            $('#questions-unviewed li:first-child').click(viewedClickHandler);
+            $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
+            var next = $('#questions-viewed li:last-child');
+            next.addClass('current-question');
 
-
-        function todoClickHandler(ev) {
-
-            $(this).trigger('mouseout');
-            $(this).appendTo($('#questions-done').children('ol'));
-            $(this).unbind('click');
-            $(this).click(doneClickHandler);
-            var next = $('#questions-to-do li:last-child');
             clearExistingProblem();
-            if (next.length)
+
+            if (next.length) {
                 makeProblem(next.data('problem'), next.data('randseed'));
+            }
+
+            });
+
+        $('#questions-unviewed').fadeIn('slow');
+        $('#questions-viewed').fadeIn('slow');
+
+
+        function unviewedClickHandler(ev) {
+
+            if ($(this).hasClass('current-question')) {
+                return;
+            }
+
+            // [@wescott] redundant code removed; next button fn should just be triggered
+            $('#next-question-button').trigger('click');
+
         };
 
-        function doneClickHandler(ev) {
+        // [@wescott] TODO: refactor 2 click handlers into one
+        function viewedClickHandler(ev) {
+
             $(this).trigger('mouseout');
-            $(this).appendTo($('#questions-to-do').children('ol'));
-            $(this).unbind('click');
-            $(this).click(todoClickHandler);
+            $('.current-question').removeClass('current-question');
+            $(this).addClass('current-question');
             clearExistingProblem();
             makeProblem($(this).data('problem'), $(this).data('randseed'));
 

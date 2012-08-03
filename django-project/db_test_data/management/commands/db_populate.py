@@ -184,9 +184,9 @@ def create_course(data, users):
     data['course'] = course
     data['section'] = sections[0]
     data['index'] = 3
-    data['title']='P1'
+    data['slug']='P1'
     data['description'] = 'This is the first problem set. Practice some question on Regular Expressions. Remember to work your problems out on a separate piece of paper first because you only get one try on these. Miss on and you have a D!'
-    data['name'] = 'Problem Set 1: Regular Expressions'
+    data['title'] = 'Problem Set 1: Regular Expressions'
     data['path']='/static/latestKhan/exercises/P1.html'
     data['due_date']='2012-07-20'
     data['partial_credit_deadline']='2012-07-27'
@@ -196,9 +196,9 @@ def create_course(data, users):
     data['course'] = course
     data['section'] = sections[1]
     data['index'] = 3
-    data['title']='P2'
+    data['slug']='P2'
     data['description'] = 'This problem set will test your knowledge of Joint Probability. Each question is worth one point and your final exam is worth 100 points so these questions are basically useless. But you have to do them because an incomplete assignment disallows you from passing the class. Have fun with this problem set!'
-    data['name']='Problem Set 2: Joint Probability'
+    data['title']='Problem Set 2: Joint Probability'
     data['path']='/static/latestKhan/exercises/P2.html'
     data['due_date']='2012-07-27'
     data['partial_credit_deadline']='2012-08-03'
@@ -302,8 +302,8 @@ def create_problem_set(data, users):
     problem_set = ProblemSet(
         course = data['course'],
         section = data['section'],
+        slug = data['slug'],
         title = data['title'],
-        name = data['name'],
         path = data['path'],
         due_date = data['due_date'],
         partial_credit_deadline = data['partial_credit_deadline'],
@@ -324,8 +324,6 @@ def create_problem_set(data, users):
     save_exercise(prod_instance, "P1_Levenshtein.html", 1)
     save_exercise(prod_instance, "P1_Regexp.html", 2)
     save_exercise(prod_instance, "P1_Tokenize.html", 3)
-
-
 
     return problem_set
 

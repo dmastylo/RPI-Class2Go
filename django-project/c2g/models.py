@@ -14,11 +14,15 @@
 
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django import forms
 
 import gdata.youtube
 import gdata.youtube.service
+
+# For file system upload
+from django.core.files.storage import FileSystemStorage
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -390,8 +394,8 @@ class VideoActivity(models.Model):
 class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     course = models.ForeignKey(Course)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
-    title = models.CharField(max_length=255)
-    name = models.CharField(max_length=255, blank=True)
+    slug = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
     due_date = models.DateTimeField(null=True, blank=True)
@@ -402,14 +406,13 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     submissions_permitted = models.IntegerField(null=True, blank=True)
     resubmission_penalty = models.IntegerField(null=True, blank=True)
     randomize = models.BooleanField()
-    slug = models.CharField(max_length=255)
 
     def create_production_instance(self):
         production_instance = ProblemSet(
             course=self.course.image,
             section=self.section.image,
+            slug=self.slug,
             title=self.title,
-            name=self.name,
             description=self.description,
             path=self.path,
             live_datetime=self.live_datetime,
@@ -421,7 +424,6 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
             submissions_permitted=self.submissions_permitted,
             resubmission_penalty=self.resubmission_penalty,
             randomize=self.randomize,
-            slug=self.slug,
             index=self.index,
             image = self,
             mode = 'production',
@@ -471,6 +473,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
 class Exercise(TimestampMixin, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
+    file = models.FileField(upload_to='exercise_files', null=True)
     def __unicode__(self):
         return self.fileName
     class Meta:
