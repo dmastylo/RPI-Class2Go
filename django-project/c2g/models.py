@@ -20,6 +20,10 @@ from django import forms
 import gdata.youtube
 import gdata.youtube.service
 
+# For file system upload
+from django.core.files.storage import FileSystemStorage
+
+
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -469,6 +473,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
 class Exercise(TimestampMixin, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
+    file = models.FileField(upload_to='exercise_files', null=True)
     def __unicode__(self):
         return self.fileName
     class Meta:

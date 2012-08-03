@@ -1,0 +1,111 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span6">
+    <h2>Create a New Problem Set</h2>
+
+    <form action="{% url 'problemsets.views.edit_action' %}" method="POST" class="form-vertical">
+        {% csrf_token %}
+        <input type="hidden" name="course_prefix" value={{course_prefix}}>
+        <input type="hidden" name="course_suffix" value={{course_suffix}}>
+        <input type="hidden" name="pset_id" value={{pset.id}}>
+        <h3>Problem Set Details</h3>
+        <div class="control-group">
+            <label class="control-label">Problem Set ID* (A unique ID consisting of numbers and letters with no spaces to be used in the URL)</label>
+            <div class="controls">
+                <input type="text" name="slug" value="{{pset.slug}}" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Problem Set Title* (A title that can include spaces that be shown when listing problem sets)</label>
+            <div class="controls">
+                <input type="text" name="title" value="{{pset.title}}"/>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Section*</label>
+            <div class="controls">
+                <select name="content_section">
+                    {% for content_section in content_sections %}
+                    <option value={{content_section.id}}>{{content_section.title}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Description</label>
+            <div class="controls">
+                <textarea row="20" cols="40" name="description" >{{pset.description}}</textarea>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">When will this problem set go live?*</label>
+            <div class="controls">
+                <input type="datetime" name="live_date" value="{{datetimes.live_datetime}}" data-datetimepicker>
+            </div>
+        </div>
+        <h3>Deadlines and Penalties</h3>
+        <div class="control-group">
+            <label class="control-label">Due Date*</label>
+            <div class="controls">
+                <input type="text" name="due_date" value="{{datetimes.due_date}}" data-datetimepicker>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Multiple Submission Preference</label>
+            <div class="controls">
+                <input type="radio" name="penalty_preference" value="formative" {% if pset.penalty_preference == "formative" %} checked {% endif %}/> Formative
+                <input type="radio" name="penalty_preference" value="assessive" {% if pset.penalty_preference == "assessive" %} checked {% endif %} /> Assessive
+                <input type="radio" name="penalty_perference" value="custom" {% if pset.penalty_preference == "custom" %} checked {% endif %} /> Custom
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Grace Period End</label>
+            <div class="controls">
+                <input type="text" name="grace_period" value="{{datetimes.grace_period}}" data-datetimepicker>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Partial Credit Deadline</label>
+            <div class="controls">
+                <input type="text" name="partial_credit_deadline" value="{{datetimes.partial_credit_deadline}}" data-datetimepicker>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Late Penalty</label>
+            <div class="controls">
+                <input type="number" name="late_penalty" value="{{pset.late_penalty}}"/>% 
+                <span class="help-block">Penalty for submitting between grace period and partial credit deadline</span>
+            </div>
+        </div>
+        <h4><a data-toggle="collapse" data-target="#advanced-options">Advanced Options</a></h4>
+        <div id="advanced-options" class="collapse in">
+            <div class="control-group">
+                <label class="control-label">Number of Submissions Permitted</label>
+                <div class="controls">
+                    <input type="number" name="submissions_permitted" value="{{pset.submissions_permitted}}"
+                    <span class="help-block">Use 0 for unlimited submissions</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Penalty % per Resubmission</label>
+                <div class="controls">
+                    <input type="number" name="resubmission_penalty" value="{{pset.resubmission_penalty}}"/>%
+                </div>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label class="control-label">Randomize exercise ordering?</label>
+            <div class="controls">
+                <input type="checkbox" name="randomize" {% if pset.reandomize %} checked {% endif %}>
+            </div>
+        </div>
+        <div class="form-actions">
+            <input type="submit" value="Save" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
+        </div>
+    </form>
+</div>​
+{% endblock m_column_content %}
+
