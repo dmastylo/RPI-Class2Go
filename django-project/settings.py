@@ -138,11 +138,18 @@ INSTALLED_APPS = (
                       'khan',
                       'problemsets',
                       'django.contrib.flatpages',
+                      'storages',
                       )
 if (hostname != "productionserver"):
     INSTALLED_APPS += (
                         'db_test_data',
                        )
+
+# S3 Storage Setting
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+AWS_ACCESS_KEY_ID = 'AKIAIYES3HTY3TOMHCTQ'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'stage.c2g'
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'

@@ -7,7 +7,7 @@ from django.template import RequestContext
 from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
 
-from courses.videos.forms import VideoUploadForm
+from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
 
@@ -67,12 +67,29 @@ def upload(request):
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
 
     data = {'common_page_data': common_page_data}
+    
+    if request.method == 'POST':
+        form = S3UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            video_title = form.cleaned_data['title']
+            file = request.FILES['file']
+            
 
-    yt_service = gdata.youtube.service.YouTubeService()
 
+            return redirect("http://" + request.META['HTTP_HOST'])
+    else:
+        form = S3UploadForm()
+    data['form'] = form
+
+    return render_to_response('videos/s3upload.html',
+                              data,
+                              context_instance=RequestContext(request))
+
+    #old YOUTUBE UPLOAD
     if request.method == 'POST':
         form = VideoUploadForm(request.POST, course=common_page_data['course'])
         if form.is_valid():
+            yt_service = gdata.youtube.service.YouTubeService()
             token = request.POST.get("token")
             yt_service.SetAuthSubToken(token)
             yt_service.UpgradeToSessionToken()
@@ -89,7 +106,6 @@ def upload(request):
                 title=video_title,
                 description=video_description,
                 slug=video_slug,
-                duration=1,
                 index=len(Video.objects.filter(course=common_page_data['course'])),
                 mode='staging',
             )
