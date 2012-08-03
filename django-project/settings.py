@@ -138,7 +138,7 @@ INSTALLED_APPS = (
                       'khan',
                       'problemsets',
                       'django.contrib.flatpages',
-                      'storages',
+#                      'storages',
                       )
 if (hostname != "productionserver"):
     INSTALLED_APPS += (
@@ -182,7 +182,7 @@ if (hostname != "productionserver" or hostname != "stagingserver"):
     file_storage_lib = 'django.core.files.storage.FileSystemStorage'
 else:
     file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
-DEFAULT_FILE_STORAGE = file_storage_lib
+#DEFAULT_FILE_STORAGE = file_storage_lib
 
 
 AWS_ACCESS_KEY_ID = 'AKIAIYES3HTY3TOMHCTQ'

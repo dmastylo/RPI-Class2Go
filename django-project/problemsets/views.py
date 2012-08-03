@@ -165,15 +165,15 @@ def add_exercise(request):
 #        raise Http404
 
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    
+
     file_content = request.FILES['exercise']
     file_name = file_content.name
-   
+
     exercise = Exercise()
     exercise.fileName = file_name
-    exercise.file.save(file_name, file_content)
+#    exercise.file.save(file_name, file_content)
     exercise.save()
-    
+
     index = len(pset.exercise_set.all())
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
     psetToEx.save()
