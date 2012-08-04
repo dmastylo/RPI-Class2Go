@@ -45,14 +45,11 @@ class Stageable(models.Model):
 class Sortable(models.Model):
     index=models.IntegerField(null=True, blank=True)
 
-    def move_to(self, new_index):
-        pass
-
-    def move_up_by_one(self):
-        pass
-
-    def move_down_by_one(self):
-       pass
+    class Meta:
+       abstract = True
+       
+class Deletable(models.Model):
+    is_deleted=models.IntegerField(default=0)
 
     class Meta:
        abstract = True
@@ -70,7 +67,7 @@ class Institution(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_institutions'
 
-class Course(TimestampMixin, Stageable, models.Model):
+class Course(TimestampMixin, Stageable, Deletable, models.Model):
     institution = models.ForeignKey(Institution, null=True, db_index=True)
     student_group = models.ForeignKey(Group, related_name="student_group", db_index=True)
     instructor_group = models.ForeignKey(Group, related_name="instructor_group", db_index=True)
@@ -160,16 +157,18 @@ class Course(TimestampMixin, Stageable, models.Model):
     class Meta:
         db_table = u'c2g_courses'
 
-class AdditionalPage(TimestampMixin, Stageable, models.Model):
+class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-
+    slug = models.CharField(max_length=255, null=True, blank=True)
+    
     def create_production_instance(self):
         production_instance = AdditionalPage(
-            course=self.course,
+            course=self.course.image,
             title=self.title,
             description=self.description,
+            index=self.index,
             mode='production',
             image=self,
         )
@@ -185,6 +184,8 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
             production_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
             production_instance.description = self.description
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
 
         production_instance.save()
 
@@ -196,6 +197,8 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
             self.title = production_instance.title
         if not clone_fields or 'description' in clone_fields:
             self.description = production_instance.description
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
 
         self.save()
 
@@ -204,7 +207,7 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
 
 #owner is person who posted
 #does it need access_id?
-class Announcement(TimestampMixin, Stageable, models.Model):
+class Announcement(TimestampMixin, Stageable, Deletable, models.Model):
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -248,7 +251,7 @@ class Announcement(TimestampMixin, Stageable, models.Model):
     class Meta:
         db_table = u'c2g_announcements'
 
-class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
+class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
 
@@ -292,7 +295,7 @@ class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
     class Meta:
         db_table = u'c2g_content_sections'
 
-class StudentSection(TimestampMixin, models.Model):
+class StudentSection(TimestampMixin, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     capacity = models.IntegerField(default=999)
@@ -315,7 +318,7 @@ def create_user_profile(sender, instance, created, raw, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
-class Video(TimestampMixin, Stageable, Sortable, models.Model):
+class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -393,7 +396,7 @@ class VideoActivity(models.Model):
      class Meta:
         db_table = u'c2g_video_activity'
 
-class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
+class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     slug = models.CharField(max_length=255)
@@ -472,7 +475,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     class Meta:
         db_table = u'c2g_problem_sets'
 
-class Exercise(TimestampMixin, models.Model):
+class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
     file = models.FileField(upload_to='exercise_files', null=True)
@@ -490,7 +493,7 @@ class ProblemSetToExercise(models.Model):
     class Meta:
         db_table = u'c2g_problemset_to_exercise'
 
-class Problem(TimestampMixin, Stageable, models.Model):
+class Problem(TimestampMixin, Stageable, Deletable, models.Model):
     exercise = models.ForeignKey(Exercise)
     slug = models.CharField(max_length=255)
 

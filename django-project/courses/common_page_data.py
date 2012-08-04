@@ -1,4 +1,4 @@
-from c2g.models import Course
+from c2g.models import Course, AdditionalPage
 from django.contrib.auth.models import User, Group
 import datetime
 
@@ -36,23 +36,26 @@ def get_common_page_data(request, prefix, suffix):
     else:
         view_mode = 'view'
     
-    # Current date and time parts
-    # now = datetime.datetime.now()
-    # month = "%02d" % now.month
-    # day = "%02d" % now.day
-    # year = "%04d" % now.year
-    # hour = "%02d" % now.hour
-    # minute = "%02d" % now.minute
-    
-    # current_datetime = {'year': year, 'month':month, 'day':day, 'hour':hour, 'minute':minute}
-    # if request.GET.get('as-of'):
-        # parts = request.GET.get('as-of').split("-")
-        # effective_current_datetime = datetime.datetime(parts[2],parts[0],parts[1])
-    # else:
-        # effective_current_datetime = current_datetime
+    # Course info pages
+    course_info_pages = AdditionalPage.objects.filter(course=course).order_by('index')
         
     current_datetime = datetime.datetime.now()
     effective_current_datetime = current_datetime
     
-    page_data = {'request': request, 'course': course, 'production_course': production_course, 'staging_course': staging_course, 'course_prefix':prefix, 'course_suffix':suffix, 'course_mode':course_mode, 'can_switch_mode':can_switch_mode, 'is_course_admin':is_course_admin, 'view_mode': view_mode, 'current_datetime':current_datetime, 'effective_current_datetime':effective_current_datetime}
+    page_data = {
+        'request': request,
+        'course': course,
+        'production_course': production_course,
+        'staging_course': staging_course,
+        'course_prefix':prefix,
+        'course_suffix':suffix,
+        'course_mode':course_mode,
+        'can_switch_mode':can_switch_mode,
+        'is_course_admin':is_course_admin,
+        'view_mode': view_mode,
+        'course_info_pages':course_info_pages,
+        'view_mode': view_mode,
+        'current_datetime':current_datetime,
+        'effective_current_datetime':effective_current_datetime
+    }
     return page_data
