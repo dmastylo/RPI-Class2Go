@@ -69,16 +69,38 @@ def upload(request):
     data = {'common_page_data': common_page_data}
     
     if request.method == 'POST':
-        form = S3UploadForm(request.POST, request.FILES)
+        form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'])
         if form.is_valid():
             video_title = form.cleaned_data['title']
             file = request.FILES['file']
+            video_section = form.cleaned_data['section']
             
+            new_video = form.save(commit=False)
+            new_video.course = common_page_data['course']
+            new_video.index = len(Video.objects.filter(course=common_page_data['course']))
+            new_video.mode = 'staging'
 
+            new_video.save()
+            new_video.create_production_instance()
+            print new_video.file.url
+
+            video = Video(
+                course=common_page_data['course'],
+                #section=video_section,
+                title=video_title,
+                #description=video_description,
+                #slug=video_slug,
+                index=len(Video.objects.filter(course=common_page_data['course'])),
+                mode='staging',
+                file=file,
+            )
+#            video.save()
+
+#            print video.file.url
 
             return redirect("http://" + request.META['HTTP_HOST'])
     else:
-        form = S3UploadForm()
+        form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
 
     return render_to_response('videos/s3upload.html',

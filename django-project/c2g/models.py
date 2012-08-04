@@ -323,7 +323,8 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
     duration = models.IntegerField(null=True)
-    slug = models.CharField(max_length=255, null=True)
+    slug = models.SlugField("URL Name", max_length=255, null=True)
+    file = models.FileField(upload_to='videos')
 
     def create_production_instance(self):
         production_instance = Video(
@@ -335,6 +336,7 @@ class Video(TimestampMixin, Stageable, Sortable, models.Model):
             url=self.url,
             duration=self.duration,
             slug=self.slug,
+            file=self.file,
             image = self,
             mode = 'production',
         )
