@@ -13,10 +13,11 @@
                 <li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'courses.views.overview' common_page_data.course_prefix common_page_data.course_suffix %}">Overview for Non-Members</a></li>
-                        <li><a href="{% url 'courses.views.syllabus' common_page_data.course_prefix common_page_data.course_suffix %}">Syllabus</a></li>
+                        {% for page in common_page_data.course_info_pages %}
+                            <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
+                        {% endfor %}
                         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
-                            <li><a href="{% url 'courses.views.edit_course_info_menu_items' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Edit menu items ...</a></li>
+                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Add/re-order pages ...</a></li>
                         {% endif %}
                     </ul>
                 </li>
@@ -50,7 +51,7 @@
                 {% endif %}
                 
                 {% if common_page_data.is_course_admin %}
-                <li {% block course_admin_link %}{% endblock course_admin_link %}><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Course Administration</a></li>
+                    <li {% block course_admin_link %}{% endblock course_admin_link %}><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Course Administration</a></li>
                 {% endif %}
             </ul>
             {% endif %}

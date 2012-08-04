@@ -49,7 +49,6 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/materials/?$', 'courses.views.course_materials'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/syllabus/?$', 'courses.views.syllabus'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/admin/?', 'courses.admin_views.admin'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/edit_course_info_menu_items/?$', 'courses.views.edit_course_info_menu_items'),
     
     url(r'^switch_mode', 'courses.actions.switch_mode'),
     url(r'^add_section', 'courses.actions.add_section'),
@@ -58,6 +57,13 @@ urlpatterns = patterns('',
     url(r'^revert/?', 'courses.actions.revert'),
     url(r'^change_live_datetime/?', 'courses.actions.change_live_datetime'),
 
+    # Additional Pages
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/pages/(?P<slug>[a-zA-Z0-9_]+)/?$', 'courses.additional_pages.views.main'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/manage_nav_menu/?$', 'courses.additional_pages.views.manage_nav_menu'),
+    url(r'^delete_page', 'courses.additional_pages.actions.delete'),
+    url(r'^save_page', 'courses.additional_pages.actions.save'),
+    url(r'^add_page', 'courses.additional_pages.actions.add'),
+    
     # Announcements
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/?$', 'courses.announcements.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/admin/?', 'courses.announcements.views.admin'),

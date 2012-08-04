@@ -156,16 +156,18 @@ class Course(TimestampMixin, Stageable, models.Model):
     class Meta:
         db_table = u'c2g_courses'
 
-class AdditionalPage(TimestampMixin, Stageable, models.Model):
+class AdditionalPage(TimestampMixin, Stageable, Sortable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
+    slug = models.CharField(max_length=255, null=True, blank=True)
     
     def create_production_instance(self):
         production_instance = AdditionalPage(
-            course=self.course,
+            course=self.course.image,
             title=self.title,
             description=self.description,
+            index=self.index,
             mode='production',
             image=self,
         )
@@ -181,6 +183,8 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
             production_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
             production_instance.description = self.description
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
 
         production_instance.save()
 
@@ -192,6 +196,8 @@ class AdditionalPage(TimestampMixin, Stageable, models.Model):
             self.title = production_instance.title
         if not clone_fields or 'description' in clone_fields:
             self.description = production_instance.description
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
 
         self.save()
 
