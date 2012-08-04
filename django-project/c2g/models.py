@@ -14,11 +14,15 @@
 
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django import forms
 
 import gdata.youtube
 import gdata.youtube.service
+
+# For file system upload
+from django.core.files.storage import FileSystemStorage
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -41,14 +45,11 @@ class Stageable(models.Model):
 class Sortable(models.Model):
     index=models.IntegerField(null=True, blank=True)
 
-    def move_to(self, new_index):
-        pass
-
-    def move_up_by_one(self):
-        pass
-
-    def move_down_by_one(self):
-       pass
+    class Meta:
+       abstract = True
+       
+class Deletable(models.Model):
+    is_deleted=models.IntegerField(default=0)
 
     class Meta:
        abstract = True
@@ -66,7 +67,7 @@ class Institution(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_institutions'
 
-class Course(TimestampMixin, Stageable, models.Model):
+class Course(TimestampMixin, Stageable, Deletable, models.Model):
     institution = models.ForeignKey(Institution, null=True, db_index=True)
     student_group = models.ForeignKey(Group, related_name="student_group", db_index=True)
     instructor_group = models.ForeignKey(Group, related_name="instructor_group", db_index=True)
@@ -156,7 +157,7 @@ class Course(TimestampMixin, Stageable, models.Model):
     class Meta:
         db_table = u'c2g_courses'
 
-class AdditionalPage(TimestampMixin, Stageable, Sortable, models.Model):
+class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
@@ -206,7 +207,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, models.Model):
 
 #owner is person who posted
 #does it need access_id?
-class Announcement(TimestampMixin, Stageable, models.Model):
+class Announcement(TimestampMixin, Stageable, Deletable, models.Model):
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -250,7 +251,7 @@ class Announcement(TimestampMixin, Stageable, models.Model):
     class Meta:
         db_table = u'c2g_announcements'
 
-class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
+class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
 
@@ -294,7 +295,7 @@ class ContentSection(TimestampMixin, Stageable, Sortable, models.Model):
     class Meta:
         db_table = u'c2g_content_sections'
 
-class StudentSection(TimestampMixin, models.Model):
+class StudentSection(TimestampMixin, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     capacity = models.IntegerField(default=999)
@@ -317,7 +318,7 @@ def create_user_profile(sender, instance, created, raw, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
-class Video(TimestampMixin, Stageable, Sortable, models.Model):
+class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -393,11 +394,11 @@ class VideoActivity(models.Model):
      class Meta:
         db_table = u'c2g_video_activity'
 
-class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
+class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
-    title = models.CharField(max_length=255)
-    name = models.CharField(max_length=255, blank=True)
+    slug = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
     due_date = models.DateTimeField(null=True, blank=True)
@@ -408,14 +409,13 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     submissions_permitted = models.IntegerField(null=True, blank=True)
     resubmission_penalty = models.IntegerField(null=True, blank=True)
     randomize = models.BooleanField()
-    slug = models.CharField(max_length=255)
 
     def create_production_instance(self):
         production_instance = ProblemSet(
             course=self.course.image,
             section=self.section.image,
+            slug=self.slug,
             title=self.title,
-            name=self.name,
             description=self.description,
             path=self.path,
             live_datetime=self.live_datetime,
@@ -427,7 +427,6 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
             submissions_permitted=self.submissions_permitted,
             resubmission_penalty=self.resubmission_penalty,
             randomize=self.randomize,
-            slug=self.slug,
             index=self.index,
             image = self,
             mode = 'production',
@@ -474,9 +473,10 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, models.Model):
     class Meta:
         db_table = u'c2g_problem_sets'
 
-class Exercise(TimestampMixin, models.Model):
+class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
+    file = models.FileField(upload_to='exercise_files', null=True)
     def __unicode__(self):
         return self.fileName
     class Meta:
@@ -491,7 +491,7 @@ class ProblemSetToExercise(models.Model):
     class Meta:
         db_table = u'c2g_problemset_to_exercise'
 
-class Problem(TimestampMixin, Stageable, models.Model):
+class Problem(TimestampMixin, Stageable, Deletable, models.Model):
     exercise = models.ForeignKey(Exercise)
     slug = models.CharField(max_length=255)
 
