@@ -128,7 +128,10 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
     margin-bottom:8px;
 }
 .help-block {
-   font-size:11px;
+    font-size:11px;
+}
+label.control-label {
+    font-weight:bold;
 }
 
 
@@ -359,10 +362,17 @@ ul.exercise-list li {
 }
 ul.exercise-list li:hover {
     border-color:#000;
+    cursor:move;
 }
 .ui-state-highlight {
     height:20px;
     border-style:dashed;
+}
+
+/* Create Problem Sets
+-------------------------------------------------- */
+.create-problemset h4 a {
+    cursor:pointer;
 }
 
 /* jQuery UI
