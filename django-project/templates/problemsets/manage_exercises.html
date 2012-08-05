@@ -18,12 +18,39 @@
             </div>
         </div>
     </form>
+    
+    <h4><a data-toggle="collapse" data-target="#choose-existing">Choose From Existing Exercises</a></h4>
+    <form action= {% url 'problemsets.views.add_existing_exercises' %} method="POST" class="form-vertical">
+        {% csrf_token %}
+        <input type="hidden" name="pset_id" value={{pset.id}}>
+        <input type="hidden" name="course_prefix" value={{course_prefix}}>
+        <input type="hidden" name="course_suffix" value={{course_suffix}}>
+        <div id="choose-existing" class="collapse in">
+            <div class="control-group">
+                <div class="controls">
+                    {% for exercise in exercises %}
+                    <input type="checkbox" name=exercise value={{exercise.id}} /> {{exercise.fileName}} <br>
+                    {% empty %}
+                    There are no existing exercises
+                    {% endfor %}
+                </div>
+            </div>
+            <input type="submit" value="Add Exercises" class="btn">
+        </div>
+    </form>
+    
 
     <form action= {% url 'problemsets.views.save_order' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
+        <div class="control-group">
+            <label class="control-label">Randomize Exercise Ordering?</label>
+            <div class="controls">
+                <input type="Checkbox" name="randomize" {% if pset.randomized %} checked {% endif %}>
+            </div>
+        <div> 
         <ul data-sortablecontainer class="exercise-list">
             {% for psetToEx in psetToExs %}
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">

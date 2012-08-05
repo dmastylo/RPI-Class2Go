@@ -93,6 +93,7 @@ def create_action(request):
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
                    resubmission_penalty = request.POST['resubmission_penalty'],
+                   randomize = False,
                    mode = 'staging')
     pset.save()
     pset.create_production_instance()
@@ -148,13 +149,16 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
     psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
+    added_exercises = pset.exercise_set.all()
+    exercises = Exercise.objects.filter(problemSet__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
                                 'pset': pset,
-                                'psetToExs': psetToExs
+                                'psetToExs': psetToExs,
+                                'exercises': exercises
                             },
                             context_instance=RequestContext(request))
 
@@ -177,6 +181,16 @@ def add_exercise(request):
     index = len(pset.exercise_set.all())
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
     psetToEx.save()
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+
+def add_existing_exercises(request):
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    exercise_ids = request.POST.getlist('exercise')
+    exercises = Exercise.objects.filter(id__in=exercise_ids)
+    for exercise in exercises:
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()))
+        psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 def save_order(request):
