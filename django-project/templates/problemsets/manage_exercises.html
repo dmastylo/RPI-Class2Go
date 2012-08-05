@@ -48,7 +48,11 @@
         <div class="control-group">
             <label class="control-label">Randomize Exercise Ordering?</label>
             <div class="controls">
-                <input type="Checkbox" name="randomize" {% if pset.randomized %} checked {% endif %}>
+                <input type="Checkbox" name="randomize"
+                {% if pset.randomized == True %}
+                    CHECKED
+                {% endif %}
+                 >
             </div>
         <div> 
         <ul data-sortablecontainer class="exercise-list">

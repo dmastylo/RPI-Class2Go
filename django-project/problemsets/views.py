@@ -137,7 +137,6 @@ def edit_action(request):
     pset.penalty_preference = request.POST['penalty_preference']
     pset.late_penalty = request.POST['late_penalty']
     pset.submissions_permitted = request.POST['submissions_permitted']
-    pset.resubmission_penalty = request.POST['resubmission_penalty']
     pset.save()
     return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'], )))
 
@@ -200,4 +199,11 @@ def save_order(request):
         listName = "exercise_order[" + str(n) + "]"
         psetToEx[n].number = request.POST[listName]
         psetToEx[n].save()
+    try:
+        if request.POST['randomize'] == "on":
+            pset.randomize = True
+            pset.save()
+    except:
+        pset.randomize = False
+        pset.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
