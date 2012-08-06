@@ -236,7 +236,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
 class GetAnnouncementsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('index')
+        all_items = self.filter(course=course).order_by('-time_created')
         now = datetime.now()
         returned_items = []
         for item in all_items:
@@ -244,7 +244,7 @@ class GetAnnouncementsByCourse(models.Manager):
                 returned_items.append(item)
         return returned_items
         
-class Announcement(TimestampMixin, Stageable, Deletable, models.Model):
+class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)

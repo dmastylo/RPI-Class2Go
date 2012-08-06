@@ -1,5 +1,5 @@
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
 from django.template import RequestContext
 from c2g.models import *
@@ -16,6 +16,7 @@ def add_announcement(request):
         
     index = len(Announcement.objects.getByCourse(course=common_page_data['course']))
     announcement = Announcement(
+        course=common_page_data['course'],
         title=request.POST.get("title"),
         description=request.POST.get("description"),
         index=index,
@@ -42,6 +43,8 @@ def save_announcement(request):
     announcement.save()
     announcement.commit()
     
+    return redirect('courses.announcements.views.list', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+    
 def delete_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -54,6 +57,8 @@ def delete_announcement(request):
     announcement = Announcement.objects.get(id=request.POST.get("announcement_id"))
     announcement.delete()
     announcement.image.delete()
+    
+    return redirect('courses.announcements.views.list', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     
 def save_announcement_order(request):
     try:
