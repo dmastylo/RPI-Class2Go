@@ -1,11 +1,12 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
-    <h2> Add or Remove Exercises</h2>
+<div id="c2g_layout_m_column" class="span12">
+    <h3>Add or Remove Exercises</h3>
 
-    <h3>Upload Exercises to {{pset.title}}</h3>
+    <h4>Upload Exercises to {{pset.title}}</h4>
     <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical" enctype="multipart/form-data">
+        <fieldset class="well">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
@@ -35,7 +36,10 @@
             {% endfor %}
         </ul>
         <span class="help-block">After reordering, save before uploading another exercise</span>
-        <input type="submit" value="Save" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+    </fieldset>
+        <div class="form-actions">
+            <input type="submit" value="Save" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+        </div>
     </form>
 </div>
 {% endblock m_column_content %}

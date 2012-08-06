@@ -99,11 +99,6 @@ a.thumbnail:hover {
   margin-top:0;
 }
 
-.navbar-fixed-top .navbar-inner {
-  height:34px;
-  min-height:34px;
-}
-
 ul.nav li.dropdown:hover ul.dropdown-menu{
     display: block;    
 }
@@ -126,9 +121,17 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
 }
 .progress {
     margin-bottom:8px;
+    background:#fff;
+    border:1px solid #ccc;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 .help-block {
-   font-size:11px;
+    font-size:11px;
+}
+label.control-label {
+    font-weight:bold;
 }
 
 
@@ -159,18 +162,20 @@ small.date {
 .announcement h4 {
     margin-bottom:.5em;
 }
+.fakelink {
+    cursor:pointer;
+}
 
 /* Header
 -------------------------------------------------- */
 #c2g_layout_topbar {
-    padding:0px; 
-    height: 55px;
-    margin-bottom:20px;
+    position:relative;
+    padding:0px;
     background:#8f2719;
     border-bottom:1px solid #480b0b;
-    position:fixed;
     width:100%;
     z-index:10;
+    display:inline-block;
     background: #8f2719; /* Old browsers */
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzhmMjYxOCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9Ijk2JSIgc3RvcC1jb2xvcj0iIzY2MTkwZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5NjEwMTIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -217,11 +222,13 @@ small.date {
     display:block;
 }
 
-.navbar-fixed-top {
-    top:56px;
+#c2g_layout_topbar .navbar {
+    margin-top:56px;
+    width:100%;
+    margin-bottom:0;
 }
 
-.navbar-inner {
+#c2g_layout_topbar .navbar .navbar-inner {
     background-color: #e0d096;
     background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
     background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
@@ -230,38 +237,21 @@ small.date {
     background-image: -o-linear-gradient(top, #e0d096, #cabb84);
     background-image: linear-gradient(top, #e0d096, #cabb84);
     background-repeat: repeat-x;
-    -webkit-border-radius: 4px;
-     -moz-border-radius: 4px;
-          border-radius: 4px;
+    -webkit-border-radius: 0;
+     -moz-border-radius: 0;
+          border-radius: 0;
     filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
-.navbar-inner {
-    background:url('../../graphics/core/bg-nav.png') repeat-x bottom center;
-}
-.navbar .nav {
-    border-left:1px solid #999;
-}
-.navbar .nav > li > a {
-    color:#333;
-}
-.navbar .nav .active > a, .navbar .nav .active > a:hover {
-    color:#820000;
-    background:#eadeb9;
-    background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
-}
-.navbar .nav > li > a {
-    padding: 7px 10px 8px;
-    border-right:1px solid #999;
-}
+
 
 
 /* Thumbnails
 -------------------------------------------------- */
 .body-content {
-    padding-top:116px;
+    padding-top:20px;
 }
 
 /* Thumbnails
@@ -359,10 +349,17 @@ ul.exercise-list li {
 }
 ul.exercise-list li:hover {
     border-color:#000;
+    cursor:move;
 }
 .ui-state-highlight {
     height:20px;
     border-style:dashed;
+}
+
+/* Create Problem Sets
+-------------------------------------------------- */
+.create-problemset h4 a {
+    cursor:pointer;
 }
 
 /* jQuery UI
@@ -372,11 +369,8 @@ ul.exercise-list li:hover {
 .ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
 .ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
 .ui-timepicker-div td { font-size: 90%; }
-.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }​
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
 
-
-​
-​
 
 
 /*  Font Awesome
