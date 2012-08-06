@@ -1,0 +1,11 @@
+<div class="announcement">
+    <small class="date" style="display:inline;"> {{announcement.last_updated}} by {{announcement.owner}}</small>
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+        <div style="display:inline;float:right;">
+            <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}">Edit</a>
+            <a href="javascript:DeleteAnnouncement('{{announcement.id}}')">Delete</a>
+        </div>
+    {% endif %}
+    <h4>{{announcement.title}}</h4>
+    {% autoescape off %}{{announcement.description}}{% endautoescape %}
+</div>

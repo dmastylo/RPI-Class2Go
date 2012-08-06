@@ -67,7 +67,14 @@ urlpatterns = patterns('',
 
     # Announcements
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/?$', 'courses.announcements.views.list'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/admin/?', 'courses.announcements.views.admin'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/admin/?$', 'courses.announcements.views.admin'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/(?P<announcement_id>[0-9]+)/edit/?$', 'courses.announcements.views.edit'),
+    url(r'^save_announcement_order$', 'courses.announcements.actions.save_announcement_order'),
+    url(r'^save_announcement$', 'courses.announcements.actions.save_announcement'),
+    url(r'^add_announcement$', 'courses.announcements.actions.add_announcement'),
+    url(r'^delete_announcement$', 'courses.announcements.actions.delete_announcement'),
+    url(r'^email_announcement$', 'courses.announcements.actions.email_announcement'),
+    
 
     # Forums
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/?$', 'courses.forums.views.view'),
