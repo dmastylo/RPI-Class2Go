@@ -2664,7 +2664,7 @@ var Khan = (function() {
         var request = {
             // Do a request to the server API
             //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
-            url: "/problemsets/attempt/" + "2",
+            url: "/problemsets/attempt/2/",
             type: "POST",
             data: data,
             dataType: "text",
@@ -2981,14 +2981,16 @@ var Khan = (function() {
 
         $('#next-question-button').click(function () {
 
-            $('#questions-viewed li:last-child').removeClass('current-question');
+            var currentQCard = $('.current-question');
+
+            currentQCard.removeClass('current-question');
 
             $('#questions-unviewed li:first-child').trigger('mouseout');
             $('#questions-unviewed li:first-child').unbind('click');
             $('#questions-unviewed li:first-child').click(viewedClickHandler);
             $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
-            var next = $('#questions-viewed li:last-child');
+            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
             next.addClass('current-question');
 
             clearExistingProblem();
@@ -2997,7 +2999,7 @@ var Khan = (function() {
                 makeProblem(next.data('problem'), next.data('randseed'));
             }
 
-            });
+        });
 
         $('#questions-unviewed').fadeIn('slow');
         $('#questions-viewed').fadeIn('slow');
