@@ -28,23 +28,17 @@
                 </li>
                 <li><span>Welcome <b><a href="/accounts/profile">{{ user.username }}</a></b>!</span></li>
             {% else %}
-                <li><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
-                <li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
+                <li class="hidden-phone hidden-tablet"><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
+                <li class="hidden-phone hidden-tablet"><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
             {% endif %}
-                <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
+                <li class="visible-phone visible-tablet"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>
             {% block navbar %}
             <div class="navbar">
                 <div class="navbar-inner">
                     <div class="container-fluid">
-                        <ul class="nav">
-                            <li class="active"><a href="#">Home</a></li>
-                            <li><a href="#">Classes</a></li>
-                            <li><a href="#">Search</a></li>
-                        </ul>
-                        
                         {% ifequal user.is_staff True %}
-						<ul class="nav pull-right">
+						<ul class="nav">
 							<li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
 						</ul>
 						{% endifequal %}
