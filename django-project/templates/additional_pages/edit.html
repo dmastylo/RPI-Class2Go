@@ -5,41 +5,50 @@
 {% block course_page_title %}{{page.title}}{% endblock course_page_title %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
-    <table style='width: 800px;'>
-        <tr>
-            <td style='width: 600px;'>
-                {% if page.description == page.image.description and page.title == page.image.title %}
-                    <p style='margin-bottom: 10px;'><span style="color: green;font-weight: bold;">D=P</span> Same in draft as public.</p>
-                {% else %}
-                    <p style='margin-bottom: 10px;'><span style="color: green;font-weight: bold;">D&#8800;P</span>Draft contains changes that have not yet been published.</p>
-                {% endif %}
-            </td>
-            {% ifnotequal page.slug 'overview' %}
-            <td style='width: 200px;text-align: right;'>
-                <form name="delete_page_form" action="{% url 'courses.additional_pages.actions.delete' %}" method="POST">
-                    <input type="hidden" name="page_id" value="{{page.id}}">
-                    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-                    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-                    <input type="button" class="btn" value="Delete page" onclick="if(confirm('Are you sure you want to delete this page?')) {document.forms.delete_page_form.submit()}" />
-                    {% csrf_token %}
-                </form>
-            </td>
-            {% endifnotequal %}
-        </tr>
-    </table>
+<div id="c2g_layout_m_column" class="span12">
+    {% if page.description == page.image.description and page.title == page.image.title %}
+    <div class="alert alert-success">
+        <i class="icon-ok" style="font-size:17px"></i> <strong>Published!</strong> This draft is published.
+    </div>
+    {% else %}
+    <div class="alert">
+        <i class="icon-exclamation-sign" style="font-size:17px"></i> Draft contains saved changes that have not yet been published.
+    </div>
+    {% endif %}
+    {% ifnotequal page.slug 'overview' %}
+    <form name="delete_page_form" action="{% url 'courses.additional_pages.actions.delete' %}" method="POST">
+        <input type="hidden" name="page_id" value="{{page.id}}">
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        {% csrf_token %}
+    </form>
+    {% endifnotequal %}
     <form name="edit_form" action="{% url 'courses.additional_pages.actions.save' %}" method="POST">
         {% ifnotequal page.slug 'overview' %}
-            Title: <input name="title" value="{{page.title}}" /><br/><br/>
+        <div class="control-group">
+            <label class="control-label">Title</label>
+            <div class="controls">
+                <input name="title" value="{{page.title}}" type="text" />
+            </div>
+        </div>
         {% else %}
             <input type='hidden' name='title' value='Overview' />
         {% endifnotequal %}
-        <textarea name="description" class="tinymce" style="width:100%">
-            {% autoescape off %}{{page.description}}{% endautoescape %}
-        </textarea>
+        <div class="control-group">
+            <div class="controls">
+                <textarea name="description" class="tinymce">
+                    {% autoescape off %}{{page.description}}{% endautoescape %}
+                </textarea>
+            </div>
+        </div>
         
         {% ifnotequal page.slug 'overview' %}
-            <br/>URL identifier: <input name="slug" id="slug" value="{{page.slug}}" /><br/>
+        <div class="control-group">
+            <label class="control-label">URL identifier</label>
+            <div class="controls">
+                <input name="slug" id="slug" value="{{page.slug}}" type="text" />
+            </div>
+        </div>
         {% else %}
             <input type='hidden' name='slug' value='overview' />
         {% endifnotequal %}
@@ -51,9 +60,12 @@
         <input type="hidden" name="revert" id="revert" value="0" />
         <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}" />
         <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}" />
-        <input type="button" value="Save" onclick="Save(0,0);" class="btn" />
-        <input type="button" value="Save and Publish" onclick="Save(1,0);" class="btn" />
-        <input type="button" value="Revert" onclick="Save(0,1);" class="btn" />
+        <div class="form-actions">
+            <input type="button" class="btn" value="Delete page" onclick="if(confirm('Are you sure you want to delete this page?')) {document.forms.delete_page_form.submit()}" />
+            <input type="button" value="Revert" onclick="Save(0,1);" class="btn" />
+            <input type="button" value="Save" onclick="Save(0,0);" class="btn" />
+            <input type="button" value="Save and publish" onclick="Save(1,0);" class="btn btn-primary" />
+        </div>
     </form>
     <script type="text/javascript">
         function Save(commit, revert) {

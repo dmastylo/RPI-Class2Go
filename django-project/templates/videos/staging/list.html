@@ -8,7 +8,11 @@
     {% include "videos/staging/video_management_section.html" %}
 
     {% for section_structure in section_structures %}
-        {% include "courses/staging/section.html" %}
+    <div class="well">
+        <table style="width:100%">
+            {% include "courses/staging/section.html" %}
+        </table>
+    </div>
     {% empty %}
         <p style='margin: 20px;'>No content to display.</p>
     {% endfor %}
