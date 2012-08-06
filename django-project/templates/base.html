@@ -23,7 +23,6 @@
                 <li>
                     <form action="{% url 'auth_logout' %}" method="POST">
                         <input type="submit" id="login_button" class="btn logout hidden-phone hidden-tablet" value="Logout" />
-                        <button type="submit" class="btn hidden-desktop visible-phone"><i class="icon-signout logout"></i></button>
                         {% csrf_token %}
                     </form>
                 </li>
@@ -32,6 +31,7 @@
                 <li><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
                 <li><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
             {% endif %}
+                <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>
             {% block navbar %}
             <div class="navbar">

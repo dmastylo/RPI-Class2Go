@@ -99,11 +99,6 @@ a.thumbnail:hover {
   margin-top:0;
 }
 
-.navbar .navbar-inner {
-  height:34px;
-  min-height:34px;
-}
-
 ul.nav li.dropdown:hover ul.dropdown-menu{
     display: block;    
 }
@@ -126,6 +121,7 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
 }
 .progress {
     margin-bottom:8px;
+    background:#fff;
 }
 .help-block {
     font-size:11px;
@@ -167,13 +163,13 @@ small.date {
 -------------------------------------------------- */
 #c2g_layout_topbar {
     position:relative;
-    padding:0px; 
-    height: 55px;
-    margin-bottom:20px;
+    padding:0px;
     background:#8f2719;
     border-bottom:1px solid #480b0b;
     width:100%;
     z-index:10;
+    height:89px;
+    display:inline-block;
     background: #8f2719; /* Old browsers */
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzhmMjYxOCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9Ijk2JSIgc3RvcC1jb2xvcj0iIzY2MTkwZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5NjEwMTIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -221,9 +217,9 @@ small.date {
 }
 
 #c2g_layout_topbar .navbar {
-    top:56px;
-    position:absolute;
+    margin-top:56px;
     width:100%;
+    margin-bottom:0;
 }
 
 #c2g_layout_topbar .navbar .navbar-inner {
@@ -242,26 +238,8 @@ small.date {
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-    background:url('../../graphics/core/bg-nav.png') repeat-x bottom center;
 }
-#c2g_layout_topbar .navbar .navbar-inner .container-fluid {
-    padding:0;
-}
-.navbar .nav {
-    border-left:1px solid #999;
-}
-.navbar .nav > li > a {
-    color:#333;
-}
-.navbar .nav .active > a, .navbar .nav .active > a:hover {
-    color:#820000;
-    background:#eadeb9;
-    background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
-}
-.navbar .nav > li > a {
-    padding: 7px 10px 8px;
-    border-right:1px solid #999;
-}
+
 
 
 /* Thumbnails
