@@ -17,7 +17,7 @@
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
                         {% endfor %}
                         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
-                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Add/re-order pages ...</a></li>
+                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Manage pages ...</a></li>
                         {% endif %}
                     </ul>
                 </li>

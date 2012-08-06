@@ -37,7 +37,7 @@ def get_common_page_data(request, prefix, suffix):
         view_mode = 'view'
     
     # Course info pages
-    course_info_pages = AdditionalPage.objects.filter(course=course).order_by('index')
+    course_info_pages = AdditionalPage.objects.getByCourse(course=course)
         
     current_datetime = datetime.datetime.now()
     effective_current_datetime = current_datetime
