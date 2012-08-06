@@ -9,7 +9,11 @@
     {% include "problemsets/staging/problem_set_management_section.html" %}
 
     {% for section_structure in section_structures %}
-        {% include "courses/staging/section.html" %}
+    <div class="well">
+        <table>
+            {% include "courses/staging/section.html" %}
+        </table>
+    </div>
     {% empty %}
         <p style='margin: 20px;'>No content to display.</p>
     {% endfor %}
