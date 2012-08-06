@@ -16,13 +16,13 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
 from django import forms
+from datetime import datetime
 
 import gdata.youtube
 import gdata.youtube.service
 
 # For file system upload
 from django.core.files.storage import FileSystemStorage
-
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -50,7 +50,15 @@ class Sortable(models.Model):
        
 class Deletable(models.Model):
     is_deleted=models.IntegerField(default=0)
-
+    
+    def delete(self):
+        self.is_deleted = 1
+        fields = self._meta.fields
+        for field in fields:
+            if field.name == 'slug':
+                self.slug = ''
+                break
+        self.save()
     class Meta:
        abstract = True
 
@@ -157,17 +165,29 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     class Meta:
         db_table = u'c2g_courses'
 
+class GetAdditionalPagesByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0:
+                returned_items.append(item)
+        return returned_items
+        
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     slug = models.CharField(max_length=255, null=True, blank=True)
+    objects = GetAdditionalPagesByCourse()
     
     def create_production_instance(self):
         production_instance = AdditionalPage(
             course=self.course.image,
             title=self.title,
             description=self.description,
+            slug=self.slug,
             index=self.index,
             mode='production',
             image=self,
@@ -201,18 +221,36 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-
+    def getCourseAdditionalPages(self,course):
+        now = datetime.now()
+        pages = []
+        all_pages = AdditionalPage.objects.filter(course=course)
+        for page in pages:
+            if page.is_deleted == 0 and (course.mode == 'staging' or page.live_datetime < now):
+                pages.append(page)
+        return pages
+        
     class Meta:
         db_table = u'c2g_additional_pages'
 
-#owner is person who posted
-#does it need access_id?
+
+class GetAnnouncementsByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0:
+                returned_items.append(item)
+        return returned_items
+        
 class Announcement(TimestampMixin, Stageable, Deletable, models.Model):
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-
+    objects = GetAnnouncementsByCourse()
+    
     def create_production_instance(self):
         production_instance = Announcement(
             course=self.course.image,
@@ -251,10 +289,21 @@ class Announcement(TimestampMixin, Stageable, Deletable, models.Model):
     class Meta:
         db_table = u'c2g_announcements'
 
+class GetContentSectionsByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0:
+                returned_items.append(item)
+        return returned_items
+        
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
-
+    objects = GetContentSectionsByCourse()
+    
     def create_production_instance(self):
         production_instance = ContentSection(
             course=self.course.image,
@@ -318,6 +367,16 @@ def create_user_profile(sender, instance, created, raw, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
+class GetVideosByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('section_id','index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0 and (course.mode == 'staging' or item.live_datetime < now):
+                returned_items.append(item)
+        return returned_items
+        
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
@@ -326,8 +385,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
     duration = models.IntegerField(null=True)
-    slug = models.SlugField("URL Name", max_length=255, null=True)
-    file = models.FileField(upload_to='videos')
+    slug = models.CharField(max_length=255, null=True)
+    objects = GetVideosByCourse()
 
     def create_production_instance(self):
         production_instance = Video(
@@ -396,6 +455,16 @@ class VideoActivity(models.Model):
      class Meta:
         db_table = u'c2g_video_activity'
 
+class GetProblemSetsByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('section_id','index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0 and (course.mode == 'staging' or item.live_datetime < now):
+                returned_items.append(item)
+        return returned_items
+        
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
@@ -411,7 +480,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     submissions_permitted = models.IntegerField(null=True, blank=True)
     resubmission_penalty = models.IntegerField(null=True, blank=True)
     randomize = models.BooleanField()
-
+    objects = GetProblemSetsByCourse()
+    
     def create_production_instance(self):
         production_instance = ProblemSet(
             course=self.course.image,

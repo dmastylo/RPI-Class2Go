@@ -62,6 +62,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/manage_nav_menu/?$', 'courses.additional_pages.views.manage_nav_menu'),
     url(r'^delete_page', 'courses.additional_pages.actions.delete'),
     url(r'^save_page', 'courses.additional_pages.actions.save'),
+    url(r'^save_order', 'courses.additional_pages.actions.save_order'),
     url(r'^add_page', 'courses.additional_pages.actions.add'),
     
     # Announcements

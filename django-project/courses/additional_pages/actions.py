@@ -42,8 +42,33 @@ def save(request):
             page.commit()
             
     return redirect('courses.additional_pages.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'], page.slug)
+
+def save_order(request):
+    common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+    if not common_page_data['is_course_admin']:
+        redirect('courses.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'])
+    
+    pages = AdditionalPage.objects.filter(course=common_page_data['staging_course'])
+    for page in pages:
+        page.index = request.POST.get("order_"+str(page.id))
+        page.save()
+        prod_page = page.image
+        prod_page.index = request.POST.get("order_"+str(page.id))
+        prod_page.save()
+        
+    return redirect(request.META['HTTP_REFERER'])
     
 def delete(request):
-    pass
+    common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+    if not common_page_data['is_course_admin']:
+        redirect('courses.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'])
+        
+    page_id = request.POST.get("page_id")
+    page = AdditionalPage.objects.get(id=page_id)
+    if page.slug == 'overview':
+        return
+        
+    page.delete()
+    page.image.delete()
     
-    
+    return redirect('courses.additional_pages.views.manage_nav_menu', common_page_data['course_prefix'],common_page_data['course_suffix'])
