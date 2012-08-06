@@ -174,7 +174,7 @@ def add_exercise(request):
 
     exercise = Exercise()
     exercise.fileName = file_name
-#    exercise.file.save(file_name, file_content)
+    exercise.file.save(file_name, file_content)
     exercise.save()
 
     index = len(pset.exercise_set.all())
@@ -192,18 +192,15 @@ def add_existing_exercises(request):
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
-def save_order(request):
+def save_exercises(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     psetToEx = pset.problemsettoexercise_set.all().order_by('number')
     for n in range(0,len(psetToEx)):
         listName = "exercise_order[" + str(n) + "]"
         psetToEx[n].number = request.POST[listName]
         psetToEx[n].save()
-    try:
-        if request.POST['randomize'] == "on":
-            pset.randomize = True
-            pset.save()
-    except:
-        pset.randomize = False
-        pset.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+
+def save_order(request):
+    return HttpResponse("Hu")

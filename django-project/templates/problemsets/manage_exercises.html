@@ -26,7 +26,7 @@
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
-        <div id="choose-existing" class="collapse in">
+        <div id="choose-existing" class="collapse">
             <div class="control-group">
                 <div class="controls">
                     {% for exercise in exercises %}
@@ -41,7 +41,7 @@
     </form>
     
 
-    <form action= {% url 'problemsets.views.save_order' %} method="POST" class="form-vertical">
+    <form action= {% url 'problemsets.views.save_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
@@ -49,11 +49,7 @@
         <div class="control-group">
             <label class="control-label">Randomize Exercise Ordering?</label>
             <div class="controls">
-                <input type="Checkbox" name="randomize"
-                {% if pset.randomized == True %}
-                    CHECKED
-                {% endif %}
-                 >
+                <input type="Checkbox" name="randomize">
             </div>
         <div> 
         <ul data-sortablecontainer class="exercise-list">

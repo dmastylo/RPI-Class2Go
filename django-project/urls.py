@@ -74,7 +74,7 @@ urlpatterns = patterns('',
     url(r'^add_announcement$', 'courses.announcements.actions.add_announcement'),
     url(r'^delete_announcement$', 'courses.announcements.actions.delete_announcement'),
     url(r'^email_announcement$', 'courses.announcements.actions.email_announcement'),
-    
+
 
     # Forums
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/?$', 'courses.forums.views.view'),
@@ -102,4 +102,5 @@ urlpatterns = patterns('',
     url(r'^createproblemsetaction/?', 'problemsets.views.create_action'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)/edit?$', 'problemsets.views.edit_form'),
     url(r'^editproblemsetaction/?', 'problemsets.views.edit_action'),
+    url(r'^save_exercises/?', 'problemsets.views.save_exercises'),
 )
