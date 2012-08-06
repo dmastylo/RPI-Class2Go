@@ -43,7 +43,7 @@
                 {% endif %}
             </ul>
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
-            <ul class="nav pull-right hidden-phone">
+            <ul class="nav pull-right hidden-phone" style="border-left:0;">
                 {% if common_page_data.can_switch_mode %}
                 <li>
                     <form style="position: relative;width: 264px;height: 1px;padding: 8px 10px 7px;color: #333;" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
