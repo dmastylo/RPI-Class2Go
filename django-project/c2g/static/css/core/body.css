@@ -162,6 +162,9 @@ small.date {
 .announcement h4 {
     margin-bottom:.5em;
 }
+.fakelink {
+    cursor:pointer;
+}
 
 /* Header
 -------------------------------------------------- */
