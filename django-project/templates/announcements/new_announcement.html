@@ -1,0 +1,19 @@
+<div id="new_announcement_div" style='display: none;' class="framed">
+    <form name="new_announcement_form" action="{% url 'courses.announcements.actions.add_announcement' %}" method="POST">
+        Title <input name="title" id="announcement_title" /><br/><br/>
+        Description:<br/>
+        <textarea class="tinymce" name="description" id="announcement_description"></textarea><br/>
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        {% csrf_token %}
+        <input type="submit" class="btn" value="Save and Publish" />
+        <input type="button" class="btn" value="Cancel" onclick="CancelNewAnnouncement()"/>
+    </form>
+    <script type="text/javascript">
+        function CancelNewAnnouncement() {
+            $('#announcement_title').val('');
+            tinyMCE.get('announcement_description').setContent('');
+            $('#new_announcement_div').hide();
+        }
+    </script>
+</div>
