@@ -17,7 +17,7 @@
         </ul>
         <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a></p>
     {% else %}
-        <h4> Please log in to view your profile </h4>
+        <h4> Please <a data-toggle="modal" href="#login-modal">log in</a> to view your profile </h4>
     {% endif %}
 
 </div>
