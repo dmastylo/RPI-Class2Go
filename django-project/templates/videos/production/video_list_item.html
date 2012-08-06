@@ -1,13 +1,11 @@
-<div class="container" id="video_{{item.video.id}}" style="margin-top: 0px;">
-    <table>
-        <tr>
-            <td style="width: 400px;"><img src="{{ STATIC_URL }}graphics/videos/video_icon.jpg" width="20" height="20" style="margin-right: 10px;" /><h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
-            <td style="width: 120px;">
-                <div class="progress-bar">
-                    <div class="fill red" style="width:{{item.completed_percent}}%"></div>
-                </div>
-            </td>
-        </tr>
-    </table>
-</div>
-<hr>
+<li class="well" id="video_{{item.video.id}}" style="overflow:hidden">
+    <div class="span1" style="margin-left:-10px;">
+    <i class="icon-facetime-video" style="font-size:60px; color:#999;opacity:.3"></i>
+    </div>
+    <div class="span11">
+        <h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4>
+        <div class="progress progress-danger progress-striped">
+            <div class="bar" style="width:{{item.completed_percent}}%"></div>
+        </div>
+    </div>
+</li>
