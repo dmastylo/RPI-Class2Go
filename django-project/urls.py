@@ -82,6 +82,8 @@ urlpatterns = patterns('',
 
     # Sections
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/sections/reorder/?$', 'courses.content_sections.views.reorder'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/sections/rename/(?P<section_id>[0-9]+)/?$', 'courses.content_sections.views.rename'),
+    url(r'^rename$', 'courses.content_sections.actions.rename'),
     url(r'^save_content_section_order$', 'courses.content_sections.actions.save_order'),
     url(r'^delete_content_section$', 'courses.content_sections.actions.delete_content_section'),
     url(r'^save_content_section_content_order$', 'courses.content_sections.actions.save_content_order'),
