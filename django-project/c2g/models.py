@@ -373,7 +373,7 @@ class GetVideosByCourse(models.Manager):
         now = datetime.now()
         returned_items = []
         for item in all_items:
-            if item.is_deleted == 0 and (course.mode == 'staging' or item.live_datetime < now):
+            if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
                 returned_items.append(item)
         return returned_items
         
@@ -460,7 +460,7 @@ class GetProblemSetsByCourse(models.Manager):
         now = datetime.now()
         returned_items = []
         for item in all_items:
-            if item.is_deleted == 0 and (course.mode == 'staging' or item.live_datetime < now):
+            if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
                 returned_items.append(item)
         return returned_items
         
