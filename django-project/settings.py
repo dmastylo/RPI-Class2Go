@@ -42,7 +42,7 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT =  '/opt/class2go/uploads/'
+MEDIA_ROOT = '/home/kelvin/Dropbox/CURIS'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -138,7 +138,7 @@ INSTALLED_APPS = (
                       'khan',
                       'problemsets',
                       'django.contrib.flatpages',
-#                      'storages',
+                      'storages',
                       )
 if (hostname != "productionserver"):
     INSTALLED_APPS += (
@@ -178,7 +178,7 @@ LOGGING = {
 SESSION_COOKIE_AGE = 3*30*24*3600
 
 # File storage stuff
-if (hostname != "productionserver" or hostname != "stagingserver"):
+if (hostname == "productionserver" or hostname == "stagingserver"):
     file_storage_lib = 'django.core.files.storage.FileSystemStorage'
 else:
     file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'

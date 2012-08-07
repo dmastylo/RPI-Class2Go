@@ -44,9 +44,8 @@ def attempt(request, problemId):
     user = request.user
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
-    problem = exercise.problem_set.get(slug=request.POST['slug'])
     problem_activity = ProblemActivity(student = user,
-                                        problem = problem,
+                                        problem = request.POST['problem_identifier'],
                                         exercise = exercise,
                                         complete = request.POST['complete'],
                                         attempt_content = request.POST['attempt_content'],
@@ -93,6 +92,7 @@ def create_action(request):
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
                    resubmission_penalty = request.POST['resubmission_penalty'],
+                   randomize = False,
                    mode = 'staging')
     pset.save()
     pset.create_production_instance()
@@ -136,7 +136,6 @@ def edit_action(request):
     pset.penalty_preference = request.POST['penalty_preference']
     pset.late_penalty = request.POST['late_penalty']
     pset.submissions_permitted = request.POST['submissions_permitted']
-    pset.resubmission_penalty = request.POST['resubmission_penalty']
     pset.save()
     return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'], )))
 
@@ -148,13 +147,16 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
     psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
+    added_exercises = pset.exercise_set.all()
+    exercises = Exercise.objects.filter(problemSet__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
                                 'pset': pset,
-                                'psetToExs': psetToExs
+                                'psetToExs': psetToExs,
+                                'exercises': exercises
                             },
                             context_instance=RequestContext(request))
 
@@ -180,7 +182,16 @@ def add_exercise(request):
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 
-def save_order(request):
+def add_existing_exercises(request):
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    exercise_ids = request.POST.getlist('exercise')
+    exercises = Exercise.objects.filter(id__in=exercise_ids)
+    for exercise in exercises:
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()))
+        psetToEx.save()
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+def save_exercises(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     psetToEx = pset.problemsettoexercise_set.all().order_by('number')
     for n in range(0,len(psetToEx)):
@@ -188,6 +199,10 @@ def save_order(request):
         psetToEx[n].number = request.POST[listName]
         psetToEx[n].save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+
+def save_order(request):
+    return HttpResponse("Hu")
 
 
 def read_exercise(request, course_prefix, course_suffix, exercise_name):
@@ -200,7 +215,7 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
 
     # return the contents of the file as an HTTP response.  Trust that it's there.
     #
-    # TODO: put exception handling around this, figure out how to handle S3 errors 
+    # TODO: put exception handling around this, figure out how to handle S3 errors
     # (file not there...)
     return HttpResponse(exercise.file.file)
 

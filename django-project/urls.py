@@ -49,7 +49,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/materials/?$', 'courses.views.course_materials'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/syllabus/?$', 'courses.views.syllabus'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/admin/?', 'courses.admin_views.admin'),
-    
+
     url(r'^switch_mode', 'courses.actions.switch_mode'),
     url(r'^add_section', 'courses.actions.add_section'),
 
@@ -64,7 +64,7 @@ urlpatterns = patterns('',
     url(r'^save_page', 'courses.additional_pages.actions.save'),
     url(r'^save_order', 'courses.additional_pages.actions.save_order'),
     url(r'^add_page', 'courses.additional_pages.actions.add'),
-    
+
     # Announcements
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/?$', 'courses.announcements.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/announcements/admin/?$', 'courses.announcements.views.admin'),
@@ -74,7 +74,7 @@ urlpatterns = patterns('',
     url(r'^add_announcement$', 'courses.announcements.actions.add_announcement'),
     url(r'^delete_announcement$', 'courses.announcements.actions.delete_announcement'),
     url(r'^email_announcement$', 'courses.announcements.actions.email_announcement'),
-    
+
 
     # Forums
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/?$', 'courses.forums.views.view'),
@@ -106,10 +106,12 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)/manage_exercises?$', 'problemsets.views.manage_exercises'),
 
     url(r'^add_exercise/?$', 'problemsets.views.add_exercise'),
+    url(r'^add_existing_exercises/?$', 'problemsets.views.add_existing_exercises'),
     url(r'^save_order/?$', 'problemsets.views.save_order'),
     url(r'^delete_problemset/?', 'problemsets.actions.delete_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/createproblemset/?$', 'problemsets.views.create_form'),
     url(r'^createproblemsetaction/?', 'problemsets.views.create_action'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)/edit?$', 'problemsets.views.edit_form'),
     url(r'^editproblemsetaction/?', 'problemsets.views.edit_action'),
+    url(r'^save_exercises/?', 'problemsets.views.save_exercises'),
 )

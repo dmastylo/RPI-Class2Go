@@ -47,10 +47,10 @@ class Sortable(models.Model):
 
     class Meta:
        abstract = True
-       
+
 class Deletable(models.Model):
     is_deleted=models.IntegerField(default=0)
-    
+
     def delete(self):
         self.is_deleted = 1
         fields = self._meta.fields
@@ -174,14 +174,14 @@ class GetAdditionalPagesByCourse(models.Manager):
             if item.is_deleted == 0:
                 returned_items.append(item)
         return returned_items
-        
+
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     slug = models.CharField(max_length=255, null=True, blank=True)
     objects = GetAdditionalPagesByCourse()
-    
+
     def create_production_instance(self):
         production_instance = AdditionalPage(
             course=self.course.image,
@@ -229,7 +229,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             if page.is_deleted == 0 and (course.mode == 'staging' or page.live_datetime < now):
                 pages.append(page)
         return pages
-        
+
     class Meta:
         db_table = u'c2g_additional_pages'
 
@@ -243,14 +243,14 @@ class GetAnnouncementsByCourse(models.Manager):
             if item.is_deleted == 0:
                 returned_items.append(item)
         return returned_items
-        
+
 class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     objects = GetAnnouncementsByCourse()
-    
+
     def create_production_instance(self):
         production_instance = Announcement(
             course=self.course.image,
@@ -298,12 +298,12 @@ class GetContentSectionsByCourse(models.Manager):
             if item.is_deleted == 0:
                 returned_items.append(item)
         return returned_items
-        
+
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     objects = GetContentSectionsByCourse()
-    
+
     def create_production_instance(self):
         production_instance = ContentSection(
             course=self.course.image,
@@ -337,7 +337,7 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-        
+
     def __unicode__(self):
         return self.title
 
@@ -376,7 +376,7 @@ class GetVideosByCourse(models.Manager):
             if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
                 returned_items.append(item)
         return returned_items
-        
+
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
@@ -387,7 +387,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     duration = models.IntegerField(null=True)
     slug = models.CharField(max_length=255, null=True)
     objects = GetVideosByCourse()
-    
+
     def create_production_instance(self):
         production_instance = Video(
             course=self.course.image,
@@ -463,7 +463,7 @@ class GetProblemSetsByCourse(models.Manager):
             if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
                 returned_items.append(item)
         return returned_items
-        
+
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
@@ -480,7 +480,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     resubmission_penalty = models.IntegerField(null=True, blank=True)
     randomize = models.BooleanField()
     objects = GetProblemSetsByCourse()
-    
+
     def create_production_instance(self):
         production_instance = ProblemSet(
             course=self.course.image,
@@ -562,19 +562,11 @@ class ProblemSetToExercise(models.Model):
     class Meta:
         db_table = u'c2g_problemset_to_exercise'
 
-class Problem(TimestampMixin, Stageable, Deletable, models.Model):
-    exercise = models.ForeignKey(Exercise)
-    slug = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.number
-    class Meta:
-        db_table = u'c2g_problems'
 
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
      exercise = models.ForeignKey(Exercise, null=True)
-     problem = models.ForeignKey(Problem, null=True)
+     problem = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)
      count_hints = models.IntegerField(null=True, blank=True)
