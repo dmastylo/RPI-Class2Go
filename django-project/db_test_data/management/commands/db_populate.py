@@ -203,7 +203,7 @@ def create_course(data, users):
     data['due_date']='2012-07-20'
     data['partial_credit_deadline']='2012-07-27'
 
-    pset1 = create_problem_set(data, users)
+    #pset1 = create_problem_set(data, users)
 
     data['course'] = course
     data['section'] = sections[1]
