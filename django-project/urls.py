@@ -92,9 +92,12 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_]+)/?$', 'courses.video_exercises.views.view'),
 
     #Problem Sets
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/exercises/(?P<exercise_name>.+)$', 'problemsets.views.read_exercise'),
+
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/?$', 'problemsets.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)?$', 'problemsets.views.show'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)/manage_exercises?$', 'problemsets.views.manage_exercises'),
+
     url(r'^add_exercise/?$', 'problemsets.views.add_exercise'),
     url(r'^save_order/?$', 'problemsets.views.save_order'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/createproblemset/?$', 'problemsets.views.create_form'),

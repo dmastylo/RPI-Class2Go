@@ -215,7 +215,11 @@ def create_course(data, users):
     data['due_date']='2012-07-27'
     data['partial_credit_deadline']='2012-08-03'
 
-    pset2 = create_problem_set(data, users)
+    # Removing second problem set
+    # KELVIN TODO -- fix create_problem_set so it handles two problem sets referencing the same exercises
+    # duplicate exercise entries screws other things up.
+    # 
+    # pset2 = create_problem_set(data, users)
 
     #Create exercises
 
