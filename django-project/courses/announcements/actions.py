@@ -12,7 +12,7 @@ def add_announcement(request):
         raise Http404
         
     if not common_page_data['is_course_admin']:
-        return redirect('courses.views.main', course_prefix, course_suffix)
+        return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
         
     index = len(Announcement.objects.getByCourse(course=common_page_data['course']))
     announcement = Announcement(
@@ -35,7 +35,7 @@ def save_announcement(request):
         raise Http404
         
     if not common_page_data['is_course_admin']:
-        return redirect('courses.views.main', course_prefix, course_suffix)
+        return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
         
     announcement = Announcement.objects.get(id=request.POST.get("announcement_id"))
     announcement.title = request.POST.get("title")
@@ -52,7 +52,7 @@ def delete_announcement(request):
         raise Http404
         
     if not common_page_data['is_course_admin']:
-        return redirect('courses.views.main', course_prefix, course_suffix)
+        return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
 
     announcement = Announcement.objects.get(id=request.POST.get("announcement_id"))
     announcement.delete()
@@ -67,7 +67,7 @@ def save_announcement_order(request):
         raise Http404
         
     if not common_page_data['is_course_admin']:
-        return redirect('courses.views.main', course_prefix, course_suffix)
+        return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     
 def email_announcement(request):
     try:

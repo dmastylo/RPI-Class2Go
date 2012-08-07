@@ -4,9 +4,9 @@ import datetime
 def get_course_materials(common_page_data, get_video_content=True, get_pset_content=True):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
-        sections = common_page_data['course'].contentsection_set.all().order_by('index')
-        videos = Video.objects.filter(course=common_page_data['course']).order_by('section', 'index')
-        problem_sets = ProblemSet.objects.filter(course=common_page_data['course']).order_by('section', 'index')
+        sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
+        videos = Video.objects.getByCourse(course=common_page_data['course'])
+        problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
         
         index = 0
         for section in sections:
@@ -15,7 +15,7 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
             if get_video_content:
                 for video in videos:
                     if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
-                        item = {'type':'video', 'video':video, 'completed_percent': 0}
+                        item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
                         video_recs = VideoActivity.objects.filter(video=video, student=common_page_data['request'].user)
                         if len(video_recs)>0:
                             video_rec = video_recs[0]
@@ -45,7 +45,7 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
             if get_pset_content:
                 for problem_set in problem_sets:
                     if problem_set.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (problem_set.live_datetime and problem_set.live_datetime < common_page_data['effective_current_datetime'])):
-                        item = {'type':'problem_set', 'problem_set':problem_set}
+                        item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
                         
                         exercises = problem_set.exercise_set.all()
                         numQuestions = len(exercises)
@@ -97,6 +97,7 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
                         section_dict['items'].append(item)
             
             if common_page_data['course_mode'] == 'staging' or len(section_dict['items']) > 0:
+                section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index']) 
                 section_structures.append(section_dict)
                 index += 1
                 

@@ -18,9 +18,9 @@ def main(request, course_prefix, course_suffix):
 
     announcement_list = common_page_data['course'].announcement_set.all().order_by('-time_created')
     news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
-    contentsection_list = common_page_data['course'].contentsection_set.all().order_by('index')
-    video_list = common_page_data['course'].video_set.all().order_by('index')
-    pset_list =  common_page_data['course'].problemset_set.all().order_by('index')
+    contentsection_list = ContentSection.objects.getByCourse(course=common_page_data['course'])
+    video_list = Video.objects.getByCourse(course=common_page_data['course'])
+    pset_list =  ProblemSet.objects.getByCourse(course=common_page_data['course'])
 
     full_index_list = []
     for contentsection in contentsection_list:

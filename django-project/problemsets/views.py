@@ -204,3 +204,19 @@ def save_exercises(request):
 
 def save_order(request):
     return HttpResponse("Hu")
+
+
+def read_exercise(request, course_prefix, course_suffix, exercise_name):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    exercise = Exercise.objects.get(problemSet__course=common_page_data["course"], fileName=exercise_name)
+
+    # return the contents of the file as an HTTP response.  Trust that it's there.
+    #
+    # TODO: put exception handling around this, figure out how to handle S3 errors
+    # (file not there...)
+    return HttpResponse(exercise.file.file)
+
