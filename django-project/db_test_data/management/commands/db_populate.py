@@ -143,7 +143,7 @@ def create_course(data, users):
 
     course.save()
     course.create_production_instance()
-    
+
     # Create the overview page
     op = AdditionalPage(
         course=course,
@@ -155,7 +155,7 @@ def create_course(data, users):
     )
     op.save()
     op.create_production_instance()
-    
+
     # Create announcements
     titles = [
         'Welcome to Natural Language Processing!',
@@ -218,7 +218,7 @@ def create_course(data, users):
     # Removing second problem set
     # KELVIN TODO -- fix create_problem_set so it handles two problem sets referencing the same exercises
     # duplicate exercise entries screws other things up.
-    # 
+    #
     # pset2 = create_problem_set(data, users)
 
     #Create exercises
@@ -334,12 +334,13 @@ def create_problem_set(data, users):
 
     # @todo: Create exercises, problems, and user activity for problem sets based on the new staging/production paradigm
 
-    save_exercise(problem_set, "P1_Levenshtein.html", 1)
-    save_exercise(problem_set, "P1_Regexp.html", 2)
-    save_exercise(problem_set, "P1_Tokenize.html", 3)
-    save_exercise(prod_instance, "P1_Levenshtein.html", 1)
-    save_exercise(prod_instance, "P1_Regexp.html", 2)
-    save_exercise(prod_instance, "P1_Tokenize.html", 3)
+    #Shouldn't need to populate exercises since they can be uploaded now
+    #save_exercise(problem_set, "P1_Levenshtein.html", 1)
+    #save_exercise(problem_set, "P1_Regexp.html", 2)
+    #save_exercise(problem_set, "P1_Tokenize.html", 3)
+    #save_exercise(prod_instance, "P1_Levenshtein.html", 1)
+    #save_exercise(prod_instance, "P1_Regexp.html", 2)
+    #save_exercise(prod_instance, "P1_Tokenize.html", 3)
 
     return problem_set
 
