@@ -1,9 +1,36 @@
-<h3>{{section_structure.section.title}}</h3>
-<ul>
-{% for item in section_structure.items %}
-    {% ifequal item.type 'problem_set' %}{% include "problemsets/staging/problemset_list_item.html" %}{% endifequal %}
-    {% ifequal item.type 'video' %}{% include "videos/staging/video_list_item.html" %}{% endifequal %}
-{% empty %}
-    <p style='margin: 20px;'>No items have been added to this section</p>
-{% endfor %}
-</ul>
+<table style="width:100%">
+    <tr>
+        <td style="width:70%"><h3>{{section_structure.section.title}}</h3></td>
+        <td style="width:30%">
+            <a style="float: right;margin-right: 10px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')">Delete Section</a>
+        </td>
+    </tr>
+</table>
+
+<form action="{% url 'courses.content_sections.actions.save_content_order' %}" method="POST">
+    <ul data-sortablecontainer style="list-style-type:none;">
+        {% for item in section_structure.items %}
+            {% ifequal item.type 'problem_set' %}
+                <li id="problem_set_{{item.problem_set.id}}" class="ui-state-default" style="padding: 3px;">
+                    {% include "problemsets/staging/problemset_list_item.html" %}
+                    <input type="hidden" name="order_problem_set_{{item.problem_set.id}}" value="{{forloop.counter0}}" />
+                </li>
+            {% endifequal %}
+            {% ifequal item.type 'video' %}
+                <li id="video_{{item.video.id}}" class="ui-state-default" style="padding: 3px;">
+                    {% include "videos/staging/video_list_item.html" %}
+                    <input type="hidden" name="order_video_{{item.video.id}}" value="{{forloop.counter0}}" />
+                </li>
+            {% endifequal %}
+        {% empty %}
+            <p style='margin: 20px;'>No items have been added to this section</p>
+        {% endfor %}
+    </ul>
+    {% if section_structure.items|length > 1 %}
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        <input type="hidden" name="section_id" value="{{ section_structure.section.id }}" />
+        <input type="submit" value="Save order" class="btn" />
+        {% csrf_token %}
+    {% endif %}
+</form>

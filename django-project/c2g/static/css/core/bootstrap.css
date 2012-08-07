@@ -771,6 +771,14 @@ label {
   margin-bottom: 5px;
 }
 
+.fieldWrapper label {
+  display: inline;
+}
+
+.fieldWrapper select {
+  width: auto;
+}
+
 select,
 textarea,
 input[type="text"],

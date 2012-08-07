@@ -231,11 +231,13 @@ var Khan = (function() {
     // pending in the middle of a load.
     loadingExercises = {},
 
+    // C2G: manual location for Khan static files
     urlBaseOverride="/static/latestKhan/",
     urlBase = typeof urlBaseOverride !== "undefined" ? urlBaseOverride :
         testMode ? "../" : "/khan-exercises/",
 
-
+    // Use later for finding exercises -- they're not stored with the static Khan files, but in S3
+    urlBaseExercise = "../",
 
     lastFocusedSolutionInput = null,
 
@@ -2652,10 +2654,10 @@ var Khan = (function() {
         }
 
         //Gets the problem ID which is (problem number)-(variation)
-        slug = $('#workarea').children('div').attr('id')
+        problem_identifier = $('#workarea').children('div').attr('id')
         exercise_filename = exercise.data('fileName')
         pset_id = document.getElementById("pset_id").value
-        data = $.extend(data, {"slug": slug})
+        data = $.extend(data, {"problem_identifier": problem_identifier})
         data = $.extend(data, {"exercise_filename": exercise_filename})
         data = $.extend(data, {"pset_id": pset_id})
 
@@ -2757,7 +2759,10 @@ var Khan = (function() {
         loadingExercises[rootName]++;
 
         // Packing occurs on the server but at the same "exercises/" URL
-        $.get(urlBase + "exercises/" + fileName, function(data, status, xhr) {
+        //
+        // C2G: we use a different place for the exercises (originally was with the rest of the static files)
+        // since we need to get from S3
+        $.get(urlBaseExercise + "exercises/" + fileName, function(data, status, xhr) {
             var match, newContents;
 
             if (!(/success|notmodified/).test(status)) {
