@@ -79,13 +79,13 @@ urlpatterns = patterns('',
     # Forums
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/?$', 'courses.forums.views.view'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/admin/?', 'courses.forums.views.admin'),
-    
+
     # Sections
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/sections/reorder/?$', 'courses.content_sections.views.reorder'),
     url(r'^save_content_section_order$', 'courses.content_sections.actions.save_order'),
     url(r'^delete_content_section$', 'courses.content_sections.actions.delete_content_section'),
     url(r'^save_content_section_content_order$', 'courses.content_sections.actions.save_content_order'),
-    
+
     # Videos
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/upload$', 'courses.videos.views.upload'),
@@ -100,6 +100,7 @@ urlpatterns = patterns('',
 
     #Problem Sets
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/exercises/(?P<exercise_name>.+)$', 'problemsets.views.read_exercise'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)/load_problem_set?$', 'problemsets.views.load_problem_set'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/?$', 'problemsets.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)?$', 'problemsets.views.show'),

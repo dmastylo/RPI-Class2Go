@@ -82,6 +82,7 @@ def create_action(request):
     pset = ProblemSet(course = course,
                     section = content_section,
                    slug = request.POST['slug'],
+                   path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+request.POST['slug']+"/load_problem_set",
                    title = request.POST['title'],
                    description = request.POST['description'],
                    live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M'),
@@ -219,3 +220,15 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     # (file not there...)
     return HttpResponse(exercise.file.file)
 
+def load_problem_set(request, course_prefix, course_suffix, pset_slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    print "Hi"
+    pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
+    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
+    file_names = []
+    for psetToEx in psetToExs:
+        file_names.append(psetToEx.exercise.fileName[:-5])
+    return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names},context_instance=RequestContext(request))

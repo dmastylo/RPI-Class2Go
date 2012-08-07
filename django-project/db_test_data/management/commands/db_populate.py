@@ -29,7 +29,7 @@ def delete_db_data():
 
     # Nuke the data that we create below.  Order doesn't seem to matter.
     Course.objects.all().delete()
-    Problem.objects.all().delete()
+    ProblemSetToExercise.objects.all().delete()
     Exercise.objects.all().delete()
     ProblemActivity.objects.all().delete()
     Announcement.objects.all().delete()
