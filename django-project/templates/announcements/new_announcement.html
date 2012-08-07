@@ -5,11 +5,19 @@
         <textarea class="tinymce" name="description" id="announcement_description"></textarea><br/>
         <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
         <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        <input type="hidden" name="commit" id="commit" value="0" />
         {% csrf_token %}
-        <input type="submit" class="btn" value="Save and Publish" />
+        
+        <input type="button" class="btn btn-primary" value="Save and Publish" onclick="SaveAnnouncement('1');" />
+        <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement('0');" />
         <input type="button" class="btn" value="Cancel" onclick="CancelNewAnnouncement()"/>
     </form>
     <script type="text/javascript">
+        function SaveAnnouncement(commit) {
+            $("#commit").val(commit);
+            document.forms.new_announcement_form.submit();
+        }
+        
         function CancelNewAnnouncement() {
             $('#announcement_title').val('');
             tinyMCE.get('announcement_description').setContent('');

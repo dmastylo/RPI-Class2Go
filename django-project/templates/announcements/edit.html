@@ -12,9 +12,22 @@
         <input type="hidden" name="announcement_id" value="{{ announcement.id }}" />
         <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
         <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        <input type="hidden" name="commit" id="commit" value="0" />
+        <input type="hidden" name="revert" id="revert" value="0" />
         {% csrf_token %}
-        <input type="submit" class="btn" value="Save and Publish" />
+        
+        <input type="button" class="btn btn-primary" value="Save and Publish" onclick="SaveAnnouncement(1,0);" />
+        <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement(0,0);" />
+        <input type="button" class="btn" value="Revert" onclick="SaveAnnouncement(0,1);" />
+        <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
     </form>
+    <script type="text/javascript">
+        function SaveAnnouncement(commit,revert) {
+            $("#commit").val(commit);
+            $("#revert").val(revert);
+            document.forms.edit_announcement_form.submit();
+        }
+    </script>
 </div>
 {% endblock m_column_content %}
 

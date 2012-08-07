@@ -42,7 +42,7 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = '/home/kelvin/Dropbox/CURIS'
+MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -145,6 +145,12 @@ if (hostname != "productionserver"):
                         'db_test_data',
                        )
 
+# S3 Storage Setting
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+AWS_ACCESS_KEY_ID = 'AKIAIYES3HTY3TOMHCTQ'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'stage.c2g'
+
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
 
@@ -176,15 +182,3 @@ LOGGING = {
 
 # Session Settings
 SESSION_COOKIE_AGE = 3*30*24*3600
-
-# File storage stuff
-if (hostname == "productionserver" or hostname == "stagingserver"):
-    file_storage_lib = 'django.core.files.storage.FileSystemStorage'
-else:
-    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
-#DEFAULT_FILE_STORAGE = file_storage_lib
-
-
-AWS_ACCESS_KEY_ID = 'AKIAIYES3HTY3TOMHCTQ'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'stage.c2g'
