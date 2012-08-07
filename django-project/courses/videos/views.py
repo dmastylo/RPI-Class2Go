@@ -8,7 +8,7 @@ from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
 import datetime
-from courses.videos.forms import VideoUploadForm
+from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
 
@@ -61,8 +61,17 @@ def edit(request, course_prefix, course_suffix, video_id):
              },
             context_instance=RequestContext(request))
 
+def GetOAuth2Url(request):
+    client_id = "287022098794.apps.googleusercontent.com"
+    redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
+    response_type = "code"
+    scope = "https://gdata.youtube.com"
+
+    return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type
+
 def GetAuthSubUrl(request):
-    next = "http://localhost:8000" + request.path
+
+    next = "http://" + request.META['HTTP_HOST'] + request.path
     scope = 'http://gdata.youtube.com'
     secure = False
     session = True
@@ -78,6 +87,15 @@ def upload(request, course_prefix, course_suffix):
 
     data = {'common_page_data': common_page_data}
 
+    form = S3UploadForm(course=common_page_data['course'])
+    data['form'] = form
+
+    return render_to_response('videos/s3upload.html',
+                              data,
+                              context_instance=RequestContext(request))
+
+
+    #OLD YOUTUBE UPLOAD
     if 'token' in request.GET:
         token = request.GET['token']
         data['token'] = token
@@ -94,6 +112,7 @@ def upload(request, course_prefix, course_suffix):
         # user is not logged into google account for youtube
         yt_logged_in = False
         authSubUrl = GetAuthSubUrl(request)
+        #authSubUrl = GetOAuth2Url(request)
         data['authSubUrl'] = authSubUrl
 
     data['yt_logged_in'] = yt_logged_in
