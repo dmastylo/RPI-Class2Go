@@ -2666,7 +2666,7 @@ var Khan = (function() {
         var request = {
             // Do a request to the server API
             //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
-            url: "/problemsets/attempt/2/",
+            url: "/problemsets/attempt/2",
             type: "POST",
             data: data,
             dataType: "text",
@@ -2988,6 +2988,18 @@ var Khan = (function() {
 
             var currentQCard = $('.current-question');
 
+            var userAnswer;
+            if ($('input#testinput').length) { 
+                console.log("It's a text input");
+                userAnswer = $('input#testinput').val();
+            } else if ($('input:radio[name=solution]').length) {
+                console.log("It's a radio input");
+                userAnswer = $('input:radio[name=solution]:checked').val();
+            } else {
+                userAnswer = '';
+            }
+            console.log(userAnswer);
+            currentQCard.data = $.extend({}, currentQCard.data, {'userAnswer': userAnswer});
             currentQCard.removeClass('current-question');
 
             $('#questions-unviewed li:first-child').trigger('mouseout');
@@ -3029,6 +3041,17 @@ var Khan = (function() {
             $(this).addClass('current-question');
             clearExistingProblem();
             makeProblem($(this).data('problem'), $(this).data('randseed'));
+            
+            var userAnswer = $(this).data('userAnswer');
+            console.log(userAnswer);
+
+            if ($('input#testinput').length) { 
+                console.log("It's a text input");
+                $('input#testinput').val(userAnswer);
+            } else if ($('input:radio[name=solution]').length) {
+                console.log("It's a radio input");
+                $('input:radio[name=solution]')[userAnswer].select();
+            }
 
         };
 
