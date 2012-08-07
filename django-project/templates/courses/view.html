@@ -38,13 +38,20 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h3 class="section-title">Recent Announcements</h3>
-    {% for announcement in announcement_list %}
-    <div class="announcement">
-          <small class="date"> {{announcement.last_updated}} by {{announcement.owner}}</small>
-      <h4>{{announcement.title}}</h4>
-          <p>{{announcement.description}}</p>
+    <h3 class="section-title" style='display:inline;'>Recent Announcements</h3>
+    <div style="display:inline; float: right;">
+        <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">View all</a>
+        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+            <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
+            <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
+        {% endif %}
     </div>
+    {% if common_page_data.is_course_admin %}
+        {% include "announcements/new_announcement.html" %}
+    {% endif %}
+    
+    {% for announcement in announcement_list %}
+        {% include "announcements/announcement.html" %}
     {% empty %}
         <p style="margin:20px;">No announcements to display.</p>
 	{% endfor %}
@@ -68,3 +75,9 @@
     <a href="#">All Events</a>
 </div>
 {% endblock r_column_content %}
+
+{% if common_page_data.is_course_admin %}
+    {% block addl_scripts %}
+    {% include "controls/tinymce.html" %}
+    {% endblock addl_scripts %}
+{% endif %}

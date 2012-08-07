@@ -1,0 +1,23 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+
+{% block course_page_title %}Edit Announcement{% endblock course_page_title %}
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span6">
+    <form name="edit_announcement_form" action="{% url 'courses.announcements.actions.save_announcement' %}" method="POST">
+        Title <input name="title" id="announcement_title" value="{{announcement.title}}"/><br/><br/>
+        Description:<br/>
+        <textarea class="tinymce" name="description" id="announcement_description">{{announcement.description}}</textarea><br/>
+        <input type="hidden" name="announcement_id" value="{{ announcement.id }}" />
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        {% csrf_token %}
+        <input type="submit" class="btn" value="Save and Publish" />
+    </form>
+</div>
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+{% include "controls/tinymce.html" %}
+{% endblock addl_scripts %}
