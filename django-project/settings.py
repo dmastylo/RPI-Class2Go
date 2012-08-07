@@ -2,7 +2,7 @@
 
 from database import *
 from os import path
-import socket
+import socket, os
 #ADDED FOR url tag future
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
@@ -42,7 +42,11 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+# If you upload files from a dev machine, set MEDIA_ROOT to be the root dir for the file
+# uploads. If you do this, set in in database.py; not this file.
+#Also, if you set it in database.py, don't uncomment the following line as settings.py
+#runs after database.py
+#MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -145,11 +149,24 @@ if (hostname != "productionserver"):
                         'db_test_data',
                        )
 
-# S3 Storage Setting
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-AWS_ACCESS_KEY_ID = 'AKIAIYES3HTY3TOMHCTQ'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'stage.c2g'
+# S3 or local file system Storage Setting
+try:
+    class2go_env = os.environ['CLASS2GO']
+except KeyError:
+    class2go_env = ""
+    
+if (class2go_env == 'prod'): 
+    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
+    AWS_STORAGE_BUCKET_NAME = 'prod-c2g'
+elif (class2go_env == 'stage'):
+    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
+    AWS_STORAGE_BUCKET_NAME = 'stage-c2g'
+else:
+    file_storage_lib = 'django.core.files.storage.FileSystemStorage'
+    
+DEFAULT_FILE_STORAGE = file_storage_lib
+
+
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
