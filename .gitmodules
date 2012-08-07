@@ -1,3 +1,0 @@
-[submodule "thirdparty/ims_lti_py"]
-	path = thirdparty/ims_lti_py
-	url = https://github.com/tophatmonocle/ims_lti_py
