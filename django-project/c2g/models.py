@@ -568,7 +568,7 @@ class ProblemSetToExercise(models.Model):
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
      exercise = models.ForeignKey(Exercise, null=True)
-     problem = models.CharField(max_length=255, blank=True)
+     problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)
      count_hints = models.IntegerField(null=True, blank=True)

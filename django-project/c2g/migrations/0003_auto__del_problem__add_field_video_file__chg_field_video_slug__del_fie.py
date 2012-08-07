@@ -11,18 +11,29 @@ class Migration(SchemaMigration):
         # Deleting model 'Problem'
         db.delete_table(u'c2g_problems')
 
+        # Adding field 'Video.file'
+        db.add_column(u'c2g_videos', 'file',
+                      self.gf('django.db.models.fields.files.FileField')(default='', max_length=100),
+                      keep_default=False)
 
-        # Renaming column for 'ProblemActivity.problem' to match new field type.
-        db.rename_column(u'c2g_problem_activity', 'problem_id', 'problem')
-        # Changing field 'ProblemActivity.problem'
-        db.alter_column(u'c2g_problem_activity', 'problem', self.gf('django.db.models.fields.CharField')(default='', max_length=255))
-        # Removing index on 'ProblemActivity', fields ['problem']
-        db.delete_index(u'c2g_problem_activity', ['problem_id'])
+
+        # Changing field 'Video.slug'
+        db.alter_column(u'c2g_videos', 'slug', self.gf('django.db.models.fields.SlugField')(max_length=255, null=True))
+        # Adding index on 'Video', fields ['slug']
+        db.create_index(u'c2g_videos', ['slug'])
+
+        # Deleting field 'ProblemActivity.problem'
+        db.delete_column(u'c2g_problem_activity', 'problem_id')
+
+        # Adding field 'ProblemActivity.problem_identifier'
+        db.add_column(u'c2g_problem_activity', 'problem_identifier',
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=255, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Adding index on 'ProblemActivity', fields ['problem']
-        db.create_index(u'c2g_problem_activity', ['problem_id'])
+        # Removing index on 'Video', fields ['slug']
+        db.delete_index(u'c2g_videos', ['slug'])
 
         # Adding model 'Problem'
         db.create_table(u'c2g_problems', (
@@ -38,11 +49,20 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('c2g', ['Problem'])
 
+        # Deleting field 'Video.file'
+        db.delete_column(u'c2g_videos', 'file')
 
-        # Renaming column for 'ProblemActivity.problem' to match new field type.
-        db.rename_column(u'c2g_problem_activity', 'problem', 'problem_id')
-        # Changing field 'ProblemActivity.problem'
-        db.alter_column(u'c2g_problem_activity', 'problem_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Problem'], null=True))
+
+        # Changing field 'Video.slug'
+        db.alter_column(u'c2g_videos', 'slug', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
+        # Adding field 'ProblemActivity.problem'
+        db.add_column(u'c2g_problem_activity', 'problem',
+                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Problem'], null=True),
+                      keep_default=False)
+
+        # Deleting field 'ProblemActivity.problem_identifier'
+        db.delete_column(u'c2g_problem_activity', 'problem_identifier')
+
 
     models = {
         'auth.group': {
@@ -181,7 +201,7 @@ class Migration(SchemaMigration):
             'exercise': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exercise']", 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'problem': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'problem_identifier': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'problem_type': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'review_mode': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'seed': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -245,6 +265,7 @@ class Migration(SchemaMigration):
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'duration': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.Video']"}),
             'index': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -253,7 +274,7 @@ class Migration(SchemaMigration):
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
-            'slug': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'default': "'youtube'", 'max_length': '30'}),
