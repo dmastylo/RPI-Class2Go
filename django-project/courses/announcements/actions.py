@@ -26,6 +26,9 @@ def add_announcement(request):
     announcement.save()
     announcement.create_production_instance()
     
+    if request.POST.get("commit") == '1':
+        announcement.commit()
+    
     return redirect(request.META['HTTP_REFERER'])
     
 def save_announcement(request):
@@ -41,7 +44,12 @@ def save_announcement(request):
     announcement.title = request.POST.get("title")
     announcement.description = request.POST.get("description")
     announcement.save()
-    announcement.commit()
+    
+    if request.POST.get("commit") == '1':
+        announcement.commit()
+        
+    if request.POST.get("revert") == '1':
+        announcement.revert()
     
     return redirect('courses.announcements.views.list', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     
