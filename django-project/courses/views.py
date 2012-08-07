@@ -16,7 +16,13 @@ def main(request, course_prefix, course_suffix):
     except:
         raise Http404
 
-    announcement_list = common_page_data['course'].announcement_set.all().order_by('-time_created')
+    announcement_list = Announcement.objects.getByCourse(course=common_page_data['course'])
+    if len(announcement_list) > 10:
+        many_announcements = True
+        announcement_list = announcement_list[0:10]
+    else:
+        many_announcements = False
+        
     news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
     contentsection_list = ContentSection.objects.getByCourse(course=common_page_data['course'])
     video_list = Video.objects.getByCourse(course=common_page_data['course'])
