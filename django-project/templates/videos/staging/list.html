@@ -9,12 +9,10 @@
 
     {% for section_structure in section_structures %}
     <div class="well">
-        <table style="width:100%">
-            {% include "courses/staging/section.html" %}
-        </table>
+        {% include "videos/staging/section.html" %}
     </div>
     {% empty %}
-        <p style='margin: 20px;'>No content to display.</p>
+        <p style='margin: 20px;'>No videos have been added to this section.</p>
     {% endfor %}
 </div>
 {% endblock m_column_content %}

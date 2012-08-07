@@ -1,11 +1,11 @@
-<tr id="video_{{item.video.id}}">
-    <td width="20"><input type="checkbox" name="video_{{item.video.id}}" id="video_{{item.video.id}}" /></td>
-    <td><i class="icon-facetime-video" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
-    <td width="15%"><label style="color: green; display:inline;"><i class="icon-ok"></i> Synched</label></td>
-    <td width="10%">{% autoescape off %}{{ item.live_status }}{% endautoescape %}</td>
-    <td width="130">
-        <button><i class="icon-arrow-up"></i></button>
-        <button><i class="icon-arrow-down"></i></button>
-        <button><i class="icon-trash"></i></button>
-    </td>
-</tr>
+<table style="width:100%">
+    <tr id="video_{{item.video.id}}">
+        <td width="20"><input type="checkbox" name="video_{{item.video.id}}" id="video_{{item.video.id}}" /></td>
+        <td><i class="icon-facetime-video" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
+        <td width="15%"><label style="color: green; display:inline;"><i class="icon-ok"></i> Synched</label></td>
+        <td width="10%">{% autoescape off %}{{ item.live_status }}{% endautoescape %}</td>
+        <td width="130">
+            <a href="javascript:DeleteVideo('{{item.video.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
+        </td>
+    </tr>
+</table>

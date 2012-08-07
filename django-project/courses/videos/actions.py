@@ -45,6 +45,21 @@ def add_video(request):
 def edit_video(request):
     pass
     
+def delete_video(request):
+    try:
+        common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+    except:
+        raise Http404
+        
+    if not common_page_data['is_course_admin']:
+        return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+        
+    video = Video.objects.get(id=request.POST.get("video_id"))
+    video.delete()
+    video.image.delete()
+    
+    return redirect(request.META['HTTP_REFERER'])
+    
 def save_video_progress(request):
     videoRec = request.POST['videoRec']
     playTime = request.POST['playTime']
