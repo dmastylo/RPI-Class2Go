@@ -45,7 +45,6 @@ def attempt(request, problemId):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
     problem_activity = ProblemActivity(student = user,
-                                        problem = request.POST['problem_identifier'],
                                         exercise = exercise,
                                         complete = request.POST['complete'],
                                         attempt_content = request.POST['attempt_content'],
@@ -53,6 +52,11 @@ def attempt(request, problemId):
                                         time_taken = request.POST['time_taken'],
                                         attempt_number = request.POST['attempt_number'],
                                         problem_type = request.POST['problem_type'])
+    #In case no problem id is specified in template
+    try:
+        problem_activity.problem = request.POST['problem_identifier']
+    except:
+        pass
 
     problem_activity.save()
     if request.POST['complete'] == "1":
@@ -174,7 +178,7 @@ def add_exercise(request):
 
     exercise = Exercise()
     exercise.fileName = file_name
-#    exercise.file.save(file_name, file_content)
+    exercise.file.save(file_name, file_content)
     exercise.save()
 
     index = len(pset.exercise_set.all())
@@ -225,7 +229,6 @@ def load_problem_set(request, course_prefix, course_suffix, pset_slug):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    print "Hi"
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
     psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
     file_names = []
