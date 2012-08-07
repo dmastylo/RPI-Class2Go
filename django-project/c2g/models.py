@@ -337,7 +337,7 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-
+        
     def __unicode__(self):
         return self.title
 
@@ -369,7 +369,7 @@ post_save.connect(create_user_profile, sender=User)
 
 class GetVideosByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section_id','index')
+        all_items = self.filter(course=course).order_by('section','index')
         now = datetime.now()
         returned_items = []
         for item in all_items:
@@ -456,7 +456,7 @@ class VideoActivity(models.Model):
 
 class GetProblemSetsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section_id','index')
+        all_items = self.filter(course=course).order_by('section','index')
         now = datetime.now()
         returned_items = []
         for item in all_items:

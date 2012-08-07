@@ -7,12 +7,10 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% include "courses/staging/course_content_management_section.html" %}
-
+    
     {% for section_structure in section_structures %}
     <div class="well">
-        <table style="width:100%">
-            {% include "courses/staging/section.html" %}
-        </table>
+        {% include "courses/staging/section.html" %}
     </div>
     {% empty %}
         <p style='margin: 20px;'>No content to display.</p>

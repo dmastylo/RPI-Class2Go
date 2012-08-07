@@ -79,13 +79,20 @@ urlpatterns = patterns('',
     # Forums
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/?$', 'courses.forums.views.view'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/forums/admin/?', 'courses.forums.views.admin'),
-
+    
+    # Sections
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/sections/reorder/?$', 'courses.content_sections.views.reorder'),
+    url(r'^save_content_section_order$', 'courses.content_sections.actions.save_order'),
+    url(r'^delete_content_section$', 'courses.content_sections.actions.delete_content_section'),
+    url(r'^save_content_section_content_order$', 'courses.content_sections.actions.save_content_order'),
+    
     # Videos
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/upload$', 'courses.videos.views.upload'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<slug>[a-zA-Z0-9_]+)/?$', 'courses.videos.views.view'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<slug>[a-zA-Z0-9_]+)/edit/?', 'courses.videos.views.edit'),
     url(r'^add_video/?', 'courses.videos.actions.add_video'),
+    url(r'^delete_video/?', 'courses.videos.actions.delete_video'),
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
 
     # Video Exercises
@@ -97,6 +104,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)/manage_exercises?$', 'problemsets.views.manage_exercises'),
     url(r'^add_exercise/?$', 'problemsets.views.add_exercise'),
     url(r'^save_order/?$', 'problemsets.views.save_order'),
+    url(r'^delete_problemset/?', 'problemsets.actions.delete_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/createproblemset/?$', 'problemsets.views.create_form'),
     url(r'^createproblemsetaction/?', 'problemsets.views.create_action'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_]+)/edit?$', 'problemsets.views.edit_form'),
