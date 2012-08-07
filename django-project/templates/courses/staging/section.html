@@ -3,6 +3,7 @@
         <td style="width:70%"><h3>{{section_structure.section.title}}</h3></td>
         <td style="width:30%">
             <a style="float: right;margin-right: 10px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')">Delete Section</a>
+            <a style="float: right;margin-right: 10px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}">Rename Section</a>
         </td>
     </tr>
 </table>
