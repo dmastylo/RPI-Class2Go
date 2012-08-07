@@ -22,6 +22,22 @@ def save_order(request):
         
     return redirect('courses.views.course_materials', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
 
+def rename(request):
+    try:
+        common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+    except:
+        raise Http404
+        
+    if not common_page_data['is_course_admin']:
+        return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+        
+    section = ContentSection.objects.get(id=request.POST.get("section_id"))
+    section.title = request.POST.get("title")
+    section.save()
+    section.commit()
+    
+    return redirect('courses.views.course_materials', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
+
 def delete_content_section(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))

@@ -41,7 +41,7 @@
     <h3 class="section-title" style='display:inline;'>Recent Announcements</h3>
     <div style="display:inline; float: right;">
         {% if many_announcements %}
-            <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">View all</a>
+            <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">View all announcements</a>
         {% endif %}
         
         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}

@@ -19,10 +19,22 @@
 {% endblock %}
 
 {% block m_column_content %}
+<link rel="stylesheet" href="{{ STATIC_URL}}latestKhan/demo/css/quiz_iframe.css" />
 <div id="c2g_layout_m_column" class="span9">
   {% if user.is_authenticated %}
     {% if video.title == 'Defining Minimum Edit Distance' %}
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
+    {% elif video.title == "Regular Expressions" or video.title == "Word Tokenization" %}
+        <h2 class="section-headline">{{video.title}}</h2>
+        <div class="content">
+          <div class="quizModule">
+            <div id="qInst"></div>
+            <div id="playerdiv">
+              <div id="player"></div>
+              <div id="slideIndex"></div>
+            </div>
+          </div>
+        </div>
     {% else %}
         <h2>{{video.title}}</h2>
         <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
@@ -33,6 +45,30 @@
   {% endif %}
 </div>
 
+
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+
+{% if video.title == "Regular Expressions" or video.title == "Word Tokenization" %}
+<script src="{{ STATIC_URL }}/js/thumbnails.js" /></script>
+<script>
+    var path = '/static/graphics/videos/nlp/' + encodeURIComponent("{{ video.title }}") + '/jpegs/';
+    var tmpmanifest = {};
+    var loadTmpmanifest = function (data, textStatus, jqXHR) { 
+        $.each(data, function (key, val) {
+            $.each(val, function (k, v) {
+                if (k == "imgsrc") {
+                    val[k] = path + v;
+                }
+            })
+            tmpmanifest[parseInt(key)] = val; 
+        });
+    };
+    $.getJSON(path + "manifest.txt", "", loadTmpmanifest);
+    var thumbSet = initThumbnails('{{ video.url }}', tmpmanifest, {});
+</script>
+{% else %}
 <script type="text/javascript">
   // This code loads the IFrame Player API code asynchronously.
   var tag = document.createElement('script');
@@ -60,5 +96,6 @@
     $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: 1, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
   }
 </script>
+{% endif %}
 
-{% endblock m_column_content %}
+{% endblock addl_scripts %}
