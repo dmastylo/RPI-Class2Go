@@ -15,6 +15,7 @@ run_list(
 #   "recipe[chef-client]",
     "recipe[gdata]",
     "recipe[class2go-base]",
+    "recipe[class2go-python]",
     "recipe[class2go-bitnami-django]",
     "recipe[class2go-deploy]",
     "recipe[class2go-database.py]",
