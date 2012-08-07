@@ -354,11 +354,11 @@ def save_exercise(problemSet, fileName, number):
     psetToEx.save()
     return ex
 
-# def save_problem(exercise, slug):
-    # problem = Problem(exercise = exercise,
-                    # slug = slug)
+def save_problem(exercise, slug):
+    problem = Problem(exercise = exercise,
+                    slug = slug)
 
-    # problem.save()
+    problem.save()
 
 # def save_problem_activity(student, problem):
     # problem_activity = ProblemActivity(student = student,
