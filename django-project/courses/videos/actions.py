@@ -10,6 +10,7 @@ from courses.common_page_data import get_common_page_data
 from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
+import urllib2, urllib, json
 
 import datetime
     
@@ -61,6 +62,49 @@ def GetAuthSubUrl(request):
     yt_service = gdata.youtube.service.YouTubeService()
     return yt_service.GenerateAuthSubURL(next, cope, secure, session)
 
+def oauth(request):
+    if 'code' in request.GET:
+        code = request.GET.get('code')
+#        print code
+        client_id = "287022098794.apps.googleusercontent.com"
+        client_secret = "vqCgk8qv1XKKtiKGfR8vTq_w"
+        redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
+
+        post_data = [('code', code), ('client_id', client_id), ('client_secret', client_secret), ('redirect_uri', redirect_uri), ('grant_type', 'authorization_code')]
+        result = urllib2.urlopen('https://accounts.google.com/o/oauth2/token', urllib.urlencode(post_data))
+        content = json.loads(result.read())
+
+        yt_service = gdata.youtube.service.YouTubeService(additional_headers={'Authorization': "Bearer "+content['access_token']})
+        yt_service.developer_key = 'AI39si5GlWcy9S4eVFtajbVZk-DjFEhlM4Zt7CYzJG3f2bwIpsBSaGd8SCWts6V5lbqBHJYXAn73-8emsZg5zWt4EUlJJ4rpQA'
+
+
+        video = Video.objects.get(pk=request.GET.get('state'))
+        
+        my_media_group = gdata.media.Group(
+            title=gdata.media.Title(text=video.title),
+            description=gdata.media.Description(description_type='plain',
+                                                text=video.description),
+            category=[gdata.media.Category(
+                    text='Education',
+                    label='Education')],
+            )
+
+        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
+
+        yt_service.InsertVideoEntry(video_entry, video.file)
+
+    return redirect("http://" + request.META['HTTP_HOST'])
+
+def GetOAuth2Url(request, video):
+    client_id = "287022098794.apps.googleusercontent.com"
+    redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
+    response_type = "code"
+    scope = "https://gdata.youtube.com"
+    state = str(video.id)
+
+    return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type + "&state=" + state
+
+
 def upload(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -96,8 +140,11 @@ def upload(request):
             )
 #            video.save()
 
-#            print video.file.url
 
+
+            authUrl = GetOAuth2Url(request, new_video)
+            #eventually should store an access token, so they don't have to give permission everytime
+            return redirect(authUrl)
             return redirect("http://" + request.META['HTTP_HOST'])
     else:
         form = S3UploadForm(course=common_page_data['course'])
