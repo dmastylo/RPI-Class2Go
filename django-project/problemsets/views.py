@@ -179,6 +179,7 @@ def add_exercise(request):
     psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
+
 def save_order(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     psetToEx = pset.problemsettoexercise_set.all().order_by('number')
@@ -187,3 +188,19 @@ def save_order(request):
         psetToEx[n].number = request.POST[listName]
         psetToEx[n].save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+
+def read_exercise(request, course_prefix, course_suffix, exercise_name):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    exercise = Exercise.objects.get(problemSet__course=common_page_data["course"], fileName=exercise_name)
+
+    # return the contents of the file as an HTTP response.  Trust that it's there.
+    #
+    # TODO: put exception handling around this, figure out how to handle S3 errors 
+    # (file not there...)
+    return HttpResponse(exercise.file.file)
+
