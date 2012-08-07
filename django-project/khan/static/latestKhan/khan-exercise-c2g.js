@@ -236,7 +236,7 @@ var Khan = (function() {
     urlBase = typeof urlBaseOverride !== "undefined" ? urlBaseOverride :
         testMode ? "../" : "/khan-exercises/",
 
-    // Use later for finding exercises -- they're not stored with the static Khan files, but in S3 
+    // Use later for finding exercises -- they're not stored with the static Khan files, but in S3
     urlBaseExercise = "../",
 
     lastFocusedSolutionInput = null,
@@ -2654,10 +2654,10 @@ var Khan = (function() {
         }
 
         //Gets the problem ID which is (problem number)-(variation)
-        slug = $('#workarea').children('div').attr('id')
+        problem_identifier = $('#workarea').children('div').attr('id')
         exercise_filename = exercise.data('fileName')
         pset_id = document.getElementById("pset_id").value
-        data = $.extend(data, {"slug": slug})
+        data = $.extend(data, {"problem_identifier": problem_identifier})
         data = $.extend(data, {"exercise_filename": exercise_filename})
         data = $.extend(data, {"pset_id": pset_id})
 

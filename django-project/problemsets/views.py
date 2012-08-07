@@ -44,9 +44,8 @@ def attempt(request, problemId):
     user = request.user
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
-    problem = exercise.problem_set.get(slug=request.POST['slug'])
     problem_activity = ProblemActivity(student = user,
-                                        problem = problem,
+                                        problem = request.POST['problem_identifier'],
                                         exercise = exercise,
                                         complete = request.POST['complete'],
                                         attempt_content = request.POST['attempt_content'],
@@ -174,7 +173,7 @@ def add_exercise(request):
 
     exercise = Exercise()
     exercise.fileName = file_name
-    exercise.file.save(file_name, file_content)
+#    exercise.file.save(file_name, file_content)
     exercise.save()
 
     index = len(pset.exercise_set.all())
