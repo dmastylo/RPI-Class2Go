@@ -2676,7 +2676,7 @@ var Khan = (function() {
             success: function(data) {
                 //alert(data)
                 if (data == "complete") {
-                    $('.current-question').addClass('correctly-answered');
+                    $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                 }
 
                 // Tell any listeners that khan-exercises has new
@@ -3047,7 +3047,7 @@ var Khan = (function() {
 
             if ($('input#testinput').length) { 
                 $('input#testinput').val(userAnswer);
-            } else if ($('input:radio[name=solution]').length) {
+            } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
                 $('input:radio[name=solution]')[userAnswer].checked = true;
             }
 
