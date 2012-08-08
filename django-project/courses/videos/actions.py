@@ -114,6 +114,8 @@ def oauth(request):
         video.url = match.group(1)
         video.duration = entry.media.duration.seconds
         video.save()
+        #temporary for demo purposes
+        video.create_production_instance()
 
     return redirect("http://" + request.META['HTTP_HOST'])
 
@@ -147,7 +149,7 @@ def upload(request):
             new_video.mode = 'staging'
 
             new_video.save()
-            new_video.create_production_instance()
+#            new_video.create_production_instance()
             print new_video.file.url
 
             video = Video(
