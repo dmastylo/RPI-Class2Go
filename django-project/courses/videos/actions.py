@@ -117,7 +117,8 @@ def oauth(request):
         #temporary for demo purposes
         video.create_production_instance()
 
-    return redirect("http://" + request.META['HTTP_HOST'])
+#    return redirect('courses.videosviews.list', course_prefix, course_suffix)
+    return redirect("http://" + request.META['HTTP_HOST'] + "/nlp/Fall2012/videos")
 
 def GetOAuth2Url(request, video):
     client_id = "287022098794.apps.googleusercontent.com"
