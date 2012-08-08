@@ -180,13 +180,13 @@ def create_course(data, users):
 
     # Create videos
     dicts = [
-        {'course':course, 'section':sections[0], 'title':'Course Introduction','description':'Intro video by Professor Dan Jurafsky and Chris Manning','type':'youtube','url':'BJiVRIPVNxU','slug':'intro', 'index':0},
-        {'course':course, 'section':sections[0], 'title':'Regular Expressions','description':'Video on Regular Expressions','type':'youtube','url':'dBVlwb15SBM','slug':'regexp', 'index':1},
-        {'course':course, 'section':sections[0], 'title':'Regular Expressions in Practical NLP','description':'Video on Regular Expressions in Practical NLP','type':'youtube','url':'zJSqHRuD2C4','slug':'regexp_in_practical_nlp', 'index':2},
-        {'course':course, 'section':sections[1], 'title':'Word Tokenization','description':'Video on Word Tokenization','type':'youtube','url':'WMC3AjgYf3A','slug':'tokenization', 'index':0},
-        {'course':course, 'section':sections[1], 'title':'Defining Minimum Edit Distance','description':'Video on Defining Minimum Edit Distance','type':'youtube','url':'xOfEYI61f3k','slug':'min_edit_distance', 'index':1},
-        {'course':course, 'section':sections[1], 'title':'Computing Minimum Edit Distance','description':'Video on Computing Minimum Edit Distance','type':'youtube','url':'Gh63CeMzav8','slug':'computing_min_edit_distance', 'index':2},
-        {'course':course, 'section':sections[2], 'title':'Introduction to N-grams','description':'Video on Introduction to N-grams','type':'youtube','url':'LRq7om7vMEc','slug':'ngrams', 'index':0},
+        {'course':course, 'section':sections[0], 'title':'Course Introduction','description':'Intro video by Professor Dan Jurafsky and Chris Manning','type':'youtube','url':'BJiVRIPVNxU', 'duration':772, 'slug':'intro', 'index':0},
+        {'course':course, 'section':sections[0], 'title':'Regular Expressions','description':'Video on Regular Expressions','type':'youtube','url':'dBVlwb15SBM', 'duration':686, 'slug':'regexp', 'index':1},
+        {'course':course, 'section':sections[0], 'title':'Regular Expressions in Practical NLP','description':'Video on Regular Expressions in Practical NLP','type':'youtube','url':'zJSqHRuD2C4', 'duration':366, 'slug':'regexp_in_practical_nlp', 'index':2},
+        {'course':course, 'section':sections[1], 'title':'Word Tokenization','description':'Video on Word Tokenization','type':'youtube','url':'WMC3AjgYf3A', 'duration':866, 'slug':'tokenization', 'index':0},
+        {'course':course, 'section':sections[1], 'title':'Defining Minimum Edit Distance','description':'Video on Defining Minimum Edit Distance','type':'youtube','url':'xOfEYI61f3k', 'duration':426, 'slug':'min_edit_distance', 'index':1},
+        {'course':course, 'section':sections[1], 'title':'Computing Minimum Edit Distance','description':'Video on Computing Minimum Edit Distance','type':'youtube','url':'Gh63CeMzav8', 'duration':355, 'slug':'computing_min_edit_distance', 'index':2},
+        {'course':course, 'section':sections[2], 'title':'Introduction to N-grams','description':'Video on Introduction to N-grams','type':'youtube','url':'LRq7om7vMEc', 'duration':522, 'slug':'ngrams', 'index':0},
     ]
 
     for i in range(7):
@@ -289,6 +289,7 @@ def create_video(data, users):
         description=data['course'],
         type=data['type'],
         url=data['url'],
+        duration=data['duration'],
         slug=data['slug'],
         index=data['index'],
         mode='staging',
