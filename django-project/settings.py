@@ -2,7 +2,6 @@
 
 from database import *
 from os import path
-import socket, os
 #ADDED FOR url tag future
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
@@ -117,8 +116,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages'
 )
 
-hostname = socket.gethostname()
-#We do not want db_test_data app installed on production.
+# the mode should be set in your database.py, but if it's not, assume
+# we're in a dev environment (careful!)
+try:
+        class2go_mode
+except NameError:
+        class2go_mode = 'dev'
+        
 
 INSTALLED_APPS = (
                       'django.contrib.auth',
@@ -143,25 +147,20 @@ INSTALLED_APPS = (
                       'problemsets',
                       'django.contrib.flatpages',
                       'storages',
-                      )
-if (hostname != "productionserver"):
+                      ) 
+if class2go_mode != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
                        )
 
-# S3 or local file system Storage Setting
-try:
-    class2go_env = os.environ['CLASS2GO']
-except KeyError:
-    class2go_env = ""
-    
-if (class2go_env == 'prod'): 
+if class2go_mode == 'prod': 
     file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
     AWS_STORAGE_BUCKET_NAME = 'prod-c2g'
-elif (class2go_env == 'stage'):
+elif class2go_mode == 'stage':
     file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
     AWS_STORAGE_BUCKET_NAME = 'stage-c2g'
 else:
+    # use local storage instead of S3
     file_storage_lib = 'django.core.files.storage.FileSystemStorage'
     
 DEFAULT_FILE_STORAGE = file_storage_lib

@@ -11,6 +11,7 @@ from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
 import urllib2, urllib, json
+import re
 
 import datetime
     
@@ -106,7 +107,15 @@ def oauth(request):
 
         video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
 
-        yt_service.InsertVideoEntry(video_entry, video.file)
+        entry = yt_service.InsertVideoEntry(video_entry, video.file)
+        #print entry.id.ToString()
+        match = re.search('http://gdata.youtube.com/feeds/api/videos/([a-zA-Z0-9_-]+)</ns0:id>', entry.id.ToString())
+        #print match.group(1)
+        video.url = match.group(1)
+        video.duration = entry.media.duration.seconds
+        video.save()
+        #temporary for demo purposes
+        video.create_production_instance()
 
     return redirect("http://" + request.META['HTTP_HOST'])
 
@@ -140,7 +149,7 @@ def upload(request):
             new_video.mode = 'staging'
 
             new_video.save()
-            new_video.create_production_instance()
+#            new_video.create_production_instance()
             print new_video.file.url
 
             video = Video(
