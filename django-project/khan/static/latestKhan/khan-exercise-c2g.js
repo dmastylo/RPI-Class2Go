@@ -2990,16 +2990,14 @@ var Khan = (function() {
 
             var userAnswer;
             if ($('input#testinput').length) { 
-                console.log("It's a text input");
                 userAnswer = $('input#testinput').val();
             } else if ($('input:radio[name=solution]').length) {
-                console.log("It's a radio input");
                 userAnswer = $('input:radio[name=solution]:checked').val();
             } else {
                 userAnswer = '';
             }
-            console.log(userAnswer);
-            currentQCard.data = $.extend({}, currentQCard.data, {'userAnswer': userAnswer});
+            
+            currentQCard.data('userAnswer', userAnswer);
             currentQCard.removeClass('current-question');
 
             $('#questions-unviewed li:first-child').trigger('mouseout');
@@ -3043,14 +3041,11 @@ var Khan = (function() {
             makeProblem($(this).data('problem'), $(this).data('randseed'));
             
             var userAnswer = $(this).data('userAnswer');
-            console.log(userAnswer);
 
             if ($('input#testinput').length) { 
-                console.log("It's a text input");
                 $('input#testinput').val(userAnswer);
             } else if ($('input:radio[name=solution]').length) {
-                console.log("It's a radio input");
-                $('input:radio[name=solution]')[userAnswer].select();
+                $('input:radio[name=solution]')[userAnswer].checked = true;
             }
 
         };
