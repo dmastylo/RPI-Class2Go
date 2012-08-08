@@ -14,3 +14,4 @@
 /* #questions-stack #questions-done ol li:hover{border-color: #000; color:#000;} */
 
 #questions-stack li.current-question { border-color: #c00; position: relative; left: .5em; }
+#questions-stack li.correctly-answered { border-color: #0c0; }

@@ -2675,6 +2675,9 @@ var Khan = (function() {
             // Backup the response locally, for later use
             success: function(data) {
                 //alert(data)
+                if (data == "complete") {
+                    $('.current-question').addClass('correctly-answered');
+                }
 
                 // Tell any listeners that khan-exercises has new
                 // userExercise data
