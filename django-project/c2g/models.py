@@ -482,7 +482,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
     partial_credit_deadline = models.DateTimeField(null=True, blank=True)
-    penalty_preference = models.CharField(max_length=255)
+    assessment_type = models.CharField(max_length=255)
     late_penalty = models.IntegerField(null=True, blank=True)
     submissions_permitted = models.IntegerField(null=True, blank=True)
     resubmission_penalty = models.IntegerField(null=True, blank=True)
@@ -501,7 +501,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             due_date=self.due_date,
             grace_period=self.grace_period,
             partial_credit_deadline=self.partial_credit_deadline,
-            penalty_preference=self.penalty_preference,
+            assessment_type=self.assessment_type,
             late_penalty=self.late_penalty,
             submissions_permitted=self.submissions_permitted,
             resubmission_penalty=self.resubmission_penalty,
@@ -529,6 +529,24 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             production_instance.slug = self.slug
         if not clone_fields or 'index' in clone_fields:
             production_instance.index = self.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            production_instance.live_datetime = self.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            production_instance.due_date = self.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            production_instance.grace_period = self.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            production_instance.partial_credit_deadline = self.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            production_instance.assessment_type = self.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            production_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            production_instance.submissions_permitted = self.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            production_instance.resubmission_penalty = self.resubmission_penalty
+        if not clone_fields or 'randomize' in clone_fields:
+            production_instance.randomize = self.randomize
 
         production_instance.save()
 
@@ -546,6 +564,26 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.slug = production_instance.slug
         if not clone_fields or 'index' in clone_fields:
             self.index = production_instance.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = production_instance.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            self.due_date = production_instance.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            self.grace_period = production_instance.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            self.partial_credit_deadline = production_instance.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            self.assessment_type = production_instance.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            self.late_penalty = production_instance.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            self.submissions_permitted = production_instance.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            self.resubmission_penalty = production_instance.resubmission_penalty
+        if not clone_fields or 'randomize' in clone_fields:
+            self.randomize = production_instance.randomize
+
+        self.save()
 
     def __unicode__(self):
         return self.title
@@ -575,7 +613,7 @@ class ProblemSetToExercise(models.Model):
 
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
-     exercise = models.ForeignKey(Exercise, null=True)
+     exercise_relationship = models.ForeignKey(ProblemSetToExercise, null=True)
      problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)

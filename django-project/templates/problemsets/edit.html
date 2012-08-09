@@ -52,11 +52,10 @@
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label">Multiple Submission Preference</label>
+            <label class="control-label">Assessment Type</label>
             <div class="controls">
-                <input type="radio" name="penalty_preference" value="formative" {% if pset.penalty_preference == "formative" %} checked {% endif %}/> Formative
-                <input type="radio" name="penalty_preference" value="assessive" {% if pset.penalty_preference == "assessive" %} checked {% endif %} /> Summative
-                <input type="radio" name="penalty_preference" value="custom" {% if pset.penalty_preference == "custom" %} checked {% endif %} /> Custom
+                <input type="radio" name="assessment_type" value="formative" {% if pset.penalty_preference == "formative" %} checked {% endif %}/> Formative
+                <input type="radio" name="assessment_type" value="assessive" {% if pset.penalty_preference == "assessive" %} checked {% endif %} /> Summative
             </div>
         </div>
         <div class="control-group">
@@ -75,7 +74,7 @@
             <label class="control-label">Late Penalty</label>
             <div class="controls">
                 <input type="number" name="late_penalty" value="{{pset.late_penalty}}"/>% 
-                <span class="help-block">Penalty for submitting between grace period and partial credit deadline</span>
+                <span class="help-block">Penalty for submitting between the end of grace period and partial credit deadline</span>
             </div>
         </div>
         <h4><a data-toggle="collapse" data-target="#advanced-options">Advanced Options</a></h4>

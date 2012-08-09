@@ -7,11 +7,11 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
         videos = Video.objects.getByCourse(course=common_page_data['course'])
         problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
-        
+
         index = 0
         for section in sections:
             section_dict = {'section':section, 'items':[]}
-            
+
             if get_video_content:
                 for video in videos:
                     if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
@@ -21,8 +21,8 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
                             video_rec = video_recs[0]
                             item['video_rec'] = video_rec
                             item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
-                                
-                        
+
+
                         live_status = ''
                         if common_page_data['course_mode'] == 'staging':
                             prod_video = video.image
@@ -39,44 +39,44 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
                                 else:
                                     live_status = "<span style='color:green;'>Live</span>"
                         item['live_status'] = live_status
-                    
+
                         section_dict['items'].append(item)
-            
+
             if get_pset_content:
                 for problem_set in problem_sets:
                     if problem_set.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (problem_set.live_datetime and problem_set.live_datetime < common_page_data['effective_current_datetime'])):
                         item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
-                        
-                        exercises = problem_set.exercise_set.all()
-                        numQuestions = len(exercises)
-                        #Starting values are total questions and will be subtracted from
-                        numCompleted = numQuestions
-                        numCorrect = numQuestions
-                        for exercise in exercises:
-                            attempts = exercise.problemactivity_set.filter(student = common_page_data['request'].user).exclude(attempt_content="hint")
+#
+#                        exercises = problem_set.exercise_set.all()
+#                        numQuestions = len(exercises)
+#                        #Starting values are total questions and will be subtracted from
+#                        numCompleted = numQuestions
+#                        numCorrect = numQuestions
+#                        for exercise in exercises:
+#                            attempts = exercise.problemactivity_set.filter(student = common_page_data['request'].user).exclude(attempt_content="hint")
 
-                            #Counts the completed problems by subtracting all without a student activity recorded for it
-                            if len(attempts) == 0:
-                                numCompleted -= 1
+#                            #Counts the completed problems by subtracting all without a student activity recorded for it
+#                            if len(attempts) == 0:
+#                                numCompleted -= 1
 
-                            #Add one to the number of correctly answered questions if the first attempt is correct
-                            attempts.filter(attempt_number = 1)
-                            for attempt in attempts:
-                                if attempt.complete == 0:
-                                    numCorrect -= 1
-                                    break
+#                            #Add one to the number of correctly answered questions if the first attempt is correct
+#                            attempts.filter(attempt_number = 1)
+#                            for attempt in attempts:
+#                                if attempt.complete == 0:
+#                                    numCorrect -= 1
+#                                    break
 
-                        #Divide by zero safety check
-                        if numQuestions == 0:
-                            progress = 0
-                        else:
-                            progress = 100.0*numCompleted/numQuestions
-                        
-                        item['numQuestions'] = numQuestions
-                        item['numCompleted'] = numCompleted
-                        item['numCorrect'] = numCorrect
-                        item['progress'] = progress
-                        
+#                        #Divide by zero safety check
+#                        if numQuestions == 0:
+#                            progress = 0
+#                        else:
+#                            progress = 100.0*numCompleted/numQuestions
+
+#                        item['numQuestions'] = numQuestions
+#                        item['numCompleted'] = numCompleted
+#                        item['numCorrect'] = numCorrect
+#                        item['progress'] = progress
+
                         live_status = ''
                         if common_page_data['course_mode'] == 'staging':
                             prod_problem_set = problem_set.image
@@ -93,12 +93,12 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
                                 else:
                                     live_status = "<span style='color:green;'>Live</span>"
                         item['live_status'] = live_status
-                        
+
                         section_dict['items'].append(item)
-            
+
             if common_page_data['course_mode'] == 'staging' or len(section_dict['items']) > 0:
-                section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index']) 
+                section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index'])
                 section_structures.append(section_dict)
                 index += 1
-                
+
     return section_structures

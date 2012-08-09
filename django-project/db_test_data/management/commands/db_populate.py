@@ -193,6 +193,8 @@ def create_course(data, users):
         create_video(dicts[i], users)
 
     # Create problem sets
+    #Kelvin - Stopping the creation of problem sets because there's no easy way to add a file and you
+    #can already use the gui to add problem sets and pick your own exercises.
     data['course'] = course
     data['section'] = sections[0]
     data['index'] = 3

@@ -122,7 +122,7 @@ try:
         class2go_mode
 except NameError:
         class2go_mode = 'dev'
-        
+
 
 INSTALLED_APPS = (
                       'django.contrib.auth',
@@ -147,13 +147,13 @@ INSTALLED_APPS = (
                       'problemsets',
                       'django.contrib.flatpages',
                       'storages',
-                      ) 
+                      )
 if class2go_mode != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
                        )
 
-if class2go_mode == 'prod': 
+if class2go_mode == 'prod':
     file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
     AWS_STORAGE_BUCKET_NAME = 'prod-c2g'
 elif class2go_mode == 'stage':
@@ -162,9 +162,8 @@ elif class2go_mode == 'stage':
 else:
     # use local storage instead of S3
     file_storage_lib = 'django.core.files.storage.FileSystemStorage'
-    
-DEFAULT_FILE_STORAGE = file_storage_lib
 
+DEFAULT_FILE_STORAGE = file_storage_lib
 
 
 #This states that app c2g's UserProfile model is the profile for this site.
