@@ -95,7 +95,7 @@ def create_action(request):
                    due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M'),
                    grace_period = datetime.strptime(request.POST['grace_period'],'%m/%d/%Y %H:%M'),
                    partial_credit_deadline = datetime.strptime(request.POST['partial_credit_deadline'],'%m/%d/%Y %H:%M'),
-                   penalty_preference = request.POST['penalty_preference'],
+                   assessment_type = request.POST['assessment_type'],
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
                    resubmission_penalty = request.POST['resubmission_penalty'],
@@ -144,7 +144,7 @@ def edit_action(request):
     pset.due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M')
     pset.grace_period = datetime.strptime(request.POST['grace_period'],'%m/%d/%Y %H:%M')
     pset.partial_credit_deadline = datetime.strptime(request.POST['partial_credit_deadline'],'%m/%d/%Y %H:%M')
-    pset.penalty_preference = request.POST['penalty_preference']
+    pset.assessment_type = request.POST['assessment_type']
     pset.late_penalty = request.POST['late_penalty']
     pset.submissions_permitted = request.POST['submissions_permitted']
     pset.save()
