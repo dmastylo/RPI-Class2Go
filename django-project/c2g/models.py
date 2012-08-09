@@ -26,8 +26,12 @@ import os
 from django.core.files.storage import FileSystemStorage
 
 def get_file_path(instance, filename):
+    parts = str(instance.handle).split("-")
     if isinstance(instance, Exercise):
-        return os.path.join(str(instance.id), 'exercises', filename)
+        return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
+    if isinstance(instance, Video):
+        return os.path.join(str(parts[0]), str(parts[1]), 'videos', filename)
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -391,7 +395,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     url = models.CharField(max_length=255, null=True)
     duration = models.IntegerField(null=True)
     slug = models.SlugField("URL Name", max_length=255, null=True)
-    file = models.FileField(upload_to='video_files')
+    file = models.FileField(upload_to=get_file_path)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
 #    kelvinator = models.IntegerField("K-Threshold", default=15)
     objects = GetVideosByCourse()
 
@@ -594,6 +599,7 @@ class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
     file = models.FileField(upload_to=get_file_path, null=True)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
     def __unicode__(self):
         return self.fileName
     class Meta:

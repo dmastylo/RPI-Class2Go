@@ -183,6 +183,7 @@ def add_exercise(request):
     file_name = file_content.name
 
     exercise = Exercise()
+    exercise.handle = request.POST['course_prefix'] + '-' + request.POST['course_suffix']
     exercise.fileName = file_name
     exercise.file.save(file_name, file_content)
     exercise.save()
