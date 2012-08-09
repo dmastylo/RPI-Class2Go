@@ -31,7 +31,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
         raise Http404
 
     ps = common_page_data['course'].problemset_set.get(slug=pset_slug)
-    #path = ProblemSet.objects(
+#    ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
                                'pset': ps,
@@ -42,10 +42,11 @@ def show(request, course_prefix, course_suffix, pset_slug):
 @csrf_exempt
 def attempt(request, problemId):
     user = request.user
-    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
+#    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+#    exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
+    exercise_relationship = ProblemSetToExercise.objects.get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'])
     problem_activity = ProblemActivity(student = user,
-                                        exercise = exercise,
+                                        exercise_relationship = exercise_relationship,
                                         complete = request.POST['complete'],
                                         attempt_content = request.POST['attempt_content'],
                                         count_hints = request.POST['count_hints'],
@@ -70,12 +71,14 @@ def create_form(request, course_prefix, course_suffix):
     except:
         raise Http404
     content_sections = common_page_data['course'].contentsection_set.all()
+    current_datetime = datetime.today().strftime('%m/%d/%Y %H:%M')
     return render_to_response('problemsets/create.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
-                                'content_sections': content_sections
+                                'content_sections': content_sections,
+                                'current_datetime': current_datetime
                             },
                             context_instance=RequestContext(request))
 
@@ -88,7 +91,6 @@ def create_action(request):
                    slug = request.POST['slug'],
                    path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+request.POST['slug']+"/load_problem_set",
                    title = request.POST['title'],
-                   description = request.POST['description'],
                    live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M'),
                    due_date = datetime.strptime(request.POST['due_date'],'%m/%d/%Y %H:%M'),
                    grace_period = datetime.strptime(request.POST['grace_period'],'%m/%d/%Y %H:%M'),
@@ -97,8 +99,12 @@ def create_action(request):
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
                    resubmission_penalty = request.POST['resubmission_penalty'],
-                   randomize = False,
                    mode = 'staging')
+    #Optional fields that may or may not be passed in the request
+    try:
+        pset.description = request.POST['description']
+    except:
+        pass
     pset.save()
     pset.create_production_instance()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
