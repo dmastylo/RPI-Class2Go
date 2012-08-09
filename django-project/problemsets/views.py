@@ -100,7 +100,10 @@ def create_action(request):
                    randomize = False,
                    mode = 'staging')
     pset.save()
-    pset.create_production_instance()
+    
+    # @deprecated: We want production instance to be created on first publish
+    #pset.create_production_instance()
+    
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 def edit_form(request, course_prefix, course_suffix, pset_slug):

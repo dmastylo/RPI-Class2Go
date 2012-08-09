@@ -38,7 +38,9 @@ def add_video(request):
         index=index
     )
     staging_video.save()
-    staging_video.create_production_instance()
+    
+    # @deprecated: We want production instance to be created on first publish
+    #staging_video.create_production_instance()
     
     return redirect(request.META['HTTP_REFERER'])
 

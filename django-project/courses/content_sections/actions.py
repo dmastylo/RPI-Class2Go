@@ -12,7 +12,7 @@ def save_order(request):
         redirect('courses.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'])
     
     sections = ContentSection.objects.filter(course=common_page_data['staging_course'])
-    import pdb; pdb.set_trace();
+    
     for section in sections:
         section.index = request.POST.get("order_"+str(section.id))
         section.save()

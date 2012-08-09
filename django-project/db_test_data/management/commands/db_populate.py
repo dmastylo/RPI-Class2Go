@@ -29,10 +29,14 @@ def delete_db_data():
 
     # Nuke the data that we create below.  Order doesn't seem to matter.
     Course.objects.all().delete()
+    AdditionalPage.objects.all().delete()
+    Announcement.objects.all().delete()
+    ContentSection.objects.all().delete()
+    ProblemSet.objects.all().delete()
+    Video.objects.all().delete()
     ProblemSetToExercise.objects.all().delete()
     Exercise.objects.all().delete()
     ProblemActivity.objects.all().delete()
-    Announcement.objects.all().delete()
     NewsEvent.objects.all().delete()
 
     Group.objects.all().delete()

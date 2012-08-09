@@ -198,6 +198,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -221,14 +222,14 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-    def getCourseAdditionalPages(self,course):
-        now = datetime.now()
-        pages = []
-        all_pages = AdditionalPage.objects.filter(course=course)
-        for page in pages:
-            if page.is_deleted == 0 and (course.mode == 'staging' or page.live_datetime < now):
-                pages.append(page)
-        return pages
+        
+    def is_synched(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
 
     class Meta:
         db_table = u'c2g_additional_pages'
@@ -266,6 +267,7 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -285,6 +287,14 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
             self.description = production_instance.description
 
         self.save()
+        
+    def is_synched(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
 
     class Meta:
         db_table = u'c2g_announcements'
@@ -409,6 +419,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -434,7 +445,15 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
                 self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
-
+        
+    def is_synched(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
+        
     def __unicode__(self):
         return self.title
 
@@ -511,6 +530,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -540,7 +560,15 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.slug = production_instance.slug
         if not clone_fields or 'index' in clone_fields:
             self.index = production_instance.index
-
+            
+    def is_synched(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
+        
     def __unicode__(self):
         return self.title
     class Meta:
