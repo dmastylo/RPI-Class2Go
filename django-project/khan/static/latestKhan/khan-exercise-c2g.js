@@ -2666,7 +2666,7 @@ var Khan = (function() {
         var request = {
             // Do a request to the server API
             //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
-            url: "/problemsets/attempt/2/",
+            url: "/problemsets/attempt/2",
             type: "POST",
             data: data,
             dataType: "text",
@@ -2675,6 +2675,9 @@ var Khan = (function() {
             // Backup the response locally, for later use
             success: function(data) {
                 //alert(data)
+                if (data == "complete") {
+                    $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                }
 
                 // Tell any listeners that khan-exercises has new
                 // userExercise data
@@ -2988,6 +2991,16 @@ var Khan = (function() {
 
             var currentQCard = $('.current-question');
 
+            var userAnswer;
+            if ($('input#testinput').length) { 
+                userAnswer = $('input#testinput').val();
+            } else if ($('input:radio[name=solution]').length) {
+                userAnswer = $('input:radio[name=solution]:checked').val();
+            } else {
+                userAnswer = '';
+            }
+            
+            currentQCard.data('userAnswer', userAnswer);
             currentQCard.removeClass('current-question');
 
             $('#questions-unviewed li:first-child').trigger('mouseout');
@@ -3029,6 +3042,14 @@ var Khan = (function() {
             $(this).addClass('current-question');
             clearExistingProblem();
             makeProblem($(this).data('problem'), $(this).data('randseed'));
+            
+            var userAnswer = $(this).data('userAnswer');
+
+            if ($('input#testinput').length) { 
+                $('input#testinput').val(userAnswer);
+            } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
+                $('input:radio[name=solution]')[userAnswer].checked = true;
+            }
 
         };
 
