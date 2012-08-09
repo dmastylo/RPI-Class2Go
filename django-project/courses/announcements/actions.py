@@ -25,8 +25,7 @@ def add_announcement(request):
     )
     announcement.save()
     
-    # @deprecated: We want production instance to be created on first publish
-    #announcement.create_production_instance()
+    announcement.create_production_instance()
     
     if request.POST.get("commit") == '1':
         announcement.commit()

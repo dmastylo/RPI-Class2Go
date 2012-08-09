@@ -2,7 +2,6 @@
 
 from database import *
 from os import path
-import socket
 #ADDED FOR url tag future
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
@@ -42,7 +41,11 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+# If you upload files from a dev machine, set MEDIA_ROOT to be the root dir for the file
+# uploads. If you do this, set in in database.py; not this file.
+#Also, if you set it in database.py, don't uncomment the following line as settings.py
+#runs after database.py
+#MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -113,8 +116,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages'
 )
 
-hostname = socket.gethostname()
-#We do not want db_test_data app installed on production.
+# the mode should be set in your database.py, but if it's not, assume
+# we're in a dev environment (careful!)
+try:
+        class2go_mode
+except NameError:
+        class2go_mode = 'dev'
+
 
 INSTALLED_APPS = (
                       'django.contrib.auth',
@@ -140,16 +148,23 @@ INSTALLED_APPS = (
                       'django.contrib.flatpages',
                       'storages',
                       )
-if (hostname != "productionserver"):
+if class2go_mode != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
                        )
 
-# S3 Storage Setting
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-AWS_ACCESS_KEY_ID = 'AKIAIYES3HTY3TOMHCTQ'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'stage.c2g'
+if class2go_mode == 'prod':
+    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
+    AWS_STORAGE_BUCKET_NAME = 'prod-c2g'
+elif class2go_mode == 'stage':
+    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
+    AWS_STORAGE_BUCKET_NAME = 'stage-c2g'
+else:
+    # use local storage instead of S3
+    file_storage_lib = 'django.core.files.storage.FileSystemStorage'
+
+DEFAULT_FILE_STORAGE = file_storage_lib
+
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'

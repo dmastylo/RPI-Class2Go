@@ -20,8 +20,7 @@ def add(request):
     staging_page = AdditionalPage(course=common_page_data['staging_course'], title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='staging')
     staging_page.save()
     
-    # @deprecated: We want production instance to be created on first publish
-    #staging_page.create_production_instance()
+    staging_page.create_production_instance()
     
     return redirect(request.META['HTTP_REFERER'])
     

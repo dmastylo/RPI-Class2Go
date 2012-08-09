@@ -69,7 +69,7 @@
             <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
             {% ifnotequal page.slug 'overview' %}
                 <input type="button" class="btn" style="margin-left: 40px;" value="Delete page" onclick="if(confirm('Are you sure you want to delete this page?')) {document.forms.delete_page_form.submit()}" />
-            {% endif %}
+            {% endifnotequal %}
         </div>
     </form>
     <script type="text/javascript">

@@ -64,7 +64,7 @@ def save_content_order(request):
         return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
         
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True)
-    #import pdb; pdb.set_trace();
+    
     for section_structure in section_structures:
         if section_structure['section'].id == long(request.POST.get("section_id")):
             for item in section_structure['items']:

@@ -54,48 +54,6 @@ def main(request, course_prefix, course_suffix):
 
             context_instance=RequestContext(request))
 
-def overview(request, course_prefix, course_suffix):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
-
-    if request.method == 'POST':
-        if request.POST.get("revert") == '1':
-            common_page_data['staging_course'].description = common_page_data['production_course'].description
-            common_page_data['staging_course'].save()
-        else:
-            common_page_data['staging_course'].description = request.POST.get("description")
-            common_page_data['staging_course'].save()
-            if request.POST.get("commit") == '1':
-                common_page_data['production_course'].description = common_page_data['staging_course'].description
-                common_page_data['production_course'].save()
-
-    return render_to_response('courses/overview.html',
-            {'common_page_data': common_page_data},
-            context_instance=RequestContext(request))
-
-def syllabus(request, course_prefix, course_suffix):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
-
-    if request.method == 'POST':
-        if request.POST.get("revert") == '1':
-            common_page_data['staging_course'].syllabus = common_page_data['production_course'].syllabus
-            common_page_data['staging_course'].save()
-        else:
-            common_page_data['staging_course'].syllabus = request.POST.get("syllabus")
-            common_page_data['staging_course'].save()
-            if request.POST.get("commit") == '1':
-                common_page_data['production_course'].syllabus = common_page_data['staging_course'].syllabus
-                common_page_data['production_course'].save()
-
-    return render_to_response('courses/syllabus.html',
-            {'common_page_data': common_page_data},
-            context_instance=RequestContext(request))
-
 def course_materials(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -104,5 +62,5 @@ def course_materials(request, course_prefix, course_suffix):
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True)
 
-    return render_to_response('courses/'+common_page_data['course_mode']+'/course_materials.html', {'common_page_data': common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
+    return render_to_response('courses/'+common_page_data['course_mode']+'/course_materials.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'course_materials'}, context_instance=RequestContext(request))
 
