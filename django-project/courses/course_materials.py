@@ -31,7 +31,7 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
                                     visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
                                     visible_status = "<span style='color:green;'>Open</span>"
-                                    
+
                             item['visible_status'] = visible_status
                         else:
                             video_recs = VideoActivity.objects.filter(video=video, student=common_page_data['request'].user)
@@ -61,39 +61,39 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
                                     visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
                                     visible_status = "<span style='color:green;'>Open</span>"
-                                    
+
                             item['visible_status'] = visible_status
-                        else:
-                            exercises = problem_set.exercise_set.all()
-                            numQuestions = len(exercises)
-                            #Starting values are total questions and will be subtracted from
-                            numCompleted = numQuestions
-                            numCorrect = numQuestions
-                            for exercise in exercises:
-                                attempts = exercise.problemactivity_set.filter(student = common_page_data['request'].user).exclude(attempt_content="hint")
+#                        else:
+#                            exercises = problem_set.exercise_set.all()
+#                            numQuestions = len(exercises)
+#                             #Starting values are total questions and will be subtracted from
+#                            numCompleted = numQuestions
+#                            numCorrect = numQuestions
+#                            for exercise in exercises:
+#                                attempts = exercise.problemactivity_set.filter(student = common_page_data['request'].user).exclude(attempt_content="hint")
 
-                                #Counts the completed problems by subtracting all without a student activity recorded for it
-                                if len(attempts) == 0:
-                                    numCompleted -= 1
+#                               #Counts the completed problems by subtracting all without a student activity recorded for it
+#                                if len(attempts) == 0:
+#                                    numCompleted -= 1
 
-                                #Add one to the number of correctly answered questions if the first attempt is correct
-                                attempts.filter(attempt_number = 1)
-                                for attempt in attempts:
-                                    if attempt.complete == 0:
-                                        numCorrect -= 1
-                                        break
+#                                #Add one to the number of correctly answered questions if the first attempt is correct
+#                                attempts.filter(attempt_number = 1)
+#                                for attempt in attempts:
+#                                    if attempt.complete == 0:
+#                                        numCorrect -= 1
+#                                        break
 
-                            #Divide by zero safety check
-                            if numQuestions == 0:
-                                progress = 0
-                            else:
-                                progress = 100.0*numCompleted/numQuestions
-                            
-                            item['numQuestions'] = numQuestions
-                            item['numCompleted'] = numCompleted
-                            item['numCorrect'] = numCorrect
-                            item['progress'] = progress
-                        
+#                            #Divide by zero safety check
+#                            if numQuestions == 0:
+#                                progress = 0
+#                            else:
+#                                progress = 100.0*numCompleted/numQuestions
+
+#                            item['numQuestions'] = numQuestions
+#                            item['numCompleted'] = numCompleted
+#                            item['numCorrect'] = numCorrect
+#                            item['progress'] = progress
+
                         section_dict['items'].append(item)
 
             if common_page_data['course_mode'] == 'staging' or len(section_dict['items']) > 0:

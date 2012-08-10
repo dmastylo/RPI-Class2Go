@@ -44,9 +44,9 @@ def attempt(request, problemId):
     user = request.user
 #    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
 #    exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
-    exercise_relationship = ProblemSetToExercise.objects.get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'])
+    problemset_to_exercise = ProblemSetToExercise.objects.get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'])
     problem_activity = ProblemActivity(student = user,
-                                        exercise_relationship = exercise_relationship,
+                                        problemset_to_exercise = problemset_to_exercise,
                                         complete = request.POST['complete'],
                                         attempt_content = request.POST['attempt_content'],
                                         count_hints = request.POST['count_hints'],
@@ -106,9 +106,9 @@ def create_action(request):
     except:
         pass
     pset.save()
-    
+
     pset.create_production_instance()
-    
+
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 def edit_form(request, course_prefix, course_suffix, pset_slug):
@@ -191,7 +191,7 @@ def add_exercise(request):
     exercise.save()
 
     index = len(pset.exercise_set.all())
-    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index)
+    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=False)
     psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
@@ -201,7 +201,7 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()))
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()), is_deleted=False)
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 

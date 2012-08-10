@@ -231,13 +231,13 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-        
+
     def is_synced(self):
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
             return False
-            
+
         return True
 
     class Meta:
@@ -296,13 +296,13 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
             self.description = production_instance.description
 
         self.save()
-        
+
     def is_synced(self):
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
             return False
-            
+
         return True
 
     class Meta:
@@ -456,15 +456,15 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 #entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
                 #self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
-        
+
     def is_synced(self):
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
             return False
-            
+
         return True
-        
+
     def __unicode__(self):
         return self.title
 
@@ -575,6 +575,18 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         production_instance.save()
 
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+        #Delete all previous relationships
+        for production_psetToEx in production_psetToExs:
+            production_psetToEx.is_deleted = True
+            production_psetToEx.save()
+
+        #Create brand new copies of staging relationships
+        for staging_psetToEx in staging_psetToExs:
+           production_psetToEx = ProblemSetToExercise(problemSet=production_instance, exercise=staging_psetToEx.exercise, number=staging_psetToEx.number, is_deleted=False)
+           production_psetToEx.save()
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
 
@@ -609,15 +621,15 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.randomize = production_instance.randomize
 
         self.save()
-            
+
     def is_synced(self):
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
             return False
-            
+
         return True
-        
+
     def __unicode__(self):
         return self.title
     class Meta:
@@ -639,6 +651,7 @@ class ProblemSetToExercise(models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField()
     def __unicode__(self):
         return self.problemSet.title + "-" + self.exercise.fileName
     class Meta:
@@ -647,7 +660,7 @@ class ProblemSetToExercise(models.Model):
 
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
-     exercise_relationship = models.ForeignKey(ProblemSetToExercise, null=True)
+     problemset_to_exercise = models.ForeignKey(ProblemSetToExercise, null=True)
      problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)
