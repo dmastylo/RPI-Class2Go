@@ -20,4 +20,4 @@ class S3UploadForm(forms.ModelForm):
 
     class Meta:
         model = Video
-        fields = ('section', 'title', 'slug', 'description', 'file')
+        fields = ('title', 'slug', 'section', 'description', 'file')

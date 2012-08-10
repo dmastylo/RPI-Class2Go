@@ -2,17 +2,21 @@
 {% block videos_link_class %}class="active"{% endblock videos_link_class %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
+<div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
-    <h2>Upload videos</h2>
+    <h3>Upload Videos</h3>
 	<form name="upload_form" action="{% url 'courses.videos.actions.upload' %}" method="POST" enctype="multipart/form-data">
 	  {% csrf_token %}
+	  <fieldset class="well">
 	  {% for field in form %}
 	    <div class="fieldWrapper">
 	      {{ field.errors }}
-	      {{ field.label_tag }}: {{ field }}
+	      {{ field.label_tag }}
+	      {{ field }}
+	      <span class="help-block">{{ field.help_text }}</span>
 	    </div>
 	  {% endfor %}
+	  </fieldset>
 	  <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
 	  <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
 	  <input type="submit" value="Upload" class="btn"/>
