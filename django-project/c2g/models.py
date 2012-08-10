@@ -26,7 +26,7 @@ import os
 from django.core.files.storage import FileSystemStorage
 
 def get_file_path(instance, filename):
-    parts = str(instance.handle).split("-")
+    parts = str(instance.handle).split("#$!")
     if isinstance(instance, Exercise):
         return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
     if isinstance(instance, Video):

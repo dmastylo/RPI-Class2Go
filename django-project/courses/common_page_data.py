@@ -4,8 +4,8 @@ import datetime
 
 def get_common_page_data(request, prefix, suffix):
     
-    production_course = Course.objects.get(handle=prefix+"-"+suffix, mode='production')
-    staging_course = Course.objects.get(handle=prefix+"-"+suffix, mode='staging')
+    production_course = Course.objects.get(handle=prefix+"#$!"+suffix, mode='production')
+    staging_course = Course.objects.get(handle=prefix+"#$!"+suffix, mode='staging')
     
     course_mode = 'production'
     course = production_course
