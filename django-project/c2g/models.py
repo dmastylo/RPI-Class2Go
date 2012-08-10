@@ -20,9 +20,18 @@ from datetime import datetime
 
 import gdata.youtube
 import gdata.youtube.service
+import os
 
 # For file system upload
 from django.core.files.storage import FileSystemStorage
+
+def get_file_path(instance, filename):
+    parts = str(instance.handle).split("-")
+    if isinstance(instance, Exercise):
+        return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
+    if isinstance(instance, Video):
+        return os.path.join(str(parts[0]), str(parts[1]), 'videos', filename)
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -198,6 +207,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -221,14 +231,14 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-    def getCourseAdditionalPages(self,course):
-        now = datetime.now()
-        pages = []
-        all_pages = AdditionalPage.objects.filter(course=course)
-        for page in pages:
-            if page.is_deleted == 0 and (course.mode == 'staging' or page.live_datetime < now):
-                pages.append(page)
-        return pages
+        
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
 
     class Meta:
         db_table = u'c2g_additional_pages'
@@ -266,6 +276,7 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -285,6 +296,14 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
             self.description = production_instance.description
 
         self.save()
+        
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
 
     class Meta:
         db_table = u'c2g_announcements'
@@ -386,7 +405,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     url = models.CharField(max_length=255, null=True)
     duration = models.IntegerField(null=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True, unique=True)
-    file = models.FileField(upload_to="videos")
+    file = models.FileField(upload_to=get_file_path)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+#    kelvinator = models.IntegerField("K-Threshold", default=15)
     objects = GetVideosByCourse()
 
     def create_production_instance(self):
@@ -409,6 +430,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -434,7 +456,15 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 #entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
                 #self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
-
+        
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
+        
     def __unicode__(self):
         return self.title
 
@@ -476,7 +506,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
     partial_credit_deadline = models.DateTimeField(null=True, blank=True)
-    penalty_preference = models.CharField(max_length=255)
+    assessment_type = models.CharField(max_length=255)
     late_penalty = models.IntegerField(null=True, blank=True)
     submissions_permitted = models.IntegerField(null=True, blank=True)
     resubmission_penalty = models.IntegerField(null=True, blank=True)
@@ -495,7 +525,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             due_date=self.due_date,
             grace_period=self.grace_period,
             partial_credit_deadline=self.partial_credit_deadline,
-            penalty_preference=self.penalty_preference,
+            assessment_type=self.assessment_type,
             late_penalty=self.late_penalty,
             submissions_permitted=self.submissions_permitted,
             resubmission_penalty=self.resubmission_penalty,
@@ -511,6 +541,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -523,6 +554,24 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             production_instance.slug = self.slug
         if not clone_fields or 'index' in clone_fields:
             production_instance.index = self.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            production_instance.live_datetime = self.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            production_instance.due_date = self.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            production_instance.grace_period = self.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            production_instance.partial_credit_deadline = self.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            production_instance.assessment_type = self.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            production_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            production_instance.submissions_permitted = self.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            production_instance.resubmission_penalty = self.resubmission_penalty
+        if not clone_fields or 'randomize' in clone_fields:
+            production_instance.randomize = self.randomize
 
         production_instance.save()
 
@@ -540,7 +589,35 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.slug = production_instance.slug
         if not clone_fields or 'index' in clone_fields:
             self.index = production_instance.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = production_instance.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            self.due_date = production_instance.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            self.grace_period = production_instance.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            self.partial_credit_deadline = production_instance.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            self.assessment_type = production_instance.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            self.late_penalty = production_instance.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            self.submissions_permitted = production_instance.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            self.resubmission_penalty = production_instance.resubmission_penalty
+        if not clone_fields or 'randomize' in clone_fields:
+            self.randomize = production_instance.randomize
 
+        self.save()
+            
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+            
+        return True
+        
     def __unicode__(self):
         return self.title
     class Meta:
@@ -549,11 +626,14 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
-    file = models.FileField(upload_to='exercise_files', null=True)
+    file = models.FileField(upload_to=get_file_path, null=True)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
     def __unicode__(self):
         return self.fileName
     class Meta:
         db_table = u'c2g_exercises'
+
+
 
 class ProblemSetToExercise(models.Model):
     problemSet = models.ForeignKey(ProblemSet)
@@ -567,7 +647,7 @@ class ProblemSetToExercise(models.Model):
 
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
-     exercise = models.ForeignKey(Exercise, null=True)
+     exercise_relationship = models.ForeignKey(ProblemSetToExercise, null=True)
      problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)

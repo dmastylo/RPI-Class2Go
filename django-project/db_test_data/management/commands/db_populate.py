@@ -29,10 +29,14 @@ def delete_db_data():
 
     # Nuke the data that we create below.  Order doesn't seem to matter.
     Course.objects.all().delete()
+    AdditionalPage.objects.all().delete()
+    Announcement.objects.all().delete()
+    ContentSection.objects.all().delete()
+    ProblemSet.objects.all().delete()
+    Video.objects.all().delete()
     ProblemSetToExercise.objects.all().delete()
     Exercise.objects.all().delete()
     ProblemActivity.objects.all().delete()
-    Announcement.objects.all().delete()
     NewsEvent.objects.all().delete()
 
     Group.objects.all().delete()
@@ -170,7 +174,7 @@ def create_course(data, users):
         'We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!',
     ]
     for i in range(4):
-        create_announcement(course, titles[i], descriptions[i], users['professors'][0])
+        create_announcement(course, titles[i], descriptions[i], i, users['professors'][0])
 
     # Create content sections
     titles = ['NLP Introduction and Regular Expressions', 'Tokenizations and Minimum Edit Distance', 'N-Grams']
@@ -193,6 +197,8 @@ def create_course(data, users):
         create_video(dicts[i], users)
 
     # Create problem sets
+    #Kelvin - Stopping the creation of problem sets because there's no easy way to add a file and you
+    #can already use the gui to add problem sets and pick your own exercises.
     data['course'] = course
     data['section'] = sections[0]
     data['index'] = 3
@@ -258,11 +264,12 @@ def create_course(data, users):
 
 
 
-def create_announcement(course, title, description, owner):
+def create_announcement(course, title, description, index, owner):
     announcement = Announcement(
         course=course,
         title = title,
         description = description,
+        index = index,
         owner = owner,
         mode = 'staging',
     )
@@ -286,7 +293,7 @@ def create_video(data, users):
         course=data['course'],
         section=data['section'],
         title=data['title'],
-        description=data['course'],
+        description=data['description'],
         type=data['type'],
         url=data['url'],
         duration=data['duration'],

@@ -47,6 +47,7 @@
         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
             <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
             <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
+            {% include "announcements/delete_announcement_form.html" %}
         {% endif %}
     </div>
     {% if common_page_data.is_course_admin %}

@@ -10,20 +10,7 @@
         <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
         <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
     </div>
-    <form name="delete_announcement_form" action="{% url 'courses.announcements.actions.delete_announcement' %}" method="POST">
-        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-        <input type="hidden" name="announcement_id" id="announcement_id" />
-        {% csrf_token %}
-    </form>
-    <script type="text/javascript">
-        function DeleteAnnouncement(id) {
-            if (confirm('Are you sure you want to delete this announcement?')) {
-                $('#announcement_id').val(id);
-                document.forms.delete_announcement_form.submit();
-            }
-        }
-    </script>
+    {% include "announcements/delete_announcement_form.html" %}
     {% endif %}
     
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}

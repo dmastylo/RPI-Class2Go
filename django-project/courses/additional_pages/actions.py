@@ -69,6 +69,7 @@ def delete(request):
         return
         
     page.delete()
-    page.image.delete()
+    if page.image:
+        page.image.delete()
     
     return redirect('courses.additional_pages.views.manage_nav_menu', common_page_data['course_prefix'],common_page_data['course_suffix'])

@@ -4,7 +4,29 @@
 {% block course_page_title %}Edit Announcement{% endblock course_page_title %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
+<div id="c2g_layout_m_column" class="span8">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 60%;">
+                {% if announcement.is_synced %}
+                <div class="alert alert-success">
+                    <i class="icon-ok" style="font-size:17px"></i> <strong>Published!</strong> This draft is published.
+                </div>
+                {% else %}
+                <div class="alert">
+                    <i class="icon-random" style="font-size:17px"></i> Draft contains saved changes that have not yet been published.
+                </div>
+                {% endif %}
+            </td>
+            <td style="width: 40%;">
+                <div style="display:inline;float:right;">
+                    <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}">Edit</a>
+                    <a href="javascript:DeleteAnnouncement('{{announcement.id}}')">Delete</a>
+                </div>
+            </td>
+        </tr>
+    </table>
+    
     <form name="edit_announcement_form" action="{% url 'courses.announcements.actions.save_announcement' %}" method="POST">
         Title <input name="title" id="announcement_title" value="{{announcement.title}}"/><br/><br/>
         Description:<br/>
@@ -18,7 +40,9 @@
         
         <input type="button" class="btn btn-primary" value="Save and Publish" onclick="SaveAnnouncement(1,0);" />
         <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement(0,0);" />
-        <input type="button" class="btn" value="Revert" onclick="SaveAnnouncement(0,1);" />
+        {% if announcement.image %}
+            <input type="button" class="btn" value="Revert" onclick="SaveAnnouncement(0,1);" />
+        {% endif %}
         <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
     </form>
     <script type="text/javascript">
