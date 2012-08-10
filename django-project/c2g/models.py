@@ -618,31 +618,32 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
 
     def is_synced(self):
-        if self.title != self.image.title:
+        image = self.image
+        if self.title != image.title:
             return False
-        if self.description != self.image.description:
+        if self.description != image.description:
             return False
-        if self.path != self.image.path:
+        if self.path != image.path:
             return False
-        if self.slug != self.image.slug:
+        if self.slug != image.slug:
             return False
-        if self.index != self.image.index:
+        if self.index != image.index:
             return False
-        if self.live_datetime != self.image.live_datetime:
+        if self.live_datetime != image.live_datetime:
             return False
-        if self.due_date != self.image.due_date:
+        if self.due_date != image.due_date:
             return False
-        if self.grace_period != self.image.grace_period:
+        if self.grace_period != image.grace_period:
             return False
-        if self.partial_credit_deadline != self.image.partial_credit_deadline:
+        if self.partial_credit_deadline != image.partial_credit_deadline:
             return False
-        if self.assessment_type != self.image.assessment_type:
+        if self.assessment_type != image.assessment_type:
             return False
-        if self.late_penalty != self.image.late_penalty:
+        if self.late_penalty != image.late_penalty:
             return False
-        if self.submissions_permitted != self.image.submissions_permitted:
+        if self.submissions_permitted != image.submissions_permitted:
             return False
-        if self.resubmission_penalty != self.image.resubmission_penalty:
+        if self.resubmission_penalty != image.resubmission_penalty:
             return False
 
         return True
