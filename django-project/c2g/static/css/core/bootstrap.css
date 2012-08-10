@@ -771,8 +771,12 @@ label {
   margin-bottom: 5px;
 }
 
+.errorlist {
+  color: red;
+}
+
 .fieldWrapper label {
-  display: inline;
+  font-weight: bold;
 }
 
 .fieldWrapper select {
