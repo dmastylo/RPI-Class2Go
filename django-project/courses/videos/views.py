@@ -1,8 +1,7 @@
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
-from c2g.models import Course, Video
-from django.template import RequestContext
+from c2g.models import Course, Video, VideoToExercise, Exercise
 
 from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
@@ -11,6 +10,8 @@ import datetime
 from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
+
+from django.template import RequestContext
 
 def list(request, course_prefix, course_suffix):
     try:
@@ -119,3 +120,24 @@ def upload(request, course_prefix, course_suffix):
     return render_to_response('videos/upload.html',
                               data,
                               context_instance=RequestContext(request))
+
+
+def manage_exercises(request, course_prefix, course_suffix, video_slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    video = Video.objects.get(course=common_page_data['course'], slug=video_slug)
+    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('number')
+    added_exercises = video.exercise_set.all()
+    exercises = Exercise.objects.filter(video__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
+    return render_to_response('problemsets/manage_exercises.html',
+                            {'request': request,
+                                'common_page_data': common_page_data,
+                                'course_prefix': course_prefix,
+                                'course_suffix': course_suffix,
+                                'video': video,
+                                'videoToExs': videoToExs,
+                                'exercises': exercises
+                            },
+                            context_instance=RequestContext(request))
