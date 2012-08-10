@@ -25,7 +25,6 @@ def list(request, course_prefix, course_suffix):
         video.url = request.GET['id']
         video.save()
         video.create_production_instance()
-        print "WADIDOD"
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=False)
     

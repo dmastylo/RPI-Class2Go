@@ -404,7 +404,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
     duration = models.IntegerField(null=True)
-    slug = models.SlugField("URL Name", max_length=255, null=True)
+    slug = models.SlugField("URL Identifier", max_length=255, null=True, unique=True)
     file = models.FileField(upload_to=get_file_path)
     handle = models.CharField(max_length=255, null=True, db_index=True)
 #    kelvinator = models.IntegerField("K-Threshold", default=15)

@@ -137,7 +137,7 @@ def upload(request):
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
 
     data = {'common_page_data': common_page_data}
-    
+
     if request.method == 'POST':
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'])
         if form.is_valid():
