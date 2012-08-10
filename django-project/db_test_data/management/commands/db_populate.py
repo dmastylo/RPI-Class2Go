@@ -106,7 +106,7 @@ def create_courses(institutions,users):
         'calendar_start': datetime(2012, 7, 27),
         'calendar_end': datetime(2012, 8, 12),
         'list_publicly': 1,
-        'handle':'nlp-Fall2012',
+        'handle':'nlp#$!Fall2012',
         'members': users,
     }
     create_course(data, users)

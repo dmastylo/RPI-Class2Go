@@ -52,7 +52,8 @@
                             <option value="staging" {% ifequal common_page_data.course_mode 'staging' %}selected{% endifequal %}>Draft</option>
                             <option value="production" {% ifequal common_page_data.course_mode 'production' %}selected{% endifequal %}>Published</option>
                         </select>
-                        <input type="hidden" name="handle" value="{{common_page_data.course_prefix}}-{{common_page_data.course_suffix}}"/>
+                        <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+                        <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
                         {% csrf_token %}
                     </form>
                 </li>
