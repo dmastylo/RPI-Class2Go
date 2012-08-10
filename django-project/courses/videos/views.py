@@ -130,7 +130,7 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
     videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('number')
     added_exercises = video.exercise_set.all()
     exercises = Exercise.objects.filter(video__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
-    return render_to_response('problemsets/manage_exercises.html',
+    return render_to_response('videos/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
