@@ -71,7 +71,11 @@ prefix for these.
     be inside the virtualenv)
     easy_install South
 
-14. Setup initial db.
+14. Install modules for Amazon S3
+    pip install django_storages
+    pip install boto
+ 
+15. Setup initial db.
     ./manage.py syncdb
     ./manage.py migrate
 
@@ -111,6 +115,8 @@ Requirements
 		easy_install
 		pip
 		python image library (pip install PIL)
+        django_storages
+        boto
 
 02. Install South, the database schema migration tool: (this will be inside the virtualenv)
     easy_install South
@@ -210,30 +216,34 @@ pip install PIL
 20. Install South db stuff:
 pip install South
 
-21. Go to django-project dir and copy over database settings file:
+21. Install modules for Amazon S3
+pip install django_storages
+pip install boto
+
+22. Go to django-project dir and copy over database settings file:
 cd django-project/
 cp database_example.py database.py
 
-22. Edit file and add db name, username and password:
+23. Edit file and add db name, username and password:
 vim database.py 
 
-23. Run syncdb to create database tables 
+24. Run syncdb to create database tables 
 ./manage.py syncdb
 Might need to issue "syncdb" command a couple times if there are errors; The first time, it will ask you for username and password for the database 
 
-24. Migrate user stuff over: 
+25. Migrate user stuff over: 
 ./manage.py migrate
 
-25. Update settings file and add "static/" for STATIC_ROOT_DIR:
+26. Update settings file and add "static/" for STATIC_ROOT_DIR:
 vim settings.py
 
-26. Make sure directory exists, or create it:
+27. Make sure directory exists, or create it:
 mkdir static
 
-27. Run collectstatic to copy stuff into your dir:
+28. Run collectstatic to copy stuff into your dir:
 ./manage.py collectstatic
 
-28. Run server on whatever port you want:
+29. Run server on whatever port you want:
 python manage.py runserver 8100
 
 
