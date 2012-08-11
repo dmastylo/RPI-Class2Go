@@ -174,7 +174,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     class Meta:
         db_table = u'c2g_courses'
 
-class GetAdditionalPagesByCourse(models.Manager):
+class GetContentSectionsByCourse(models.Manager):
     def getByCourse(self, course):
         all_items = self.filter(course=course).order_by('index')
         now = datetime.now()
@@ -184,8 +184,83 @@ class GetAdditionalPagesByCourse(models.Manager):
                 returned_items.append(item)
         return returned_items
 
+class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    objects = GetContentSectionsByCourse()
+
+    def create_production_instance(self):
+        production_instance = ContentSection(
+            course=self.course.image,
+            title=self.title,
+            index=self.index,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
+
+        self.save()
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        db_table = u'c2g_content_sections'
+        
+class GetAdditionalPagesByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0:
+                returned_items.append(item)
+        return returned_items
+        
+    def getByCourseAndMenuSlug(self, course, menu_slug):
+        all_items = self.filter(course=course).order_by('index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0 and item.menu_slug == menu_slug:
+                returned_items.append(item)
+        return returned_items
+        
+    def getSectionPagesByCourse(self, course):
+        all_items = self.filter(course=course).order_by('section','index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0 and item.section:
+                returned_items.append(item)
+        return returned_items
+
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
+    menu_slug = models.CharField(max_length=255, null=True, blank=True)
+    section = models.ForeignKey(ContentSection, null=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     slug = models.CharField(max_length=255, null=True, blank=True)
@@ -307,61 +382,6 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
 
     class Meta:
         db_table = u'c2g_announcements'
-
-class GetContentSectionsByCourse(models.Manager):
-    def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
-
-class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
-    course = models.ForeignKey(Course, db_index=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    objects = GetContentSectionsByCourse()
-
-    def create_production_instance(self):
-        production_instance = ContentSection(
-            course=self.course.image,
-            title=self.title,
-            index=self.index,
-            mode='production',
-            image=self,
-        )
-        production_instance.save()
-        self.image=production_instance
-        self.save()
-
-    def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
-        if not clone_fields or 'index' in clone_fields:
-            production_instance.index = self.index
-
-        production_instance.save()
-
-    def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
-
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
-        if not clone_fields or 'index' in clone_fields:
-            self.index = production_instance.index
-
-        self.save()
-
-    def __unicode__(self):
-        return self.title
-
-    class Meta:
-        db_table = u'c2g_content_sections'
 
 class StudentSection(TimestampMixin, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
