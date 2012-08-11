@@ -24,6 +24,7 @@ def add_announcement(request):
         owner=request.user,
     )
     announcement.save()
+    
     announcement.create_production_instance()
     
     if request.POST.get("commit") == '1':
@@ -64,7 +65,9 @@ def delete_announcement(request):
 
     announcement = Announcement.objects.get(id=request.POST.get("announcement_id"))
     announcement.delete()
-    announcement.image.delete()
+    
+    if announcement.image:
+        announcement.image.delete()
     
     return redirect('courses.announcements.views.list', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     

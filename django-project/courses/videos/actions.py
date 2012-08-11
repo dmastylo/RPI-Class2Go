@@ -39,6 +39,7 @@ def add_video(request):
         index=index
     )
     staging_video.save()
+    
     staging_video.create_production_instance()
     
     return redirect(request.META['HTTP_REFERER'])
@@ -136,7 +137,7 @@ def upload(request):
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
 
     data = {'common_page_data': common_page_data}
-    
+
     if request.method == 'POST':
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'])
         if form.is_valid():
@@ -148,9 +149,10 @@ def upload(request):
             new_video.course = common_page_data['course']
             new_video.index = len(Video.objects.filter(course=common_page_data['course']))
             new_video.mode = 'staging'
+            new_video.handle = course_prefix + "#$!" + course_suffix
 
             new_video.save()
-#            new_video.create_production_instance()
+            new_video.create_production_instance()
             print new_video.file.url
 
             video = Video(

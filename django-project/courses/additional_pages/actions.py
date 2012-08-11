@@ -17,7 +17,7 @@ def add(request):
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.view', course_prefix, course_suffix)
     
-    staging_page = AdditionalPage(course=common_page_data['staging_course'], title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='staging')
+    staging_page = AdditionalPage(course=common_page_data['staging_course'], menu_slug='course_info', title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='staging')
     staging_page.save()
     
     staging_page.create_production_instance()
@@ -69,6 +69,7 @@ def delete(request):
         return
         
     page.delete()
-    page.image.delete()
+    if page.image:
+        page.image.delete()
     
     return redirect('courses.additional_pages.views.manage_nav_menu', common_page_data['course_prefix'],common_page_data['course_suffix'])

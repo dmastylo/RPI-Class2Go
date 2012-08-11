@@ -25,11 +25,10 @@ def list(request, course_prefix, course_suffix):
         video.url = request.GET['id']
         video.save()
         video.create_production_instance()
-        print "WADIDOD"
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=False)
     
-    return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures}, context_instance=RequestContext(request))
+    return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'video_list'}, context_instance=RequestContext(request))
     
 def view(request, course_prefix, course_suffix, slug):
     try:

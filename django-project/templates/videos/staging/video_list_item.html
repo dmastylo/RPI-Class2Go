@@ -1,10 +1,22 @@
 <table style="width:100%">
     <tr id="video_{{item.video.id}}">
-        <td width="20"><input type="checkbox" name="video_{{item.video.id}}" id="video_{{item.video.id}}" /></td>
-        <td><i class="icon-facetime-video" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
-        <td width="15%"><label style="color: green; display:inline;"><i class="icon-ok"></i> Synched</label></td>
-        <td width="10%">{% autoescape off %}{{ item.live_status }}{% endautoescape %}</td>
-        <td width="130">
+        <td width="20"><input type="checkbox" name="video_{{item.video.id}}" id="video_{{item.video.id}}" class="item_selector section_{{item.video.section.id}}_item_selector" /></td>
+        <td width="50%"><i class="icon-facetime-video" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
+        <td width="20%">
+            {% if item.video.is_synced %}
+            <div style="color: #00A000; padding: 0px;">
+                <i class="icon-ok" style="font-size:17px"></i> Published
+            </div>
+            {% else %}
+            <div style="color: #A07000; padding: 0px;">
+                <i class="icon-random" style="font-size:17px"></i> Draft has unpublished changes
+            </div>
+            {% endif %}
+        </td>
+        <td style="width: 25%">
+            {% autoescape off %}{{ item.visible_status }}{% endautoescape %}
+        </td>
+        <td width="20">
             <a href="javascript:DeleteVideo('{{item.video.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
         </td>
     </tr>

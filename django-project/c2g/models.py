@@ -20,9 +20,18 @@ from datetime import datetime
 
 import gdata.youtube
 import gdata.youtube.service
+import os
 
 # For file system upload
 from django.core.files.storage import FileSystemStorage
+
+def get_file_path(instance, filename):
+    parts = str(instance.handle).split("#$!")
+    if isinstance(instance, Exercise):
+        return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
+    if isinstance(instance, Video):
+        return os.path.join(str(parts[0]), str(parts[1]), 'videos', filename)
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -165,130 +174,6 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     class Meta:
         db_table = u'c2g_courses'
 
-class GetAdditionalPagesByCourse(models.Manager):
-    def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
-
-class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
-    course = models.ForeignKey(Course, db_index=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
-    slug = models.CharField(max_length=255, null=True, blank=True)
-    objects = GetAdditionalPagesByCourse()
-
-    def create_production_instance(self):
-        production_instance = AdditionalPage(
-            course=self.course.image,
-            title=self.title,
-            description=self.description,
-            slug=self.slug,
-            index=self.index,
-            mode='production',
-            image=self,
-        )
-        production_instance.save()
-        self.image=production_instance
-        self.save()
-
-    def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
-        if not clone_fields or 'description' in clone_fields:
-            production_instance.description = self.description
-        if not clone_fields or 'index' in clone_fields:
-            production_instance.index = self.index
-
-        production_instance.save()
-
-    def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
-
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
-        if not clone_fields or 'description' in clone_fields:
-            self.description = production_instance.description
-        if not clone_fields or 'index' in clone_fields:
-            self.index = production_instance.index
-
-        self.save()
-    def getCourseAdditionalPages(self,course):
-        now = datetime.now()
-        pages = []
-        all_pages = AdditionalPage.objects.filter(course=course)
-        for page in pages:
-            if page.is_deleted == 0 and (course.mode == 'staging' or page.live_datetime < now):
-                pages.append(page)
-        return pages
-
-    class Meta:
-        db_table = u'c2g_additional_pages'
-
-
-class GetAnnouncementsByCourse(models.Manager):
-    def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('-time_created')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
-
-class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
-    owner = models.ForeignKey(User)
-    course = models.ForeignKey(Course, db_index=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
-    objects = GetAnnouncementsByCourse()
-
-    def create_production_instance(self):
-        production_instance = Announcement(
-            course=self.course.image,
-            title=self.title,
-            description=self.description,
-            owner = self.owner,
-            mode='production',
-            image=self,
-        )
-        production_instance.save()
-        self.image=production_instance
-        self.save()
-
-    def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
-        if not clone_fields or 'description' in clone_fields:
-            production_instance.description = self.description
-
-        production_instance.save()
-
-    def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
-
-        production_instance = self.image
-        if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
-        if not clone_fields or 'description' in clone_fields:
-            self.description = production_instance.description
-
-        self.save()
-
-    class Meta:
-        db_table = u'c2g_announcements'
-
 class GetContentSectionsByCourse(models.Manager):
     def getByCourse(self, course):
         all_items = self.filter(course=course).order_by('index')
@@ -343,6 +228,160 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     class Meta:
         db_table = u'c2g_content_sections'
+        
+class GetAdditionalPagesByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0:
+                returned_items.append(item)
+        return returned_items
+        
+    def getByCourseAndMenuSlug(self, course, menu_slug):
+        all_items = self.filter(course=course).order_by('index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0 and item.menu_slug == menu_slug:
+                returned_items.append(item)
+        return returned_items
+        
+    def getSectionPagesByCourse(self, course):
+        all_items = self.filter(course=course).order_by('section','index')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0 and item.section:
+                returned_items.append(item)
+        return returned_items
+
+class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    menu_slug = models.CharField(max_length=255, null=True, blank=True)
+    section = models.ForeignKey(ContentSection, null=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(blank=True)
+    slug = models.CharField(max_length=255, null=True, blank=True)
+    objects = GetAdditionalPagesByCourse()
+
+    def create_production_instance(self):
+        production_instance = AdditionalPage(
+            course=self.course.image,
+            title=self.title,
+            description=self.description,
+            slug=self.slug,
+            index=self.index,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
+
+        self.save()
+
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+
+        return True
+
+    class Meta:
+        db_table = u'c2g_additional_pages'
+
+
+class GetAnnouncementsByCourse(models.Manager):
+    def getByCourse(self, course):
+        all_items = self.filter(course=course).order_by('-time_created')
+        now = datetime.now()
+        returned_items = []
+        for item in all_items:
+            if item.is_deleted == 0:
+                returned_items.append(item)
+        return returned_items
+
+class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
+    owner = models.ForeignKey(User)
+    course = models.ForeignKey(Course, db_index=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(blank=True)
+    objects = GetAnnouncementsByCourse()
+
+    def create_production_instance(self):
+        production_instance = Announcement(
+            course=self.course.image,
+            title=self.title,
+            description=self.description,
+            owner = self.owner,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+
+        self.save()
+
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+
+        return True
+
+    class Meta:
+        db_table = u'c2g_announcements'
 
 class StudentSection(TimestampMixin, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -385,8 +424,10 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
     duration = models.IntegerField(null=True)
-    slug = models.SlugField("URL Name", max_length=255, null=True)
-    file = models.FileField(upload_to='video_files')
+    slug = models.SlugField("URL Identifier", max_length=255, null=True, unique=True)
+    file = models.FileField(upload_to=get_file_path)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+#    kelvinator = models.IntegerField("K-Threshold", default=15)
     objects = GetVideosByCourse()
 
     def create_production_instance(self):
@@ -409,6 +450,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -431,9 +473,17 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if not self.duration:
             if self.type == "youtube" and self.url:
                 yt_service = gdata.youtube.service.YouTubeService()
-                entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
-                self.duration = entry.media.duration.seconds
+                #entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
+                #self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
+
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+
+        return True
 
     def __unicode__(self):
         return self.title
@@ -476,7 +526,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
     partial_credit_deadline = models.DateTimeField(null=True, blank=True)
-    penalty_preference = models.CharField(max_length=255)
+    assessment_type = models.CharField(max_length=255)
     late_penalty = models.IntegerField(null=True, blank=True)
     submissions_permitted = models.IntegerField(null=True, blank=True)
     resubmission_penalty = models.IntegerField(null=True, blank=True)
@@ -495,11 +545,10 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             due_date=self.due_date,
             grace_period=self.grace_period,
             partial_credit_deadline=self.partial_credit_deadline,
-            penalty_preference=self.penalty_preference,
+            assessment_type=self.assessment_type,
             late_penalty=self.late_penalty,
             submissions_permitted=self.submissions_permitted,
             resubmission_penalty=self.resubmission_penalty,
-            randomize=self.randomize,
             index=self.index,
             image = self,
             mode = 'production',
@@ -511,6 +560,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
 
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
@@ -523,8 +573,36 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             production_instance.slug = self.slug
         if not clone_fields or 'index' in clone_fields:
             production_instance.index = self.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            production_instance.live_datetime = self.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            production_instance.due_date = self.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            production_instance.grace_period = self.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            production_instance.partial_credit_deadline = self.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            production_instance.assessment_type = self.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            production_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            production_instance.submissions_permitted = self.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            production_instance.resubmission_penalty = self.resubmission_penalty
 
         production_instance.save()
+
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+        #Delete all previous relationships
+        for production_psetToEx in production_psetToExs:
+            production_psetToEx.is_deleted = True
+            production_psetToEx.save()
+
+        #Create brand new copies of staging relationships
+        for staging_psetToEx in staging_psetToExs:
+           production_psetToEx = ProblemSetToExercise(problemSet=production_instance, exercise=staging_psetToEx.exercise, number=staging_psetToEx.number, is_deleted=False)
+           production_psetToEx.save()
 
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
@@ -540,6 +618,54 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.slug = production_instance.slug
         if not clone_fields or 'index' in clone_fields:
             self.index = production_instance.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = production_instance.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            self.due_date = production_instance.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            self.grace_period = production_instance.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            self.partial_credit_deadline = production_instance.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            self.assessment_type = production_instance.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            self.late_penalty = production_instance.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            self.submissions_permitted = production_instance.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            self.resubmission_penalty = production_instance.resubmission_penalty
+
+        self.save()
+
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+        if self.path != self.image.path:
+            return False
+        if self.slug != self.image.slug:
+            return False
+        if self.index != self.image.index:
+            return False
+        if self.live_datetime != self.image.live_datetime:
+            return False
+        if self.due_date != self.image.due_date:
+            return False
+        if self.grace_period != self.image.grace_period:
+            return False
+        if self.partial_credit_deadline != self.image.partial_credit_deadline:
+            return False
+        if self.assessment_type != self.image.assessment_type:
+            return False
+        if self.late_penalty != self.image.late_penalty:
+            return False
+        if self.submissions_permitted != self.image.submissions_permitted:
+            return False
+        if self.resubmission_penalty != self.image.resubmission_penalty:
+            return False
+
+        return True
 
     def __unicode__(self):
         return self.title
@@ -549,16 +675,20 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     fileName = models.CharField(max_length=255)
-    file = models.FileField(upload_to='exercise_files', null=True)
+    file = models.FileField(upload_to=get_file_path, null=True)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
     def __unicode__(self):
         return self.fileName
     class Meta:
         db_table = u'c2g_exercises'
 
+
+
 class ProblemSetToExercise(models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField()
     def __unicode__(self):
         return self.problemSet.title + "-" + self.exercise.fileName
     class Meta:
@@ -567,7 +697,7 @@ class ProblemSetToExercise(models.Model):
 
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
-     exercise = models.ForeignKey(Exercise, null=True)
+     problemset_to_exercise = models.ForeignKey(ProblemSetToExercise, null=True)
      problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
      attempt_content = models.TextField(null=True, blank=True)
