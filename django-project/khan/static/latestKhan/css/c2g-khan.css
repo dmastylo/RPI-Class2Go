@@ -13,5 +13,6 @@
 #questions-stack #questions-done ol li { /* -webkit-transform:rotate(17deg); -ms-transform:rotate(17deg); -moz-transform:rotate(17deg); -o-transform:rotate(17deg)*/ }
 /* #questions-stack #questions-done ol li:hover{border-color: #000; color:#000;} */
 
-#questions-stack li.current-question { border-color: #cc6200; position: relative; left: .5em; }
-#questions-stack li.correctly-answered { background-color: #afdcaf; color: #070; }
+#questions-stack li.current-question { border-color: #cc6200; position: relative; left: .5em; z-index: 2; }
+#questions-stack li.correctly-answered { background-color: #afdcaf; color: #070; position: relative; }
+#questions-stack li.correctly-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }

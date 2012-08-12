@@ -742,7 +742,24 @@ var Khan = (function() {
 
             if (remoteExercises.length) {
 
-                remoteExercises.each(loadExercise);
+                var controlLoad = function(exArr) {
+                    //console.log(exArr);
+                    if (exArr.length) {
+                        currentEx = exArr.shift();
+                        loadExercise.call(currentEx).done(function () { 
+                            controlLoad(exArr); 
+                        });
+                    } else {
+                        return;
+                    }
+                }
+                controlLoad(remoteExercises.toArray());
+                /*
+                remoteExercises.each(function (idx, elem) {
+                    $.when(loadExercise.call(elem)).done(function () {
+                        console.log('Ex ' + idx + ' executed');});
+                });
+                */
 
             // Only run loadModules if exercises are in the page
             } else if ($("div.exercise").length) {
@@ -1031,7 +1048,6 @@ var Khan = (function() {
 
     function makeProblem(id, seed) {
 
-
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
 
@@ -1065,13 +1081,21 @@ var Khan = (function() {
         // Otherwise we grab a problem at random from the bag of problems
         // we made earlier to ensure that every problem gets shown the
         // appropriate number of times
+
+        // [@wescott] Removing this as we're not dealing with a problemBag at this time
+        /*
         } else if (problemBag.length > 0) {
             problem = problemBag[problemBagIndex];
             id = problem.data("id");
+        */
 
         // No valid problem was found, bail out
+        // [@wescott] Actually, just return first problem
         } else {
-            return;
+            // [@wescott] Don't just return
+            //return;
+            problem = problems[0];
+            id = problem.data("id");
         }
 
         problemID = id;
@@ -2676,7 +2700,7 @@ var Khan = (function() {
             success: function(data) {
                 //alert(data)
                 if (data == "complete") {
-                    $('.current-question').addClass('correctly-answered');
+                    $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                 }
 
                 // Tell any listeners that khan-exercises has new
@@ -2744,7 +2768,9 @@ var Khan = (function() {
         $(Khan).trigger("apiRequestStarted");
     }
 
+    // [@wescott] I added the index to test
     function loadExercise(callback) {
+
         var self = $(this).detach();
         var id = self.data("name");
         var weight = self.data("weight");
@@ -2765,6 +2791,8 @@ var Khan = (function() {
         //
         // C2G: we use a different place for the exercises (originally was with the rest of the static files)
         // since we need to get from S3
+        var dfd = $.Deferred();
+
         $.get(urlBaseExercise + "exercises/" + fileName, function(data, status, xhr) {
             var match, newContents;
 
@@ -2844,8 +2872,10 @@ var Khan = (function() {
 
             }
 
-        });
 
+        }).done(dfd.resolve);
+
+        return dfd.promise();
     }
 
     function loadModules() {
@@ -2924,10 +2954,13 @@ var Khan = (function() {
             // because it messes up problem permalinks (because makeProblemBag
             // calls KhanUtil.random() and changes the seed)
 
+            // [@wescott] Removing problem bag as we don't want randomized problems now
+            /*
             if (Khan.query.problem == null) {
               weighExercises(problems);
               problemBag = makeProblemBag(problems, 10);
             }
+            */
 
 
             // Generate the initial problem when dependencies are done being loaded
@@ -2935,7 +2968,9 @@ var Khan = (function() {
 
             // [@wescott] moves to viewed list, as it's currently being viewed
             var first = $('#questions-viewed li:first-child');
-            makeProblem(first.data('problem'), first.data('randseed'))
+            //makeProblem(first.data('problem'), first.data('randseed'))
+            KhanC2G.problemIdx = 0;
+            makeProblem(KhanC2G.problemIdx);
 
 
         }
@@ -2968,8 +3003,12 @@ var Khan = (function() {
                 //this data 'problem' will be used to index into the problems array
                 //the problems array is a flat array containing all problems from all exercises
                 //we do the counting above to get a problem index in the right range for this exercise
-                li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
-                li.data('randseed',Math.floor(Math.random()*100000));
+
+                // [@wescott] We don't want to randomize anymore, so changing problem to evaluate
+                // to the index
+                //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
+                li.data('problem',idx);
+                //li.data('randseed',Math.floor(Math.random()*100000));
                 if (idx == 0) {
                     $('#questions-viewed ol').append(li);
                 } else {
@@ -3014,7 +3053,9 @@ var Khan = (function() {
             clearExistingProblem();
 
             if (next.length) {
-                makeProblem(next.data('problem'), next.data('randseed'));
+                // [@wescott] Again, we don't need to randomize
+                //makeProblem(next.data('problem'), next.data('randseed'));
+                makeProblem(next.data('problem'));
             }
 
         });
@@ -3041,13 +3082,15 @@ var Khan = (function() {
             $('.current-question').removeClass('current-question');
             $(this).addClass('current-question');
             clearExistingProblem();
-            makeProblem($(this).data('problem'), $(this).data('randseed'));
+            // [@wescott] Changing here again so it doesn't randomize
+            //makeProblem($(this).data('problem'), $(this).data('randseed'));
+            makeProblem($(this).data('problem'));
             
             var userAnswer = $(this).data('userAnswer');
 
             if ($('input#testinput').length) { 
                 $('input#testinput').val(userAnswer);
-            } else if ($('input:radio[name=solution]').length) {
+            } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
                 $('input:radio[name=solution]')[userAnswer].checked = true;
             }
 

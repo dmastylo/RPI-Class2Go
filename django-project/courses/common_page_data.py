@@ -4,8 +4,8 @@ import datetime
 
 def get_common_page_data(request, prefix, suffix):
     
-    production_course = Course.objects.get(handle=prefix+"-"+suffix, mode='production')
-    staging_course = Course.objects.get(handle=prefix+"-"+suffix, mode='staging')
+    production_course = Course.objects.get(handle=prefix+"#$!"+suffix, mode='production')
+    staging_course = Course.objects.get(handle=prefix+"#$!"+suffix, mode='staging')
     
     course_mode = 'production'
     course = production_course
@@ -37,7 +37,7 @@ def get_common_page_data(request, prefix, suffix):
         view_mode = 'view'
     
     # Course info pages
-    course_info_pages = AdditionalPage.objects.getByCourse(course=course)
+    course_info_pages = AdditionalPage.objects.getByCourseAndMenuSlug(course=course, menu_slug='course_info')
         
     current_datetime = datetime.datetime.now()
     effective_current_datetime = current_datetime

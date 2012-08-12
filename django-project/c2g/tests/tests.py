@@ -22,7 +22,7 @@ class C2GUnitTests(TestCase):
         numGroupsB4=len(Group.objects.all())
         i=Institution(title='TestInstitute')
         i.save()
-        course1=Course(institution=i,title='gack',handle='test-course')
+        course1=Course(institution=i,title='gack',handle='test#$!course')
         course1.save()
         course1.title='hack'
         course1.save()
@@ -37,7 +37,7 @@ class C2GUnitTests(TestCase):
         numGroupsB4=len(Group.objects.all())
         i=Institution(title='TestInstitute')
         i.save()
-        course1=Course(institution=i,title='gack',handle='test-course')
+        course1=Course(institution=i,title='gack',handle='test#$!course')
         course1.save()
         numGroupsAfter=len(Group.objects.all())
         self.assertEqual(numGroupsB4+4, numGroupsAfter)
