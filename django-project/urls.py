@@ -114,5 +114,7 @@ urlpatterns = patterns('',
     url(r'^createproblemsetaction/?', 'problemsets.views.create_action'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/edit?$', 'problemsets.views.edit_form'),
     url(r'^editproblemsetaction/?', 'problemsets.views.edit_action'),
+    url(r'^edit_publish_action/?', 'problemsets.views.edit_publish_action'),
     url(r'^save_exercises/?', 'problemsets.views.save_exercises'),
+    url(r'^save_and_publish_exercises/?', 'problemsets.views.save_and_publish_exercises'),
 )
