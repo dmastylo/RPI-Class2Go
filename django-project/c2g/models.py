@@ -228,7 +228,7 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     class Meta:
         db_table = u'c2g_content_sections'
-        
+
 class GetAdditionalPagesByCourse(models.Manager):
     def getByCourse(self, course):
         all_items = self.filter(course=course).order_by('index')
@@ -238,7 +238,7 @@ class GetAdditionalPagesByCourse(models.Manager):
             if item.is_deleted == 0:
                 returned_items.append(item)
         return returned_items
-        
+
     def getByCourseAndMenuSlug(self, course, menu_slug):
         all_items = self.filter(course=course).order_by('index')
         now = datetime.now()
@@ -247,7 +247,7 @@ class GetAdditionalPagesByCourse(models.Manager):
             if item.is_deleted == 0 and item.menu_slug == menu_slug:
                 returned_items.append(item)
         return returned_items
-        
+
     def getSectionPagesByCourse(self, course):
         all_items = self.filter(course=course).order_by('section','index')
         now = datetime.now()
@@ -558,6 +558,17 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
         return production_instance
 
+    def exercises_changed(self):
+        production_instance = self.image
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+        if len(staging_psetToExs) != len(production_psetToExs):
+            return True
+        for staging_psetToEx in staging_psetToExs:
+            if not staging_psetToEx.image:
+                return True
+        return False
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
         if not self.image: self.create_production_instance()
@@ -592,17 +603,25 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         production_instance.save()
 
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
-        #Delete all previous relationships
-        for production_psetToEx in production_psetToExs:
-            production_psetToEx.is_deleted = True
-            production_psetToEx.save()
+        if self.exercises_changed() == True:
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            #Delete all previous relationships
+            for production_psetToEx in production_psetToExs:
+                production_psetToEx.is_deleted = True
+                production_psetToEx.save()
 
         #Create brand new copies of staging relationships
-        for staging_psetToEx in staging_psetToExs:
-           production_psetToEx = ProblemSetToExercise(problemSet=production_instance, exercise=staging_psetToEx.exercise, number=staging_psetToEx.number, is_deleted=False)
-           production_psetToEx.save()
+            for staging_psetToEx in staging_psetToExs:
+                production_psetToEx = ProblemSetToExercise(problemSet = production_instance,
+                                                    exercise = staging_psetToEx.exercise,
+                                                    number = staging_psetToEx.number,
+                                                    is_deleted = False,
+                                                    mode = 'production',
+                                                    image = staging_psetToEx)
+                production_psetToEx.save()
+                staging_psetToEx.image = production_psetToEx
+                staging_psetToEx.save()
 
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
@@ -639,6 +658,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def is_synced(self):
         image = self.image
+        print "hi"
+        if self.exercises_changed() == True:
+            return False
         if self.title != image.title:
             return False
         if self.description != image.description:
@@ -690,6 +712,8 @@ class ProblemSetToExercise(models.Model):
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
     is_deleted = models.BooleanField()
+    image = models.ForeignKey('self',null=True, blank=True)
+    mode = models.TextField(blank=True)
     def __unicode__(self):
         return self.problemSet.title + "-" + self.exercise.fileName
     class Meta:
