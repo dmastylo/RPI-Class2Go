@@ -58,6 +58,7 @@ urlpatterns = patterns('',
     # Additional Pages
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/pages/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.additional_pages.views.main'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/manage_nav_menu/?$', 'courses.additional_pages.views.manage_nav_menu'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/add_section_page/?$', 'courses.additional_pages.views.add_section_page'),
     url(r'^delete_page', 'courses.additional_pages.actions.delete'),
     url(r'^save_page', 'courses.additional_pages.actions.save'),
     url(r'^save_order', 'courses.additional_pages.actions.save_order'),
