@@ -165,7 +165,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     for psetToEx in psetToExs:
         used_exercises.append(psetToEx.exercise.id)
     #Get all the exercises in the course but not in this problem set to list in add from existing
-    exercises = Exercise.objects.filter(problemSet__course=common_page_data['course']).exclude(id__in=used_exercises).distinct()
+    exercises = Exercise.objects.all().filter(problemSet__course=common_page_data['course'])
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
@@ -194,7 +194,7 @@ def add_exercise(request):
     exercise.file.save(file_name, file_content)
     exercise.save()
 
-    index = len(pset.exercise_set.all())
+    index = len(pset.problemsettoexercise_set.all().filter(is_deleted=False))
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=False, mode='staging')
     psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
@@ -205,22 +205,18 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()), is_deleted=False)
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()), is_deleted=False, mode='staging')
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 def save_exercises(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
+    psetToEx = pset.problemsettoexercise_set.all().filter(is_deleted=False).order_by('number')
     for n in range(0,len(psetToEx)):
         listName = "exercise_order[" + str(n) + "]"
         psetToEx[n].number = request.POST[listName]
         psetToEx[n].save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
-
-
-def save_order(request):
-    return HttpResponse("Hu")
 
 
 def read_exercise(request, course_prefix, course_suffix, exercise_name):
@@ -229,7 +225,7 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     except:
         raise Http404
 
-    exercise = Exercise.objects.get(problemSet__course=common_page_data["course"], fileName=exercise_name)
+    exercise = Exercise.objects.distinct().get(problemSet__course=common_page_data["course"], fileName=exercise_name)
 
     # return the contents of the file as an HTTP response.  Trust that it's there.
     #

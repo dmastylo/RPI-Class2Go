@@ -117,7 +117,7 @@ urlpatterns = patterns('',
 
     url(r'^add_problemset_exercise/?$', 'problemsets.views.add_exercise'),
     url(r'^add_existing_problemset_exercises/?$', 'problemsets.views.add_existing_exercises'),
-    url(r'^save_order/?$', 'problemsets.views.save_order'),
+
     url(r'^delete_problemset/?', 'problemsets.actions.delete_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/createproblemset/?$', 'problemsets.views.create_form'),
     url(r'^createproblemsetaction/?', 'problemsets.views.create_action'),

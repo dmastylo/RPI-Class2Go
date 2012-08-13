@@ -624,6 +624,12 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 staging_psetToEx.image = production_psetToEx
                 staging_psetToEx.save()
 
+        else:
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+            for staging_psetToEx in staging_psetToExs:
+                staging_psetToEx.image.number = staging_psetToEx.number
+                staging_psetToEx.image.save()
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
 
@@ -659,7 +665,6 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def is_synced(self):
         image = self.image
-        print "hi"
         if self.exercises_changed() == True:
             return False
         if self.title != image.title:
@@ -688,7 +693,10 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.resubmission_penalty != image.resubmission_penalty:
             return False
-
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+        for staging_psetToEx in staging_psetToExs:
+            if staging_psetToEx.number != staging_psetToEx.image.number:
+                return False
         return True
 
     def __unicode__(self):
