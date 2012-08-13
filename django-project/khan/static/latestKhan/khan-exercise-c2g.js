@@ -743,8 +743,7 @@ var Khan = (function() {
             if (remoteExercises.length) {
 
                 var controlLoad = function(exArr) {
-                    //console.log(exArr);
-                    if (exArr.length) {
+                    if (exArr.length > 0) {
                         currentEx = exArr.shift();
                         loadExercise.call(currentEx).done(function () { 
                             controlLoad(exArr); 
@@ -754,12 +753,14 @@ var Khan = (function() {
                     }
                 }
                 controlLoad(remoteExercises.toArray());
+                
                 /*
                 remoteExercises.each(function (idx, elem) {
                     $.when(loadExercise.call(elem)).done(function () {
                         console.log('Ex ' + idx + ' executed');});
                 });
                 */
+                
 
             // Only run loadModules if exercises are in the page
             } else if ($("div.exercise").length) {
@@ -2768,7 +2769,6 @@ var Khan = (function() {
         $(Khan).trigger("apiRequestStarted");
     }
 
-    // [@wescott] I added the index to test
     function loadExercise(callback) {
 
         var self = $(this).detach();
@@ -2793,6 +2793,7 @@ var Khan = (function() {
         // since we need to get from S3
         var dfd = $.Deferred();
 
+        $.ajaxSetup({timeout:10000});
         $.get(urlBaseExercise + "exercises/" + fileName, function(data, status, xhr) {
             var match, newContents;
 
@@ -2817,7 +2818,6 @@ var Khan = (function() {
             newContents.filter("[data-name]").each(function() {
                 loadExercise.call(this, callback);
             });
-
             // Throw out divs that just load other exercises
             newContents = newContents.not("[data-name]");
 
@@ -2872,8 +2872,8 @@ var Khan = (function() {
 
             }
 
-
-        }).done(dfd.resolve);
+        // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
+        }).done(setTimeout(function () { dfd.resolve(); }, 1000));
 
         return dfd.promise();
     }
