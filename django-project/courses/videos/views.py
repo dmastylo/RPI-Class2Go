@@ -1,5 +1,6 @@
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
 from c2g.models import Course, Video, VideoToExercise, Exercise
 
@@ -147,49 +148,40 @@ def add_exercise(request):
 #    except:
 #        raise Http404
 
-    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    video = Video.objects.get(id=request.POST['video_id'])
 
     file_content = request.FILES['exercise']
     file_name = file_content.name
 
     exercise = Exercise()
-    exercise.handle = request.POST['course_prefix'] + '-' + request.POST['course_suffix']
+    exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
     exercise.fileName = file_name
     exercise.file.save(file_name, file_content)
     exercise.save()
 
-    index = len(pset.exercise_set.all())
-    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=False)
-    psetToEx.save()
-    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+    index = len(video.exercise_set.all())
+    videoToEx = VideoToExercise(video=video, exercise=exercise, number=index, is_deleted=False)
+    videoToEx.save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 
 def add_existing_exercises(request):
-    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    video = Video.objects.get(id=request.POST['video_id'])
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()), is_deleted=False)
-        psetToEx.save()
-    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+        videoToEx = VideoToExercise(video=video, exercise=exercise, number=len(video.exercise_set.all()), is_deleted=False)
+        videoToEx.save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 
 def save_exercises(request):
-    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
-    for n in range(0,len(psetToEx)):
+    video = Video.objects.get(id=request.POST['video_id'])
+    videoToEx = video.videotoexercise_set.all().order_by('number')
+    for n in range(0,len(videoToEx)):
         listName = "exercise_order[" + str(n) + "]"
-        psetToEx[n].number = request.POST[listName]
-        psetToEx[n].save()
-    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+        videoToEx[n].number = request.POST[listName]
+        videoToEx[n].save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
-def list(request, course_prefix, course_suffix):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
-
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
-
-    return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list'}, context_instance=RequestContext(request))
 

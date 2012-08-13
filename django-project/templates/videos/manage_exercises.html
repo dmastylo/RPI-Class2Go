@@ -43,7 +43,7 @@
 
     <form action= {% url 'courses.videos.views.save_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
-        <input type="hidden" name="pset_id" value={{pset.id}}>
+        <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <ul data-sortablecontainer class="exercise-list">

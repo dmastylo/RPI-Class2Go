@@ -701,6 +701,7 @@ class VideoToExercise(models.Model):
     video = models.ForeignKey(Video)
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField()
     def __unicode__(self):
         return self.video.title + "-" + self.exercise.fileName
     class Meta:
