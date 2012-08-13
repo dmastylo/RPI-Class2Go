@@ -17,6 +17,9 @@
                 <input type="file" name="exercise">
                 <input type="submit" value="Add Exercise" class="btn">
             </div>
+            <div>
+                Video Time <input type="text" name="videotime" >
+            </div>
         </div>
     </form>
     
@@ -30,7 +33,9 @@
             <div class="control-group">
                 <div class="controls">
                     {% for exercise in exercises %}
-                    <input type="checkbox" name=exercise value={{exercise.id}} /> {{exercise.fileName}} <br>
+                    <input type="checkbox" name=exercise value={{exercise.id}} /> {{exercise.fileName}} 
+                    Video Time <input type="text" name="videotime_{{exercise.id}}" >
+                    <br>
                     {% empty %}
                     There are no existing exercises
                     {% endfor %}

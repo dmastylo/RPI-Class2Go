@@ -171,9 +171,9 @@ def upload(request):
 
 
 
-            authUrl = GetOAuth2Url(request, new_video)
+     #       authUrl = GetOAuth2Url(request, new_video)
             #eventually should store an access token, so they don't have to give permission everytime
-            return redirect(authUrl)
+     #       return redirect(authUrl)
         #    return redirect("http://" + request.META['HTTP_HOST'])
         
         return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_video.slug)))
