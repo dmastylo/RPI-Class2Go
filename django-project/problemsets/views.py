@@ -159,9 +159,13 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
-    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
-    added_exercises = pset.exercise_set.all()
-    exercises = Exercise.objects.filter(problemSet__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
+    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).filter(is_deleted=False).order_by('number')
+    used_exercises = []
+    #Get the list of exercises currently in this problem set
+    for psetToEx in psetToExs:
+        used_exercises.append(psetToEx.exercise.id)
+    #Get all the exercises in the course but not in this problem set to list in add from existing
+    exercises = Exercise.objects.filter(problemSet__course=common_page_data['course']).exclude(id__in=used_exercises).distinct()
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
@@ -191,7 +195,7 @@ def add_exercise(request):
     exercise.save()
 
     index = len(pset.exercise_set.all())
-    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=False)
+    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=False, mode='staging')
     psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
@@ -239,8 +243,9 @@ def load_problem_set(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
-    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).order_by('number')
+    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).filter(is_deleted=False).order_by('number')
     file_names = []
     for psetToEx in psetToExs:
+        #Remove the .html from the end of the file name
         file_names.append(psetToEx.exercise.fileName[:-5])
     return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names},context_instance=RequestContext(request))
