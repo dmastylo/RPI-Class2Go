@@ -176,13 +176,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
 
 class GetContentSectionsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
+        return self.filter(course=course,is_deleted=0).order_by('index')
 
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -231,31 +225,13 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
 class GetAdditionalPagesByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
+        return self.filter(course=course,is_deleted=0).order_by('index')
 
     def getByCourseAndMenuSlug(self, course, menu_slug):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and item.menu_slug == menu_slug:
-                returned_items.append(item)
-        return returned_items
+        return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
 
     def getSectionPagesByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section','index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and item.section:
-                returned_items.append(item)
-        return returned_items
+        return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
 
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -267,10 +243,16 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
     objects = GetAdditionalPagesByCourse()
 
     def create_production_instance(self):
+        image_section = None
+        if self.section:
+            image_section = self.section.image
+            
         production_instance = AdditionalPage(
             course=self.course.image,
             title=self.title,
             description=self.description,
+            menu_slug=self.menu_slug,
+            section = image_section,
             slug=self.slug,
             index=self.index,
             mode='production',
@@ -321,13 +303,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
 class GetAnnouncementsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('-time_created')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
+        return self.filter(course=course,is_deleted=0).order_by('-time_created')
 
 class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     owner = models.ForeignKey(User)
@@ -408,13 +384,11 @@ post_save.connect(create_user_profile, sender=User)
 
 class GetVideosByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section','index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
-                returned_items.append(item)
-        return returned_items
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__gt=now).order_by('section','index')
 
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -509,13 +483,11 @@ class VideoActivity(models.Model):
 
 class GetProblemSetsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section','index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
-                returned_items.append(item)
-        return returned_items
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__gt=now).order_by('section','index')
 
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
