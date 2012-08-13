@@ -83,7 +83,7 @@ def create_form(request, course_prefix, course_suffix):
                             context_instance=RequestContext(request))
 
 def create_action(request):
-    course_handle = request.POST['course_prefix'] + "-" + request.POST['course_suffix']
+    course_handle = request.POST['course_prefix'] + "#$!" + request.POST['course_suffix']
     course = Course.objects.get(handle=course_handle, mode='staging')
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
     pset = ProblemSet(course = course,
@@ -185,7 +185,7 @@ def add_exercise(request):
     file_name = file_content.name
 
     exercise = Exercise()
-    exercise.handle = request.POST['course_prefix'] + '-' + request.POST['course_suffix']
+    exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
     exercise.fileName = file_name
     exercise.file.save(file_name, file_content)
     exercise.save()

@@ -77,7 +77,7 @@ function ValidateAndSubmit() {
         return;
     }
     prefix = $("#id_prefix").val(); suffix = $("#id_suffix").val();
-    if (!prefix.match(/^[a-z0-9_]+$/) || !suffix.match(/^[a-z0-9_]+$/)) {
+    if (!prefix.match(/^[a-zA-Z0-9_-]+$/) || !suffix.match(/^[a-zA-Z0-9_-]+$/)) {
         alert("Error: Both URL slugs must be non-empty and can contain only lower case alphabets, numbers, or underscores.");
         return;
     }
