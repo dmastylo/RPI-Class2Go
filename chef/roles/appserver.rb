@@ -1,7 +1,7 @@
 name "appserver"
 description "Class2Go appserver node"
 
-# on't auto-run chef-client recipe until I code up proper software
+# Don't auto-run chef-client recipe until I code up proper software
 # deployment tooling (see issue #196)
 
 #override_attributes({ 
