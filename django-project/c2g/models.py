@@ -246,7 +246,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         image_section = None
         if self.section:
             image_section = self.section.image
-            
+
         production_instance = AdditionalPage(
             course=self.course.image,
             title=self.title,
@@ -634,6 +634,33 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.resubmission_penalty = production_instance.resubmission_penalty
 
         self.save()
+
+        if self.exercises_changed() == True:
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            #Delete all previous relationships
+            for staging_psetToEx in staging_psetToExs:
+                staging_psetToEx.is_deleted = True
+                staging_psetToEx.save()
+
+        #Create brand new copies of staging relationships
+            for production_psetToEx in production_psetToExs:
+                staging_psetToEx = ProblemSetToExercise(problemSet = self,
+                                                    exercise = production_psetToEx.exercise,
+                                                    number = production_psetToEx.number,
+                                                    is_deleted = False,
+                                                    mode = 'staging',
+                                                    image = production_psetToEx)
+                staging_psetToEx.save()
+                production_psetToEx.image = staging_psetToEx
+                production_psetToEx.save()
+
+        else:
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            for production_psetToEx in production_psetToExs:
+                production_psetToEx.image.number = production_psetToEx.number
+                production_psetToEx.image.save()
+
 
     def is_synced(self):
         image = self.image
