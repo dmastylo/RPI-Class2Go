@@ -140,3 +140,56 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
                                 'exercises': exercises
                             },
                             context_instance=RequestContext(request))
+
+def add_exercise(request):
+#    try:
+#        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+#    except:
+#        raise Http404
+
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+
+    file_content = request.FILES['exercise']
+    file_name = file_content.name
+
+    exercise = Exercise()
+    exercise.handle = request.POST['course_prefix'] + '-' + request.POST['course_suffix']
+    exercise.fileName = file_name
+    exercise.file.save(file_name, file_content)
+    exercise.save()
+
+    index = len(pset.exercise_set.all())
+    psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=False)
+    psetToEx.save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+
+def add_existing_exercises(request):
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    exercise_ids = request.POST.getlist('exercise')
+    exercises = Exercise.objects.filter(id__in=exercise_ids)
+    for exercise in exercises:
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()), is_deleted=False)
+        psetToEx.save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+
+def save_exercises(request):
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    psetToEx = pset.problemsettoexercise_set.all().order_by('number')
+    for n in range(0,len(psetToEx)):
+        listName = "exercise_order[" + str(n) + "]"
+        psetToEx[n].number = request.POST[listName]
+        psetToEx[n].save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+def list(request, course_prefix, course_suffix):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
+
+    return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list'}, context_instance=RequestContext(request))
+

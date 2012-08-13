@@ -5,7 +5,7 @@
     <h3>Add or Remove Exercises</h3>
 
     <h4>Upload Exercises to {{video.title}}</h4>
-    <form action= {% url 'videos.views.add_exercise' %} method="POST" class="form-vertical" enctype="multipart/form-data">
+    <form action= {% url 'courses.videos.views.add_exercise' %} method="POST" class="form-vertical" enctype="multipart/form-data">
         <fieldset class="well">
         {% csrf_token %}
         <input type="hidden" name="video_id" value={{video.id}}>
@@ -21,7 +21,7 @@
     </form>
     
     <h4><a data-toggle="collapse" data-target="#choose-existing">Choose From Existing Exercises</a></h4>
-    <form action= {% url 'videos.views.add_existing_exercises' %} method="POST" class="form-vertical">
+    <form action= {% url 'courses.videos.views.add_existing_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
@@ -41,7 +41,7 @@
     </form>
     
 
-    <form action= {% url 'videos.views.save_exercises' %} method="POST" class="form-vertical">
+    <form action= {% url 'courses.videos.views.save_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
@@ -49,7 +49,7 @@
         <ul data-sortablecontainer class="exercise-list">
             {% for videoToEx in videoToExs %}
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
-                    {{psetToEx.exercise.fileName}}
+                    {{videoToEx.exercise.fileName}}
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
                 </li>
             {% empty%}
@@ -59,7 +59,7 @@
         <span class="help-block">After reordering, save before uploading another exercise</span>
     </fieldset>
         <div class="form-actions">
-            <input type="submit" value="Save" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+            <input type="submit" value="Save" class="btn"> or <a href="{% url 'courses.videos.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
         </div>
     </form>
 </div>
