@@ -1,5 +1,5 @@
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
 from django.template import RequestContext
 from c2g.models import *
@@ -16,7 +16,19 @@ def manage_nav_menu(request, course_prefix, course_suffix):
     if not common_page_data['is_course_admin']:
         redirect('courses.views.main', course_prefix, course_suffix)
     
-    return render_to_response('additional_pages/manage_nav_menu.html', {'common_page_data':common_page_data}, context_instance=RequestContext(request))
+    return render_to_response('additional_pages/manage_nav_menu.html', {'common_page_data':common_page_data, 'mode':'nav_menu'}, context_instance=RequestContext(request))
+
+def add_section_page(request, course_prefix, course_suffix):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+        
+    if not common_page_data['is_course_admin']:
+        redirect('courses.views.main', course_prefix, course_suffix)
+    
+    sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
+    return render_to_response('additional_pages/add_section_page.html', {'common_page_data':common_page_data, 'mode':'section', 'sections':sections}, context_instance=RequestContext(request))
     
 def main(request, course_prefix, course_suffix, slug):
     try:

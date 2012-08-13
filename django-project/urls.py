@@ -58,6 +58,7 @@ urlpatterns = patterns('',
     # Additional Pages
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/pages/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.additional_pages.views.main'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/manage_nav_menu/?$', 'courses.additional_pages.views.manage_nav_menu'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/add_section_page/?$', 'courses.additional_pages.views.add_section_page'),
     url(r'^delete_page', 'courses.additional_pages.actions.delete'),
     url(r'^save_page', 'courses.additional_pages.actions.save'),
     url(r'^save_order', 'courses.additional_pages.actions.save_order'),
@@ -91,13 +92,21 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/upload$', 'courses.videos.views.upload'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.videos.views.view'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit/?', 'courses.videos.views.edit'),
-    url(r'^add_video/?', 'courses.videos.actions.add_video'),
+    url(r'^add_video/?$', 'courses.videos.actions.add_video'),
     url(r'^delete_video/?', 'courses.videos.actions.delete_video'),
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
 
+
     # Video Exercises
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_-]+)/?$', 'courses.video_exercises.views.view'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_slug>[a-zA-Z0-9_-]+)/manage_exercises?$', 'courses.videos.views.manage_exercises'),
+    url(r'^add_video_exercise/?$', 'courses.videos.views.add_exercise'),
+    url(r'^add_existing_video_exercises/?$', 'courses.videos.views.add_existing_exercises'),
+    url(r'^save_video_exercises/?', 'courses.videos.views.save_exercises'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_-]+)/?$', 'courses.video_exercises.views.view'),
+
 
     #Problem Sets
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exercises/(?P<exercise_name>.+)$', 'problemsets.views.read_exercise'),
@@ -107,14 +116,15 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)?$', 'problemsets.views.show'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/manage_exercises?$', 'problemsets.views.manage_exercises'),
 
-    url(r'^add_exercise/?$', 'problemsets.views.add_exercise'),
-    url(r'^add_existing_exercises/?$', 'problemsets.views.add_existing_exercises'),
+    url(r'^add_problemset_exercise/?$', 'problemsets.views.add_exercise'),
+    url(r'^add_existing_problemset_exercises/?$', 'problemsets.views.add_existing_exercises'),
+
     url(r'^delete_problemset/?', 'problemsets.actions.delete_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/createproblemset/?$', 'problemsets.views.create_form'),
     url(r'^createproblemsetaction/?', 'problemsets.views.create_action'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/edit?$', 'problemsets.views.edit_form'),
     url(r'^editproblemsetaction/?', 'problemsets.views.edit_action'),
     url(r'^edit_publish_action/?', 'problemsets.views.edit_publish_action'),
-    url(r'^save_exercises/?', 'problemsets.views.save_exercises'),
-    url(r'^save_and_publish_exercises/?', 'problemsets.views.save_and_publish_exercises'),
+    url(r'^save_problemset_exercises/?', 'problemsets.views.save_exercises'),
+    url(r'^save_and_publish_problemset_exercises/?', 'problemsets.views.save_and_publish_exercises'),
 )

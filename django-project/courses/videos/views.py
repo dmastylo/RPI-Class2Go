@@ -1,8 +1,8 @@
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
-from c2g.models import Course, Video
-from django.template import RequestContext
+from c2g.models import Course, Video, VideoToExercise, Exercise
 
 from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
@@ -11,6 +11,8 @@ import datetime
 from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
+
+from django.template import RequestContext
 
 def list(request, course_prefix, course_suffix):
     try:
@@ -118,3 +120,68 @@ def upload(request, course_prefix, course_suffix):
     return render_to_response('videos/upload.html',
                               data,
                               context_instance=RequestContext(request))
+
+
+def manage_exercises(request, course_prefix, course_suffix, video_slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    video = Video.objects.get(course=common_page_data['course'], slug=video_slug)
+    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('number')
+    added_exercises = video.exercise_set.all()
+    exercises = Exercise.objects.filter(video__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
+    return render_to_response('videos/manage_exercises.html',
+                            {'request': request,
+                                'common_page_data': common_page_data,
+                                'course_prefix': course_prefix,
+                                'course_suffix': course_suffix,
+                                'video': video,
+                                'videoToExs': videoToExs,
+                                'exercises': exercises
+                            },
+                            context_instance=RequestContext(request))
+
+def add_exercise(request):
+#    try:
+#        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+#    except:
+#        raise Http404
+
+    video = Video.objects.get(id=request.POST['video_id'])
+
+    file_content = request.FILES['exercise']
+    file_name = file_content.name
+
+    exercise = Exercise()
+    exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
+    exercise.fileName = file_name
+    exercise.file.save(file_name, file_content)
+    exercise.save()
+
+    index = len(video.exercise_set.all())
+    videoToEx = VideoToExercise(video=video, exercise=exercise, number=index, is_deleted=False)
+    videoToEx.save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+
+
+def add_existing_exercises(request):
+    video = Video.objects.get(id=request.POST['video_id'])
+    exercise_ids = request.POST.getlist('exercise')
+    exercises = Exercise.objects.filter(id__in=exercise_ids)
+    for exercise in exercises:
+        videoToEx = VideoToExercise(video=video, exercise=exercise, number=len(video.exercise_set.all()), is_deleted=False)
+        videoToEx.save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+
+
+def save_exercises(request):
+    video = Video.objects.get(id=request.POST['video_id'])
+    videoToEx = video.videotoexercise_set.all().order_by('number')
+    for n in range(0,len(videoToEx)):
+        listName = "exercise_order[" + str(n) + "]"
+        videoToEx[n].number = request.POST[listName]
+        videoToEx[n].save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+
+

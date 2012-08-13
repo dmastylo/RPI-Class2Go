@@ -17,7 +17,15 @@ def add(request):
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.view', course_prefix, course_suffix)
     
-    staging_page = AdditionalPage(course=common_page_data['staging_course'], menu_slug='course_info', title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='staging')
+    menu_slug = None
+    if request.POST.get("menu_slug") != "":
+        menu_slug = request.POST.get("menu_slug")
+        
+    section = None
+    if request.POST.get("section_id") != "":
+        section = ContentSection.objects.get(id=request.POST.get("section_id"))
+        
+    staging_page = AdditionalPage(course=common_page_data['staging_course'], menu_slug=menu_slug, section=section, title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='staging')
     staging_page.save()
     
     staging_page.create_production_instance()
