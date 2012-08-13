@@ -417,6 +417,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             file=self.file,
             image = self,
             mode = 'production',
+            handle = self.handle
         )
         production_instance.save()
         self.image = production_instance
@@ -677,6 +678,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
 class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
+    video = models.ManyToManyField(Video, through='VideoToExercise')
     fileName = models.CharField(max_length=255)
     file = models.FileField(upload_to=get_file_path, null=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
@@ -700,8 +702,20 @@ class ProblemSetToExercise(models.Model):
         db_table = u'c2g_problemset_to_exercise'
 
 
+class VideoToExercise(models.Model):
+    video = models.ForeignKey(Video)
+    exercise = models.ForeignKey(Exercise)
+    number = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField()
+    def __unicode__(self):
+        return self.video.title + "-" + self.exercise.fileName
+    class Meta:
+        db_table = u'c2g_video_to_exercise'
+
+
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
+     video_to_exercise = models.ForeignKey(VideoToExercise, null=True)
      problemset_to_exercise = models.ForeignKey(ProblemSetToExercise, null=True)
      problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
