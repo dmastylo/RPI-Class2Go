@@ -33,6 +33,7 @@ def main(request, course_prefix, course_suffix):
     contentsection_list = ContentSection.objects.getByCourse(course=common_page_data['course'])
     video_list = Video.objects.getByCourse(course=common_page_data['course'])
     pset_list =  ProblemSet.objects.getByCourse(course=common_page_data['course'])
+    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
 
     full_index_list = []
     for contentsection in contentsection_list:
@@ -44,6 +45,10 @@ def main(request, course_prefix, course_suffix):
         for pset in pset_list:
             if pset.section.id == contentsection.id:
                 index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
+                
+        for page in additional_pages:
+            if page.section.id == contentsection.id:
+                index_list.append(('additional_page', page.index, page.id, contentsection.id, page.slug, page.title))
 
         index_list.sort(key = index)
         full_index_list.append(index_list)
