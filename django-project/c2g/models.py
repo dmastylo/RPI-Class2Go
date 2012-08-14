@@ -224,14 +224,17 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         db_table = u'c2g_content_sections'
 
 class GetAdditionalPagesByCourse(models.Manager):
-    def getByCourse(self, course):
-        return self.filter(course=course,is_deleted=0).order_by('index')
-
     def getByCourseAndMenuSlug(self, course, menu_slug):
+        # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
         return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
 
     def getSectionPagesByCourse(self, course):
-        return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
+        # Additional pages displayed under sections have a live_datetime effect.
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__gt=now).order_by('section','index')
 
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -417,7 +420,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             file=self.file,
             image = self,
             mode = 'production',
-            handle = self.handle
+            handle = self.handle,
+            live_datetime = self.live_datetime,
         )
         production_instance.save()
         self.image = production_instance
@@ -734,6 +738,7 @@ class VideoToExercise(models.Model):
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
     is_deleted = models.BooleanField()
+    video_time = models.IntegerField(null=True, blank=True)
     def __unicode__(self):
         return self.video.title + "-" + self.exercise.fileName
     class Meta:

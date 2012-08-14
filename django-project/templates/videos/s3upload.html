@@ -16,6 +16,8 @@
 	      <span class="help-block">{{ field.help_text }}</span>
 	    </div>
 	  {% endfor %}
+	  <b>Set Live Date</b> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
+	  <div id="live_date" style="display:none"><input type="datetime" name="live_date" data-datetimepicker></div>
 	  </fieldset>
 	  <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
 	  <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
@@ -25,4 +27,19 @@
     <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to upload videos.</h4>
   {% endif %}
 </div>
+
 {% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script>
+function showLiveDate(checked) {
+    $("#live_date").toggle('slow');
+    if (checked) {
+        //$("#live_date").show('slow');
+    }
+    else {
+        //$("#live_date").hide('slow');
+    }
+}
+</script>
+{% endblock addl_scripts %}

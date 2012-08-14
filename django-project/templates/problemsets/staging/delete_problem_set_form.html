@@ -6,7 +6,7 @@
 </form>
 <script type="text/javascript">
     function DeleteProblemSet(id) {
-        if (confirm("Are you sure you want to delete this problem set?")) {
+        if (confirm("Are you sure you want to delete this problem set '" + $("#problemset_"+id+"_title").html() + "'?")) {
             $("#delete_problem_set_id").val(id);
             document.forms.delete_problem_set_form.submit();
         }
