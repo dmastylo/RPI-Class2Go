@@ -86,6 +86,8 @@ def create_action(request):
     course_handle = request.POST['course_prefix'] + "#$!" + request.POST['course_suffix']
     course = Course.objects.get(handle=course_handle, mode='staging')
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
+    index = content_section.getNextIndex()
+    
     pset = ProblemSet(course = course,
                     section = content_section,
                    slug = request.POST['slug'],
@@ -99,7 +101,8 @@ def create_action(request):
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
                    resubmission_penalty = request.POST['resubmission_penalty'],
-                   mode = 'staging')
+                   mode = 'staging',
+                   index=index)
     #Optional fields that may or may not be passed in the request
     try:
         pset.description = request.POST['description']

@@ -149,7 +149,7 @@ def upload(request):
             
             new_video = form.save(commit=False)
             new_video.course = common_page_data['course']
-            new_video.index = len(Video.objects.filter(course=common_page_data['course']))
+            new_video.index = video_section.getNextIndex()
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
 

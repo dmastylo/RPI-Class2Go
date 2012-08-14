@@ -12,8 +12,6 @@ def add(request):
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     
-    index = len(AdditionalPage.objects.filter(course=common_page_data['course']))
-    
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.view', course_prefix, course_suffix)
     
@@ -24,13 +22,18 @@ def add(request):
     section = None
     if request.POST.get("section_id") != "":
         section = ContentSection.objects.get(id=request.POST.get("section_id"))
+    
+    if request.POST.get("menu_slug") != "":
+        index = len(AdditionalPage.objects.filter(course=common_page_data['course'],menu_slug=request.POST.get("menu_slug")))
+    else:
+        index = section.getNextIndex()
         
     staging_page = AdditionalPage(course=common_page_data['staging_course'], menu_slug=menu_slug, section=section, title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='staging')
     staging_page.save()
     
     staging_page.create_production_instance()
     
-    if request.POST.get("menu_slug") != "":
+    if request.POST.get("menu_slug") == "":
         return redirect('courses.views.course_materials', course_prefix, course_suffix)
     else:
         return redirect(request.META['HTTP_REFERER'])
