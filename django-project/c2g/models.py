@@ -174,14 +174,14 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     class Meta:
         db_table = u'c2g_courses'
 
-class GetContentSectionsByCourse(models.Manager):
+class ContentSectionManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course,is_deleted=0).order_by('index')
 
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
-    objects = GetContentSectionsByCourse()
+    objects = ContentSectionManager()
 
     def create_production_instance(self):
         production_instance = ContentSection(
@@ -216,14 +216,45 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-
+        
+    def getChildren(self):
+        dict_list = []
+        output_list = []
+        
+        videos = Video.objects.getBySection(section=self)
+        for item in videos:
+            dict_list.append({'item':item, 'index':item.index})
+            
+        problemsets = ProblemSet.objects.getBySection(section=self)
+        for item in problemsets:
+            dict_list.append({'item':item, 'index':item.index})
+            
+        additionalpages = AdditionalPage.objects.getBySection(section=self)
+        for item in additionalpages:
+            dict_list.append({'item':item, 'index':item.index})
+            
+        sorted_dict_list = sorted(dict_list, key=lambda k: k['index'])
+        
+        for item in sorted_dict_list:
+            output_list.append(item['item'])
+            
+        return output_list
+    
+    def countChildren(self):
+        return len(self.getChildren)
+    
+    def getNextIndex(self):
+        # We will not return len(children)+1 since this approach is not fail safe. If an index is skipped for whatever reason, we want to make sure we are still robust
+        children = self.getChildren()
+        return children[-1].index+1
+    
     def __unicode__(self):
         return self.title
 
     class Meta:
         db_table = u'c2g_content_sections'
 
-class GetAdditionalPagesByCourse(models.Manager):
+class AdditionalPageManager(models.Manager):
     def getByCourseAndMenuSlug(self, course, menu_slug):
         # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
         return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
@@ -234,7 +265,14 @@ class GetAdditionalPagesByCourse(models.Manager):
             return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__gt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__lt=now).order_by('section','index')
+    
+    def getBySection(self, section):
+        if section.mode == 'staging':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -243,7 +281,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     slug = models.CharField(max_length=255, null=True, blank=True)
-    objects = GetAdditionalPagesByCourse()
+    objects = AdditionalPageManager()
 
     def create_production_instance(self):
         image_section = None
@@ -304,7 +342,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         db_table = u'c2g_additional_pages'
 
 
-class GetAnnouncementsByCourse(models.Manager):
+class AnnouncementManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course,is_deleted=0).order_by('-time_created')
 
@@ -313,7 +351,7 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    objects = GetAnnouncementsByCourse()
+    objects = AnnouncementManager()
 
     def create_production_instance(self):
         production_instance = Announcement(
@@ -385,13 +423,20 @@ def create_user_profile(sender, instance, created, raw, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
-class GetVideosByCourse(models.Manager):
+class VideoManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'staging':
             return self.filter(course=course,is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__gt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            
+    def getBySection(self, section):
+        if section.mode == 'staging':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -405,7 +450,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     file = models.FileField(upload_to=get_file_path)
     handle = models.CharField(max_length=255, null=True, db_index=True)
 #    kelvinator = models.IntegerField("K-Threshold", default=15)
-    objects = GetVideosByCourse()
+    objects = VideoManager()
 
     def create_production_instance(self):
         production_instance = Video(
@@ -485,13 +530,20 @@ class VideoActivity(models.Model):
      class Meta:
         db_table = u'c2g_video_activity'
 
-class GetProblemSetsByCourse(models.Manager):
+class ProblemSetManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'staging':
             return self.filter(course=course,is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            
+    def getBySection(self, section):
+        if section.mode == 'staging':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
@@ -508,7 +560,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     submissions_permitted = models.IntegerField(null=True, blank=True)
     resubmission_penalty = models.IntegerField(null=True, blank=True)
     randomize = models.BooleanField()
-    objects = GetProblemSetsByCourse()
+    objects = ProblemSetManager()
 
     def create_production_instance(self):
         production_instance = ProblemSet(
@@ -537,8 +589,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def exercises_changed(self):
         production_instance = self.image
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
         if len(staging_psetToExs) != len(production_psetToExs):
             return True
         for staging_psetToEx in staging_psetToExs:
@@ -581,11 +633,11 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         production_instance.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
             #Delete all previous relationships
             for production_psetToEx in production_psetToExs:
-                production_psetToEx.is_deleted = True
+                production_psetToEx.delete()
                 production_psetToEx.save()
 
         #Create brand new copies of staging relationships
@@ -593,7 +645,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 production_psetToEx = ProblemSetToExercise(problemSet = production_instance,
                                                     exercise = staging_psetToEx.exercise,
                                                     number = staging_psetToEx.number,
-                                                    is_deleted = False,
+                                                    is_deleted = 0,
                                                     mode = 'production',
                                                     image = staging_psetToEx)
                 production_psetToEx.save()
@@ -601,7 +653,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 staging_psetToEx.save()
 
         else:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
             for staging_psetToEx in staging_psetToExs:
                 staging_psetToEx.image.number = staging_psetToEx.number
                 staging_psetToEx.image.save()
@@ -640,11 +692,11 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
             #Delete all previous relationships
             for staging_psetToEx in staging_psetToExs:
-                staging_psetToEx.is_deleted = True
+                staging_psetToEx.delete()
                 staging_psetToEx.save()
 
         #Create brand new copies of staging relationships
@@ -652,7 +704,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 staging_psetToEx = ProblemSetToExercise(problemSet = self,
                                                     exercise = production_psetToEx.exercise,
                                                     number = production_psetToEx.number,
-                                                    is_deleted = False,
+                                                    is_deleted = 0,
                                                     mode = 'staging',
                                                     image = production_psetToEx)
                 staging_psetToEx.save()
@@ -660,7 +712,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 production_psetToEx.save()
 
         else:
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
             for production_psetToEx in production_psetToExs:
                 production_psetToEx.image.number = production_psetToEx.number
                 production_psetToEx.image.save()
@@ -696,7 +748,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.resubmission_penalty != image.resubmission_penalty:
             return False
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
         for staging_psetToEx in staging_psetToExs:
             if staging_psetToEx.number != staging_psetToEx.image.number:
                 return False
@@ -719,12 +771,15 @@ class Exercise(TimestampMixin, Deletable, models.Model):
         db_table = u'c2g_exercises'
 
 
+class GetPsetToExByProblemset(models.Manager):
+    def getByProblemset(self, problemSet):
+        return self.filter(problemSet=problemSet,is_deleted=0).order_by('number')
 
-class ProblemSetToExercise(models.Model):
+
+class ProblemSetToExercise(Deletable, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
-    is_deleted = models.BooleanField()
     image = models.ForeignKey('self',null=True, blank=True)
     mode = models.TextField(blank=True)
     def __unicode__(self):
@@ -764,6 +819,8 @@ class ProblemActivity(TimestampMixin, models.Model):
      card = models.TextField(blank=True)
      cards_done = models.IntegerField(null=True, blank=True)
      cards_left = models.IntegerField(null=True, blank=True)
+     user_selection_val = models.CharField(max_length=1024, null=True, blank=True)
+     user_choices = models.CharField(max_length=1024, null=True, blank=True)
      def __unicode__(self):
             return self.student.username
      class Meta:

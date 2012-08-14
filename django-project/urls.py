@@ -52,7 +52,7 @@ urlpatterns = patterns('',
     url(r'^add_section', 'courses.actions.add_section'),
 
     url(r'^commit/?', 'courses.actions.commit'),
-    url(r'^revert/?', 'courses.actions.revert'),
+    url(r'^revert/?$', 'courses.actions.revert'),
     url(r'^change_live_datetime/?', 'courses.actions.change_live_datetime'),
 
     # Additional Pages
@@ -129,4 +129,5 @@ urlpatterns = patterns('',
     url(r'^save_problemset_exercises/?', 'problemsets.views.save_exercises'),
     url(r'^save_and_publish_problemset_exercises/?', 'problemsets.views.save_and_publish_exercises'),
     url(r'^delete_exercise/?', 'problemsets.views.delete_exercise'),
+    url(r'^revert_problemset/?', 'problemsets.views.revert_problemset'),
 )
