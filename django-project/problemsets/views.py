@@ -34,6 +34,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
                               {'common_page_data':common_page_data,
                                'pset': ps,
                                'pset_url':ps.path,
+                               'pset_type':ps.assessment_type,
                               },
                               context_instance=RequestContext(request))
 
@@ -261,7 +262,7 @@ def load_problem_set(request, course_prefix, course_suffix, pset_slug):
     for psetToEx in psetToExs:
         #Remove the .html from the end of the file name
         file_names.append(psetToEx.exercise.fileName[:-5])
-    return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names},context_instance=RequestContext(request))
+    return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names, 'assessment_type': pset.assessment_type},context_instance=RequestContext(request))
 
 def delete_exercise(request):
     toDelete = ProblemSetToExercise.objects.get(id=request.POST['exercise_id'])
