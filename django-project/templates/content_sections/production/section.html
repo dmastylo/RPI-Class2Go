@@ -1,0 +1,14 @@
+<h3>{{section_structure.section.title}}</h3>
+{% for item in section_structure.items %}
+    {% ifequal item.type 'additional_page' %}
+            {% include "additional_pages/production/additional_page_list_item.html" %}
+    {% endifequal %}
+    {% ifequal item.type 'problem_set' %}
+            {% include "problemsets/production/problemset_list_item.html" %}
+    {% endifequal %}
+    {% ifequal item.type 'video' %}
+            {% include "videos/production/video_list_item.html" %}
+    {% endifequal %}
+{% empty %}
+    <p style='margin: 20px;'>No items have been added to this section</p>
+{% endfor %}

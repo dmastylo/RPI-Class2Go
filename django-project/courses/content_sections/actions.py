@@ -80,6 +80,12 @@ def save_content_order(request):
                     problem_set_image = item['problem_set'].image
                     problem_set_image.index = request.POST.get("order_problem_set_"+str(item['problem_set'].id))
                     problem_set_image.save()
+                elif item['type'] == 'additional_page':
+                    item['additional_page'].index = request.POST.get("order_additional_page_"+str(item['additional_page'].id))
+                    item['additional_page'].save()
+                    additional_page_image = item['additional_page'].image
+                    additional_page_image.index = request.POST.get("order_additional_page_"+str(item['additional_page'].id))
+                    additional_page_image.save()
             break
             
     return redirect(request.META['HTTP_REFERER'])

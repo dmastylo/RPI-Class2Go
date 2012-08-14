@@ -8,6 +8,10 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    {% autoescape off %}{{page.description}}{% endautoescape %}
+    {% ifnotequal page.description '' %}
+        {% autoescape off %}{{page.description}}{% endautoescape %}
+    {% else %}
+        <p>No content has been added to this page yet.</p>
+    {% endifnotequal %}
 </div>
 {% endblock m_column_content %}

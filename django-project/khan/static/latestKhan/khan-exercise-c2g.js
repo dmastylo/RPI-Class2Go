@@ -737,6 +737,16 @@ var Khan = (function() {
         // Initialize to an empty jQuery set
         exercises = jQuery();
 
+        // [@wescott] Is this problem set formative or summative?
+        // Default is formative, but check problem set div for summative CSS
+        // class; otherwise, check the class name on the article element in 
+        // the page
+        exAssessType = 'formative';
+        if ($("div.summative").length || $("div.assessive").length || 
+            $("article.summative").length || $("article.summative").length) {
+            exAssessType = 'summative';
+        }
+
         $(function() {
             var remoteExercises = $("div.exercise[data-name]");
 
@@ -1157,7 +1167,8 @@ var Khan = (function() {
             //console.log(problem);
         $(".hint-box").show();
 
-        if (hints.length === 0) {
+        // [@wescott] Adding check for summative exercises, which shouldn't have hints
+        if (hints.length === 0 || exAssessType == "summative") {
             $(".hint-box").hide();
         }
 
@@ -1277,6 +1288,11 @@ var Khan = (function() {
         // Enable the all answer input elements except the check answer button.
         $("#answercontent input").not("#check-answer-button")
             .removeAttr("disabled");
+
+        // [@wescott] If summative problem set, add note about penalties per try
+        if (exAssessType == "summative") {
+            $('#solutionarea').append('<p>Note: Maximum of 3 attempts accepted.</p>');
+        }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
             $("#examples-show").show();
