@@ -19,23 +19,23 @@
 						{% ifequal content_section.id item.3 %}
       		 	            {% ifequal item.0 'video' %} 
       		 	                {% if is_logged_in %}
-      		 		                <li style="margin-top:5px;"><i class="icon-facetime-video" style="font-size:15px; color:#999;opacity:.3; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+      		 		                <li style="margin-top:5px;"><i class="icon-facetime-video" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
       		 		            {% else %}
-                                    <li style="margin-top:5px;"><i class="icon-facetime-video" style="font-size:15px; color:#999;opacity:.3; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
+                                    <li style="margin-top:5px;"><i class="icon-facetime-video" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
       		 		            {% endif %}
       		 	            {% endifequal %}
       		 	            {% ifequal item.0 'pset' %}
       		 	                {% if is_logged_in %}
-                                    <li style="margin-top:5px;"><i class="icon-pencil" style="font-size:15px; color:#999;opacity:.3; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+                                    <li style="margin-top:5px;"><i class="icon-pencil" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
       		 	                {% else %}
-      		 	                    <li style="margin-top:5px;"><i class="icon-pencil" style="font-size:15px; color:#999;opacity:.3; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
+      		 	                    <li style="margin-top:5px;"><i class="icon-pencil" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
       		 	                {% endif %}
       		 	            {% endifequal %}
                             {% ifequal item.0 'additional_page' %}
       		 	                {% if is_logged_in %}
-                                    <li style="margin-top:5px;"><i class="icon-book" style="font-size:15px; color:#999;opacity:.3; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+                                    <li style="margin-top:5px;"><i class="icon-book" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
       		 	                {% else %}
-      		 	                    <li style="margin-top:5px;"><i class="icon-book" style="font-size:15px; color:#999;opacity:.3; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
+      		 	                    <li style="margin-top:5px;"><i class="icon-book" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
       		 	                {% endif %}
       		 	            {% endifequal %}
       		 	        {% endifequal %}
