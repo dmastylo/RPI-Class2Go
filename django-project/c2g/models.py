@@ -719,6 +719,10 @@ class Exercise(TimestampMixin, Deletable, models.Model):
         db_table = u'c2g_exercises'
 
 
+class GetPsetToExByProblemset(models.Manager):
+    def getByProblemset(self, problemSet):
+        return self.filter(problemSet=problemSet,is_deleted=0).order_by('number')
+
 
 class ProblemSetToExercise(Deletable, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
