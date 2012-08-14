@@ -188,10 +188,18 @@ def save_exercises(request):
 
 
 
-def get_exercises():
-    video = Video.objects.get(id = request.POST['video_id'])
+def get_video_exercises(request):
+    video = Video.objects.get(id = request.GET['video_id'])
     videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('number')
-    
+    json_list = []
+    for videoToEx in videoToExs:
+        json_string = "\"" + str(videoToEx.video_time) + "\": {\"time\": " + str(videoToEx.video_time) + ", \"problemDiv\": \"" + str(videoToEx.exercise_id) + "\"}"
+        json_list.append(json_string)
+     
+    json_string = "{" + ','.join( map( str, json_list )) + "}"
+    return HttpResponse(json_string)
+        
+        
     
     
     
