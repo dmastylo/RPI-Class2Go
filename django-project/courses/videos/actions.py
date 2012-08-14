@@ -120,8 +120,11 @@ def oauth(request):
         #temporary for demo purposes
         video.create_production_instance()
 
+        parts = str(video.handle).split("#$!")
+        return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(parts[0], parts[1], video.slug)))
+    
 #    return redirect('courses.videosviews.list', course_prefix, course_suffix)
-    return redirect("http://" + request.META['HTTP_HOST'] + "/nlp/Fall2012/videos")
+    #return redirect("http://" + request.META['HTTP_HOST'] + "/nlp/Fall2012/videos")
 
 def GetOAuth2Url(request, video):
     client_id = "287022098794.apps.googleusercontent.com"
@@ -179,7 +182,6 @@ def upload(request):
             return redirect(authUrl)
         #    return redirect("http://" + request.META['HTTP_HOST'])
         
-        return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_video.slug)))
     
     else:
         form = S3UploadForm(course=common_page_data['course'])
