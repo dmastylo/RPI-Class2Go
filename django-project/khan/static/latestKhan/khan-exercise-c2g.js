@@ -1291,8 +1291,16 @@ var Khan = (function() {
 
         // [@wescott] If summative problem set, add note about penalties per try
         if (exAssessType == "summative") {
-            $('#solutionarea').append('<p>Note: Maximum of 3 attempts accepted.</p>');
-            $('#solutionarea').append('<p><span id="penalty-pct"></span> penalty per attempt.</p>');
+            var maxAttempts, penaltyPct; 
+            if (typeof c2gConfig != "undefined") {
+                maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+                penaltyPct = c2gConfig.penaltyPct + "%";
+            } else {
+                maxAttempts = 3;
+                penaltyPct = "25%";
+            }
+            $('#solutionarea').append('<p>Note: Maximum of ' + maxAttempts + ' attempts accepted.</p>');
+            $('#solutionarea').append('<p><span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.</p>');
             $('#solutionarea').append('<p>Attempts so far: <span id="attempt-count">0</span></p>');
         }
 
