@@ -135,7 +135,7 @@ def edit_form(request, course_prefix, course_suffix, pset_slug):
                             },
                             context_instance=RequestContext(request))
 
-def edit_action(request):
+def edit_helper(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
     pset.section = content_section
@@ -150,8 +150,16 @@ def edit_action(request):
     pset.late_penalty = request.POST['late_penalty']
     pset.submissions_permitted = request.POST['submissions_permitted']
     pset.save()
+
+def edit_action(request):
+    edit_helper(request)
     return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'], )))
 
+def edit_publish_action(request):
+    edit_helper(request)
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    pset.commit()
+    return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'], )))
 
 def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     try:
@@ -165,7 +173,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     for psetToEx in psetToExs:
         used_exercises.append(psetToEx.exercise.id)
     #Get all the exercises in the course but not in this problem set to list in add from existing
-    exercises = Exercise.objects.all().filter(problemSet__course=common_page_data['course'])
+    exercises = Exercise.objects.all().filter(problemSet__course=common_page_data['course']).exclude(id__in=used_exercises).distinct()
     return render_to_response('problemsets/manage_exercises.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
@@ -209,14 +217,24 @@ def add_existing_exercises(request):
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
-def save_exercises(request):
+def save_helper(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     psetToEx = pset.problemsettoexercise_set.all().filter(is_deleted=False).order_by('number')
     for n in range(0,len(psetToEx)):
         listName = "exercise_order[" + str(n) + "]"
         psetToEx[n].number = request.POST[listName]
         psetToEx[n].save()
+
+def save_exercises(request):
+    save_helper(request)
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
+def save_and_publish_exercises(request):
+    save_helper(request)
+    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+    pset.commit()
+    return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'])))
 
 
 def read_exercise(request, course_prefix, course_suffix, exercise_name):

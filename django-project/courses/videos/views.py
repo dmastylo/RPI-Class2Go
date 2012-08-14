@@ -149,6 +149,7 @@ def add_exercise(request):
 #        raise Http404
 
     video = Video.objects.get(id=request.POST['video_id'])
+    video_time = request.POST['videotime']
 
     file_content = request.FILES['exercise']
     file_name = file_content.name
@@ -160,7 +161,7 @@ def add_exercise(request):
     exercise.save()
 
     index = len(video.exercise_set.all())
-    videoToEx = VideoToExercise(video=video, exercise=exercise, number=index, is_deleted=False)
+    videoToEx = VideoToExercise(video=video, exercise=exercise, number=index, is_deleted=False, video_time=video_time)
     videoToEx.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
@@ -170,7 +171,8 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        videoToEx = VideoToExercise(video=video, exercise=exercise, number=len(video.exercise_set.all()), is_deleted=False)
+        video_time = request.POST['videotime_' + str(exercise.id)]
+        videoToEx = VideoToExercise(video=video, exercise=exercise, number=len(video.exercise_set.all()), is_deleted=False, video_time=video_time)
         videoToEx.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
@@ -185,3 +187,13 @@ def save_exercises(request):
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 
+
+def get_exercises():
+    video = Video.objects.get(id = request.POST['video_id'])
+    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('number')
+    
+    
+    
+    
+    
+    
