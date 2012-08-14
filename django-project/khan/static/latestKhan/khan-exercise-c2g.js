@@ -2695,7 +2695,7 @@ var Khan = (function() {
         data = $.extend(data, {"exercise_filename": exercise_filename});
         data = $.extend(data, {"pset_id": pset_id});
         data = $.extend(data, {"user_selection_val": user_selection_val});
-        data = $.extend(data, {"user_choices": JSON.stringify(user_choices)});
+        data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         //URL starts with problemsets/attempt to direct to a view to collect data.
         //problemId is the id of the problem the information is being created for
