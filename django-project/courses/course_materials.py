@@ -1,20 +1,46 @@
 from c2g.models import *
 import datetime
 
-def get_course_materials(common_page_data, get_video_content=True, get_pset_content=True):
+def get_course_materials(common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content = True):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
         videos = Video.objects.getByCourse(course=common_page_data['course'])
         problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
+        pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
 
         index = 0
         for section in sections:
             section_dict = {'section':section, 'items':[]}
+            
+            if get_additional_page_content:
+                for page in pages:
+                    if page.section_id == section.id:
+                        item = {'type':'additional_page', 'additional_page':page, 'index':page.index}
+                        
+                        if common_page_data['course_mode'] == 'staging':
+                            prod_page = page.image
+                            if not prod_page.live_datetime:
+                                visible_status = "<span style='color:#A00000;'>Not open</span>"
+                            else:
+                                if prod_page.live_datetime > datetime.datetime.now():
+                                    year = prod_page.live_datetime.year
+                                    month = prod_page.live_datetime.month
+                                    day = prod_page.live_datetime.day
+                                    hour = prod_page.live_datetime.hour
+                                    minute = prod_page.live_datetime.minute
+                                    visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                else:
+                                    visible_status = "<span style='color:green;'>Open</span>"
 
+                            item['visible_status'] = visible_status
+                            
+                        section_dict['items'].append(item)
+            
             if get_video_content:
                 for video in videos:
-                    if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
+                    #if video.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
+                    if video.section_id == section.id:
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
 
                         if common_page_data['course_mode'] == 'staging':
@@ -44,7 +70,8 @@ def get_course_materials(common_page_data, get_video_content=True, get_pset_cont
 
             if get_pset_content:
                 for problem_set in problem_sets:
-                    if problem_set.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (problem_set.live_datetime and problem_set.live_datetime < common_page_data['effective_current_datetime'])):
+                    #if problem_set.section_id == section.id and (common_page_data['course_mode'] == 'staging' or (problem_set.live_datetime and problem_set.live_datetime < common_page_data['effective_current_datetime'])):
+                    if problem_set.section_id == section.id:
                         item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
 
                         if common_page_data['course_mode'] == 'staging':

@@ -224,14 +224,17 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         db_table = u'c2g_content_sections'
 
 class GetAdditionalPagesByCourse(models.Manager):
-    def getByCourse(self, course):
-        return self.filter(course=course,is_deleted=0).order_by('index')
-
     def getByCourseAndMenuSlug(self, course, menu_slug):
+        # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
         return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
 
     def getSectionPagesByCourse(self, course):
-        return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
+        # Additional pages displayed under sections have a live_datetime effect.
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__gt=now).order_by('section','index')
 
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)

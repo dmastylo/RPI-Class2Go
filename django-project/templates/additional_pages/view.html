@@ -1,6 +1,8 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block course_info_link_class %}class="dropdown active"{% endblock course_info_link_class %}
+
+{% block course_info_link_class %}{% ifnotequal page.menu_slug '' %}class="dropdown active"{% endifnotequal %}{% endblock course_info_link_class %}
+{% block course_materials_link_class %}{% ifequal page.menu_slug '' %}class="active"{% endifequal %}{% endblock course_materials_link_class %}
 
 {% block course_page_title %}{{page.title}}{% endblock course_page_title %}
 
