@@ -2,7 +2,7 @@
 {% load url from future %}
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h2>Create a New Problem Set</h2>
+    <h2>Editing {{pset.title}}</h2>
 
     <form action="{% url 'problemsets.views.edit_action' %}" method="POST" class="form-vertical">
         {% csrf_token %}
