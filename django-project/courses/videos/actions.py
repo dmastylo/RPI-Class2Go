@@ -154,7 +154,7 @@ def upload(request):
             new_video.handle = course_prefix + "#$!" + course_suffix
 
             new_video.save()
-            new_video.create_production_instance()
+            #new_video.create_production_instance()
             print new_video.file.url
 
             video = Video(
