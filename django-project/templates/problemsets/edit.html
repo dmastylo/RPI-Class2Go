@@ -94,7 +94,9 @@
             </div>
         </div>
         <div class="form-actions">
-            <input type="submit" value="Save" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
+            <input type="submit" value="Save as Draft" onclick="form.action='{% url 'problemsets.views.edit_action' %}';" class="btn">
+            <input type="submit" value="Save and Publish" onclick="form.action='{% url 'problemsets.views.edit_publish_action' %}';" class="btn">
+            <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
         </div>
     </form>
 </div>​

@@ -1,6 +1,24 @@
+
 {% extends "course_base.html" %}
 {% load url from future %}
 {% block m_column_content %}
+
+<script type="text/javascript">
+function confirm_change(){
+    if ("{{problemset_taken}}" == "False"){
+        return true;
+    }   
+    var r=confirm("WARNING: Students have already begun taking this problem set. Adding exercises can ruin the integrity of the results. Are you sure you wish to make this change?")
+    if (r==true){
+       return true;
+    } else {
+        return false;
+    }
+}
+</script>
+
+{% include "problemsets/delete_exercise_form.html" %}
+
 <div id="c2g_layout_m_column" class="span12">
     <h3>Add or Remove Exercises</h3>
 
@@ -15,12 +33,12 @@
             <label class="control-label">Add Exercises* (Choose a file and then click Add Exercise)</label>
             <div class="controls">
                 <input type="file" name="exercise">
-                <input type="submit" value="Add Exercise" class="btn">
+                <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
             </div>
         </div>
     </form>
     
-    <h4><a data-toggle="collapse" data-target="#choose-existing">Choose From Existing Exercises</a></h4>
+    <h4><a data-toggle="collapse" data-target="#choose-existing" class='btn'>Choose From Existing Exercises</a></h4>
     <form action= {% url 'problemsets.views.add_existing_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
@@ -36,12 +54,12 @@
                     {% endfor %}
                 </div>
             </div>
-            <input type="submit" value="Add Exercises" class="btn">
+            <input type="submit" value="Add Exercises" onclick="return confirm_change()" class="btn">
         </div>
     </form>
     
 
-    <form action= {% url 'problemsets.views.save_exercises' %} method="POST" class="form-vertical">
+    <form action= ''  method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
@@ -51,6 +69,7 @@
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
                     {{psetToEx.exercise.fileName}}
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
+                    <a href="javascript:DeleteExercise('{{psetToEx.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
                 </li>
             {% empty%}
                 <p style='margin: 20px;'>There are no exercises yet.</p>
@@ -59,8 +78,12 @@
         <span class="help-block">After reordering, save before uploading another exercise</span>
     </fieldset>
         <div class="form-actions">
-            <input type="submit" value="Save" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+            <input type="submit" value="Save" onclick="form.action='{% url 'problemsets.views.save_exercises' %}';" class="btn">
+            <input type="submit" value="Save and Publish" onclick="form.action='{% url 'problemsets.views.save_and_publish_exercises' %}';" class="btn">
+            <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
         </div>
     </form>
 </div>
 {% endblock m_column_content %}
+
+

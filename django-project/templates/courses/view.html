@@ -17,11 +17,19 @@
       		        {% for item in list_item %}
 
 						{% ifequal content_section.id item.3 %}
-      		 	            {% ifequal item.0 'video' %}
-      		 		            <li><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+      		 	            {% ifequal item.0 'video' %} 
+      		 	                {% if is_logged_in %}
+      		 		                <li><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+      		 		            {% else %}
+      		 		            	<li>{{item.5}}</li>
+      		 		            {% endif %}
       		 	            {% endifequal %}
       		 	            {% ifequal item.0 'pset' %}
-      		 	                <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+      		 	                {% if is_logged_in %}
+      		 	                    <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+      		 	                {% else %}
+      		 	                    <li>{{item.5}}</li>
+      		 	                {% endif %}
       		 	            {% endifequal %}
       		 	        {% endifequal %}
         	        {% endfor %}	
@@ -64,6 +72,7 @@
 {% endblock m_column_content %}
 
 {%block r_column_content %}
+{% if is_logged_in %}
 <div id="c2g_layout_r_column" class="span3">
     <h3 class="section-title">Recent Events</h3>
     
@@ -78,6 +87,7 @@
     
     <a href="#">All Events</a>
 </div>
+{% endif %}
 {% endblock r_column_content %}
 
 {% if common_page_data.is_course_admin %}

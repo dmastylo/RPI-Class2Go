@@ -3,6 +3,8 @@ from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
 from c2g.models import Course, Video
 from django.template import RequestContext
+from django.shortcuts import render_to_response, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
@@ -13,7 +15,7 @@ import gdata.youtube.service
 import urllib2, urllib, json
 import re
 
-import datetime
+from datetime import datetime
     
 ### Videos ###
 
@@ -151,8 +153,11 @@ def upload(request):
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
 
+            if request.POST.get("set_live_date"):
+                new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
+
             new_video.save()
-            new_video.create_production_instance()
+            #new_video.create_production_instance()
             print new_video.file.url
 
             video = Video(
@@ -172,7 +177,10 @@ def upload(request):
             authUrl = GetOAuth2Url(request, new_video)
             #eventually should store an access token, so they don't have to give permission everytime
             return redirect(authUrl)
-            return redirect("http://" + request.META['HTTP_HOST'])
+        #    return redirect("http://" + request.META['HTTP_HOST'])
+        
+        return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_video.slug)))
+    
     else:
         form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
@@ -195,6 +203,7 @@ def upload(request):
             video_description = form.cleaned_data['description']
             video_slug = form.cleaned_data['url_name']
             video_section = form.cleaned_data['section']
+
 
             video = Video(
                 course=common_page_data['course'],
@@ -229,7 +238,7 @@ def upload(request):
             data['youtube_token'] = youtube_token
             data['next'] = "http://localhost:8000/nlp/Fall2012/videos?vid="+str(video.id)
 
-
+            
             #return redirect(request.META['HTTP_REFERER'])
     else:
         form = VideoUploadForm(course=common_page_data['course'])
@@ -237,6 +246,7 @@ def upload(request):
     data['token'] = request.POST.get("token")
     data['form'] = form
     data['yt_logged_in'] = True
+    
     return render_to_response('videos/upload.html',
                               data,
                               context_instance=RequestContext(request))

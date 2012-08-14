@@ -176,13 +176,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
 
 class GetContentSectionsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
+        return self.filter(course=course,is_deleted=0).order_by('index')
 
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -228,34 +222,19 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     class Meta:
         db_table = u'c2g_content_sections'
-        
+
 class GetAdditionalPagesByCourse(models.Manager):
-    def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
-        
     def getByCourseAndMenuSlug(self, course, menu_slug):
-        all_items = self.filter(course=course).order_by('index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and item.menu_slug == menu_slug:
-                returned_items.append(item)
-        return returned_items
-        
+        # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
+        return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
+
     def getSectionPagesByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section','index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and item.section:
-                returned_items.append(item)
-        return returned_items
+        # Additional pages displayed under sections have a live_datetime effect.
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__gt=now).order_by('section','index')
 
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -267,10 +246,16 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
     objects = GetAdditionalPagesByCourse()
 
     def create_production_instance(self):
+        image_section = None
+        if self.section:
+            image_section = self.section.image
+
         production_instance = AdditionalPage(
             course=self.course.image,
             title=self.title,
             description=self.description,
+            menu_slug=self.menu_slug,
+            section = image_section,
             slug=self.slug,
             index=self.index,
             mode='production',
@@ -321,13 +306,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
 class GetAnnouncementsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('-time_created')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0:
-                returned_items.append(item)
-        return returned_items
+        return self.filter(course=course,is_deleted=0).order_by('-time_created')
 
 class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     owner = models.ForeignKey(User)
@@ -408,13 +387,11 @@ post_save.connect(create_user_profile, sender=User)
 
 class GetVideosByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section','index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
-                returned_items.append(item)
-        return returned_items
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__gt=now).order_by('section','index')
 
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -443,6 +420,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             file=self.file,
             image = self,
             mode = 'production',
+            handle = self.handle,
+            live_datetime = self.live_datetime,
         )
         production_instance.save()
         self.image = production_instance
@@ -508,13 +487,11 @@ class VideoActivity(models.Model):
 
 class GetProblemSetsByCourse(models.Manager):
     def getByCourse(self, course):
-        all_items = self.filter(course=course).order_by('section','index')
-        now = datetime.now()
-        returned_items = []
-        for item in all_items:
-            if item.is_deleted == 0 and (course.mode == 'staging' or (item.live_datetime and item.live_datetime < now)):
-                returned_items.append(item)
-        return returned_items
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
@@ -558,6 +535,17 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
         return production_instance
 
+    def exercises_changed(self):
+        production_instance = self.image
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+        if len(staging_psetToExs) != len(production_psetToExs):
+            return True
+        for staging_psetToEx in staging_psetToExs:
+            if not staging_psetToEx.image:
+                return True
+        return False
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
         if not self.image: self.create_production_instance()
@@ -592,17 +580,31 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         production_instance.save()
 
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
-        #Delete all previous relationships
-        for production_psetToEx in production_psetToExs:
-            production_psetToEx.is_deleted = True
-            production_psetToEx.save()
+        if self.exercises_changed() == True:
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+            #Delete all previous relationships
+            for production_psetToEx in production_psetToExs:
+                production_psetToEx.delete()
+                production_psetToEx.save()
 
         #Create brand new copies of staging relationships
-        for staging_psetToEx in staging_psetToExs:
-           production_psetToEx = ProblemSetToExercise(problemSet=production_instance, exercise=staging_psetToEx.exercise, number=staging_psetToEx.number, is_deleted=False)
-           production_psetToEx.save()
+            for staging_psetToEx in staging_psetToExs:
+                production_psetToEx = ProblemSetToExercise(problemSet = production_instance,
+                                                    exercise = staging_psetToEx.exercise,
+                                                    number = staging_psetToEx.number,
+                                                    is_deleted = 0,
+                                                    mode = 'production',
+                                                    image = staging_psetToEx)
+                production_psetToEx.save()
+                staging_psetToEx.image = production_psetToEx
+                staging_psetToEx.save()
+
+        else:
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            for staging_psetToEx in staging_psetToExs:
+                staging_psetToEx.image.number = staging_psetToEx.number
+                staging_psetToEx.image.save()
 
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
@@ -637,34 +639,67 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         self.save()
 
-    def is_synced(self):
-        if self.title != self.image.title:
-            return False
-        if self.description != self.image.description:
-            return False
-        if self.path != self.image.path:
-            return False
-        if self.slug != self.image.slug:
-            return False
-        if self.index != self.image.index:
-            return False
-        if self.live_datetime != self.image.live_datetime:
-            return False
-        if self.due_date != self.image.due_date:
-            return False
-        if self.grace_period != self.image.grace_period:
-            return False
-        if self.partial_credit_deadline != self.image.partial_credit_deadline:
-            return False
-        if self.assessment_type != self.image.assessment_type:
-            return False
-        if self.late_penalty != self.image.late_penalty:
-            return False
-        if self.submissions_permitted != self.image.submissions_permitted:
-            return False
-        if self.resubmission_penalty != self.image.resubmission_penalty:
-            return False
+        if self.exercises_changed() == True:
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+            #Delete all previous relationships
+            for staging_psetToEx in staging_psetToExs:
+                staging_psetToEx.delete()
+                staging_psetToEx.save()
 
+        #Create brand new copies of staging relationships
+            for production_psetToEx in production_psetToExs:
+                staging_psetToEx = ProblemSetToExercise(problemSet = self,
+                                                    exercise = production_psetToEx.exercise,
+                                                    number = production_psetToEx.number,
+                                                    is_deleted = 0,
+                                                    mode = 'staging',
+                                                    image = production_psetToEx)
+                staging_psetToEx.save()
+                production_psetToEx.image = staging_psetToEx
+                production_psetToEx.save()
+
+        else:
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+            for production_psetToEx in production_psetToExs:
+                production_psetToEx.image.number = production_psetToEx.number
+                production_psetToEx.image.save()
+
+
+    def is_synced(self):
+        image = self.image
+        if self.exercises_changed() == True:
+            return False
+        if self.title != image.title:
+            return False
+        if self.description != image.description:
+            return False
+        if self.path != image.path:
+            return False
+        if self.slug != image.slug:
+            return False
+        if self.index != image.index:
+            return False
+        if self.live_datetime != image.live_datetime:
+            return False
+        if self.due_date != image.due_date:
+            return False
+        if self.grace_period != image.grace_period:
+            return False
+        if self.partial_credit_deadline != image.partial_credit_deadline:
+            return False
+        if self.assessment_type != image.assessment_type:
+            return False
+        if self.late_penalty != image.late_penalty:
+            return False
+        if self.submissions_permitted != image.submissions_permitted:
+            return False
+        if self.resubmission_penalty != image.resubmission_penalty:
+            return False
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+        for staging_psetToEx in staging_psetToExs:
+            if staging_psetToEx.number != staging_psetToEx.image.number:
+                return False
         return True
 
     def __unicode__(self):
@@ -674,6 +709,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
 class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
+    video = models.ManyToManyField(Video, through='VideoToExercise')
     fileName = models.CharField(max_length=255)
     file = models.FileField(upload_to=get_file_path, null=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
@@ -684,19 +720,33 @@ class Exercise(TimestampMixin, Deletable, models.Model):
 
 
 
-class ProblemSetToExercise(models.Model):
+class ProblemSetToExercise(Deletable, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
-    is_deleted = models.BooleanField()
+    image = models.ForeignKey('self',null=True, blank=True)
+    mode = models.TextField(blank=True)
     def __unicode__(self):
         return self.problemSet.title + "-" + self.exercise.fileName
     class Meta:
         db_table = u'c2g_problemset_to_exercise'
 
 
+class VideoToExercise(models.Model):
+    video = models.ForeignKey(Video)
+    exercise = models.ForeignKey(Exercise)
+    number = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField()
+    video_time = models.IntegerField(null=True, blank=True)
+    def __unicode__(self):
+        return self.video.title + "-" + self.exercise.fileName
+    class Meta:
+        db_table = u'c2g_video_to_exercise'
+
+
 class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
+     video_to_exercise = models.ForeignKey(VideoToExercise, null=True)
      problemset_to_exercise = models.ForeignKey(ProblemSetToExercise, null=True)
      problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
@@ -713,6 +763,8 @@ class ProblemActivity(TimestampMixin, models.Model):
      card = models.TextField(blank=True)
      cards_done = models.IntegerField(null=True, blank=True)
      cards_left = models.IntegerField(null=True, blank=True)
+     user_selection_val = models.CharField(max_length=1024, null=True, blank=True)
+     user_choices = models.CharField(max_length=1024, null=True, blank=True)
      def __unicode__(self):
             return self.student.username
      class Meta:
