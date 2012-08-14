@@ -164,7 +164,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
-    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).filter(is_deleted=0).order_by('number')
+    psetToExs = ProblemSetToExercise.objects.getByProblemset(pset).select_related('exercise', 'problemSet')
     used_exercises = []
     problemset_taken = False
     if len(ProblemActivity.objects.filter(problemset_to_exercise__problemSet=pset.image)) > 0:
@@ -203,7 +203,7 @@ def add_exercise(request):
     exercise.file.save(file_name, file_content)
     exercise.save()
 
-    index = len(pset.problemsettoexercise_set.filter(is_deleted=0))
+    index = len(ProblemSetToExercise.objects.getByProblemset(pset))
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='staging')
     psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
@@ -214,17 +214,17 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.problemsettoexercise_set.filter(is_deleted=0)), is_deleted=0, mode='staging')
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(ProblemSetToExercise.objects.getByProblemset(pset)), is_deleted=0, mode='staging')
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 def save_helper(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    psetToEx = pset.problemsettoexercise_set.filter(is_deleted=0).order_by('number')
-    for n in range(0,len(psetToEx)):
+    psetToExs = ProblemSetToExercise.objects.getByProblemset(pset)
+    for n in range(0,len(psetToExs)):
         listName = "exercise_order[" + str(n) + "]"
-        psetToEx[n].number = request.POST[listName]
-        psetToEx[n].save()
+        psetToExs[n].number = request.POST[listName]
+        psetToExs[n].save()
 
 def save_exercises(request):
     save_helper(request)
@@ -258,7 +258,7 @@ def load_problem_set(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
-    psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).filter(is_deleted=False).order_by('number')
+    psetToExs = ProblemSetToExercise.objects.getByProblemset(pset).select_related('exercise', 'problemSet')
     file_names = []
     for psetToEx in psetToExs:
         #Remove the .html from the end of the file name
@@ -270,7 +270,7 @@ def delete_exercise(request):
     toDelete.delete()
     toDelete.save()
     pset = toDelete.problemSet
-    psetToExs = pset.problemsettoexercise_set.filter(is_deleted=0).order_by('number')
+    psetToExs = ProblemSetToExercise.objects.getByProblemset(pset)
     index = 0
     for psetToEx in psetToExs:
         psetToEx.number = index

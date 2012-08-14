@@ -537,8 +537,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def exercises_changed(self):
         production_instance = self.image
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
-        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+        staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
         if len(staging_psetToExs) != len(production_psetToExs):
             return True
         for staging_psetToEx in staging_psetToExs:
@@ -581,8 +581,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         production_instance.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+            staging_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
+            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
             #Delete all previous relationships
             for production_psetToEx in production_psetToExs:
                 production_psetToEx.delete()
@@ -601,7 +601,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 staging_psetToEx.save()
 
         else:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
             for staging_psetToEx in staging_psetToExs:
                 staging_psetToEx.image.number = staging_psetToEx.number
                 staging_psetToEx.image.save()
@@ -640,8 +640,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+            staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
             #Delete all previous relationships
             for staging_psetToEx in staging_psetToExs:
                 staging_psetToEx.delete()
@@ -660,7 +660,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 production_psetToEx.save()
 
         else:
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
+            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
             for production_psetToEx in production_psetToExs:
                 production_psetToEx.image.number = production_psetToEx.number
                 production_psetToEx.image.save()
@@ -696,7 +696,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.resubmission_penalty != image.resubmission_penalty:
             return False
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+        staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
         for staging_psetToEx in staging_psetToExs:
             if staging_psetToEx.number != staging_psetToEx.image.number:
                 return False
@@ -719,7 +719,7 @@ class Exercise(TimestampMixin, Deletable, models.Model):
         db_table = u'c2g_exercises'
 
 
-class GetPsetToExByProblemset(models.Manager):
+class GetPsetToExsByProblemset(models.Manager):
     def getByProblemset(self, problemSet):
         return self.filter(problemSet=problemSet,is_deleted=0).order_by('number')
 
@@ -730,6 +730,7 @@ class ProblemSetToExercise(Deletable, models.Model):
     number = models.IntegerField(null=True, blank=True)
     image = models.ForeignKey('self',null=True, blank=True)
     mode = models.TextField(blank=True)
+    objects = GetPsetToExsByProblemset()
     def __unicode__(self):
         return self.problemSet.title + "-" + self.exercise.fileName
     class Meta:
