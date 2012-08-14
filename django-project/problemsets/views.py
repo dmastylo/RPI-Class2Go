@@ -86,7 +86,7 @@ def create_action(request):
     course = Course.objects.get(handle=course_handle, mode='staging')
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
     index = content_section.getNextIndex()
-    
+
     pset = ProblemSet(course = course,
                     section = content_section,
                    slug = request.POST['slug'],
