@@ -1,10 +1,10 @@
 <html>
 <head>
-<script src="../khan-exercise-c2g.js"></script>
+<!--<script src="../khan-exercise-c2g.js"></script>-->
 </head>
 <body>
     {% for file_name in file_names%}
-    <div class="exercise" data-name={{file_name}} data-weight="1"></div>
+    <div class="exercise {{assessment_type}}" data-name={{file_name}} data-weight="1"></div>
     {% endfor %}
 </body>
 </html>
