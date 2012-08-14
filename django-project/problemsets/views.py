@@ -35,6 +35,8 @@ def show(request, course_prefix, course_suffix, pset_slug):
                                'pset': ps,
                                'pset_url':ps.path,
                                'pset_type':ps.assessment_type,
+                               'pset_penalty':ps.late_penalty,
+                               'pset_attempts_allowed':ps.submissions_permitted,
                               },
                               context_instance=RequestContext(request))
 
