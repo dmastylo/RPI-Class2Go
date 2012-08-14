@@ -1,7 +1,7 @@
 <table style="width:100%">
     <tr id="video_{{item.video.id}}">
         <td width="20"><input type="checkbox" name="video_{{item.video.id}}" id="video_{{item.video.id}}" class="item_selector section_{{item.video.section.id}}_item_selector" /></td>
-        <td width="50%"><i class="icon-facetime-video" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
+        <td width="50%"><i class="icon-facetime-video" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a id="video_{{item.video.id}}_title" href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a></h4></td>
         <td width="20%">
             {% if item.video.is_synced %}
             <div style="color: #00A000; padding: 0px;">

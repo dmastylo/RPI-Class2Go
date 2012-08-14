@@ -14,6 +14,12 @@
 <form action="{% url 'courses.content_sections.actions.save_content_order' %}" method="POST">
     <ul {% ifequal context 'course_materials' %}data-sortablecontainer{% endifequal %} style="list-style-type:none;">
         {% for item in section_structure.items %}
+            {% ifequal item.type 'additional_page' %}
+                <li id="additional_page_{{item.additional_page.id}}" class="ui-state-default" style="padding: 3px;">
+                    {% include "additional_pages/staging/additional_page_list_item.html" %}
+                    <input type="hidden" name="order_additional_page_{{item.additional_page.id}}" value="{{forloop.counter0}}" />
+                </li>
+            {% endifequal %}
             {% ifequal item.type 'problem_set' %}
                 <li id="problem_set_{{item.problem_set.id}}" class="ui-state-default" style="padding: 3px;">
                     {% include "problemsets/staging/problemset_list_item.html" %}

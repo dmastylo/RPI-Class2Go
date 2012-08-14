@@ -15,7 +15,7 @@ import gdata.youtube.service
 import urllib2, urllib, json
 import re
 
-import datetime
+from datetime import datetime
     
 ### Videos ###
 
@@ -153,8 +153,11 @@ def upload(request):
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
 
+            if request.POST.get("set_live_date"):
+                new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
+
             new_video.save()
-            new_video.create_production_instance()
+            #new_video.create_production_instance()
             print new_video.file.url
 
             video = Video(

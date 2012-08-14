@@ -30,7 +30,10 @@ def add(request):
     
     staging_page.create_production_instance()
     
-    return redirect(request.META['HTTP_REFERER'])
+    if request.POST.get("menu_slug") != "":
+        return redirect('courses.views.course_materials', course_prefix, course_suffix)
+    else:
+        return redirect(request.META['HTTP_REFERER'])
     
 def save(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -80,4 +83,4 @@ def delete(request):
     if page.image:
         page.image.delete()
     
-    return redirect('courses.additional_pages.views.manage_nav_menu', common_page_data['course_prefix'],common_page_data['course_suffix'])
+    return redirect(request.META['HTTP_REFERER'])

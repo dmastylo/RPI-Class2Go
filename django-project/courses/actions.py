@@ -40,7 +40,7 @@ def commit(request):
             Video.objects.get(id=parts[1]).commit()
         elif parts[0] == 'problemset':
             ProblemSet.objects.get(id=parts[1]).commit()
-        elif parts[0] == 'page':
+        elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).commit()
     return redirect(request.META['HTTP_REFERER'])
     
@@ -52,7 +52,7 @@ def revert(request):
             Video.objects.get(id=parts[1]).revert()
         elif parts[0] == 'problemset':
             ProblemSet.objects.get(id=parts[1]).revert()
-        elif parts[0] == 'page':
+        elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).revert()
     return redirect(request.META['HTTP_REFERER'])
     
@@ -86,6 +86,10 @@ def change_live_datetime(request):
             image.save()
         elif parts[0] == 'problemset':
             image = ProblemSet.objects.get(id=parts[1]).image
+            image.live_datetime = new_live_datetime
+            image.save()
+        elif parts[0] == 'additionalpage':
+            image = AdditionalPage.objects.get(id=parts[1]).image
             image.live_datetime = new_live_datetime
             image.save()
             
