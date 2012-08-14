@@ -207,7 +207,7 @@ def add_exercise(request):
     exercise.file.save(file_name, file_content)
     exercise.save()
 
-    index = len(pset.problemsettoexercise_set.all().filter(is_deleted=False))
+    index = len(pset.problemsettoexercise_set.filter(is_deleted=False))
     psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=False, mode='staging')
     psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
@@ -218,7 +218,7 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.exercise_set.all()), is_deleted=False, mode='staging')
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(pset.problemsettoexercise_set.filter(is_deleted=False)), is_deleted=False, mode='staging')
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
@@ -268,3 +268,16 @@ def load_problem_set(request, course_prefix, course_suffix, pset_slug):
         #Remove the .html from the end of the file name
         file_names.append(psetToEx.exercise.fileName[:-5])
     return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names},context_instance=RequestContext(request))
+
+def delete_exercise(request):
+    toDelete = ProblemSetToExercise.objects.get(id=request.POST['exercise_id'])
+    toDelete.is_deleted = True
+    toDelete.save()
+    pset = toDelete.problemSet
+    psetToExs = pset.problemsettoexercise_set.filter(is_deleted=False).order_by('number')
+    index = 0
+    for psetToEx in psetToExs:
+        psetToEx.number = index
+        psetToEx.save()
+        index += 1
+    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))

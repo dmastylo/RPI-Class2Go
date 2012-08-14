@@ -8,7 +8,7 @@ function confirm_change(){
     if ("{{problemset_taken}}" == "False"){
         return true;
     }   
-    var r=confirm("WARNING: Students have already begun taking this problem set. Adding or deleting exercises can ruin the integrity of the results. Are you sure you wish to make this change?")
+    var r=confirm("WARNING: Students have already begun taking this problem set. Adding exercises can ruin the integrity of the results. Are you sure you wish to make this change?")
     if (r==true){
        return true;
     } else {
@@ -17,7 +17,7 @@ function confirm_change(){
 }
 </script>
 
-
+{% include "problemsets/delete_exercise_form.html" %}
 
 <div id="c2g_layout_m_column" class="span12">
     <h3>Add or Remove Exercises</h3>
@@ -69,6 +69,7 @@ function confirm_change(){
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
                     {{psetToEx.exercise.fileName}}
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
+                    <a href="javascript:DeleteExercise('{{psetToEx.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
                 </li>
             {% empty%}
                 <p style='margin: 20px;'>There are no exercises yet.</p>

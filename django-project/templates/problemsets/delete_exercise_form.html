@@ -1,0 +1,14 @@
+<form name="delete_exercise_form" action="{% url 'problemsets.views.delete_exercise' %}" method="POST">
+        <input type="hidden" name="exercise_id" id="delete_exercise_id" />
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        {% csrf_token %}
+</form>
+<script type="text/javascript">
+    function DeleteExercise(id) {
+        if ("{{problemset_taken}}"=="True")
+            confirm("WARNING: Students have already begun taking this problem set. Deleting an exercise can ruin the integrity of the result. Are you sure you wish to make this change?")
+        $("#delete_exercise_id").val(id);
+        document.forms.delete_exercise_form.submit();
+}
+</script>
