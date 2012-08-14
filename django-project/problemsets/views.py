@@ -44,7 +44,7 @@ def attempt(request, problemId):
     user = request.user
 #    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
 #    exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
-    problemset_to_exercise = ProblemSetToExercise.objects.get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'])
+    problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'])
     problem_activity = ProblemActivity(student = user,
                                         problemset_to_exercise = problemset_to_exercise,
                                         complete = request.POST['complete'],
@@ -169,6 +169,10 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
     psetToExs = ProblemSetToExercise.objects.select_related('exercise', 'problemSet').filter(problemSet=pset).filter(is_deleted=False).order_by('number')
     used_exercises = []
+    problemset_taken = False
+    if len(ProblemActivity.objects.filter(problemset_to_exercise__problemSet=pset.image)) > 0:
+        problemset_taken = True
+    print problemset_taken
     #Get the list of exercises currently in this problem set
     for psetToEx in psetToExs:
         used_exercises.append(psetToEx.exercise.id)
@@ -181,6 +185,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
                                 'course_suffix': course_suffix,
                                 'pset': pset,
                                 'psetToExs': psetToExs,
+                                'problemset_taken': problemset_taken,
                                 'exercises': exercises
                             },
                             context_instance=RequestContext(request))

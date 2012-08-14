@@ -1,6 +1,24 @@
+
 {% extends "course_base.html" %}
 {% load url from future %}
 {% block m_column_content %}
+
+<script type="text/javascript">
+function confirm_change(){
+    if ("{{problemset_taken}}" == "False"){
+        return true;
+    }   
+    var r=confirm("WARNING: Students have already begun taking this problem set. Adding or deleting exercises can ruin the integrity of the results. Are you sure you wish to make this change?")
+    if (r==true){
+       return true;
+    } else {
+        return false;
+    }
+}
+</script>
+
+
+
 <div id="c2g_layout_m_column" class="span12">
     <h3>Add or Remove Exercises</h3>
 
@@ -15,7 +33,7 @@
             <label class="control-label">Add Exercises* (Choose a file and then click Add Exercise)</label>
             <div class="controls">
                 <input type="file" name="exercise">
-                <input type="submit" value="Add Exercise" class="btn">
+                <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
             </div>
         </div>
     </form>
@@ -66,3 +84,5 @@
     </form>
 </div>
 {% endblock m_column_content %}
+
+
