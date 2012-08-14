@@ -15,7 +15,7 @@ import gdata.youtube.service
 import urllib2, urllib, json
 import re
 
-import datetime
+from datetime import datetime
     
 ### Videos ###
 
@@ -153,6 +153,9 @@ def upload(request):
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
 
+            if request.POST.get("set_live_date"):
+                new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
+
             new_video.save()
             #new_video.create_production_instance()
             print new_video.file.url
@@ -171,9 +174,9 @@ def upload(request):
 
 
 
-     #       authUrl = GetOAuth2Url(request, new_video)
+            authUrl = GetOAuth2Url(request, new_video)
             #eventually should store an access token, so they don't have to give permission everytime
-     #       return redirect(authUrl)
+            return redirect(authUrl)
         #    return redirect("http://" + request.META['HTTP_HOST'])
         
         return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_video.slug)))

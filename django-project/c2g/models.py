@@ -465,7 +465,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             file=self.file,
             image = self,
             mode = 'production',
-            handle = self.handle
+            handle = self.handle,
+            live_datetime = self.live_datetime,
         )
         production_instance.save()
         self.image = production_instance
