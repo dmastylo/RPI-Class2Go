@@ -29,9 +29,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-
-    ps = common_page_data['course'].problemset_set.get(slug=pset_slug)
-#    ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
+    ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
                                'pset': ps,
@@ -42,9 +40,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
 @csrf_exempt
 def attempt(request, problemId):
     user = request.user
-#    pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-#    exercise = pset.exercise_set.get(fileName=request.POST['exercise_filename'])
-    problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'])
+    problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
     problem_activity = ProblemActivity(student = user,
                                         problemset_to_exercise = problemset_to_exercise,
                                         complete = request.POST['complete'],
@@ -106,9 +102,7 @@ def create_action(request):
     except:
         pass
     pset.save()
-
     pset.create_production_instance()
-
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 def edit_form(request, course_prefix, course_suffix, pset_slug):
@@ -116,8 +110,8 @@ def edit_form(request, course_prefix, course_suffix, pset_slug):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    pset = common_page_data['course'].problemset_set.all().get(slug=pset_slug)
-    content_sections = common_page_data['course'].contentsection_set.all()
+    pset = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
+    content_sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
     #datetimes need to be converted to date picker format
     datetimes = {'live_datetime': pset.live_datetime.strftime('%m/%d/%Y %H:%M'),
                 'due_date': pset.due_date.strftime('%m/%d/%Y %H:%M'),
@@ -140,6 +134,7 @@ def edit_helper(request):
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
     pset.section = content_section
     pset.slug = request.POST['slug']
+    pset.path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+request.POST['slug']+"/load_problem_set"
     pset.title = request.POST['title']
     pset.description = request.POST['description']
     pset.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
@@ -172,7 +167,6 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     problemset_taken = False
     if len(ProblemActivity.objects.filter(problemset_to_exercise__problemSet=pset.image)) > 0:
         problemset_taken = True
-    print problemset_taken
     #Get the list of exercises currently in this problem set
     for psetToEx in psetToExs:
         used_exercises.append(psetToEx.exercise.id)
@@ -224,7 +218,7 @@ def add_existing_exercises(request):
 
 def save_helper(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    psetToEx = pset.problemsettoexercise_set.all().filter(is_deleted=False).order_by('number')
+    psetToEx = pset.problemsettoexercise_set.filter(is_deleted=False).order_by('number')
     for n in range(0,len(psetToEx)):
         listName = "exercise_order[" + str(n) + "]"
         psetToEx[n].number = request.POST[listName]
