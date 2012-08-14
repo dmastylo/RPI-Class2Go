@@ -34,6 +34,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
                               {'common_page_data':common_page_data,
                                'pset': ps,
                                'pset_url':ps.path,
+                               'pset_type':ps.assessment_type,
                               },
                               context_instance=RequestContext(request))
 
@@ -84,6 +85,8 @@ def create_action(request):
     course_handle = request.POST['course_prefix'] + "#$!" + request.POST['course_suffix']
     course = Course.objects.get(handle=course_handle, mode='staging')
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
+    index = content_section.getNextIndex()
+    
     pset = ProblemSet(course = course,
                     section = content_section,
                    slug = request.POST['slug'],
@@ -97,7 +100,8 @@ def create_action(request):
                    late_penalty = request.POST['late_penalty'],
                    submissions_permitted = request.POST['submissions_permitted'],
                    resubmission_penalty = request.POST['resubmission_penalty'],
-                   mode = 'staging')
+                   mode = 'staging',
+                   index=index)
     #Optional fields that may or may not be passed in the request
     try:
         pset.description = request.POST['description']
@@ -263,7 +267,7 @@ def load_problem_set(request, course_prefix, course_suffix, pset_slug):
     for psetToEx in psetToExs:
         #Remove the .html from the end of the file name
         file_names.append(psetToEx.exercise.fileName[:-5])
-    return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names},context_instance=RequestContext(request))
+    return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names, 'assessment_type': pset.assessment_type},context_instance=RequestContext(request))
 
 def delete_exercise(request):
     toDelete = ProblemSetToExercise.objects.get(id=request.POST['exercise_id'])

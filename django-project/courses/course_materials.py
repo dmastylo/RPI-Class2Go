@@ -1,7 +1,7 @@
 from c2g.models import *
 import datetime
 
-def get_course_materials(common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content = True):
+def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
