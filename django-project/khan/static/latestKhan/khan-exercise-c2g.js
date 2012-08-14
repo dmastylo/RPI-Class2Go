@@ -1292,6 +1292,8 @@ var Khan = (function() {
         // [@wescott] If summative problem set, add note about penalties per try
         if (exAssessType == "summative") {
             $('#solutionarea').append('<p>Note: Maximum of 3 attempts accepted.</p>');
+            $('#solutionarea').append('<p><span id="penalty-pct"></span> penalty per attempt.</p>');
+            $('#solutionarea').append('<p>Attempts so far: <span id="attempt-count">0</span></p>');
         }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
@@ -2729,6 +2731,9 @@ var Khan = (function() {
                 //alert(data)
                 if (data == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                } else {
+                    var attCt = $('#attempt-count').text();
+                    $('#attempt-count').text(parseInt(attCt) + 1);
                 }
 
                 // Tell any listeners that khan-exercises has new
@@ -3129,10 +3134,10 @@ var Khan = (function() {
 
             if ($('input#testinput').length) {
                 $('input#testinput').val(userAnswer);
-                $('input#testinput').attr('disabled', 'disabled');
+                //$('input#testinput').attr('disabled', 'disabled');
             } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
                 $('input:radio[name=solution]')[userAnswer].checked = true;
-                $('input:radio').attr('disabled', 'disabled');
+                //$('input:radio').attr('disabled', 'disabled');
             }
 
         };
