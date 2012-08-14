@@ -4,17 +4,15 @@ DATABASES = {
         'NAME': 'class2go',                      # Or path to database file if using sqlite3.
         'USER': 'class2go',                      # Not used with sqlite3.
         'PASSWORD': 'class2go',                  # Not used with sqlite3.
-        'HOST': '<%= @node[:bitnami_django][:database_host] %>',   # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '<%= @node[:aws][:database_host] %>',   # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
 
 SECRET_KEY = 'class2go'
 
-# TODO -- conditionalize this based on environment
-class2go_mode = 'stage'
-
-AWS_ACCESS_KEY_ID = 'AKIAIYES3HTY3TOMHCTQ'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = '<%= @node[:aws][:access_key] %>'
+AWS_SECRET_ACCESS_KEY = '<%= @node[:aws][:access_secret] %>'
+AWS_STORAGE_BUCKET_NAME = '<%= @node[:aws][:storage_bucket] %>'
 
 MEDIA_ROOT = ''
