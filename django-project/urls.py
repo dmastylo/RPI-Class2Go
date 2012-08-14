@@ -128,4 +128,5 @@ urlpatterns = patterns('',
     url(r'^edit_publish_action/?', 'problemsets.views.edit_publish_action'),
     url(r'^save_problemset_exercises/?', 'problemsets.views.save_exercises'),
     url(r'^save_and_publish_problemset_exercises/?', 'problemsets.views.save_and_publish_exercises'),
+    url(r'^delete_exercise/?', 'problemsets.views.delete_exercise'),
 )
