@@ -106,6 +106,7 @@ urlpatterns = patterns('',
     url(r'^save_video_exercises/?', 'courses.videos.views.save_exercises'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_-]+)/?$', 'courses.video_exercises.views.view'),
+    url(r'^get_video_exercises/?$', 'courses.videos.views.get_video_exercises'),
 
 
     #Problem Sets
@@ -127,4 +128,5 @@ urlpatterns = patterns('',
     url(r'^edit_publish_action/?', 'problemsets.views.edit_publish_action'),
     url(r'^save_problemset_exercises/?', 'problemsets.views.save_exercises'),
     url(r'^save_and_publish_problemset_exercises/?', 'problemsets.views.save_and_publish_exercises'),
+    url(r'^delete_exercise/?', 'problemsets.views.delete_exercise'),
 )

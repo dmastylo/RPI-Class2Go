@@ -265,14 +265,14 @@ class AdditionalPageManager(models.Manager):
             return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__gt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__lt=now).order_by('section','index')
     
     def getBySection(self, section):
         if section.mode == 'staging':
             return self.filter(section=section, is_deleted=0).order_by('index')
         else:
             now = datetime.now()
-            return self.filter(section=section, is_deleted=0, live_datetime__gt=now).order_by('index')
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -429,14 +429,14 @@ class VideoManager(models.Manager):
             return self.filter(course=course,is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__gt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
             
     def getBySection(self, section):
         if section.mode == 'staging':
             return self.filter(section=section, is_deleted=0).order_by('index')
         else:
             now = datetime.now()
-            return self.filter(section=section, is_deleted=0, live_datetime__gt=now).order_by('index')
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -536,14 +536,14 @@ class ProblemSetManager(models.Manager):
             return self.filter(course=course,is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__gt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
             
     def getBySection(self, section):
         if section.mode == 'staging':
             return self.filter(section=section, is_deleted=0).order_by('index')
         else:
             now = datetime.now()
-            return self.filter(section=section, is_deleted=0, live_datetime__gt=now).order_by('index')
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
@@ -589,8 +589,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def exercises_changed(self):
         production_instance = self.image
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+        production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
         if len(staging_psetToExs) != len(production_psetToExs):
             return True
         for staging_psetToEx in staging_psetToExs:
@@ -633,11 +633,11 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         production_instance.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
             #Delete all previous relationships
             for production_psetToEx in production_psetToExs:
-                production_psetToEx.is_deleted = True
+                production_psetToEx.delete()
                 production_psetToEx.save()
 
         #Create brand new copies of staging relationships
@@ -645,7 +645,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 production_psetToEx = ProblemSetToExercise(problemSet = production_instance,
                                                     exercise = staging_psetToEx.exercise,
                                                     number = staging_psetToEx.number,
-                                                    is_deleted = False,
+                                                    is_deleted = 0,
                                                     mode = 'production',
                                                     image = staging_psetToEx)
                 production_psetToEx.save()
@@ -653,7 +653,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 staging_psetToEx.save()
 
         else:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
             for staging_psetToEx in staging_psetToExs:
                 staging_psetToEx.image.number = staging_psetToEx.number
                 staging_psetToEx.image.save()
@@ -692,11 +692,11 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
             #Delete all previous relationships
             for staging_psetToEx in staging_psetToExs:
-                staging_psetToEx.is_deleted = True
+                staging_psetToEx.delete()
                 staging_psetToEx.save()
 
         #Create brand new copies of staging relationships
@@ -704,7 +704,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 staging_psetToEx = ProblemSetToExercise(problemSet = self,
                                                     exercise = production_psetToEx.exercise,
                                                     number = production_psetToEx.number,
-                                                    is_deleted = False,
+                                                    is_deleted = 0,
                                                     mode = 'staging',
                                                     image = production_psetToEx)
                 staging_psetToEx.save()
@@ -712,7 +712,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 production_psetToEx.save()
 
         else:
-            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=False)
+            production_psetToExs = production_instance.problemsettoexercise_set.all().filter(is_deleted=0)
             for production_psetToEx in production_psetToExs:
                 production_psetToEx.image.number = production_psetToEx.number
                 production_psetToEx.image.save()
@@ -748,7 +748,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.resubmission_penalty != image.resubmission_penalty:
             return False
-        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=False)
+        staging_psetToExs = self.problemsettoexercise_set.all().filter(is_deleted=0)
         for staging_psetToEx in staging_psetToExs:
             if staging_psetToEx.number != staging_psetToEx.image.number:
                 return False
@@ -772,11 +772,10 @@ class Exercise(TimestampMixin, Deletable, models.Model):
 
 
 
-class ProblemSetToExercise(models.Model):
+class ProblemSetToExercise(Deletable, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
-    is_deleted = models.BooleanField()
     image = models.ForeignKey('self',null=True, blank=True)
     mode = models.TextField(blank=True)
     def __unicode__(self):
@@ -816,6 +815,8 @@ class ProblemActivity(TimestampMixin, models.Model):
      card = models.TextField(blank=True)
      cards_done = models.IntegerField(null=True, blank=True)
      cards_left = models.IntegerField(null=True, blank=True)
+     user_selection_val = models.CharField(max_length=1024, null=True, blank=True)
+     user_choices = models.CharField(max_length=1024, null=True, blank=True)
      def __unicode__(self):
             return self.student.username
      class Meta:

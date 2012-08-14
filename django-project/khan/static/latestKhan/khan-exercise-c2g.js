@@ -745,22 +745,22 @@ var Khan = (function() {
                 var controlLoad = function(exArr) {
                     if (exArr.length > 0) {
                         currentEx = exArr.shift();
-                        loadExercise.call(currentEx).done(function () { 
-                            controlLoad(exArr); 
+                        loadExercise.call(currentEx).done(function () {
+                            controlLoad(exArr);
                         });
                     } else {
                         return;
                     }
                 }
                 controlLoad(remoteExercises.toArray());
-                
+
                 /*
                 remoteExercises.each(function (idx, elem) {
                     $.when(loadExercise.call(elem)).done(function () {
                         console.log('Ex ' + idx + ' executed');});
                 });
                 */
-                
+
 
             // Only run loadModules if exercises are in the page
             } else if ($("div.exercise").length) {
@@ -2682,7 +2682,7 @@ var Khan = (function() {
         problem_identifier = $('#workarea').children('div').attr('id')
         exercise_filename = exercise.data('fileName')
         pset_id = document.getElementById("pset_id").value
-        if ($('input#testinput').length) { 
+        if ($('input#testinput').length) {
             user_selection_val = $('input#testinput').val();
         } else if ($('input:radio[name=solution]').length) {
             user_selection_val = $('input:radio[name=solution]:checked').val();
@@ -2695,7 +2695,7 @@ var Khan = (function() {
         data = $.extend(data, {"exercise_filename": exercise_filename});
         data = $.extend(data, {"pset_id": pset_id});
         data = $.extend(data, {"user_selection_val": user_selection_val});
-        data = $.extend(data, {"user_choices": JSON.stringify(user_choices)});
+        data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         //URL starts with problemsets/attempt to direct to a view to collect data.
         //problemId is the id of the problem the information is being created for
@@ -3042,7 +3042,7 @@ var Khan = (function() {
             var currentQCard = $('.current-question');
 
             var userAnswer = readOnlyChoices = null;
-            if ($('input#testinput').length) { 
+            if ($('input#testinput').length) {
                 userAnswer = $('input#testinput').val();
             } else if ($('input:radio[name=solution]').length) {
                 userAnswer = $('input:radio[name=solution]:checked').val();
@@ -3055,7 +3055,7 @@ var Khan = (function() {
                 });
                 //console.log(JSON.stringify(readOnlyChoices));
             }
-            
+
             currentQCard.data('userAnswer', userAnswer);
             currentQCard.data('readOnlyChoices', readOnlyChoices);
             currentQCard.removeClass('current-question');
@@ -3087,7 +3087,7 @@ var Khan = (function() {
             if ($(this).hasClass('current-question')) {
                 return;
             }
-            if ($('input#testinput').length) { 
+            if ($('input#testinput').length) {
                 $('input#testinput').removeAttr('disabled');
             } else if ($('input:radio').length) {
                 $('input:radio').removeAttr('disabled');
@@ -3108,10 +3108,10 @@ var Khan = (function() {
             // [@wescott] Changing here again so it doesn't randomize
             //makeProblem($(this).data('problem'), $(this).data('randseed'));
             makeProblem($(this).data('problem'));
-            
+
             var userAnswer = $(this).data('userAnswer');
 
-            if ($('input#testinput').length) { 
+            if ($('input#testinput').length) {
                 $('input#testinput').val(userAnswer);
                 $('input#testinput').attr('disabled', 'disabled');
             } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {

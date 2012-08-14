@@ -22,8 +22,14 @@ def main(request, course_prefix, course_suffix):
         announcement_list = announcement_list[0:10]
     else:
         many_announcements = False
-        
-    news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
+    
+    if request.user.is_authenticated():
+        is_logged_in = 1
+        news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
+    else:
+        is_logged_in = 0
+        news_list = []
+
     contentsection_list = ContentSection.objects.getByCourse(course=common_page_data['course'])
     video_list = Video.objects.getByCourse(course=common_page_data['course'])
     pset_list =  ProblemSet.objects.getByCourse(course=common_page_data['course'])
@@ -49,7 +55,8 @@ def main(request, course_prefix, course_suffix):
              'contentsection_list': contentsection_list,
              'video_list': video_list,
              'pset_list': pset_list,
-             'full_index_list': full_index_list
+             'full_index_list': full_index_list,
+             'is_logged_in': is_logged_in
              },
 
             context_instance=RequestContext(request))
@@ -60,7 +67,7 @@ def course_materials(request, course_prefix, course_suffix):
     except:
         raise Http404
 
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True)
-
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True)
+    
     return render_to_response('courses/'+common_page_data['course_mode']+'/course_materials.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'course_materials'}, context_instance=RequestContext(request))
 
