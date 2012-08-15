@@ -1291,7 +1291,8 @@ var Khan = (function() {
 
         // [@wescott] If summative problem set, add note about penalties per try
         if (exAssessType == "summative") {
-            var maxAttempts, penaltyPct; 
+            var maxAttempts, penaltyPct;
+            var maxCredit = 100; 
             if (typeof c2gConfig != "undefined") {
                 maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
                 penaltyPct = c2gConfig.penaltyPct + "%";
@@ -1301,7 +1302,7 @@ var Khan = (function() {
             }
             $('#solutionarea').append('<p>Note: Maximum of ' + maxAttempts + ' attempts accepted.</p>');
             $('#solutionarea').append('<p><span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.</p>');
-            $('#solutionarea').append('<p>Attempts so far: <span id="attempt-count">0</span></p>');
+            $('#solutionarea').append('<p>Attempts so far: <span id="attempt-count">0</span> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
         }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
@@ -2740,8 +2741,21 @@ var Khan = (function() {
                 if (data == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                 } else {
+                    var maxCredit = 100;
+                    var maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+
                     var attCt = $('#attempt-count').text();
-                    $('#attempt-count').text(parseInt(attCt) + 1);
+                    var newAttCt = parseInt(attCt) + 1;
+                    $('#attempt-count').text(newAttCt);
+
+                    // since page displays last attempt count, the display will be behind by one
+                    // (i.e. with max of 3 attempts, by the time "Attempts so far" shows as "3",
+                    // the credit should reflect "0%") 
+                    if (newAttCt > (maxAttempts - 1)) {
+                        $('#max-credit').text(0);
+                    } else {
+                        $('#max-credit').text(maxCredit - (c2gConfig.penaltyPct * newAttCt));
+                    }
                 }
 
                 // Tell any listeners that khan-exercises has new
@@ -2913,7 +2927,7 @@ var Khan = (function() {
             }
 
         // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
-        }).done(setTimeout(function () { dfd.resolve(); }, 1000));
+        }).done(setTimeout(function () { dfd.resolve(); }, 2000));
 
         return dfd.promise();
     }
@@ -3094,7 +3108,8 @@ var Khan = (function() {
             $('#questions-unviewed li:first-child').click(viewedClickHandler);
             $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
-            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
+            //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
+            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
             next.addClass('current-question');
 
             clearExistingProblem();
@@ -3103,6 +3118,17 @@ var Khan = (function() {
                 // [@wescott] Again, we don't need to randomize
                 //makeProblem(next.data('problem'), next.data('randseed'));
                 makeProblem(next.data('problem'));
+            }
+
+            if ((c2gConfig.problemType == 'summative' || c2gConfig.problemType == 'assessive') && $('#questions-unviewed li').length == 0) {
+                if ($('#submit-problemset-button').length) {
+                    $('#submit-problemset-button').show();
+                } else {
+                    $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+                    $('#submit-problemset-button').click(function () {
+                        //location.href = '';
+                    });
+                }
             }
 
         });
