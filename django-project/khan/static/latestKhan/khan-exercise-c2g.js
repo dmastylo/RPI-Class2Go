@@ -2748,7 +2748,10 @@ var Khan = (function() {
                     var newAttCt = parseInt(attCt) + 1;
                     $('#attempt-count').text(newAttCt);
 
-                    if (newAttCt > maxAttempts) {
+                    // since page displays last attempt count, the display will be behind by one
+                    // (i.e. with max of 3 attempts, by the time "Attempts so far" shows as "3",
+                    // the credit should reflect "0%") 
+                    if (newAttCt > (maxAttempts - 1)) {
                         $('#max-credit').text(0);
                     } else {
                         $('#max-credit').text(maxCredit - (c2gConfig.penaltyPct * newAttCt));
@@ -3105,7 +3108,8 @@ var Khan = (function() {
             $('#questions-unviewed li:first-child').click(viewedClickHandler);
             $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
-            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
+            //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
+            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
             next.addClass('current-question');
 
             clearExistingProblem();
@@ -3117,10 +3121,14 @@ var Khan = (function() {
             }
 
             if ((c2gConfig.problemType == 'summative' || c2gConfig.problemType == 'assessive') && $('#questions-unviewed li').length == 0) {
-                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
-                $('#submit-problemset-button').click(function () {
-                    //location.href = '';
-                });
+                if ($('#submit-problemset-button').length) {
+                    $('#submit-problemset-button').show();
+                } else {
+                    $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+                    $('#submit-problemset-button').click(function () {
+                        location.href = '/nlp/Fall2012/problemsets';
+                    });
+                }
             }
 
         });
