@@ -480,7 +480,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
         if not clone_fields or 'section' in clone_fields:
-            production_instance.section = self.section
+            production_instance.section = self.section.image
         if not clone_fields or 'description' in clone_fields:
             production_instance.description = self.description
         if not clone_fields or 'slug' in clone_fields:
@@ -499,7 +499,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
         if not clone_fields or 'section' in clone_fields:
-            self.section = production_instance.section
+            self.section = production_instance.section.image
         if not clone_fields or 'description' in clone_fields:
             self.description = production_instance.description
         if not clone_fields or 'slug' in clone_fields:
@@ -522,6 +522,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     def is_synced(self):
         prod_instance = self.image
         if self.title != prod_instance.title:
+            return False
+        if self.section != prod_instance.section.image:
             return False
         if self.description != prod_instance.description:
             return False
