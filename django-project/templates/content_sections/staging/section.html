@@ -12,7 +12,7 @@
 </table>
 
 <form action="{% url 'courses.content_sections.actions.save_content_order' %}" method="POST">
-    <ul {% ifequal context 'course_materials' %}data-sortablecontainer{% endifequal %} style="list-style-type:none;">
+    <ul {% ifequal context 'course_materials' %}data-sortablecontainer{% endifequal %} class="unstyled">
         {% for item in section_structure.items %}
             {% ifequal item.type 'additional_page' %}
                 <li id="additional_page_{{item.additional_page.id}}" class="ui-state-default" style="padding: 3px;">
