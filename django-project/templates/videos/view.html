@@ -22,7 +22,9 @@
 <link rel="stylesheet" href="{{ STATIC_URL}}latestKhan/demo/css/quiz_iframe.css" />
 <div id="c2g_layout_m_column" class="span9">
   {% if user.is_authenticated %}
-    <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn">Edit Video</a>
+    {% if common_page_data.is_course_admin %}
+      <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn">Edit Video</a>
+    {% endif %}
     {% if video.title == 'Defining Minimum Edit Distance' %}
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
     {% elif video.title == "Regular Expressions" or video.title == "Word Tokenization" %}
