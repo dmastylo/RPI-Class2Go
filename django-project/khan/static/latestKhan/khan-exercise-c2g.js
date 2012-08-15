@@ -3126,7 +3126,7 @@ var Khan = (function() {
                 } else {
                     $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                     $('#submit-problemset-button').click(function () {
-                        //location.href = '';
+                        location.href = '/nlp/Fall2012/problemsets';
                     });
                 }
             }
