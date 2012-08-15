@@ -46,10 +46,11 @@
             <ul class="nav pull-right hidden-phone" style="border-left:0;">
                 {% if common_page_data.can_switch_mode %}
                 <li>
-                    <form style="position: relative;width: 180px;height: 1px;padding: 8px 10px 7px;color: #333;" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
+                    <form class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
+                        <p>You are currently viewing:</p>
                         <div class="btn-group btn-views-toggle" style="position: absolute;top: 60px;right: -150px;height: 23px;">
-                            <button type="submit" name="to_mode" value="staging" class="btn btn-inverse btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Draft</button>
-                            <button type="submit" name="to_mode" value="production" class="btn btn-inverse btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Published</button>
+                            <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Draft</button>
+                            <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Published</button>
                         </div>
                         <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
                         <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
