@@ -343,13 +343,13 @@ small.date {
 ul.exercise-list {
     margin:10px 0 !important;
 }
-ul.exercise-list li {
+ul.ui-sortable li {
     list-style-type:none;
     padding:5px;
     border:1px solid #ccc;
     margin-bottom:5px;
 }
-ul.exercise-list li:hover {
+ul.ui-sortable li:hover {
     border-color:#000;
     cursor:move;
 }
