@@ -21,19 +21,19 @@
       		 	                {% if is_logged_in %}
       		 		                <li style="margin-top:5px;"><i class="icon-facetime-video" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
       		 		            {% else %}
-                                    <li style="margin-top:5px;"><i class="icon-facetime-video" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
+                              <li style="margin-top:5px;"><i class="icon-facetime-video" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
       		 		            {% endif %}
       		 	            {% endifequal %}
       		 	            {% ifequal item.0 'pset' %}
       		 	                {% if is_logged_in %}
-                                    <li style="margin-top:5px;"><i class="icon-pencil" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+                                <li style="margin-top:5px;"><i class="icon-pencil" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
       		 	                {% else %}
       		 	                    <li style="margin-top:5px;"><i class="icon-pencil" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
       		 	                {% endif %}
       		 	            {% endifequal %}
                             {% ifequal item.0 'additional_page' %}
       		 	                {% if is_logged_in %}
-                                    <li style="margin-top:5px;"><i class="icon-book" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
+                                <li style="margin-top:5px;"><i class="icon-book" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><a style="display:inline;margin-left: -10px;" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}">{{item.5}}</a></li>
       		 	                {% else %}
       		 	                    <li style="margin-top:5px;"><i class="icon-book" style="font-size:15px; color:#999;opacity:.5; display:inline;"></i><label style="display:inline;margin-left: 5px;">{{item.5}}</label></li>
       		 	                {% endif %}
@@ -53,8 +53,8 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h3 class="section-title" style='display:inline;'>Recent Announcements</h3>
-    <div style="display:inline; float: right;">
+    <h3 class="section-title pull-left">Recent Announcements</h3>
+    <div class="pull-right">
         {% if many_announcements %}
             <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">View all announcements</a>
         {% endif %}

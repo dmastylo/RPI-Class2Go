@@ -7,8 +7,12 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     <form action="{% url 'courses.content_sections.actions.rename' %}" method="POST" class="span8">
-        New title for section "{{section.title}}": <br/>
-        <input name="title" value="{{section.title}}" style="width: 100%"/>
+        <div class="control-group">
+            <label>New title for section "{{section.title}}":</label>
+            <div class="controls">
+                <input name="title" class="span12" type="text" value="{{section.title}}" />
+            </div>
+        </div>
         {% csrf_token %}
         <input type="hidden" name="section_id" value="{{section.id}}" />
         <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
