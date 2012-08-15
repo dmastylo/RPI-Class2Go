@@ -6,12 +6,25 @@ from os import path
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
 
-DEBUG = True
+# If PRODUCTION flag not set in Database.py, then set it now.
+try:
+    PRODUCTION
+except NameError:
+    PRODUCTION = False
+
+if PRODUCTION == True:
+    DEBUG = False
+else:
+    DEBUG = True
+
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-)
+# ADMINS should be set in database.py too.
+try:
+    ADMINS
+except NameError:
+    # TODO: error out in this case since I can't think of a default
+    pass
 
 MANAGERS = ADMINS
 

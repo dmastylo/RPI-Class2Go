@@ -11,6 +11,14 @@ DATABASES = {
 
 SECRET_KEY = ''
 
+# Set PRODUCTION to True so we don't show stackdumps on errors
+PRODUCTION = False
+
+# Put your name and email address here, so Django serious errors can come to you
+ADMINS = (
+        ('Class2Go Dev', "YOURNAME@stanford.edu")
+        )
+
 # For using S3 Storage, specify these with real settings
 AWS_ACCESS_KEY_ID = 'AAAAAAAAAAAAAAAAAAAA'
 AWS_SECRET_ACCESS_KEY = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
