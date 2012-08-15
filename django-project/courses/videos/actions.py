@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
 from c2g.models import Course, Video
 from django.template import RequestContext
-from django.shortcuts import render_to_response, HttpResponseRedirect
+from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 from c2g.models import Course, Video, VideoActivity
@@ -47,8 +47,39 @@ def add_video(request):
     return redirect(request.META['HTTP_REFERER'])
 
 def edit_video(request):
-    pass
-    
+    course_prefix = request.POST.get("course_prefix")
+    course_suffix = request.POST.get("course_suffix")
+    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    slug = request.POST.get("video_slug")
+
+    if not common_page_data['is_course_admin']:
+        return redirect('courses.views.main', course_prefix, course_suffix)
+
+    if request.method == 'POST':
+        video = common_page_data['course'].video_set.all().get(slug=slug)
+
+        action = request.POST['action']
+        if action == "Revert":
+            video.revert()
+        else:
+            form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
+            if form.is_valid():
+                if request.POST.get("set_live_date"):
+                    video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
+                else:
+                    video.live_datetime = None
+                form.save()
+                if action == "Save and Publish":
+                    video.commit()
+                return redirect('courses.videos.views.list', course_prefix, course_suffix)
+
+    return render(request, 'videos/edit.html',
+                  {'common_page_data': common_page_data,
+                   'slug': slug,
+                   'form': form,
+                   'live_date': request.POST['live_date'],
+                   })
+
 def delete_video(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
