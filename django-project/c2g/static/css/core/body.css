@@ -261,17 +261,19 @@ small.date {
 }
 .toggle-views {
     position: relative;
-    width: 180px;
-    height: 1px;
-    padding: 8px 10px 7px;
+    width: 280px;
+    padding: 7px 7px 0;
     color: #333;
+    text-align: right;
+    background:#ffc;
+    overflow:hidden;
+
 }
 .toggle-views p {
-    position:absolute;
-    top:70px;
-    right:-20px;
-    display:block;
     font-weight:bold;
+    float:left;
+    margin-right:5px;
+    margin-top:2px;
 }
 .btn-views-toggle .btn-mini {
     padding:3px 8px;
