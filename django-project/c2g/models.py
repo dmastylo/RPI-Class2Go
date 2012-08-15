@@ -216,38 +216,38 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.index = production_instance.index
 
         self.save()
-        
+
     def getChildren(self):
         dict_list = []
         output_list = []
-        
+
         videos = Video.objects.getBySection(section=self)
         for item in videos:
             dict_list.append({'item':item, 'index':item.index})
-            
+
         problemsets = ProblemSet.objects.getBySection(section=self)
         for item in problemsets:
             dict_list.append({'item':item, 'index':item.index})
-            
+
         additionalpages = AdditionalPage.objects.getBySection(section=self)
         for item in additionalpages:
             dict_list.append({'item':item, 'index':item.index})
-            
+
         sorted_dict_list = sorted(dict_list, key=lambda k: k['index'])
-        
+
         for item in sorted_dict_list:
             output_list.append(item['item'])
-            
+
         return output_list
-    
+
     def countChildren(self):
         return len(self.getChildren)
-    
+
     def getNextIndex(self):
         # We will not return len(children)+1 since this approach is not fail safe. If an index is skipped for whatever reason, we want to make sure we are still robust
         children = self.getChildren()
         return children[-1].index+1
-    
+
     def __unicode__(self):
         return self.title
 
@@ -266,7 +266,7 @@ class AdditionalPageManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__lt=now).order_by('section','index')
-    
+
     def getBySection(self, section):
         if section.mode == 'staging':
             return self.filter(section=section, is_deleted=0).order_by('index')
@@ -430,7 +430,7 @@ class VideoManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
-            
+
     def getBySection(self, section):
         if section.mode == 'staging':
             return self.filter(section=section, is_deleted=0).order_by('index')
@@ -564,7 +564,7 @@ class ProblemSetManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
-            
+
     def getBySection(self, section):
         if section.mode == 'staging':
             return self.filter(section=section, is_deleted=0).order_by('index')
@@ -630,6 +630,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if not self.image: self.create_production_instance()
 
         production_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            production_instance.section = self.section.image
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
@@ -689,6 +691,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.mode != 'staging': return;
 
         production_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            self.section = production_instance.section.image
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
         if not clone_fields or 'description' in clone_fields:
@@ -748,6 +752,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     def is_synced(self):
         image = self.image
         if self.exercises_changed() == True:
+            return False
+        if self.section != image.section.image:
             return False
         if self.title != image.title:
             return False
