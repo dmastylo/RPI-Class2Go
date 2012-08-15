@@ -153,18 +153,29 @@ if class2go_mode != "prod":
                         'db_test_data',
                        )
 
-if class2go_mode == 'prod':
-    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
-    AWS_STORAGE_BUCKET_NAME = 'prod-c2g'
-elif class2go_mode == 'stage':
-    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
-    AWS_STORAGE_BUCKET_NAME = 'stage-c2g'
-else:
-    # use local storage instead of S3
-    file_storage_lib = 'django.core.files.storage.FileSystemStorage'
+# Storage
 
-DEFAULT_FILE_STORAGE = file_storage_lib
+# By default we use S3 storage.  Make sure we have the settings we need.
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+try:
+    AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY
+    AWS_STORAGE_BUCKET_NAME
+except NameError:
+    # TODO: fail if not defined
+    pass
 
+# Setting these variables to 'local' is the idiom for using local storage.
+if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
+        AWS_STORAGE_BUCKET_NAME == 'local'):
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+    # We need MEDIA_ROOT to be set to something useful in this case
+    try:
+        MEDIA_ROOT
+    except NameError:
+        # TODO: fail if not defined
+        pass
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
