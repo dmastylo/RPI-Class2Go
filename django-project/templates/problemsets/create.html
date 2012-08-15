@@ -55,11 +55,15 @@
                     <input type="text" name="due_date" value="{{current_datetime}}" data-datetimepicker>
                 </div>
             </div>
-            <div class="control-group">
+            <div class="control-group" style="margin-bottom:18px;">
                 <label class="control-label">Assessment Type</label>
                 <div class="controls">
-                    <input type="radio" name="assessment_type" value="formative" checked/> <a href="#" rel="tooltip" title="A student can attempt each problem as many times as they want without penalty in a formative problem set">Formative</a>
-                    <input type="radio" name="assessment_type" value="summative" /> <a href="#" rel="tooltip" title="Summative problem sets penalize students for multiple problem attempts.">Summative</a>
+                    <label class="radio">
+                        <input type="radio" name="assessment_type" value="formative" id="formative" checked/> Formative <a href="#" rel="tooltip" title="A student can attempt each problem as many times as they want without penalty in a formative problem set"><i class="icon-info-sign"></i></a>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="assessment_type" value="summative" id="summative" /> Summative <a href="#" rel="tooltip" title="Summative problem sets penalize students for multiple problem attempts."><i class="icon-info-sign"></i></a>
+                    </label>
                 </div>
             </div>
             <div class="control-group">

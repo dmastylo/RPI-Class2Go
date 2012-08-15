@@ -1157,6 +1157,11 @@
   }
 
 }(window.jQuery);
+
+$('a[rel=tooltip]').tooltip({
+  placement: "right"
+});
+
 /* ===========================================================
  * bootstrap-popover.js v2.0.4
  * http://twitter.github.com/bootstrap/javascript.html#popovers

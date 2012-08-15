@@ -479,8 +479,16 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             production_instance.title = self.title
-        if not clone_fields or 'index' in clone_fields:
-            production_instance.index = self.index
+        if not clone_fields or 'section' in clone_fields:
+            production_instance.section = self.section.image
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+        if not clone_fields or 'slug' in clone_fields:
+            production_instance.slug = self.slug
+        if not clone_fields or 'file' in clone_fields:
+            production_instance.file = self.file
+        if not clone_fields or 'live_datetime' in clone_fields:
+            production_instance.live_datetime = self.live_datetime
 
         production_instance.save()
 
@@ -490,8 +498,18 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         production_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             self.title = production_instance.title
-        if not clone_fields or 'index' in clone_fields:
-            self.index = production_instance.index
+        if not clone_fields or 'section' in clone_fields:
+            self.section = production_instance.section.image
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = production_instance.slug
+        if not clone_fields or 'file' in clone_fields:
+            self.file = production_instance.file
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = production_instance.live_datetime
+
+        self.save()
 
     def save(self, *args, **kwargs):
         if not self.duration:
@@ -502,9 +520,18 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         super(Video, self).save(*args, **kwargs)
 
     def is_synced(self):
-        if self.title != self.image.title:
+        prod_instance = self.image
+        if self.title != prod_instance.title:
             return False
-        if self.description != self.image.description:
+        if self.section != prod_instance.section.image:
+            return False
+        if self.description != prod_instance.description:
+            return False
+        if self.slug != prod_instance.slug:
+            return False
+        if self.file != prod_instance.file:
+            return False
+        if self.live_datetime != prod_instance.live_datetime:
             return False
 
         return True
