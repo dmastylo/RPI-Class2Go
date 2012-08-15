@@ -54,7 +54,7 @@ prefix for these.
 9. Start using the virtual environment that we just created.  
     . ./django-class2go/bin/activate
 
-    WARNING: you need to do this from whatever shell you're using.
+    WARNING:  you need to do this from whatever shell you're using.
     You can tell this because is puts an environment indicator at
     the beginning of your prompt
 
