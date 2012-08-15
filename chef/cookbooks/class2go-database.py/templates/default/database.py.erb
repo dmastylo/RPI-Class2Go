@@ -9,6 +9,14 @@ DATABASES = {
     }
 }
 
+# Set PRODUCTION to True so we don't show stackdumps on errors
+PRODUCTION = <%= @node[:class2go][:production] %>
+
+# Put your name and email address here, so Django serious errors can come to you
+ADMINS = (
+        ('<%= @node[:class2go][:admin_name] %>', '<%= @node[:class2go][:admin_email] %>')
+        )
+
 SECRET_KEY = 'class2go'
 
 AWS_ACCESS_KEY_ID = '<%= @node[:aws][:access_key] %>'
