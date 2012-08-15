@@ -299,8 +299,10 @@ def create_video(data, users):
         url=data['url'],
         duration=data['duration'],
         slug=data['slug'],
+        file="default",
         index=data['index'],
         mode='staging',
+        handle=data['course'].handle,
     )
     video.save()
     video.create_production_instance()

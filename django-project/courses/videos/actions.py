@@ -61,6 +61,11 @@ def edit_video(request):
         action = request.POST['action']
         if action == "Revert":
             video.revert()
+            form = S3UploadForm(course=common_page_data['course'], instance=video)
+            if video.live_datetime:
+                live_date = video.live_datetime.strftime('%m/%d/%Y %H:%M')
+            else:
+                live_date = ''
         else:
             form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
             if form.is_valid():
@@ -72,12 +77,13 @@ def edit_video(request):
                 if action == "Save and Publish":
                     video.commit()
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
+            live_date = request.POST['live_date']
 
     return render(request, 'videos/edit.html',
                   {'common_page_data': common_page_data,
                    'slug': slug,
                    'form': form,
-                   'live_date': request.POST['live_date'],
+                   'live_date': live_date,
                    })
 
 def delete_video(request):
@@ -148,8 +154,9 @@ def oauth(request):
         video.url = match.group(1)
         video.duration = entry.media.duration.seconds
         video.save()
-        #temporary for demo purposes
-        video.create_production_instance()
+        video.image.url = video.url
+        video.image.duration = video.duration
+        video.image.save()
 
         parts = str(video.handle).split("#$!")
         return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(parts[0], parts[1], video.slug)))
@@ -177,13 +184,9 @@ def upload(request):
     if request.method == 'POST':
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'])
         if form.is_valid():
-            video_title = form.cleaned_data['title']
-            file = request.FILES['file']
-            video_section = form.cleaned_data['section']
-            
             new_video = form.save(commit=False)
             new_video.course = common_page_data['course']
-            new_video.index = video_section.getNextIndex()
+            new_video.index = new_video.section.getNextIndex()
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
 
@@ -191,22 +194,8 @@ def upload(request):
                 new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
 
             new_video.save()
-            #new_video.create_production_instance()
+            new_video.create_production_instance()
             print new_video.file.url
-
-            video = Video(
-                course=common_page_data['course'],
-                #section=video_section,
-                title=video_title,
-                #description=video_description,
-                #slug=video_slug,
-                index=len(Video.objects.filter(course=common_page_data['course'])),
-                mode='staging',
-                file=file,
-            )
-#            video.save()
-
-
 
             authUrl = GetOAuth2Url(request, new_video)
             #eventually should store an access token, so they don't have to give permission everytime
