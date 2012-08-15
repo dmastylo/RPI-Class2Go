@@ -1,18 +1,24 @@
-<table style="width:100%">
-    <tr>
-        <td style="width:60%"><h3>{{section_structure.section.title}}</h3></td>
-        <td style="width:40%">
-            {% ifequal context 'course_materials' %}
-                <a style="float: right;margin-right: 20px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')">Delete Section</a>
-                <a style="float: right;margin-right: 20px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}">Rename Section</a>
-                {% if section_structure.items|length > 0 %}<span style="float: right;margin-right: 20px;"><a href="javascript:sectionSelectAll('{{section_structure.section.id}}')">Select all in section</a> / <a href="javascript:sectionUnselectAll('{{section_structure.section.id}}')">Unselect all in section</a>{% endif %}
-            {% endifequal %}
-        </td>
-    </tr>
-</table>
+<div class="row-fluid">
+    <div class="span12">
+        <h3 class="pull-left">{{section_structure.section.title}}</h3>
+        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')"><i class="icon-trash icon-large" style="margin-left:10px;"></i> Delete Section</a>
+        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}"><i class="icon-edit icon-large"></i> Rename Section</a>
+    </div>
+</div>
+
+{% ifequal context 'course_materials' %}
+    {% if section_structure.items|length > 0 %}
+    <div class="row-fluid">
+        <div class="span12">
+            <a href="javascript:sectionSelectAll('{{section_structure.section.id}}')">Select all in section</a> / <a href="javascript:sectionUnselectAll('{{section_structure.section.id}}')">Unselect all in section</a>
+        </div>
+    </div>
+    {% endif %}
+{% endifequal %}
+
 
 <form action="{% url 'courses.content_sections.actions.save_content_order' %}" method="POST">
-    <ul {% ifequal context 'course_materials' %}data-sortablecontainer{% endifequal %} style="list-style-type:none;">
+    <ul {% ifequal context 'course_materials' %}data-sortablecontainer{% endifequal %} class="unstyled">
         {% for item in section_structure.items %}
             {% ifequal item.type 'additional_page' %}
                 <li id="additional_page_{{item.additional_page.id}}" class="ui-state-default" style="padding: 3px;">
