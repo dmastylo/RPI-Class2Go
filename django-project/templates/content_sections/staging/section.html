@@ -6,15 +6,14 @@
     </div>
 </div>
 
-{% ifequal context 'course_materials' %}
-    {% if section_structure.items|length > 0 %}
-    <div class="row-fluid">
-        <div class="span12">
-            <a href="javascript:sectionSelectAll('{{section_structure.section.id}}')">Select all in section</a> / <a href="javascript:sectionUnselectAll('{{section_structure.section.id}}')">Unselect all in section</a>
-        </div>
+
+{% if section_structure.items|length > 0 %}
+<div class="row-fluid">
+    <div class="span12">
+        <a href="javascript:sectionSelectAll('{{section_structure.section.id}}')">Select all in section</a> / <a href="javascript:sectionUnselectAll('{{section_structure.section.id}}')">Unselect all in section</a>
     </div>
-    {% endif %}
-{% endifequal %}
+</div>
+{% endif %}
 
 
 <form action="{% url 'courses.content_sections.actions.save_content_order' %}" method="POST">
