@@ -5,10 +5,12 @@
         {% csrf_token %}
 </form>
 <script type="text/javascript">
-    function DeleteExercise(id) {
+    function DeleteExercise(id, title) {
         var r = true;
         if ("{{problemset_taken}}"=="True")
-            r = confirm("WARNING: Students have already begun taking this problem set. Deleting an exercise can ruin the integrity of the result. Are you sure you wish to make this change?")
+            r = confirm("WARNING: Students have already begun taking this problem set. Deleting an exercise can ruin the integrity of the results. Are you sure you want to delete "+title+"?")
+        else 
+            r = confirm("Are you sure you want to delete "+title+"?");
         if(r == true){
             $("#delete_exercise_id").val(id);
             document.forms.delete_exercise_form.submit();

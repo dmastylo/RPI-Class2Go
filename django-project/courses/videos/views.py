@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect, HttpResponseRedirect
+from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
 from c2g.models import Course, Video, VideoToExercise, Exercise
 
@@ -47,20 +47,25 @@ def view(request, course_prefix, course_suffix, slug):
 
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
     
-def edit(request, course_prefix, course_suffix, video_id):
+def edit(request, course_prefix, course_suffix, slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
         
-    return render_to_response('videos/edit.html', 
-            {'request': request,
-             'course_prefix': course_prefix,
-             'course_suffix': course_suffix,
-             'course': course,
-             'video_id': video_id,
-             },
-            context_instance=RequestContext(request))
+    video = common_page_data['course'].video_set.all().get(slug=slug)
+    form = S3UploadForm(course=common_page_data['course'], instance=video)
+    if video.live_datetime:
+        live_date = video.live_datetime.strftime('%m/%d/%Y %H:%M')
+    else:
+        live_date = ''
+
+    return render(request, 'videos/edit.html', 
+            {'common_page_data': common_page_data,
+             'slug': slug,
+             'form': form,
+             'live_date': live_date,
+             })
 
 def GetOAuth2Url(request):
     client_id = "287022098794.apps.googleusercontent.com"
