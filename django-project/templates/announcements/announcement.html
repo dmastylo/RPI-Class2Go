@@ -1,32 +1,25 @@
 <div class="announcement">
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
-        <table style="width: 100%;margin-top: 5px;">
-            <tr>
-                <td style="width: 30%;vertical-align: top;padding-top: 5px;">
-                    <small class="date" style="display:inline;"> {{announcement.last_updated}}</small>
-                </td>
-                <td style="width: 40%;font-size: 9pt;">
-                    {% if announcement.is_synced %}
-                    <div class="alert alert-success" style="padding: 2px;">
-                        <i class="icon-ok" style="font-size:17px"></i> <strong>Published!</strong>
-                    </div>
-                    {% else %}
-                    <div class="alert" style="padding: 2px;">
-                        <i class="icon-random" style="font-size:17px"></i> Draft has unpublished changes
-                    </div>
-                    {% endif %}
-                </td>
-                <td style="width: 30%; vertical-align: top;padding-top: 5px;">
-                    <div style="display:inline;float:right;">
-                        <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}">Edit</a>
-                        <a href="javascript:DeleteAnnouncement('{{announcement.id}}')">Delete</a>
-                    </div>
-                </td>
-            </tr>
-        </table>
+    <small class="date"> {{announcement.last_updated}}</small>
+    <div class="announcement-actions">
+        <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><i class="icon-edit icon-large"></i> Edit</a>
+        <a href="javascript:DeleteAnnouncement('{{announcement.id}}')"><i class="icon-trash icon-large"></i> Delete</a>
+    </div>
     {% else %}
-        <small class="date" style="display:inline;"> {{announcement.last_updated}}</small>
+        <small class="date"> {{announcement.last_updated}}</small>
     {% endif %}
     <h4>{{announcement.title}}</h4>
-    {% autoescape off %}{{announcement.description}}{% endautoescape %}
+    {% autoescape off %}<p>{{announcement.description}}</p>{% endautoescape %}
+
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+        {% if announcement.is_synced %}
+        <span class="badge badge-success">
+            <i class="icon-ok icon-large"></i> <strong>Published!</strong>
+        </span>
+        {% else %}
+        <span class="badge badge-warning">
+            <i class="icon-random icon-large"></i> Draft has unpublished changes
+        </span>
+        {% endif %}
+    {% endif %}
 </div>

@@ -155,6 +155,8 @@ small.date {
     -webkit-border-radius: 5px;
     -khtml-border-radius: 5px;
     -o-border-radius: 5px;
+    position:relative;
+    clear:left;
 }
 .announcement p {
     margin-bottom:0;
@@ -164,6 +166,18 @@ small.date {
 }
 .fakelink {
     cursor:pointer;
+}
+.announcement .badge {
+    display:inline-block;
+    margin-top:7px;
+}
+.announcement .announcement-actions {
+    position:absolute;
+    top:15px;
+    right:15px;
+}
+#new_announcement_div {
+    clear:left;
 }
 
 /* Header
