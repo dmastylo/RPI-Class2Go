@@ -52,7 +52,7 @@
 {% endblock l_column_content %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
+<div id="c2g_layout_m_column" class="span9">
     <h3 class="section-title pull-left">Recent Announcements</h3>
     <div class="pull-right">
         {% if many_announcements %}
@@ -77,25 +77,6 @@
 
 </div>
 {% endblock m_column_content %}
-
-{%block r_column_content %}
-{% if is_logged_in %}
-<div id="c2g_layout_r_column" class="span3">
-    <h3 class="section-title">Recent Events</h3>
-    
-    {% for event in news_list %}
-        <p>
-          <small class="date">{{event.time_created}}</small>
-          <b>{{event.event}}</b>
-        </p>
-    {% empty %}
-        <p style="margin:20px;">No events to display.</p>
-    {% endfor %}
-    
-    <a href="#">All Events</a>
-</div>
-{% endif %}
-{% endblock r_column_content %}
 
 {% if common_page_data.is_course_admin %}
     {% block addl_scripts %}
