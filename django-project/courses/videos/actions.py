@@ -193,6 +193,10 @@ def upload(request):
             if request.POST.get("set_live_date"):
                 new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
 
+            new_video.file = None
+            new_video.save()
+            new_video.file = form.cleaned_data['file']
+            
             new_video.save()
             new_video.create_production_instance()
             print new_video.file.url

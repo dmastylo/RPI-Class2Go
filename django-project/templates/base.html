@@ -58,10 +58,20 @@
         {% block content %}
         <div class="container-fluid body-content">
             <div class="row-fluid">
-                {% block l_column_content %}{% endblock %}
+                {% block l_column_content %}
+                	<h1>Current courses available for signup</h1>
+                	{% for available_course in available_course_list %}
+                		<li>{{available_course.0}} ({{available_course.1}})
+                			<a class="btn btn-primary" href="/nlp/Fall2012/videos/upload" style="margin-left: 30px;">Signup</a>
+                		</li>
+                	{% endfor %}
                 
-                {% block m_column_content %}{% endblock %}
+                {% endblock %}
                 
+                {% block m_column_content %}
+                	                
+                {% endblock %}
+
                 {% block r_column_content %}{% endblock %}
             </div>
             {% include "footer.html" %}
