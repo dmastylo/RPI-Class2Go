@@ -31,3 +31,7 @@ AWS_STORAGE_BUCKET_NAME = 'dev-c2g'
 # AWS_STORAGE_BUCKET_NAME = 'local'
 # MEDIA_ROOT = '/opt/class2go/uploads'
 
+# This is if you want to change to a different logging directory than the default,
+# which is '/var/log/django/'
+# Please keep the trailing '/'
+# LOGGING_DIR = '/my/logging/dir/'
