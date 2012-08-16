@@ -81,17 +81,23 @@ def change_live_datetime(request):
     for id in ids:
         parts = id.split('_')
         if parts[0] == 'video':
-            image = Video.objects.get(id=parts[1]).image
-            image.live_datetime = new_live_datetime
-            image.save()
+            video = Video.objects.get(id=parts[1])
+            video.live_datetime = new_live_datetime
+            video.image.live_datetime = new_live_datetime
+            video.save()
+            video.image.save()
         elif parts[0] == 'problemset':
-            image = ProblemSet.objects.get(id=parts[1]).image
-            image.live_datetime = new_live_datetime
-            image.save()
+            pset = ProblemSet.objects.get(id=parts[1])
+            pset.live_datetime = new_live_datetime
+            pset.image.live_datetime = new_live_datetime
+            pset.save()
+            pset.image.save()
         elif parts[0] == 'additionalpage':
-            image = AdditionalPage.objects.get(id=parts[1]).image
-            image.live_datetime = new_live_datetime
-            image.save()
+            page = AdditionalPage.objects.get(id=parts[1])
+            page.live_datetime = new_live_datetime
+            page.image.live_datetime = new_live_datetime
+            page.save()
+            page.image.save()
             
     return redirect(request.META['HTTP_REFERER'])
 
