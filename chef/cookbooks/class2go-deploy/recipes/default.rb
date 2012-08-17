@@ -8,7 +8,7 @@
 #
 
 git "/home/bitnami/class2go" do
-    repository "https://github.com/jbau/class2go.git"
+    repository "https://github.com/Stanford-Online/class2go.git"
     user "bitnami"
     group "root"
     action :sync

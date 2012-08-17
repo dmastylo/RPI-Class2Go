@@ -6,12 +6,25 @@ from os import path
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
 
-DEBUG = True
+# If PRODUCTION flag not set in Database.py, then set it now.
+try:
+    PRODUCTION
+except NameError:
+    PRODUCTION = False
+
+if PRODUCTION == True:
+    DEBUG = False
+else:
+    DEBUG = True
+
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-)
+# ADMINS should be set in database.py too.
+try:
+    ADMINS
+except NameError:
+    # TODO: error out in this case since I can't think of a default
+    pass
 
 MANAGERS = ADMINS
 
@@ -112,6 +125,7 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages'
 )
@@ -153,18 +167,29 @@ if class2go_mode != "prod":
                         'db_test_data',
                        )
 
-if class2go_mode == 'prod':
-    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
-    AWS_STORAGE_BUCKET_NAME = 'prod-c2g'
-elif class2go_mode == 'stage':
-    file_storage_lib = 'storages.backends.s3boto.S3BotoStorage'
-    AWS_STORAGE_BUCKET_NAME = 'stage-c2g'
-else:
-    # use local storage instead of S3
-    file_storage_lib = 'django.core.files.storage.FileSystemStorage'
+# Storage
 
-DEFAULT_FILE_STORAGE = file_storage_lib
+# By default we use S3 storage.  Make sure we have the settings we need.
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+try:
+    AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY
+    AWS_STORAGE_BUCKET_NAME
+except NameError:
+    # TODO: fail if not defined
+    pass
 
+# Setting these variables to 'local' is the idiom for using local storage.
+if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
+        AWS_STORAGE_BUCKET_NAME == 'local'):
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+    # We need MEDIA_ROOT to be set to something useful in this case
+    try:
+        MEDIA_ROOT
+    except NameError:
+        # TODO: fail if not defined
+        pass
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
@@ -172,24 +197,63 @@ AUTH_PROFILE_MODULE = 'c2g.UserProfile'
 ACCOUNT_ACTIVATION_DAYS = 7 #used by registration
 
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
+
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+# If PRODUCTION flag not set in Database.py, then set it now.
+try:
+    LOGGING_DIR
+except NameError:
+    LOGGING_DIR = '/var/log/django/'
+
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'formatters' : {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(pathname)s -- %(funcName)s -- line# %(lineno)d : %(message)s '
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'logfile': {
+            'level':'INFO', #making this DEBUG will log _all_ SQL queries.
+            'class':'logging.handlers.RotatingFileHandler',
+            'formatter':'verbose',
+            'filename': LOGGING_DIR+'django.log',
+            'maxBytes': 1024*1024*500,
+            'backupCount': 3,
+        },
+        'console':{
+            'level':'WARNING',
+            'class':'logging.StreamHandler',
+            'formatter': 'simple'
+        },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
         }
     },
     'loggers': {
+        '': {
+            'handlers':['logfile', 'console'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
         'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'handlers': ['mail_admins', 'logfile', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.db.backends':{
+            'handlers':['logfile'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     }

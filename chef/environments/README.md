@@ -14,5 +14,5 @@ doc in our Google Docs shared folder (actually, in the ops subfolder).
     [reldoc]: https://docs.google.com/document/d/1Ij5dR9E-cUhxOJlOcrWfv_kiXpIfgNOzSYLm79UCOjg/edit#
 
 To get you started, look at the example environment files are checked
-in here.  See ```example-stage.rb``` and ```example-prod.rb```.
+in here: ```example-stage.rb``` and ```example-prod.rb```.
 

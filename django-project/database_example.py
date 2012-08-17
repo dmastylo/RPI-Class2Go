@@ -10,3 +10,28 @@ DATABASES = {
 }
 
 SECRET_KEY = ''
+
+# Set PRODUCTION to True so we don't show stackdumps on errors
+PRODUCTION = False
+
+# Put your name and email address here, so Django serious errors can come to you
+ADMINS = (
+        ('Class2Go Dev', "YOURNAME@stanford.edu")
+        )
+
+# For using S3 Storage, specify these with real settings
+AWS_ACCESS_KEY_ID = 'AAAAAAAAAAAAAAAAAAAA'
+AWS_SECRET_ACCESS_KEY = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+AWS_STORAGE_BUCKET_NAME = 'dev-c2g'
+
+# To use Local Storage.  You still need to define these three all to 'local'
+# and specify where you want those local files written
+# AWS_ACCESS_KEY_ID = 'local'
+# AWS_SECRET_ACCESS_KEY = 'local'
+# AWS_STORAGE_BUCKET_NAME = 'local'
+# MEDIA_ROOT = '/opt/class2go/uploads'
+
+# This is if you want to change to a different logging directory than the default,
+# which is '/var/log/django/'
+# Please keep the trailing '/'
+# LOGGING_DIR = '/my/logging/dir/'
