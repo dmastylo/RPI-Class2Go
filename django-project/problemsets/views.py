@@ -7,6 +7,7 @@ from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
+from problemsets.forms import *
 
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
@@ -30,6 +31,13 @@ def show(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
+    problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
+    psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
+    activity_list = []
+    for psetToEx in psetToExs:
+        attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-time_created')
+        if len(attempts) > 0:
+            activity_list.append(attempts[0])
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
                                'pset': ps,
@@ -37,6 +45,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
                                'pset_type':ps.assessment_type,
                                'pset_penalty':ps.late_penalty,
                                'pset_attempts_allowed':ps.submissions_permitted,
+                               'activity_list': activity_list,
                               },
                               context_instance=RequestContext(request))
 
@@ -82,6 +91,21 @@ def create_form(request, course_prefix, course_suffix):
                                 'current_datetime': current_datetime
                             },
                             context_instance=RequestContext(request))
+
+def model_create_form(request, course_prefix, course_suffix):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    data = {'common_page_data': common_page_data}
+
+    form = CreateProblemSet(course=common_page_data['course'])
+    data['form'] = form
+
+    return render_to_response('problemsets/model_create.html',
+                              data,
+                              context_instance=RequestContext(request))
 
 def create_action(request):
     course_handle = request.POST['course_prefix'] + "#$!" + request.POST['course_suffix']
