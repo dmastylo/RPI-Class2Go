@@ -575,7 +575,7 @@ class ProblemSetManager(models.Manager):
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
-    slug = models.CharField(max_length=255)
+    slug = models.SlugField()
     title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)

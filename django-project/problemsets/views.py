@@ -7,6 +7,7 @@ from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
+from problemsets.forms import *
 
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
@@ -82,6 +83,21 @@ def create_form(request, course_prefix, course_suffix):
                                 'current_datetime': current_datetime
                             },
                             context_instance=RequestContext(request))
+
+def model_create_form(request, course_prefix, course_suffix):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    data = {'common_page_data': common_page_data}
+
+    form = CreateProblemSet(course=common_page_data['course'])
+    data['form'] = form
+
+    return render_to_response('problemsets/model_create.html',
+                              data,
+                              context_instance=RequestContext(request))
 
 def create_action(request):
     course_handle = request.POST['course_prefix'] + "#$!" + request.POST['course_suffix']
