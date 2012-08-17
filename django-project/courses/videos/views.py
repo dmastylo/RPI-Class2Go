@@ -29,15 +29,15 @@ def list(request, course_prefix, course_suffix):
         video.create_production_instance()
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=False)
-    
+
     return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'video_list'}, context_instance=RequestContext(request))
-    
+
 def view(request, course_prefix, course_suffix, slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    
+
     video = None
     video_rec = None
     if request.user.is_authenticated():
@@ -47,13 +47,13 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = request.user.videoactivity_set.filter(video=video)
 
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
-    
+
 def edit(request, course_prefix, course_suffix, slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-        
+
     video = common_page_data['course'].video_set.all().get(slug=slug)
     form = S3UploadForm(course=common_page_data['course'], instance=video)
     if video.live_datetime:
@@ -61,7 +61,7 @@ def edit(request, course_prefix, course_suffix, slug):
     else:
         live_date = ''
 
-    return render(request, 'videos/edit.html', 
+    return render(request, 'videos/edit.html',
             {'common_page_data': common_page_data,
              'slug': slug,
              'form': form,
@@ -201,17 +201,18 @@ def get_video_exercises(request):
     for videoToEx in videoToExs:
         json_string = "\"" + str(videoToEx.video_time) + "\": {\"time\": " + str(videoToEx.video_time) + ", \"problemDiv\": \"" + str(videoToEx.exercise_id) + "\"}"
         json_list.append(json_string)
-     
+
     json_string = "{" + ','.join( map( str, json_list )) + "}"
     return HttpResponse(json_string)
-        
+
+
 def load_video_problem_set(request, course_prefix, course_suffix, video_id):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
 
-    ex_list = Exercise.objects.filter(videotoexercise__video_id=video_id) 
+    ex_list = Exercise.objects.filter(videotoexercise__video_id=video_id)
     file_names = []
     for ex in ex_list:
         #Remove the .html from the end of the file name
