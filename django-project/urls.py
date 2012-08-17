@@ -97,6 +97,7 @@ urlpatterns = patterns('',
     url(r'^delete_video/?', 'courses.videos.actions.delete_video'),
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set?$', 'courses.videos.views.load_video_problem_set'),
 
 
     # Video Exercises
