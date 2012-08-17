@@ -62,7 +62,7 @@
                 	<h1>Current courses available for signup</h1>
                 	{% for available_course in available_course_list %}
                 		<li>{{available_course.0}} ({{available_course.1}})
-                			<a class="btn btn-primary" href="/nlp/Fall2012/videos/upload" style="margin-left: 30px;">Signup</a>
+                			<a class="btn btn-primary" href=signup/{{available_course.1}} style="margin-left: 30px;">Signup</a>
                 		</li>
                 	{% endfor %}
                 
