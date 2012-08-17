@@ -856,7 +856,7 @@ class ProblemActivity(TimestampMixin, models.Model):
      user_selection_val = models.CharField(max_length=1024, null=True, blank=True)
      user_choices = models.CharField(max_length=1024, null=True, blank=True)
      def __unicode__(self):
-            return self.student.username
+            return self.student.username + " " + str(self.time_created)
      class Meta:
         db_table = u'c2g_problem_activity'
 
