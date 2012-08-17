@@ -755,7 +755,9 @@ var Khan = (function() {
                 var controlLoad = function(exArr) {
                     if (exArr.length > 0) {
                         currentEx = exArr.shift();
-                        loadExercise.call(currentEx).done(function () {
+                        // [@wescott] Passing "remoteExercises" to loadExercise too,
+                        // so it can check original list of exercises that should be coming
+                        loadExercise.call(currentEx, remoteExercises.toArray()).done(function () {
                             controlLoad(exArr);
                         });
                     } else {
@@ -985,6 +987,7 @@ var Khan = (function() {
             }
 
             // Generate a new problem
+            //console.log("In finishRender, generating new problem with no arguments");
             makeProblem();
 
         }
@@ -1058,6 +1061,8 @@ var Khan = (function() {
     }
 
     function makeProblem(id, seed) {
+        //console.log("id is " + id);
+        //console.log("seed is " + seed);
 
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
@@ -1942,6 +1947,7 @@ var Khan = (function() {
 
             if (testMode) {
                 // Just generate a new problem from existing exercise
+                //console.log("In testMode, calling makeProblem without an argument");
                 makeProblem();
             } else {
                 loadAndRenderExercise(nextUserExercise);
@@ -2825,6 +2831,7 @@ var Khan = (function() {
 
     function loadExercise(callback) {
 
+        //console.log(arguments);
         var self = $(this).detach();
         var id = self.data("name");
         var weight = self.data("weight");
@@ -2846,6 +2853,7 @@ var Khan = (function() {
         // C2G: we use a different place for the exercises (originally was with the rest of the static files)
         // since we need to get from S3
         var dfd = $.Deferred();
+        var listOfExercises = arguments[0];
 
         $.ajaxSetup({timeout:10000});
         $.get(urlBaseExercise + "exercises/" + fileName, function(data, status, xhr) {
@@ -2878,6 +2886,7 @@ var Khan = (function() {
             // Save the id, fileName and weights
             // TODO(david): Make sure weights work for recursively-loaded exercises.
             newContents.data("name", id).data("fileName", fileName).data("weight", weight);
+            //console.log(newContents);
 
             // Add the new exercise elements to the exercises DOM set
             exercises = exercises.add(newContents);
@@ -2927,8 +2936,24 @@ var Khan = (function() {
             }
 
         // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
-        }).done(setTimeout(function () { dfd.resolve(); }, 2000));
-
+        }).done(setTimeout(function () { dfd.resolve(); }, 5000));
+        /*
+        }).done(function () {
+            (function pollExercises() { 
+                console.log('pollExercises called');
+                console.log('exercises');
+                console.log(exercises);
+                console.log('listOfExercises');
+                console.log(listOfExercises);
+                console.log(' ');
+                if (exercises.length == listOfExercises.length) {
+                    dfd.resolve();
+                } else {
+                    setTimeout(pollExercises, 500);
+                }
+            })();
+        });
+        */
         return dfd.promise();
     }
 
@@ -3000,6 +3025,7 @@ var Khan = (function() {
             prepareSite();
 
             initC2GStacks(exercises);
+            //console.log(exercises);
 
             var problems = exercises.children(".problems").children();
             globalProblems=problems;
@@ -3024,6 +3050,7 @@ var Khan = (function() {
             var first = $('#questions-viewed li:first-child');
             //makeProblem(first.data('problem'), first.data('randseed'))
             KhanC2G.problemIdx = 0;
+            //console.log("makeProblem called here with 0");
             makeProblem(KhanC2G.problemIdx);
 
 

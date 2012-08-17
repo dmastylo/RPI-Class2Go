@@ -41,7 +41,8 @@ def view(request, course_prefix, course_suffix, slug):
     video = None
     video_rec = None
     if request.user.is_authenticated():
-        video = Video.objects.get(course=common_page_data['production_course'], slug=slug)
+        #video = Video.objects.get(course=common_page_data['production_course'], slug=slug)
+        video = Video.objects.get(course=common_page_data['course'], slug=slug)
         #video_rec = request.user.videoactivity_set.filter(video=video)
         video_rec = request.user.videoactivity_set.filter(video=video)
 
@@ -204,9 +205,16 @@ def get_video_exercises(request):
     json_string = "{" + ','.join( map( str, json_list )) + "}"
     return HttpResponse(json_string)
         
-        
-    
-    
-    
-    
-    
+def load_video_problem_set(request, course_prefix, course_suffix, video_id):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    ex_list = Exercise.objects.filter(videotoexercise__video_id=video_id) 
+    file_names = []
+    for ex in ex_list:
+        #Remove the .html from the end of the file name
+        file_names.append(ex.fileName[:-5])
+    # assessment type is hard-coded because all in-video exercises are formative
+    return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names, 'assessment_type': 'formative'},context_instance=RequestContext(request))
