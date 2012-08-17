@@ -908,8 +908,13 @@ var Khan = (function() {
     function enableCheckAnswer() {
         $("#check-answer-button")
             .removeAttr("disabled")
-            .removeClass("buttonDisabled")
-            .val("Check Answer");
+            .removeClass("buttonDisabled");
+        // [@wescott] Added text change for Summative exercises
+        if (typeof exAssessType != "undefined" && exAssessType == "summative") {
+            $("#check-answer-button").val("Submit Answer");
+        } else {
+            $("#check-answer-button").val("Check Answer");
+        }
     }
 
     function disableCheckAnswer() {
@@ -1305,9 +1310,10 @@ var Khan = (function() {
                 maxAttempts = 3;
                 penaltyPct = "25%";
             }
-            $('#solutionarea').append('<p>Note: Maximum of ' + maxAttempts + ' attempts accepted.</p>');
-            $('#solutionarea').append('<p><span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.</p>');
-            $('#solutionarea').append('<p>Attempts so far: <span id="attempt-count">0</span> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
+            $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
+            $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
+            $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">0</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
+            $("#check-answer-button").val("Submit Answer");
         }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
