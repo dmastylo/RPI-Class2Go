@@ -211,7 +211,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'formatters' : {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '%(levelname)s %(asctime)s %(pathname)s -- %(funcName)s -- line# %(lineno)d : %(message)s '
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -227,7 +227,7 @@ LOGGING = {
             'class':'logging.handlers.RotatingFileHandler',
             'formatter':'verbose',
             'filename': LOGGING_DIR+'django.log',
-            'maxBytes': 100000000,
+            'maxBytes': 1024*1024*500,
             'backupCount': 3,
         },
         'console':{
@@ -241,7 +241,7 @@ LOGGING = {
         }
     },
     'loggers': {
-        'django': {
+        '': {
             'handlers':['logfile', 'console'],
             'propagate': True,
             'level':'DEBUG',
