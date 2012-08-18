@@ -4,7 +4,7 @@
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 
 {% block content %}
-<input type="hidden" name="pset_id" value={{pset.id}} id="pset_id" />
+<input type="hidden" name="pset_id" value="{{pset.id}}" id="pset_id" />
 <div class="container-fluid body-content">
     <div class="row-fluid">
         <div class="span12">
@@ -64,6 +64,15 @@ var c2gConfig = {
     penaltyPct: '{{pset_penalty}}',
     maxAttempts: '{{pset_attempts_allowed}}'
 };
+var userPSData = {};
+{% for activity in activity_list %}
+    userPSData["{{ activity.problemset_to_exercise.number}}"] = {
+        user_selection_val: "{{ activity.user_selection_val }}",
+        user_choices: unescape("{{ activity.user_choices }}"),
+        correct: {% if activity.complete == 1 %}true{% else %}false{% endif %}
+    };
+{% endfor %}
+
 $(function() {
   /*
     $.ajax({
