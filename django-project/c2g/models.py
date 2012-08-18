@@ -30,7 +30,7 @@ def get_file_path(instance, filename):
     if isinstance(instance, Exercise):
         return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
     if isinstance(instance, Video):
-        return os.path.join(str(parts[0]), str(parts[1]), 'videos', filename)
+        return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
 
 
 class TimestampMixin(models.Model):
