@@ -193,6 +193,13 @@ def upload(request):
             if request.POST.get("set_live_date"):
                 new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
 
+            # Bit of jiggery pokery to so that the id is set when the upload_path function is called.
+            # Now storing file with id appended to the file path so that thumbnail and associated manifest files
+            # are easily associated with the video by putting them all in the same directory.
+            new_video.file = None
+            new_video.save()
+            new_video.file = form.cleaned_data['file']
+            
             new_video.save()
             new_video.create_production_instance()
             print new_video.file.url

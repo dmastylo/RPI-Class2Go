@@ -18,6 +18,7 @@ urlpatterns = patterns('',
 
     # Examples:
     url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),
+    url(r'^courses/signup/?$', 'courses.actions.signup'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
      #for data collection
@@ -97,6 +98,7 @@ urlpatterns = patterns('',
     url(r'^delete_video/?', 'courses.videos.actions.delete_video'),
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set?$', 'courses.videos.views.load_video_problem_set'),
 
 
     # Video Exercises
@@ -131,4 +133,5 @@ urlpatterns = patterns('',
     url(r'^save_and_publish_problemset_exercises/?', 'problemsets.views.save_and_publish_exercises'),
     url(r'^delete_exercise/?', 'problemsets.views.delete_exercise'),
     url(r'^revert_problemset/?', 'problemsets.views.revert_problemset'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/modelcreate/?$', 'problemsets.views.model_create_form'),
 )

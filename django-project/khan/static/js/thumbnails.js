@@ -244,7 +244,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
                         thumbSet.addSlideIndex(sorted[i]);
                     }
                     if (questions.hasOwnProperty(sorted[i])) {
-                        var tmpDiv=addQuizSlide(sorted[i]);
+                        var tmpDiv=thumbSet.addQuizSlide(sorted[i]);
                         slideIndices[sorted[i]]={displayDiv: tmpDiv};
                     }
                 }
@@ -271,7 +271,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
                 player.seekTo(time);
                 thumbSet.selectSlide(time);
             };})(idxTime);
-            indexDiv.appendChild(tempDiv);
+            $('#slideIndex').append(tempDiv);
             return tempDiv;
 
         },
@@ -292,7 +292,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
             player.seekTo(time-1);
             thumbSet.selectSlide(time);
             };})(idxTime);
-            indexDiv.appendChild(tempDiv);
+            $('#slideIndex').append(tempDiv);
             return tempDiv;
         }
 
