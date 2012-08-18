@@ -536,6 +536,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         return True
 
+    def dl_link(self):
+        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+
     def __unicode__(self):
         return self.title
 
