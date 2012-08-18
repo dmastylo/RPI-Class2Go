@@ -110,6 +110,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'convenience_redirect.redirector.convenience_redirector',
 )
 
 ROOT_URLCONF = 'urls'
