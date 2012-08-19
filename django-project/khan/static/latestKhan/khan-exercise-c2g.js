@@ -1132,6 +1132,9 @@ var Khan = (function() {
         // Work with a clone to avoid modifying the original
         problem = problem.clone();
 
+        // [@wescott] Adding clearExistingProblem to clear out Loading message
+        clearExistingProblem();
+
         // problem has to be child of visible #workarea for MathJax metrics to all work right
         $("#workarea").append(problem);
 
@@ -2748,9 +2751,9 @@ var Khan = (function() {
             xhrFields: xhrFields,
 
             // Backup the response locally, for later use
-            success: function(data) {
+            success: function(xhrData) {
                 //alert(data)
-                if (data == "complete") {
+                if (xhrData == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                 } else {
                     var maxCredit = 100;
@@ -2770,12 +2773,15 @@ var Khan = (function() {
                     }
                 }
 
+                // find current card and stash localUserAnswer in it ("data" is what user submits)
+                $('.current-question').data('localUserAnswer', data);
+
                 // Tell any listeners that khan-exercises has new
                 // userExercise data
                 $(Khan).trigger("updateUserExercise", data);
 
                 if ($.isFunction(fn)) {
-                    fn(data);
+                    fn(xhrData);
                 }
             },
 
@@ -3055,11 +3061,24 @@ var Khan = (function() {
             // [@wescott] moves to viewed list, as it's currently being viewed
             var first = $('#questions-viewed li:first-child');
             //makeProblem(first.data('problem'), first.data('randseed'))
-            KhanC2G.problemIdx = 0;
-            //console.log("makeProblem called here with 0");
-            makeProblem(KhanC2G.problemIdx);
 
-
+            // [@wescott] Set up cards so the first one not done is the "current card"
+            (function configureCards () {
+                var cardArr = $('#questions-stack li').toArray();
+                $('li.current-question').removeClass('current-question');
+                for (var c = 0; c <= cardArr.length; c += 1) {
+                    if ($(cardArr[c]).hasClass('correctly-answered')) {
+                        $('#questions-viewed ol').append($(cardArr[c]));
+                    } else {
+                        $(cardArr[c]).addClass('current-question');
+                        break;
+                    }
+                }
+                $('#workarea').append('<p>Loading Exercise...</p>');
+                //console.log($('.current-question').data('problem'));
+                //setTimeout(function () { makeProblem($('.current-question').data('problem')); }, 5000);
+            })();
+            
         }
 
     }
@@ -3075,6 +3094,7 @@ var Khan = (function() {
         $('#problem-and-answer').append($('<div id="questions-stack"></div>'));
         $('#questions-stack').append($('<div id="questions-viewed"><ol></ol></div>'));
         $('#questions-stack').append($('<div id="questions-unviewed"><ol></ol></div>'));
+        $('#questions-stack').click(stackClickHandler);
 
         //populate 1 questions-to-do for each exercise
         var curNumProbs=0;
@@ -3116,6 +3136,7 @@ var Khan = (function() {
                 //console.log('Added ' + curNumProbs + ' to questions stack');
 
             });
+
 
         // [@wescott] It takes some time for the answer_area inputs to show up with page, exercise,
         // et al loading, then makeProblem() being called
@@ -3161,6 +3182,13 @@ var Khan = (function() {
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
         // value, if the user has already answered it
         $.when(checkForInputs()).then(function () {
+            console.log("when in effect...");
+            if ($('.current-question').data('problem')) {
+                makeProblem($('.current-question').data('problem'));
+            } else {
+                KhanC2G.problemIdx = 0;
+                makeProblem(KhanC2G.problemIdx);
+            }
             if ($('.current-question').data('user_selection_val')) {
                 if ($('#testinput').length) {
                     $('#testinput').val($('.current-question').data('user_selection_val')).attr('disabled','disabled');
@@ -3168,17 +3196,22 @@ var Khan = (function() {
                     reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
                 }
             }
+        }).always(function () {
+            console.log("What gives?");
         });
 
         // set class on last question to show it is the current one
         $('#questions-viewed li:first-child').addClass('current-question');
 
-        $('#questions-unviewed').find('li').click(unviewedClickHandler);
-        $('#questions-viewed').find('li').click(viewedClickHandler);
+        //$('#questions-unviewed').find('li').click(unviewedClickHandler);
+        //$('#questions-viewed').find('li').click(viewedClickHandler);
 
         $('#next-question-button').click(function () {
 
             var currentQCard = $('.current-question');
+            console.log("currentQCard...");
+            console.log(currentQCard);
+            console.log(currentQCard.next());
 
             var userAnswer = readOnlyChoices = null;
             if ($('input#testinput').length) {
@@ -3187,12 +3220,8 @@ var Khan = (function() {
                 userAnswer = $('input:radio[name=solution]:checked').val();
                 readOnlyChoices = [];
                 $('#solutionarea span.value').each(function () {
-                    //console.log(readOnlyChoices);
-                    //console.log($(this).text());
                     readOnlyChoices.push($(this).text());
-                    //console.log(readOnlyChoices);
                 });
-                //console.log(JSON.stringify(readOnlyChoices));
             }
 
             currentQCard.data('userAnswer', userAnswer);
@@ -3200,8 +3229,8 @@ var Khan = (function() {
             currentQCard.removeClass('current-question');
 
             $('#questions-unviewed li:first-child').trigger('mouseout');
-            $('#questions-unviewed li:first-child').unbind('click');
-            $('#questions-unviewed li:first-child').click(viewedClickHandler);
+            //$('#questions-unviewed li:first-child').unbind('click');
+            //$('#questions-unviewed li:first-child').click(viewedClickHandler);
             $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
             //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
@@ -3233,6 +3262,9 @@ var Khan = (function() {
         $('#questions-viewed').fadeIn('slow');
 
 
+        // [@wescott] TODO: refactor 2 click handlers into one
+        // DONE. Will remove commented out handlers when I'm back
+        /*
         function unviewedClickHandler(ev) {
 
             if ($(this).hasClass('current-question')) {
@@ -3268,7 +3300,6 @@ var Khan = (function() {
 
         };
 
-        // [@wescott] TODO: refactor 2 click handlers into one
         function viewedClickHandler(ev) {
 
             $(this).trigger('mouseout');
@@ -3305,7 +3336,58 @@ var Khan = (function() {
             });
 
         };
+        */
 
+        // [@wescott] Make use of event delegation by setting click handler on the common 
+        // questions-stack parent 
+        function stackClickHandler(ev) {
+
+            ev.stopPropagation();
+            var clickTarget = ev.target;
+            console.log("clickTarget");
+            console.log(clickTarget);
+            var thisCard = (clickTarget.tagName == 'li') ? $(clickTarget) : $(clickTarget).closest('li');
+            if (thisCard.length == 0) {
+                return;
+            } 
+            console.log("thisCard");
+            console.log(thisCard);
+            // whichever is the current card, make it not the current card
+            thisCard.trigger('mouseout');
+            if (!thisCard.hasClass('current-question')) {
+                $('.current-question').removeClass('current-question');
+                clearExistingProblem();
+
+                thisCard.addClass('current-question');
+                makeProblem(thisCard.data('problem'));
+            }
+
+            // load previous answers into the solution area
+            $.when(checkForInputs()).then(function () {
+                var userPrevSel = thisCard.data("user_selection_val");
+                var validUserChoices = thisCard.data("user_choices");
+                var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON(thisCard.data("user_choices")).length : 0;
+                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an 
+                // empty array within a string, which is a non-empty string; have to convert to a real array and 
+                // check its length
+                if (userChoicesLen > 0 && thisCard.data("correct")) {
+                    var choicesArr = $.parseJSON(thisCard.data("user_choices"));
+                    var userSel = userPrevSel; 
+                    reconstructChoices(choicesArr, userSel);
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else if (userPrevSel && $(ev.target).data("correct")) {
+                    $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else {
+                    if ($('input#testinput').length) {
+                        $('input#testinput').removeAttr('disabled');
+                    } else if ($('input:radio').length) {
+                        $('input:radio').removeAttr('disabled');
+                    }
+                }
+            });
+            
+        }
 
     }
 
