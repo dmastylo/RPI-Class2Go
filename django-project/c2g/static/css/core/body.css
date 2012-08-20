@@ -182,6 +182,13 @@ small.date {
 
 /* Header
 -------------------------------------------------- */
+#global-header {
+    background:#8C1515 url(/static/graphics/core/shadow-header-bg.png) bottom center no-repeat;
+    width:100%;
+}
+.stanford-logo {
+    padding:10px 20px;
+}
 #c2g_layout_topbar {
     position:relative;
     padding:0px;
