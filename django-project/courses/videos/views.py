@@ -56,16 +56,11 @@ def edit(request, course_prefix, course_suffix, slug):
 
     video = common_page_data['course'].video_set.all().get(slug=slug)
     form = S3UploadForm(course=common_page_data['course'], instance=video)
-    if video.live_datetime:
-        live_date = video.live_datetime.strftime('%m/%d/%Y %H:%M')
-    else:
-        live_date = ''
 
     return render(request, 'videos/edit.html',
             {'common_page_data': common_page_data,
              'slug': slug,
              'form': form,
-             'live_date': live_date,
              })
 
 def GetOAuth2Url(request):

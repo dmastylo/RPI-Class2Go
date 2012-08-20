@@ -11,13 +11,18 @@
 	  {% for field in form %}
 	    <div class="fieldWrapper">
 	      {{ field.errors }}
-	      {{ field.label_tag }}
-	      {{ field }}
-	      <span class="help-block">{{ field.help_text }}</span>
+	      {% if field.name == "live_datetime" %}
+	        <b>Set Live Date</b> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
+	        <div id="live_date" style="display:none">{{ field }}</div>
+	      {% else %}
+	        {{ field.label_tag }}
+	        {{ field }}
+	      {% endif %}
+	      {% if field.help_text %}
+	        <span class="help-block">{{ field.help_text }}</span>
+	      {% endif %}
 	    </div>
 	  {% endfor %}
-	  <b>Set Live Date</b> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
-	  <div id="live_date" style="display:none"><input type="datetime" name="live_date" data-datetimepicker /></div>
 	  </fieldset>
 	  <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
 	  <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
@@ -33,12 +38,12 @@
 {% block addl_scripts %}
 <script>
 function showLiveDate(checked) {
-    $("#live_date").toggle('fast');
     if (checked) {
-        //$("#live_date").show('slow');
+        $("#live_date").show('fast');
     }
     else {
-        //$("#live_date").hide('slow');
+        $("#id_live_datetime").val(null);
+        $("#live_date").hide('fast');
     }
 }
 </script>

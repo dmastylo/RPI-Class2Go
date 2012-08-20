@@ -62,28 +62,18 @@ def edit_video(request):
         if action == "Revert":
             video.revert()
             form = S3UploadForm(course=common_page_data['course'], instance=video)
-            if video.live_datetime:
-                live_date = video.live_datetime.strftime('%m/%d/%Y %H:%M')
-            else:
-                live_date = ''
         else:
             form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
             if form.is_valid():
-                if request.POST.get("set_live_date"):
-                    video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
-                else:
-                    video.live_datetime = None
                 form.save()
                 if action == "Save and Publish":
                     video.commit()
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
-            live_date = request.POST['live_date']
 
     return render(request, 'videos/edit.html',
                   {'common_page_data': common_page_data,
                    'slug': slug,
                    'form': form,
-                   'live_date': live_date,
                    })
 
 def delete_video(request):
@@ -189,9 +179,6 @@ def upload(request):
             new_video.index = new_video.section.getNextIndex()
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
-
-            if request.POST.get("set_live_date"):
-                new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
 
             # Bit of jiggery pokery to so that the id is set when the upload_path function is called.
             # Now storing file with id appended to the file path so that thumbnail and associated manifest files

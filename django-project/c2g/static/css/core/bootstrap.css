@@ -783,6 +783,12 @@ label {
   width: auto;
 }
 
+.fieldWrapper input[type="file"] {
+  height: auto;
+  line-height: normal;
+  margin-bottom: 9px;
+}
+
 select,
 textarea,
 input[type="text"],
