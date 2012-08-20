@@ -18,6 +18,7 @@ urlpatterns = patterns('',
 
     # Examples:
     url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),
+    url(r'^courses/signup/?$', 'courses.actions.signup'),
     # url(r'^class2go/', include('class2go.foo.urls')),
 
      #for data collection

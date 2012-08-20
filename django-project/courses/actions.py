@@ -101,3 +101,23 @@ def change_live_datetime(request):
             
     return redirect(request.META['HTTP_REFERER'])
 
+def is_member_of_course(course, user):
+    group_id = course.student_group.id
+    group_list = user.groups.values_list('id',flat=True)
+    
+    for item in group_list:
+        if item == group_id:
+            return True
+        
+    return False
+
+def signup(request):
+    handle = request.POST.get('handle')
+    
+    user = request.user
+    course = Course.objects.get(handle=handle, mode = "production")
+    if not is_member_of_course(course, user):
+        student_group = Group.objects.get(id=course.student_group_id) 
+        student_group.user_set.add(user)
+        
+    return redirect(request.META['HTTP_REFERER'])

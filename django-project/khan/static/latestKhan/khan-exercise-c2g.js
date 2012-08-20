@@ -3096,6 +3096,16 @@ var Khan = (function() {
                 //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
                 li.data('problem',idx);
                 //li.data('randseed',Math.floor(Math.random()*100000));
+                if (typeof userPSData != "undefined" && userPSData[idx.toString()]) {
+                    var userQDataObj = userPSData[idx.toString()];
+                    li.data('user_selection_val', userQDataObj.user_selection_val);
+                    li.data('correct', userQDataObj.correct);
+                    li.data('user_choices', userQDataObj.user_choices);
+                }
+                if (li.data('correct')) {
+                    li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
+                }
+
                 if (idx == 0) {
                     $('#questions-viewed ol').append(li);
                 } else {
@@ -3106,6 +3116,59 @@ var Khan = (function() {
                 //console.log('Added ' + curNumProbs + ' to questions stack');
 
             });
+
+        // [@wescott] It takes some time for the answer_area inputs to show up with page, exercise,
+        // et al loading, then makeProblem() being called
+        var checkForInputs = function() {
+
+            var dfd = $.Deferred();
+
+            var counter = 0;
+            setTimeout(function checkInputs() {
+                //console.log("checkInputs called " + (++counter) + " times");
+                if (($('#testinput').length > 0) || ($('#solutionarea input:radio').length > 0)) {
+                    dfd.resolve(true);  // [@wescott] Resolve with a value of "true" to pass on
+                } else {
+                    if (dfd.state() === "pending") {
+                        dfd.notify("Still checking...");
+                        setTimeout(checkInputs, 1000)
+                    } else {
+                        dfd.reject("Sorry, answer input not available");
+                    }
+                };
+            }, 1000);
+    
+            return dfd.promise();
+
+        };
+
+        // [@wescott] This replaces the radio button choices in the #solutionarea with the exact 
+        // choices that were given to the user when he/she answered the question before; userSelection
+        // is what the user actually chose
+        var reconstructChoices = function (choices, userSelection) {
+            $('#solutionarea').empty();
+            $('#solutionarea').append('<ul></ul>');
+            for (var i = 0; i < choices.length; i += 1) {
+                $('#solutionarea ul').append('<li><label></label></li>');
+                $('#solutionarea li:last label').append('<input type="radio" name="solution" value="' + i + '"/>');
+                if (i == userSelection) {
+                    $('#solutionarea li:last input').get(0).checked = true;
+                }
+                $('#solutionarea li:last label').append('<span class="value">' + choices[i] + '</span>');
+            } 
+        };
+
+        // [@wescott] When the inputs are available, pre-populate current one with the current question's
+        // value, if the user has already answered it
+        $.when(checkForInputs()).then(function () {
+            if ($('.current-question').data('user_selection_val')) {
+                if ($('#testinput').length) {
+                    $('#testinput').val($('.current-question').data('user_selection_val')).attr('disabled','disabled');
+                } else if ($('#solutionarea input:radio').length) {
+                    reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
+                }
+            }
+        });
 
         // set class on last question to show it is the current one
         $('#questions-viewed li:first-child').addClass('current-question');
@@ -3175,11 +3238,30 @@ var Khan = (function() {
             if ($(this).hasClass('current-question')) {
                 return;
             }
-            if ($('input#testinput').length) {
-                $('input#testinput').removeAttr('disabled');
-            } else if ($('input:radio').length) {
-                $('input:radio').removeAttr('disabled');
-            }
+
+            $.when(checkForInputs()).then(function () {
+                var userPrevSel = $(ev.target).data("user_selection_val");
+                var validUserChoices = $(ev.target).data("user_choices");
+                var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
+                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an 
+                // empty array within a string, which is a non-empty string; have to convert to a real array and 
+                // check its length
+                if (userChoicesLen > 0 && $(ev.target).data("correct")) {
+                    var choicesArr = $.parseJSON($(ev.target).data("user_choices"));
+                    var userSel = userPrevSel; 
+                    reconstructChoices(choicesArr, userSel);
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else if (userPrevSel && $(ev.target).data("correct")) {
+                    $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else {
+                    if ($('input#testinput').length) {
+                        $('input#testinput').removeAttr('disabled');
+                    } else if ($('input:radio').length) {
+                        $('input:radio').removeAttr('disabled');
+                    }
+                }
+            });
 
             // [@wescott] redundant code removed; next button fn should just be triggered
             $('#next-question-button').trigger('click');
@@ -3199,13 +3281,28 @@ var Khan = (function() {
 
             var userAnswer = $(this).data('userAnswer');
 
-            if ($('input#testinput').length) {
-                $('input#testinput').val(userAnswer);
-                //$('input#testinput').attr('disabled', 'disabled');
-            } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
-                $('input:radio[name=solution]')[userAnswer].checked = true;
-                //$('input:radio').attr('disabled', 'disabled');
-            }
+            $.when(checkForInputs()).then(function () {
+                var userPrevSel = $(ev.target).data("user_selection_val");
+                var validUserChoices = $(ev.target).data("user_choices");
+                var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
+                if (userChoicesLen > 0 && $(ev.target).data("correct")) {
+                    var choicesArr = $.parseJSON($(this).data("user_choices"));
+                    var userSel = userPrevSel; 
+                    reconstructChoices(choicesArr, userSel);
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else if (userPrevSel && $(ev.target).data("correct")) {
+                    $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else {
+                    if ($('input#testinput').length) {
+                        $('input#testinput').val(userAnswer);
+                        //$('input#testinput').attr('disabled', 'disabled');
+                    } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
+                        $('input:radio[name=solution]')[userAnswer].checked = true;
+                        //$('input:radio').attr('disabled', 'disabled');
+                    }
+                }
+            });
 
         };
 
