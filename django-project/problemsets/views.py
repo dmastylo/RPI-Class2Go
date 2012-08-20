@@ -6,7 +6,7 @@ from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
+from datetime import datetime, timedelta
 from problemsets.forms import *
 
 
@@ -100,12 +100,49 @@ def model_create_form(request, course_prefix, course_suffix):
 
     data = {'common_page_data': common_page_data}
 
-    form = CreateProblemSet(course=common_page_data['course'])
+    form = CreateProblemSet(course=common_page_data['course'],
+                            initial={'late_penalty':10,
+                                    'assessment_type':'formative',
+                                    'due_date':(datetime.today()+timedelta(7)),
+                                    'grace_period':(datetime.today()+timedelta(14)).strftime('%m/%d/%Y %H:%M'),
+                                    'partial_credit_deadline':(datetime.today()+timedelta(21)).strftime('%m/%d/%Y %H:%M')
+                                    })
     data['form'] = form
 
     return render_to_response('problemsets/model_create.html',
                               data,
                               context_instance=RequestContext(request))
+
+
+def model_create_action(request):
+    course_prefix = request.POST.get("course_prefix")
+    course_suffix = request.POST.get("course_suffix")
+    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+
+    data = {'common_page_data': common_page_data}
+
+    if request.method == 'POST':
+        form = CreateProblemSet(request.POST, request.FILES, course=common_page_data['course'])
+        if form.is_valid():
+            new_pset = form.save(commit=False)
+            new_pset.course = common_page_data['course']
+            new_pset.mode = 'staging'
+            new_pset.handle = course_prefix + "#$!" + course_suffix
+            new_pset.path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+new_pset.slug+"/load_problem_set"
+
+            new_pset.save()
+            new_pset.create_production_instance()
+            return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_pset.slug,)))
+
+    else:
+        form = CreateProblemSet(course=common_page_data['course'])
+    data['form'] = form
+
+    return render_to_response('problemsets/model_create.html',
+                              data,
+                              context_instance=RequestContext(request))
+
+
 
 def create_action(request):
     course_handle = request.POST['course_prefix'] + "#$!" + request.POST['course_suffix']

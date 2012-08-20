@@ -2,8 +2,8 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
-    <h3>Upload Videos</h3>
-    <form action="{% url 'problemsets.views.create_action' %}" method="POST" class="form-vertical">
+    <h3>Create New Problem Set</h3>
+    <form action="{% url 'problemsets.views.model_create_action' %}" method="POST" class="form-vertical">
 	  {% csrf_token %}
 	  <fieldset class="well">
 	  {% for field in form %}
@@ -13,9 +13,12 @@
 	      {{ field }}
 	      <span class="help-block">{{ field.help_text }}</span>
 	    </div>
-	  {% endfor %}
+	{% endfor %}
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+	    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+	    <input type="submit" value="Create Problem Set" class="btn"/>
     </form>
-  {% else %}
+    {% else %}
     <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to upload videos.</h4>
   {% endif %}
 </div>

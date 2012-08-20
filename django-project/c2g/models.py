@@ -574,18 +574,18 @@ class ProblemSetManager(models.Manager):
 
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
-    section = models.ForeignKey(ContentSection, null=True, db_index=True)
-    slug = models.SlugField()
-    title = models.CharField(max_length=255, blank=True)
+    section = models.ForeignKey(ContentSection, db_index=True)
+    slug = models.SlugField("URL Identifier")
+    title = models.CharField(max_length=255,)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    due_date = models.DateTimeField(null=True, blank=True)
-    grace_period = models.DateTimeField(null=True, blank=True)
-    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True)
+    grace_period = models.DateTimeField()
+    partial_credit_deadline = models.DateTimeField()
     assessment_type = models.CharField(max_length=255)
-    late_penalty = models.IntegerField(null=True, blank=True)
-    submissions_permitted = models.IntegerField(null=True, blank=True)
-    resubmission_penalty = models.IntegerField(null=True, blank=True)
+    late_penalty = models.IntegerField()
+    submissions_permitted = models.IntegerField()
+    resubmission_penalty = models.IntegerField()
     randomize = models.BooleanField()
     objects = ProblemSetManager()
 
@@ -626,6 +626,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def commit(self, clone_fields = None):
+        print self.mode
         if self.mode != 'staging': return;
         if not self.image: self.create_production_instance()
 
@@ -661,7 +662,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         production_instance.save()
 
+        print "hilo"
         if self.exercises_changed() == True:
+            print "hi"
             staging_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
             production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
             #Delete all previous relationships

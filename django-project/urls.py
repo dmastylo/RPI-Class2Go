@@ -133,4 +133,5 @@ urlpatterns = patterns('',
     url(r'^delete_exercise/?', 'problemsets.views.delete_exercise'),
     url(r'^revert_problemset/?', 'problemsets.views.revert_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/modelcreate/?$', 'problemsets.views.model_create_form'),
+    url(r'^modelcreateaction/?', 'problemsets.views.model_create_action'),
 )
