@@ -14,12 +14,13 @@
 	      <span class="help-block">{{ field.help_text }}</span>
 	    </div>
 	{% endfor %}
+    </fieldset>
         <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
 	    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
 	    <input type="submit" value="Create Problem Set" class="btn"/>
     </form>
     {% else %}
-    <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to upload videos.</h4>
+    <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to create a problem set.</h4>
   {% endif %}
 </div>
 

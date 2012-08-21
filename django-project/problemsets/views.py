@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, HttpResponseRedirect
+from django.shortcuts import render_to_response, HttpResponseRedirect, render
 from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
@@ -14,6 +14,8 @@ from problemsets.forms import *
 # many questions there are and how many were completed to calculate progress on
 # each problem set. Packages this information along with problem set
 # information about deadlines into a dictionary and passes it to the template.
+
+
 
 def list(request, course_prefix, course_suffix):
     try:
@@ -82,36 +84,53 @@ def create_form(request, course_prefix, course_suffix):
         raise Http404
     content_sections = common_page_data['course'].contentsection_set.all()
     current_datetime = datetime.today().strftime('%m/%d/%Y %H:%M')
+    form = CreateProblemSet(course=common_page_data['course'])
     return render_to_response('problemsets/create.html',
                             {'request': request,
                                 'common_page_data': common_page_data,
                                 'course_prefix': course_prefix,
                                 'course_suffix': course_suffix,
                                 'content_sections': content_sections,
-                                'current_datetime': current_datetime
+                                'current_datetime': current_datetime,
+                                'form': form
                             },
                             context_instance=RequestContext(request))
+
 
 def model_create_form(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-
     data = {'common_page_data': common_page_data}
-
     form = CreateProblemSet(course=common_page_data['course'],
                             initial={'late_penalty':10,
                                     'assessment_type':'formative',
                                     'due_date':(datetime.today()+timedelta(7)),
-                                    'grace_period':(datetime.today()+timedelta(14)).strftime('%m/%d/%Y %H:%M'),
-                                    'partial_credit_deadline':(datetime.today()+timedelta(21)).strftime('%m/%d/%Y %H:%M')
+                                    'grace_period':(datetime.today()+timedelta(14)),
+                                    'partial_credit_deadline':(datetime.today()+timedelta(21))
                                     })
     data['form'] = form
-
+    data['course_prefix'] = course_prefix
+    data['course_suffix'] = course_suffix
     return render_to_response('problemsets/model_create.html',
                               data,
                               context_instance=RequestContext(request))
+
+
+def model_edit_form(request, course_prefix, course_suffix, pset_slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
+    data = {'common_page_data': common_page_data}
+    form = CreateProblemSet(course=common_page_data['course'], instance=pset)
+    data['form'] = form
+    data['pset'] = pset
+    data['course_prefix'] = course_prefix
+    data['course_suffix'] = course_suffix
+    return render_to_response('problemsets/model_edit.html', data, context_instance=RequestContext(request))
 
 
 def model_create_action(request):
@@ -119,10 +138,11 @@ def model_create_action(request):
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
 
-    data = {'common_page_data': common_page_data}
+    data = {'common_page_data': common_page_data, 'course_prefix': course_prefix, 'course_suffix': course_suffix}
 
     if request.method == 'POST':
-        form = CreateProblemSet(request.POST, request.FILES, course=common_page_data['course'])
+        pset = ProblemSet(course = common_page_data['course'])
+        form = CreateProblemSet(request.POST, request.FILES, course=common_page_data['course'], instance=pset)
         if form.is_valid():
             new_pset = form.save(commit=False)
             new_pset.course = common_page_data['course']
@@ -137,11 +157,94 @@ def model_create_action(request):
     else:
         form = CreateProblemSet(course=common_page_data['course'])
     data['form'] = form
+    return render_to_response('problemsets/model_create.html', data, context_instance=RequestContext(request))
 
-    return render_to_response('problemsets/model_create.html',
-                              data,
-                              context_instance=RequestContext(request))
+def model_edit_action(request):
+    course_prefix = request.POST.get("course_prefix")
+    course_suffix = request.POST.get("course_suffix")
+    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    data = {'common_page_data': common_page_data, 'course_prefix': course_prefix, 'course_suffix': course_suffix}
+    pset_id = request.POST.get("pset_id")
 
+    if not common_page_data['is_course_admin']:
+        return redirect('courses.views.main', course_prefix, course_suffix)
+
+    if request.method == 'POST':
+        pset = ProblemSet.objects.get(id=pset_id)
+
+        action = request.POST['action']
+        if action == "Revert":
+            pset.revert()
+            form = CreateProblemSet(course=common_page_data['course'], instance=pset)
+        else:
+            form = CreateProblemSet(request.POST, course=common_page_data['course'], instance=pset)
+            if form.is_valid():
+                form.save()
+                if action == "Save and Publish":
+                    pset.commit()
+                return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
+
+    data['form'] = form
+    data['pset'] = pset
+    return render(request, 'problemsets/model_edit.html', data)
+
+
+def model_exercises(request, course_prefix, course_suffix, pset_slug):
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    data = {'common_page_data': common_page_data}
+    form = ManageExercisesForm()
+    pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
+    psetToExs = ProblemSetToExercise.objects.getByProblemset(pset).select_related('exercise', 'problemSet')
+    used_exercises = []
+    problemset_taken = False
+    if len(ProblemActivity.objects.filter(problemset_to_exercise__problemSet=pset.image)) > 0:
+        problemset_taken = True
+    #Get the list of exercises currently in this problem set
+    for psetToEx in psetToExs:
+        used_exercises.append(psetToEx.exercise.id)
+    #Get all the exercises in the course but not in this problem set to list in add from existing
+    exercises = Exercise.objects.all().filter(problemSet__course=common_page_data['course']).exclude(id__in=used_exercises).distinct()
+    data['form'] = form
+    data['course_prefix'] = course_prefix
+    data['course_suffix'] = course_suffix
+    data['pset'] = pset
+    data['psetToExs'] = psetToExs
+    data['problemset_taken'] = problemset_taken
+    data['exercises'] = exercises
+    return render_to_response('problemsets/model_manage_exercises.html', data, context_instance=RequestContext(request))
+
+
+def model_add_exercise(request, course_prefix, course_suffix, pset_slug):
+    course_prefix = request.POST.get("course_prefix")
+    course_suffix = request.POST.get("course_suffix")
+    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    data = {'common_page_data': common_page_data, 'course_prefix': course_prefix, 'course_suffix': course_suffix}
+    if request.method == 'POST':
+        form = ManageExercisesForm(request.POST, request.FILES)
+        if form.is_valid():
+            pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+            file_content = request.FILES['file']
+            file_name = file_content.name
+
+            exercise = Exercise()
+            exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
+            exercise.fileName = file_name
+            exercise.file.save(file_name, file_content)
+            exercise.save()
+
+            index = len(ProblemSetToExercise.objects.getByProblemset(pset))
+            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='staging')
+            psetToEx.save()
+            return HttpResponseRedirect(reverse('problemsets.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+    else:
+        form = ManageExercisesForm()
+    data['form'] = form
+    pset = ProblemSet.objects.getByCourse(common_page_data['course'])
+    data['pset'] = pset
+    return render_to_response('problemsets/model_manage_exercises.html', data, context_instance=RequestContext(request))
 
 
 def create_action(request):

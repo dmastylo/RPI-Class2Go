@@ -4,7 +4,7 @@
 <div id="c2g_layout_m_column" class="span12 create-problemset">
     <h3>Create a New Problem Set</h3>
 
-    <form action="{% url 'problemsets.views.create_action' %}" method="POST" class="form-vertical">
+    <form action="{% url 'problemsets.views.model_create_action' %}" method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
@@ -13,25 +13,24 @@
             <div class="control-group">
                 <label class="control-label">Problem Set Title*</label>
                 <div class="controls">
-                    <input type="text" name="title" />
+                    {{ form.title.errors }}
+	                {{ form.title}}
                     <span class="help-block">A title that can include spaces that be shown when listing problem sets</span>
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label">URL Identifier for Problem Set*</label>
                 <div class="controls">
-                    <input type="text" name="slug" />
+                    {{ form.slug.errors }}
+	                {{ form.slug}}
                     <span class="help-block">*A unique ID consisting of numbers and letters with no spaces to be used in the URL</span>
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label">Section*</label>
                 <div class="controls">
-                    <select name="content_section">
-                        {% for content_section in content_sections %}
-                        <option value={{content_section.id}}>{{content_section.title}}</option>
-                        {% endfor %}
-                    </select>
+                    {{ form.section.errors }}
+	                {{ form.section}}
                 </div>
             </div>
             <div class="control-group">

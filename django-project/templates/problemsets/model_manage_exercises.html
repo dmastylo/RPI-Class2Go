@@ -22,41 +22,18 @@ function confirm_change(){
     <h3>Add or Remove Exercises</h3>
 
     <h4>Upload Exercises to {{pset.title}}</h4>
-    <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical" enctype="multipart/form-data">
+    <form action= {% url 'problemsets.views.model_add_exercise' course_prefix course_suffix pset.slug %} method="POST" class="form-vertical" enctype="multipart/form-data">
         <fieldset class="well">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
-        <div class="control-group">
-            <label class="control-label">Add Exercises* (Choose a file and then click Add Exercise)</label>
-            <div class="controls">
-                <input type="file" name="exercise">
-                <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
-            </div>
+        <div class="fieldWrapper">
+            {{ form.file.errors }}
+            {{ form.file }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
-    
-    <h4><a data-toggle="collapse" data-target="#choose-existing" class='btn'>Choose From Existing Exercises</a></h4>
-    <form action= {% url 'problemsets.views.add_existing_exercises' %} method="POST" class="form-vertical">
-        {% csrf_token %}
-        <input type="hidden" name="pset_id" value={{pset.id}}>
-        <input type="hidden" name="course_prefix" value={{course_prefix}}>
-        <input type="hidden" name="course_suffix" value={{course_suffix}}>
-        <div id="choose-existing" class="collapse">
-            <div class="control-group">
-                <div class="controls">
-                    {% for exercise in exercises %}
-                    <input type="checkbox" name=exercise value={{exercise.id}} /> {{exercise.fileName}} <br>
-                    {% empty %}
-                    There are no existing exercises
-                    {% endfor %}
-                </div>
-            </div>
-            <input type="submit" value="Add Exercises" onclick="return confirm_change()" class="btn">
-        </div>
-    </form>
-    
 
     <form action= ''  method="POST" class="form-vertical">
         {% csrf_token %}
@@ -85,5 +62,3 @@ function confirm_change(){
     </form>
 </div>
 {% endblock m_column_content %}
-
-

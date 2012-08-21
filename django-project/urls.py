@@ -135,4 +135,8 @@ urlpatterns = patterns('',
     url(r'^revert_problemset/?', 'problemsets.views.revert_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/modelcreate/?$', 'problemsets.views.model_create_form'),
     url(r'^modelcreateaction/?', 'problemsets.views.model_create_action'),
+    url(r'^modeleditaction/?', 'problemsets.views.model_edit_action'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/modeledit?$', 'problemsets.views.model_edit_form'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/model_exercises?$', 'problemsets.views.model_exercises'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/model_add_exercise?$', 'problemsets.views.model_add_exercise'),
 )
