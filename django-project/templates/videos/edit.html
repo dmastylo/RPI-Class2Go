@@ -1,7 +1,58 @@
 {% extends "course_base.html" %}
-{% load url from future %}
-{% block m_column_content %}
+{% block videos_link_class %}class="active"{% endblock videos_link_class %}
 
-<h2>Edit video "{{video_id}}" for course "{{course_prefix}} ({{course_suffix}})" </h2>
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span12">
+  {% if user.is_authenticated %}
+    <h3>Edit video</h3>
+      <form name="upload_form" action="{% url 'courses.videos.actions.edit_video' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="well">
+        {% for field in form %}
+          <div class="fieldWrapper">
+            {{ field.errors }}
+	    {% if field.name == "live_datetime" %}
+	      <b>Live Date</b>
+	      {% if field.value %}
+	        <input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" checked />
+	      {% else %}
+		<input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" />
+	      {% endif %}
+	      <div>{{ field }}</div>
+	    {% else %}
+              {{ field.label_tag }}
+              {{ field }}
+	    {% endif %}
+	    {% if field.help_text %}
+              <span class="help-block">{{ field.help_text }}</span>
+            {% endif %}
+	  </div>
+        {% endfor %}
+	</fieldset>
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />	
+	<input type="hidden" name="video_slug" value="{{slug}}" />
+	<div class="form-actions">
+	  <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
+	  <input type="submit" name="action" value="Save as Draft" class="btn" />
+	  <input type="submit" name="action" value="Revert" class="btn" />
+	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
+	</div>
+  {% else %}
+    <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to edit videos.</h4>
+  {% endif %}
 
 {% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script>
+function toggleLiveDate(checked) {
+    if (checked) {
+        $("#id_live_datetime").focus();
+    }
+    else {
+        $("#id_live_datetime").val(null);
+    }
+}
+</script>
+{% endblock addl_scripts %}

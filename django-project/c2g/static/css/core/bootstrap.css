@@ -771,6 +771,24 @@ label {
   margin-bottom: 5px;
 }
 
+.errorlist {
+  color: red;
+}
+
+.fieldWrapper label {
+  font-weight: bold;
+}
+
+.fieldWrapper select {
+  width: auto;
+}
+
+.fieldWrapper input[type="file"] {
+  height: auto;
+  line-height: normal;
+  margin-bottom: 9px;
+}
+
 select,
 textarea,
 input[type="text"],

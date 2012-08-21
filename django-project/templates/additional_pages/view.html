@@ -1,7 +1,17 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+
+{% block course_info_link_class %}{% ifnotequal page.menu_slug '' %}class="dropdown active"{% endifnotequal %}{% endblock course_info_link_class %}
+{% block course_materials_link_class %}{% ifequal page.menu_slug '' %}class="active"{% endifequal %}{% endblock course_materials_link_class %}
+
+{% block course_page_title %}{{page.title}}{% endblock course_page_title %}
+
 {% block m_column_content %}
-
-<h2>Shows additional page "{{additional_page_id}}" in course "{{course_prefix}} ({{course_suffix}})" </h2>
-
+<div id="c2g_layout_m_column" class="span6">
+    {% ifnotequal page.description '' %}
+        {% autoescape off %}{{page.description}}{% endautoescape %}
+    {% else %}
+        <p>No content has been added to this page yet.</p>
+    {% endifnotequal %}
+</div>
 {% endblock m_column_content %}

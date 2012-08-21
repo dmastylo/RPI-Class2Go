@@ -1,0 +1,36 @@
+<div id="new_announcement_div" style='display: none;'>
+    <form name="new_announcement_form" action="{% url 'courses.announcements.actions.add_announcement' %}" method="POST" class="form-vertical">
+        <div class="control-group">
+            <label>Title</label>
+            <div class="controls">
+                <input name="title" id="announcement_title" type="text" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label>Description:</label>
+            <div class="controls">
+                <textarea class="tinymce" style="width:100%;" name="description" id="announcement_description"></textarea>
+            </div>
+        </div>
+        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+        <input type="hidden" name="commit" id="commit" value="0" />
+        {% csrf_token %}
+        
+        <input type="button" class="btn btn-primary" value="Save and Publish" onclick="SaveAnnouncement('1');" />
+        <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement('0');" />
+        <input type="button" class="btn" value="Cancel" onclick="CancelNewAnnouncement()"/>
+    </form>
+    <script type="text/javascript">
+        function SaveAnnouncement(commit) {
+            $("#commit").val(commit);
+            document.forms.new_announcement_form.submit();
+        }
+        
+        function CancelNewAnnouncement() {
+            $('#announcement_title').val('');
+            tinyMCE.get('announcement_description').setContent('');
+            $('#new_announcement_div').hide();
+        }
+    </script>
+</div>

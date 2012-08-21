@@ -231,12 +231,14 @@ var Khan = (function() {
     // pending in the middle of a load.
     loadingExercises = {},
 
+    // C2G: manual location for Khan static files
     urlBaseOverride="/static/latestKhan/",
     urlBase = typeof urlBaseOverride !== "undefined" ? urlBaseOverride :
         testMode ? "../" : "/khan-exercises/",
 
-    
-            
+    // Use later for finding exercises -- they're not stored with the static Khan files, but in S3
+    urlBaseExercise = "../",
+
     lastFocusedSolutionInput = null,
 
     issueError = "Communication with GitHub isn't working. Please file " +
@@ -276,7 +278,7 @@ var Khan = (function() {
             link.rel = "stylesheet";
             link.href = urlBase + "css/khan-exercise.css";
             document.getElementsByTagName("head")[0].appendChild(link);
-         
+
             link = document.createElement("link");
             link.rel = "stylesheet";
             link.href = urlBase + "css/c2g-khan.css";
@@ -735,12 +737,42 @@ var Khan = (function() {
         // Initialize to an empty jQuery set
         exercises = jQuery();
 
+        // [@wescott] Is this problem set formative or summative?
+        // Default is formative, but check problem set div for summative CSS
+        // class; otherwise, check the class name on the article element in 
+        // the page
+        exAssessType = 'formative';
+        if ($("div.summative").length || $("div.assessive").length || 
+            $("article.summative").length || $("article.summative").length) {
+            exAssessType = 'summative';
+        }
+
         $(function() {
             var remoteExercises = $("div.exercise[data-name]");
 
             if (remoteExercises.length) {
 
-                remoteExercises.each(loadExercise);
+                var controlLoad = function(exArr) {
+                    if (exArr.length > 0) {
+                        currentEx = exArr.shift();
+                        // [@wescott] Passing "remoteExercises" to loadExercise too,
+                        // so it can check original list of exercises that should be coming
+                        loadExercise.call(currentEx, remoteExercises.toArray()).done(function () {
+                            controlLoad(exArr);
+                        });
+                    } else {
+                        return;
+                    }
+                }
+                controlLoad(remoteExercises.toArray());
+
+                /*
+                remoteExercises.each(function (idx, elem) {
+                    $.when(loadExercise.call(elem)).done(function () {
+                        console.log('Ex ' + idx + ' executed');});
+                });
+                */
+
 
             // Only run loadModules if exercises are in the page
             } else if ($("div.exercise").length) {
@@ -876,8 +908,13 @@ var Khan = (function() {
     function enableCheckAnswer() {
         $("#check-answer-button")
             .removeAttr("disabled")
-            .removeClass("buttonDisabled")
-            .val("Check Answer");
+            .removeClass("buttonDisabled");
+        // [@wescott] Added text change for Summative exercises
+        if (typeof exAssessType != "undefined" && exAssessType == "summative") {
+            $("#check-answer-button").val("Submit Answer");
+        } else {
+            $("#check-answer-button").val("Check Answer");
+        }
     }
 
     function disableCheckAnswer() {
@@ -955,6 +992,7 @@ var Khan = (function() {
             }
 
             // Generate a new problem
+            //console.log("In finishRender, generating new problem with no arguments");
             makeProblem();
 
         }
@@ -1028,7 +1066,8 @@ var Khan = (function() {
     }
 
     function makeProblem(id, seed) {
-            
+        //console.log("id is " + id);
+        //console.log("seed is " + seed);
 
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
@@ -1063,20 +1102,28 @@ var Khan = (function() {
         // Otherwise we grab a problem at random from the bag of problems
         // we made earlier to ensure that every problem gets shown the
         // appropriate number of times
+
+        // [@wescott] Removing this as we're not dealing with a problemBag at this time
+        /*
         } else if (problemBag.length > 0) {
             problem = problemBag[problemBagIndex];
             id = problem.data("id");
+        */
 
         // No valid problem was found, bail out
+        // [@wescott] Actually, just return first problem
         } else {
-            return;
+            // [@wescott] Don't just return
+            //return;
+            problem = problems[0];
+            id = problem.data("id");
         }
 
         problemID = id;
 
         // Find which exercise this problem is from
         exercise = problem.parents("div.exercise").eq(0);
-            
+
         // JASON BAU -- for C2G problems sets we want to display the exercise title
         if (exercise.data('title'))
             $("#container .exercises-header h2").children().last().text(exercise.data('title')[0]);
@@ -1126,15 +1173,16 @@ var Khan = (function() {
         hints = problem.children(".hints").remove();
 
         // Hide the hint box if there are no hints in the problem
-        
+
             //console.log(problem);
         $(".hint-box").show();
 
-        if (hints.length === 0) {
+        // [@wescott] Adding check for summative exercises, which shouldn't have hints
+        if (hints.length === 0 || exAssessType == "summative") {
             $(".hint-box").hide();
         }
-         
-    
+
+
         // Evaluate any inline script tags in this exercise's source
         $.each(exercise.data("script") || [], function(i, scriptContents) {
             $.globalEval(scriptContents);
@@ -1250,6 +1298,23 @@ var Khan = (function() {
         // Enable the all answer input elements except the check answer button.
         $("#answercontent input").not("#check-answer-button")
             .removeAttr("disabled");
+
+        // [@wescott] If summative problem set, add note about penalties per try
+        if (exAssessType == "summative") {
+            var maxAttempts, penaltyPct;
+            var maxCredit = 100; 
+            if (typeof c2gConfig != "undefined") {
+                maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+                penaltyPct = c2gConfig.penaltyPct + "%";
+            } else {
+                maxAttempts = 3;
+                penaltyPct = "25%";
+            }
+            $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
+            $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
+            $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">0</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
+            $("#check-answer-button").val("Submit Answer");
+        }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
             $("#examples-show").show();
@@ -1861,7 +1926,7 @@ var Khan = (function() {
     KhanC2G.clearExistingProblem=clearExistingProblem;
     KhanC2G.makeProblem=makeProblem;
     KhanC2G.makeProblemBag=makeProblemBag;
-            
+
     function renderNextProblem(nextUserExercise) {
         clearExistingProblem();
 
@@ -1888,6 +1953,7 @@ var Khan = (function() {
 
             if (testMode) {
                 // Just generate a new problem from existing exercise
+                //console.log("In testMode, calling makeProblem without an argument");
                 makeProblem();
             } else {
                 loadAndRenderExercise(nextUserExercise);
@@ -2003,7 +2069,7 @@ var Khan = (function() {
             var checkAnswerButton = $("#check-answer-button");
 
             // If incorrect, warn the user and help them in any way we can
-            if (pass !== true) {
+            if (pass != true) {
                 checkAnswerButton
                     .effect("shake", {times: 3, distance: 5}, 80)
                     .val("Try Again");
@@ -2051,7 +2117,8 @@ var Khan = (function() {
                     // See http://stackoverflow.com/questions/1370322/jquery-ajax-fires-error-callback-on-window-unload
                     return;
                 }
-
+/* Kelvin here. I commented this warning out because it kept showing up whenever questions was answered
+ *
                 // Error during submit. Disable the page and ask users to
                 // reload in an attempt to get updated data.
 
@@ -2068,7 +2135,7 @@ var Khan = (function() {
                     "If you think this is a mistake, " +
                     "<a href='http://www.khanacademy.org/reportissue?type=Defect&issue_labels='>tell us</a>."
                 );
-
+*/
             }, "attempt_hint_queue");
 
             if (pass === true) {
@@ -2531,7 +2598,7 @@ var Khan = (function() {
 
             // testMode automatically advances to the next problem --
             // integrated mode just listens and waits for renderNextProblem
-                                          
+
             /* JASON BAU COMMENTED OUT
             $(Khan).bind("gotoNextProblem", function() {
                 renderNextProblem();
@@ -2631,8 +2698,8 @@ var Khan = (function() {
     }
 
     function request(method, data, fn, fnError, queue) {
-        
-        /*                                  
+
+        /*
         if (testMode) {
             // Pretend we have success
             if ($.isFunction(fn)) {
@@ -2650,16 +2717,58 @@ var Khan = (function() {
             xhrFields["withCredentials"] = true;
         }
 
+        //Gets the problem ID which is (problem number)-(variation)
+        problem_identifier = $('#workarea').children('div').attr('id')
+        exercise_filename = exercise.data('fileName')
+        pset_id = document.getElementById("pset_id").value
+        if ($('input#testinput').length) {
+            user_selection_val = $('input#testinput').val();
+        } else if ($('input:radio[name=solution]').length) {
+            user_selection_val = $('input:radio[name=solution]:checked').val();
+        }
+        user_choices = [];
+        $('#solutionarea span.value').each(function () {
+            user_choices.push($(this).text());
+        });
+        data = $.extend(data, {"problem_identifier": problem_identifier});
+        data = $.extend(data, {"exercise_filename": exercise_filename});
+        data = $.extend(data, {"pset_id": pset_id});
+        data = $.extend(data, {"user_selection_val": user_selection_val});
+        data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
+
+        //URL starts with problemsets/attempt to direct to a view to collect data.
+        //problemId is the id of the problem the information is being created for
         var request = {
             // Do a request to the server API
-            url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
+            //url: server + "/api/v1/user/exercises/" + exerciseId + "/" + method,
+            url: "/problemsets/attempt/2",
             type: "POST",
             data: data,
-            dataType: "json",
+            dataType: "text",
             xhrFields: xhrFields,
 
             // Backup the response locally, for later use
             success: function(data) {
+                //alert(data)
+                if (data == "complete") {
+                    $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                } else {
+                    var maxCredit = 100;
+                    var maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+
+                    var attCt = $('#attempt-count').text();
+                    var newAttCt = parseInt(attCt) + 1;
+                    $('#attempt-count').text(newAttCt);
+
+                    // since page displays last attempt count, the display will be behind by one
+                    // (i.e. with max of 3 attempts, by the time "Attempts so far" shows as "3",
+                    // the credit should reflect "0%") 
+                    if (newAttCt > (maxAttempts - 1)) {
+                        $('#max-credit').text(0);
+                    } else {
+                        $('#max-credit').text(maxCredit - (c2gConfig.penaltyPct * newAttCt));
+                    }
+                }
 
                 // Tell any listeners that khan-exercises has new
                 // userExercise data
@@ -2727,6 +2836,8 @@ var Khan = (function() {
     }
 
     function loadExercise(callback) {
+
+        //console.log(arguments);
         var self = $(this).detach();
         var id = self.data("name");
         var weight = self.data("weight");
@@ -2744,7 +2855,14 @@ var Khan = (function() {
         loadingExercises[rootName]++;
 
         // Packing occurs on the server but at the same "exercises/" URL
-        $.get(urlBase + "exercises/" + fileName, function(data, status, xhr) {
+        //
+        // C2G: we use a different place for the exercises (originally was with the rest of the static files)
+        // since we need to get from S3
+        var dfd = $.Deferred();
+        var listOfExercises = arguments[0];
+
+        $.ajaxSetup({timeout:10000});
+        $.get(urlBaseExercise + "exercises/" + fileName, function(data, status, xhr) {
             var match, newContents;
 
             if (!(/success|notmodified/).test(status)) {
@@ -2768,13 +2886,13 @@ var Khan = (function() {
             newContents.filter("[data-name]").each(function() {
                 loadExercise.call(this, callback);
             });
-
             // Throw out divs that just load other exercises
             newContents = newContents.not("[data-name]");
 
             // Save the id, fileName and weights
             // TODO(david): Make sure weights work for recursively-loaded exercises.
             newContents.data("name", id).data("fileName", fileName).data("weight", weight);
+            //console.log(newContents);
 
             // Add the new exercise elements to the exercises DOM set
             exercises = exercises.add(newContents);
@@ -2823,8 +2941,26 @@ var Khan = (function() {
 
             }
 
+        // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
+        }).done(setTimeout(function () { dfd.resolve(); }, 5000));
+        /*
+        }).done(function () {
+            (function pollExercises() { 
+                console.log('pollExercises called');
+                console.log('exercises');
+                console.log(exercises);
+                console.log('listOfExercises');
+                console.log(listOfExercises);
+                console.log(' ');
+                if (exercises.length == listOfExercises.length) {
+                    dfd.resolve();
+                } else {
+                    setTimeout(pollExercises, 500);
+                }
+            })();
         });
-
+        */
+        return dfd.promise();
     }
 
     function loadModules() {
@@ -2871,14 +3007,14 @@ var Khan = (function() {
         });
 
         function injectExerciseFrameMarkup(htmlExercise) {
-        
+
             $("#container .exercises-body .current-card-contents").html(htmlExercise);
-                                                                    
+
         }
-                                                                    
+
         function injectTestModeSite(html, htmlExercise) {
             $("body").prepend(html);
-            
+
             $("#container .exercises-header h2").append($('<span>').html(document.title));
             injectExerciseFrameMarkup(htmlExercise);
 
@@ -2887,138 +3023,290 @@ var Khan = (function() {
             }
 
             finishSitePrep();
-                                                                    
+
         }
-                                                                    
+
         function finishSitePrep() {
-                                                                    
+
             prepareSite();
-            
+
             initC2GStacks(exercises);
-            
+            //console.log(exercises);
+
             var problems = exercises.children(".problems").children();
             globalProblems=problems;
             globalExercises=exercises;
             // Don't make the problem bag when a specific problem is specified
             // because it messes up problem permalinks (because makeProblemBag
             // calls KhanUtil.random() and changes the seed)
-            
+
+            // [@wescott] Removing problem bag as we don't want randomized problems now
+            /*
             if (Khan.query.problem == null) {
               weighExercises(problems);
               problemBag = makeProblemBag(problems, 10);
             }
-            
-            
+            */
+
+
             // Generate the initial problem when dependencies are done being loaded
             //var answerType = makeProblem();
-            
-            var first = $('#questions-to-do li:last-child');
-            makeProblem(first.data('problem'), first.data('randseed'))
+
+            // [@wescott] moves to viewed list, as it's currently being viewed
+            var first = $('#questions-viewed li:first-child');
+            //makeProblem(first.data('problem'), first.data('randseed'))
+            KhanC2G.problemIdx = 0;
+            //console.log("makeProblem called here with 0");
+            makeProblem(KhanC2G.problemIdx);
 
 
         }
-                                                                    
-        
 
     }
-                                                                    
+
     //var c2gProblemBag;
-    
-                                                                    
-                                                                    
-                                                                    
-                                                                    
+
     function initC2GStacks(exercises) {
-        //console.log(exercises);                                                           
 
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
-        
-        $('#problem-and-answer').append($('<div id="questions-to-do"><ol></ol></div>'));
-        $('#problem-and-answer').append($('<div id="questions-done"><ol></ol></div>'));
-                                                                
-        $('#questions-to-do').css('position', 'absolute');
-        $('#questions-done').css('position', 'absolute');
+
+        $('#problem-and-answer').append($('<div id="questions-stack"></div>'));
+        $('#questions-stack').append($('<div id="questions-viewed"><ol></ol></div>'));
+        $('#questions-stack').append($('<div id="questions-unviewed"><ol></ol></div>'));
 
         //populate 1 questions-to-do for each exercise
         var curNumProbs=0;
-        $(exercises).filter(".exercise").each(
-                          function(i,v){
-                                //Figure out how many problems there are in this exercise
-                                var probsInExercise=$(v).children('.problems').children().length;
-                                $(v).data('problemsStartAtIndex',curNumProbs);
-                                $(v).data('numberOfProblems',probsInExercise);
-                                var li = $("<li>");
-                                
-                                li.text("Q" + (i+1));
-                                //this data 'problem' will be used to index into the problems array
-                                //the problems array is a flat array containing all problems from all exercises
-                                //we do the counting above to get a problem index in the right range for this exercise
-                                li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
-                                li.data('randseed',Math.floor(Math.random()*100000));
-                                $('#questions-to-do ol').prepend(li);
-                                curNumProbs+=probsInExercise;
-                                                                                
-                          });
-                                    
-                                                                    
-        
-                
-            
-        /* Commenting out these because using :hover css selector instead
-        $('#questions-to-do').find('li').mouseover(function (ev) {
-                                                   //$(this).css('border-color', '#000');
-                                                   //$(this).css('color', '#000');
-                                                   });
-        $('#questions-to-do').find('li').mouseout(function (ev) {
-                                                  //$(this).css('border-color', '#ccc');
-                                                  //$(this).css('color', '#999');
-                                                  });
-        */
-                                                                    
-        $('#questions-to-do').find('li').click(todoClickHandler);
-        
+        $(exercises).filter(".exercise").each(function(idx, elem) {
+
+                //Figure out how many problems there are in this exercise
+                var probsInExercise=$(elem).children('.problems').children().length;
+                $(elem).data('problemsStartAtIndex',curNumProbs);
+                $(elem).data('numberOfProblems',probsInExercise);
+                var li = $("<li>");
+
+                li.text("Q" + (idx + 1));
+                //this data 'problem' will be used to index into the problems array
+                //the problems array is a flat array containing all problems from all exercises
+                //we do the counting above to get a problem index in the right range for this exercise
+
+                // [@wescott] We don't want to randomize anymore, so changing problem to evaluate
+                // to the index
+                //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
+                li.data('problem',idx);
+                //li.data('randseed',Math.floor(Math.random()*100000));
+                if (typeof userPSData != "undefined" && userPSData[idx.toString()]) {
+                    var userQDataObj = userPSData[idx.toString()];
+                    li.data('user_selection_val', userQDataObj.user_selection_val);
+                    li.data('correct', userQDataObj.correct);
+                    li.data('user_choices', userQDataObj.user_choices);
+                }
+                if (li.data('correct')) {
+                    li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
+                }
+
+                if (idx == 0) {
+                    $('#questions-viewed ol').append(li);
+                } else {
+                    $('#questions-unviewed ol').append(li);
+                }
+                curNumProbs+=probsInExercise;
+
+                //console.log('Added ' + curNumProbs + ' to questions stack');
+
+            });
+
+        // [@wescott] It takes some time for the answer_area inputs to show up with page, exercise,
+        // et al loading, then makeProblem() being called
+        var checkForInputs = function() {
+
+            var dfd = $.Deferred();
+
+            var counter = 0;
+            setTimeout(function checkInputs() {
+                //console.log("checkInputs called " + (++counter) + " times");
+                if (($('#testinput').length > 0) || ($('#solutionarea input:radio').length > 0)) {
+                    dfd.resolve(true);  // [@wescott] Resolve with a value of "true" to pass on
+                } else {
+                    if (dfd.state() === "pending") {
+                        dfd.notify("Still checking...");
+                        setTimeout(checkInputs, 1000)
+                    } else {
+                        dfd.reject("Sorry, answer input not available");
+                    }
+                };
+            }, 1000);
+    
+            return dfd.promise();
+
+        };
+
+        // [@wescott] This replaces the radio button choices in the #solutionarea with the exact 
+        // choices that were given to the user when he/she answered the question before; userSelection
+        // is what the user actually chose
+        var reconstructChoices = function (choices, userSelection) {
+            $('#solutionarea').empty();
+            $('#solutionarea').append('<ul></ul>');
+            for (var i = 0; i < choices.length; i += 1) {
+                $('#solutionarea ul').append('<li><label></label></li>');
+                $('#solutionarea li:last label').append('<input type="radio" name="solution" value="' + i + '"/>');
+                if (i == userSelection) {
+                    $('#solutionarea li:last input').get(0).checked = true;
+                }
+                $('#solutionarea li:last label').append('<span class="value">' + choices[i] + '</span>');
+            } 
+        };
+
+        // [@wescott] When the inputs are available, pre-populate current one with the current question's
+        // value, if the user has already answered it
+        $.when(checkForInputs()).then(function () {
+            if ($('.current-question').data('user_selection_val')) {
+                if ($('#testinput').length) {
+                    $('#testinput').val($('.current-question').data('user_selection_val')).attr('disabled','disabled');
+                } else if ($('#solutionarea input:radio').length) {
+                    reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
+                }
+            }
+        });
+
+        // set class on last question to show it is the current one
+        $('#questions-viewed li:first-child').addClass('current-question');
+
+        $('#questions-unviewed').find('li').click(unviewedClickHandler);
+        $('#questions-viewed').find('li').click(viewedClickHandler);
+
         $('#next-question-button').click(function () {
-                                         $('#questions-to-do li:last-child').trigger('mouseout');
-                                         $('#questions-to-do li:last-child').unbind('click');
-                                         $('#questions-to-do li:last-child').click(doneClickHandler);
-                                         $('#questions-to-do li:last-child').appendTo($('#questions-done').children('ol'));
-                                         var next = $('#questions-to-do li:last-child');
-                                         clearExistingProblem();
-                                         if (next.length)
-                                              makeProblem(next.data('problem'), next.data('randseed'));
-                                         
-                                         });
-        
-        $('#questions-to-do').fadeIn('slow');
-        $('#questions-done').fadeIn('slow');
-        
-        
-        
-        function todoClickHandler(ev) {
-            
-            $(this).trigger('mouseout');
-            $(this).appendTo($('#questions-done').children('ol'));
-            $(this).unbind('click');
-            $(this).click(doneClickHandler);
-            var next = $('#questions-to-do li:last-child');
+
+            var currentQCard = $('.current-question');
+
+            var userAnswer = readOnlyChoices = null;
+            if ($('input#testinput').length) {
+                userAnswer = $('input#testinput').val();
+            } else if ($('input:radio[name=solution]').length) {
+                userAnswer = $('input:radio[name=solution]:checked').val();
+                readOnlyChoices = [];
+                $('#solutionarea span.value').each(function () {
+                    //console.log(readOnlyChoices);
+                    //console.log($(this).text());
+                    readOnlyChoices.push($(this).text());
+                    //console.log(readOnlyChoices);
+                });
+                //console.log(JSON.stringify(readOnlyChoices));
+            }
+
+            currentQCard.data('userAnswer', userAnswer);
+            currentQCard.data('readOnlyChoices', readOnlyChoices);
+            currentQCard.removeClass('current-question');
+
+            $('#questions-unviewed li:first-child').trigger('mouseout');
+            $('#questions-unviewed li:first-child').unbind('click');
+            $('#questions-unviewed li:first-child').click(viewedClickHandler);
+            $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
+
+            //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
+            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
+            next.addClass('current-question');
+
             clearExistingProblem();
-            if (next.length)
-                makeProblem(next.data('problem'), next.data('randseed'));
+
+            if (next.length) {
+                // [@wescott] Again, we don't need to randomize
+                //makeProblem(next.data('problem'), next.data('randseed'));
+                makeProblem(next.data('problem'));
+            }
+
+            if ((c2gConfig.problemType == 'summative' || c2gConfig.problemType == 'assessive') && $('#questions-unviewed li').length == 0) {
+                if ($('#submit-problemset-button').length) {
+                    $('#submit-problemset-button').show();
+                } else {
+                    $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+                    $('#submit-problemset-button').click(function () {
+                        location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : '/nlp/Fall2012/problemsets';
+                    });
+                }
+            }
+
+        });
+
+        $('#questions-unviewed').fadeIn('slow');
+        $('#questions-viewed').fadeIn('slow');
+
+
+        function unviewedClickHandler(ev) {
+
+            if ($(this).hasClass('current-question')) {
+                return;
+            }
+
+            $.when(checkForInputs()).then(function () {
+                var userPrevSel = $(ev.target).data("user_selection_val");
+                var validUserChoices = $(ev.target).data("user_choices");
+                var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
+                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an 
+                // empty array within a string, which is a non-empty string; have to convert to a real array and 
+                // check its length
+                if (userChoicesLen > 0 && $(ev.target).data("correct")) {
+                    var choicesArr = $.parseJSON($(ev.target).data("user_choices"));
+                    var userSel = userPrevSel; 
+                    reconstructChoices(choicesArr, userSel);
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else if (userPrevSel && $(ev.target).data("correct")) {
+                    $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else {
+                    if ($('input#testinput').length) {
+                        $('input#testinput').removeAttr('disabled');
+                    } else if ($('input:radio').length) {
+                        $('input:radio').removeAttr('disabled');
+                    }
+                }
+            });
+
+            // [@wescott] redundant code removed; next button fn should just be triggered
+            $('#next-question-button').trigger('click');
+
         };
-        
-        function doneClickHandler(ev) {
+
+        // [@wescott] TODO: refactor 2 click handlers into one
+        function viewedClickHandler(ev) {
+
             $(this).trigger('mouseout');
-            $(this).appendTo($('#questions-to-do').children('ol')); 
-            $(this).unbind('click');
-            $(this).click(todoClickHandler);
+            $('.current-question').removeClass('current-question');
+            $(this).addClass('current-question');
             clearExistingProblem();
-            makeProblem($(this).data('problem'), $(this).data('randseed'));
-        
+            // [@wescott] Changing here again so it doesn't randomize
+            //makeProblem($(this).data('problem'), $(this).data('randseed'));
+            makeProblem($(this).data('problem'));
+
+            var userAnswer = $(this).data('userAnswer');
+
+            $.when(checkForInputs()).then(function () {
+                var userPrevSel = $(ev.target).data("user_selection_val");
+                var validUserChoices = $(ev.target).data("user_choices");
+                var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
+                if (userChoicesLen > 0 && $(ev.target).data("correct")) {
+                    var choicesArr = $.parseJSON($(this).data("user_choices"));
+                    var userSel = userPrevSel; 
+                    reconstructChoices(choicesArr, userSel);
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else if (userPrevSel && $(ev.target).data("correct")) {
+                    $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
+                    $('#check-answer-button').attr('disabled', 'disabled');
+                } else {
+                    if ($('input#testinput').length) {
+                        $('input#testinput').val(userAnswer);
+                        //$('input#testinput').attr('disabled', 'disabled');
+                    } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
+                        $('input:radio[name=solution]')[userAnswer].checked = true;
+                        //$('input:radio').attr('disabled', 'disabled');
+                    }
+                }
+            });
+
         };
-        
-                                                                    
+
+
     }
 
     return Khan;

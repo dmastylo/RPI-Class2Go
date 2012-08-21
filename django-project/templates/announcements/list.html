@@ -1,7 +1,33 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+
+{% block course_page_title %}Announcements (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
+
 {% block m_column_content %}
+<div id="c2g_layout_m_column" class="span12">
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+    <div>
+        <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
+        <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
+    </div>
+    {% include "announcements/delete_announcement_form.html" %}
+    {% endif %}
+    
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+        {% include "announcements/new_announcement.html" %}
+    {% endif %}
+    
+    {% for announcement in announcements %}
+        {% include "announcements/announcement.html" %}
+    {% empty %}
+        <p style="margin:20px;">No announcements to display.</p>
+	{% endfor %}
 
-<h2>List announcements for course "{{course_prefix}} ({{course_suffix}})" </h2>
-
+</div>
 {% endblock m_column_content %}
+
+{% if common_page_data.is_course_admin  and common_page_data.course_mode == 'staging' %}
+    {% block addl_scripts %}
+    {% include "controls/tinymce.html" %}
+    {% endblock addl_scripts %}
+{% endif %}

@@ -1,0 +1,29 @@
+{
+  "recipes": {
+  },
+  "groupings": {
+  },
+  "maintainer_email": "sef@cs.stanford.edu",
+  "name": "class2go-bitnami-django",
+  "license": "All rights reserved",
+  "maintainer": "Stanford Class2Go",
+  "providing": {
+  },
+  "conflicting": {
+  },
+  "description": "Adapts the Bitnami Django stack so it's useful for the Class2Go project",
+  "version": "0.1.0",
+  "attributes": {
+  },
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "suggestions": {
+  },
+  "recommendations": {
+  },
+  "replacing": {
+  },
+  "dependencies": {
+  },
+  "platforms": {
+  }
+}

@@ -5,52 +5,81 @@
 
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
-	<div class="well tight">
-		<ul class="nav nav-list">
-			<li class="nav-header">Videos</li>
-			{% for video in course.video_set.all %}
-			  <li><a href="{% url 'courses.videos.views.view' course_prefix course_suffix video.id %}">{{video.title}}</a></li>
-			{% endfor %}
-			<li class="nav-header">Problem Sets</li>
-			{% for pset in course.problemset_set.all %}
-			  <li><a href="{% url 'problemsets.views.show' course_prefix course_suffix pset.title %}">{{pset.title}}</a></li>
-			{% endfor %}
-			<li class="divider"></li>
-			<li><a href="#"><i class="icon-flag"></i>Help</a></li>
-            <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
+    <div class="well tight">
+        <ul class="nav nav-list">
+        	
+        	{% for content_section in contentsection_list %}
+        	  <li class="nav-header">{{content_section.title}}</li>
+        	  
+      		    {% for list_item in full_index_list %}
+      		    
+      		        {% for item in list_item %}
+
+						{% ifequal content_section.id item.3 %}
+      		 	            {% ifequal item.0 'video' %} 
+      		 	                {% if is_logged_in %}
+      		 		                <li><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><i class="icon-facetime-video"></i> {{item.5}}</a></li>
+      		 		            {% else %}
+                              <li><i class="icon-facetime-video"></i> {{item.5}}</li>
+      		 		            {% endif %}
+      		 	            {% endifequal %}
+      		 	            {% ifequal item.0 'pset' %}
+      		 	                {% if is_logged_in %}
+                                <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><i class="icon-pencil"></i> {{item.5}}</a></li>
+      		 	                {% else %}
+      		 	                    <li><i class="icon-pencil"></i> {{item.5}}</li>
+      		 	                {% endif %}
+      		 	            {% endifequal %}
+                            {% ifequal item.0 'additional_page' %}
+      		 	                {% if is_logged_in %}
+                                <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><i class="icon-book"></i> {{item.5}}</a></li>
+      		 	                {% else %}
+      		 	                    <li><i class="icon-book"></i> {{item.5}}</li>
+      		 	                {% endif %}
+      		 	            {% endifequal %}
+      		 	        {% endifequal %}
+        	        {% endfor %}	
+        	    {% endfor %}
+
+            <li class="divider"></li>
+        	{% endfor %}
+        
+            <li><a href="#">Help/FAQs</a></li>
+            <li><a href="#">Contact</a></li>
         </ul>
     </div>
 </div>
 {% endblock l_column_content %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
-	<h3 class="section-title">Recent Announcements</h3>
-	{% for announcement in announcement_list %}
-    <div class="announcement">
-		  <small class="date"> {{announcement.last_updated}} by {{announcement.owner}}</small>
-      <h4>{{announcement.title}}</h4>
-		  <p>{{announcement.description}}</p>
+<div id="c2g_layout_m_column" class="span9">
+    <h3 class="section-title pull-left">Recent Announcements</h3>
+    <div class="pull-right">
+        {% if many_announcements %}
+            <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">View all announcements</a>
+        {% endif %}
+        
+        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+            <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
+            <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
+            {% include "announcements/delete_announcement_form.html" %}
+        {% endif %}
     </div>
+    {% if common_page_data.is_course_admin %}
+        {% include "announcements/new_announcement.html" %}
+    {% endif %}
+    
+    {% for announcement in announcement_list %}
+        {% include "announcements/announcement.html" %}
+    {% empty %}
+        <p style="margin:20px;">No announcements to display.</p>
 	{% endfor %}
-	
-  <h3>Course Description</h3>
-  <p>{{course.description}}</p>
 
 </div>
 {% endblock m_column_content %}
 
-{%block r_column_content %}
-<div id="c2g_layout_r_column" class="span3">
-    <h3 class="section-title">Recent Events</h3>
-    
-    {% for event in news_list %}
-        <p>
-          <small class="date">{{event.time_created}}</small>
-          <b>{{event.event}}</b>
-        </p>
-    {% endfor %}
-    
-    <a href="#">All Events</a>
-</div>
-{% endblock r_column_content %}
+{% if common_page_data.is_course_admin %}
+    {% block addl_scripts %}
+    {% include "controls/tinymce.html" %}
+    {% endblock addl_scripts %}
+{% endif %}

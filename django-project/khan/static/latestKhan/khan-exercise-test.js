@@ -2,7 +2,7 @@
 
     The main entry point here is actually the loadScripts method which is defined
     as Khan.loadScripts and then evaluated around line 500.
- 
+
     When this loadScripts is called, it loads in many of the pre-reqs and then
     calls, one way or another, setUserExercise concurrently with loadModules.
 
@@ -59,7 +59,7 @@
       call or initialization
 */
 
-var KhanTest={};                                                                    
+var KhanTest={};
 
 
 var Khan = (function() {
@@ -717,7 +717,7 @@ var Khan = (function() {
     // Actually load the scripts. This is getting evaluated when the file is loaded.
     Khan.loadScripts(scripts, function() {
 
-            
+
         /****************Start JASON BAU 6-29-12 Testing**************/
         //Khan.require(['../khan-event-hooks']);
         /****************End   JASON BAU 6-29-12 Testing**************/
@@ -1070,7 +1070,7 @@ var Khan = (function() {
             return;
         }
 
-            
+
         //console.log(problem);
             KhanTest.problemID = id;
             KhanTest.randomSeed = randomSeed;
@@ -1847,7 +1847,7 @@ var Khan = (function() {
 
         Khan.scratchpad.clear();
     }
-            
+
     KhanTest.makeProblem=makeProblem;
     KhanTest.makeProblemBag=makeProblemBag;
     KhanTest.clearExistingProblem=clearExistingProblem  ;
@@ -1875,10 +1875,10 @@ var Khan = (function() {
             $("#sidebar").hide();
 
         } else {
-            
+
             /*********JASON BAU HERE IS THE LOGIC FOR THE NEXT EXERCISE *******/
-            
-            
+
+
 
             if (testMode) {
                 // Just generate a new problem from existing exercise
@@ -2626,7 +2626,7 @@ var Khan = (function() {
     function request(method, data, fn, fnError, queue) {
 
         /*
-        
+
         if (testMode) {
             // Pretend we have success
             if ($.isFunction(fn)) {
@@ -2676,7 +2676,7 @@ var Khan = (function() {
                 if (queue && requestQueue[queue]) {
                     requestQueue[queue].clearQueue();
                 }
-            
+
                 /*
 
                 if ($.isFunction(fnError)) {
@@ -2777,7 +2777,7 @@ var Khan = (function() {
             // Add the new exercise elements to the exercises DOM set
             exercises = exercises.add(newContents);
 
-              
+
               console.log(exercises);
             // Extract data-require
             var requires = data.match(/<html(?:[^>]+)data-require=(['"])((?:(?!\1).)*)\1/);
@@ -2890,9 +2890,9 @@ var Khan = (function() {
 
             prepareSite();
             console.log(exercises);
-            
+
             $('#exerciseTitle').text(exercises[1].innerText);
-                                                                    
+
             var problems = exercises.children(".problems").children();
 
             // Don't make the problem bag when a specific problem is specified

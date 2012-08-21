@@ -2600,6 +2600,7 @@ var Khan = (function() {
     }
 
     function request(method, data, fn, fnError, queue) {
+    /*
         if (testMode) {
             // Pretend we have success
             if ($.isFunction(fn)) {
@@ -2608,7 +2609,7 @@ var Khan = (function() {
 
             return;
         }
-
+    */
         var xhrFields = {};
         if (typeof XMLHTTPRequest !== "undefined") {
             // If we have native XMLHTTPRequest support,
@@ -2626,7 +2627,6 @@ var Khan = (function() {
 
             // Backup the response locally, for later use
             success: function(data) {
-
                 // Tell any listeners that khan-exercises has new
                 // userExercise data
                 $(Khan).trigger("updateUserExercise", data);

@@ -3,38 +3,88 @@
 {% load url from future %}
 
 {% block navbar %}
-<div class="navbar navbar-fixed-top">
-	<div class="navbar-inner">
-		<div class="container-fluid">
-			<ul class="nav">
-				<li {% block home_link_class %}{% endblock home_link_class %}>
-					<a href="{% url 'courses.views.view' course_prefix course_suffix %}">Home</a>
-				</li>
-				<li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
-					<ul class="dropdown-menu">
-						<li><a href="{% url 'courses.views.info' course_prefix course_suffix %}">Course Info</a></li>
-						<li><a href="{% url 'courses.views.syllabus' course_prefix course_suffix %}">Syllabus</a></li>
-						<li><a href="{% url 'courses.views.prereqs' course_prefix course_suffix %}">Prerequisites</a></li>
-					</ul>
-				</li>
-				<li {% block forums_link_class %}{% endblock forums_link_class %}>
-					<a href="{% url 'courses.forums.views.view' course_prefix course_suffix %}">Forum</a>
-				</li>
-				<li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-					<a href="{% url 'problemsets.views.list' course_prefix course_suffix %}">Problem Sets</a>
-				</li>
-				<li {% block videos_link_class %}{% endblock videos_link_class %}>
-					<a href="{% url 'courses.videos.views.list' course_prefix course_suffix %}">Videos</a>
-				</li>
-			</ul>
-			<!--form class="navbar-search hidden-phone" action="">
-				<div class="input-append">
-					<input class="span2 search-query" placeholder="Search course" id="appendedInputButton" size="16" type="text">
-					<button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
-				</div>
-			</form-->
-		</div>
-	</div>
+<div class="navbar">
+    <div class="navbar-inner nav-collapse collapse">
+        <div class="container-fluid">
+            <ul class="nav">
+                <li {% block home_link_class %}{% endblock home_link_class %}>
+                    <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
+                </li>
+                <li {% block course_info_link_class %}class="dropdown"{% endblock course_info_link_class %}>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        {% for page in common_page_data.course_info_pages %}
+                            <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
+                        {% endfor %}
+                        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Manage pages ...</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li {% block course_materials_link_class %}{% endblock course_materials_link_class %}>
+                    <a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Course Materials</a>
+                </li>
+                <li {% block forums_link_class %}{% endblock forums_link_class %}>
+                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
+                </li>
+                <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
+                    <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
+                </li>
+                <li {% block videos_link_class %}{% endblock videos_link_class %}>
+                    <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="visible-phone visible-tablet">
+                    <a href="/accounts/profile">My Account</a>
+                </li>
+                <li class="visible-phone visible-tablet">
+                    <a href="{% url 'auth_logout' %}">Logout</a>
+                </li>
+                {% else %}
+                    <li class="visible-phone"><a id="login_button" data-toggle="modal" href="#login-modal">Login</a></li>
+                    <li class="visible-phone"><a href="{% url 'registration_register' %}">Register</a></li>
+                {% endif %}
+                {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
+                    {% if common_page_data.is_course_admin %}
+                        <li {% block course_admin_link %}{% endblock course_admin_link %}><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Course Administration</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
 </div>
 {% endblock navbar %}
+
+{% block content %}
+<div class="container-fluid body-content">
+    <div class="row-fluid page-header">
+        <div class="span12">
+            <h2 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
+            {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
+            <div class="hidden-phone pull-right">
+                {% if common_page_data.can_switch_mode %}
+                    <form class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
+                        <p>You are currently viewing:</p>
+                        <div class="btn-group btn-views-toggle">
+                            <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Draft</button>
+                            <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Published</button>
+                        </div>
+                        <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+                        <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+                        {% csrf_token %}
+                    </form>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row-fluid">
+        {% block l_column_content %}{% endblock %}
+        
+        {% block m_column_content %}{% endblock %}
+        
+        {% block r_column_content %}{% endblock %}
+    </div>
+    {% include "footer.html" %}
+</div>
+{% endblock content %}

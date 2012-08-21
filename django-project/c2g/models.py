@@ -14,12 +14,24 @@
 
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django import forms
+from datetime import datetime
 
-from datetime import time
 import gdata.youtube
 import gdata.youtube.service
+import os
+
+# For file system upload
+from django.core.files.storage import FileSystemStorage
+
+def get_file_path(instance, filename):
+    parts = str(instance.handle).split("#$!")
+    if isinstance(instance, Exercise):
+        return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
+    if isinstance(instance, Video):
+        return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -31,6 +43,33 @@ class TimestampMixin(models.Model):
     class Meta:
        abstract = True
 
+class Stageable(models.Model):
+    mode = models.TextField(blank=True)
+    image = models.ForeignKey('self', null=True, related_name="+")
+    live_datetime = models.DateTimeField(editable=True, null=True)
+
+    class Meta:
+       abstract = True
+
+class Sortable(models.Model):
+    index=models.IntegerField(null=True, blank=True)
+
+    class Meta:
+       abstract = True
+
+class Deletable(models.Model):
+    is_deleted=models.IntegerField(default=0)
+
+    def delete(self):
+        self.is_deleted = 1
+        fields = self._meta.fields
+        for field in fields:
+            if field.name == 'slug':
+                self.slug = ''
+                break
+        self.save()
+    class Meta:
+       abstract = True
 
 class Institution(TimestampMixin, models.Model):
 #    #id = models.BigIntegerField(primary_key=True)
@@ -45,225 +84,323 @@ class Institution(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_institutions'
 
-class Course(TimestampMixin, models.Model):
-#    #id = models.BigIntegerField(primary_key=True)
-    institution = models.ForeignKey(Institution, db_index=True)
+class Course(TimestampMixin, Stageable, Deletable, models.Model):
+    institution = models.ForeignKey(Institution, null=True, db_index=True)
     student_group = models.ForeignKey(Group, related_name="student_group", db_index=True)
     instructor_group = models.ForeignKey(Group, related_name="instructor_group", db_index=True)
     tas_group = models.ForeignKey(Group, related_name="tas_group", db_index=True)
     readonly_tas_group = models.ForeignKey(Group, related_name="readonly_tas_group", db_index=True)
-    code = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
-    listing_description = models.TextField(blank=True)
-    mode = models.TextField(blank=True)
     description = models.TextField(blank=True)
-    staff_emails = models.TextField(blank=True)
+    syllabus = models.TextField(blank=True)
     term = models.TextField(blank=True)
     year = models.IntegerField(null=True, blank=True)
     calendar_start = models.DateField(null=True, blank=True)
     calendar_end = models.DateField(null=True, blank=True)
-    meeting_info = models.TextField(blank=True)
-    feature_settings = models.TextField(blank=True)
-    membership_control = models.TextField(blank=True)
-    join_password = models.TextField(blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
-    handle = models.CharField(max_length=255, null=True, unique=True, db_index=True)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+
+    def __unicode__(self):
+        return self.title
+
+    def create_production_instance(self):
+        production_instance = Course(institution = self.institution,
+            student_group = self.student_group,
+            instructor_group = self.instructor_group,
+            tas_group = self.tas_group,
+            readonly_tas_group = self.readonly_tas_group,
+            title = self.title,
+            description = self.description,
+            syllabus = self.syllabus,
+            term = self.term,
+            year = self.year,
+            calendar_start = self.calendar_start,
+            calendar_end = self.calendar_end,
+            list_publicly = 0,
+            image = self,
+            mode = 'production',
+            handle = self.handle,
+        )
+        production_instance.save()
+        self.image = production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'institution' in clone_fields:
+            production_instance.institution = self.institution
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+        if not clone_fields or 'syllabus' in clone_fields:
+            production_instance.syllabus = self.syllabus
+        if not clone_fields or 'term' in clone_fields:
+            production_instance.term = self.term
+        if not clone_fields or 'year' in clone_fields:
+            production_instance.year = self.year
+        if not clone_fields or 'calendar_start' in clone_fields:
+            production_instance.calendar_start = self.calendar_start
+        if not clone_fields or 'calendar_end' in clone_fields:
+            production_instance.calendar_end = self.calendar_end
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'institution' in clone_fields:
+            self.institution = production_instance.institution
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+        if not clone_fields or 'syllabus' in clone_fields:
+            self.syllabus = production_instance.syllabus
+        if not clone_fields or 'term' in clone_fields:
+            self.term = production_instance.term
+        if not clone_fields or 'year' in clone_fields:
+            self.year = production_instance.year
+        if not clone_fields or 'calendar_start' in clone_fields:
+            self.calendar_start = production_instance.calendar_start
+        if not clone_fields or 'calendar_end' in clone_fields:
+            self.calendar_end = production_instance.calendar_end
+
+        self.save()
+
+    class Meta:
+        db_table = u'c2g_courses'
+
+class ContentSectionManager(models.Manager):
+    def getByCourse(self, course):
+        return self.filter(course=course,is_deleted=0).order_by('index')
+
+class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    objects = ContentSectionManager()
+
+    def create_production_instance(self):
+        production_instance = ContentSection(
+            course=self.course.image,
+            title=self.title,
+            index=self.index,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
+
+        self.save()
+
+    def getChildren(self):
+        dict_list = []
+        output_list = []
+
+        videos = Video.objects.getBySection(section=self)
+        for item in videos:
+            dict_list.append({'item':item, 'index':item.index})
+
+        problemsets = ProblemSet.objects.getBySection(section=self)
+        for item in problemsets:
+            dict_list.append({'item':item, 'index':item.index})
+
+        additionalpages = AdditionalPage.objects.getBySection(section=self)
+        for item in additionalpages:
+            dict_list.append({'item':item, 'index':item.index})
+
+        sorted_dict_list = sorted(dict_list, key=lambda k: k['index'])
+
+        for item in sorted_dict_list:
+            output_list.append(item['item'])
+
+        return output_list
+
+    def countChildren(self):
+        return len(self.getChildren)
+
+    def getNextIndex(self):
+        # We will not return len(children)+1 since this approach is not fail safe. If an index is skipped for whatever reason, we want to make sure we are still robust
+        children = self.getChildren()
+        return children[-1].index+1
 
     def __unicode__(self):
         return self.title
 
     class Meta:
-        db_table = u'c2g_courses'
+        db_table = u'c2g_content_sections'
 
+class AdditionalPageManager(models.Manager):
+    def getByCourseAndMenuSlug(self, course, menu_slug):
+        # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
+        return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
 
-def defineUserGroupsForCourse(sender, **kwargs):
-    instance = kwargs.get('instance')
-    if (not hasattr(instance,'student_group')):
-        instance.student_group = Group.objects.create( name="Student Group for " + instance.handle + "_" + str(instance.institution.id))
-    if (not hasattr(instance,'instructor_group')):
-        instance.instructor_group = Group.objects.create(name="Instructor Group for " + instance.handle + "_" + str(instance.institution.id))
-    if (not hasattr(instance,'tas_group')):
-        instance.tas_group = Group.objects.create(name="TAS Group for " + instance.handle + "_" + str(instance.institution.id))
-    if (not hasattr(instance,'readonly_tas_group')):
-        instance.readonly_tas_group = Group.objects.create(name="Readonly TAS Group for " + instance.handle + "_" + str(instance.institution.id))
+    def getSectionPagesByCourse(self, course):
+        # Additional pages displayed under sections have a live_datetime effect.
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__lt=now).order_by('section','index')
 
+    def getBySection(self, section):
+        if section.mode == 'staging':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
-pre_save.connect(defineUserGroupsForCourse, sender=Course)
-
-
-
-
-#does additional pages need an owner?
-#There's no social network
-#here, so not every item need an owner.
-#why overlap of write_access and access_id?
-class AdditionalPage(TimestampMixin, models.Model):
-#   #id = models.BigIntegerField(primary_key=True)
-    #owner = models.ForeignKey(User)
+class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
-    access_id = models.TextField(blank=True)
-    write_access = models.TextField(blank=True)
+    menu_slug = models.CharField(max_length=255, null=True, blank=True)
+    section = models.ForeignKey(ContentSection, null=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    update_log = models.TextField(blank=True)
+    slug = models.CharField(max_length=255, null=True, blank=True)
+    objects = AdditionalPageManager()
+
+    def create_production_instance(self):
+        image_section = None
+        if self.section:
+            image_section = self.section.image
+
+        production_instance = AdditionalPage(
+            course=self.course.image,
+            title=self.title,
+            description=self.description,
+            menu_slug=self.menu_slug,
+            section = image_section,
+            slug=self.slug,
+            index=self.index,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
+
+        self.save()
+
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+
+        return True
+
     class Meta:
         db_table = u'c2g_additional_pages'
 
-#owner is person who posted
-#does it need access_id?
-class Announcement(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
+
+class AnnouncementManager(models.Manager):
+    def getByCourse(self, course):
+        return self.filter(course=course,is_deleted=0).order_by('-time_created')
+
+class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     owner = models.ForeignKey(User)
     course = models.ForeignKey(Course, db_index=True)
-    access_id = models.TextField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
+    objects = AnnouncementManager()
+
+    def create_production_instance(self):
+        production_instance = Announcement(
+            course=self.course.image,
+            title=self.title,
+            description=self.description,
+            owner = self.owner,
+            mode='production',
+            image=self,
+        )
+        production_instance.save()
+        self.image=production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+
+        self.save()
+
+    def is_synced(self):
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+
+        return True
+
     class Meta:
         db_table = u'c2g_announcements'
 
-
-##ASSIGNMENTS SECTION####
-#Assignments, AssigmentGrades, AssignmentSubmissions might need ondelete for User
-class AssignmentCategory(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course, db_index=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    class Meta:
-        db_table = u'c2g_assignment_categories'
-
-#do we really need both an owner_id and an access_id?  There's no social network
-#here, so not every item need an owner.
-class Assignment(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    #owner_id = models.ForeignKey(User)
-    course = models.ForeignKey(Course, db_index=True)
-    category = models.ForeignKey(AssignmentCategory, db_index=True)
-    access_id = models.TextField(blank=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
-    due_date = models.DateTimeField(null=True, blank=True)
-    close_date = models.DateTimeField(null=True, blank=True)
-    class Meta:
-        db_table = u'c2g_assignments'
-
-#deleted course
-#Need to have a double-column (assignment, user) index here
-class AssignmentGrade(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    user = models.ForeignKey(User)
-    #course = models.ForeignKey(Course)
-    assignment = models.ForeignKey(Assignment)
-    json = models.TextField()
-    class Meta:
-        db_table = u'c2g_assignment_grades'
-
-#deleted course
-#Need to have a double-column (assignmer, owner) index here
-class AssignmentSubmission(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    owner = models.ForeignKey(User)
-    #course = models.ForeignKey(Course)
-    assignment = models.ForeignKey(Assignment)
-    json = models.TextField()
-    class Meta:
-        db_table = u'c2g_assignment_submissions'
-
-
-#what's the difference between this and UserCourseData
-#they have the same fields
-#need to have (user,course) index here
-class CourseAnalytics(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    user = models.ForeignKey(User, null=True)
-    course = models.ForeignKey(Course)
-    json = models.TextField()
-    class Meta:
-        db_table = u'c2g_course_analytics'
-
-class CourseMap(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    course = models.ForeignKey(Course, db_index=True)
-    json = models.TextField(blank=True)
-    class Meta:
-        db_table = u'c2g_course_maps'
-
-#Let's use django file support or something else instead, but keep for now
-#Need (owner,course) index here
-class File(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    owner = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
-    access_id = models.TextField(blank=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
-    class Meta:
-        db_table = u'c2g_files'
-
-#Let's completely delegate Forums elsewhere
-#I have not edited these at all
-#class ForumPostReplies(models.Model):
-#    #id = models.BigIntegerField(primary_key=True)
-#    owner_id = models.IntegerField(null=True, blank=True)
-#    forum_id = models.BigIntegerField()
-#    forum_post_id = models.BigIntegerField()
-#    description = models.TextField(blank=True)
-#    rating_data = models.TextField(blank=True)
-#    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-#    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
-#    class Meta:
-#        db_table = u'c2g_forum_post_replies'
-#
-#class ForumPosts(models.Model):
-#    #id = models.BigIntegerField(primary_key=True)
-#    owner_id = models.IntegerField(null=True, blank=True)
-#    forum_id = models.BigIntegerField()
-#    title = models.CharField(max_length=255, null=True, blank=True)
-#    description = models.TextField(blank=True)
-#    rating_data = models.TextField(blank=True)
-#    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-#    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
-#    class Meta:
-#        db_table = u'c2g_forum_posts'
-#
-#class Forums(models.Model):
-#    #id = models.BigIntegerField(primary_key=True)
-#    access_id = models.TextField(blank=True)
-#    coure = models.BigIntegerField()
-#    title = models.CharField(max_length=255, null=True, blank=True)
-#    description = models.TextField(blank=True)
-#    time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
-#    last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
-#    class Meta:
-#        db_table = u'c2g_forums'
-
-
-#Again, do lectures need owners?
-class Lecture(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    #owner = models.ForeignKey(User)
-    course = models.ForeignKey(Course, db_index=True)
-    access_id = models.TextField(blank=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
-    calendar_start = models.DateTimeField(null=True, blank=True)
-    calendar_end = models.DateTimeField(null=True, blank=True)
-    class Meta:
-        db_table = u'c2g_lectures'
-
-class Officehour(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    owner = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
-    calendar_start = models.DateTimeField(null=True, blank=True)
-    calendar_end = models.DateTimeField(null=True, blank=True)
-    class Meta:
-        db_table = u'c2g_officehours'
-
-
-class StudentSection(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
+class StudentSection(TimestampMixin, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     capacity = models.IntegerField(default=999)
@@ -271,22 +408,10 @@ class StudentSection(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_sections'
 
-
-#what's the difference between this and CourseAnalytics
-#they have the same fields
-class UserCourseData(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    user = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
-    json = models.TextField()
-    class Meta:
-        db_table = u'c2g_user_course_data'
-
 #Extended storage fields for Users, in addition to django.contrib.auth.models
 #Uses one-to-one as per django recommendations at
 #https://docs.djangoproject.com/en/dev/topics/auth/#django.contrib.auth.models.User
 class UserProfile(models.Model):
-    #id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, db_index=True)
     site_data = models.TextField(blank=True)
     class Meta:
@@ -298,46 +423,121 @@ def create_user_profile(sender, instance, created, raw, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
-class VideoTopic(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
+class VideoManager(models.Manager):
+    def getByCourse(self, course):
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+    def getBySection(self, section):
+        if section.mode == 'staging':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
+
+class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
-    title = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.title
-
-    class Meta:
-        db_table = u'c2g_video_topics'
-
-
-#do Videos need owners?  What are index and segments and why are they text fields
-#commenting out for now
-class Video(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    #owner = models.ForeignKey(User, null=True, blank=True)
-    course = models.ForeignKey(Course, db_index=True)
-    topic = models.ForeignKey(VideoTopic, null=True, db_index=True)
-    access_id = models.TextField(blank=True)
+    section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    #index = models.IntegerField(null=True, blank=True)
-    #segments = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField(max_length=255, null=True)
-    start_time = models.TimeField(default=time())
-    duration = models.IntegerField(blank=True)
+    duration = models.IntegerField(null=True)
+    slug = models.SlugField("URL Identifier", max_length=255, null=True)
+    file = models.FileField(upload_to=get_file_path)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+#    kelvinator = models.IntegerField("K-Threshold", default=15)
+    objects = VideoManager()
+
+    def create_production_instance(self):
+        production_instance = Video(
+            course=self.course.image,
+            section=self.section.image,
+            title=self.title,
+            description=self.description,
+            type=self.type,
+            url=self.url,
+            duration=self.duration,
+            slug=self.slug,
+            file=self.file,
+            image = self,
+            mode = 'production',
+            handle = self.handle,
+            live_datetime = self.live_datetime,
+        )
+        production_instance.save()
+        self.image = production_instance
+        self.save()
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'section' in clone_fields:
+            production_instance.section = self.section.image
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+        if not clone_fields or 'slug' in clone_fields:
+            production_instance.slug = self.slug
+        if not clone_fields or 'file' in clone_fields:
+            production_instance.file = self.file
+        if not clone_fields or 'live_datetime' in clone_fields:
+            production_instance.live_datetime = self.live_datetime
+
+        production_instance.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'section' in clone_fields:
+            self.section = production_instance.section.image
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = production_instance.slug
+        if not clone_fields or 'file' in clone_fields:
+            self.file = production_instance.file
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = production_instance.live_datetime
+
+        self.save()
 
     def save(self, *args, **kwargs):
-        if self.type == "youtube":
-            if not self.duration:
+        if not self.duration:
+            if self.type == "youtube" and self.url:
                 yt_service = gdata.youtube.service.YouTubeService()
-                entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
-                self.duration = entry.media.duration.seconds
+                #entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
+                #self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
 
-    def percent_done(self):
-        start_seconds = self.start_time.hour*3600 + self.start_time.minute*60 + self.start_time.second
-        return float(start_seconds*100)/self.duration
+    def is_synced(self):
+        prod_instance = self.image
+        if self.title != prod_instance.title:
+            return False
+        if self.section != prod_instance.section.image:
+            return False
+        if self.description != prod_instance.description:
+            return False
+        if self.slug != prod_instance.slug:
+            return False
+        if self.file != prod_instance.file:
+            return False
+        if self.live_datetime != prod_instance.live_datetime:
+            return False
+
+        return True
+
+    def dl_link(self):
+        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     def __unicode__(self):
         return self.title
@@ -345,98 +545,305 @@ class Video(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_videos'
 
-#video quizzes do not need owners or access
-class VideoQuiz(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    video = models.ForeignKey(Video, db_index=True)
-    json = models.TextField(blank=True)
-    class Meta:
-        db_table = u'c2g_video_quizzes'
+class VideoActivity(models.Model):
+     student = models.ForeignKey(User)
+     course = models.ForeignKey(Course)
+     video = models.ForeignKey(Video)
+     start_seconds = models.IntegerField(default=0, blank=True)
+     #last_watched = models.DateTimeField(auto_now=True, auto_now_add=False)
 
-class VideoQuizQuestion(models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    video_quiz = models.ForeignKey(VideoQuiz, db_index=True)
-    time_in_video = models.IntegerField(default=0)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    json = models.TextField(blank=True)
-    class Meta:
-        db_table = u'c2g_video_quiz_questions'
+     def percent_done(self):
+         return float(self.start_seconds)*100/self.video.duration
 
+     def __unicode__(self):
+            return self.student.username
+     class Meta:
+        db_table = u'c2g_video_activity'
 
-#Need (owner, question) index
-class VideoQuizSubmission(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    owner = models.ForeignKey(User)
-    question = models.ForeignKey(VideoQuizQuestion) #
-    time_in_video = models.IntegerField(default=0)
-    video_metadata = models.IntegerField(null=True) # might use this for YouTube ID
-    json = models.TextField(blank=True)
-    class Meta:
-        db_table = u'c2g_video_quiz_submissions'
+class ProblemSetManager(models.Manager):
+    def getByCourse(self, course):
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
+    def getBySection(self, section):
+        if section.mode == 'staging':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
-#video annotations may not need access_id
-#need (owner,video) index
-class VideoAnnotation(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    owner = models.ForeignKey(User, null=True, blank=True)
-    #access_id = models.TextField(blank=True)
-    video = models.ForeignKey(Video)
-    time_in_video = models.IntegerField(default=0)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True)
-    class Meta:
-        db_table = u'c2g_video_annotations'
-
-
-
-class SharingPermission(TimestampMixin, models.Model):
-    #id = models.BigIntegerField(primary_key=True)
-    object_id = models.BigIntegerField(db_index=True)
-    type = models.TextField(blank=True)
-    licensee_id = models.BigIntegerField()
-    cond_by = models.IntegerField(null=True, blank=True)
-    cond_nc = models.IntegerField(null=True, blank=True)
-    cond_nd = models.IntegerField(null=True, blank=True)
-    cond_sa = models.IntegerField(null=True, blank=True)
-    class Meta:
-        db_table = u'c2g_sharing_permissions'
-
-
-class instance_status(models.Model):
-    prefix = models.CharField(max_length=30, null=True, db_index=True)
-    current_prod = models.ForeignKey(Course, related_name="current_prod", null=True, db_index=True)
-    current_staging = models.ForeignKey(Course, related_name="current_staging", null=True, db_index=True)
-    class Meta:
-        db_table = u'c2g_instance_status'
-
-class ProblemSet(TimestampMixin, models.Model):
+class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
-    title = models.CharField(max_length=255)
-    name = models.CharField(max_length=255, blank=True)
+    section = models.ForeignKey(ContentSection, null=True, db_index=True)
+    slug = models.SlugField()
+    title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    soft_deadline = models.DateTimeField(null=True, blank=True)
-    hard_deadline = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    grace_period = models.DateTimeField(null=True, blank=True)
+    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    assessment_type = models.CharField(max_length=255)
+    late_penalty = models.IntegerField(null=True, blank=True)
+    submissions_permitted = models.IntegerField(null=True, blank=True)
+    resubmission_penalty = models.IntegerField(null=True, blank=True)
+    randomize = models.BooleanField()
+    objects = ProblemSetManager()
+
+    def create_production_instance(self):
+        production_instance = ProblemSet(
+            course=self.course.image,
+            section=self.section.image,
+            slug=self.slug,
+            title=self.title,
+            description=self.description,
+            path=self.path,
+            live_datetime=self.live_datetime,
+            due_date=self.due_date,
+            grace_period=self.grace_period,
+            partial_credit_deadline=self.partial_credit_deadline,
+            assessment_type=self.assessment_type,
+            late_penalty=self.late_penalty,
+            submissions_permitted=self.submissions_permitted,
+            resubmission_penalty=self.resubmission_penalty,
+            index=self.index,
+            image = self,
+            mode = 'production',
+        )
+        production_instance.save()
+        self.image = production_instance
+        self.save()
+        return production_instance
+
+    def exercises_changed(self):
+        production_instance = self.image
+        staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
+        if len(staging_psetToExs) != len(production_psetToExs):
+            return True
+        for staging_psetToEx in staging_psetToExs:
+            if not staging_psetToEx.image:
+                return True
+        return False
+
+    def commit(self, clone_fields = None):
+        if self.mode != 'staging': return;
+        if not self.image: self.create_production_instance()
+
+        production_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            production_instance.section = self.section.image
+        if not clone_fields or 'title' in clone_fields:
+            production_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            production_instance.description = self.description
+        if not clone_fields or 'path' in clone_fields:
+            production_instance.path = self.path
+        if not clone_fields or 'slug' in clone_fields:
+            production_instance.slug = self.slug
+        if not clone_fields or 'index' in clone_fields:
+            production_instance.index = self.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            production_instance.live_datetime = self.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            production_instance.due_date = self.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            production_instance.grace_period = self.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            production_instance.partial_credit_deadline = self.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            production_instance.assessment_type = self.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            production_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            production_instance.submissions_permitted = self.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            production_instance.resubmission_penalty = self.resubmission_penalty
+
+        production_instance.save()
+
+        if self.exercises_changed() == True:
+            staging_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
+            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
+            #Delete all previous relationships
+            for production_psetToEx in production_psetToExs:
+                production_psetToEx.delete()
+                production_psetToEx.save()
+
+        #Create brand new copies of staging relationships
+            for staging_psetToEx in staging_psetToExs:
+                production_psetToEx = ProblemSetToExercise(problemSet = production_instance,
+                                                    exercise = staging_psetToEx.exercise,
+                                                    number = staging_psetToEx.number,
+                                                    is_deleted = 0,
+                                                    mode = 'production',
+                                                    image = staging_psetToEx)
+                production_psetToEx.save()
+                staging_psetToEx.image = production_psetToEx
+                staging_psetToEx.save()
+
+        else:
+            staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+            for staging_psetToEx in staging_psetToExs:
+                staging_psetToEx.image.number = staging_psetToEx.number
+                staging_psetToEx.image.save()
+
+    def revert(self, clone_fields = None):
+        if self.mode != 'staging': return;
+
+        production_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            self.section = production_instance.section.image
+        if not clone_fields or 'title' in clone_fields:
+            self.title = production_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = production_instance.description
+        if not clone_fields or 'path' in clone_fields:
+            self.path = production_instance.path
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = production_instance.slug
+        if not clone_fields or 'index' in clone_fields:
+            self.index = production_instance.index
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = production_instance.live_datetime
+        if not clone_fields or 'due_date' in clone_fields:
+            self.due_date = production_instance.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            self.grace_period = production_instance.grace_period
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            self.partial_credit_deadline = production_instance.partial_credit_deadline
+        if not clone_fields or 'assessment_type' in clone_fields:
+            self.assessment_type = production_instance.assessment_type
+        if not clone_fields or 'late_penalty' in clone_fields:
+            self.late_penalty = production_instance.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            self.submissions_permitted = production_instance.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            self.resubmission_penalty = production_instance.resubmission_penalty
+
+        self.save()
+
+        if self.exercises_changed() == True:
+            staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
+            #Delete all previous relationships
+            for staging_psetToEx in staging_psetToExs:
+                staging_psetToEx.delete()
+                staging_psetToEx.save()
+
+        #Create brand new copies of staging relationships
+            for production_psetToEx in production_psetToExs:
+                staging_psetToEx = ProblemSetToExercise(problemSet = self,
+                                                    exercise = production_psetToEx.exercise,
+                                                    number = production_psetToEx.number,
+                                                    is_deleted = 0,
+                                                    mode = 'staging',
+                                                    image = production_psetToEx)
+                staging_psetToEx.save()
+                production_psetToEx.image = staging_psetToEx
+                production_psetToEx.save()
+
+        else:
+            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
+            for production_psetToEx in production_psetToExs:
+                production_psetToEx.image.number = production_psetToEx.number
+                production_psetToEx.image.save()
+
+
+    def is_synced(self):
+        image = self.image
+        if self.exercises_changed() == True:
+            return False
+        if self.section != image.section.image:
+            return False
+        if self.title != image.title:
+            return False
+        if self.description != image.description:
+            return False
+        if self.path != image.path:
+            return False
+        if self.slug != image.slug:
+            return False
+        if self.index != image.index:
+            return False
+        if self.live_datetime != image.live_datetime:
+            return False
+        if self.due_date != image.due_date:
+            return False
+        if self.grace_period != image.grace_period:
+            return False
+        if self.partial_credit_deadline != image.partial_credit_deadline:
+            return False
+        if self.assessment_type != image.assessment_type:
+            return False
+        if self.late_penalty != image.late_penalty:
+            return False
+        if self.submissions_permitted != image.submissions_permitted:
+            return False
+        if self.resubmission_penalty != image.resubmission_penalty:
+            return False
+        staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        for staging_psetToEx in staging_psetToExs:
+            if staging_psetToEx.number != staging_psetToEx.image.number:
+                return False
+        return True
+
     def __unicode__(self):
         return self.title
     class Meta:
         db_table = u'c2g_problem_sets'
 
-class Problem(TimestampMixin, models.Model):
-    problem_set = models.ForeignKey(ProblemSet)
-    problem_number = models.IntegerField(null=True, blank=True)
+class Exercise(TimestampMixin, Deletable, models.Model):
+    problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
+    video = models.ManyToManyField(Video, through='VideoToExercise')
+    fileName = models.CharField(max_length=255)
+    file = models.FileField(upload_to=get_file_path, null=True)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
     def __unicode__(self):
-        return self.problem_number
+        return self.fileName
     class Meta:
-        db_table = u'c2g_problems'
+        db_table = u'c2g_exercises'
 
-class ProblemActivity(models.Model):
+
+class GetPsetToExsByProblemset(models.Manager):
+    def getByProblemset(self, problemSet):
+        return self.filter(problemSet=problemSet,is_deleted=0).order_by('number')
+
+
+class ProblemSetToExercise(Deletable, models.Model):
+    problemSet = models.ForeignKey(ProblemSet)
+    exercise = models.ForeignKey(Exercise)
+    number = models.IntegerField(null=True, blank=True)
+    image = models.ForeignKey('self',null=True, blank=True)
+    mode = models.TextField(blank=True)
+    objects = GetPsetToExsByProblemset()
+    def __unicode__(self):
+        return self.problemSet.title + "-" + self.exercise.fileName
+    class Meta:
+        db_table = u'c2g_problemset_to_exercise'
+
+
+class VideoToExercise(models.Model):
+    video = models.ForeignKey(Video)
+    exercise = models.ForeignKey(Exercise)
+    number = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField()
+    video_time = models.IntegerField(null=True, blank=True)
+    def __unicode__(self):
+        return self.video.title + "-" + self.exercise.fileName
+    class Meta:
+        db_table = u'c2g_video_to_exercise'
+
+
+class ProblemActivity(TimestampMixin, models.Model):
      student = models.ForeignKey(User)
-     course = models.ForeignKey(Course)
-     problem_set = models.ForeignKey(ProblemSet, null=True)
-     problem = models.ForeignKey(Problem, null=True)
+     video_to_exercise = models.ForeignKey(VideoToExercise, null=True)
+     problemset_to_exercise = models.ForeignKey(ProblemSetToExercise, null=True)
+     problem_identifier = models.CharField(max_length=255, blank=True)
      complete = models.IntegerField(null=True, blank=True)
+     attempt_content = models.TextField(null=True, blank=True)
      count_hints = models.IntegerField(null=True, blank=True)
      time_taken = models.IntegerField(null=True, blank=True)
      attempt_number = models.IntegerField(null=True, blank=True)
@@ -449,8 +856,10 @@ class ProblemActivity(models.Model):
      card = models.TextField(blank=True)
      cards_done = models.IntegerField(null=True, blank=True)
      cards_left = models.IntegerField(null=True, blank=True)
+     user_selection_val = models.CharField(max_length=1024, null=True, blank=True)
+     user_choices = models.CharField(max_length=1024, null=True, blank=True)
      def __unicode__(self):
-            return self.student.username
+            return self.student.username + " " + str(self.time_created)
      class Meta:
         db_table = u'c2g_problem_activity'
 

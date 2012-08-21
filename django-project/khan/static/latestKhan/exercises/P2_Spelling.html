@@ -9,11 +9,9 @@
 <body>
     <div class="exercise">
         <div class="problems">
-            <div class="prob1">
+            <div id="p1">
                 <div class="question">
-                	<div class="definition" id="nc">
-						In a noisy channel model, you're trying to find the intended word given a word where the letters have been scrambled in some manner.
-					</div> <!--definition-->
+
 					<p>Suppose we want to smooth the likelihood term of a <a href="#" class="show-definition" data-definition="nc">noisy
 					channel</a>
 					model of spelling. We are given two words, <code>x</code> and <code>w</code>, where
@@ -33,8 +31,11 @@
 					smoothing to the insertion edit model? Assume the only characters we
 					use are lowercase a-z, that there are <code>V</code> word types in our corpus,
 					and <code>n</code> total characters, not counting spaces. </p>
+                	<div class="definition" id="nc">
+						In a noisy channel model, you're trying to find the intended word given a word where the letters have been scrambled in some manner.
+					</div> <!--definition-->                
                 </div> <!--question-->
-                
+
                 <div class="solution"><code>\Large \frac{ins[w_{i-1}, x_i] + 1}{c(w_{i-1}) + 26}</code></div>
                 <ul class="choices">
                     <li><code>\Large \frac{ins[w_{i-1}, x_i]}{c(w_{i-1})}</code></li>

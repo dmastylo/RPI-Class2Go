@@ -1,15 +1,30 @@
 # Django settings for class2go project.
 
-from database import DATABASES, SECRET_KEY
+from database import *
 from os import path
-import socket
+#ADDED FOR url tag future
+import django.template
+django.template.add_to_builtins('django.templatetags.future')
 
-DEBUG = True
+# If PRODUCTION flag not set in Database.py, then set it now.
+try:
+    PRODUCTION
+except NameError:
+    PRODUCTION = False
+
+if PRODUCTION == True:
+    DEBUG = False
+else:
+    DEBUG = True
+
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-)
+# ADMINS should be set in database.py too.
+try:
+    ADMINS
+except NameError:
+    # TODO: error out in this case since I can't think of a default
+    pass
 
 MANAGERS = ADMINS
 
@@ -39,7 +54,11 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+# If you upload files from a dev machine, set MEDIA_ROOT to be the root dir for the file
+# uploads. If you do this, set in in database.py; not this file.
+#Also, if you set it in database.py, don't uncomment the following line as settings.py
+#runs after database.py
+#MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -50,7 +69,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/static/'
+STATIC_ROOT = '/opt/class2go/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -91,6 +110,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'convenience_redirect.redirector.convenience_redirector',
 )
 
 ROOT_URLCONF = 'urls'
@@ -106,12 +126,18 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages'
 )
 
-hostname = socket.gethostname()
-#We do not want db_test_data app installed on production.
+# the mode should be set in your database.py, but if it's not, assume
+# we're in a dev environment (careful!)
+try:
+        class2go_mode
+except NameError:
+        class2go_mode = 'dev'
+
 
 INSTALLED_APPS = (
                       'django.contrib.auth',
@@ -134,11 +160,37 @@ INSTALLED_APPS = (
                       'courses.video_exercises',
                       'khan',
                       'problemsets',
+                      'django.contrib.flatpages',
+                      'storages',
                       )
-if (hostname != "productionserver"):
+if class2go_mode != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
                        )
+
+# Storage
+
+# By default we use S3 storage.  Make sure we have the settings we need.
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+try:
+    AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY
+    AWS_STORAGE_BUCKET_NAME
+except NameError:
+    # TODO: fail if not defined
+    pass
+
+# Setting these variables to 'local' is the idiom for using local storage.
+if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
+        AWS_STORAGE_BUCKET_NAME == 'local'):
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+    # We need MEDIA_ROOT to be set to something useful in this case
+    try:
+        MEDIA_ROOT
+    except NameError:
+        # TODO: fail if not defined
+        pass
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
@@ -146,24 +198,63 @@ AUTH_PROFILE_MODULE = 'c2g.UserProfile'
 ACCOUNT_ACTIVATION_DAYS = 7 #used by registration
 
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
+
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+# If PRODUCTION flag not set in Database.py, then set it now.
+try:
+    LOGGING_DIR
+except NameError:
+    LOGGING_DIR = '/var/log/django/'
+
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'formatters' : {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(pathname)s -- %(funcName)s -- line# %(lineno)d : %(message)s '
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'logfile': {
+            'level':'INFO', #making this DEBUG will log _all_ SQL queries.
+            'class':'logging.handlers.RotatingFileHandler',
+            'formatter':'verbose',
+            'filename': LOGGING_DIR+'django.log',
+            'maxBytes': 1024*1024*500,
+            'backupCount': 3,
+        },
+        'console':{
+            'level':'WARNING',
+            'class':'logging.StreamHandler',
+            'formatter': 'simple'
+        },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
         }
     },
     'loggers': {
+        '': {
+            'handlers':['logfile', 'console'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
         'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'handlers': ['mail_admins', 'logfile', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.db.backends':{
+            'handlers':['logfile'],
+            'level': 'DEBUG',
             'propagate': True,
         },
     }

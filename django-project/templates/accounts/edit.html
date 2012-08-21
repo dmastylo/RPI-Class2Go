@@ -3,18 +3,38 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    {% if user.is_authenticated %}
+<div class="row-fluid page-header">
+    <div class="span12">
         <h2>Edit Profile</h2>
-        <h4>Please fill out the information completely</h4>
-        <form name="edit profile" action="{% url 'accounts.views.save_edits' %}" method="POST">
+    </div>
+</div>
+    {% if user.is_authenticated %}
+        <p>Please fill out the information completely.</p>
+        <form name="edit profile form-vertical" action="{% url 'accounts.views.save_edits' %}" method="POST">
             {% csrf_token %}
-            First Name: <input type="text" name="first_name" maxlength="30" value={{user.first_name}}><br>
-            Last Name: <input type="text" name="last_name" maxlength="30" value={{user.last_name}}><br>
-            Email: <input type="text" name="email" maxlength="30" value={{user.email}}><br>
-            <input type="submit" value="Submit" />
+            <div class="control-group">
+                <label class="control-label">First Name</label>
+                <div class="controls">
+                    <input type="text" name="first_name" maxlength="30" value={{user.first_name}}>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Last Name</label>
+                <div class="controls">
+                    <input type="text" name="last_name" maxlength="30" value={{user.last_name}}>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Email Address</label>
+                <div class="controls">
+                    <input type="text" name="email" maxlength="30" value={{user.email}}>
+                </div>
+            </div>
+             
+            <input type="submit" value="Submit" class="btn" />
         </form>
     {% else %}
-        <h4> Please log in to see profile information </h4>
+        <h4> Please <a data-toggle="modal" href="#login-modal">log in</a> to see profile information </h4>
     {% endif %}
 </div>
 {% endblock m_column_content %}

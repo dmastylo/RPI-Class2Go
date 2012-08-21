@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
+from courses.common_page_data import get_common_page_data
+	
 import httplib 
 from OAuthSimple import OAuthSimple
 from urlparse import urlparse

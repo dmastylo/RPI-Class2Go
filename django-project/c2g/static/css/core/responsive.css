@@ -118,14 +118,11 @@
   }
   .modal {
     position: absolute;
-    top: 10px;
+    top: 20px;
     right: 10px;
     left: 10px;
     width: auto;
-    margin: 0;
-  }
-  .modal.fade.in {
-    top: auto;
+    margin-left:0;
   }
   .modal-header .close {
     padding: 10px;
@@ -135,31 +132,41 @@
     position: static;
   }
   .logo {
-    width: 183px;
-    height:27px;
+    width:144px;
+    height:21px;
     text-indent:-999px;
     display:block;
     background: url(/static/graphics/core/c2g-logo-mobile.png) no-repeat;
     position: absolute; 
-    top: 25px; 
+    top: 17px; 
     left: 25px;
+  }
+  .top-nav li .btn {
+    padding:8px !important;
+    margin-top:-7px;
   }
 }
 
 @media (max-width: 767px) {
   .logo {
-    width: 183px;
-    height:27px;
+    width:144px;
+    height:21px;
     text-indent:-999px;
     display:block;
     background: url(/static/graphics/core/c2g-logo-mobile.png) no-repeat;
     position: absolute; 
-    top: 25px; 
+    top: 17px; 
     left: 25px;
   }
   body .container-fluid {
     padding-right: 20px;
     padding-left: 20px;
+  }
+  #c2g_layout_topbar .navbar .navbar-inner {
+    padding:0;
+  }
+  .top-nav {
+    right:55px;
   }
   .navbar-fixed-top,
   .navbar-fixed-bottom {
@@ -708,6 +715,9 @@
   .row-fluid .thumbnails {
     margin-left: 0;
   }
+  .nav-collapse .nav {
+    padding-bottom:0;
+  }
 }
 
 @media (max-width: 979px) {
@@ -723,9 +733,13 @@
   .navbar-fixed-bottom {
     margin-top: 18px;
   }
+  #c2g_layout_topbar .navbar .navbar-inner,
   .navbar-fixed-top .navbar-inner,
   .navbar-fixed-bottom .navbar-inner {
-    padding: 5px;
+    padding: 0;
+  }
+  #c2g_layout_topbar .navbar .navbar-inner .container-fluid {
+    padding:0;
   }
   .navbar .container {
     width: auto;
@@ -738,32 +752,29 @@
   }
   .nav-collapse {
     clear: both;
+    min-height:0;
   }
   .nav-collapse .nav {
     float: none;
-    margin: 0 0 9px;
+    margin: 0;
   }
   .nav-collapse .nav > li {
     float: none;
   }
   .nav-collapse .nav > li > a {
     margin-bottom: 2px;
+    color:#333;
   }
   .nav-collapse .nav > .divider-vertical {
     display: none;
   }
   .nav-collapse .nav .nav-header {
-    color: #999999;
     text-shadow: none;
   }
   .nav-collapse .nav > li > a,
   .nav-collapse .dropdown-menu a {
     padding: 6px 15px;
     font-weight: bold;
-    color: #999999;
-    -webkit-border-radius: 3px;
-       -moz-border-radius: 3px;
-            border-radius: 3px;
   }
   .nav-collapse .btn {
     padding: 4px 10px 4px;
@@ -830,16 +841,48 @@
   }
   .navbar .btn-navbar {
     display: block;
-  }
-  .navbar-static .navbar-inner {
-    padding-right: 10px;
-    padding-left: 10px;
+    position:absolute;
+    top:5px;
+    right:0;
+    background: rgb(100,0,0);
+    color:white;
+    border:0;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    -o-border-radius: 10px;
   }
 }
 
 @media (min-width: 980px) {
+  #c2g_layout_topbar {
+    min-height: 89px;
+  }
+  #c2g_layout_topbar .navbar .navbar-inner {
+    background:url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
+    min-height:34px;
+  }
+  #c2g_layout_topbar .navbar .navbar-inner .container-fluid {
+    padding:0;
+  }
+  .navbar .nav {
+      border-left:1px solid #999;
+  }
+  .navbar .nav > li > a {
+      color:#333;
+  }
+  .navbar .nav .active > a, .navbar .nav .active > a:hover {
+      color:#820000;
+      background:#eadeb9;
+      background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
+  }
+  .navbar .nav > li > a {
+      padding: 7px 10px 8px;
+      border-right:1px solid #999;
+  }
   .logo {
-    width: 308px;
+    width:308px;
     height:21px;
     text-indent:-999px;
     display:block;
