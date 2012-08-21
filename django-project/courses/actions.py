@@ -129,27 +129,11 @@ def signup(request):
 def auth_view_wrapper(view):
     @wraps (view)
     def inner(request, *args, **kw):
-        logger.info('in wrapper')
         user = request.user
         course = request.common_page_data['course']
-     #   handle = str(course_prefix) + '#$!' + str(course_suffix)        
-     #   courses = Course.objects.filter(handle=handle)
-        
-     #   for course in courses:
-     #       if course.mode == 'production':
-     #           request.production_course = course
-     #       elif course.mode == 'staging':
-     #           request.staging_course = course
-     #       else:
-     #           raise Http404
         
         if user.is_authenticated() and not is_member_of_course(course, user):
             return HttpResponseRedirect(reverse('c2g.views.home'))
-    #    else:
-    #        try:
-    #            common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    #        except:
-    #            raise Http404
             
         return view(request, *args, **kw)
     return inner
