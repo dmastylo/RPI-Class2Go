@@ -4,19 +4,9 @@
   {% if user.is_authenticated %}
     <h3>Edit Problem Set</h3>
     <form action="{% url 'problemsets.views.edit_action' %}" method="POST" class="form-vertical">
-	  {% csrf_token %}
-	  <fieldset class="well">
-	  {% for field in form %}
-	    <div class="fieldWrapper">
-	      {{ field.errors }}
-	      {{ field.label_tag }}
-	      {{ field }}
-	      <span class="help-block">{{ field.help_text }}</span>
-	    </div>
-	{% endfor %}
-    </fieldset>
-        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-	    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+
+        {% include 'problemsets/create_edit_common.html' %}
+
         <input type="hidden" name="pset_id" value="{{ pset.id }}" />
         <div class="form-actions">
 	        <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
