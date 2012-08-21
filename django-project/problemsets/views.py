@@ -77,7 +77,7 @@ def attempt(request, problemId):
     else:
         return HttpResponse("wrong")
 
-def create_form(request, course_prefix, course_suffix):
+def html_create_form(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -97,7 +97,7 @@ def create_form(request, course_prefix, course_suffix):
                             context_instance=RequestContext(request))
 
 
-def model_create_form(request, course_prefix, course_suffix):
+def create_form(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -113,12 +113,12 @@ def model_create_form(request, course_prefix, course_suffix):
     data['form'] = form
     data['course_prefix'] = course_prefix
     data['course_suffix'] = course_suffix
-    return render_to_response('problemsets/model_create.html',
+    return render_to_response('problemsets/create.html',
                               data,
                               context_instance=RequestContext(request))
 
 
-def model_edit_form(request, course_prefix, course_suffix, pset_slug):
+def edit_form(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -130,10 +130,10 @@ def model_edit_form(request, course_prefix, course_suffix, pset_slug):
     data['pset'] = pset
     data['course_prefix'] = course_prefix
     data['course_suffix'] = course_suffix
-    return render_to_response('problemsets/model_edit.html', data, context_instance=RequestContext(request))
+    return render_to_response('problemsets/edit.html', data, context_instance=RequestContext(request))
 
 
-def model_create_action(request):
+def create_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -157,9 +157,9 @@ def model_create_action(request):
     else:
         form = CreateProblemSet(course=common_page_data['course'])
     data['form'] = form
-    return render_to_response('problemsets/model_create.html', data, context_instance=RequestContext(request))
+    return render_to_response('problemsets/create.html', data, context_instance=RequestContext(request))
 
-def model_edit_action(request):
+def edit_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -186,7 +186,7 @@ def model_edit_action(request):
 
     data['form'] = form
     data['pset'] = pset
-    return render(request, 'problemsets/model_edit.html', data)
+    return render(request, 'problemsets/edit.html', data)
 
 
 def model_exercises(request, course_prefix, course_suffix, pset_slug):
@@ -247,7 +247,7 @@ def model_add_exercise(request, course_prefix, course_suffix, pset_slug):
     return render_to_response('problemsets/model_manage_exercises.html', data, context_instance=RequestContext(request))
 
 
-def create_action(request):
+def html_create_action(request):
     course_handle = request.POST['course_prefix'] + "#$!" + request.POST['course_suffix']
     course = Course.objects.get(handle=course_handle, mode='staging')
     content_section = ContentSection.objects.get(id=request.POST['content_section'])
@@ -277,7 +277,7 @@ def create_action(request):
     pset.create_production_instance()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
-def edit_form(request, course_prefix, course_suffix, pset_slug):
+def html_edit_form(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -318,11 +318,11 @@ def edit_helper(request):
     pset.submissions_permitted = request.POST['submissions_permitted']
     pset.save()
 
-def edit_action(request):
+def html_edit_action(request):
     edit_helper(request)
     return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'], )))
 
-def edit_publish_action(request):
+def html_edit_publish_action(request):
     edit_helper(request)
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     pset.commit()
