@@ -71,16 +71,6 @@ def GetOAuth2Url(request):
 
     return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type
 
-def GetAuthSubUrl(request):
-
-    next = "http://" + request.META['HTTP_HOST'] + request.path
-    scope = 'http://gdata.youtube.com'
-    secure = False
-    session = True
-
-    yt_service = gdata.youtube.service.YouTubeService()
-    return yt_service.GenerateAuthSubURL(next, scope, secure, session)
-
 def upload(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -95,33 +85,6 @@ def upload(request, course_prefix, course_suffix):
     return render_to_response('videos/s3upload.html',
                               data,
                               context_instance=RequestContext(request))
-
-
-    #OLD YOUTUBE UPLOAD
-    if 'token' in request.GET:
-        token = request.GET['token']
-        data['token'] = token
-
-        yt_service = gdata.youtube.service.YouTubeService()
-        #yt_service.developer_key = 'AI39si5GlWcy9S4eVFtajbVZk-DjFEhlM4Zt7CYzJG3f2bwIpsBSaGd8SCWts6V5lbqBHJYXAn73-8emsZg5zWt4EUlJJ4rpQA'
-        #yt_service.SetAuthSubToken(token)
-        #yt_service.UpgradeToSessionToken()
-
-        yt_logged_in = True
-        form = VideoUploadForm(course=common_page_data['course'])
-        data['form'] = form
-    else:
-        # user is not logged into google account for youtube
-        yt_logged_in = False
-        authSubUrl = GetAuthSubUrl(request)
-        #authSubUrl = GetOAuth2Url(request)
-        data['authSubUrl'] = authSubUrl
-
-    data['yt_logged_in'] = yt_logged_in
-    return render_to_response('videos/upload.html',
-                              data,
-                              context_instance=RequestContext(request))
-
 
 def manage_exercises(request, course_prefix, course_suffix, video_slug):
     try:
