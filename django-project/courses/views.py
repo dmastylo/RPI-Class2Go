@@ -6,8 +6,6 @@ from c2g.models import *
 from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 import re
-import logging
-logger = logging.getLogger(__name__)
 
 
 from courses.actions import auth_view_wrapper
@@ -17,8 +15,6 @@ def index(item): # define a index function for list items
 
 def main(request, course_prefix, course_suffix):
     common_page_data = request.common_page_data
-    logger.info('worked!')
-    
     
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course'])
     if len(announcement_list) > 10:

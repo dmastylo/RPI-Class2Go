@@ -17,7 +17,6 @@ class common_data(object):
         try:
             request.common_page_data=get_common_page_data(request, view_kwargs['course_prefix'], 
                                                       view_kwargs['course_suffix'])
-           # logger.info('Ran get_common_page_data course: ' + request.common_page_data['course_mode'])
             return None
         except:
             raise Http404
