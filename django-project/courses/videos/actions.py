@@ -172,10 +172,10 @@ def upload(request):
     data = {'common_page_data': common_page_data}
 
     if request.method == 'POST':
-        form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'])
+        new_video = Video(course=common_page_data['course'])
+        form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=new_video)
         if form.is_valid():
             new_video = form.save(commit=False)
-            new_video.course = common_page_data['course']
             new_video.index = new_video.section.getNextIndex()
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
