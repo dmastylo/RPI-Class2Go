@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
-	
+    
 import httplib 
 from OAuthSimple import OAuthSimple
 from urlparse import urlparse
@@ -13,14 +13,22 @@ import urllib
 secrets_file = __import__('django-project.database', globals(), locals(), ['PIAZZA_CONSUMER_KEY', 'PIAZZA_OAUTH_SECRET'], -1)
 
 def admin(request, course_prefix, course_suffix):
-	return render_to_response('forums/admin.html', 
-            {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'request': request}, 
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    return render_to_response('forums/admin.html', {'common_page_data': common_page_data},
             context_instance=RequestContext(request))
 
 
 def view(request, course_prefix, course_suffix):
-	return render_to_response('forums/outer.html', 
-            {'course_prefix': course_prefix, 'course_suffix': course_suffix, 'request': request}, 
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+
+    return render_to_response('forums/outer.html', {'common_page_data': common_page_data},
             context_instance=RequestContext(request))
 
 
