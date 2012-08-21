@@ -9,7 +9,8 @@ from courses.common_page_data import get_common_page_data
 from c2g.models import *
 from random import randrange
 from datetime import datetime
-
+import logging
+logger = logging.getLogger(__name__)
 from django.utils.functional import wraps
 
 def switch_mode(request):
@@ -105,18 +106,14 @@ def change_live_datetime(request):
     return redirect(request.META['HTTP_REFERER'])
 
 def is_member_of_course(course, user):
-    student_group_id = course.student_group.id
-    instructor_group_id = course.instructor_group.id
-    tas_group_id = course.tas_group.id
-    readonly_tas_group_id = course.readonly_tas_group.id
     
     group_list = user.groups.values_list('id',flat=True)
-    
     for item in group_list:
-        if item == student_group_id or item == instructor_group_id or item == tas_group_id or item == readonly_tas_group_id:
+        if item == course.student_group.id or item == course.instructor_group.id or item == course.tas_group.id or item == course.readonly_tas_group.id:
             return True
         
     return False
+
 
 def signup(request):
     handle = request.POST.get('handle')
@@ -131,17 +128,31 @@ def signup(request):
 
 def auth_view_wrapper(view):
     @wraps (view)
-    def inner(request, course_prefix, course_suffix, *args, **kw):
-        
+    def inner(request, *args, **kw):
+        logger.info('in wrapper')
         user = request.user
-        handle = str(course_prefix) + '#$!' + str(course_suffix)        
-        course = Course.objects.get(mode="production", handle=handle)
-
-        if not is_member_of_course(course, user):
-            return HttpResponseRedirect(reverse('c2g.views.home'))
+        course = request.common_page_data['course']
+     #   handle = str(course_prefix) + '#$!' + str(course_suffix)        
+     #   courses = Course.objects.filter(handle=handle)
         
-        return view(request, course_prefix, course_suffix, *args, **kw)
+     #   for course in courses:
+     #       if course.mode == 'production':
+     #           request.production_course = course
+     #       elif course.mode == 'staging':
+     #           request.staging_course = course
+     #       else:
+     #           raise Http404
+        
+        if user.is_authenticated() and not is_member_of_course(course, user):
+            return HttpResponseRedirect(reverse('c2g.views.home'))
+    #    else:
+    #        try:
+    #            common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    #        except:
+    #            raise Http404
+            
+        return view(request, *args, **kw)
     return inner
-    
+
     
     
