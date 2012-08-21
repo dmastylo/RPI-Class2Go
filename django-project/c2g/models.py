@@ -629,7 +629,6 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def commit(self, clone_fields = None):
-        print self.mode
         if self.mode != 'staging': return;
         if not self.image: self.create_production_instance()
 
@@ -665,9 +664,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         production_instance.save()
 
-        print "hilo"
         if self.exercises_changed() == True:
-            print "hi"
             staging_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
             production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
             #Delete all previous relationships
