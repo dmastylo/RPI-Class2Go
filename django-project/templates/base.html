@@ -22,7 +22,44 @@
             </div>
         </div>
         <div id="c2g_layout_topbar">
-            <h1><a href="{% url 'c2g.views.home' %}" class="logo">Class2Go by Stanford University</a></h1>
+            <div class="row-fluid">
+            <h1 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h1>
+            {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
+                <div class="hidden-phone pull-right">
+                    {% if common_page_data.can_switch_mode %}
+                        <form class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
+                            <p>You are currently viewing:</p>
+                            <div class="btn-group btn-views-toggle">
+                                <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Draft</button>
+                                <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Published</button>
+                            </div>
+                            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+                            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+                            {% csrf_token %}
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
+            </div>
+            {% block navbar %}
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        {% ifequal user.is_staff True %}
+                        <ul class="nav">
+                            <li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
+                        </ul>
+                        {% endifequal %}
+                        <!--form class="navbar-search hidden-phone" action="">
+                            <div class="input-append">
+                                <input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
+                                <button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
+                            </div>
+                        </form-->
+                    </div>
+                </div>
+            </div>
+            {% endblock navbar %}
             <div class="top-nav">
             {% if user.is_authenticated %}
                 <li>
@@ -38,25 +75,6 @@
             {% endif %}
                 <li class="visible-phone visible-tablet"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>
-            {% block navbar %}
-            <div class="navbar">
-                <div class="navbar-inner">
-                    <div class="container-fluid">
-                        {% ifequal user.is_staff True %}
-						<ul class="nav">
-							<li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
-						</ul>
-						{% endifequal %}
-                        <!--form class="navbar-search hidden-phone" action="">
-                            <div class="input-append">
-                                <input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
-                                <button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
-                            </div>
-                        </form-->
-                    </div>
-                </div>
-            </div>
-            {% endblock navbar %}
         </div>
         
         

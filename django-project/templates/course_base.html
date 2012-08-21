@@ -57,27 +57,6 @@
 
 {% block content %}
 <div class="container-fluid body-content">
-    <div class="row-fluid page-header">
-        <div class="span12">
-            <h2 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
-            {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
-            <div class="hidden-phone pull-right">
-                {% if common_page_data.can_switch_mode %}
-                    <form class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
-                        <p>You are currently viewing:</p>
-                        <div class="btn-group btn-views-toggle">
-                            <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Draft</button>
-                            <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Published</button>
-                        </div>
-                        <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
-                        <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
-                        {% csrf_token %}
-                    </form>
-                {% endif %}
-            </div>
-            {% endif %}
-        </div>
-    </div>
     <div class="row-fluid">
         {% block l_column_content %}{% endblock %}
         
