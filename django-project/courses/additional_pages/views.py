@@ -6,7 +6,9 @@ from c2g.models import *
 from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 import re
+from courses.actions import auth_view_wrapper
 
+@auth_view_wrapper
 def manage_nav_menu(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -18,6 +20,7 @@ def manage_nav_menu(request, course_prefix, course_suffix):
     
     return render_to_response('additional_pages/manage_nav_menu.html', {'common_page_data':common_page_data, 'mode':'nav_menu'}, context_instance=RequestContext(request))
 
+@auth_view_wrapper
 def add_section_page(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -29,7 +32,8 @@ def add_section_page(request, course_prefix, course_suffix):
     
     sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
     return render_to_response('additional_pages/add_section_page.html', {'common_page_data':common_page_data, 'mode':'section', 'sections':sections}, context_instance=RequestContext(request))
-    
+
+@auth_view_wrapper    
 def main(request, course_prefix, course_suffix, slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)

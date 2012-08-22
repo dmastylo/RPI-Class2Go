@@ -132,6 +132,9 @@ def auth_view_wrapper(view):
         
         if user.is_authenticated() and not is_member_of_course(course, user):
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+        
+        if not user.is_authenticated():
+            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
             
         return view(request, *args, **kw)
     return inner
