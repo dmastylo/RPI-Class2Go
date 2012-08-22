@@ -13,10 +13,23 @@ class common_data(object):
     def process_view (self, request, view_func, view_args, view_kwargs):
         if (('course_prefix' not in view_kwargs) or 
             ('course_suffix' not in view_kwargs)):
-            return None # Bail out in this case since we can't find the course
+            #No course information in the URL.  There is a special case that has it as a POST parameter (Why?)
+            #Handle those here
+            if ((not request.POST.__contains__('course_prefix') or 
+                (not request.POST.__contains__('course_suffix')))):
+                return None
+            else:
+                #The course info is in the POST in this case
+                cp = request.POST.get('course_prefix')
+                cs = request.POST.get('course_suffix')
+        else:
+            cp = view_kwargs['course_prefix']
+            cs = view_kwargs['course_suffix']
+                
+        
         try:
-            request.common_page_data=get_common_page_data(request, view_kwargs['course_prefix'], 
-                                                      view_kwargs['course_suffix'])
+            request.common_page_data=get_common_page_data(request, cp, cs)
+            #logger.info('Ran get_common_page_data course: ' + request.common_page_data['course_mode'])
             return None
         except:
             raise Http404

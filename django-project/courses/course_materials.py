@@ -1,13 +1,14 @@
 from c2g.models import *
 import datetime
 
-def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False):
+def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
         videos = Video.objects.getByCourse(course=common_page_data['course'])
         problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
         pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
+        files = File.objects.getByCourse(course=common_page_data['course'])
 
         index = 0
         for section in sections:
@@ -29,6 +30,30 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     day = prod_page.live_datetime.day
                                     hour = prod_page.live_datetime.hour
                                     minute = prod_page.live_datetime.minute
+                                    visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                else:
+                                    visible_status = "<span style='color:green;'>Open</span>"
+
+                            item['visible_status'] = visible_status
+
+                        section_dict['items'].append(item)
+
+            if get_file_content:
+                for file in files:
+                    if file.section_id == section.id:
+                        item = {'type':'file', 'file':file, 'index':file.index}
+
+                        if common_page_data['course_mode'] == 'staging':
+                            prod_file = file.image
+                            if not prod_file.live_datetime:
+                                visible_status = "<span style='color:#A00000;'>Not open</span>"
+                            else:
+                                if prod_file.live_datetime > datetime.datetime.now():
+                                    year = prod_file.live_datetime.year
+                                    month = prod_file.live_datetime.month
+                                    day = prod_file.live_datetime.day
+                                    hour = prod_file.live_datetime.hour
+                                    minute = prod_file.live_datetime.minute
                                     visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
                                     visible_status = "<span style='color:green;'>Open</span>"

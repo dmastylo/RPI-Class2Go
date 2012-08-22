@@ -10,6 +10,9 @@
     {% ifequal item.type 'video' %}
             {% include "videos/production/video_list_item.html" %}
     {% endifequal %}
+    {% ifequal item.type 'file' %}
+            {% include "files/production/file_list_item.html" %}
+    {% endifequal %}
     </ul>
 {% empty %}
     <p style='margin: 20px;'>No items have been added to this section</p>

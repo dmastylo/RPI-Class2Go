@@ -31,7 +31,8 @@ def get_file_path(instance, filename):
         return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
     if isinstance(instance, Video):
         return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
-
+    if isinstance(instance, File):
+        return os.path.join(str(parts[0]), str(parts[1]), 'files', filename)
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -46,7 +47,7 @@ class TimestampMixin(models.Model):
 class Stageable(models.Model):
     mode = models.TextField(blank=True)
     image = models.ForeignKey('self', null=True, related_name="+")
-    live_datetime = models.DateTimeField(editable=True, null=True)
+    live_datetime = models.DateTimeField(editable=True, null=True, blank=True)
 
     class Meta:
        abstract = True
@@ -341,6 +342,43 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
     class Meta:
         db_table = u'c2g_additional_pages'
 
+class FileManager(models.Manager):
+    def getByCourse(self, course):
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    section = models.ForeignKey(ContentSection, null=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    file = models.FileField(upload_to=get_file_path)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+    objects = FileManager()
+
+    def create_production_instance(self):
+        production_instance = File(
+            course=self.course.image,
+            section=self.section.image,
+            title=self.title,
+            file=self.file,
+            image = self,
+            index = self.index,
+            mode = 'production',
+            handle = self.handle,
+            live_datetime = self.live_datetime,
+        )
+        production_instance.save()
+        self.image = production_instance
+        self.save()
+
+    def dl_link(self):
+        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+
+    class Meta:
+        db_table = u'c2g_files'
 
 class AnnouncementManager(models.Manager):
     def getByCourse(self, course):
@@ -541,7 +579,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def validate_unique(self, exclude=None):
         errors = {}
-        
+
         try:
             super(Video, self).validate_unique(exclude=exclude)
         except ValidationError, e:
@@ -549,7 +587,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         # Special slug uniqueness validation for course
         slug_videos = Video.objects.filter(course=self.course,is_deleted=0,slug=self.slug)
-        
+
         # Exclude the current object from the query if we are editing an
         # instance (as opposed to creating a new one)
         if not self._state.adding and self.pk is not None:
@@ -599,18 +637,18 @@ class ProblemSetManager(models.Manager):
 
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
-    section = models.ForeignKey(ContentSection, null=True, db_index=True)
-    slug = models.SlugField()
-    title = models.CharField(max_length=255, blank=True)
+    section = models.ForeignKey(ContentSection, db_index=True)
+    slug = models.SlugField("URL Identifier")
+    title = models.CharField(max_length=255,)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    due_date = models.DateTimeField(null=True, blank=True)
-    grace_period = models.DateTimeField(null=True, blank=True)
-    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True)
+    grace_period = models.DateTimeField()
+    partial_credit_deadline = models.DateTimeField()
     assessment_type = models.CharField(max_length=255)
-    late_penalty = models.IntegerField(null=True, blank=True)
-    submissions_permitted = models.IntegerField(null=True, blank=True)
-    resubmission_penalty = models.IntegerField(null=True, blank=True)
+    late_penalty = models.IntegerField()
+    submissions_permitted = models.IntegerField()
+    resubmission_penalty = models.IntegerField()
     randomize = models.BooleanField()
     objects = ProblemSetManager()
 
@@ -811,6 +849,30 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             if staging_psetToEx.number != staging_psetToEx.image.number:
                 return False
         return True
+
+    def validate_unique(self, exclude=None):
+        errors = {}
+
+        try:
+            super(ProblemSet, self).validate_unique(exclude=exclude)
+        except ValidationError, e:
+            errors.update(e.message_dict)
+
+        # Special slug uniqueness validation for course
+        slug_psets = ProblemSet.objects.filter(course=self.course,is_deleted=0,slug=self.slug)
+
+        # Exclude the current object from the query if we are editing an
+        # instance (as opposed to creating a new one)
+        if not self._state.adding and self.pk is not None:
+            slug_psets = slug_psets.exclude(pk=self.pk)
+
+        if slug_psets.exists():
+            errors.setdefault("slug", []).append("Problem set with this URL identifier already exists.")
+
+        if errors:
+            raise ValidationError(errors)
+
+
 
     def __unicode__(self):
         return self.title
