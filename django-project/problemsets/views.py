@@ -191,7 +191,7 @@ def edit_action(request):
     return render(request, 'problemsets/edit.html', data)
 
 
-def model_exercises(request, course_prefix, course_suffix, pset_slug):
+def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -210,7 +210,6 @@ def model_exercises(request, course_prefix, course_suffix, pset_slug):
     #Get all the exercises in the course but not in this problem set to list in add from existing
     exercises = Exercise.objects.all().filter(problemSet__course=common_page_data['course']).exclude(id__in=used_exercises).distinct()
 
-
     if request.method == 'POST':
         form = ManageExercisesForm(request.POST, request.FILES)
         if form.is_valid():
@@ -227,7 +226,7 @@ def model_exercises(request, course_prefix, course_suffix, pset_slug):
             index = len(ProblemSetToExercise.objects.getByProblemset(pset))
             psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='staging')
             psetToEx.save()
-            return HttpResponseRedirect(reverse('problemsets.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+            return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
     data['form'] = form
     data['course_prefix'] = course_prefix
@@ -236,7 +235,7 @@ def model_exercises(request, course_prefix, course_suffix, pset_slug):
     data['psetToExs'] = psetToExs
     data['problemset_taken'] = problemset_taken
     data['exercises'] = exercises
-    return render_to_response('problemsets/model_manage_exercises.html', data, context_instance=RequestContext(request))
+    return render_to_response('problemsets/manage_exercises.html', data, context_instance=RequestContext(request))
 
 
 def model_add_exercise(request, course_prefix, course_suffix, pset_slug):
@@ -350,7 +349,7 @@ def html_edit_publish_action(request):
     pset.commit()
     return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'], )))
 
-def manage_exercises(request, course_prefix, course_suffix, pset_slug):
+def html_manage_exercises(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
@@ -419,9 +418,26 @@ def save_helper(request):
         psetToExs[n].save()
 
 def save_exercises(request):
-    save_helper(request)
+    if request.method != 'POST':
+        return redirect(request.META['HTTP_REFERER'])
+
+    course_prefix = request.POST['course_prefix']
+    course_suffix = request.POST['course_suffix']
+    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
-    return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+    action = request.POST['action']
+    if action == 'Revert':
+        pset.revert()
+        return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+    else:
+        psetToExs = ProblemSetToExercise.objects.getByProblemset(pset)
+        for n in range(0,len(psetToExs)):
+            listName = "exercise_order[" + str(n) + "]"
+            psetToExs[n].number = request.POST[listName]
+            psetToExs[n].save()
+        if action == 'Save and Publish':
+            pset.commit()
+        return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'])))
 
 def save_and_publish_exercises(request):
     save_helper(request)

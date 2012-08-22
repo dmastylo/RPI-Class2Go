@@ -22,21 +22,19 @@ function confirm_change(){
     <h3>Add or Remove Exercises</h3>
 
     <h4>Upload Exercises to {{pset.title}}</h4>
-    <form action= {% url 'problemsets.views.add_exercise' %} method="POST" class="form-vertical" enctype="multipart/form-data">
+    <form action= {% url 'problemsets.views.manage_exercises' course_prefix course_suffix pset.slug %} method="POST" class="form-vertical" enctype="multipart/form-data">
         <fieldset class="well">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
-        <div class="control-group">
-            <label class="control-label">Add Exercises* (Choose a file and then click Add Exercise)</label>
-            <div class="controls">
-                <input type="file" name="exercise">
-                <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
-            </div>
+        <div class="fieldWrapper">
+            {{ form.file.errors }}
+            {{ form.file }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
-    
+
     <h4><a data-toggle="collapse" data-target="#choose-existing" class='btn'>Choose From Existing Exercises</a></h4>
     <form action= {% url 'problemsets.views.add_existing_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
@@ -56,9 +54,8 @@ function confirm_change(){
             <input type="submit" value="Add Exercises" onclick="return confirm_change()" class="btn">
         </div>
     </form>
-    
 
-    <form action= ''  method="POST" class="form-vertical">
+    <form action= {% url 'problemsets.views.save_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
@@ -77,13 +74,11 @@ function confirm_change(){
         <span class="help-block">After reordering, save before uploading another exercise</span>
     </fieldset>
         <div class="form-actions">
-            <input type="submit" value="Save" onclick="form.action='{% url 'problemsets.views.save_exercises' %}';" class="btn">
-            <input type="submit" value="Save and Publish" onclick="form.action='{% url 'problemsets.views.save_and_publish_exercises' %}';" class="btn">
-            <input type="submit" value="Revert" onclick="form.action='{% url 'problemsets.views.revert_problemset' %}';" class="btn">
-            <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+            <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
+	        <input type="submit" name="action" value="Save as Draft" class="btn" />
+	        <input type="submit" name="action" value="Revert" class="btn" />
+	        <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
         </div>
     </form>
 </div>
 {% endblock m_column_content %}
-
-
