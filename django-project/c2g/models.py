@@ -541,7 +541,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def validate_unique(self, exclude=None):
         errors = {}
-        
+
         try:
             super(Video, self).validate_unique(exclude=exclude)
         except ValidationError, e:
@@ -549,7 +549,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         # Special slug uniqueness validation for course
         slug_videos = Video.objects.filter(course=self.course,is_deleted=0,slug=self.slug)
-        
+
         # Exclude the current object from the query if we are editing an
         # instance (as opposed to creating a new one)
         if not self._state.adding and self.pk is not None:
@@ -599,18 +599,18 @@ class ProblemSetManager(models.Manager):
 
 class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course)
-    section = models.ForeignKey(ContentSection, null=True, db_index=True)
-    slug = models.SlugField()
-    title = models.CharField(max_length=255, blank=True)
+    section = models.ForeignKey(ContentSection, db_index=True)
+    slug = models.SlugField("URL Identifier")
+    title = models.CharField(max_length=255,)
     description = models.TextField(blank=True)
     path = models.CharField(max_length=255)
-    due_date = models.DateTimeField(null=True, blank=True)
-    grace_period = models.DateTimeField(null=True, blank=True)
-    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateTimeField(null=True)
+    grace_period = models.DateTimeField()
+    partial_credit_deadline = models.DateTimeField()
     assessment_type = models.CharField(max_length=255)
-    late_penalty = models.IntegerField(null=True, blank=True)
-    submissions_permitted = models.IntegerField(null=True, blank=True)
-    resubmission_penalty = models.IntegerField(null=True, blank=True)
+    late_penalty = models.IntegerField()
+    submissions_permitted = models.IntegerField()
+    resubmission_penalty = models.IntegerField()
     randomize = models.BooleanField()
     objects = ProblemSetManager()
 
@@ -811,6 +811,30 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             if staging_psetToEx.number != staging_psetToEx.image.number:
                 return False
         return True
+
+    def validate_unique(self, exclude=None):
+        errors = {}
+
+        try:
+            super(ProblemSet, self).validate_unique(exclude=exclude)
+        except ValidationError, e:
+            errors.update(e.message_dict)
+
+        # Special slug uniqueness validation for course
+        slug_psets = ProblemSet.objects.filter(course=self.course,is_deleted=0,slug=self.slug)
+
+        # Exclude the current object from the query if we are editing an
+        # instance (as opposed to creating a new one)
+        if not self._state.adding and self.pk is not None:
+            slug_psets = slug_psets.exclude(pk=self.pk)
+
+        if slug_psets.exists():
+            errors.setdefault("slug", []).append("Problem set with this URL identifier already exists.")
+
+        if errors:
+            raise ValidationError(errors)
+
+
 
     def __unicode__(self):
         return self.title
