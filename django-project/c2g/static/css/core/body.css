@@ -53,6 +53,9 @@ a:hover {color:#820000;}
     font-size: 1.1em;
     margin-right: 4px;
 }
+a:hover [class^="icon-"] {
+  text-decoration: none;
+}
 
 .modal {
     border-radius: 10px;
