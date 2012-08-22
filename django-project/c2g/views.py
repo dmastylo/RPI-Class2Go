@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 
 ### C2G Core Views ###
 
-@require_POST
+#@require_POST
 def home(request):
     now = datetime.now()
     courses = Course.objects.filter(calendar_start__gt=now, mode="production")
@@ -23,7 +23,7 @@ def home(request):
         viewable_handle = course.handle.replace('#$!', '/')
         available_course_list.append((course.title, course.handle, viewable_handle, course_student_member))
         
-    return render_to_response('base.html', {'request': request, 'available_course_list': available_course_list}, context_instance=RequestContext(request))
+    return render_to_response('courses/signup.html', {'request': request, 'available_course_list': available_course_list}, context_instance=RequestContext(request))
 
 def healthcheck(request):
     return HttpResponse("I'm alive!")

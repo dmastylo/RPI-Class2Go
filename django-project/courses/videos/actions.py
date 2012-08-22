@@ -17,6 +17,7 @@ import re
 
 from datetime import datetime
 from courses.actions import auth_view_wrapper
+from django.views.decorators.http import require_POST
     
 ### Videos ###
 
@@ -92,6 +93,8 @@ def delete_video(request):
     
     return redirect(request.META['HTTP_REFERER'])
     
+@require_POST
+@auth_view_wrapper
 def save_video_progress(request):
     videoRec = request.POST['videoRec']
     playTime = request.POST['playTime']

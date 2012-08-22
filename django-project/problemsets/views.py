@@ -8,6 +8,8 @@ from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
+from courses.actions import auth_view_wrapper
+from django.views.decorators.http import require_POST
 
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
@@ -52,6 +54,8 @@ def show(request, course_prefix, course_suffix, pset_slug):
                               context_instance=RequestContext(request))
 
 @csrf_exempt
+@require_POST
+@auth_view_wrapper
 def attempt(request, problemId):
     user = request.user
     problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)

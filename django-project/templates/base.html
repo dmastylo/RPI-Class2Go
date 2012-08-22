@@ -58,34 +58,10 @@
         {% block content %}
         <div class="container-fluid body-content">
             <div class="row-fluid">
-                {% block l_column_content %}
-                  {% if user.is_authenticated %}
-                	<h1>Current courses available for signup</h1>
-                	{% for available_course in available_course_list %}
-                		{% ifequal available_course.3 'False' %}
-                		    <form name="signup" action="{% url 'courses.actions.signup' %}" method="POST">
-                                <input type="hidden" id="handle" name="handle" value={{available_course.1}} />
-                                {{available_course.0}} ({{available_course.2}})<input type="button" value="Signup" class="btn btn-primary" style='width: 75px; margin-right: 10px;' onclick="signup_clicked('{{available_course.2}}')"/>
-                                {% csrf_token %}
-                            </form>
-                        {% else %}
-                            {{available_course.0}} ({{available_course.2}})<b>Already signed up</b>    
-                        {% endifequal %}            
-                	{% endfor %}
-                  {% endif %}
-                {% endblock %}
+                {% block l_column_content %}{% endblock %}
                 
-            <script type="text/javascript">
-                function signup_clicked(course) {
-                    r = confirm("Please confirm you wish to join class " + course + "?")
-                    if (!r) return;
-                    document.forms.signup.submit();
-                }
-                </script>
+                {% block m_column_content %}{% endblock %}
                 
-                {% block m_column_content %}    	                
-                {% endblock %}
-
                 {% block r_column_content %}{% endblock %}
             </div>
             {% include "footer.html" %}
