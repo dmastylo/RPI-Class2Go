@@ -106,6 +106,8 @@ def create_form(request, course_prefix, course_suffix):
     form = CreateProblemSet(course=common_page_data['course'],
                             initial={'late_penalty':10,
                                     'assessment_type':'formative',
+                                    'submissions_permitted':0,
+                                    'resubmission_penalty':0,
                                     'due_date':(datetime.today()+timedelta(7)),
                                     'grace_period':(datetime.today()+timedelta(14)),
                                     'partial_credit_deadline':(datetime.today()+timedelta(21))

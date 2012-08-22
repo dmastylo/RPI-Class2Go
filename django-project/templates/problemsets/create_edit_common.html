@@ -73,7 +73,7 @@
                 </div>
             </div>
             <div class="control-group" style="margin-bottom:18px;">
-                <label class="control-label">Assessment Type</label>
+                <label class="control-label">Assessment Type <a href="#" rel="tooltip" title="A student can attempt each problem as many times as they want without penalty in a formative problem set. Summative problem sets penalize students for multiple problem attempts."><i class="icon-info-sign"></i></a></label>
                 <div class="controls">
                     {{ form.assessment_type.errors }}
                     {{ form.assessment_type }}
@@ -95,3 +95,20 @@
                 </div>
             </div>
         </fieldset>
+
+
+        <script>
+            function setPenalties(default_attempts_permitted, default_attempt_penalty)
+            {
+                var attempts_permitted = document.getElementById("id_submissions_permitted");
+                var attempt_penalty = document.getElementById("id_resubmission_penalty");
+                attempts_permitted.value = default_attempts_permitted;
+                attempt_penalty.setAttribute("value", default_attempt_penalty);
+            }
+            var formative = document.getElementById("id_assessment_type_0"); 
+            var assessive = document.getElementById("id_assessment_type_1");
+            formative.setAttribute("onchange", "setPenalties(0, 0)");
+            assessive.setAttribute("onchange", "setPenalties(3, 30)");
+            
+            
+        </script>
