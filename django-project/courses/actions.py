@@ -5,6 +5,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.contrib.auth.models import User,Group
 from courses.common_page_data import get_common_page_data
+from django.views.decorators.http import require_POST
 
 from c2g.models import *
 from random import randrange
@@ -118,7 +119,7 @@ def is_member_of_course(course, user):
         
     return False
 
-
+@require_POST
 def signup(request):
     handle = request.POST.get('handle')
     

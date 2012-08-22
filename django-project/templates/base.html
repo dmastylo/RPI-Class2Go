@@ -59,6 +59,7 @@
         <div class="container-fluid body-content">
             <div class="row-fluid">
                 {% block l_column_content %}
+                  {% if user.is_authenticated %}
                 	<h1>Current courses available for signup</h1>
                 	{% for available_course in available_course_list %}
                 		{% ifequal available_course.3 'False' %}
@@ -70,8 +71,8 @@
                         {% else %}
                             {{available_course.0}} ({{available_course.2}})<b>Already signed up</b>    
                         {% endifequal %}            
-                        
                 	{% endfor %}
+                  {% endif %}
                 {% endblock %}
                 
             <script type="text/javascript">

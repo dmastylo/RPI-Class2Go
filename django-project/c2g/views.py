@@ -5,10 +5,11 @@ from django.template import RequestContext
 from datetime import datetime
 from models import Course
 from courses.actions import is_member_of_course
-
+from django.views.decorators.http import require_POST
 
 ### C2G Core Views ###
 
+@require_POST
 def home(request):
     now = datetime.now()
     courses = Course.objects.filter(calendar_start__gt=now, mode="production")
