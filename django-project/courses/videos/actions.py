@@ -92,10 +92,9 @@ def delete_video(request):
     
     return redirect(request.META['HTTP_REFERER'])
     
-@auth_view_wrapper    
 def save_video_progress(request):
-    videoRec = request.common_page_data['videoRec']
-    playTime = request.common_page_data['playTime']
+    videoRec = request.POST['videoRec']
+    playTime = request.POST['playTime']
     video = VideoActivity.objects.get(id=videoRec)
     video.start_seconds = playTime
     video.save()
