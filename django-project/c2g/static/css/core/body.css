@@ -284,10 +284,11 @@ small.date {
 }
 
 
-/* Thumbnails
+/* Body
 -------------------------------------------------- */
 .body-content {
     padding-top:20px;
+    min-height:450px;
 }
 
 /* Thumbnails
@@ -418,6 +419,15 @@ ul.ui-sortable li:hover {
 -------------------------------------------------- */
 .create-problemset h4 a {
     cursor:pointer;
+}
+.assessment-type {
+    margin-bottom:18px;
+}
+.assessment-type ul {
+    margin-left:0;
+}
+.assessment-type ul li {
+    list-style-type:none;
 }
 
 /* jQuery UI
