@@ -7,6 +7,8 @@ from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 import re
 
+from courses.actions import auth_view_wrapper
+
 def index(item): # define a index function for list items
  return item[1]
 
@@ -66,7 +68,9 @@ def main(request, course_prefix, course_suffix):
 
             context_instance=RequestContext(request))
 
+@auth_view_wrapper
 def course_materials(request, course_prefix, course_suffix):
+    
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:

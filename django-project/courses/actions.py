@@ -1,4 +1,5 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
 from django.template import RequestContext
@@ -8,6 +9,8 @@ from courses.common_page_data import get_common_page_data
 from c2g.models import *
 from random import randrange
 from datetime import datetime
+
+from django.utils.functional import wraps
 
 def switch_mode(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -102,11 +105,15 @@ def change_live_datetime(request):
     return redirect(request.META['HTTP_REFERER'])
 
 def is_member_of_course(course, user):
-    group_id = course.student_group.id
+    student_group_id = course.student_group.id
+    instructor_group_id = course.instructor_group.id
+    tas_group_id = course.tas_group.id
+    readonly_tas_group_id = course.readonly_tas_group.id
+    
     group_list = user.groups.values_list('id',flat=True)
     
     for item in group_list:
-        if item == group_id:
+        if item == student_group_id or item == instructor_group_id or item == tas_group_id or item == readonly_tas_group_id:
             return True
         
     return False
@@ -121,3 +128,20 @@ def signup(request):
         student_group.user_set.add(user)
         
     return redirect(request.META['HTTP_REFERER'])
+
+def auth_view_wrapper(view):
+    @wraps (view)
+    def inner(request, course_prefix, course_suffix, *args, **kw):
+        
+        user = request.user
+        handle = str(course_prefix) + '#$!' + str(course_suffix)        
+        course = Course.objects.get(mode="production", handle=handle)
+
+        if not is_member_of_course(course, user):
+            return HttpResponseRedirect(reverse('c2g.views.home'))
+        
+        return view(request, course_prefix, course_suffix, *args, **kw)
+    return inner
+    
+    
+    
