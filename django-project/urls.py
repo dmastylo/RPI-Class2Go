@@ -113,25 +113,23 @@ urlpatterns = patterns('',
 
 
     #Problem Sets
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exercises/(?P<exercise_name>.+)$', 'problemsets.views.read_exercise'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/load_problem_set?$', 'problemsets.views.load_problem_set'),
-
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/?$', 'problemsets.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)?$', 'problemsets.views.show'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/manage_exercises?$', 'problemsets.views.manage_exercises'),
-
-    url(r'^add_problemset_exercise/?$', 'problemsets.views.add_exercise'),
-    url(r'^add_existing_problemset_exercises/?$', 'problemsets.views.add_existing_exercises'),
-
-    url(r'^delete_problemset/?', 'problemsets.actions.delete_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/createproblemset/?$', 'problemsets.views.create_form'),
     url(r'^createproblemsetaction/?', 'problemsets.views.create_action'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/edit?$', 'problemsets.views.edit_form'),
     url(r'^editproblemsetaction/?', 'problemsets.views.edit_action'),
-    url(r'^edit_publish_action/?', 'problemsets.views.edit_publish_action'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/manage_exercises?$', 'problemsets.views.manage_exercises'),
+    url(r'^add_existing_problemset_exercises/?$', 'problemsets.views.add_existing_exercises'),
     url(r'^save_problemset_exercises/?', 'problemsets.views.save_exercises'),
-    url(r'^save_and_publish_problemset_exercises/?', 'problemsets.views.save_and_publish_exercises'),
     url(r'^delete_exercise/?', 'problemsets.views.delete_exercise'),
-    url(r'^revert_problemset/?', 'problemsets.views.revert_problemset'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/modelcreate/?$', 'problemsets.views.model_create_form'),
+    url(r'^delete_problemset/?', 'problemsets.actions.delete_problemset'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exercises/(?P<exercise_name>.+)$', 'problemsets.views.read_exercise'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/load_problem_set?$', 'problemsets.views.load_problem_set'),
+
+
+    #Files
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/files/upload$', 'courses.files.views.upload'),
+    url(r'^upload_file/?', 'courses.files.actions.upload'),
+    url(r'^delete_file/?', 'courses.files.actions.delete_file'),
 )

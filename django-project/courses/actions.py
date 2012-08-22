@@ -102,7 +102,13 @@ def change_live_datetime(request):
             page.image.live_datetime = new_live_datetime
             page.save()
             page.image.save()
-            
+        elif parts[0] == 'file':
+            file = File.objects.get(id=parts[1])
+            file.live_datetime = new_live_datetime
+            file.image.live_datetime = new_live_datetime
+            file.save()
+            file.image.save()
+  
     return redirect(request.META['HTTP_REFERER'])
 
 def is_member_of_course(course, user):
