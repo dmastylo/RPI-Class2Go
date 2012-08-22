@@ -2,7 +2,7 @@
     <tr id="additional_page_{{item.additional_page.id}}">
         <td width="20"><input type="checkbox" name="additionalpage_{{item.additional_page.id}}" id="additionalpage_{{item.additional_page.id}}" class="item_selector section_{{item.additional_page.section.id}}_item_selector" /></td>
         <td width="50%"><i class="icon-book" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a id="additionalpage_{{item.additional_page.id}}_title" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4></td>
-        <td width="20%">
+        <td width="250">
             {% if item.additional_page.is_synced %}
             <div style="color: #00A000; padding: 0px;">
                 <i class="icon-ok" style="font-size:17px"></i> Published
@@ -13,9 +13,10 @@
             </div>
             {% endif %}
         </td>
-        <td style="width: 25%">
+        <td width="100">
             {% autoescape off %}{{ item.visible_status }}{% endautoescape %}
         </td>
+        <td width="50"></td>
         <td width="20">
             <a href="javascript:DeleteAdditionalPage('{{item.additional_page.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
         </td>
