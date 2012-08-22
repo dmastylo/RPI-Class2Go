@@ -16,6 +16,7 @@ import urllib2, urllib, json
 import re
 
 from datetime import datetime
+from courses.actions import auth_view_wrapper
     
 ### Videos ###
 
