@@ -1,0 +1,44 @@
+{% extends "course_base.html" %}
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span12">
+  <h3>Upload File</h3>
+  <form action="{% url 'courses.files.actions.upload' %}" method="POST" enctype="multipart/form-data">
+    <fieldset class="well">
+      {% for field in form %}
+        <div class="fieldWrapper">
+          {{ field.errors }}
+          {% if field.name == "live_datetime" %}
+            <b>Set Live Date</b> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
+            <div id="live_date" style="display:none">{{ field }}</div>
+          {% else %}
+            {{ field.label_tag }}
+            {{ field }}
+          {% endif %}
+          {% if field.help_text %}
+            <span class="help-block">{{ field.help_text }}</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </fieldset>
+    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+    {% csrf_token %}
+    <input type="submit" value="Upload" class="btn"/>
+  </form>
+</div>
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script>
+function showLiveDate(checked) {
+    if (checked) {
+        $("#live_date").show('fast');
+    }
+    else {
+        $("#id_live_datetime").val(null);
+        $("#live_date").hide('fast');
+    }
+}
+</script>
+{% endblock addl_scripts %}

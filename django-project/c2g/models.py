@@ -31,7 +31,8 @@ def get_file_path(instance, filename):
         return os.path.join(str(parts[0]), str(parts[1]), 'exercises', filename)
     if isinstance(instance, Video):
         return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
-
+    if isinstance(instance, File):
+        return os.path.join(str(parts[0]), str(parts[1]), 'files', filename)
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -46,7 +47,7 @@ class TimestampMixin(models.Model):
 class Stageable(models.Model):
     mode = models.TextField(blank=True)
     image = models.ForeignKey('self', null=True, related_name="+")
-    live_datetime = models.DateTimeField(editable=True, null=True)
+    live_datetime = models.DateTimeField(editable=True, null=True, blank=True)
 
     class Meta:
        abstract = True
@@ -341,6 +342,43 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
     class Meta:
         db_table = u'c2g_additional_pages'
 
+class FileManager(models.Manager):
+    def getByCourse(self, course):
+        if course.mode == 'staging':
+            return self.filter(course=course,is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    section = models.ForeignKey(ContentSection, null=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    file = models.FileField(upload_to=get_file_path)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+    objects = FileManager()
+
+    def create_production_instance(self):
+        production_instance = File(
+            course=self.course.image,
+            section=self.section.image,
+            title=self.title,
+            file=self.file,
+            image = self,
+            index = self.index,
+            mode = 'production',
+            handle = self.handle,
+            live_datetime = self.live_datetime,
+        )
+        production_instance.save()
+        self.image = production_instance
+        self.save()
+
+    def dl_link(self):
+        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+
+    class Meta:
+        db_table = u'c2g_files'
 
 class AnnouncementManager(models.Manager):
     def getByCourse(self, course):
