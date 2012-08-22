@@ -365,16 +365,38 @@ small.date {
 
 /* Footer
 -------------------------------------------------- */
+
+#global-footer {
+    background:#8C1515 url(/static/graphics/core/shadow-footer-bg.png) top center no-repeat;
+    width:100%;
+}
+#bottom-logo {
+    margin-top:3px;
+}
+
 .footer {
     margin-top: 45px;
     padding: 35px 0 36px;
-    border-top: 1px solid #e5e5e5;
-    background:red;
 }
-.footer p {
-    margin-bottom: 0;
-    color: #555;
+.footer ul {
+    overflow:hidden;
 }
+.footer ul a {
+    color: #fff;
+}
+.footer ul li {
+    float:left;
+    margin: 0 1em 0 0;
+    padding: 0 1em 0 0;
+}
+.footer .vcard {
+    font-size: 11px;
+    color:#fff;
+    clear:left;
+}
+
+
+
 ul.exercise-list {
     margin:10px 0 !important;
 }
