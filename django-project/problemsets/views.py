@@ -24,7 +24,6 @@ def list(request, course_prefix, course_suffix):
         raise Http404
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
-
     return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list'}, context_instance=RequestContext(request))
 
 def show(request, course_prefix, course_suffix, pset_slug):
@@ -180,7 +179,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     data = {'common_page_data': common_page_data}
-    form = ManageExercisesForm()
+    form = ManageExercisesForm(initial={'course':common_page_data['course'].id})
     pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(pset).select_related('exercise', 'problemSet')
     used_exercises = []

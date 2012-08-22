@@ -31,6 +31,7 @@ function confirm_change(){
         <div class="fieldWrapper">
             {{ form.file.errors }}
             {{ form.file }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            {{ form.course }}
             <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
