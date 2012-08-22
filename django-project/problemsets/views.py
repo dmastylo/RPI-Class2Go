@@ -209,6 +209,26 @@ def model_exercises(request, course_prefix, course_suffix, pset_slug):
         used_exercises.append(psetToEx.exercise.id)
     #Get all the exercises in the course but not in this problem set to list in add from existing
     exercises = Exercise.objects.all().filter(problemSet__course=common_page_data['course']).exclude(id__in=used_exercises).distinct()
+
+
+    if request.method == 'POST':
+        form = ManageExercisesForm(request.POST, request.FILES)
+        if form.is_valid():
+            pset = ProblemSet.objects.get(id=request.POST['pset_id'])
+            file_content = request.FILES['file']
+            file_name = file_content.name
+
+            exercise = Exercise()
+            exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
+            exercise.fileName = file_name
+            exercise.file.save(file_name, file_content)
+            exercise.save()
+
+            index = len(ProblemSetToExercise.objects.getByProblemset(pset))
+            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='staging')
+            psetToEx.save()
+            return HttpResponseRedirect(reverse('problemsets.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
+
     data['form'] = form
     data['course_prefix'] = course_prefix
     data['course_suffix'] = course_suffix
@@ -244,7 +264,7 @@ def model_add_exercise(request, course_prefix, course_suffix, pset_slug):
     else:
         form = ManageExercisesForm()
     data['form'] = form
-    pset = ProblemSet.objects.getByCourse(common_page_data['course'])
+    pset = ProblemSet.objects.getByCourse(common_page_data['course']).get(slug=pset_slug)
     data['pset'] = pset
     return render_to_response('problemsets/model_manage_exercises.html', data, context_instance=RequestContext(request))
 

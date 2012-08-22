@@ -33,13 +33,6 @@
 	                {{ form.description}}
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label">When will this problem set go live?*</label>
-                <div class="controls">
-                    {{ form.live_datetime.errors }}
-	                {{ form.live_datetime}}
-                </div>
-            </div>
         </fieldset>
         <h4>Deadlines and Penalties</h4>
         <fieldset class="well">
@@ -94,6 +87,14 @@
                     {{ form.resubmission_penalty }}
                 </div>
             </div>
+            <div class="control-group">
+                <label class="control-label">Live Date</label>
+                <div class="controls">
+                    {{ form.live_datetime.errors }}
+	                {{ form.live_datetime}}
+                    <span class="help-block">Leave blank to set live date at a later time</span>
+                </div>
+            </div>
         </fieldset>
 
 
@@ -103,7 +104,7 @@
                 var attempts_permitted = document.getElementById("id_submissions_permitted");
                 var attempt_penalty = document.getElementById("id_resubmission_penalty");
                 attempts_permitted.value = default_attempts_permitted;
-                attempt_penalty.setAttribute("value", default_attempt_penalty);
+                attempt_penalty.value = default_attempt_penalty;
             }
             var formative = document.getElementById("id_assessment_type_0"); 
             var assessive = document.getElementById("id_assessment_type_1");

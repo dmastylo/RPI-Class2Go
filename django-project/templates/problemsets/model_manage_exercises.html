@@ -22,7 +22,7 @@ function confirm_change(){
     <h3>Add or Remove Exercises</h3>
 
     <h4>Upload Exercises to {{pset.title}}</h4>
-    <form action= {% url 'problemsets.views.model_add_exercise' course_prefix course_suffix pset.slug %} method="POST" class="form-vertical" enctype="multipart/form-data">
+    <form action= {% url 'problemsets.views.model_exercises' course_prefix course_suffix pset.slug %} method="POST" class="form-vertical" enctype="multipart/form-data">
         <fieldset class="well">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
@@ -54,10 +54,10 @@ function confirm_change(){
         <span class="help-block">After reordering, save before uploading another exercise</span>
     </fieldset>
         <div class="form-actions">
-            <input type="submit" value="Save" onclick="form.action='{% url 'problemsets.views.save_exercises' %}';" class="btn">
-            <input type="submit" value="Save and Publish" onclick="form.action='{% url 'problemsets.views.save_and_publish_exercises' %}';" class="btn">
-            <input type="submit" value="Revert" onclick="form.action='{% url 'problemsets.views.revert_problemset' %}';" class="btn">
-            <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+            <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
+	        <input type="submit" name="action" value="Save as Draft" class="btn" />
+	        <input type="submit" name="action" value="Revert" class="btn" />
+	        <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
         </div>
     </form>
 </div>
