@@ -9,8 +9,6 @@ from courses.common_page_data import get_common_page_data
 from c2g.models import *
 from random import randrange
 from datetime import datetime
-import logging
-logger = logging.getLogger(__name__)
 from django.utils.functional import wraps
 
 def switch_mode(request):

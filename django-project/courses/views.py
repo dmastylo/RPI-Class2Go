@@ -6,8 +6,6 @@ from c2g.models import *
 from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 import re
-
-
 from courses.actions import auth_view_wrapper
 
 def index(item): # define a index function for list items

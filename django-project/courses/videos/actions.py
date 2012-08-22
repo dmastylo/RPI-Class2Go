@@ -16,6 +16,7 @@ import urllib2, urllib, json
 import re
 
 from datetime import datetime
+from courses.actions import auth_view_wrapper
     
 ### Videos ###
 
@@ -91,9 +92,10 @@ def delete_video(request):
     
     return redirect(request.META['HTTP_REFERER'])
     
+@auth_view_wrapper    
 def save_video_progress(request):
-    videoRec = request.POST['videoRec']
-    playTime = request.POST['playTime']
+    videoRec = request.common_page_data['videoRec']
+    playTime = request.common_page_data['playTime']
     video = VideoActivity.objects.get(id=videoRec)
     video.start_seconds = playTime
     video.save()
