@@ -77,8 +77,6 @@ urlpatterns = patterns('',
 
     # Forums
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/forums/?$', 'courses.forums.views.view'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/forums/inner?$', 'courses.forums.views.piazza_iframe'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/forums/admin/?', 'courses.forums.views.admin'),
 
     # Sections
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/sections/reorder/?$', 'courses.content_sections.views.reorder'),
