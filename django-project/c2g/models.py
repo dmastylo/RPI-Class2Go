@@ -502,6 +502,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             slug=self.slug,
             file=self.file,
             image = self,
+            index = self.index,
             mode = 'production',
             handle = self.handle,
             live_datetime = self.live_datetime,

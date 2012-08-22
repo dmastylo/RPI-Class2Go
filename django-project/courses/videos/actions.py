@@ -1,9 +1,8 @@
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
 from c2g.models import Course, Video
 from django.template import RequestContext
-from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 from c2g.models import Course, Video, VideoActivity
@@ -163,6 +162,7 @@ def upload(request):
     data = {'common_page_data': common_page_data}
 
     if request.method == 'POST':
+        # Need partial instance with course for form slug validation
         new_video = Video(course=common_page_data['course'])
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=new_video)
         if form.is_valid():

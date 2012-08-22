@@ -11,7 +11,6 @@ class S3UploadForm(forms.ModelForm):
         course = kwargs.pop('course')
         super(S3UploadForm, self).__init__(*args, **kwargs)
         self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course), empty_label=None)
-        self.fields['live_datetime'].required = False
 
     class Meta:
         model = Video

@@ -28,7 +28,7 @@ def list(request, course_prefix, course_suffix):
         video.save()
         video.create_production_instance()
 
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=False)
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True)
 
     return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'video_list'}, context_instance=RequestContext(request))
 
