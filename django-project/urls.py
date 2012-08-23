@@ -111,6 +111,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_-]+)/?$', 'courses.video_exercises.views.view'),
     url(r'^get_video_exercises/?$', 'courses.videos.views.get_video_exercises'),
 
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/(?P<video_slug>[a-zA-Z0-9_-]+)/model_exercises?$', 'courses.videos.views.model_exercises'),
 
     #Problem Sets
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/?$', 'problemsets.views.list'),

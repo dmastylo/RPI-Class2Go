@@ -871,12 +871,11 @@ class ProblemSetToExercise(Deletable, models.Model):
         db_table = u'c2g_problemset_to_exercise'
 
 
-class VideoToExercise(models.Model):
+class VideoToExercise(Deletable, models.Model):
     video = models.ForeignKey(Video)
     exercise = models.ForeignKey(Exercise)
-    number = models.IntegerField(null=True, blank=True)
-    is_deleted = models.BooleanField()
-    video_time = models.IntegerField(null=True, blank=True)
+    video_time = models.IntegerField()
+    mode = models.TextField(blank=True)
     def __unicode__(self):
         return self.video.title + "-" + self.exercise.fileName
     class Meta:

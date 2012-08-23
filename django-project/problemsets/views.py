@@ -8,6 +8,7 @@ from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
+from django.db.models import Q
 
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
@@ -180,7 +181,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
         raise Http404
     data = {'common_page_data': common_page_data}
     form = ManageExercisesForm(initial={'course':common_page_data['course'].id})
-    pset = ProblemSet.objects.get(course=common_page_data['course'], slug=pset_slug)
+    pset = ProblemSet.objects.getByCourse(common_page_data['course']).get(slug=pset_slug)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(pset).select_related('exercise', 'problemSet')
     used_exercises = []
     problemset_taken = False
@@ -190,7 +191,8 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     for psetToEx in psetToExs:
         used_exercises.append(psetToEx.exercise.id)
     #Get all the exercises in the course but not in this problem set to list in add from existing
-    exercises = Exercise.objects.all().filter(problemSet__course=common_page_data['course']).exclude(id__in=used_exercises).distinct()
+    #Q objects allow queryset filters to be ORed together
+    exercises = Exercise.objects.all().filter(Q(problemSet__course=common_page_data['course'])|Q(video__course=common_page_data['course'])).exclude(id__in=used_exercises).distinct()
 
     #Form processing action if form was submitted
     if request.method == 'POST':
