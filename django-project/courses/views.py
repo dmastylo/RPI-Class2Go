@@ -76,7 +76,7 @@ def course_materials(request, course_prefix, course_suffix):
     except:
         raise Http404
 
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True)
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
     
     return render_to_response('courses/'+common_page_data['course_mode']+'/course_materials.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'course_materials'}, context_instance=RequestContext(request))
 

@@ -96,17 +96,8 @@
                 	{% endfor %}
                 {% endblock %}
                 
-            <script type="text/javascript">
-                function signup_clicked(course) {
-                    r = confirm("Please confirm you wish to join class " + course + "?")
-                    if (!r) return;
-                    document.forms.signup.submit();
-                }
-                </script>
+                {% block m_column_content %}{% endblock %}
                 
-                {% block m_column_content %}    	                
-                {% endblock %}
-
                 {% block r_column_content %}{% endblock %}
             </div>
         </div>
