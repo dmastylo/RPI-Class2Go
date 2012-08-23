@@ -127,4 +127,10 @@ urlpatterns = patterns('',
     url(r'^delete_problemset/?', 'problemsets.actions.delete_problemset'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exercises/(?P<exercise_name>.+)$', 'problemsets.views.read_exercise'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<pset_slug>[a-zA-Z0-9_-]+)/load_problem_set?$', 'problemsets.views.load_problem_set'),
+
+
+    #Files
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/files/upload$', 'courses.files.views.upload'),
+    url(r'^upload_file/?', 'courses.files.actions.upload'),
+    url(r'^delete_file/?', 'courses.files.actions.delete_file'),
 )
