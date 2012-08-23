@@ -5,21 +5,23 @@
         <td width="240">
             {% if item.video.is_synced %}
             <div style="color: #00A000; padding: 0px;">
-                <i class="icon-ok" style="font-size:17px"></i> Published
+                <i class="icon-ok" style="font-size:17px"></i> Working=Ready
             </div>
             {% else %}
             <div style="color: #A07000; padding: 0px;">
-                <i class="icon-random" style="font-size:17px"></i> Draft has unpublished changes
+                <i class="icon-random" style="font-size:17px"></i> Working Version Different From Ready
             </div>
             {% endif %}
         </td>
         <td width="70">
             {% autoescape off %}{{ item.visible_status }}{% endautoescape %}
         </td>
-    	<td width="120">
-    	    <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">Edit Video</a>
+    	<td width="60">
+    	    <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">Edit</a>
     	</td>
-        <td width="120"></td>
+        <td width="120">
+            <a href="{% url 'courses.videos.views.manage_exercises' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">Manage Exercises</a>
+        </td>
         <td width="20">
             <a href="javascript:DeleteVideo('{{item.video.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
         </td>
