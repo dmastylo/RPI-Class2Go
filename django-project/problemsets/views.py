@@ -155,7 +155,7 @@ def edit_action(request):
         pset = ProblemSet.objects.get(id=pset_id)
 
         action = request.POST['action']
-        if action == "Revert":
+        if action == "Reset to Ready":
             pset.revert()
             form = CreateProblemSet(course=common_page_data['course'], instance=pset)
         else:
@@ -164,7 +164,7 @@ def edit_action(request):
                 form.save()
                 pset.path = "/"+course_prefix+"/"+course_suffix+"/problemsets/"+pset.slug+"/load_problem_set"
                 pset.save()
-                if action == "Save and Publish":
+                if action == "Save and Set as Ready":
                     pset.commit()
                 return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
 
@@ -256,7 +256,7 @@ def save_exercises(request):
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     action = request.POST['action']
-    if action == 'Revert':
+    if action == 'Reset to Ready':
         pset.revert()
         return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
     else:
@@ -265,7 +265,7 @@ def save_exercises(request):
             listName = "exercise_order[" + str(n) + "]"
             psetToExs[n].number = request.POST[listName]
             psetToExs[n].save()
-        if action == 'Save and Publish':
+        if action == 'Save and Set as Ready':
             pset.commit()
         return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'])))
 
