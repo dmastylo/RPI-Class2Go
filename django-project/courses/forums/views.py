@@ -6,6 +6,8 @@ from courses.common_page_data import get_common_page_data
     
 from courses.forums.forms import PiazzaAuthForm
 
+from django.contrib.auth.models import User
+
 import httplib 
 from OAuthSimple import OAuthSimple
 from urlparse import urlparse
@@ -32,7 +34,7 @@ def view(request, course_prefix, course_suffix):
         "resource_link_title": "Weekly Blog",
         "resource_link_description": "A weekly blog.",
         "user_id": "8321264",
-        "lis_person_contact_email_primary": "sef@cs.stanford.edu",
+        "lis_person_contact_email_primary": request.user.email,
         "lis_person_sourcedid": "school.edu:user",
         "tool_consumer_instance_description": "University of School (LMSng)",
         "launch_presentation_return_url": "http://example.com/lti_return",
