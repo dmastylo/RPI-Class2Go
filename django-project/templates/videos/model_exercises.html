@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
 function confirm_change(){
-    if ("{{problemset_taken}}" == "False"){
+    if ("{{exercise_attempted}}" == "False"){
         return true;
     }   
     var r=confirm("WARNING: Students have already begun taking this problem set. Adding exercises can ruin the integrity of the results. Are you sure you wish to make this change?")
@@ -21,25 +21,30 @@ function confirm_change(){
 <div id="c2g_layout_m_column" class="span12">
     <h3>Add or Remove Exercises</h3>
 
-    <h4>Upload Exercises to {{pset.title}}</h4>
-    <form action= {% url 'problemsets.views.manage_exercises' course_prefix course_suffix pset.slug %} method="POST" class="form-vertical" enctype="multipart/form-data">
+    <h4>Upload Exercises to {{video.title}}</h4>
+    <form action= {% url 'courses.videos.views.model_exercises' course_prefix course_suffix video.slug %} method="POST" class="form-vertical" enctype="multipart/form-data">
         <fieldset class="well">
         {% csrf_token %}
-        <input type="hidden" name="pset_id" value={{pset.id}}>
+        <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <div class="fieldWrapper">
             {{ form.file.errors }}
-            {{ form.file }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            {{ form.file }}
             {{ form.course }}
+            <span class="help-block">{{ field.help_text }}</span>
+        </div>
+        <div class="fieldWrapper">
+            {{ form.video_time.errors }}
+            Video Time (s):{{ form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
             <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
 
     <h4><a data-toggle="collapse" data-target="#choose-existing" class='btn'>Choose From Existing Exercises</a></h4>
-    <form action= {% url 'problemsets.views.add_existing_exercises' %} method="POST" class="form-vertical">
+    <form action= {% url 'courses.videos.views.add_existing_exercises' %} method="POST" class="form-vertical">
         {% csrf_token %}
-        <input type="hidden" name="pset_id" value={{pset.id}}>
+        <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <div id="choose-existing" class="collapse">
@@ -56,17 +61,17 @@ function confirm_change(){
         </div>
     </form>
 
-    <form action= {% url 'problemsets.views.save_exercises' %} method="POST" class="form-vertical">
+    <form action='' method="POST" class="form-vertical">
         {% csrf_token %}
-        <input type="hidden" name="pset_id" value={{pset.id}}>
+        <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <ul data-sortablecontainer class="exercise-list">
-            {% for psetToEx in psetToExs %}
+            {% for videoToEx in videoToExs %}
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
-                    {{psetToEx.exercise.fileName}}
+                {{videoToEx.exercise.fileName}} - {{videoToEx.video_time}}s
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
-                    <a href="javascript:DeleteExercise('{{psetToEx.id}}', '{{psetToEx.exercise.fileName}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
+                    <!-- Add delete button here -->
                 </li>
             {% empty%}
                 <p style='margin: 20px;'>There are no exercises yet.</p>
@@ -78,7 +83,7 @@ function confirm_change(){
             <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
 	        <input type="submit" name="action" value="Save as Draft" class="btn" />
 	        <input type="submit" name="action" value="Revert" class="btn" />
-	        <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
+	        <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
         </div>
     </form>
 </div>

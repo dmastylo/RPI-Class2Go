@@ -54,7 +54,7 @@
         <ul data-sortablecontainer class="exercise-list">
             {% for videoToEx in videoToExs %}
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
-                    {{videoToEx.exercise.fileName}}
+                {{videoToEx.exercise.fileName}} - {{videoToEx.video_time}}s
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
                 </li>
             {% empty%}

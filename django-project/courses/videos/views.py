@@ -11,6 +11,7 @@ import datetime
 from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
+from django.db.models import Q
 
 from django.template import RequestContext
 
@@ -28,7 +29,7 @@ def list(request, course_prefix, course_suffix):
         video.save()
         video.create_production_instance()
 
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=False)
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True)
 
     return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'video_list'}, context_instance=RequestContext(request))
 
@@ -71,16 +72,6 @@ def GetOAuth2Url(request):
 
     return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type
 
-def GetAuthSubUrl(request):
-
-    next = "http://" + request.META['HTTP_HOST'] + request.path
-    scope = 'http://gdata.youtube.com'
-    secure = False
-    session = True
-
-    yt_service = gdata.youtube.service.YouTubeService()
-    return yt_service.GenerateAuthSubURL(next, scope, secure, session)
-
 def upload(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -96,32 +87,55 @@ def upload(request, course_prefix, course_suffix):
                               data,
                               context_instance=RequestContext(request))
 
+def model_exercises(request, course_prefix, course_suffix, video_slug):
+    #Get all necessary information about the problemset
+    try:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    except:
+        raise Http404
+    data = {'common_page_data': common_page_data}
+    form = ManageExercisesForm(initial={'course':common_page_data['course'].id})
+    video = Video.objects.getByCourse(common_page_data['course']).get(slug=video_slug)
+    videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=video_slug).order_by('video_time')
+    used_exercises = []
+    exercise_attempted = False
+#    if len(VideoActivity.objects.filter(video_to_exercise__video=video.image)) > 0:
+#        exercise_attempted = True
+    #Get the list of exercises currently in this problem set
+    for videoToEx in videoToExs:
+        used_exercises.append(videoToEx.exercise.id)
+    #Get all the exercises in the course but not in this problem set to list in add from existing
+    #Q objects allow queryset objects to be ORed together
+    exercises = Exercise.objects.all().filter(Q(problemSet__course=common_page_data['course'])|Q(video__course=common_page_data['course'])).exclude(id__in=used_exercises).distinct()
 
-    #OLD YOUTUBE UPLOAD
-    if 'token' in request.GET:
-        token = request.GET['token']
-        data['token'] = token
+    #Form processing action if form was submitted
+    if request.method == 'POST':
+        form = ManageExercisesForm(request.POST, request.FILES)
+        if form.is_valid():
+            video = Video.objects.get(id=request.POST['video_id'])
+            file_content = request.FILES['file']
+            file_name = file_content.name
 
-        yt_service = gdata.youtube.service.YouTubeService()
-        #yt_service.developer_key = 'AI39si5GlWcy9S4eVFtajbVZk-DjFEhlM4Zt7CYzJG3f2bwIpsBSaGd8SCWts6V5lbqBHJYXAn73-8emsZg5zWt4EUlJJ4rpQA'
-        #yt_service.SetAuthSubToken(token)
-        #yt_service.UpgradeToSessionToken()
+            exercise = Exercise()
+            exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
+            exercise.fileName = file_name
+            exercise.file.save(file_name, file_content)
+            exercise.save()
 
-        yt_logged_in = True
-        form = VideoUploadForm(course=common_page_data['course'])
-        data['form'] = form
-    else:
-        # user is not logged into google account for youtube
-        yt_logged_in = False
-        authSubUrl = GetAuthSubUrl(request)
-        #authSubUrl = GetOAuth2Url(request)
-        data['authSubUrl'] = authSubUrl
+            video_time = request.POST['video_time']
+            videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='staging')
+            videoToEx.save()
+            return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
-    data['yt_logged_in'] = yt_logged_in
-    return render_to_response('videos/upload.html',
-                              data,
-                              context_instance=RequestContext(request))
-
+    #If form was not submitted then the form should be displayed or if there were errors the page needs to be rendered again
+    data['form'] = form
+    data['course_prefix'] = course_prefix
+    data['course_suffix'] = course_suffix
+    data['video'] = video
+    data['videoToExs'] = videoToExs
+    data['exercise_attempted'] = exercise_attempted
+    data['exercises'] = exercises
+    return render_to_response('videos/model_exercises.html', data, context_instance=RequestContext(request))
 
 def manage_exercises(request, course_prefix, course_suffix, video_slug):
     try:
@@ -129,7 +143,7 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
     except:
         raise Http404
     video = Video.objects.get(course=common_page_data['course'], slug=video_slug)
-    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('number')
+    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')
     added_exercises = video.exercise_set.all()
     exercises = Exercise.objects.filter(video__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
     return render_to_response('videos/manage_exercises.html',
