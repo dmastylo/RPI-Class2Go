@@ -24,15 +24,14 @@ def view(request, course_prefix, course_suffix):
     except:
         raise Http404
 
-    # import pdb; pdb.set_trace()
     lti_params = {
         "lti_message_type": "basic-lti-launch-request",
         "lti_version": "LTI-1p0",
+
         "resource_link_id": "120988f929-274612",
         "resource_link_title": "Weekly Blog",
         "resource_link_description": "A weekly blog.",
         "user_id": "8321264",
-        "lis_person_name_full": "Jane Q. Public",
         "lis_person_contact_email_primary": "sef@cs.stanford.edu",
         "lis_person_sourcedid": "school.edu:user",
         "tool_consumer_instance_description": "University of School (LMSng)",
@@ -44,7 +43,6 @@ def view(request, course_prefix, course_suffix):
         "context_id": "47264",
         "context_title": "foo",
         "context_type": "bar",
-        "oauth_callback": "about:blank",
     }
 
     # settings for OAuth
@@ -55,10 +53,10 @@ def view(request, course_prefix, course_suffix):
     
     oauthsimple = OAuthSimple()
     signed_request = oauthsimple.sign({
-        "path": database_dot_py_config.PIAZZA_ENDPOINT,
-        "action": 'POST',
-        "parameters": lti_params, 
-        "signatures": signatures,
+        'path': database_dot_py_config.PIAZZA_ENDPOINT,
+        'action': "POST",
+        'parameters': lti_params, 
+        'signatures': signatures,
     })
     # tack the signature along with all the other things we're setting
     lti_params['oauth_signature'] = signed_request['signature']

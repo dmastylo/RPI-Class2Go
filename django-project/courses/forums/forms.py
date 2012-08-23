@@ -20,5 +20,10 @@ class PiazzaAuthForm(forms.Form):
     context_title = forms.CharField()
     context_type = forms.CharField()
     oauth_callback = forms.CharField()
+    oauth_version = forms.CharField()
+    oauth_nonce = forms.CharField()
+    oauth_timestamp = forms.CharField()
+    oauth_consumer_key = forms.CharField()
+    oauth_signature_method = forms.CharField()
     oauth_signature = forms.CharField()
 
