@@ -857,7 +857,7 @@
 
 @media (min-width: 980px) {
   #c2g_layout_topbar {
-    min-height: 89px;
+
   }
   #c2g_layout_topbar .navbar .navbar-inner {
     background:url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
