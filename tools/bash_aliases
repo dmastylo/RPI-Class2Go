@@ -1,10 +1,10 @@
 # source this from your login shell
 
-hoststage="app"
-hostprod="app"
+hoststage="app1"
+hostprod="app1"
 
 function prodapp {
-    ssh-add -l | grep -q "c2g-prod" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
+    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
     ssh -A bitnami@${hostprod}.prod.c2gops.com
 }
 

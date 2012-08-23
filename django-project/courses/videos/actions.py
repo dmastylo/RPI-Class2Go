@@ -1,9 +1,8 @@
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
 from c2g.models import Course, Video
 from django.template import RequestContext
-from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 from c2g.models import Course, Video, VideoActivity
@@ -62,28 +61,18 @@ def edit_video(request):
         if action == "Revert":
             video.revert()
             form = S3UploadForm(course=common_page_data['course'], instance=video)
-            if video.live_datetime:
-                live_date = video.live_datetime.strftime('%m/%d/%Y %H:%M')
-            else:
-                live_date = ''
         else:
             form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
             if form.is_valid():
-                if request.POST.get("set_live_date"):
-                    video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
-                else:
-                    video.live_datetime = None
                 form.save()
                 if action == "Save and Publish":
                     video.commit()
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
-            live_date = request.POST['live_date']
 
     return render(request, 'videos/edit.html',
                   {'common_page_data': common_page_data,
                    'slug': slug,
                    'form': form,
-                   'live_date': live_date,
                    })
 
 def delete_video(request):
@@ -108,15 +97,6 @@ def save_video_progress(request):
     video.start_seconds = playTime
     video.save()
     return HttpResponse("saved")
-
-def GetAuthSubUrl(request):
-    next = request.META['HTTP_REFERER']
-    scope = 'http://gdata.youtube.com'
-    secure = False
-    session = True
-    
-    yt_service = gdata.youtube.service.YouTubeService()
-    return yt_service.GenerateAuthSubURL(next, cope, secure, session)
 
 def oauth(request):
     if 'code' in request.GET:
@@ -182,16 +162,14 @@ def upload(request):
     data = {'common_page_data': common_page_data}
 
     if request.method == 'POST':
-        form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'])
+        # Need partial instance with course for form slug validation
+        new_video = Video(course=common_page_data['course'])
+        form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=new_video)
         if form.is_valid():
             new_video = form.save(commit=False)
-            new_video.course = common_page_data['course']
             new_video.index = new_video.section.getNextIndex()
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
-
-            if request.POST.get("set_live_date"):
-                new_video.live_datetime = datetime.strptime(request.POST['live_date'],'%m/%d/%Y %H:%M')
 
             # Bit of jiggery pokery to so that the id is set when the upload_path function is called.
             # Now storing file with id appended to the file path so that thumbnail and associated manifest files
@@ -217,66 +195,3 @@ def upload(request):
     return render_to_response('videos/s3upload.html',
                               data,
                               context_instance=RequestContext(request))
-
-    #old YOUTUBE UPLOAD
-    if request.method == 'POST':
-        form = VideoUploadForm(request.POST, course=common_page_data['course'])
-        if form.is_valid():
-            yt_service = gdata.youtube.service.YouTubeService()
-            token = request.POST.get("token")
-            yt_service.SetAuthSubToken(token)
-            yt_service.UpgradeToSessionToken()
-
-
-            video_title = form.cleaned_data['title']
-            video_description = form.cleaned_data['description']
-            video_slug = form.cleaned_data['url_name']
-            video_section = form.cleaned_data['section']
-
-
-            video = Video(
-                course=common_page_data['course'],
-                section=video_section,
-                title=video_title,
-                description=video_description,
-                slug=video_slug,
-                index=len(Video.objects.filter(course=common_page_data['course'])),
-                mode='staging',
-            )
-            video.save()
-
-            my_media_group = gdata.media.Group(
-                title=gdata.media.Title(text=video_title),
-                description=gdata.media.Description(description_type='plain',
-                                                    text=video_description),
-                #keywords=gdata.media.Keywords(text=video_tags),
-                category=[gdata.media.Category(
-                        text='Education',
-                        label='Education')],
-                )
-            
-            yt_service.developer_key = 'AI39si5GlWcy9S4eVFtajbVZk-DjFEhlM4Zt7CYzJG3f2bwIpsBSaGd8SCWts6V5lbqBHJYXAn73-8emsZg5zWt4EUlJJ4rpQA'
-
-            video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
-            response = yt_service.GetFormUploadToken(video_entry)
-            
-            post_url = response[0]
-            youtube_token = response[1]
-
-            data['post_url'] = post_url
-            data['youtube_token'] = youtube_token
-            data['next'] = "http://localhost:8000/nlp/Fall2012/videos?vid="+str(video.id)
-
-            
-            #return redirect(request.META['HTTP_REFERER'])
-    else:
-        form = VideoUploadForm(course=common_page_data['course'])
-    
-    data['token'] = request.POST.get("token")
-    data['form'] = form
-    data['yt_logged_in'] = True
-    
-    return render_to_response('videos/upload.html',
-                              data,
-                              context_instance=RequestContext(request))
-

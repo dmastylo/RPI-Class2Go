@@ -11,20 +11,23 @@
         {% for field in form %}
           <div class="fieldWrapper">
             {{ field.errors }}
-            {{ field.label_tag }}
-            {{ field }}
-            <span class="help-block">{{ field.help_text }}</span>
-          </div>
-        {% endfor %}
-	  <div class="fieldWrapper">
-	    <label style="display:inline">Live Date</label>
-	    {% if live_date %}
-	    <input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" checked />
+	    {% if field.name == "live_datetime" %}
+	      <b>Live Date</b>
+	      {% if field.value %}
+	        <input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" checked />
+	      {% else %}
+		<input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" />
+	      {% endif %}
+	      <div>{{ field }}</div>
 	    {% else %}
-	    <input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" />	    
+              {{ field.label_tag }}
+              {{ field }}
 	    {% endif %}
-	    <div><input type="datetime" name="live_date" value="{{live_date}}" data-datetimepicker /></div>
+	    {% if field.help_text %}
+              <span class="help-block">{{ field.help_text }}</span>
+            {% endif %}
 	  </div>
+        {% endfor %}
 	</fieldset>
         <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
         <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />	
@@ -45,10 +48,10 @@
 <script>
 function toggleLiveDate(checked) {
     if (checked) {
-        $('[name=live_date]').focus();
+        $("#id_live_datetime").focus();
     }
     else {
-        $('[name=live_date]').val(null);
+        $("#id_live_datetime").val(null);
     }
 }
 </script>

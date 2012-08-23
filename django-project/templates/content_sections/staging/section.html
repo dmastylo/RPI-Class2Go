@@ -1,8 +1,8 @@
 <div class="row-fluid">
     <div class="span12">
         <h3 class="pull-left">{{section_structure.section.title}}</h3>
-        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')"><i class="icon-trash icon-large" style="margin-left:10px;"></i> Delete Section</a>
-        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}"><i class="icon-edit icon-large"></i> Rename Section</a>
+        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')"><i class="icon-trash icon-large" style="margin-left:10px;"></i>Delete Section</a>
+        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}"><i class="icon-edit icon-large" style="margin-right:4px"></i>Rename Section</a>
     </div>
 </div>
 
@@ -37,6 +37,12 @@
                     <input type="hidden" name="order_video_{{item.video.id}}" value="{{forloop.counter0}}" />
                 </li>
             {% endifequal %}
+	    {% ifequal item.type 'file' %}
+		<li id="file_{{item.file.id}}" class="ui-state-default" style="padding: 3px;">
+		    {% include "files/staging/file_list_item.html" %}
+		    <input type="hidden" name="order_file_{{item.file.id}}" value="{{forloop.counter0}}" />
+		</li>
+	    {% endifequal %}
         {% empty %}
             <p style='margin: 20px;'>No items have been added to this section</p>
         {% endfor %}
