@@ -48,6 +48,9 @@ def create_users():
     for i in range(3):
         professors.append(User.objects.create_user('professor_' + str(i)))
         professors[i].set_password('class2go')
+        professors[i].first_name = "Tess"
+        professors[i].last_name = "Teacher"
+        professors[i].email = "professor_%d@stanford.edu" % i
         professors[i].is_staff = 1
         professors[i].save()
 
@@ -56,6 +59,9 @@ def create_users():
     for i in range(3):
         tas.append(User.objects.create_user('ta_' + str(i)))
         tas[i].set_password('class2go')
+        tas[i].first_name = "Alan"
+        tas[i].last_name = "Assistant"
+        tas[i].email = "ta_%d@stanford.edu" % i
         tas[i].save()
 
     # Create Readonly-TA accounts
@@ -63,6 +69,9 @@ def create_users():
     for i in range(3):
         readonly_tas.append(User.objects.create_user('readonly_ta_' + str(i)))
         readonly_tas[i].set_password('class2go')
+        readonly_tas[i].first_name = "Roger"
+        readonly_tas[i].last_name = "Readonly"
+        readonly_tas[i].email = "readonly_ta_%d@stanford.edu" % i
         readonly_tas[i].save()
 
     # Create student accounts
@@ -70,6 +79,9 @@ def create_users():
     for i in range(40):
         students.append(User.objects.create_user('student_' + str(i)))
         students[i].set_password('class2go')
+        students[i].first_name = "Sarah"
+        students[i].last_name = "Student"
+        students[i].email = "student_%d@stanford.edu" % i
         students[i].save()
 
     return {'professors':professors, 'tas':tas, 'readonly_tas':readonly_tas, 'students':students}
