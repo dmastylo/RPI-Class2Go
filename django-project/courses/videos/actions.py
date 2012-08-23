@@ -21,6 +21,8 @@ from django.views.decorators.http import require_POST
     
 ### Videos ###
 
+@require_POST
+@auth_view_wrapper
 def add_video(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -48,6 +50,8 @@ def add_video(request):
     
     return redirect(request.META['HTTP_REFERER'])
 
+@require_POST
+@auth_view_wrapper
 def edit_video(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -78,6 +82,8 @@ def edit_video(request):
                    'form': form,
                    })
 
+@require_POST
+@auth_view_wrapper
 def delete_video(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -158,7 +164,8 @@ def GetOAuth2Url(request, video):
 
     return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type + "&state=" + state
 
-
+@require_POST
+@auth_view_wrapper
 def upload(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")

@@ -5,6 +5,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.contrib.auth.models import User,Group
 from courses.common_page_data import get_common_page_data
+#from actions import auth_view_wrapper
 from django.views.decorators.http import require_POST
 
 from c2g.models import *
@@ -12,12 +13,31 @@ from random import randrange
 from datetime import datetime
 from django.utils.functional import wraps
 
+def auth_view_wrapper(view):
+    @wraps (view)
+    def inner(request, *args, **kw):
+        user = request.user
+        course = request.common_page_data['course']
+        
+        if user.is_authenticated() and not is_member_of_course(course, user):
+            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+        
+        if not user.is_authenticated():
+            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+            
+        return view(request, *args, **kw)
+    return inner
+
+@require_POST
+@auth_view_wrapper
 def switch_mode(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     if common_page_data['can_switch_mode']:
         request.session['course_mode'] = request.POST.get('to_mode')
     return redirect(request.META['HTTP_REFERER'])
-    
+
+@require_POST
+@auth_view_wrapper    
 def add_section(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -35,6 +55,8 @@ def add_section(request):
     
     return redirect(request.META['HTTP_REFERER'])
     
+@require_POST
+@auth_view_wrapper
 def commit(request):
     ids = request.POST.get("commit_ids").split(",")
     for id in ids:
@@ -46,7 +68,9 @@ def commit(request):
         elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).commit()
     return redirect(request.META['HTTP_REFERER'])
-    
+
+@require_POST
+@auth_view_wrapper
 def revert(request):
     ids = request.POST.get("revert_ids").split(",")
     for id in ids:
@@ -58,7 +82,9 @@ def revert(request):
         elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).revert()
     return redirect(request.META['HTTP_REFERER'])
-    
+
+@require_POST
+@auth_view_wrapper
 def change_live_datetime(request):
     ids = request.POST.get("change_live_datetime_ids").split(",")
     
@@ -131,20 +157,6 @@ def signup(request):
         
     return redirect(request.META['HTTP_REFERER'])
 
-def auth_view_wrapper(view):
-    @wraps (view)
-    def inner(request, *args, **kw):
-        user = request.user
-        course = request.common_page_data['course']
-        
-        if user.is_authenticated() and not is_member_of_course(course, user):
-            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
-        
-        if not user.is_authenticated():
-            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
-            
-        return view(request, *args, **kw)
-    return inner
 
     
     
