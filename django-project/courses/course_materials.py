@@ -89,7 +89,10 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             if len(video_recs)>0:
                                 video_rec = video_recs[0]
                                 item['video_rec'] = video_rec
-                                item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
+                                if video.duration:
+                                    item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
+                                else:
+                                    item['completed_percent'] = 0
 
                         section_dict['items'].append(item)
 
