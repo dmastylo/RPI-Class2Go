@@ -8,14 +8,16 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding field 'VideoToExercise.image'
+        db.add_column(u'c2g_video_to_exercise', 'image',
+                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.VideoToExercise'], null=True, blank=True),
+                      keep_default=False)
 
-        # Changing field 'VideoToExercise.video_time'
-        db.alter_column(u'c2g_video_to_exercise', 'video_time', self.gf('django.db.models.fields.IntegerField')(default=1))
 
     def backwards(self, orm):
+        # Deleting field 'VideoToExercise.image'
+        db.delete_column(u'c2g_video_to_exercise', 'image_id')
 
-        # Changing field 'VideoToExercise.video_time'
-        db.alter_column(u'c2g_video_to_exercise', 'video_time', self.gf('django.db.models.fields.IntegerField')(null=True))
 
     models = {
         'auth.group': {
@@ -56,7 +58,7 @@ class Migration(SchemaMigration):
             'index': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'menu_slug': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
@@ -73,7 +75,7 @@ class Migration(SchemaMigration):
             'index': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -87,7 +89,7 @@ class Migration(SchemaMigration):
             'index': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
@@ -105,7 +107,7 @@ class Migration(SchemaMigration):
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'list_publicly': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'readonly_tas_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'readonly_tas_group'", 'to': "orm['auth.Group']"}),
             'student_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'student_group'", 'to': "orm['auth.Group']"}),
@@ -127,6 +129,22 @@ class Migration(SchemaMigration):
             'problemSet': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['c2g.ProblemSet']", 'through': "orm['c2g.ProblemSetToExercise']", 'symmetrical': 'False'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'video': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['c2g.Video']", 'through': "orm['c2g.VideoToExercise']", 'symmetrical': 'False'})
+        },
+        'c2g.file': {
+            'Meta': {'object_name': 'File', 'db_table': "u'c2g_files'"},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
+            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.File']"}),
+            'index': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'c2g.institution': {
             'Meta': {'object_name': 'Institution', 'db_table': "u'c2g_institutions'"},
@@ -184,7 +202,7 @@ class Migration(SchemaMigration):
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'late_penalty': ('django.db.models.fields.IntegerField', [], {}),
-            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'partial_credit_deadline': ('django.db.models.fields.DateTimeField', [], {}),
             'path': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
@@ -235,7 +253,7 @@ class Migration(SchemaMigration):
             'index': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True'}),
@@ -256,6 +274,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'VideoToExercise', 'db_table': "u'c2g_video_to_exercise'"},
             'exercise': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exercise']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.VideoToExercise']", 'null': 'True', 'blank': 'True'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Video']"}),

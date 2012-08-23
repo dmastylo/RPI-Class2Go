@@ -511,6 +511,17 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.image = production_instance
         self.save()
 
+    def exercises_changed(self):
+        production_instance = self.image
+        staging_videoToExs = VideoToExercise.objects.getByVideo(self)
+        production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
+        if len(staging_videoToExs) != len(production_videoToExs):
+            return True
+        for staging_videoToEx in staging_videoToExs:
+            if not staging_videoToEx.image:
+                return True
+        return False
+
     def commit(self, clone_fields = None):
         if self.mode != 'staging': return;
         if not self.image: self.create_production_instance()
@@ -531,6 +542,32 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         production_instance.save()
 
+        if self.exercises_changed() == True:
+            staging_videoToExs =  VideoToExercise.objects.getByVideo(self)
+            production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
+            #Delete all previous relationships
+            for production_videoToEx in production_videoToExs:
+                production_videoToEx.delete()
+                production_videoToEx.save()
+
+        #Create brand new copies of staging relationships
+            for staging_videoToEx in staging_videoToExs:
+                production_videoToEx = VideoToExercise(video = production_instance,
+                                                    exercise = staging_videoToEx.exercise,
+                                                    video_time = staging_videoToEx.video_time,
+                                                    is_deleted = 0,
+                                                    mode = 'production',
+                                                    image = staging_videoToEx)
+                production_videoToEx.save()
+                staging_videoToEx.image = production_videoToEx
+                staging_videoToEx.save()
+
+        else:
+            staging_videoToExs = VideoToExercise.objects.getByVideo(self)
+            for staging_videoToEx in staging_videoToExs:
+                staging_videoToEx.image.video_time = staging_videoToEx.video_time
+                staging_videoToEx.image.save()
+
     def revert(self, clone_fields = None):
         if self.mode != 'staging': return;
 
@@ -550,6 +587,32 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         self.save()
 
+        if self.exercises_changed() == True:
+            staging_videoToExs = VideoToExercise.objects.getByVideo(self)
+            production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
+            #Delete all previous relationships
+            for staging_videoToEx in staging_videoToExs:
+                staging_videoToEx.delete()
+                staging_videoToEx.save()
+
+        #Create brand new copies of staging relationships
+            for production_videoToEx in production_videoToExs:
+                staging_videoToEx = VideoToExercise(video = self,
+                                                    exercise = production_videoToEx.exercise,
+                                                    video_time = production_videoToEx.video_time,
+                                                    is_deleted = 0,
+                                                    mode = 'staging',
+                                                    image = production_videoToEx)
+                staging_videoToEx.save()
+                production_videoToEx.image = staging_videoToEx
+                production_videoToEx.save()
+
+        else:
+            production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
+            for production_videoToEx in production_videoToExs:
+                production_videoToEx.image.video_time = production_videoToEx.video_time
+                production_videoToEx.image.save()
+
     def save(self, *args, **kwargs):
         if not self.duration:
             if self.type == "youtube" and self.url:
@@ -560,6 +623,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def is_synced(self):
         prod_instance = self.image
+        if self.exercises_changed() == True:
+            return False
         if self.title != prod_instance.title:
             return False
         if self.section != prod_instance.section.image:
@@ -572,7 +637,10 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.live_datetime != prod_instance.live_datetime:
             return False
-
+        staging_videoToExs = VideoToExercise.objects.getByVideo(self)
+        for staging_videoToEx in staging_videoToExs:
+            if staging_videoToEx.video_time != staging_videoToEx.image.video_time:
+                return False
         return True
 
     def dl_link(self):
@@ -892,12 +960,12 @@ class Exercise(TimestampMixin, Deletable, models.Model):
         db_table = u'c2g_exercises'
 
 
-class GetPsetToExsByProblemset(models.Manager):
+class GetPsetToExsByProblemset (models.Manager):
     def getByProblemset(self, problemSet):
         return self.filter(problemSet=problemSet,is_deleted=0).order_by('number')
 
 
-class ProblemSetToExercise(Deletable, models.Model):
+class ProblemSetToExercise( Deletable, models.Model):
     problemSet = models.ForeignKey(ProblemSet)
     exercise = models.ForeignKey(Exercise)
     number = models.IntegerField(null=True, blank=True)
@@ -910,11 +978,17 @@ class ProblemSetToExercise(Deletable, models.Model):
         db_table = u'c2g_problemset_to_exercise'
 
 
+class GetVideoToExerciseByVideo(models.Manager):
+    def getByVideo(self, video):
+        return self.filter(video=video, is_deleted=0).order_by('video_time')
+
 class VideoToExercise(Deletable, models.Model):
     video = models.ForeignKey(Video)
     exercise = models.ForeignKey(Exercise)
     video_time = models.IntegerField()
+    image = models.ForeignKey('self',null=True, blank=True)
     mode = models.TextField(blank=True)
+    objects = GetVideoToExerciseByVideo()
     def __unicode__(self):
         return self.video.title + "-" + self.exercise.fileName
     class Meta:
