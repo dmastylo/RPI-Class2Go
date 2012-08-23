@@ -9,9 +9,9 @@
 
         <input type="hidden" name="pset_id" value="{{ pset.id }}" />
         <div class="form-actions">
-	        <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
+	        <input type="submit" name="action" value="Save and Set as Ready" class="btn btn-primary" />
 	        <input type="submit" name="action" value="Save as Draft" class="btn" />
-	        <input type="submit" name="action" value="Revert" class="btn" />
+	        <input type="submit" name="action" value="Reset to Ready" class="btn" />
 	        <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
 	    </div>
     </form>

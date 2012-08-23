@@ -58,14 +58,14 @@ def edit_video(request):
         video = common_page_data['course'].video_set.all().get(slug=slug)
 
         action = request.POST['action']
-        if action == "Revert":
+        if action == "Reset to Ready":
             video.revert()
             form = S3UploadForm(course=common_page_data['course'], instance=video)
         else:
             form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
             if form.is_valid():
                 form.save()
-                if action == "Save and Publish":
+                if action == "Save and Set as Ready":
                     video.commit()
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
 
