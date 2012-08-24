@@ -36,6 +36,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
+    ps.get_grade(request.user)
     problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
     activity_list = []
@@ -56,7 +57,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
 
 @csrf_exempt
 @require_POST
-@auth_view_wrapper
+#@auth_view_wrapper
 def attempt(request, problemId):
     user = request.user
     problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)

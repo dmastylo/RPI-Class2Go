@@ -8,7 +8,7 @@
 #
 
 execute "collectstatic" do
-    cwd "/home/bitnami/class2go/django-project"
+    cwd "/home/bitnami/class2go/main"
     command "python manage.py collectstatic --noinput --clear"
     user "bitnami"
 end
