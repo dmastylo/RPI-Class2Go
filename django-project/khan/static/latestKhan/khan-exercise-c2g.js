@@ -2947,6 +2947,14 @@ var Khan = (function() {
 
             }
 
+            console.log("File is here!");
+            console.log(exercises);
+            if (typeof userPSData == "undefined" || 
+                    $.isEmptyObject(userPSData) || 
+                    typeof userPSData.userAnswer == "undefined") {
+                makeProblem(exercises.length - 1);
+            } 
+
         // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
         }).done(setTimeout(function () { dfd.resolve(); }, 5000));
         /*
@@ -3344,14 +3352,12 @@ var Khan = (function() {
 
             ev.stopPropagation();
             var clickTarget = ev.target;
-            console.log("clickTarget");
-            console.log(clickTarget);
+            // if user clicks on green checkmark icon, find parent card upon which to trigger click
             var thisCard = (clickTarget.tagName == 'li') ? $(clickTarget) : $(clickTarget).closest('li');
             if (thisCard.length == 0) {
                 return;
             } 
-            console.log("thisCard");
-            console.log(thisCard);
+
             // whichever is the current card, make it not the current card
             thisCard.trigger('mouseout');
             if (!thisCard.hasClass('current-question')) {
