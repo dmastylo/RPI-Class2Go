@@ -102,7 +102,8 @@ def upload(request, course_prefix, course_suffix):
                               data,
                               context_instance=RequestContext(request))
 
-<<<<<<< HEAD
+
+@auth_view_wrapper
 def model_exercises(request, course_prefix, course_suffix, video_slug):
     #Get all necessary information about the problemset
     try:
@@ -153,9 +154,8 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     data['exercises'] = exercises
     return render_to_response('videos/model_exercises.html', data, context_instance=RequestContext(request))
 
-=======
+
 @auth_view_wrapper
->>>>>>> perCourseAuthNoRevert
 def manage_exercises(request, course_prefix, course_suffix, video_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
