@@ -45,8 +45,7 @@ def view(request, course_prefix, course_suffix):
         "context_title": "foo",
         "context_type": "bar",
     }
-    # TODO: better test? Different roles for TA's?
-    if request.user.is_staff:
+    if common_page_data['is_course_admin']:
         lti_params['roles'] = "Instructor"
     else:
         lti_params['roles'] = "Student"
@@ -54,12 +53,12 @@ def view(request, course_prefix, course_suffix):
     # Use OAuthSimple to sign the request. Signature just ends up as a few extra parameters 
     # passed along in the form.
     signatures = {
-        'consumer_key': database_dot_py_config.PIAZZA_KEY, 
-        'shared_secret': database_dot_py_config.PIAZZA_SECRET,
+        'consumer_key': PIAZZA_KEY, 
+        'shared_secret': PIAZZA_SECRET,
     }
     oauthsimple = OAuthSimple()
     signed_request = oauthsimple.sign({
-        'path': database_dot_py_config.PIAZZA_ENDPOINT,
+        'path': PIAZZA_ENDPOINT,
         'action': "POST",
         'parameters': lti_params, 
         'signatures': signatures,
@@ -72,6 +71,6 @@ def view(request, course_prefix, course_suffix):
     return render_to_response('forums/piazza.html', {
             'common_page_data': common_page_data, 
             'form': form, 
-            'piazza_target_url': database_dot_py_config.PIAZZA_ENDPOINT
+            'piazza_target_url': PIAZZA_ENDPOINT,
         }, context_instance=RequestContext(request))
 
