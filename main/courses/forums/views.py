@@ -13,10 +13,7 @@ import urllib
 from courses.forums.forms import PiazzaAuthForm
 from django.contrib.auth.models import User
 
-# won't be needed once we remove the dash from the directory name
-# see https://github.com/Stanford-Online/class2go/issues/125
-database_dot_py_config = __import__('django-project.database', globals(), locals(), 
-        ['PIAZZA_ENDPOINT', 'PIAZZA_KEY', 'PIAZZA_SECRET'], -1)
+from main.database import PIAZZA_ENDPOINT, PIAZZA_KEY, PIAZZA_SECRET
 
 @auth_view_wrapper	
 def admin(request, course_prefix, course_suffix):
