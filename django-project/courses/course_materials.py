@@ -22,7 +22,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         if common_page_data['course_mode'] == 'staging':
                             prod_page = page.image
                             if not prod_page.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not open</span>"
+                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
                             else:
                                 if prod_page.live_datetime > datetime.datetime.now():
                                     year = prod_page.live_datetime.year
@@ -30,9 +30,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     day = prod_page.live_datetime.day
                                     hour = prod_page.live_datetime.hour
                                     minute = prod_page.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
-                                    visible_status = "<span style='color:green;'>Open</span>"
+                                    visible_status = "<span style='color:green;'>Live</span>"
 
                             item['visible_status'] = visible_status
 
@@ -46,7 +46,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         if common_page_data['course_mode'] == 'staging':
                             prod_file = file.image
                             if not prod_file.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not open</span>"
+                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
                             else:
                                 if prod_file.live_datetime > datetime.datetime.now():
                                     year = prod_file.live_datetime.year
@@ -54,9 +54,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     day = prod_file.live_datetime.day
                                     hour = prod_file.live_datetime.hour
                                     minute = prod_file.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
-                                    visible_status = "<span style='color:green;'>Open</span>"
+                                    visible_status = "<span style='color:green;'>Live</span>"
 
                             item['visible_status'] = visible_status
 
@@ -71,7 +71,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         if common_page_data['course_mode'] == 'staging':
                             prod_video = video.image
                             if not prod_video.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not open</span>"
+                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
                             else:
                                 if prod_video.live_datetime > datetime.datetime.now():
                                     year = prod_video.live_datetime.year
@@ -79,9 +79,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     day = prod_video.live_datetime.day
                                     hour = prod_video.live_datetime.hour
                                     minute = prod_video.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
-                                    visible_status = "<span style='color:green;'>Open</span>"
+                                    visible_status = "<span style='color:green;'>Live</span>"
 
                             item['visible_status'] = visible_status
                         else:
@@ -89,7 +89,10 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             if len(video_recs)>0:
                                 video_rec = video_recs[0]
                                 item['video_rec'] = video_rec
-                                item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
+                                if video.duration:
+                                    item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
+                                else:
+                                    item['completed_percent'] = 0
 
                         section_dict['items'].append(item)
 
@@ -102,7 +105,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         if common_page_data['course_mode'] == 'staging':
                             prod_problem_set = problem_set.image
                             if not prod_problem_set.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not open</span>"
+                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
                             else:
                                 if prod_problem_set.live_datetime > datetime.datetime.now():
                                     year = prod_problem_set.live_datetime.year
@@ -110,9 +113,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     day = prod_problem_set.live_datetime.day
                                     hour = prod_problem_set.live_datetime.hour
                                     minute = prod_problem_set.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Open %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
-                                    visible_status = "<span style='color:green;'>Open</span>"
+                                    visible_status = "<span style='color:green;'>Live</span>"
 
                             item['visible_status'] = visible_status
                         else:

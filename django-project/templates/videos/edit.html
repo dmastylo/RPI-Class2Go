@@ -33,9 +33,9 @@
         <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />	
 	<input type="hidden" name="video_slug" value="{{slug}}" />
 	<div class="form-actions">
-	  <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
+	  <input type="submit" name="action" value="Save and Set as Ready" class="btn btn-primary" />
 	  <input type="submit" name="action" value="Save as Draft" class="btn" />
-	  <input type="submit" name="action" value="Revert" class="btn" />
+	  <input type="submit" name="action" value="Reset to Ready" class="btn" />
 	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
 	</div>
   {% else %}

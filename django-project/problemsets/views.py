@@ -9,6 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
 from django.db.models import Q
+from courses.actions import auth_view_wrapper
+from django.views.decorators.http import require_POST
 
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
@@ -17,7 +19,7 @@ from django.db.models import Q
 # information about deadlines into a dictionary and passes it to the template.
 
 
-
+@auth_view_wrapper
 def list(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -27,6 +29,7 @@ def list(request, course_prefix, course_suffix):
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
     return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list'}, context_instance=RequestContext(request))
 
+@auth_view_wrapper
 def show(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -52,6 +55,8 @@ def show(request, course_prefix, course_suffix, pset_slug):
                               context_instance=RequestContext(request))
 
 @csrf_exempt
+@require_POST
+@auth_view_wrapper
 def attempt(request, problemId):
     user = request.user
     problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
@@ -77,6 +82,7 @@ def attempt(request, problemId):
     else:
         return HttpResponse("wrong")
 
+@auth_view_wrapper
 def create_form(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -100,6 +106,7 @@ def create_form(request, course_prefix, course_suffix):
                               context_instance=RequestContext(request))
 
 
+@auth_view_wrapper
 def edit_form(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -114,7 +121,8 @@ def edit_form(request, course_prefix, course_suffix, pset_slug):
     data['course_suffix'] = course_suffix
     return render_to_response('problemsets/edit.html', data, context_instance=RequestContext(request))
 
-
+@require_POST
+@auth_view_wrapper
 def create_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -141,6 +149,8 @@ def create_action(request):
     data['form'] = form
     return render_to_response('problemsets/create.html', data, context_instance=RequestContext(request))
 
+@require_POST
+@auth_view_wrapper
 def edit_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -155,7 +165,7 @@ def edit_action(request):
         pset = ProblemSet.objects.get(id=pset_id)
 
         action = request.POST['action']
-        if action == "Revert":
+        if action == "Reset to Ready":
             pset.revert()
             form = CreateProblemSet(course=common_page_data['course'], instance=pset)
         else:
@@ -164,7 +174,7 @@ def edit_action(request):
                 form.save()
                 pset.path = "/"+course_prefix+"/"+course_suffix+"/problemsets/"+pset.slug+"/load_problem_set"
                 pset.save()
-                if action == "Save and Publish":
+                if action == "Save and Set as Ready":
                     pset.commit()
                 return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
 
@@ -172,7 +182,8 @@ def edit_action(request):
     data['pset'] = pset
     return render(request, 'problemsets/edit.html', data)
 
-
+@require_POST
+@auth_view_wrapper
 def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     #Get all necessary information about the problemset
     try:
@@ -223,6 +234,8 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     data['exercises'] = exercises
     return render_to_response('problemsets/manage_exercises.html', data, context_instance=RequestContext(request))
 
+@require_POST
+@auth_view_wrapper
 def add_existing_exercises(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     exercise_ids = request.POST.getlist('exercise')
@@ -232,6 +245,8 @@ def add_existing_exercises(request):
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
+@require_POST
+@auth_view_wrapper
 def delete_exercise(request):
     toDelete = ProblemSetToExercise.objects.get(id=request.POST['exercise_id'])
     toDelete.delete()
@@ -246,6 +261,8 @@ def delete_exercise(request):
         index += 1
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
+@require_POST
+@auth_view_wrapper
 def save_exercises(request):
     #Function should only be accessed from submitting a form
     if request.method != 'POST':
@@ -256,7 +273,7 @@ def save_exercises(request):
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     action = request.POST['action']
-    if action == 'Revert':
+    if action == 'Reset to Ready':
         pset.revert()
         return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
     else:
@@ -265,10 +282,12 @@ def save_exercises(request):
             listName = "exercise_order[" + str(n) + "]"
             psetToExs[n].number = request.POST[listName]
             psetToExs[n].save()
-        if action == 'Save and Publish':
+        if action == 'Save and Set as Ready':
             pset.commit()
         return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'])))
 
+
+@auth_view_wrapper
 def read_exercise(request, course_prefix, course_suffix, exercise_name):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -283,6 +302,8 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     # (file not there...)
     return HttpResponse(exercise.file.file)
 
+
+@auth_view_wrapper
 def load_problem_set(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)

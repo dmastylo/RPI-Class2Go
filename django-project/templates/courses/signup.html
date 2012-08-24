@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block addl_stylesheets %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/core/datepicker.css" />
+{% endblock addl_stylesheets %}
+
+
+{% block new_course_link %}class="active"{% endblock new_course_link %}
+
+{% block m_column_content %}
+
+<style>
+.header {font-weight: bold; display: block; margin: 0px; margin-top: 20px;}
+.explanation {color: #800000; font-size: 9pt; font-style: italic; display: block; margin: 0px; }
+</style>
+
+<h2>Current courses available for signup</h2>
+    {% for available_course in available_course_list %}
+        {% ifequal available_course.3 'False' %}
+            <form name="signup" action="{% url 'courses.actions.signup' %}" method="POST">
+                <input type="hidden" id="handle" name="handle" value={{available_course.1}} />
+                {{available_course.0}} ({{available_course.2}})<input type="button" value="Signup" class="btn btn-primary" style='width: 75px; margin-right: 10px;' onclick="signup_clicked('{{available_course.2}}')"/>
+                {% csrf_token %}
+            </form>
+        {% else %}
+            {{available_course.0}} ({{available_course.2}})<b>Already signed up</b>    
+        {% endifequal %}            
+    {% endfor %}
+    
+<script type="text/javascript">
+    function signup_clicked(course) {
+        r = confirm("Please confirm you wish to join class " + course + "?")
+        if (!r) return;
+            document.forms.signup.submit();
+    }
+</script>
+
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap-datepicker.js"></script>
+<script type="text/javascript">$(".datepicker").datepicker();</script>
+{% endblock addl_scripts %}

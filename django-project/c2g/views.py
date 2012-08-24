@@ -6,7 +6,6 @@ from datetime import datetime
 from models import Course
 from courses.actions import is_member_of_course
 
-
 ### C2G Core Views ###
 
 def home(request):
@@ -22,7 +21,7 @@ def home(request):
         viewable_handle = course.handle.replace('#$!', '/')
         available_course_list.append((course.title, course.handle, viewable_handle, course_student_member))
         
-    return render_to_response('base.html', {'request': request, 'available_course_list': available_course_list}, context_instance=RequestContext(request))
+    return render_to_response('courses/signup.html', {'request': request, 'available_course_list': available_course_list}, context_instance=RequestContext(request))
 
 def healthcheck(request):
     return HttpResponse("I'm alive!")
