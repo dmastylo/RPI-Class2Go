@@ -5,28 +5,24 @@ from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
 from courses.actions import auth_view_wrapper
 
-@auth_view_wrapper	
-def admin(request, course_prefix, course_suffix):
-    return render_to_response('forums/admin.html', {'common_page_data': common_page_data}, context_instance=RequestContext(request))
-	
-@auth_view_wrapper
-    
-from courses.forums.forms import PiazzaAuthForm
-
-from django.contrib.auth.models import User
-
 import httplib 
 from OAuthSimple import OAuthSimple
 from urlparse import urlparse
 import urllib 
 
+from courses.forums.forms import PiazzaAuthForm
+from django.contrib.auth.models import User
 
 # won't be needed once we remove the dash from the directory name
 # see https://github.com/Stanford-Online/class2go/issues/125
 database_dot_py_config = __import__('django-project.database', globals(), locals(), 
         ['PIAZZA_ENDPOINT', 'PIAZZA_KEY', 'PIAZZA_SECRET'], -1)
 
-
+@auth_view_wrapper	
+def admin(request, course_prefix, course_suffix):
+    return render_to_response('forums/admin.html', {'common_page_data': common_page_data}, context_instance=RequestContext(request))
+	
+@auth_view_wrapper
 def view(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
