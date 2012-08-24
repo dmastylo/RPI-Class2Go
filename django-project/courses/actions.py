@@ -29,7 +29,7 @@ def auth_view_wrapper(view):
     return inner
 
 @require_POST
-@auth_view_wrapper
+#@auth_view_wrapper
 def switch_mode(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     if common_page_data['can_switch_mode']:
@@ -37,7 +37,7 @@ def switch_mode(request):
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper    
+#@auth_view_wrapper    
 def add_section(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -56,7 +56,7 @@ def add_section(request):
     return redirect(request.META['HTTP_REFERER'])
     
 @require_POST
-@auth_view_wrapper
+#@auth_view_wrapper
 def commit(request):
     ids = request.POST.get("commit_ids").split(",")
     for id in ids:
@@ -70,7 +70,7 @@ def commit(request):
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper
+#@auth_view_wrapper
 def revert(request):
     ids = request.POST.get("revert_ids").split(",")
     for id in ids:
@@ -84,7 +84,7 @@ def revert(request):
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper
+#@auth_view_wrapper
 def change_live_datetime(request):
     ids = request.POST.get("change_live_datetime_ids").split(",")
     
