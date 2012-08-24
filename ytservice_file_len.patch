@@ -1,0 +1,11 @@
+--- service.py	2012-08-24 02:20:21.000000000 -0700
++++ service.py~	2012-08-07 02:23:42.000000000 -0700
+@@ -642,7 +642,7 @@
+       if hasattr(filename_or_handle, 'name'):
+         name = filename_or_handle.name
+       mediasource = gdata.MediaSource(file_handle, content_type,
+-          content_length=file_handle.len, file_name=name)
++          content_length=file_handle.size, file_name=name)
+     else:
+       raise YouTubeError({'status':YOUTUBE_INVALID_ARGUMENT, 'body':
+           '`filename_or_handle` must be a path name or a file-like object',
