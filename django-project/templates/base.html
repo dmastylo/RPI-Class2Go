@@ -27,8 +27,12 @@
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                 <div class="hidden-phone pull-right">
                     {% if common_page_data.can_switch_mode %}
+                        <a href="#" rel="tooltip" title="Choosing DRAFT mode lets you edit the course site.  Choosing READY mode lets you view the site as students will.">
+						
                         <form class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
+                            
                             <p>You are currently viewing:</p>
+                            
                             <div class="btn-group btn-views-toggle">
                                 <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Draft</button>
                                 <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Ready</button>
@@ -37,6 +41,7 @@
                             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
                             {% csrf_token %}
                         </form>
+                        </a>
                     {% endif %}
                 </div>
             {% endif %}
