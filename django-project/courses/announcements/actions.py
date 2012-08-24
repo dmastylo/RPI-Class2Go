@@ -4,7 +4,11 @@ from django.template import Context, loader
 from django.template import RequestContext
 from c2g.models import *
 from courses.common_page_data import get_common_page_data
+from courses.actions import auth_view_wrapper
+from django.views.decorators.http import require_POST
 
+@require_POST
+@auth_view_wrapper
 def add_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -32,6 +36,8 @@ def add_announcement(request):
     
     return redirect(request.META['HTTP_REFERER'])
     
+@require_POST
+@auth_view_wrapper
 def save_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -54,6 +60,8 @@ def save_announcement(request):
     
     return redirect('courses.announcements.views.list', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     
+@require_POST
+@auth_view_wrapper
 def delete_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -70,7 +78,9 @@ def delete_announcement(request):
         announcement.image.delete()
     
     return redirect('courses.announcements.views.list', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
-    
+
+@require_POST
+@auth_view_wrapper    
 def save_announcement_order(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -79,7 +89,9 @@ def save_announcement_order(request):
         
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
-    
+
+@require_POST
+@auth_view_wrapper
 def email_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
