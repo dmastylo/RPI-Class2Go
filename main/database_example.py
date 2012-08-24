@@ -35,3 +35,7 @@ AWS_STORAGE_BUCKET_NAME = 'dev-c2g'
 # which is '/var/log/django/'
 # Please keep the trailing '/'
 # LOGGING_DIR = '/my/logging/dir/'
+
+PIAZZA_ENDPOINT = "https://piazza.com/basic_lti"
+PIAZZA_KEY = "class2go"
+PIAZZA_SECRET = "piazza_xxxxxxx"
