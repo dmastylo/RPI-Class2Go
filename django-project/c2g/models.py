@@ -942,9 +942,17 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             raise ValidationError(errors)
 
 
+    def get_grade(self, student):
+        resubmission_penalty = self.resubmission_penalty
+        submissions_permitted = self.submissions_permitted
+        pset_activities = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__problemSet=self, student=student)
+        psetToExs = self.problemsettoexercise_set.all()
+        total_score = 0
+        for psetToEx in psetToExs:
+            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
+            exercise_percent = 100
+            print exercise_activities
 
-    def __unicode__(self):
-        return self.title
     class Meta:
         db_table = u'c2g_problem_sets'
 
