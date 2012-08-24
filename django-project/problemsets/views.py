@@ -183,7 +183,6 @@ def edit_action(request):
     data['pset'] = pset
     return render(request, 'problemsets/edit.html', data)
 
-#@require_POST
 @auth_view_wrapper
 def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     #Get all necessary information about the problemset
