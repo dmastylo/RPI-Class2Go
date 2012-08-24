@@ -24,3 +24,16 @@ function stageapp {
 # }
 
 alias localdb="~/src/class2go/django-project/manage.py dbshell"
+
+function sprint-bug-report {
+    for a in sefk dcadams jbau jinpa shalinguyen wescott halawa kluo kelvindo
+    do
+        for p in P0 P1
+        do
+            echo "--------- $a ($p) ---------"
+            ghi list -l $p -u $a -q -M sprint-10
+        done
+        echo; echo
+    done
+}
+
