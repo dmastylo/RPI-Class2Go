@@ -34,8 +34,8 @@
                             <p>You are currently viewing:</p>
                             
                             <div class="btn-group btn-views-toggle">
-                                <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Draft</button>
-                                <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Ready</button>
+                                <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Edit</button>
+                                <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Live</button>
                             </div>
                             <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
                             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
