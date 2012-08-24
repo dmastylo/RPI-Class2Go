@@ -12,5 +12,10 @@ default_attributes \
         "production" => "True",
         "admin_name" => "Class2Go",
         "admin_email" => "c2gops@gmail.com"
+    },
+    "piazza" => {
+        "endpoint" => "https://piazza.com/basic_lti",
+        "key" => "class2go",
+        "secret" => "XXXXXXXXXXXXXXXXXXXXXXXXX"
     }
 

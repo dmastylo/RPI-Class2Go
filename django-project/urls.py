@@ -75,10 +75,8 @@ urlpatterns = patterns('',
     url(r'^delete_announcement$', 'courses.announcements.actions.delete_announcement'),
     url(r'^email_announcement$', 'courses.announcements.actions.email_announcement'),
 
-
     # Forums
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/forums/?$', 'courses.forums.views.view'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/forums/admin/?', 'courses.forums.views.admin'),
 
     # Sections
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/sections/reorder/?$', 'courses.content_sections.views.reorder'),
