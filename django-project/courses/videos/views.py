@@ -196,7 +196,7 @@ def add_exercise(request):
     exercise.save()
 
     index = len(video.exercise_set.all())
-    videoToEx = VideoToExercise(video=video, exercise=exercise, number=index, is_deleted=False, video_time=video_time)
+    videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=False, video_time=video_time)
     videoToEx.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
@@ -214,11 +214,11 @@ def add_existing_exercises(request):
 @auth_view_wrapper
 def save_exercises(request):
     video = Video.objects.get(id=request.POST['video_id'])
-    videoToEx = video.videotoexercise_set.all().order_by('number')
-    for n in range(0,len(videoToEx)):
-        listName = "exercise_order[" + str(n) + "]"
-        videoToEx[n].number = request.POST[listName]
-        videoToEx[n].save()
+ #   videoToEx = video.videotoexercise_set.all().order_by('number')
+ #   for n in range(0,len(videoToEx)):
+ #       listName = "exercise_order[" + str(n) + "]"
+ #       videoToEx[n].number = request.POST[listName]
+ #       videoToEx[n].save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 

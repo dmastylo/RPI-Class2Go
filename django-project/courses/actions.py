@@ -5,7 +5,6 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.contrib.auth.models import User,Group
 from courses.common_page_data import get_common_page_data
-#from actions import auth_view_wrapper
 from django.views.decorators.http import require_POST
 
 from c2g.models import *
