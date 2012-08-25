@@ -21,6 +21,7 @@ from django.core.exceptions import ValidationError
 import gdata.youtube
 import gdata.youtube.service
 import os
+import time
 
 # For file system upload
 from django.core.files.storage import FileSystemStorage
@@ -100,6 +101,10 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     calendar_end = models.DateField(null=True, blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
+    # Since all environments (dev, staging, prod) go against production piazza, things will get
+    # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
+    # Just use epoch seconds to make it unique.
+    piazza_id = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return self.title
@@ -121,6 +126,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             image = self,
             mode = 'production',
             handle = self.handle,
+            piazza_id = int(time.mktime(time.gmtime())),
         )
         production_instance.save()
         self.image = production_instance
