@@ -102,7 +102,6 @@ your local mysql and see a bunch of c2g_* tables.  Yay.
 	Note, when configuring the Remote Push Url you'll need to add ".git" on the end:
 	(https://github.com/jbau/class2go.git)
 
-
 Everyone:
 ----------
 
