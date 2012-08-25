@@ -752,6 +752,7 @@ var Khan = (function() {
 
             if (remoteExercises.length) {
 
+                KhanC2G.remoteExercises = [];
                 var controlLoad = function(exArr) {
                     if (exArr.length > 0) {
                         currentEx = exArr.shift();
@@ -765,13 +766,6 @@ var Khan = (function() {
                     }
                 }
                 controlLoad(remoteExercises.toArray());
-
-                /*
-                remoteExercises.each(function (idx, elem) {
-                    $.when(loadExercise.call(elem)).done(function () {
-                        console.log('Ex ' + idx + ' executed');});
-                });
-                */
 
 
             // Only run loadModules if exercises are in the page
@@ -1066,8 +1060,6 @@ var Khan = (function() {
     }
 
     function makeProblem(id, seed) {
-        //console.log("id is " + id);
-        //console.log("seed is " + seed);
 
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
@@ -1177,7 +1169,6 @@ var Khan = (function() {
 
         // Hide the hint box if there are no hints in the problem
 
-            //console.log(problem);
         $(".hint-box").show();
 
         // [@wescott] Adding check for summative exercises, which shouldn't have hints
@@ -2843,7 +2834,6 @@ var Khan = (function() {
 
     function loadExercise(callback) {
 
-        //console.log(arguments);
         var self = $(this).detach();
         var id = self.data("name");
         var weight = self.data("weight");
@@ -2898,7 +2888,9 @@ var Khan = (function() {
             // Save the id, fileName and weights
             // TODO(david): Make sure weights work for recursively-loaded exercises.
             newContents.data("name", id).data("fileName", fileName).data("weight", weight);
-            //console.log(newContents);
+
+            // [@wescott] Add to our global object
+            KhanC2G.remoteExercises.push(newContents);
 
             // Add the new exercise elements to the exercises DOM set
             exercises = exercises.add(newContents);
@@ -2947,25 +2939,19 @@ var Khan = (function() {
 
             }
 
-            console.log("File is here!");
-            console.log(exercises);
+            /*
             if (typeof userPSData == "undefined" || 
                     $.isEmptyObject(userPSData) || 
                     typeof userPSData.userAnswer == "undefined") {
                 makeProblem(exercises.length - 1);
             } 
+            */
 
         // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
         }).done(setTimeout(function () { dfd.resolve(); }, 5000));
         /*
         }).done(function () {
             (function pollExercises() { 
-                console.log('pollExercises called');
-                console.log('exercises');
-                console.log(exercises);
-                console.log('listOfExercises');
-                console.log(listOfExercises);
-                console.log(' ');
                 if (exercises.length == listOfExercises.length) {
                     dfd.resolve();
                 } else {
@@ -3045,7 +3031,6 @@ var Khan = (function() {
             prepareSite();
 
             initC2GStacks(exercises);
-            //console.log(exercises);
 
             var problems = exercises.children(".problems").children();
             globalProblems=problems;
@@ -3082,9 +3067,19 @@ var Khan = (function() {
                         break;
                     }
                 }
-                $('#workarea').append('<p>Loading Exercise...</p>');
-                //console.log($('.current-question').data('problem'));
-                //setTimeout(function () { makeProblem($('.current-question').data('problem')); }, 5000);
+                var pollForRemoteEx = function() {
+                    if (KhanC2G.remoteExercises[$('.current-question').data('problem')]) {
+                        $('#workarea').remove('.loading');
+                        makeProblem($('.current-question').data('problem'));
+                    } else {
+                        if ($('#workarea .loading').length == 0) {
+                            $('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                        }
+                        $('#workarea .loading').append('.');
+                        setTimeout(pollForRemoteEx, 500);
+                    }
+                };
+                pollForRemoteEx();
             })();
             
         }
@@ -3134,14 +3129,13 @@ var Khan = (function() {
                     li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
                 }
 
+                $.extend(li.data(), $(elem).data());
                 if (idx == 0) {
                     $('#questions-viewed ol').append(li);
                 } else {
                     $('#questions-unviewed ol').append(li);
                 }
                 curNumProbs+=probsInExercise;
-
-                //console.log('Added ' + curNumProbs + ' to questions stack');
 
             });
 
@@ -3154,7 +3148,6 @@ var Khan = (function() {
 
             var counter = 0;
             setTimeout(function checkInputs() {
-                //console.log("checkInputs called " + (++counter) + " times");
                 if (($('#testinput').length > 0) || ($('#solutionarea input:radio').length > 0)) {
                     dfd.resolve(true);  // [@wescott] Resolve with a value of "true" to pass on
                 } else {
@@ -3190,7 +3183,7 @@ var Khan = (function() {
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
         // value, if the user has already answered it
         $.when(checkForInputs()).then(function () {
-            console.log("when in effect...");
+            //console.log("when in effect...");
             if ($('.current-question').data('problem')) {
                 makeProblem($('.current-question').data('problem'));
             } else {
@@ -3205,7 +3198,7 @@ var Khan = (function() {
                 }
             }
         }).always(function () {
-            console.log("What gives?");
+            //console.log("What gives?");
         });
 
         // set class on last question to show it is the current one
@@ -3217,9 +3210,6 @@ var Khan = (function() {
         $('#next-question-button').click(function () {
 
             var currentQCard = $('.current-question');
-            console.log("currentQCard...");
-            console.log(currentQCard);
-            console.log(currentQCard.next());
 
             var userAnswer = readOnlyChoices = null;
             if ($('input#testinput').length) {
@@ -3365,8 +3355,24 @@ var Khan = (function() {
                 clearExistingProblem();
 
                 thisCard.addClass('current-question');
-                makeProblem(thisCard.data('problem'));
             }
+
+            var pollForRemoteEx = function() {
+                if (KhanC2G.remoteExercises[thisCard.data('problem')]) {
+                    //console.log('Exercise finally loaded');
+                    $('#workarea').remove('.loading');
+                    makeProblem(thisCard.data('problem'));
+                } else {
+                    if ($('#workarea .loading').length == 0) {
+                        $('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                    }
+                    $('#workarea .loading').append('.');
+                    //console.log('Not loaded yet, repolling...');
+                    setTimeout(pollForRemoteEx, 500);
+                }
+            };
+            pollForRemoteEx();
+            //makeProblem(thisCard.data('problem'));
 
             // load previous answers into the solution area
             $.when(checkForInputs()).then(function () {
@@ -3394,6 +3400,8 @@ var Khan = (function() {
             });
             
         }
+
+        // [@wescott] Still within initC2GStacks()
 
     }
 
