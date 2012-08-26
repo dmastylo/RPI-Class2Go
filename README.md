@@ -11,8 +11,8 @@ in Fall 2012 to host a handful of internal and open Stanford classes.
 Class2Go is intended to be an open platform for research.  Professors
 will have direct access to the data for their classes to learn how
 their students learn.  We will facilitate experiments.  This could
-be just simple A/B/N testing, or even bespoke code to try out
-interesting new features.
+be A/B/N testing of how different things effect student learning, or 
+even bespoke code to try out interesting new features.
 
 If you are interested in discussing with us, the team can be reached 
 at [class2go@cs.stanford.edu] [mail].
@@ -29,10 +29,10 @@ Here is what is important to us.
     Eventually we would love to have others use the platform, or
     to collaborate with similar efforts in other places.
 
-* *Portable*. We believe strongly that the valuable course content
+* *Portable*. We believe strongly that valuable course content
     shouldn't be tied to any one platform. Documents are already
-    portable; the videos are outside our system (in YouTube) and
-    the assets themselves can be repurposed as they see fit.  And
+    portable; the videos are outside our system (on YouTube) and
+    the assets themselves can be repurposed as faculty see fit.  And
     our exercises and problem sets, instead of being trapped in a
     proprietary database, are in the Khan Academy format, so they
     can be used elsewhere.
@@ -43,7 +43,7 @@ Here is what is important to us.
 
 To bring this to life then we've built a few key features:
 
-* *Content Management*. We have build a simple content management
+* *Content Management*. We have built a simple content management
     system where course information (videos, static pages, problem
     sets) can be created, reviewed, and then published.  One important
     ability is an automatic live date, so a professor (or, most
@@ -51,17 +51,19 @@ To bring this to life then we've built a few key features:
     publish a problem set.
 
 * *Video and Problem Set Management*. Professors (and TA's) can
-    upload assets to S3; videos are then uploaded to to YouTube.
-    We have a simple video player, navigable
+    upload assets to S3; videos are then uploaded to YouTube.
 
 * *Frame Extraction*.  We have a tool for extracting frames from
     a video (using ```ffmpeg```) differencing them to find key
-    frames, and then using as an index to the video.  We call it
-    the Kelvinator because it was written by Kelvin.
+    frames, and then using thumbnails of these frames as an index to 
+    the video.  We call it the Kelvinator because it was written by Kelvin.
 
 * *Exercises*.  We support two kinds of exercises: formative (for
-    learning) and summative (for assessment, like quizzes and tests).
-
+    learning) and summative (for assessment, like quizzes and tests).  Students
+    can attempt each problem as many times as they want without penalty in
+    formative problem sets, but may be penalized for multiple submissions
+    in summative sets.  In both types of problem sets, feedback is
+    immediately so students can learn along the way.
 
 
 Leveraging Others
@@ -81,7 +83,7 @@ commercial, some open source.  But a ton of good stuff.
 
   [yt]:    http://www.youtube.com/
   [ka]:    http://www.khanacademy.org/
-  [pz]:    http://www.mysql.org/
+  [pz]:    http://www.piazza.com/
   [mys]:   http://www.mysql.org/
   [p]:     http://www.python.org/
   [dj]:    http://www.djangoproject.com/
