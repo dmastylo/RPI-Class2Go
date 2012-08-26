@@ -190,13 +190,13 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
             //console.log('checkTime');
             var curTime = Math.floor(player.getCurrentTime());
             
-            if (slideIndices.hasOwnProperty(curTime) || Math.abs(lastTime-curTime)>1){ 
+            if (slideIndices.hasOwnProperty(curTime) || Math.abs(thumbSet.lastTime-curTime)>1){ 
                 thumbSet.selectSlide(curTime);
             }
             
             if (questions.hasOwnProperty(curTime) && skipSecQ!=curTime && 
                     player.getPlayerState() == YT.PlayerState.PLAYING) {
-                processQuiz(curTime);
+                thumbSet.processQuiz(curTime);
             } else if (player.getPlayerState() == YT.PlayerState.PLAYING) {
                     setTimeout(thumbSet.checkTime, 200);
             }
@@ -205,7 +205,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
                 skipSecQ=-1;
             }
 
-            lastTime=curTime;
+            thumbSet.lastTime=curTime;
         },
 
         processQuiz: function (curTime) {
@@ -215,7 +215,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
 
             if (questions.hasOwnProperty(curTime)) {
                 questions[curTime].done=true;
-                setupQPane(curTime);
+                thumbSet.setupQPane(curTime);
             } else {
                 player.playVideo();
             }

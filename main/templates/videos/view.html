@@ -149,9 +149,7 @@
         */
         $('.current-card-contents').append($('div.content'));
         $('#problem-and-answer').css('min-height', '600px');
-        {% if video.title == "Something else" %}
         $('div.content').css('position', 'absolute').css('top', '10px').css('left','10px');
-        {% endif %}
 
         $('#container').css('padding-top',0);
         $('#examples-show').hide();
