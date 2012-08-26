@@ -8,10 +8,10 @@ in Fall 2012 to host a handful of internal and open Stanford classes.
 
 (TODO: list of classes, links here)
 
-Class2Go is intended to be an open platform for research.  Professors
+Class2Go is intended to be an open platform for learning and research.  Professors
 will have direct access to the data for their classes to learn how
 their students learn.  We will facilitate experiments.  This could
-be A/B/N testing of how different things effect student learning, or 
+be A/B/N testing of how different things affect student learning, or 
 even bespoke code to try out interesting new features.
 
 If you are interested in discussing with us, the team can be reached 
@@ -25,7 +25,7 @@ Philosophy and Key Features
 Here is what is important to us.
 
 * *Open*. The platform is open source to make it easier for users
-    (faulty members) to give us feedback on what we are doing.
+    (faculty members) to give us feedback on what we are doing.
     Eventually we would love to have others use the platform, or
     to collaborate with similar efforts in other places.
 
@@ -62,7 +62,7 @@ To bring this to life then we've built a few key features:
     learning) and summative (for assessment, like quizzes and tests).  Students
     can attempt each problem as many times as they want without penalty in
     formative problem sets, but may be penalized for multiple submissions
-    in summative sets.  In both types of problem sets, feedback is
+    in summative sets.  In both types of problem sets, feedback is available
     immediately so students can learn along the way.
 
 
