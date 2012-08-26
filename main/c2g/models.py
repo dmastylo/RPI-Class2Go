@@ -22,6 +22,7 @@ import gdata.youtube
 import gdata.youtube.service
 import os
 import time
+import sys
 
 # For file system upload
 from django.core.files.storage import FileSystemStorage
@@ -947,17 +948,44 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if errors:
             raise ValidationError(errors)
 
+    def get_progress(self, student):
+        submissions_permitted = self.submissions_permitted
+        if submissions_permitted == 0:
+            submissions_permitted = sys.maxsize
+        pset_activities = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__problemSet=self, student=student)
+        psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        questions_completed = 0
+        for psetToEx in psetToExs:
+            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
+            for exercise_activity in exercise_activities:
+                if exercise_activity.attempt_number == submissions_permitted:
+                    questions_completed += 1
+                    break
+                elif exercise_activity.complete:
+                    questions_completed += 1
+                    break
+        return questions_completed
 
-    def get_grade(self, student):
+    def get_score(self, student):
         resubmission_penalty = self.resubmission_penalty
         submissions_permitted = self.submissions_permitted
+        if submissions_permitted == 0:
+            submissions_permitted = sys.maxsize
         pset_activities = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__problemSet=self, student=student)
-        psetToExs = self.problemsettoexercise_set.all()
-        total_score = 0
+        psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        total_score = 0.0
         for psetToEx in psetToExs:
             exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
             exercise_percent = 100
-            print exercise_activities
+            for exercise_activity in exercise_activities:
+                if exercise_activity.attempt_number > submissions_permitted:
+                    break
+                elif exercise_activity.complete:
+                    total_score += exercise_percent/100.0
+                    break
+                else:
+                    exercise_percent -= resubmission_penalty
+        return total_score
 
     class Meta:
         db_table = u'c2g_problem_sets'

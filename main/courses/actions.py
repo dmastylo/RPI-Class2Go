@@ -18,13 +18,13 @@ def auth_view_wrapper(view):
     def inner(request, *args, **kw):
         user = request.user
         course = request.common_page_data['course']
-        
+
         if user.is_authenticated() and not is_member_of_course(course, user):
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
-        
+
         if not user.is_authenticated():
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
-            
+
         return view(request, *args, **kw)
     return inner
 
@@ -37,24 +37,24 @@ def switch_mode(request):
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper    
+@auth_view_wrapper
 def add_section(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    
+
     index = len(ContentSection.objects.filter(course=common_page_data['course']))
-    
+
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.view', course_prefix, course_suffix)
-    
+
     staging_section = ContentSection(course=common_page_data['staging_course'], title=request.POST.get("title"), index=index, mode='staging')
     staging_section.save()
-    
+
     staging_section.create_production_instance()
-    
+
     return redirect(request.META['HTTP_REFERER'])
-    
+
 @require_POST
 @auth_view_wrapper
 def commit(request):
@@ -87,7 +87,7 @@ def revert(request):
 @auth_view_wrapper
 def change_live_datetime(request):
     ids = request.POST.get("change_live_datetime_ids").split(",")
-    
+
     if request.POST.get("live_datetime_option") == 'now':
         new_live_datetime = datetime.now()
     else:
@@ -99,14 +99,14 @@ def change_live_datetime(request):
             hour = 0
         else:
             hour = int(request.POST.get("live_hours"))
-            
+
         if request.POST.get("live_minutes") == '':
             minute = 0
         else:
             minute = int(request.POST.get("live_minutes"))
-        
+
         new_live_datetime = datetime(year,month,day,hour,minute)
-    
+
     for id in ids:
         parts = id.split('_')
         if parts[0] == 'video':
@@ -133,7 +133,7 @@ def change_live_datetime(request):
             file.image.live_datetime = new_live_datetime
             file.save()
             file.image.save()
-  
+
     return redirect(request.META['HTTP_REFERER'])
 
 def is_member_of_course(course, user):
@@ -141,27 +141,27 @@ def is_member_of_course(course, user):
     instructor_group_id = course.instructor_group.id
     tas_group_id = course.tas_group.id
     readonly_tas_group_id = course.readonly_tas_group.id
-    
+
     group_list = user.groups.values_list('id',flat=True)
-    
+
     for item in group_list:
         if item == student_group_id or item == instructor_group_id or item == tas_group_id or item == readonly_tas_group_id:
             return True
-        
+
     return False
 
 
 @require_POST
 def signup(request):
     handle = request.POST.get('handle')
-    
+
     user = request.user
     course = Course.objects.get(handle=handle, mode = "production")
     if not is_member_of_course(course, user):
-        student_group = Group.objects.get(id=course.student_group_id) 
+        student_group = Group.objects.get(id=course.student_group_id)
         student_group.user_set.add(user)
-        
+
     return redirect(request.META['HTTP_REFERER'])
 
-    
-    
+
+
