@@ -2,13 +2,13 @@ Class2Go
 -------------
 
 Class2Go is the project codename for Stanford's internal platform
-for hosting on-line courses.  We began building Class2Go in June
-2012.  A team of eight has worked through the summer.  It will
-launch in Fall 2012 for a handful of Stanford classes.
+for on-line courses.  We began building Class2Go in June 2012.  A
+team of eight has worked on it through the summer.  It will launch
+in Fall 2012 to host a handful of internal and open Stanford classes.
 
 (TODO: list of classes, links here)
 
-Class2Go is intended to be a platform for research.  Professors
+Class2Go is intended to be an open platform for research.  Professors
 will have direct access to the data for their classes to learn how
 their students learn.  We will facilitate experiments.  This could
 be just simple A/B/N testing, or even bespoke code to try out
@@ -71,17 +71,18 @@ Thanks to all the projects we are relying on to make this work.  Some
 commercial, some open source.  But a ton of good stuff.
 
 * [YouTube] [yt] for videos
+* [Khan Academy] [ka] for their HTML-based exercise framework
 * [Piazza] [pz] for forums
-* [MySQL] [mysql] is our database
+* [MySQL] [mys] is our database
 * The massive [Python] [p] [Django] [dj] ecosystem: eg. South, Registration
 * [Amazon] [a] AWS suite for hosting (EC2, S3, Route53, IAM)
 * Chef from [Opscode] [oc] for configuration management
 * [Github] [gh] for source code management and issues
 
   [yt]:    http://www.youtube.com/
-  [khan]:  http://www.khanacademy.org/
+  [ka]:    http://www.khanacademy.org/
   [pz]:    http://www.mysql.org/
-  [mysql]: http://www.mysql.org/
+  [mys]:   http://www.mysql.org/
   [p]:     http://www.python.org/
   [dj]:    http://www.djangoproject.com/
   [a]:     http://aws.amazon.com/
