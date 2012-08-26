@@ -71,17 +71,18 @@ Thanks to all the projects we are relying on to make this work.  Some
 commercial, some open source.  But a ton of good stuff.
 
 * [YouTube] [yt] for videos
+* [Khan Academy] [ka] for their HTML-based exercise framework
 * [Piazza] [pz] for forums
-* [MySQL] [mysql] is our database
+* [MySQL] [mys] is our database
 * The massive [Python] [p] [Django] [dj] ecosystem: eg. South, Registration
 * [Amazon] [a] AWS suite for hosting (EC2, S3, Route53, IAM)
 * Chef from [Opscode] [oc] for configuration management
 * [Github] [gh] for source code management and issues
 
   [yt]:    http://www.youtube.com/
-  [khan]:  http://www.khanacademy.org/
+  [ka]:    http://www.khanacademy.org/
   [pz]:    http://www.mysql.org/
-  [mysql]: http://www.mysql.org/
+  [mys]:   http://www.mysql.org/
   [p]:     http://www.python.org/
   [dj]:    http://www.djangoproject.com/
   [a]:     http://aws.amazon.com/
