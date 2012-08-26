@@ -225,7 +225,7 @@ def save_exercises(request):
 @auth_view_wrapper
 def get_video_exercises(request):
     video = Video.objects.get(id = request.GET['video_id'])
-    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('number')
+    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')
     json_list = []
     for videoToEx in videoToExs:
         json_string = "\"" + str(videoToEx.video_time) + "\": {\"time\": " + str(videoToEx.video_time) + ", \"problemDiv\": \"" + str(videoToEx.exercise_id) + "\"}"
