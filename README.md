@@ -6,7 +6,7 @@ for hosting on-line courses.  We began building Class2Go in June
 2012.  A team of eight has worked through the summer.  It will
 launch in Fall 2012 for a handful of Stanford classes.
 
-    TODO: list of classes, links
+(TODO: list of classes, links here)
 
 Class2Go is intended to be a platform for research.  Professors will
 have direct access to the data for their classes to learn how their students
@@ -15,9 +15,9 @@ researchers learn how people learn.  This could be just simple A/B/N
 testing, or even bespoke code to try out interesting new features.
 
 If you are interested in discussing with us, the team can be reached 
-at [class2go@stanford.edu] [mail].
+at [class2go@cs.stanford.edu] [mail].
 
-  [mail] mailto:class2go@cs.stanford.edu
+  [mail]: mailto:class2go@cs.stanford.edu
 
 Philosophy and Key Features
 -------------------------
@@ -76,6 +76,7 @@ commercial, some open source.  But a ton of good stuff.
 * The massive [Python] [p] [Django] [dj] ecosystem: eg. South, Registration
 * [Amazon] [a] AWS suite for hosting (EC2, S3, Route53, IAM)
 * Chef from [Opscode] [oc] for configuration management
+* [Github] [gh] for source code management and issues
 
   [yt]:    http://www.youtube.com/
   [khan]:  http://www.khanacademy.org/
@@ -85,7 +86,7 @@ commercial, some open source.  But a ton of good stuff.
   [dj]:    http://www.djangoproject.com/
   [a]:     http://aws.amazon.com/
   [oc]:    http://www.opscode.org/
-
+  [gh]:    http://www.github.com/
 
 
 License
