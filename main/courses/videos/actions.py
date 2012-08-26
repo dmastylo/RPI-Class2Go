@@ -193,6 +193,10 @@ def upload(request):
             new_video.create_production_instance()
             print new_video.file.url
 
+            print new_video.url
+            if new_video.url:
+                return redirect('courses.videos.views.list', course_prefix, course_suffix)
+
             authUrl = GetOAuth2Url(request, new_video)
             #eventually should store an access token, so they don't have to give permission everytime
             return redirect(authUrl)

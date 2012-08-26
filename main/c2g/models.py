@@ -489,7 +489,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
-    url = models.CharField(max_length=255, null=True)
+    url = models.CharField("Youtube Video ID", max_length=255, null=True, blank=True)
     duration = models.IntegerField(null=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     file = models.FileField(upload_to=get_file_path)
@@ -623,9 +623,10 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     def save(self, *args, **kwargs):
         if not self.duration:
             if self.type == "youtube" and self.url:
+                print "**** tryna get duration from yt vid id!!!! ****"
                 yt_service = gdata.youtube.service.YouTubeService()
-                #entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
-                #self.duration = entry.media.duration.seconds
+                entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
+                self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
 
     def is_synced(self):
