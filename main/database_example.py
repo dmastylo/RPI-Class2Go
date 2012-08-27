@@ -39,3 +39,7 @@ AWS_STORAGE_BUCKET_NAME = 'dev-c2g'
 PIAZZA_ENDPOINT = "https://piazza.com/basic_lti"
 PIAZZA_KEY = "class2go"
 PIAZZA_SECRET = "piazza_xxxxxxx"
+
+# SMTP INFO for SES -- Amazon Simple Email Service $1 per 10K recipients
+SES_SMTP_USER = "USER"
+SES_SMTP_PASSWD = "PWD"

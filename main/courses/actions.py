@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
@@ -28,25 +28,50 @@ def auth_view_wrapper(view):
         return view(request, *args, **kw)
     return inner
 
+def auth_can_switch_mode_view_wrapper(view):
+    @wraps (view)
+    def inner(request, *args, **kw):
+        if request.common_page_data['can_switch_mode']:
+            return view(request, *args, **kw)
+        else:
+            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+    return inner
+
+def auth_is_course_admin_view_wrapper(view):
+    @wraps (view)
+    def inner(request, *args, **kw):
+        if request.common_page_data['is_course_admin']:
+            return view(request, *args, **kw)
+        else:
+            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+    return inner
+
+def auth_is_staff_view_wrapper(view):
+    @wraps (view)
+    def inner(request, *args, **kw):
+        user = request.user
+        if user.is_staff:
+            return view(request, *args, **kw)
+        else:
+           raise Http404
+    return inner                
+
 @require_POST
-@auth_view_wrapper
+@auth_can_switch_mode_view_wrapper
 def switch_mode(request):
-    common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
-    if common_page_data['can_switch_mode']:
-        request.session['course_mode'] = request.POST.get('to_mode')
+    
+    common_page_data = request.common_page_data
+    request.session['course_mode'] = request.POST.get('to_mode')
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def add_section(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
-    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    common_page_data = request.common_page_data
 
     index = len(ContentSection.objects.filter(course=common_page_data['course']))
-
-    if not common_page_data['is_course_admin']:
-        return redirect('courses.views.view', course_prefix, course_suffix)
 
     staging_section = ContentSection(course=common_page_data['staging_course'], title=request.POST.get("title"), index=index, mode='staging')
     staging_section.save()
@@ -56,7 +81,7 @@ def add_section(request):
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def commit(request):
     ids = request.POST.get("commit_ids").split(",")
     for id in ids:
@@ -70,7 +95,7 @@ def commit(request):
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def revert(request):
     ids = request.POST.get("revert_ids").split(",")
     for id in ids:
@@ -84,7 +109,7 @@ def revert(request):
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def change_live_datetime(request):
     ids = request.POST.get("change_live_datetime_ids").split(",")
 
