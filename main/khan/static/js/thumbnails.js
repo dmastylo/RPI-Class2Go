@@ -19,6 +19,13 @@ function onYouTubePlayerAPIReady() {
 function onPlayerReady(event) {
     //HotKey(player);
     thumbSet.setupNavPanel();
+
+    $('.quiz-thumb').each(function (idx) {
+        $(this).click(function () {
+            //console.log("Calling makeProblem for " + idx);
+            KhanC2G.makeProblem(idx);
+        });
+    });
 }
 
 function onPlayerError(event) {
@@ -121,6 +128,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
             //console.log(questions[qTime]["problemDiv"]);
             $('#' + questions[qTime]["problemDiv"]).show();
             $('#' + questions[qTime]["problemDiv"]).css('z-index', 100);
+            $('#problemarea').css('z-index', 2);
             $('#answer_area').fadeIn('slow');
 
             //hide index navigation panel
@@ -280,7 +288,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
             var indexDiv = document.getElementById('slideIndex');
             var tempDiv = document.createElement('div');
             var greyDiv = document.createElement('div');
-            $(tempDiv).addClass('divInIndex').attr('id','slideIndex'+idxTime+'s');
+            $(tempDiv).addClass('divInIndex').addClass('quiz-thumb').attr('id','slideIndex'+idxTime+'s');
             $(greyDiv).addClass('greyOverlay').html("<br/><br/>Quiz");
             var slideImg = document.createElement('img');
             slideImg.src = 'q_'+idxTime+'.jpg';

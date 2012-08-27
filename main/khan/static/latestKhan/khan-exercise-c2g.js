@@ -2712,9 +2712,11 @@ var Khan = (function() {
         }
 
         //Gets the problem ID which is (problem number)-(variation)
-        problem_identifier = $('#workarea').children('div').attr('id')
-        exercise_filename = exercise.data('fileName')
-        pset_id = document.getElementById("pset_id").value
+        problem_identifier = $('#workarea').children('div').attr('id');
+        exercise_filename = exercise.data('fileName');
+        // [@wescott] pset_id of -1 will cause error, but right now just used for in-video
+        // Needs to have a real problem set associated with videos
+        pset_id = ($('#pset_id').length) ? $('#pset_id').val() : -1;
         if ($('input#testinput').length) {
             user_selection_val = $('input#testinput').val();
         } else if ($('input:radio[name=solution]').length) {
