@@ -32,11 +32,15 @@ alias localdb="~/src/class2go/django-project/manage.py dbshell"
 ##
 
 function buglist-sprint {
+    if [[ $# -ne 1 ]]; then
+        echo "usage: buglist-sprint <milestone>"
+        return 1
+    fi
     for a in dcadams halawa jbau jinpa kelvindo kluo sefk shalinguyen wescott; do
         for p in P0 P1
         do
             echo "--------- $a ($p) ---------"
-            ghi list -l $p -u $a -q -M sprint-10
+            ghi list -l $p -u $a -q -M $1
         done
         echo; echo
     done
@@ -51,7 +55,8 @@ function buglist-counts {
     for l in P0 P1 P2; do
         echo -ne "${NOW}\t"
         echo -ne "$l\t"
-        ghi list -s open -l $l | wc -l | tr -d ' '
+        ghi list -s open -l $l | grep -v '3-Done' | wc -l | tr -d ' '
     done
 }
+
 
