@@ -46,3 +46,12 @@ function buglist-unprioritized {
     ghi list -s open | egrep -v '[P0]|[P1]|[P2]'
 }
 
+function buglist-counts {
+    NOW=`date -u +"%F %R UTC"`
+    for l in P0 P1 P2; do
+        echo -ne "${NOW}\t"
+        echo -ne "$l\t"
+        ghi list -s open -l $l | wc -l | tr -d ' '
+    done
+}
+
