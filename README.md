@@ -20,8 +20,8 @@ at [class2go@cs.stanford.edu] [mail].
   [mail]: mailto:class2go@cs.stanford.edu
 
 
-Philosophy and Key Features
----------------------------
+Philosophy 
+----------
 
 Here is what is important to us.
 
@@ -42,23 +42,15 @@ Here is what is important to us.
     have to. See the section below for a list of all the shoulders
     we are standing on.
 
-To bring this to life we've built a few key features.
 
-* *Content Management*. We have built a simple content management
-    system where course information (videos, static pages, problem
-    sets) can be created, reviewed, and then published. One important
-    ability is an automatic live date, so a professor (or, most
-    likely, a TA) doesn't have to click a button at midnight to
-    publish a problem set.
+Key Features
+------------
+
+To bring this to life we've built a system. Here are some of its
+important and distinguishing features.
 
 * *Video and Problem Set Management*. Professors (and TA's) can
     upload assets to S3; videos are then uploaded to YouTube.
-
-* *Frame Extraction*. We have a tool for extracting frames from
-    a video (using ```ffmpeg```) differencing them to find key
-    frames, and then using thumbnails of these frames as an index
-    to the video. It's called the Kelvinator after its author,
-    Kelvin Do.
 
 * *Exercises*. We support two kinds of exercises: formative (for
     learning) and summative (for assessment, like quizzes and tests).
@@ -67,6 +59,19 @@ To bring this to life we've built a few key features.
     for multiple submissions in summative sets. In both types of
     problem sets, feedback is available immediately so students can
     learn along the way.
+
+* *Content Management*. We have built a simple content management
+    system where course information (videos, static pages, problem
+    sets) can be created, reviewed, and then published. One important
+    ability is an automatic live date, so a professor (or, most
+    likely, a TA) doesn't have to click a button at midnight to
+    publish a problem set.
+
+* *Frame Extraction*. We have a tool for extracting frames from
+    a video (using ```ffmpeg```) differencing them to find key
+    frames, and then using thumbnails of these frames as an index
+    to the video. It's called the Kelvinator after its author,
+    Kelvin Do.
 
 
 Leveraging Others
