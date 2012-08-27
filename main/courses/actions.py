@@ -46,6 +46,16 @@ def auth_is_course_admin_view_wrapper(view):
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
     return inner
 
+def auth_is_staff_view_wrapper(view):
+    @wraps (view)
+    def inner(request, *args, **kw):
+        user = request.user
+        if user.is_staff:
+            return view(request, *args, **kw)
+        else:
+           raise Http404
+    return inner                
+
 @require_POST
 @auth_can_switch_mode_view_wrapper
 def switch_mode(request):
