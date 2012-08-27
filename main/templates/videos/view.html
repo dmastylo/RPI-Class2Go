@@ -81,6 +81,8 @@
     {% else %}
         <h2>{{video.title}}</h2>
         <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
+        <input type="hidden" name="exercise_type" value="video" id="type" />
+        <input type="hidden" name="video_id" value="{{ video.id }}" id="video_id" /> 
     <div id="player"></div>
     {% endif %}
   {% else %}
