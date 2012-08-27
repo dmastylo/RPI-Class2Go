@@ -177,7 +177,6 @@ def upload(request):
         new_video = Video(course=common_page_data['course'])
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=new_video)
         if form.is_valid():
-            new_video = form.save(commit=False)
             new_video.index = new_video.section.getNextIndex()
             new_video.mode = 'staging'
             new_video.handle = course_prefix + "#$!" + course_suffix
@@ -193,7 +192,6 @@ def upload(request):
             new_video.create_production_instance()
             print new_video.file.url
 
-            print new_video.url
             if new_video.url:
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
 
