@@ -3,7 +3,7 @@
     <div style="width:700px; float: right;margin-left: 20px;">
         <form name="commit_form" action="{% url 'courses.actions.commit' %}" method="POST">
             <input type="hidden" id="commit_ids" name="commit_ids" value="" />
-            <input type="button" value="Make Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="commit_clicked()"/>Copy the working version of selected items to ready
+            <input type="button" value="Make Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="commit_clicked()"/>Copy the draft version of selected items to ready
             <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
             <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
             {% csrf_token %}
@@ -20,7 +20,7 @@
         </script>
         <form name="revert_form" action="{% url 'courses.actions.revert' %}" method="POST">
             <input type="hidden" id="revert_ids" name="revert_ids" value="" />
-            <input type="button" value="Reset to Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="revert_clicked()"/>Reset the working version of selected items back to ready
+            <input type="button" value="Reset to Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="revert_clicked()"/>Reset the draft version of selected items back to ready
             <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
             <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
             {% csrf_token %}
@@ -33,7 +33,7 @@
                 return;
             }
             
-            r = confirm("Resetting any item will cause any changes to the working version to be discarded. Are you sure you want to reset all of the selected items?")
+            r = confirm("Resetting any item will cause any changes to the draft version to be discarded. Are you sure you want to reset all of the selected items?")
             if (!r) return;
             
             document.forms.revert_form.submit();
