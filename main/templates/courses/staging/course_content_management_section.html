@@ -46,7 +46,7 @@
             <input type="radio" name="live_datetime_option" id="live_datetime_option_date" value="date" style='margin-left:50px;'/>on 
             <input type='text' class='datepicker' name='live_date' id='live_date' value="{{common_page_data.current_datetime.month}}-{{common_page_data.current_datetime.day}}-{{common_page_data.current_datetime.year}}" data-date-format="mm-dd-yyyy" style='width:100px;'/> at
             <input type='text' name='live_hours' id='live_hours' style='width:50px;' placeholder="hh"/>:<input type='text' name='live_minutes' id='live_minutes' style='width:50px;' placeholder="mm"/>
-            <input type="radio" name="live_datetime_option" id="live_datetime_option_now" value="now" style='margin-left:50px;'/> now
+            <input type="radio" name="live_datetime_option" id="live_datetime_option_now" value="now" checked style='margin-left:50px;'/> now
             <input type="button" value="Set Live Date" class="btn" style='width: 100px; margin-left: 10px;' onclick="apply_clicked()"/>
             <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
             <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
