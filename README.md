@@ -85,7 +85,7 @@ commercial, some open source. But a ton of good stuff.
 * [Piazza] [pz] for forums
 * [MySQL] [mys] is our database
 * The massive [Python] [p] [Django] [dj] ecosystem: eg. South, Registration
-* [Amazon AWS] [a] suite for hosting (EC2, S3, Route53, IAM)
+* [Amazon AWS] [a] suite for hosting (EC2, S3, RDS, Route53, IAM)
 * Chef from [Opscode] [oc] for configuration management
 * [Github] [gh] for source code management and issues
 
