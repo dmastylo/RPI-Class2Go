@@ -1,14 +1,22 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 from datetime import datetime
 from models import Course
 from courses.actions import is_member_of_course
+from courses.actions import auth_view_wrapper
 
 ### C2G Core Views ###
 
+@auth_view_wrapper
 def home(request):
+    #try:
+    #    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    #except:
+    raise Http404
+    
+    
     now = datetime.now()
     courses = Course.objects.filter(calendar_start__gt=now, mode="production")
     available_course_list = []

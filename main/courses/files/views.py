@@ -3,7 +3,9 @@ from django.shortcuts import render, render_to_response
 from courses.common_page_data import get_common_page_data
 
 from courses.files.forms import *
+from courses.actions import auth_is_course_admin_view_wrapper
 
+@auth_is_course_admin_view_wrapper
 def upload(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
