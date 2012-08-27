@@ -222,7 +222,7 @@ def save_exercises(request):
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 
-@auth_view_wrapper
+#@auth_view_wrapper
 def get_video_exercises(request):
     video = Video.objects.get(id = request.GET['video_id'])
     videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')

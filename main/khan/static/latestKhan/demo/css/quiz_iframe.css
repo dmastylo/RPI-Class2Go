@@ -410,7 +410,7 @@ div#buttonDiv {
 #qInst {display: none;}
 .video-overlay-question {position: absolute; top: 1em; background:rgba(180,180,180,.7); padding: 1em; display: none;}
 .video-overlay-hint {position: relative; top: -5em; left: 0; background:rgba(180,180,180,.7); display: none;}
-#hintsarea {position: relative; bottom: 7em; left: 0; /* background:rgba(180,180,180,.7); */}
+/*#hintsarea {position: relative; bottom: 7em; left: 0; background:rgba(180,180,180,.7); }*/
 #answer_area {display: none;}
 #outer-wrapper #page-container {margin: 0;}
 #container .topic-exercise-badge, #container .exercises-stack {width:0;}
