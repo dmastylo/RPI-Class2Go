@@ -27,7 +27,7 @@
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                 <div class="hidden-phone pull-right">
                     {% if common_page_data.can_switch_mode %}
-                        <a href="#" rel="tooltip" title="Choosing DRAFT mode lets you edit the course site.  Choosing READY mode lets you view the site as students will.">
+                        <a href="#" rel="tooltip" title="Choosing EDIT mode lets you edit the course site.  Choosing LIVE mode lets you view the site as students will.">
 						
                         <form class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
                             

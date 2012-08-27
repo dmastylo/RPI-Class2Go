@@ -11,10 +11,14 @@ class S3UploadForm(forms.ModelForm):
         course = kwargs.pop('course')
         super(S3UploadForm, self).__init__(*args, **kwargs)
         self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course), empty_label=None)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.id:
+            del self.fields['file']
+            del self.fields['url']
 
     class Meta:
         model = Video
-        fields = ('title', 'slug', 'section', 'description', 'file', 'live_datetime')
+        fields = ('title', 'slug', 'section', 'description', 'file', 'url', 'live_datetime')
         widgets = {
             'live_datetime': forms.widgets.DateTimeInput(format='%m/%d/%Y %H:%M', attrs={'data-datetimepicker':''})
         }

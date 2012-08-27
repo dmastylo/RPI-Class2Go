@@ -25,6 +25,8 @@ def list(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
+    print "ASDNAJDSNAJDSAJDSNAJKNDSAJKDSNAD"
+    print request
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
     return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list'}, context_instance=RequestContext(request))
@@ -36,7 +38,6 @@ def show(request, course_prefix, course_suffix, pset_slug):
     except:
         raise Http404
     ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
-    ps.get_grade(request.user)
     problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
     activity_list = []
