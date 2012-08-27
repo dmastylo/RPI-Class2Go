@@ -8,11 +8,11 @@ in Fall 2012 to host a handful of internal and open Stanford classes.
 
 (TODO: list of classes, links here)
 
-Class2Go is intended to be an open platform for learning and research.  Professors
-will have direct access to the data for their classes to learn how
-their students learn.  We will facilitate experiments.  This could
-be A/B/N testing of how different things affect student learning, or 
-even bespoke code to try out interesting new features.
+Class2Go is intended to be an open platform for learning and research.
+Professors will have direct access to the data for their classes
+to learn how their students learn.  We will facilitate experiments.
+This could be A/B/N testing of how different things affect student
+learning, or even bespoke code to try out interesting new features.
 
 If you are interested in discussing with us, the team can be reached 
 at [class2go@cs.stanford.edu] [mail].
