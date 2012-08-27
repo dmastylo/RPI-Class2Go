@@ -14,7 +14,7 @@ import gdata.youtube.service
 from django.db.models import Q
 
 from django.template import RequestContext
-from courses.actions import auth_view_wrapper
+from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 
 @auth_view_wrapper
 def list(request, course_prefix, course_suffix):
@@ -60,9 +60,10 @@ def view(request, course_prefix, course_suffix, slug):
                     video_rec.save()
                     break
 
+    print "going to template"
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -86,7 +87,7 @@ def GetOAuth2Url(request):
 
     return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def upload(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -155,7 +156,7 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     return render_to_response('videos/model_exercises.html', data, context_instance=RequestContext(request))
 
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def manage_exercises(request, course_prefix, course_suffix, video_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -176,7 +177,7 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
                             },
                             context_instance=RequestContext(request))
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def add_exercise(request):
 #    try:
 #        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -200,7 +201,7 @@ def add_exercise(request):
     videoToEx.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def add_existing_exercises(request):
     video = Video.objects.get(id=request.POST['video_id'])
     exercise_ids = request.POST.getlist('exercise')
@@ -211,7 +212,7 @@ def add_existing_exercises(request):
         videoToEx.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def save_exercises(request):
     video = Video.objects.get(id=request.POST['video_id'])
  #   videoToEx = video.videotoexercise_set.all().order_by('number')
@@ -222,7 +223,6 @@ def save_exercises(request):
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 
-#@auth_view_wrapper
 def get_video_exercises(request):
     video = Video.objects.get(id = request.GET['video_id'])
     videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')
