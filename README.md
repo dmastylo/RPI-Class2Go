@@ -32,10 +32,10 @@ Here is what is important to us.
 * *Portable*. We believe strongly that valuable course content
     shouldn't be tied to any one platform. Documents are already
     portable; the videos are outside our system (on YouTube) and
-    the assets themselves can be repurposed as faculty see fit.  And
-    our exercises and problem sets, instead of being trapped in a
-    proprietary database, are in the Khan Academy format, so they
-    can be used elsewhere.
+    the assets themselves can be repurposed as faculty see fit.
+    And our exercises and problem sets, instead of being trapped
+    in a proprietary database, are in the Khan Academy format, so
+    they can be used elsewhere.
 
 * *Interoperable*. We don't want to build or maintain more than we
     have to.  See the section below for a list of all the shoulders
@@ -55,15 +55,17 @@ To bring this to life then we've built a few key features:
 
 * *Frame Extraction*.  We have a tool for extracting frames from
     a video (using ```ffmpeg```) differencing them to find key
-    frames, and then using thumbnails of these frames as an index to 
-    the video.  We call it the Kelvinator because it was written by Kelvin.
+    frames, and then using thumbnails of these frames as an index
+    to the video.  It's called the Kelvinator after its author,
+    Kelvin Do.
 
 * *Exercises*.  We support two kinds of exercises: formative (for
-    learning) and summative (for assessment, like quizzes and tests).  Students
-    can attempt each problem as many times as they want without penalty in
-    formative problem sets, but may be penalized for multiple submissions
-    in summative sets.  In both types of problem sets, feedback is available
-    immediately so students can learn along the way.
+    learning) and summative (for assessment, like quizzes and tests).
+    Students can attempt each problem as many times as they want
+    without penalty in formative problem sets, but may be penalized
+    for multiple submissions in summative sets.  In both types of
+    problem sets, feedback is available immediately so students can
+    learn along the way.
 
 
 Leveraging Others
