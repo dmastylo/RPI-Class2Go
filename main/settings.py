@@ -264,10 +264,21 @@ LOGGING = {
 # Session Settings
 SESSION_COOKIE_AGE = 3*30*24*3600
 
+# Actually send email
+EMAIL_ALWAYS_ACTUALLY_SEND = False
+
 # Email Settings
-DEFAULT_FROM_EMAIL = "c2g-dev@cs.stanford.edu" #probably change for production
-EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = SES_SMTP_USER
-EMAIL_HOST_PASSWORD = SES_SMTP_PASSWD
-EMAIL_USE_TLS = True
+# For Production, or if override is set, actually send email
+if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
+    DEFAULT_FROM_EMAIL = "c2g-dev@cs.stanford.edu" #probably change for production
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = SES_SMTP_USER
+    EMAIL_HOST_PASSWORD = SES_SMTP_PASSWD
+    EMAIL_USE_TLS = True
+#Otherwise, send email to a file in the logging directory
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = LOGGING_DIR + 'emails_sent.log'
+
