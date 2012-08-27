@@ -1,5 +1,5 @@
 Class2Go 
--------------
+========
 
 Class2Go is the project codename for Stanford's internal platform
 for on-line courses.  We began building Class2Go in June 2012.  A
@@ -19,8 +19,9 @@ at [class2go@cs.stanford.edu] [mail].
 
   [mail]: mailto:class2go@cs.stanford.edu
 
+
 Philosophy and Key Features
--------------------------
+---------------------------
 
 Here is what is important to us.
 
@@ -41,7 +42,7 @@ Here is what is important to us.
     have to.  See the section below for a list of all the shoulders
     we are standing on.
 
-To bring this to life then we've built a few key features:
+To bring this to life we've built a few key features.
 
 * *Content Management*. We have built a simple content management
     system where course information (videos, static pages, problem
@@ -69,33 +70,33 @@ To bring this to life then we've built a few key features:
 
 
 Leveraging Others
--------------------------
+-----------------
 
 Thanks to all the projects we are relying on to make this work.  Some
 commercial, some open source.  But a ton of good stuff.
 
-* [YouTube] [yt] for videos
+* [YouTube] [yt] for video
 * [Khan Academy] [ka] for their HTML-based exercise framework
 * [Piazza] [pz] for forums
 * [MySQL] [mys] is our database
 * The massive [Python] [p] [Django] [dj] ecosystem: eg. South, Registration
-* [Amazon] [a] AWS suite for hosting (EC2, S3, Route53, IAM)
+* [Amazon AWS] [a] suite for hosting (EC2, S3, Route53, IAM)
 * Chef from [Opscode] [oc] for configuration management
 * [Github] [gh] for source code management and issues
 
-  [yt]:    http://www.youtube.com/
-  [ka]:    http://www.khanacademy.org/
-  [pz]:    http://www.piazza.com/
-  [mys]:   http://www.mysql.org/
-  [p]:     http://www.python.org/
-  [dj]:    http://www.djangoproject.com/
-  [a]:     http://aws.amazon.com/
-  [oc]:    http://www.opscode.org/
-  [gh]:    http://www.github.com/
+  [yt]:   http://www.youtube.com/
+  [ka]:   http://www.khanacademy.org/
+  [pz]:   http://www.piazza.com/
+  [mys]:  http://www.mysql.org/
+  [p]:    http://www.python.org/
+  [dj]:   http://www.djangoproject.com/
+  [a]:    http://aws.amazon.com/
+  [oc]:   http://www.opscode.org/
+  [gh]:   http://www.github.com/
 
 
 License
--------------------------
+-------
 
 TODO: license terms
 
