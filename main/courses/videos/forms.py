@@ -4,6 +4,8 @@ from c2g.models import ContentSection, Video, Exercise
 #import logging
 #logger = logging.getLogger('django')
 
+import gdata.youtube.service
+
 class S3UploadForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
@@ -15,6 +17,17 @@ class S3UploadForm(forms.ModelForm):
         if instance and instance.id:
             del self.fields['file']
             del self.fields['url']
+
+    def clean_url(self):
+        url = self.cleaned_data['url']
+        if url:
+            yt_service = gdata.youtube.service.YouTubeService()
+            try:
+                entry = yt_service.GetYouTubeVideoEntry(video_id=url)
+                self.instance.duration = entry.media.duration.seconds
+            except gdata.service.RequestError:
+                raise forms.ValidationError('Invalid Youtube video ID.')
+        return url
 
     class Meta:
         model = Video
