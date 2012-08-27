@@ -52,11 +52,37 @@ function buglist-unprioritized {
 
 function buglist-counts {
     NOW=`date -u +"%F %R UTC"`
+    YESTERDAY=`date -v-1d`
     for l in P0 P1 P2; do
-        echo -ne "${NOW}\t"
+        # echo -ne "${NOW}\t"
         echo -ne "$l\t"
-        ghi list -s open -l $l | grep -v '3-Done' | wc -l | tr -d ' '
+        ghi list -s open -l $l | grep -v '3-Done' | wc -l | tr -d ' ' | tr -d '\n'
+
+        ACTIVE=`ghi list -s open -l $l --since "${YESTERDAY}" | grep -v '3-Done' | wc -l | tr -d ' '`
+        echo -ne "\t (${ACTIVE} active)"
+        echo
     done
+}
+
+function buglist-hot {
+    ghi list -s open -l P0 | grep -v '3-Done' 
+}
+
+function buglist-goalline {
+    echo "-------- COUNTS OF OPEN ISSUES "
+    echo
+    buglist-counts
+
+    echo; echo
+    echo "-------- ALL OPEN P0 ISSUES"
+    echo
+    buglist-hot
+
+    echo; echo
+    echo "Notes:"
+    echo "- Counts and bug lists exclude bugs marked with \"3-Done\" label."
+    echo "- Active seems to mean opened or commented on"
+    echo "- Bugs are sorted with most recent activity on top"
 }
 
 
