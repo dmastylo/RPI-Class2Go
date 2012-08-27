@@ -21,6 +21,8 @@ from django.core.exceptions import ValidationError
 import gdata.youtube
 import gdata.youtube.service
 import os
+import time
+import sys
 
 # For file system upload
 from django.core.files.storage import FileSystemStorage
@@ -100,6 +102,10 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     calendar_end = models.DateField(null=True, blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
+    # Since all environments (dev, staging, prod) go against production piazza, things will get
+    # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
+    # Just use epoch seconds to make it unique.
+    piazza_id = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return self.title
@@ -121,6 +127,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             image = self,
             mode = 'production',
             handle = self.handle,
+            piazza_id = int(time.mktime(time.gmtime())),
         )
         production_instance.save()
         self.image = production_instance
@@ -482,7 +489,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
-    url = models.CharField(max_length=255, null=True)
+    url = models.CharField("Youtube Video ID", max_length=255, null=True, blank=True)
     duration = models.IntegerField(null=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     file = models.FileField(upload_to=get_file_path)
@@ -616,9 +623,10 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     def save(self, *args, **kwargs):
         if not self.duration:
             if self.type == "youtube" and self.url:
+                print "**** tryna get duration from yt vid id!!!! ****"
                 yt_service = gdata.youtube.service.YouTubeService()
-                #entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
-                #self.duration = entry.media.duration.seconds
+                entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
+                self.duration = entry.media.duration.seconds
         super(Video, self).save(*args, **kwargs)
 
     def is_synced(self):
@@ -941,17 +949,44 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if errors:
             raise ValidationError(errors)
 
+    def get_progress(self, student):
+        submissions_permitted = self.submissions_permitted
+        if submissions_permitted == 0:
+            submissions_permitted = sys.maxsize
+        pset_activities = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__problemSet=self, student=student)
+        psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        questions_completed = 0
+        for psetToEx in psetToExs:
+            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
+            for exercise_activity in exercise_activities:
+                if exercise_activity.attempt_number == submissions_permitted:
+                    questions_completed += 1
+                    break
+                elif exercise_activity.complete:
+                    questions_completed += 1
+                    break
+        return questions_completed
 
-    def get_grade(self, student):
+    def get_score(self, student):
         resubmission_penalty = self.resubmission_penalty
         submissions_permitted = self.submissions_permitted
+        if submissions_permitted == 0:
+            submissions_permitted = sys.maxsize
         pset_activities = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__problemSet=self, student=student)
-        psetToExs = self.problemsettoexercise_set.all()
-        total_score = 0
+        psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        total_score = 0.0
         for psetToEx in psetToExs:
             exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
             exercise_percent = 100
-            print exercise_activities
+            for exercise_activity in exercise_activities:
+                if exercise_activity.attempt_number > submissions_permitted:
+                    break
+                elif exercise_activity.complete:
+                    total_score += exercise_percent/100.0
+                    break
+                else:
+                    exercise_percent -= resubmission_penalty
+        return total_score
 
     class Meta:
         db_table = u'c2g_problem_sets'

@@ -8,7 +8,7 @@
 #
 
 template "database.py" do
-    path "/home/bitnami/class2go/django-project/database.py"
+    path "/home/bitnami/class2go/main/database.py"
     source "database.py.erb"
     owner "bitnami"
     group "bitnami"

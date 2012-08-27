@@ -13,7 +13,7 @@
                 <div class="bar" style="width:{{item.progress}}%"></div>
             </div>
             {% if item.numCompleted == item.numQuestions %}
-                <span class="label">Complete with Score: {{item.numCorrect}} of {{item.numQuestions}}</span>
+                <span class="label">Complete with Score: {{item.score}} of {{item.numQuestions}}</span>
             {% else %}
                 <span class="label">In Progress: {{item.numCompleted}} of {{item.numQuestions}}</span>
             {% endif %}

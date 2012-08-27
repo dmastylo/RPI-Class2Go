@@ -99,8 +99,8 @@ def delete_video(request):
     return redirect(request.META['HTTP_REFERER'])
     
 @require_POST
-@auth_view_wrapper
 def save_video_progress(request):
+    
     videoRec = request.POST['videoRec']
     playTime = request.POST['playTime']
     video = VideoActivity.objects.get(id=videoRec)
@@ -192,6 +192,10 @@ def upload(request):
             new_video.save()
             new_video.create_production_instance()
             print new_video.file.url
+
+            print new_video.url
+            if new_video.url:
+                return redirect('courses.videos.views.list', course_prefix, course_suffix)
 
             authUrl = GetOAuth2Url(request, new_video)
             #eventually should store an access token, so they don't have to give permission everytime

@@ -81,6 +81,8 @@
     {% else %}
         <h2>{{video.title}}</h2>
         <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
+        <input type="hidden" name="exercise_type" value="video" id="exercise_type" />
+        <input type="hidden" name="video_id" value="{{ video.id }}" id="video_id" /> 
     <div id="player"></div>
     {% endif %}
   {% else %}
@@ -139,19 +141,16 @@
 
     var initStacks = function () {
         console.log("initStacks being run now");
-        /*
-        if (typeof globalProblems != "undefined") {
-            for (var i = 0; i < globalProblems.length; i += 1) {
+        if (typeof KhanC2G != "undefined" && $.isArray(KhanC2G.remoteExercises)) {
+            for (var i = 0; i < KhanC2G.remoteExercises.length; i += 1) {
                 KhanC2G.makeProblem(i); 
                 console.log("Made problem " + i);
             }
         }
-        */
         $('.current-card-contents').append($('div.content'));
-        $('#problem-and-answer').css('min-height', '600px');
-        {% if video.title == "Something else" %}
+        $('.current-card-contents').css('min-height', '600px');
+        //$('#problem-and-answer').css('min-height', '600px');
         $('div.content').css('position', 'absolute').css('top', '10px').css('left','10px');
-        {% endif %}
 
         $('#container').css('padding-top',0);
         $('#examples-show').hide();
@@ -164,13 +163,15 @@
         $(skipBtn).addClass('simple-button').addClass('green').addClass('full-width');
         $('#check-answer-button').after($(skipBtn));
         $(skipBtn).click(function () { $('#next-question-button').trigger('click'); })
+        $('#next-question-button').val("Correct! Resume Video");
 
         $('#next-question-button').unbind('click');
         $('#next-question-button').click(function () {
 
             $('#questionBG').remove();
             $('#questionPane').remove();
-            $('#hintsarea').hide();
+            //$('#hintsarea').hide();
+            $('#problemarea').css('z-index', 0);
 
             $('#playerdiv').fadeTo('slow', 1.0);
             $('.video-overlay-question').hide();
