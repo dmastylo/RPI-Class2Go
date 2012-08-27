@@ -6,7 +6,9 @@ default_attributes \
         "database_host" => "prod.AAAAAAAAAAAA.us-west-2.rds.amazonaws.com",
         "storage_bucket" => "prod-c2g",
         "access_key" => "BBBBBBBBBBBBBBBBBBBB",
-        "access_secret" => "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+        "access_secret" => "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        "ses_user" =>  "DDDDDDDDDDDDDDDDDDDD",
+        "ses_passwd" => "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
     },
     "class2go" => {
         "production" => "True",
