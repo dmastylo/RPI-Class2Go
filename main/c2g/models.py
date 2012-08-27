@@ -957,7 +957,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
         questions_completed = 0
         for psetToEx in psetToExs:
-            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
+            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('time_created')
             for exercise_activity in exercise_activities:
                 if exercise_activity.attempt_number == submissions_permitted:
                     questions_completed += 1
@@ -976,7 +976,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
         total_score = 0.0
         for psetToEx in psetToExs:
-            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
+            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('time_created')
             exercise_percent = 100
             for exercise_activity in exercise_activities:
                 if exercise_activity.attempt_number > submissions_permitted:

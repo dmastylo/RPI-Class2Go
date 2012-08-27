@@ -62,13 +62,14 @@ def show(request, course_prefix, course_suffix, pset_slug):
 def attempt(request, problemId):
     user = request.user
     problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
+    previous_attempts = ProblemActivity.objects.filter(student=user, problemset_to_exercise=problemset_to_exercise)
     problem_activity = ProblemActivity(student = user,
                                         problemset_to_exercise = problemset_to_exercise,
                                         complete = request.POST['complete'],
                                         attempt_content = request.POST['attempt_content'],
                                         count_hints = request.POST['count_hints'],
                                         time_taken = request.POST['time_taken'],
-                                        attempt_number = request.POST['attempt_number'],
+                                        attempt_number = len(previous_attempts)+1,
                                         problem_type = request.POST['problem_type'],
                                         user_selection_val = request.POST['user_selection_val'],
                                         user_choices = request.POST['user_choices'])
