@@ -1,4 +1,5 @@
-django-project/database.py
+main/database.py
+venv_c2g
 
 django-class2go
 
@@ -21,19 +22,5 @@ js/quizrun.js~
 problem-sets/from-cware-dev2/problem_set_json.tgz
 
 problem-sets/quizzes/Advanced-Maxent/test_json_load.html~
-
-django-project/new-class2go
-
-django-project/django-class2go
-
-django-project/static
-
-django-project/c2g/__init__.pyc
-
-django-project/c2g/models.pyc
-
-django-project/settings.py.bak
-
-django-project/templates/base_c2g.html
 
 nohup.out
