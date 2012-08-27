@@ -1,4 +1,6 @@
-# source this from your login shell
+#!/bin/bash
+
+## source this from your login shell
 
 hoststage="app1"
 hostprod="app1"
@@ -25,9 +27,12 @@ function stageapp {
 
 alias localdb="~/src/class2go/django-project/manage.py dbshell"
 
-function sprint-bug-report {
-    for a in sefk dcadams jbau jinpa shalinguyen wescott halawa kluo kelvindo
-    do
+##
+## PROJECT MANAGEMENT JUNK
+##
+
+function buglist-sprint {
+    for a in dcadams halawa jbau jinpa kelvindo kluo sefk shalinguyen wescott; do
         for p in P0 P1
         do
             echo "--------- $a ($p) ---------"
@@ -35,5 +40,9 @@ function sprint-bug-report {
         done
         echo; echo
     done
+}
+
+function buglist-unprioritized {
+    ghi list -s open | egrep -v '[P0]|[P1]|[P2]'
 }
 
