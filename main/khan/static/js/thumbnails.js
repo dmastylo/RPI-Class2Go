@@ -23,6 +23,7 @@ function onPlayerReady(event) {
     $('.quiz-thumb').each(function (idx) {
         $(this).click(function () {
             //console.log("Calling makeProblem for " + idx);
+            $('#problemarea').show();
             KhanC2G.makeProblem(idx);
         });
     });
