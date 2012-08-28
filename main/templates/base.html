@@ -69,16 +69,16 @@
             {% if user.is_authenticated %}
                 <li>
                     <form action="{% url 'auth_logout' %}" method="POST">
-                        <input type="submit" id="login_button" class="btn logout hidden-phone hidden-tablet" value="Logout" />
+                        <input type="submit" id="login_button" class="btn logout hidden-phone" value="Logout" />
                         {% csrf_token %}
                     </form>
                 </li>
                 <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.username }}</a></b>!</span></li>
             {% else %}
-                <li class="hidden-phone hidden-tablet"><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
-                <li class="hidden-phone hidden-tablet"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
+                <li class="hidden-phone"><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
+                <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
             {% endif %}
-                <li class="visible-phone visible-tablet"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
+                <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>
         </div>
         

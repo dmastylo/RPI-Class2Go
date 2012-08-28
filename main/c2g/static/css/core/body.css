@@ -242,12 +242,24 @@ small.date {
 #c2g_layout_topbar .navbar {
     margin:0;
 }
-#c2g_layout_topbar .navbar-inner {
+
+#c2g_layout_topbar .navbar .navbar-inner {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
+    background-color: #e0d096;
+    background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
+    background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e0d096), to(#cabb84));
+    background-image: -webkit-linear-gradient(top, #e0d096, #cabb84);
+    background-image: -o-linear-gradient(top, #e0d096, #cabb84);
+    background-image: linear-gradient(top, #e0d096, #cabb84);
+    background-repeat: repeat-x;
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
-
 .toggle-views {
     position: relative;
     width: 280px;

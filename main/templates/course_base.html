@@ -34,10 +34,10 @@
                     <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
                 </li>
                 {% if user.is_authenticated %}
-                <li class="visible-phone visible-tablet">
+                <li class="visible-phone">
                     <a href="/accounts/profile">My Account</a>
                 </li>
-                <li class="visible-phone visible-tablet">
+                <li class="visible-phone">
                     <a href="{% url 'auth_logout' %}">Logout</a>
                 </li>
                 {% else %}
