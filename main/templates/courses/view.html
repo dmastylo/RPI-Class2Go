@@ -3,7 +3,7 @@
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
 {% block course_notification %}
-{% if is_logged_in and not common_page_data.is_course_member %}
+{% if user.is_authenticated and not common_page_data.is_course_member %}
 <div class="alert alert-info inline">
     <i class="icon-info-sign"></i>You are not yet enrolled in this course. <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
         <input type="submit" id="login_button" class="btn" value="Enroll" />

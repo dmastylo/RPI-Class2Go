@@ -7,7 +7,8 @@ Forms and validation code for user registration.
 from django.contrib.auth.models import User
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-
+import logging
+logger = logging.getLogger('form')
 
 # I put this on all required fields, because it's easier to pick up
 # on them with CSS or JavaScript if they have a class of "required"
@@ -32,20 +33,20 @@ class RegistrationForm(forms.Form):
     username = forms.RegexField(regex=r'^[\w.@+-]+$',
                                 max_length=30,
                                 widget=forms.TextInput(attrs=attrs_dict),
-                                label=_("Username"),
+                                label=_("Choose a Username"),
                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
-                             label=_("E-mail"))
-    first_name = forms.RegexField(regex=r'^[\w]+$',
+                             label=_("Your E-mail"))
+    first_name = forms.RegexField(regex=r'^[\w ]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
-                                  label=_("First Name"),
+                                  label=_("Your First Name"),
                                   error_messages={'invalid': _("This value may contain only letters and numbers.")})
-    last_name = forms.RegexField(regex=r'^[\w]+$',
+    last_name = forms.RegexField(regex=r'^[\w ]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
-                                  label=_("Last Name"),
+                                  label=_("Your Last Name"),
                                   error_messages={'invalid': _("This value may contain only letters and numbers.")})
     password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password"))
@@ -75,6 +76,7 @@ class RegistrationForm(forms.Form):
         field.
         
         """
+        #logger.info(self.cleaned_data['first_name'])
         if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
             if self.cleaned_data['password1'] != self.cleaned_data['password2']:
                 raise forms.ValidationError(_("The two password fields didn't match."))

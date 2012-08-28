@@ -81,7 +81,7 @@ function buglist-goalline {
     echo; echo
     echo "Notes:"
     echo "- Counts and bug lists exclude bugs marked with \"3-Done\" label."
-    echo "- Active seems to mean opened or commented on"
+    echo "- Active are opened or commented on in the prior 24 hours, doesn't include closed bugs."
     echo "- Bugs are sorted with most recent activity on top"
 }
 
