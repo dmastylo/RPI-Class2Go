@@ -17,6 +17,8 @@
 #questions-stack li.correctly-answered { background-color: #afdcaf; color: #070; position: relative; }
 #questions-stack li.correctly-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }
 
+.loading {background-color: #ffc; border: 2px solid #b75; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; font-weight: bold; opacity: .5; padding: .3em 1em; -ms-filter: “alpha(opacity=50)”; filter: alpha(opacity=50); -khtml-opacity: .5; -moz-opacity: .5; }
+
 /* summative exercises styles */
 #penalty-pct { font-weight: bold; }
 strong.attempts-so-far { color: #cc6200; }
