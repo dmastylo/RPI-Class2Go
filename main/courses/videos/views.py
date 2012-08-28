@@ -111,7 +111,7 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     except:
         raise Http404
     data = {'common_page_data': common_page_data}
-    form = ManageExercisesForm(initial={'course':common_page_data['course'].id})
+
     video = Video.objects.getByCourse(common_page_data['course']).get(slug=video_slug)
     videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=video_slug).order_by('video_time')
     used_exercises = []
@@ -124,6 +124,7 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     #Get all the exercises in the course but not in this problem set to list in add from existing
     #Q objects allow queryset objects to be ORed together
     exercises = Exercise.objects.all().filter(Q(problemSet__course=common_page_data['course'])|Q(video__course=common_page_data['course'])).exclude(id__in=used_exercises).distinct()
+    form = ManageExercisesForm(initial={'course':common_page_data['course'].id}, used_exercises=exercises)
 
     #Form processing action if form was submitted
     if request.method == 'POST':

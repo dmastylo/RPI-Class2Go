@@ -37,6 +37,12 @@ function confirm_change(){
         <div class="fieldWrapper">
             {{ form.video_time.errors }}
             Video Time (s):{{ form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+
+            {% for exercise in exercises %}
+            <br>
+            Check {{form.check}} {{form__exercise}}
+            {% endfor %}
+
             <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
