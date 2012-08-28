@@ -107,7 +107,7 @@ class RegistrationFormUniqueEmail(RegistrationForm):
         
         """
         if User.objects.filter(email__iexact=self.cleaned_data['email']):
-            raise forms.ValidationError(_("This email address is already in use. Please supply a different email address."))
+            raise forms.ValidationError(_("This email address is already in use."))
         return self.cleaned_data['email']
 
 
