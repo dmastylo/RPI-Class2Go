@@ -184,7 +184,8 @@ def signup_with_course(request, course_prefix, course_suffix):
     if not is_member_of_course(course, request.user):
         student_group = Group.objects.get(id=course.student_group_id)
         student_group.user_set.add(request.user)
-    
+    if (request.GET.__contains__('redirect_to')):
+            return redirect(request.GET.get('redirect_to'))
     return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))
 
 

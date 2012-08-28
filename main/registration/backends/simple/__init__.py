@@ -6,8 +6,9 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 from registration import signals
-from registration.forms import RegistrationForm
-
+from registration.forms import RegistrationFormUniqueEmail
+import logging
+logger=logging.getLogger(__name__)
 
 class SimpleBackend(object):
     """
@@ -24,16 +25,16 @@ class SimpleBackend(object):
         """
         username, email, password = kwargs['username'], kwargs['email'], kwargs['password1']
         User.objects.create_user(username, email, password)
-        
+        #logger.info(kwargs['first_name'])
         # authenticate() always has to be called before login(), and
         # will return the user we just created.
         new_user = authenticate(username=username, password=password)
         
-        if (not hasattr(kwargs,'first_name')):
-            kwargs['first_name']='first' 
+            #if (not hasattr(kwargs,'first_name')):
+        #kwargs['first_name']='first' 
         
-        if (not hasattr(kwargs,'last_name')):
-            kwargs['last_name']='last'    
+            #if (not hasattr(kwargs,'last_name')):
+        #kwargs['last_name']='last'    
         
 
         new_user.first_name, new_user.last_name = kwargs['first_name'], kwargs['last_name']
@@ -63,7 +64,7 @@ class SimpleBackend(object):
         return getattr(settings, 'REGISTRATION_OPEN', True)
 
     def get_form_class(self, request):
-        return RegistrationForm
+        return RegistrationFormUniqueEmail
 
     def post_registration_redirect(self, request, user):
         """
