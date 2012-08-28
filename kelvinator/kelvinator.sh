@@ -25,6 +25,13 @@ fi
 
 me=$0
 
+echo
+echo
+echo -ne "$me: BEGINNING RUN at "
+echo `date`
+echo "$me: PROCESSING: $1"
+echo
+
 # we assume that working_path is writeable
 working_path="/opt/class2go"
 today_epoch=`date +%s`
@@ -39,12 +46,12 @@ if [[ ${1:0:2} == "s3" ]]; then
     source_dir=`dirname $1`
     using_s3=true
 fi
-videofile=`basename $1`
+video_file=`basename $1`
 
 if [[ $using_s3 ]]; then
     echo "$me: setting up working directory: ${working_dir}"
     mkdir -p ${working_dir} 
-    s3cmd cp $1 ${working_dir} 
+    s3cmd get $1 ${working_dir}/$video_file
 
     pushd ${working_dir}   # yes, this is fragile
 fi
@@ -64,12 +71,12 @@ fi
 #Runs ffmpeg to extract frames at a certain interval
 echo
 echo "$me: Starting Extraction (ffmpeg)"
-ffmpeg -i $videofile -r $2 -f image2 jpegs/img%3d.jpeg 
+ffmpeg -i $video_file -r $2 -f image2 jpegs/img%3d.jpeg 
 
 #Runs extractFrames to list frames to be deleted
 echo
 echo "$me: Starting Differencing (extractFrames.py)"
-python $mydir/extractFrames.py $3 $2
+python $mydir/differenceFrames.py $3 $2
 
 #Deletes all images listed in file toDelete
 myFile="toDelete.txt"
@@ -85,11 +92,13 @@ done < $myFile
 
 if [[ $using_s3 ]]; then
     echo "$me: copying frames to target: $source_dir/$frame_dir"
-    s3cmd sync $frame_dir $source_dir/$frame_dir 
+    s3cmd sync $frame_dir $source_dir/
 
     popd
-    echo "$me: cleaning up working dir: $working_dir"
+    echo "$me: cleaning up working directory: $working_dir"
     rm -rv $working_dir
 fi
 
-
+echo
+echo -ne "$me: ENDING RUN at "
+echo `date`
