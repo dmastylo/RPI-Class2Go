@@ -15,7 +15,7 @@ def index(item): # define a index function for list items
 def main(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
+    except Course.DoesNotExist:
         raise Http404
 
 

@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.contrib.auth.models import User,Group
 from courses.common_page_data import get_common_page_data
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect
 
 from c2g.models import *
 from random import randrange
@@ -174,6 +175,17 @@ def is_member_of_course(course, user):
             return True
 
     return False
+
+
+@require_POST
+@csrf_protect
+def signup_with_course(request, course_prefix, course_suffix):
+    course = request.common_page_data['course']
+    if not is_member_of_course(course, request.user):
+        student_group = Group.objects.get(id=course.student_group_id)
+        student_group.user_set.add(request.user)
+    
+    return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))
 
 
 @require_POST

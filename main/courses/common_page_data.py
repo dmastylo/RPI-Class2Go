@@ -1,6 +1,9 @@
 from c2g.models import Course, AdditionalPage
 from django.contrib.auth.models import User, Group
 import datetime
+import logging
+
+logger=logging.getLogger(__name__)
 
 def get_common_page_data(request, prefix, suffix):
     
@@ -12,17 +15,32 @@ def get_common_page_data(request, prefix, suffix):
     
     can_switch_mode = False
     is_course_admin = False
+    is_course_member = False
     
     user_groups = request.user.groups.all()
+    logger.info("here")
     for g in user_groups:
-        if g.id == course.instructor_group_id or g.id == course.tas_group_id or g.id == course.readonly_tas_group_id:
+        if g.id == course.student_group_id:
+            is_course_member = True
+            break
+        
+        if g.id == course.instructor_group_id:
             can_switch_mode = True
+            is_course_admin = True
+            is_course_member = True
+            break
+ 
+        if g.id == course.tas_group_id:
+            can_switch_mode = True
+            is_course_admin = True
+            is_course_member = True
+            break
+
+        if g.id == course.readonly_tas_group_id:
+            can_switch_mode = True
+            is_course_member = True
             break
             
-    for g in user_groups:
-        if g.id == production_course.instructor_group_id or g.id == production_course.tas_group_id:
-            is_course_admin = True
-            break
     
     if can_switch_mode and ('course_mode' in request.session) and (request.session['course_mode'] == 'staging'):
         course_mode = 'staging'
@@ -52,6 +70,7 @@ def get_common_page_data(request, prefix, suffix):
         'course_mode':course_mode,
         'can_switch_mode':can_switch_mode,
         'is_course_admin':is_course_admin,
+        'is_course_member':is_course_member,
         'view_mode': view_mode,
         'course_info_pages':course_info_pages,
         'view_mode': view_mode,

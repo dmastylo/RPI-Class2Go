@@ -1,5 +1,6 @@
 from courses.common_page_data import get_common_page_data
 from django.http import Http404
+from c2g.models import Course
 
 import logging
 logger = logging.getLogger(__name__)
@@ -31,5 +32,5 @@ class common_data(object):
             request.common_page_data=get_common_page_data(request, cp, cs)
             #logger.info('Ran get_common_page_data course: ' + request.common_page_data['course_mode'])
             return None
-        except:
+        except Course.DoesNotExist:
             raise Http404
