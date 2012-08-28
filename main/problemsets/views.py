@@ -61,17 +61,36 @@ def show(request, course_prefix, course_suffix, pset_slug):
 #@auth_view_wrapper
 def attempt(request, problemId):
     user = request.user
-    problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-    problem_activity = ProblemActivity(student = user,
-                                        problemset_to_exercise = problemset_to_exercise,
-                                        complete = request.POST['complete'],
-                                        attempt_content = request.POST['attempt_content'],
-                                        count_hints = request.POST['count_hints'],
-                                        time_taken = request.POST['time_taken'],
-                                        attempt_number = request.POST['attempt_number'],
-                                        problem_type = request.POST['problem_type'],
-                                        user_selection_val = request.POST['user_selection_val'],
-                                        user_choices = request.POST['user_choices'])
+    
+    exercise_type = request.POST['exercise_type']
+    if exercise_type == 'problemset':
+        problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
+        problem_activity = ProblemActivity(student = user,
+                                           problemset_to_exercise = problemset_to_exercise,
+                                           complete = request.POST['complete'],
+                                           attempt_content = request.POST['attempt_content'],
+                                           count_hints = request.POST['count_hints'],
+                                           time_taken = request.POST['time_taken'],
+                                           attempt_number = request.POST['attempt_number'],
+                                           problem_type = request.POST['problem_type'],
+                                           user_selection_val = request.POST['user_selection_val'],
+                                           user_choices = request.POST['user_choices'])
+        
+    elif exercise_type == 'video':
+        video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
+        problem_activity = ProblemActivity(student = user,
+                                           video_to_exercise = video_to_exercise,
+                                           complete = request.POST['complete'],
+                                           attempt_content = request.POST['attempt_content'],
+                                           count_hints = request.POST['count_hints'],
+                                           time_taken = request.POST['time_taken'],
+                                           attempt_number = request.POST['attempt_number'],
+                                           problem_type = request.POST['problem_type'],
+                                           user_selection_val = request.POST['user_selection_val'],
+                                           user_choices = request.POST['user_choices'])
+        
+        
+           
     #In case no problem id is specified in template
     try:
         problem_activity.problem = request.POST['problem_identifier']
