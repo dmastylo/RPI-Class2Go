@@ -138,4 +138,11 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/files/upload$', 'courses.files.views.upload'),
     url(r'^upload_file/?', 'courses.files.actions.upload'),
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
+                       
+                       
+    #Preview
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview/$', 'courses.preview.views.preview'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_reg/$', 'courses.preview.views.preview_reg')
+                       
+                       
 )

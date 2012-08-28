@@ -1,0 +1,47 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block topnav %} {% endblock topnav %}
+{% block navbar %} {% endblock navbar %}
+{% block r_column_content %}
+<div class = "span7">
+<h1>Course Info</h1>
+Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people's opinions about products or services to extracting appointments from your email. In this class, you'll learn the fundamental algorithms and mathematical models for human alanguage processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.    
+</div>
+{% if user.is_authenticated %}
+  {% if common_page_data.is_course_member %}
+  <div class="span5">
+    <div class="alert alert-success"><i class="icon-heart"></i>You have signed up for {{common_page_data.course.title}}!</div>
+    The course starts on {{common_page_data.course.calendar_start}}.  The course staff will contact you with an email introduction when the date approaches.  Hope to see you online this term!
+  </div>
+  {% else %}
+    <div class="span5 alert alert-info"><i class="icon-info-sign"></i>Hi {{user.first_name}} {{user.last_name}}.  It looks we already have record of you at Stanford Online.  Would you like to register for this class?
+    <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}?redirect_to={{request.path}}" method="POST">
+    <input type="submit" id="login_button" class="btn" value="Enroll" /></div>
+    {% csrf_token %}
+  {% endif %}
+{% else %}
+<div class="span5">
+  {% if form.errors %}
+  <div class="alert alert-error">
+      <button class="close" data-dismiss="alert">×</button>
+      Please correct the errors below.
+  </div>
+  {% endif %}
+
+  <div class="registration">
+	  <div class="well">
+            <h2 class="span12 pagination-centered"> Signup </h2>
+	    	<form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post">
+		         {% csrf_token %}
+		         <table>
+                    {{ form.as_table }}
+		         </table>
+		         <div class="form-actions">
+		    	<input type="submit" value="Register" class="btn btn-primary btn-large" />
+			    </div>
+            </form>
+	  </div>
+   </div>
+</div>
+{% endif %}
+{% endblock r_column_content %}

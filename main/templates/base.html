@@ -65,6 +65,7 @@
             </div>
             {% endifequal %}
             {% endblock navbar %}
+            {% block topnav %}
             <div class="top-nav">
             {% if user.is_authenticated %}
                 <li>
@@ -73,13 +74,14 @@
                         {% csrf_token %}
                     </form>
                 </li>
-                <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.username }}</a></b>!</span></li>
+                <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></b>!</span></li>
             {% else %}
                 <li class="hidden-phone hidden-tablet"><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
                 <li class="hidden-phone hidden-tablet"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
             {% endif %}
                 <li class="visible-phone visible-tablet"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>
+            {% endblock topnav %}
         </div>
         
         

@@ -13,6 +13,9 @@ from courses.common_page_data import get_common_page_data
 
 import json
 import settings
+import logging
+logger=logging.getLogger(__name__)
+
 
 def activate(request, backend,
              template_name='registration/activate.html',
@@ -187,6 +190,7 @@ def register(request, backend, success_url=None, form_class=None,
     if request.method == 'POST':
         form = form_class(data=request.POST, files=request.FILES)
         if form.is_valid():
+            #logger.info(form.cleaned_data['first_name'])
             new_user = backend.register(request, **form.cleaned_data)
             try:
                 cpd=get_common_page_data(request, request.POST.get('course_prefix'), request.POST.get('course_suffix'))
