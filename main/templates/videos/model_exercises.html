@@ -29,18 +29,17 @@ function confirm_change(){
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <div class="fieldWrapper">
-            {{ form.file.errors }}
-            {{ form.file }}
-            {{ form.course }}
-            <span class="help-block">{{ field.help_text }}</span>
+            {{ manage_form.file.errors }}
+            {{ manage_form.file }}
+            {{ manage_form.course }}
         </div>
         <div class="fieldWrapper">
-            {{ form.video_time.errors }}
-            Video Time (s):{{ form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            {{ manage_form.video_time.errors }}
+            Video Time (s):{{ manage_form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
 
-            {% for exercise in exercises %}
+            {% for field in additional_form %}
             <br>
-            Check {{form.check}} {{form__exercise}}
+            {{field.error}} {{field}}
             {% endfor %}
 
             <span class="help-block">{{ field.help_text }}</span>
@@ -66,29 +65,24 @@ function confirm_change(){
             <input type="submit" value="Add Exercises" onclick="return confirm_change()" class="btn">
         </div>
     </form>
-
-    <form action='' method="POST" class="form-vertical">
+    </fieldset>
+    <fieldset class="well">
+    <h4>Reorder Exercises</h4>
+    <form action='{% url 'courses.videos.views.save_exercises' %}' method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
-        <ul data-sortablecontainer class="exercise-list">
-            {% for videoToEx in videoToExs %}
-                <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
-                {{videoToEx.exercise.fileName}} - {{videoToEx.video_time}}s
-                    <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
-                    <!-- Add delete button here -->
-                </li>
-            {% empty%}
-                <p style='margin: 20px;'>There are no exercises yet.</p>
-            {% endfor %}
-        </ul>
+        
+        {% for field in reorder_form %}
+        {{field.label}} {{field}}s <br>
+        {% endfor %}
         <span class="help-block">After reordering, save before uploading another exercise</span>
     </fieldset>
         <div class="form-actions">
-            <input type="submit" name="action" value="Save and Publish" class="btn btn-primary" />
+            <input type="submit" name="action" value="Save and Set as Ready" class="btn btn-primary" />
 	        <input type="submit" name="action" value="Save as Draft" class="btn" />
-	        <input type="submit" name="action" value="Revert" class="btn" />
+	        <input type="submit" name="action" value="Reset to Ready" class="btn" />
 	        <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
         </div>
     </form>

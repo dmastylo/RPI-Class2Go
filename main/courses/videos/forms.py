@@ -41,15 +41,6 @@ class ManageExercisesForm(forms.Form):
     video_time = forms.IntegerField(min_value=0)
     course = forms.CharField(widget=(forms.HiddenInput()))
 
-    def __init__(self, *args, **kwargs):
-        used_exercises = kwargs.pop('used_exercises', None)
-        super(ManageExercisesForm, self).__init__(*args, **kwargs)
-        for used_exercise in used_exercises:
-            check = 'check' + str(used_exercise.id)
-            video_time = 'time' + str(used_exercise.id)
-            self.fields[check] = forms.BooleanField(required=False)
-            self.fields[video_time] = forms.IntegerField(required=False)
-
     #Check to make sure added exercise file names are unique to the course
     def clean(self):
         cleaned_data = super(ManageExercisesForm, self).clean()
@@ -59,9 +50,29 @@ class ManageExercisesForm(forms.Form):
             exercises = Exercise.objects.filter(video__course=course, fileName=file)
             if len(exercises) > 0:
                 self._errors['file'] = self.error_class(['An exercise by this name has already been uploaded'])
+        return cleaned_data
 
+class AdditionalExercisesForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        used_exercises = kwargs.pop('used_exercises', None)
+        super(AdditionalExercisesForm, self).__init__(*args, **kwargs)
+        for used_exercise in used_exercises:
+            check = 'check' + str(used_exercise.id)
+            video_time = 'time' + str(used_exercise.id)
+            self.fields[check] = forms.BooleanField(required=False)
+            self.fields[video_time] = forms.IntegerField(required=False)
+
+    def clean(self):
+        cleaned_data = super(AdditionalExercisesForm, self).clean()
         check = cleaned_data.get('check')
         poo = cleaned_data.get('poo')
         if check and not poo:
             self._errors['poo'] = self.error_class(['Dont be so poopy'])
         return cleaned_data
+
+class ReorderExercisesForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        current_exercises = kwargs.pop('current_exercises', None)
+        super(ReorderExercisesForm, self).__init__(*args, **kwargs)
+        for current_exercise in current_exercises:
+            self.fields[current_exercise.exercise.fileName] = forms.IntegerField(initial=current_exercise.video_time)

@@ -112,7 +112,7 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     except:
         raise Http404
     data = {'common_page_data': common_page_data}
-
+    manage_form = ManageExercisesForm(initial={'course':common_page_data['course'].id})
     video = Video.objects.getByCourse(common_page_data['course']).get(slug=video_slug)
     videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=video_slug).order_by('video_time')
     used_exercises = []
@@ -125,12 +125,15 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     #Get all the exercises in the course but not in this problem set to list in add from existing
     #Q objects allow queryset objects to be ORed together
     exercises = Exercise.objects.all().filter(Q(problemSet__course=common_page_data['course'])|Q(video__course=common_page_data['course'])).exclude(id__in=used_exercises).distinct()
-    form = ManageExercisesForm(initial={'course':common_page_data['course'].id}, used_exercises=exercises)
+    additional_form = AdditionalExercisesForm(initial={'course':common_page_data['course'].id}, used_exercises=exercises)
+    reorder_form = ReorderExercisesForm(current_exercises=videoToExs)
 
     #Form processing action if form was submitted
     if request.method == 'POST':
-        form = ManageExercisesForm(request.POST, request.FILES)
-        if form.is_valid():
+        manage_form = ManageExercisesForm(request.POST, request.FILES)
+        additional_form = AdditionalExercisesForm(request.POST, used_exercises=exercises)
+
+        if manage_form.is_valid():
             video = Video.objects.get(id=request.POST['video_id'])
             file_content = request.FILES['file']
             file_name = file_content.name
@@ -145,9 +148,13 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
             videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='staging')
             videoToEx.save()
             return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+#        elif additional_form.is_valid():
+#            return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
     #If form was not submitted then the form should be displayed or if there were errors the page needs to be rendered again
-    data['form'] = form
+    data['manage_form'] = manage_form
+    data['additional_form'] = additional_form
+    data['reorder_form'] = reorder_form
     data['course_prefix'] = course_prefix
     data['course_suffix'] = course_suffix
     data['video'] = video
@@ -213,15 +220,30 @@ def add_existing_exercises(request):
         videoToEx.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
+
 @auth_is_course_admin_view_wrapper
 def save_exercises(request):
+    #Function should only be accessed from submitting a form
+    if request.method != 'POST':
+        return redirect(request.META['HTTP_REFERER'])
+
+    course_prefix = request.POST['course_prefix']
+    course_suffix = request.POST['course_suffix']
+    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     video = Video.objects.get(id=request.POST['video_id'])
- #   videoToEx = video.videotoexercise_set.all().order_by('number')
- #   for n in range(0,len(videoToEx)):
- #       listName = "exercise_order[" + str(n) + "]"
- #       videoToEx[n].number = request.POST[listName]
- #       videoToEx[n].save()
-    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+    action = request.POST['action']
+    if action == 'Reset to Ready':
+        video.revert()
+        return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+    else:
+        videoToExs = VideoToExercise.objects.getByVideo(video)
+        for videoToEx in videoToExs:
+            videoToEx.video_time = request.POST[videoToEx.exercise.fileName]
+            videoToEx.save()
+        if action == 'Save and Set as Ready':
+            video.commit()
+        return HttpResponseRedirect(reverse('courses.videos.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'],)))
+
 
 
 def get_video_exercises(request):
