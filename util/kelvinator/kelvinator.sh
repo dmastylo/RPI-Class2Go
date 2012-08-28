@@ -11,6 +11,8 @@
 # in this case the script will use the s3cmd utilities to download the video, do the
 # work locally, and then upload the result back to S3.
 # 
+# Assumes this is being run from the directory right above the kelvinator directory.
+#
 # This is pretty fragile as written now, needs a lot of error handling and hardning.
 
 set -e     # fail on errors
@@ -23,7 +25,7 @@ if [[ $# -ne 3 ]]; then
     exit 1
 fi
 
-me=$0
+me=`basename $0`
 
 echo
 echo
@@ -42,7 +44,7 @@ source_dir="."
 using_s3=false
 # if first character is a slash, then full path, extract it
 # otherwise assume it's right here.  
-if [[ ${1:0:2} == "s3" ]]; then
+if [[ ${1:0:5} == "s3://" || ${1:0:5} == "S3://" ]]; then
     source_dir=`dirname $1`
     using_s3=true
 fi
@@ -76,7 +78,7 @@ ffmpeg -i $video_file -r $2 -f image2 jpegs/img%3d.jpeg
 #Runs extractFrames to list frames to be deleted
 echo
 echo "$me: Starting Differencing (extractFrames.py)"
-python $mydir/differenceFrames.py $3 $2
+python $mydir/kelvinator/differenceFrames.py $3 $2
 
 #Deletes all images listed in file toDelete
 myFile="toDelete.txt"
