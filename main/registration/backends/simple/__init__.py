@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 from registration import signals
 from registration.forms import RegistrationForm
@@ -68,7 +70,7 @@ class SimpleBackend(object):
         After registration, redirect to the home view.
         
         """
-        return ('c2g.views.home', (), {})
+        return (reverse('accounts.views.profile'), (), {})
 
     def post_activation_redirect(self, request, user):
         raise NotImplementedError

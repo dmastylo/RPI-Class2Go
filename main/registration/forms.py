@@ -52,6 +52,9 @@ class RegistrationForm(forms.Form):
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password (again)"))
     
+    course_prefix = forms.CharField(widget=forms.HiddenInput(),required=False)
+    course_suffix = forms.CharField(widget=forms.HiddenInput(),required=False)
+    
     def clean_username(self):
         """
         Validate that the username is alphanumeric and is not already

@@ -76,7 +76,7 @@
                 <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.username }}</a></b>!</span></li>
             {% else %}
                 <li class="hidden-phone hidden-tablet"><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
-                <li class="hidden-phone hidden-tablet"><a href="{% url 'registration_register' %}" class="btn">Register</a></li>
+                <li class="hidden-phone hidden-tablet"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
             {% endif %}
                 <li class="visible-phone visible-tablet"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>
@@ -119,7 +119,7 @@
         <form action="{% url 'auth_login' %}" method="POST" class="form-horizontal">
         <div class="modal-body">
             <div class="alert alert-info">
-                <i class="icon-info-sign"></i>New to Class2Go? <strong><a href="{% url 'registration_register' %}">Register here</a></strong>.
+                <i class="icon-info-sign"></i>New to Class2Go? <strong><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Register here</a></strong>.
             </div>
             <fieldset>
                 <div class="control-group">
@@ -138,6 +138,7 @@
             </fieldset>
         </div>
         <div class="modal-footer">
+            <a href="{% url 'auth_password_reset' %}">Forgot my password</a> &nbsp;
 	    <input type="hidden" name="next" value="{{request.path}}" />
             <input type='submit' class="btn btn-primary" value="Login" />
         </div>
