@@ -121,9 +121,24 @@ def create_courses(institutions,users):
         'handle':'nlp#$!Fall2012',
         'members': users,
     }
-    create_course(data, users)
+    create_course_nlp(data, users)
 
-def create_course(data, users):
+    data = {
+            'institution': institutions[0],
+            'title': 'Introductory Cryptography',
+            'description': 'Cryptography is an indispensable tool for protecting information in computer systems. This course explains the inner workings of cryptographic primitives and how to correctly use them. Students will learn how to reason about the security of cryptographic constructions and how to apply this knowledge to real-world applications. The course begins with a detailed discussion of how two parties who have a shared secret key can communicate securely when a powerful adversary eavesdrops and tampers with traffic. We will examine many deployed protocols and analyze mistakes in existing systems. The second half of the course discusses public-key techniques that let two or more parties generate a shared secret key. We will cover the relevant number theory and discuss public-key encryption, digital signatures, and authentication protocols. Towards the end of the course we will cover more advanced topics such as zero-knowledge, distributed protocols such as secure auctions, and a number of privacy mechanisms. Throughout the course students will be exposed to many exciting open problems in the field.The course will include written homeworks and programming labs. The course is self-contained, however it will be helpful to have a basic understanding of discrete probability theory.',
+            'term': 'Fall',
+            'year': 2012,
+            'calendar_start': datetime(2013, 7, 27),
+            'calendar_end': datetime(2013, 8, 12),
+            'list_publicly': 1,
+            'handle':'crypto#$!Fall2012',
+            'members': users,
+    }
+
+    create_course_crypto(data, users)
+
+def create_course_nlp(data, users):
     # Create the user groups
     r = randrange(0,100000000)
     student_group = Group.objects.create(name="Student Group for class2go course " + data['handle'] + " %d" % r)
@@ -190,7 +205,7 @@ def create_course(data, users):
         create_announcement(course, titles[i], descriptions[i], i, users['professors'][0])
 
     # Create content sections
-    titles = ['NLP Introduction and Regular Expressions', 'Tokenizations and Minimum Edit Distance', 'N-Grams']
+    titles = ['Introduction and Regular Expressions', 'Tokenizations and Minimum Edit Distance', 'N-Grams']
     sections = []
     for i in range(3):
         sections.append(create_content_section(course, titles[i], i))
@@ -274,6 +289,160 @@ def create_course(data, users):
     ]
     for i in range(3):
         create_news_event(course,titles[i])
+
+
+def create_course_crypto(data, users):
+    # Create the user groups
+    r = randrange(0,100000000)
+    student_group = Group.objects.create(name="Student Group for class2go course " + data['handle'] + " %d" % r)
+    instructor_group = Group.objects.create(name="Instructor Group for class2go course " + data['handle'] + " %d" % r)
+    tas_group = Group.objects.create(name="TAS Group for class2go course " + data['handle'] + " %d" % r)
+    readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + data['handle'] + " %d" % r)
+
+    # Join users to their groups
+    for professor in users['professors']:
+        instructor_group.user_set.add(professor)
+    for ta in users['tas']:
+        tas_group.user_set.add(ta)
+    for readonly_ta in users['readonly_tas']:
+        readonly_tas_group.user_set.add(readonly_ta)
+    for student in users['students']:
+        student_group.user_set.add(student)
+
+    # Create the course instances
+    course = Course(institution = data['institution'],
+            student_group = student_group,
+            instructor_group = instructor_group,
+            tas_group = tas_group,
+            readonly_tas_group = readonly_tas_group,
+            title = data['title'],
+            description = data['description'],
+            term = data['term'],
+            year = data['year'],
+            calendar_start = data['calendar_start'],
+            calendar_end = data['calendar_end'],
+            list_publicly = data['list_publicly'],
+            mode='staging',
+            handle = data['handle'])
+
+    course.save()
+    course.create_production_instance()
+
+    # Create the overview page
+    op = AdditionalPage(
+        course=course,
+        menu_slug='course_info',
+        title='Overview',
+        description='Cryptography is an indispensable tool for protecting information in computer systems. This course explains the inner workings of cryptographic primitives and how to correctly use them. Students will learn how to reason about the security of cryptographic constructions and how to apply this knowledge to real-world applications.',
+        slug='overview',
+        index=0,
+        mode='staging',
+    )
+    op.save()
+    op.create_production_instance()
+
+    # Create announcements
+    titles = [
+        'Welcome to Crypto 223!',
+        'Crypto: Assignment 1 Still Not Out',
+        'Crypto: There is no lecture room for this course',
+        'Crypto: Yet another assignment.'
+    ]
+    descriptions = [
+        'Crypto: Welcome to the Crypto course! Check out the links to announcements, news events, assignments and grades.',
+        'Crypto: The first assignment has been posted.  Visit the assignments link to see the list of assignments and instructions for each assignment.  Be sure to check the additional pages for additional help. If you have any question email us at nlp@stanford.edu.',
+        'Crypto: Because this Friday is Friday the 13th, we do not want to take any chances so class is cancelled. Post any questions on the discussion forum if you have any questions',
+        'Crypto: We will be moving the lecture room to the medical school. Sorry for any inconviniences. For those of you without a bike, I am even more sorry. See you next lecture!',
+    ]
+    for i in range(4):
+        create_announcement(course, titles[i], descriptions[i], i, users['professors'][0])
+
+    # Create content sections
+    titles = ['Crypto: Introduction and md5', 'Crypto: md5 collisions', 'Crypto: Why not to use md5 any more']
+    sections = []
+    for i in range(3):
+        sections.append(create_content_section(course, titles[i], i))
+
+    # Create videos
+    dicts = [
+        {'course':course, 'section':sections[0], 'title':'Crypto: Course Introduction','description':'Intro video by Professor Dan Jurafsky and Chris Manning','type':'youtube','url':'BJiVRIPVNxU', 'duration':772, 'slug':'intro', 'index':0},
+        {'course':course, 'section':sections[0], 'title':'Crypto: Regular Expressions','description':'Video on Regular Expressions','type':'youtube','url':'dBVlwb15SBM', 'duration':686, 'slug':'regexp', 'index':1},
+        {'course':course, 'section':sections[0], 'title':'Crypto: Regular Expressions in Practical NLP','description':'Video on Regular Expressions in Practical NLP','type':'youtube','url':'zJSqHRuD2C4', 'duration':366, 'slug':'regexp_in_practical_nlp', 'index':2},
+        {'course':course, 'section':sections[1], 'title':'Crypto: Word Tokenization','description':'Video on Word Tokenization','type':'youtube','url':'WMC3AjgYf3A', 'duration':866, 'slug':'tokenization', 'index':0},
+        {'course':course, 'section':sections[1], 'title':'Crypto: Defining Minimum Edit Distance','description':'Video on Defining Minimum Edit Distance','type':'youtube','url':'xOfEYI61f3k', 'duration':426, 'slug':'min_edit_distance', 'index':1},
+        {'course':course, 'section':sections[1], 'title':'Crypto: Computing Minimum Edit Distance','description':'Video on Computing Minimum Edit Distance','type':'youtube','url':'Gh63CeMzav8', 'duration':355, 'slug':'computing_min_edit_distance', 'index':2},
+        {'course':course, 'section':sections[2], 'title':'Crypto: Introduction to N-grams','description':'Video on Introduction to N-grams','type':'youtube','url':'LRq7om7vMEc', 'duration':522, 'slug':'ngrams', 'index':0},
+    ]
+
+    for i in range(7):
+        create_video(dicts[i], users)
+
+    # Create problem sets
+    #Kelvin - Stopping the creation of problem sets because there's no easy way to add a file and you
+    #can already use the gui to add problem sets and pick your own exercises.
+    data['course'] = course
+    data['section'] = sections[0]
+    data['index'] = 3
+    data['slug']='P1'
+    data['description'] = 'Crypto: This is the first problem set. Practice some question on Regular Expressions. Remember to work your problems out on a separate piece of paper first because you only get one try on these. Miss on and you have a D!'
+    data['title'] = 'Crypto: Problem Set 1: Regular Expressions'
+    data['path']='/static/latestKhan/exercises/P1.html'
+    data['due_date']='2012-07-20'
+    data['partial_credit_deadline']='2012-07-27'
+
+    #pset1 = create_problem_set(data, users)
+
+    data['course'] = course
+    data['section'] = sections[1]
+    data['index'] = 3
+    data['slug']='P2'
+    data['description'] = 'Crypto: This problem set will test your knowledge of Joint Probability. Each question is worth one point and your final exam is worth 100 points so these questions are basically useless. But you have to do them because an incomplete assignment disallows you from passing the class. Have fun with this problem set!'
+    data['title']='Crypto: Problem Set 2: Joint Probability'
+    data['path']='/static/latestKhan/exercises/P2.html'
+    data['due_date']='2012-07-27'
+    data['partial_credit_deadline']='2012-08-03'
+
+    # Removing second problem set
+    # KELVIN TODO -- fix create_problem_set so it handles two problem sets referencing the same exercises
+    # duplicate exercise entries screws other things up.
+    #
+    # pset2 = create_problem_set(data, users)
+
+    #Create exercises
+
+#    exercise1_1 = save_exercise(pset1, "P1_Levenshtein.html", 1)
+#    exercise1_2 = save_exercise(pset1, "P1_Regexp.html", 2)
+#    exercise1_3 = save_exercise(pset1, "P1_Tokenize.html", 3)
+
+#    exercise2_1 = save_exercise(pset2, "P2_Add_one_smoothing.html", 1)
+#    exercise2_2 = save_exercise(pset2, "P2_Joint.html", 2)
+#    exercise2_3 = save_exercise(pset2, "P2_Lexical1.html", 3)
+#    exercise2_4 = save_exercise(pset2, "P2_NER1.html", 4)
+#    exercise2_5 = save_exercise(pset2, "P2_Spelling.html", 5)
+
+    #Create problems
+
+    # save_problem(exercise1_1, 'p1')
+    # save_problem(exercise1_1, 'p2')
+    # save_problem(exercise1_2, 'p1')
+    # save_problem(exercise1_3, 'p1')
+
+    # save_problem(exercise2_1, 'p1')
+    # save_problem(exercise2_1, 'p2')
+    # save_problem(exercise2_2, 'p1')
+    # save_problem(exercise2_3, 'p1')
+    # save_problem(exercise2_4, 'p1')
+    # save_problem(exercise2_5, 'p1')
+
+    # Create news events
+    titles = [
+        'Crypto: Assignment 1 solutions and grades released',
+        'Crypto: Assignment 2 now available',
+        'Crypto: New video available: Ngrams',
+    ]
+    for i in range(3):
+        create_news_event(course,titles[i])
+
 
 
 

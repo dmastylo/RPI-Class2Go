@@ -52,7 +52,7 @@ function buglist-unprioritized {
 
 function buglist-counts {
     NOW=`date -u +"%F %R UTC"`
-    YESTERDAY=`date -v-1d`
+    YESTERDAY=`date --date="yesterday"`
     for l in P0 P1 P2; do
         # echo -ne "${NOW}\t"
         echo -ne "$l\t"
