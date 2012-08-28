@@ -22,30 +22,6 @@
             </div>
         </div>
         <div id="c2g_layout_topbar">
-            <div class="row-fluid">
-            <h1 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h1>
-            {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
-                <div class="hidden-phone pull-right">
-                    {% if common_page_data.can_switch_mode %}
-                        <a href="#" rel="tooltip" title="Choosing EDIT mode lets you edit the course site.  Choosing LIVE mode lets you view the site as students will.">
-						
-                        <form class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST">
-                            
-                            <p>You are currently viewing:</p>
-                            
-                            <div class="btn-group btn-views-toggle">
-                                <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Edit</button>
-                                <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Live</button>
-                            </div>
-                            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
-                            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
-                            {% csrf_token %}
-                        </form>
-                        </a>
-                    {% endif %}
-                </div>
-            {% endif %}
-            </div>
             {% block navbar %}
             {% ifequal user.is_staff True %}
             <div class="navbar">
@@ -65,20 +41,41 @@
             </div>
             {% endifequal %}
             {% endblock navbar %}
+            <div class="row-fluid">
+            <h1 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h1>
+            {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
+                <div class="hidden-phone pull-right">
+                    {% if common_page_data.can_switch_mode %}
+                        <form data-c2g-tooltip class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST" data-placement="left" title="Choosing EDIT mode lets you edit the course site. Choosing LIVE mode lets you view the site as students will.">
+                            
+                            <p>You are currently viewing:</p>
+                            
+                            <div class="btn-group btn-views-toggle">
+                                <button type="submit" name="to_mode" value="staging" class="btn btn-mini{% ifequal common_page_data.course_mode 'staging' %} active{% endifequal %}">Edit</button>
+                                <button type="submit" name="to_mode" value="production" class="btn btn-mini{% ifequal common_page_data.course_mode 'production' %} active{% endifequal %}">Live</button>
+                            </div>
+                            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+                            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+                            {% csrf_token %}
+                        </form>
+                    {% endif %}
+                </div>
+            {% endif %}
+            </div>
             <div class="top-nav">
             {% if user.is_authenticated %}
                 <li>
                     <form action="{% url 'auth_logout' %}" method="POST">
-                        <input type="submit" id="login_button" class="btn logout hidden-phone hidden-tablet" value="Logout" />
+                        <input type="submit" id="login_button" class="btn logout hidden-phone" value="Logout" />
                         {% csrf_token %}
                     </form>
                 </li>
                 <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.username }}</a></b>!</span></li>
             {% else %}
-                <li class="hidden-phone hidden-tablet"><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
-                <li class="hidden-phone hidden-tablet"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
+                <li class="hidden-phone"><a id="login_button" class="btn" data-toggle="modal" href="#login-modal">Login</a></li>
+                <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
             {% endif %}
-                <li class="visible-phone visible-tablet"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
+                <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>
         </div>
         
