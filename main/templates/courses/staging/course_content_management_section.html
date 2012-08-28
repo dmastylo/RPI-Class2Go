@@ -20,7 +20,7 @@
         </script>
         <form name="revert_form" action="{% url 'courses.actions.revert' %}" method="POST">
             <input type="hidden" id="revert_ids" name="revert_ids" value="" />
-            <input type="button" value="Reset to Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="revert_clicked()"/>Reset the ready version of selected items back to draft
+            <input type="button" value="Reset to Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="revert_clicked()"/>Reset the draft version of selected items back to ready
             <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
             <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
             {% csrf_token %}
@@ -29,7 +29,7 @@
         function revert_clicked() {
             document.getElementById("revert_ids").value = getCheckedIds();
             if (document.getElementById("revert_ids").value == '') {
-                alert('Nothing selected to revert.');
+                alert('Nothing selected to reset.');
                 return;
             }
             
@@ -42,14 +42,13 @@
         
         <form name="change_live_datetime_form" action="{% url 'courses.actions.change_live_datetime' %}" method="POST">
             <input type="hidden" id="change_live_datetime_ids" name="change_live_datetime_ids" value="" />
-            Go live 
-            <input type="radio" name="live_datetime_option" id="live_datetime_option_date" value="date" style='margin-left:50px;'/>on 
-            <input type='text' class='datepicker' name='live_date' id='live_date' value="{{common_page_data.current_datetime.month}}-{{common_page_data.current_datetime.day}}-{{common_page_data.current_datetime.year}}" data-date-format="mm-dd-yyyy" style='width:100px;'/> at
-            <input type='text' name='live_hours' id='live_hours' style='width:50px;' placeholder="hh"/>:<input type='text' name='live_minutes' id='live_minutes' style='width:50px;' placeholder="mm"/>
-            <input type="radio" name="live_datetime_option" id="live_datetime_option_now" value="now" checked style='margin-left:50px;'/> now
-            <input type="button" value="Set Live Date" class="btn" style='width: 100px; margin-left: 10px;' onclick="apply_clicked()"/>
+	    {{ form.live_datetime.errors }}
+            <label for="id_live_datetime" style="display:inline">Go live</label>
+	    {{ form.live_datetime }}
+            <input type="button" value="Set Live Date" class="btn" style='margin: 0 0 9px 10px' onclick="apply_clicked()"/>
             <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
             <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+	    <input type="hidden" name="list_type" value="course_materials" />
             {% csrf_token %}
         </form>
         <script type="text/javascript">

@@ -1,13 +1,15 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, render_to_response, redirect
 from django.template import Context, loader
 from django.template import RequestContext
 from django.contrib.auth.models import User,Group
+from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 
+from courses.forms import *
 from c2g.models import *
 from random import randrange
 from datetime import datetime
@@ -112,55 +114,61 @@ def revert(request):
 @require_POST
 @auth_is_course_admin_view_wrapper
 def change_live_datetime(request):
-    ids = request.POST.get("change_live_datetime_ids").split(",")
+    list_type = request.POST.get('list_type')
+    form = LiveDateForm(request.POST)
+    if form.is_valid():
+        new_live_datetime = form.cleaned_data['live_datetime']
 
-    if request.POST.get("live_datetime_option") == 'now':
-        new_live_datetime = datetime.now()
+        ids = request.POST.get("change_live_datetime_ids").split(",")
+
+        for id in ids:
+            parts = id.split('_')
+            if parts[0] == 'video':
+                video = Video.objects.get(id=parts[1])
+                video.live_datetime = new_live_datetime
+                video.image.live_datetime = new_live_datetime
+                video.save()
+                video.image.save()
+            elif parts[0] == 'problemset':
+                pset = ProblemSet.objects.get(id=parts[1])
+                pset.live_datetime = new_live_datetime
+                pset.image.live_datetime = new_live_datetime
+                pset.save()
+                pset.image.save()
+            elif parts[0] == 'additionalpage':
+                page = AdditionalPage.objects.get(id=parts[1])
+                page.live_datetime = new_live_datetime
+                page.image.live_datetime = new_live_datetime
+                page.save()
+                page.image.save()
+            elif parts[0] == 'file':
+                file = File.objects.get(id=parts[1])
+                file.live_datetime = new_live_datetime
+                file.image.live_datetime = new_live_datetime
+                file.save()
+                file.image.save()
+        if list_type == 'course_materials':
+            return redirect('courses.views.course_materials', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
+        elif list_type == 'problemsets':
+            return redirect('problemsets.views.list', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
+        else:
+            return redirect('courses.videos.views.list', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
+        #This won't work anymore because referer could be /change_live_datetime if it's an invalid form post
+        #return redirect(request.META['HTTP_REFERER'])
+
+    if list_type == 'course_materials':
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
+        template = 'courses/staging/course_materials.html'
+    elif list_type == 'problemsets':
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_pset_content=True)
+        template = 'problemsets/staging/list.html'
     else:
-        live_date_parts = request.POST.get("live_date").split("-")
-        year = int(live_date_parts[2])
-        month = int(live_date_parts[0])
-        day = int(live_date_parts[1])
-        if request.POST.get("live_hours") == '':
-            hour = 0
-        else:
-            hour = int(request.POST.get("live_hours"))
-
-        if request.POST.get("live_minutes") == '':
-            minute = 0
-        else:
-            minute = int(request.POST.get("live_minutes"))
-
-        new_live_datetime = datetime(year,month,day,hour,minute)
-
-    for id in ids:
-        parts = id.split('_')
-        if parts[0] == 'video':
-            video = Video.objects.get(id=parts[1])
-            video.live_datetime = new_live_datetime
-            video.image.live_datetime = new_live_datetime
-            video.save()
-            video.image.save()
-        elif parts[0] == 'problemset':
-            pset = ProblemSet.objects.get(id=parts[1])
-            pset.live_datetime = new_live_datetime
-            pset.image.live_datetime = new_live_datetime
-            pset.save()
-            pset.image.save()
-        elif parts[0] == 'additionalpage':
-            page = AdditionalPage.objects.get(id=parts[1])
-            page.live_datetime = new_live_datetime
-            page.image.live_datetime = new_live_datetime
-            page.save()
-            page.image.save()
-        elif parts[0] == 'file':
-            file = File.objects.get(id=parts[1])
-            file.live_datetime = new_live_datetime
-            file.image.live_datetime = new_live_datetime
-            file.save()
-            file.image.save()
-
-    return redirect(request.META['HTTP_REFERER'])
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True)
+        template = 'videos/staging/list.html'
+    return render(request, template,
+                  {'common_page_data': request.common_page_data,
+                   'section_structures': section_structures,
+                   'form': form})
 
 def is_member_of_course(course, user):
     student_group_id = course.student_group.id
