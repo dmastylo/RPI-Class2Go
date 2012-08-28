@@ -1,11 +1,61 @@
-#Deletes all images in the jpegs folder
-rm jpegs/*
+#!/bin/bash
+
+set -e   
+
+if [[ $# -ne 3 ]]; then
+    echo "usage: frameExtract <video> <rate> <thresh>"
+    echo "   video    video name, assumed to be in current directory unless fully qualified path"
+    echo "   rate     frames per second to extract (1 is good)"
+    echo "   thresh   difference threshold to keep different frams (15 is good)"
+    exit 1
+fi
+
+me=$0
+
+working_path="/opt/class2go"
+today_epoch=`date +%s`
+working_dir="${working_path}/extract-${today_epoch}"
+mydir=`pwd`
+
+# if first character is a slash, then full path, extract it
+# otherwise assume it's right here.  
+if [[ ${1:0:1} == "/" ]]; then
+    source_dir=`dirname $1`
+    use_temp_dir=true
+else
+    source_dir="."
+    use_temp_dir=false
+fi
+videofile=`basename $1`
+
+if [[ $use_temp_dir ]]; then
+    echo "$me: setting up working directory: ${working_dir}"
+    mkdir -p ${working_dir} 
+    cp $1 ${working_dir} 
+    cd ${working_dir}
+fi
+
+frame_dir=jpegs
+
+if [[ ! -d ${frame_dir} ]]; then
+    echo "$me: creating target directory: ${frame_dir}"
+    mkdir -p ${frame_dir} 
+fi
+
+if [[ -e ${frame_dir}/* ]]; then
+    echo "$me: files already in target, clearing out: ${frame_dir}"
+    rm -v ${frame_dir}/*
+fi
 
 #Runs ffmpeg to extract frames at a certain interval
-ffmpeg -i $1 -r $2 -f image2 jpegs/img%3d.jpeg
+echo
+echo "$me: Starting Extraction (ffmpeg)"
+ffmpeg -i $videofile -r $2 -f image2 jpegs/img%3d.jpeg 
 
 #Runs extractFrames to list frames to be deleted
-python extractFrames.py $3 $2
+echo
+echo "$me: Starting Differencing (extractFrames.py)"
+python $mydir/extractFrames.py $3 $2
 
 #Deletes all images listed in file toDelete
 myFile="toDelete.txt"
@@ -13,6 +63,19 @@ myLine=""
 while [ 1 ]
 do
     read myLine || break
-    rm jpegs/$myLine
+    rm ${frame_dir}/$myLine 
 done < $myFile
+
+# if we are doing in place then we are done.  But if we are using a temp directory
+# we need to copy files back to where they belong
+
+# if [[ ! -d $source_dir/$frame_dir ]]; then
+    # echo "$me: target directory didn't exist, creating: $source_dir/$frame_dir"
+    # mkdir -p $source_dir/$frame_dir
+# fi
+
+if [[ $use_temp_dir ]]; then
+    echo "$me: copying frames to target: $source_dir/$frame_dir"
+    cp -vr $frame_dir $source_dir/$frame_dir 
+fi
 
