@@ -2714,6 +2714,8 @@ var Khan = (function() {
         //Gets the problem ID which is (problem number)-(variation)
         problem_identifier = $('#workarea').children('div').attr('id');
         exercise_filename = exercise.data('fileName');
+        exercise_type = $('#exercise_type').val();
+        video_id = $('#video_id').val();
         // [@wescott] pset_id of -1 will cause error, but right now just used for in-video
         // Needs to have a real problem set associated with videos
         pset_id = ($('#pset_id').length) ? $('#pset_id').val() : -1;
@@ -2728,6 +2730,8 @@ var Khan = (function() {
         });
         data = $.extend(data, {"problem_identifier": problem_identifier});
         data = $.extend(data, {"exercise_filename": exercise_filename});
+        data = $.extend(data, {"exercise_type": exercise_type});
+        data = $.extend(data, {"video_id": video_id});
         data = $.extend(data, {"pset_id": pset_id});
         data = $.extend(data, {"user_selection_val": user_selection_val});
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
