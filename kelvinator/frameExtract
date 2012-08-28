@@ -1,6 +1,19 @@
 #!/bin/bash
+#
+# Drive the frame extraction and differencing steps
+# 
+# This basically has two modes.  If the file given is right in the directory where
+# frameExtractor and extractFrames.py are, then it will run locally and put the 
+# results in the jpegs directory.
+#
+# The more common mode is for the source to be given as a URL to S3, like this:
+#    frameExtractor s3://prod-c2g/nlp/Fall2012/Videos/11/RegularExpression.m4v 1 15
+# in this case the script will use the s3cmd utilities to download the video, do the
+# work locally, and then upload the result back to S3.
+# 
+# This is pretty fragile as written now, needs a lot of error handling and hardning.
 
-set -e   
+set -e     # fail on errors
 
 if [[ $# -ne 3 ]]; then
     echo "usage: frameExtract <video> <rate> <thresh>"
@@ -12,27 +25,28 @@ fi
 
 me=$0
 
+# we assume that working_path is writeable
 working_path="/opt/class2go"
 today_epoch=`date +%s`
 working_dir="${working_path}/extract-${today_epoch}"
 mydir=`pwd`
 
+source_dir="."
+using_s3=false
 # if first character is a slash, then full path, extract it
 # otherwise assume it's right here.  
-if [[ ${1:0:1} == "/" ]]; then
+if [[ ${1:0:2} == "s3" ]]; then
     source_dir=`dirname $1`
-    use_temp_dir=true
-else
-    source_dir="."
-    use_temp_dir=false
+    using_s3=true
 fi
 videofile=`basename $1`
 
-if [[ $use_temp_dir ]]; then
+if [[ $using_s3 ]]; then
     echo "$me: setting up working directory: ${working_dir}"
     mkdir -p ${working_dir} 
-    cp $1 ${working_dir} 
-    cd ${working_dir}
+    s3cmd cp $1 ${working_dir} 
+
+    pushd ${working_dir}   # yes, this is fragile
 fi
 
 frame_dir=jpegs
@@ -66,16 +80,16 @@ do
     rm ${frame_dir}/$myLine 
 done < $myFile
 
-# if we are doing in place then we are done.  But if we are using a temp directory
-# we need to copy files back to where they belong
+# if we are doing in place then we are done.  But if we are using S3 we need to 
+# upload files (and manifest) back up there
 
-# if [[ ! -d $source_dir/$frame_dir ]]; then
-    # echo "$me: target directory didn't exist, creating: $source_dir/$frame_dir"
-    # mkdir -p $source_dir/$frame_dir
-# fi
-
-if [[ $use_temp_dir ]]; then
+if [[ $using_s3 ]]; then
     echo "$me: copying frames to target: $source_dir/$frame_dir"
-    cp -vr $frame_dir $source_dir/$frame_dir 
+    s3cmd sync $frame_dir $source_dir/$frame_dir 
+
+    popd
+    echo "$me: cleaning up working dir: $working_dir"
+    rm -rv $working_dir
 fi
+
 
