@@ -135,4 +135,6 @@
     })
     .disableSelection();
 
+    $("[data-c2g-tooltip]").tooltip();
+
 })(document);

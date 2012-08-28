@@ -24,12 +24,12 @@
   {% if user.is_authenticated %}
 
     {% if common_page_data.course_mode == 'staging' and common_page_data.is_course_admin %}
-      <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn">Edit Video</a>
+      <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
     {% endif %}
 
     {% if video.title == 'Defining Minimum Edit Distance'%}
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
-    {% elif video.title == "Regular Expressions" or video.title == "Word Tokenization" or video.title == "Something else" %}
+    {% elif video.title %} 
         <h2 class="section-headline">{{video.title}}</h2>
             <!-- Hardcoding select content of khan-site.html -->
             <div id="page-container">
@@ -78,10 +78,12 @@
           </div>
         </div>
         <div id="loadedExercises"></div>
+        <input type="hidden" name="exercise_type" value="video" id="exercise_type" />
+        <input type="hidden" name="video_id" value="{{ video.id }}" id="video_id" /> 
     {% else %}
         <h2>{{video.title}}</h2>
         <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
-    <div id="player"></div>
+        <div id="player"></div>
     {% endif %}
   {% else %}
     <h4>Please log in to see videos.</h4>
@@ -94,7 +96,7 @@
 {% block addl_scripts %}
 
 
-{% if video.title == "Regular Expressions" or video.title == "Word Tokenization" or video.title == "Something else"%}
+{% if video.title %} 
 <script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script>
 <script src="{{ STATIC_URL }}js/thumbnails.js" /></script>
 <script>
@@ -109,11 +111,10 @@
 
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
-    //var path = '/static/graphics/videos/nlp/' + encodeURIComponent("{{ video.title }}") + '/jpegs/';
-    var path = '/static/graphics/videos/nlp/' + encodeURIComponent("Word Tokenization") + '/jpegs/';
+    var path = '/static/graphics/videos/nlp/' + encodeURIComponent("{{ video.title }}") + '/jpegs/';
     var thumbManifest = {};
     var psManifest = {};
-    var loadTmpmanifest = function (data, textStatus, jqXHR) { 
+    var loadThumbManifest = function (data, textStatus, jqXHR) { 
         $.each(data, function (key, val) {
             $.each(val, function (k, v) {
                 if (k == "imgsrc") {
@@ -133,7 +134,7 @@
             psManifest[parseInt(key)] = val; 
         });
     };
-    $.getJSON(path + "manifest.txt", "", loadTmpmanifest);
+    $.getJSON(path + "manifest.txt", "", loadThumbManifest);
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
     var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest);
 
@@ -179,6 +180,7 @@
 
             player.playVideo();
         });
+
     };
     $(document).ready(function () {
         window.setTimeout(initStacks, 2000);
@@ -188,32 +190,32 @@
 {% else %}
 
 <script type="text/javascript">
-  // This code loads the IFrame Player API code asynchronously.
-  var tag = document.createElement('script');
-  tag.src = "//www.youtube.com/player_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    // This code loads the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
+    tag.src = "//www.youtube.com/player_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-  // This function creates a YouTube player after the API code downloads.
-  var player;
-  function onYouTubePlayerAPIReady() {
-    player = new YT.Player('player', {
-      height: '430',
-      width: '710',
-      videoId: '{{video.url}}',
+    // This function creates a YouTube player after the API code downloads.
+    var player;
+    function onYouTubePlayerAPIReady() {
+        player = new YT.Player('player', {
+        height: '430',
+        width: '710',
+        videoId: '{{video.url}}',
         /* [@wescott] commented out below for Kevin for the 8/1/12 demo */
-      /*playerVars: { 'rel': 0, 'start': {{video_rec.start_seconds}} },*/
-      playerVars: { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} },
+        /*playerVars: { 'rel': 0, 'start': {{video_rec.start_seconds}} },*/
+        playerVars: { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} },
     });
-  }
+    }
 
-{% if video_rec %}
-  window.onbeforeunload = function() {
-    vidTime = Math.floor(player.getCurrentTime());
-    /* [@wescott] commented out below for Kevin for the 8/1/12 demo */
-    $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
-  }
-{% endif %}
+    {% if video_rec %}
+    window.onbeforeunload = function() {
+        vidTime = Math.floor(player.getCurrentTime());
+        /* [@wescott] commented out below for Kevin for the 8/1/12 demo */
+        $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+    }
+    {% endif %}
 </script>
 {% endif %}
 

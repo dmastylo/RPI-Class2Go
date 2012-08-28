@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect
 from courses.common_page_data import get_common_page_data
 
 from courses.files.forms import *
+from courses.actions import auth_is_course_admin_view_wrapper
 
+@auth_is_course_admin_view_wrapper
 def upload(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -29,6 +31,7 @@ def upload(request):
              'form': form,
              })
 
+@auth_is_course_admin_view_wrapper
 def delete_file(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))

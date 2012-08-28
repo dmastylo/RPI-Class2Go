@@ -7,8 +7,10 @@ Views which allow users to create and activate accounts.
 from django.shortcuts import redirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-
+from django.core.urlresolvers import reverse
 from registration.backends import get_backend
+from courses.common_page_data import get_common_page_data
+
 import json
 import settings
 
@@ -186,13 +188,20 @@ def register(request, backend, success_url=None, form_class=None,
         form = form_class(data=request.POST, files=request.FILES)
         if form.is_valid():
             new_user = backend.register(request, **form.cleaned_data)
+            try:
+                cpd=get_common_page_data(request, request.POST.get('course_prefix'), request.POST.get('course_suffix'))
+                course_group = cpd['course'].student_group
+                course_group.user_set.add(new_user)
+                return redirect(reverse('courses.views.main', args=[request.POST.get('course_prefix'), request.POST.get('course_suffix')]))
+            except:
+                pass
             if success_url is None:
                 to, args, kwargs = backend.post_registration_redirect(request, new_user)
                 return redirect(to, *args, **kwargs)
             else:
                 return redirect(success_url)
     else:
-        form = form_class()
+        form = form_class(initial={'course_prefix':request.GET.get('pre'),'course_suffix':request.GET.get('post')})
     
     if extra_context is None:
         extra_context = {}

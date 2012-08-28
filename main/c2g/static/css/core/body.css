@@ -240,13 +240,13 @@ small.date {
 }
 
 #c2g_layout_topbar .navbar {
-    margin-bottom: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-top: 25px;
+    margin:0;
 }
 
 #c2g_layout_topbar .navbar .navbar-inner {
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
     background-color: #e0d096;
     background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
     background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
@@ -261,8 +261,7 @@ small.date {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 .toggle-views {
-    position: relative;
-    width: 280px;
+    width: 246px;
     padding: 7px 7px 0;
     color: #333;
     text-align: right;

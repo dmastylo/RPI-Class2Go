@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
 from django.db.models import Q
-from courses.actions import auth_view_wrapper
+from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
 
 
@@ -85,7 +85,7 @@ def attempt(request, problemId):
     else:
         return HttpResponse("wrong")
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def create_form(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -109,7 +109,7 @@ def create_form(request, course_prefix, course_suffix):
                               context_instance=RequestContext(request))
 
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def edit_form(request, course_prefix, course_suffix, pset_slug):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -125,7 +125,7 @@ def edit_form(request, course_prefix, course_suffix, pset_slug):
     return render_to_response('problemsets/edit.html', data, context_instance=RequestContext(request))
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def create_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -153,7 +153,7 @@ def create_action(request):
     return render_to_response('problemsets/create.html', data, context_instance=RequestContext(request))
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def edit_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -185,7 +185,7 @@ def edit_action(request):
     data['pset'] = pset
     return render(request, 'problemsets/edit.html', data)
 
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     #Get all necessary information about the problemset
     try:
@@ -237,7 +237,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     return render_to_response('problemsets/manage_exercises.html', data, context_instance=RequestContext(request))
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def add_existing_exercises(request):
     pset = ProblemSet.objects.get(id=request.POST['pset_id'])
     exercise_ids = request.POST.getlist('exercise')
@@ -248,7 +248,7 @@ def add_existing_exercises(request):
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def delete_exercise(request):
     toDelete = ProblemSetToExercise.objects.get(id=request.POST['exercise_id'])
     toDelete.delete()
@@ -264,7 +264,7 @@ def delete_exercise(request):
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 @require_POST
-@auth_view_wrapper
+@auth_is_course_admin_view_wrapper
 def save_exercises(request):
     #Function should only be accessed from submitting a form
     if request.method != 'POST':
