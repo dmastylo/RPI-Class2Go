@@ -11,7 +11,7 @@ from problemsets.forms import *
 from django.db.models import Q
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
-
+from courses.forms import *
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -29,7 +29,12 @@ def list(request, course_prefix, course_suffix):
     print request
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
-    return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list'}, context_instance=RequestContext(request))
+
+    form = None
+    if request.common_page_data['course_mode'] == "staging":
+        form = LiveDateForm()
+
+    return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list', 'form': form}, context_instance=RequestContext(request))
 
 @auth_view_wrapper
 def show(request, course_prefix, course_suffix, pset_slug):
