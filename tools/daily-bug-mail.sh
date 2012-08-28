@@ -6,4 +6,5 @@
 . ./bash_aliases
 
 TODAY=`date +"%A %D"`
-buglist-goalline | mail -s "Class2Go Bug Summary - ${TODAY}" sef@cs.stanford.edu
+buglist-goalline | mail -s "Class2Go Bug Summary - ${TODAY}" c2g-dev@cs.stanford.edu
+
