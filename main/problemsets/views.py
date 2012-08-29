@@ -100,9 +100,10 @@ def attempt(request, problemId):
 
     problem_activity.save()
     if request.POST['complete'] == "1":
-        return HttpResponse("complete")
+        activityConfirmation = '{"exercise_status":"complete", "attempt_num": ', problem_activity.attempt_number, '}' 
     else:
-        return HttpResponse("wrong")
+        activityConfirmation = '{"exercise_status":"wrong", "attempt_num": ', problem_activity.attempt_number, '}'
+    return HttpResponse(activityConfirmation)
 
 @auth_is_course_admin_view_wrapper
 def create_form(request, course_prefix, course_suffix):

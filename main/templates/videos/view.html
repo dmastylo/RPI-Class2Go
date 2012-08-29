@@ -112,6 +112,7 @@
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
     var path = '/static/graphics/videos/nlp/' + encodeURIComponent("{{ video.title }}") + '/jpegs/';
+    //var path = 'http://dev/{{course.prefix}}/{{course.suffix}}/videos/{{ video.id}}/thumbnails/';
     var thumbManifest = {};
     var psManifest = {};
     var loadThumbManifest = function (data, textStatus, jqXHR) { 
