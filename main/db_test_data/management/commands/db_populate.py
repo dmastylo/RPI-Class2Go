@@ -290,8 +290,30 @@ def create_course_nlp(data, users):
     for i in range(3):
         create_news_event(course,titles[i])
 
+def create_c2g_team():
+    for (username,email,first,last) in [('sefk_auto','sefklon@gmail.com','Sef','Kloninger'),
+                                        ('jbau_auto','jbau@stanford.edu','Jason','Bau'),
+                                        ('wescott_auto','wescott@cs.stanford.edu','Mike','Wescott'),
+                                        ('dcadams_auto','dcadams@stanford.edu','David','Adams'),
+                                        ('jinpa_auto','jmanning@cs.stanford.edu','Jane','Manning'),
+                                        ('halawa_auto','halawa@stanford.edu','Sherif','Halawa'),]:
+        user=User.objects.create_user(username)
+        user.set_password('class2go')
+        user.first_name = first
+        user.last_name = last
+        user.email = email
+        user.save()
+
 
 def create_course_crypto(data, users):
+    create_c2g_team()
+    user1=User.objects.get(username='sefk_auto');
+    user2=User.objects.get(username='jbau_auto');
+    user3=User.objects.get(username='wescott_auto');
+    user4=User.objects.get(username='dcadams_auto');
+    user5=User.objects.get(username='jinpa_auto');
+    user6=User.objects.get(username='halawa_auto');
+    
     # Create the user groups
     r = randrange(0,100000000)
     student_group = Group.objects.create(name="Student Group for class2go course " + data['handle'] + " %d" % r)
@@ -300,13 +322,13 @@ def create_course_crypto(data, users):
     readonly_tas_group = Group.objects.create(name="Readonly TAS Group for class2go course " + data['handle'] + " %d" % r)
 
     # Join users to their groups
-    for professor in users['professors']:
+    for professor in [user2]:
         instructor_group.user_set.add(professor)
-    for ta in users['tas']:
+    for ta in [user1, user3]:
         tas_group.user_set.add(ta)
-    for readonly_ta in users['readonly_tas']:
+    for readonly_ta in [user4]:
         readonly_tas_group.user_set.add(readonly_ta)
-    for student in users['students']:
+    for student in [user5, user6]:
         student_group.user_set.add(student)
 
     # Create the course instances

@@ -144,6 +144,8 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview/$', 'courses.preview.views.preview'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_reg/$', 'courses.preview.views.preview_reg'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'courses.preview.views.preview_login'),
-                       
+    
+    #Email
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),             
                        
 )

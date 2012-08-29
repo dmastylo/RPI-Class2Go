@@ -1,0 +1,37 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block mode_switcher %}{% endblock mode_switcher %}
+{% block m_column_content %}
+{% if error_msg %}
+<div class="row-fluid">
+<div class="span8 alert alert-error"><i class="icon-warning-sign"></i><button class="close" data-dismiss="alert">×</button>
+    {{ error_msg }}</div></div>
+{% endif %}
+{% if success_msg %}
+<div class="row-fluid">
+<div class="span8 alert alert-success"><i class="icon-ok"></i><button class="close" data-dismiss="alert">×</button>
+    {{ success_msg }}</div></div>
+{% endif %}
+
+<div class="row-fluid">
+<div class="span8">
+<h2>Send email to course members</h2>
+<div class="well">
+    <form action="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+        {% csrf_token %}
+        <label for="id_to">{{ form.to.label }}:</label> 
+          {{form.to}}
+        <label for="id_subject">{{ form.subject.label }}: {{form.subject.errors}}</label> 
+        {{form.subject}}
+        <label for="id_to">{{ form.message.label }}:  {{form.subject.errors}}</label> 
+        {{form.message}}
+        <input class="btn" type="submit" value="Send">
+    </form>
+</div>
+</div>
+</div>
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+
+{% endblock addl_scripts %}

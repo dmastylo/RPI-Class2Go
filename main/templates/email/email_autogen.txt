@@ -1,0 +1,5 @@
+{{ message }}
+
+----
+This email was automatically sent from Stanford Online for {{ course.title }}.
+{{ url }}
