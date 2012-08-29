@@ -6,4 +6,4 @@ class ExtractForm(forms.Form):
             max_length=200,
             initial="/nlp/Fall2012/videos/15/nlp-sef.mp4")
     frames = forms.FloatField(initial=1)
-    threshold = forms.FloatField(initial=15)
+    threshold = forms.FloatField(initial=1000)

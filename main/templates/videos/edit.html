@@ -9,15 +9,15 @@
         {% csrf_token %}
         <fieldset class="well">
         {% for field in form %}
-          <div class="fieldWrapper">
-            {{ field.errors }}
+          <div class="fieldWrapper {% if field.errors %}errors{% endif %}">
 	    {% if field.name == "live_datetime" %}
-	      <b>Live Date</b>
+	      <label>Live Date
 	      {% if field.value %}
 	        <input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" checked />
 	      {% else %}
 		<input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" />
 	      {% endif %}
+	      </label>
 	      <div>{{ field }}</div>
 	    {% else %}
               {{ field.label_tag }}
@@ -26,6 +26,7 @@
 	    {% if field.help_text %}
               <span class="help-block">{{ field.help_text }}</span>
             {% endif %}
+	    {{ field.errors }}
 	  </div>
         {% endfor %}
 	</fieldset>

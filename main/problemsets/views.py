@@ -66,7 +66,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
 #@auth_view_wrapper
 def attempt(request, problemId):
     user = request.user
-    
+
     exercise_type = request.POST['exercise_type']
     if exercise_type == 'problemset':
         problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
@@ -80,7 +80,7 @@ def attempt(request, problemId):
                                            problem_type = request.POST['problem_type'],
                                            user_selection_val = request.POST['user_selection_val'],
                                            user_choices = request.POST['user_choices'])
-        
+
     elif exercise_type == 'video':
         video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
         problem_activity = ProblemActivity(student = user,
@@ -93,9 +93,7 @@ def attempt(request, problemId):
                                            problem_type = request.POST['problem_type'],
                                            user_selection_val = request.POST['user_selection_val'],
                                            user_choices = request.POST['user_choices'])
-        
-        
-           
+
     #In case no problem id is specified in template
     try:
         problem_activity.problem = request.POST['problem_identifier']

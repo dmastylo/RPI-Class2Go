@@ -4,6 +4,7 @@
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 
 {% block content %}
+<input type="hidden" name="exercise_type" value="problemset" id="type" />
 <input type="hidden" name="pset_id" value="{{pset.id}}" id="pset_id" />
 <div class="container-fluid body-content">
     <div class="row-fluid">
