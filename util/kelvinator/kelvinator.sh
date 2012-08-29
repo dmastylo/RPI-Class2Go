@@ -78,7 +78,7 @@ ffmpeg -i $video_file -r $2 -f image2 jpegs/img%3d.jpeg
 #Runs extractFrames to list frames to be deleted
 echo
 echo "$me: Starting Differencing (extractFrames.py)"
-python $mydir/kelvinator/differenceFrames.py $3 $2
+python $mydir/differenceFrames.py $3 $2
 
 #Deletes all images listed in file toDelete
 myFile="toDelete.txt"
