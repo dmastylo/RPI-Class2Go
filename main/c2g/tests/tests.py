@@ -47,11 +47,15 @@ class C2GUnitTests(TestCase):
         """
         Tests that fixtures were installed correctly
         """
-        c = Course.objects.filter(handle='nlp#!$Fall2012', mode = 'production') 
-        self.assertEqual(len(Course.objects.all()),2)
+        self.assertEqual(len(Course.objects.all()),4)
+                         
+        c = Course.objects.filter(handle='nlp#$!Fall2012', mode = 'production')
         for ci in c: 
             self.assertEqual(ci.title, u'Natural Language Processing')
 
+        c = Course.objects.filter(handle='crypto#$!Fall2012', mode = 'production')
+        for ci in c:
+            self.assertEqual(ci.title, u'Introductory Cryptography')
                                
     def test_index_page(self):
         """
