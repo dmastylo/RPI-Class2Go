@@ -20,6 +20,11 @@ function stageapp {
     ssh -A bitnami@${hoststage}.stage.c2gops.com
 }
 
+function jenkins {
+    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
+    ssh -A ubuntu@jenkins.dev.c2gops.com
+}
+
 # function stagedb {
 #     ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
 #     ssh -At bitnami@${hoststage}.stage.c2gops.com "class2go/django-project/manage.py dbshell"
@@ -52,7 +57,13 @@ function buglist-unprioritized {
 
 function buglist-counts {
     NOW=`date -u +"%F %R UTC"`
-    YESTERDAY=`date --date="yesterday"`
+    case `uname` in
+        "Darwin" )
+            YESTERDAY=`date -v -1d` ;;
+        * )
+            YESTERDAY=`date --date="yesterday"` ;;
+    esac
+
     for l in P0 P1 P2; do
         # echo -ne "${NOW}\t"
         echo -ne "$l\t"
@@ -62,6 +73,20 @@ function buglist-counts {
         echo -ne "\t (${ACTIVE} active)"
         echo
     done
+}
+
+function buglist-active {
+    case `uname` in
+        "Darwin" )
+            YESTERDAY=`date -v -1d` ;;
+        * )
+            YESTERDAY=`date --date="yesterday"` ;;
+    esac
+    echo -ne '# Marked as Not Done, '
+    ghi list -s open --since "${YESTERDAY}"  | grep -v '3-Done'
+    echo -ne '# Marked as Done, '
+    ghi list -s open --since "${YESTERDAY}"  | egrep '^#|3-Done'
+    ghi list -s closed --since "${YESTERDAY}"
 }
 
 function buglist-hot {
@@ -79,10 +104,15 @@ function buglist-goalline {
     buglist-hot
 
     echo; echo
+    echo "-------- ALL ACTIVE ISSUES"
+    echo
+    buglist-active
+
+    echo; echo
     echo "Notes:"
     echo "- Counts and bug lists exclude bugs marked with \"3-Done\" label."
-    echo "- Active are opened or commented on in the prior 24 hours, doesn't include closed bugs."
-    echo "- Bugs are sorted with most recent activity on top"
+    echo "- \"Active\" means opened or commented-on in the prior 24 hours."
+    echo "- Bugs are sorted with most recent activity on top."
 }
 
 
