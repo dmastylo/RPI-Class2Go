@@ -1,0 +1,21 @@
+<form name="delete_exercise_form" action="{% url 'courses.videos.views.delete_exercise' %}" method="POST">
+    <input type="hidden" name="exercise_file" id="exercise_file_id" />
+    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+    <input type="hidden" name="video_slug" value={{video.slug}} />
+    {% csrf_token %}
+</form>
+
+<script type="text/javascript">
+    function DeleteExercise(file_name) {
+        var r = true;
+        if ('{{exercise_attempted}}'=="True")
+            r = confirm("WARNING: Students have already begun taking this problem set. Deleting an exercise can ruin the integrity of the results. Are you sure you want to delete "+file_name+"?");
+        else
+            r = confirm("Are you sure you want to delete "+file_name+"?");
+        if(r == true){
+            $("#exercise_file_id").val(file_name);
+            document.forms.delete_exercise_form.submit();
+        }
+    }
+</script>
