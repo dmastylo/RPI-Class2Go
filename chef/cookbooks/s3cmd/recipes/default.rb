@@ -9,6 +9,6 @@ template "dot-s3cfg" do
     source "dot-s3cfg.erb"
     owner "bitnami"
     group "bitnami"
-    mode "0600"
+    mode "0644"
 end
 
