@@ -22,6 +22,3 @@ package "ffmpeg" do
     action :install
 end
 
-package "s3cmd" do
-    action :install
-end
