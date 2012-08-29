@@ -48,7 +48,7 @@ function confirm_change(){
                     {% for exercise in exercises %}
                     <input type="checkbox" name=exercise value={{exercise.id}} /> {{exercise.fileName}} <br>
                     {% empty %}
-                    There are no existing exercises
+                    There are no existing exercises on record.
                     {% endfor %}
                 </div>
             </div>

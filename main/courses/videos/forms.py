@@ -56,11 +56,12 @@ class AdditionalExercisesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         used_exercises = kwargs.pop('used_exercises', None)
         super(AdditionalExercisesForm, self).__init__(*args, **kwargs)
-        for used_exercise in used_exercises:
-            check = 'check' + str(used_exercise.id)
-            video_time = 'time' + str(used_exercise.id)
-            self.fields[check] = forms.BooleanField(required=False)
-            self.fields[video_time] = forms.IntegerField(required=False)
+        self.fields['exercise'] = forms.ModelMultipleChoiceField(used_exercises)
+#        for used_exercise in used_exercises:
+#            check = 'check' + str(used_exercise.id)
+#            video_time = 'time' + str(used_exercise.id)
+#            self.fields[check] = forms.BooleanField(required=False)
+#            self.fields[video_time] = forms.IntegerField(required=False)
 
     def clean(self):
         cleaned_data = super(AdditionalExercisesForm, self).clean()

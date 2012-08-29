@@ -35,10 +35,7 @@ function confirm_change(){
         </div>
         <div class="fieldWrapper">
             {{ manage_form.video_time.errors }}
-            Video Time (s):{{ manage_form.video_time }} <input type="submit" name="action" value="Add Exercise" onclick="return confirm_change()" class="btn">
-
-            
-
+            Video Time (s):{{ manage_form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
             <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
@@ -52,27 +49,25 @@ function confirm_change(){
         <div id="choose-existing" class="collapse">
             <div class="control-group">
                 <div class="controls">
-                    {% for field in additional_form %}
-                        <br>
-                        {{field.error}} {{field}}
+                    {% for exercise in exercises %}
+                    <input type="checkbox" name=exercise value={{exercise.id}} /> {{exercise.fileName}} <br>
                     {% empty %}
-                        <p>There are no existing exercises on record.</p>
+                    There are no existing exercises on record.
                     {% endfor %}
                 </div>
             </div>
-            <input type="submit" name="action" value="Add Exercises" onclick="return confirm_change()" class="btn">
+            <input type="submit" value="Add Exercises" onclick="return confirm_change()" class="btn">
         </div>
     </form>
-    </fieldset>
-    <fieldset class="well">
-    <h4>Reorder Exercises</h4>
+
+    <h4>Set Exercise Times</h4>
     <form action='{% url 'courses.videos.views.save_exercises' %}' method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
 
-           <table style="width:50%">
+    <table style="width:35%">
     {% for field in reorder_form %}
     <tr id="video_{{item.video.id}}">
         <td><p style="margin-top:10px;display:inline;">{{field.label}}</p></td>
@@ -85,8 +80,6 @@ function confirm_change(){
     </tr>
     {% endfor %}
     </table>
-
-
 
         <span class="help-block">After reordering, save before uploading another exercise</span>
     </fieldset>
