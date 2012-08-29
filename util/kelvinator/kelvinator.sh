@@ -94,7 +94,7 @@ done < $myFile
 
 if [[ $using_s3 == 1 ]]; then
     echo "$me: copying frames to target: $source_dir/$frame_dir"
-    s3cmd sync $frame_dir $source_dir/
+    s3cmd put --recursive $frame_dir ${source_dir}/
 
     popd
     echo "$me: cleaning up working directory: $working_dir"
