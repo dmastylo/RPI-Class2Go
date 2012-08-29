@@ -3073,16 +3073,25 @@ var Khan = (function() {
                         break;
                     }
                 }
+                KhanC2G.remoteExPollCount = 0;
                 var pollForRemoteEx = function() {
+
+                    if (KhanC2G.remoteExPollCount > 50) {
+                        $('#workarea .loading').text("Exercise " + (parseInt($('.current-question').data("problem")) + 1) + " could not be loaded.");
+                        KhanC2G.remoteExPollCount = 0;
+                        return;
+                    }
+
                     if (KhanC2G.remoteExercises[$('.current-question').data('problem')]) {
                         $('#workarea').remove('.loading');
+                        KhanC2G.remoteExPollCount = 0;
                         makeProblem($('.current-question').data('problem'));
                     } else {
                         if ($('#workarea .loading').length == 0) {
                             $('#workarea').append('<p class="loading">Loading Exercise...</p>');
                         }
                         $('#workarea .loading').append('.');
-                        setTimeout(pollForRemoteEx, 500);
+                        setTimeout(function () { KhanC2G.remoteExPollCount++; pollForRemoteEx(); }, 500);
                     }
                 };
                 pollForRemoteEx();
@@ -3364,17 +3373,24 @@ var Khan = (function() {
             }
 
             var pollForRemoteEx = function() {
+
+                if (KhanC2G.remoteExPollCount > 50) {
+                    $('#workarea .loading').text("Exercise " + (parseInt(thisCard.data("problem")) + 1) + " could not be loaded.");
+                    KhanC2G.remoteExPollCount = 0;
+                    return;
+                }
+
                 if (KhanC2G.remoteExercises[thisCard.data('problem')]) {
-                    //console.log('Exercise finally loaded');
                     $('#workarea').remove('.loading');
+                    KhanC2G.remoteExPollCount = 0;
                     makeProblem(thisCard.data('problem'));
                 } else {
                     if ($('#workarea .loading').length == 0) {
                         $('#workarea').append('<p class="loading">Loading Exercise...</p>');
                     }
                     $('#workarea .loading').append('.');
-                    //console.log('Not loaded yet, repolling...');
-                    setTimeout(pollForRemoteEx, 500);
+                    //setTimeout(pollForRemoteEx, 500);
+                    setTimeout(function () { KhanC2G.remoteExPollCount++; pollForRemoteEx(); }, 500);
                 }
             };
             pollForRemoteEx();
