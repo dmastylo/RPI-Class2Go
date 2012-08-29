@@ -4,7 +4,7 @@ from django.shortcuts import render, render_to_response, redirect, HttpResponseR
 from django.template import Context, loader
 from c2g.models import Course, Video, VideoToExercise, Exercise
 
-from c2g.models import Course, Video, VideoActivity
+from c2g.models import Course, Video, VideoActivity, ProblemActivity
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
 import datetime
@@ -122,8 +122,8 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=video_slug).order_by('video_time')
     used_exercises = []
     exercise_attempted = False
-#    if len(VideoActivity.objects.filter(video_to_exercise__video=video.image)) > 0:
-#        exercise_attempted = True
+    if len(ProblemActivity.objects.filter(video_to_exercise__video=video.image)) > 0:
+        exercise_attempted = True
     #Get the list of exercises currently in this problem set
     for videoToEx in videoToExs:
         used_exercises.append(videoToEx.exercise.id)
@@ -135,26 +135,30 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
 
     #Form processing action if form was submitted
     if request.method == 'POST':
+        action = request.POST['action']
         manage_form = ManageExercisesForm(request.POST, request.FILES)
         additional_form = AdditionalExercisesForm(request.POST, used_exercises=exercises)
 
-        if manage_form.is_valid():
-            video = Video.objects.get(id=request.POST['video_id'])
-            file_content = request.FILES['file']
-            file_name = file_content.name
+        if action == "Add Exercise":
+            if manage_form.is_valid():
+                video = Video.objects.get(id=request.POST['video_id'])
+                file_content = request.FILES['file']
+                file_name = file_content.name
 
-            exercise = Exercise()
-            exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
-            exercise.fileName = file_name
-            exercise.file.save(file_name, file_content)
-            exercise.save()
+                exercise = Exercise()
+                exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
+                exercise.fileName = file_name
+                exercise.file.save(file_name, file_content)
+                exercise.save()
 
-            video_time = request.POST['video_time']
-            videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='staging')
-            videoToEx.save()
-            return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
-#        elif additional_form.is_valid():
-#            return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+                video_time = request.POST['video_time']
+                videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='staging')
+                videoToEx.save()
+                return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+
+        elif action == "Add Exercises":
+            if additional_form.is_valid():
+                return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
     #If form was not submitted then the form should be displayed or if there were errors the page needs to be rendered again
     data['manage_form'] = manage_form
@@ -166,6 +170,7 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     data['videoToExs'] = videoToExs
     data['exercise_attempted'] = exercise_attempted
     data['exercises'] = exercises
+    data['exercise_attempted'] = exercise_attempted
     return render_to_response('videos/model_exercises.html', data, context_instance=RequestContext(request))
 
 
@@ -249,7 +254,12 @@ def save_exercises(request):
             video.commit()
         return HttpResponseRedirect(reverse('courses.videos.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'],)))
 
-
+def delete_exercise(request):
+    print "KN#KJNJWNKAJDSAJNDSNAJKD"
+    toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='staging', is_deleted=False)
+    toDelete.delete()
+    toDelete.save()
+    return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], request.POST['video_slug'],)))
 
 def get_video_exercises(request):
     video = Video.objects.get(id = request.GET['video_id'])

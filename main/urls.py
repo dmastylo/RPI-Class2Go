@@ -49,7 +49,7 @@ urlpatterns = patterns('',
     #Course signup for students
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/signup/?$', 'courses.actions.signup_with_course'),
 
-                       
+
     url(r'^courses/new/?', 'courses.admin_views.new'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/?$', 'courses.views.main'),
@@ -100,9 +100,10 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit/?', 'courses.videos.views.edit'),
     url(r'^add_video/?$', 'courses.videos.actions.add_video'),
     url(r'^edit_video/?$', 'courses.videos.actions.edit_video'),
-    url(r'^delete_video/?', 'courses.videos.actions.delete_video'),
+    url(r'^delete_video/?$', 'courses.videos.actions.delete_video'),
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
+    url(r'^delete_video_exercise/?$', 'courses.videos.views.delete_exercise'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set?$', 'courses.videos.views.load_video_problem_set'),
 
 
@@ -138,11 +139,11 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/files/upload$', 'courses.files.views.upload'),
     url(r'^upload_file/?', 'courses.files.actions.upload'),
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
-                       
-                       
+
+
     #Preview
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview/$', 'courses.preview.views.preview'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_reg/$', 'courses.preview.views.preview_reg')
-                       
-                       
+
+
 )

@@ -16,7 +16,7 @@ function confirm_change(){
 }
 </script>
 
-{% include "problemsets/delete_exercise_form.html" %}
+{% include "videos/delete_exercise_form.html" %}
 
 <div id="c2g_layout_m_column" class="span12">
     <h3>Add or Remove Exercises</h3>
@@ -35,12 +35,9 @@ function confirm_change(){
         </div>
         <div class="fieldWrapper">
             {{ manage_form.video_time.errors }}
-            Video Time (s):{{ manage_form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            Video Time (s):{{ manage_form.video_time }} <input type="submit" name="action" value="Add Exercise" onclick="return confirm_change()" class="btn">
 
-            {% for field in additional_form %}
-            <br>
-            {{field.error}} {{field}}
-            {% endfor %}
+            
 
             <span class="help-block">{{ field.help_text }}</span>
         </div>
@@ -55,14 +52,15 @@ function confirm_change(){
         <div id="choose-existing" class="collapse">
             <div class="control-group">
                 <div class="controls">
-                    {% for exercise in exercises %}
-                    <input type="checkbox" name=exercise value={{exercise.id}} /> {{exercise.fileName}} <br>
+                    {% for field in additional_form %}
+                        <br>
+                        {{field.error}} {{field}}
                     {% empty %}
-                    There are no existing exercises
+                        <p>There are no existing exercises on record.</p>
                     {% endfor %}
                 </div>
             </div>
-            <input type="submit" value="Add Exercises" onclick="return confirm_change()" class="btn">
+            <input type="submit" name="action" value="Add Exercises" onclick="return confirm_change()" class="btn">
         </div>
     </form>
     </fieldset>
@@ -73,10 +71,23 @@ function confirm_change(){
         <input type="hidden" name="video_id" value={{video.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
-        
-        {% for field in reorder_form %}
-        {{field.label}} {{field}}s <br>
-        {% endfor %}
+
+           <table style="width:50%">
+    {% for field in reorder_form %}
+    <tr id="video_{{item.video.id}}">
+        <td><p style="margin-top:10px;display:inline;">{{field.label}}</p></td>
+        <td width="120">
+            {{field.errors}} {{field}}
+        </td>
+        <td width="20">
+            <a href="javascript:DeleteExercise('{{field.name}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </table>
+
+
+
         <span class="help-block">After reordering, save before uploading another exercise</span>
     </fieldset>
         <div class="form-actions">
