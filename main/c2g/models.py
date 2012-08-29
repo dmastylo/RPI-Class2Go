@@ -620,15 +620,6 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 production_videoToEx.image.video_time = production_videoToEx.video_time
                 production_videoToEx.image.save()
 
-    def save(self, *args, **kwargs):
-        if not self.duration:
-            if self.type == "youtube" and self.url:
-                print "**** tryna get duration from yt vid id!!!! ****"
-                yt_service = gdata.youtube.service.YouTubeService()
-                entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
-                self.duration = entry.media.duration.seconds
-        super(Video, self).save(*args, **kwargs)
-
     def is_synced(self):
         prod_instance = self.image
         if self.exercises_changed() == True:
