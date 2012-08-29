@@ -101,11 +101,14 @@ def delete_video(request):
 @require_POST
 def save_video_progress(request):
 
-    videoRec = request.POST['videoRec']
+    videoRecId = request.POST['videoRec']
     playTime = request.POST['playTime']
-    video = VideoActivity.objects.get(id=videoRec)
-    video.start_seconds = playTime
-    video.save()
+    videoRec = VideoActivity.objects.get(id=videoRecId)
+    if not videoRec.video.duration:
+        videoRec.video.duration = request.POST['duration']
+    if videoRec.start_seconds != long(playTime):
+        videoRec.start_seconds = playTime
+        videoRec.save()
     return HttpResponse("saved")
 
 def oauth(request):

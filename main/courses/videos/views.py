@@ -65,7 +65,6 @@ def view(request, course_prefix, course_suffix, slug):
                     video_rec.save()
                     break
 
-    print "going to template"
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper

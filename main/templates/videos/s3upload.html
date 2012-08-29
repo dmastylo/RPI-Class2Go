@@ -9,10 +9,10 @@
 	  {% csrf_token %}
 	  <fieldset class="well">
 	  {% for field in form %}
-	    <div class="fieldWrapper">
-	      {{ field.errors }}
+	    <div class="fieldWrapper {% if field.errors %}errors{% endif %}">
 	      {% if field.name == "url" %}
-	        <b>Youtube Video ID</b>
+	      <a href="#" rel="tooltip" title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><i class="icon-info-sign"></i>
+	        <b>Already on YouTube?  Enter Video ID</b></a>
 		{% if field.value %}
 		  <input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" checked />
 		  <div id="yt_id">{{ field }}</div>
@@ -21,7 +21,8 @@
 		  <div id="yt_id" style="display:none">{{ field }}</div>
 		{% endif %}
 	      {% elif field.name == "live_datetime" %}
-	        <b>Set Live Date</b>
+	       <a href="#" rel="tooltip" title="If you're ready to set a live date for the video, check here.  If you're not ready to decide on a live date yet, you can leave this box unchecked."><i class="icon-info-sign"></i>
+	        <b>Set Live Date</b> </a>
 		{% if field.value %}
 		  <input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" checked />
 	          <div id="live_date">{{ field }}</div>
@@ -36,6 +37,7 @@
 	      {% if field.help_text %}
 	        <span class="help-block">{{ field.help_text }}</span>
 	      {% endif %}
+	      {{ field.errors }}
 	    </div>
 	  {% endfor %}
 	  </fieldset>
