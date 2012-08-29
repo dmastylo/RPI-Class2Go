@@ -60,6 +60,7 @@
 </div>
 <script>
 var c2gConfig = {
+    user: {{user.id}},
     problemType: '{{pset_type}}',
     penaltyPct: '{{pset_penalty}}',
     maxAttempts: '{{pset_attempts_allowed}}'
@@ -69,25 +70,12 @@ var userPSData = {};
     userPSData["{{ activity.problemset_to_exercise.number}}"] = {
         user_selection_val: "{{ activity.user_selection_val }}",
         user_choices: unescape("{{ activity.user_choices }}"),
+        already_attempted: {{ activity.attempt_number }},
         correct: {% if activity.complete == 1 %}true{% else %}false{% endif %}
     };
 {% endfor %}
 
 $(function() {
-  /*
-    $.ajax({
-           url: "{{ pset_url }}",
-           dataType: "html",
-           success: function(htmlExercise) {
-                var shadowDOM=document.createElement('html');
-                shadowDOM.innerHTML=htmlExercise;
-                $("body").append($(shadowDOM).find("div.exercise"));
-                var kScript = document.createElement('script');
-                kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js";
-                document.head.appendChild(kScript);
-           }
-    });
-   */
   $("#loadedExercises").load("{{ pset_url }}", function(text,status) {
                     if(status=="success"){
                         var kScript = document.createElement('script');

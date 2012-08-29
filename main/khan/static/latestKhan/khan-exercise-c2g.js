@@ -1295,7 +1295,7 @@ var Khan = (function() {
 
         // [@wescott] If summative problem set, add note about penalties per try
         if (exAssessType == "summative") {
-            var maxAttempts, penaltyPct;
+            var maxAttempts, penaltyPct, alreadyAttempted;
             var maxCredit = 100; 
             if (typeof c2gConfig != "undefined") {
                 maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
@@ -1304,10 +1304,25 @@ var Khan = (function() {
                 maxAttempts = 3;
                 penaltyPct = "25%";
             }
-            $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
-            $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
-            $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">0</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
-            $("#check-answer-button").val("Submit Answer");
+            var exerciseRef = ($('.current-question').data("problem")) ? parseInt($('.current-question').data("problem")) : id;
+            if (typeof userPSData != "undefined" && userPSData[exerciseRef]) {
+                if (userPSData[exerciseRef]["already_attempted"]) {
+                    alreadyAttempted = userPSData[exerciseRef]["already_attempted"];
+                } else {
+                    alreadyAttempted = 0;
+                }
+                if (userPSData[exerciseRef]['correct']) {
+                    $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
+                } else {
+                    if (alreadyAttempted > 0) {
+                        maxCredit -= alreadyAttempted * parseInt(penaltyPct); 
+                    } 
+                    $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
+                    $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
+                    $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
+                    $("#check-answer-button").val("Submit Answer");
+                }
+            }
         }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
@@ -2714,7 +2729,7 @@ var Khan = (function() {
         //Gets the problem ID which is (problem number)-(variation)
         problem_identifier = $('#workarea').children('div').attr('id');
         exercise_filename = exercise.data('fileName');
-        exercise_type = $('#exercise_type').val();
+        exercise_type = $('#exercise_type').val() || 'problemset';
         video_id = $('#video_id').val();
         // [@wescott] pset_id of -1 will cause error, but right now just used for in-video
         // Needs to have a real problem set associated with videos
@@ -2744,13 +2759,12 @@ var Khan = (function() {
             url: "/problemsets/attempt/2",
             type: "POST",
             data: data,
-            dataType: "text",
+            dataType: "json",
             xhrFields: xhrFields,
 
             // Backup the response locally, for later use
-            success: function(xhrData) {
-                //alert(data)
-                if (xhrData == "complete") {
+            success: function(data, txtStatus, jqXHR) {
+                if (data['exercise_status'] == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                 } else {
                     var maxCredit = 100;
@@ -2778,7 +2792,7 @@ var Khan = (function() {
                 $(Khan).trigger("updateUserExercise", data);
 
                 if ($.isFunction(fn)) {
-                    fn(xhrData);
+                    fn(data);
                 }
             },
 
@@ -3088,7 +3102,7 @@ var Khan = (function() {
                         makeProblem($('.current-question').data('problem'));
                     } else {
                         if ($('#workarea .loading').length == 0) {
-                            $('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                            $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt($('.current-question').data("problem")) + 1) + '...</p>');
                         }
                         $('#workarea .loading').append('.');
                         setTimeout(function () { KhanC2G.remoteExPollCount++; pollForRemoteEx(); }, 500);
@@ -3139,6 +3153,7 @@ var Khan = (function() {
                     li.data('user_selection_val', userQDataObj.user_selection_val);
                     li.data('correct', userQDataObj.correct);
                     li.data('user_choices', userQDataObj.user_choices);
+                    li.data('already_attempted', userQDataObj.already_attempted);
                 }
                 if (li.data('correct')) {
                     li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
@@ -3207,7 +3222,10 @@ var Khan = (function() {
             }
             if ($('.current-question').data('user_selection_val')) {
                 if ($('#testinput').length) {
-                    $('#testinput').val($('.current-question').data('user_selection_val')).attr('disabled','disabled');
+                    $('#testinput').val($('.current-question').data('user_selection_val'));
+                    if ($('.current-question').data('correct')) {
+                        $('#testinput').attr('disabled','disabled');
+                    }
                 } else if ($('#solutionarea input:radio').length) {
                     reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
                 }
@@ -3386,7 +3404,8 @@ var Khan = (function() {
                     makeProblem(thisCard.data('problem'));
                 } else {
                     if ($('#workarea .loading').length == 0) {
-                        $('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                        //$('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                        $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt(thisCard.data("problem")) + 1) + '...</p>');
                     }
                     $('#workarea .loading').append('.');
                     //setTimeout(pollForRemoteEx, 500);
