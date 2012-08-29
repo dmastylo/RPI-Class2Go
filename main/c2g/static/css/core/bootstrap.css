@@ -772,8 +772,16 @@ label {
 }
 
 .errorlist {
-  margin: 10px 0 0 25px;
+  margin-bottom: 20px;
   color: red;
+}
+
+.fieldWrapper.errors {
+  color: red;
+}
+
+.fieldWrapper.errors input[type="text"] {
+  border: 1px solid red;
 }
 
 .fieldWrapper label {
