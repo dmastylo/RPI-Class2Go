@@ -109,7 +109,7 @@ def upload(request, course_prefix, course_suffix):
 
 
 @auth_view_wrapper
-def model_exercises(request, course_prefix, course_suffix, video_slug):
+def manage_exercises(request, course_prefix, course_suffix, video_slug):
     #Get all necessary information about the problemset
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
@@ -151,7 +151,7 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
             video_time = request.POST['video_time']
             videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='staging')
             videoToEx.save()
-            return HttpResponseRedirect(reverse('courses.videos.views.model_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
+            return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
     #If form was not submitted then the form should be displayed or if there were errors the page needs to be rendered again
     data['manage_form'] = manage_form
@@ -164,29 +164,7 @@ def model_exercises(request, course_prefix, course_suffix, video_slug):
     data['exercise_attempted'] = exercise_attempted
     data['exercises'] = exercises
     data['exercise_attempted'] = exercise_attempted
-    return render_to_response('videos/model_exercises.html', data, context_instance=RequestContext(request))
-
-
-@auth_is_course_admin_view_wrapper
-def manage_exercises(request, course_prefix, course_suffix, video_slug):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
-    video = Video.objects.get(course=common_page_data['course'], slug=video_slug)
-    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')
-    added_exercises = video.exercise_set.all()
-    exercises = Exercise.objects.filter(video__course=common_page_data['course']).exclude(id__in=added_exercises).distinct()
-    return render_to_response('videos/manage_exercises.html',
-                            {'request': request,
-                                'common_page_data': common_page_data,
-                                'course_prefix': course_prefix,
-                                'course_suffix': course_suffix,
-                                'video': video,
-                                'videoToExs': videoToExs,
-                                'exercises': exercises
-                            },
-                            context_instance=RequestContext(request))
+    return render_to_response('videos/manage_exercises.html', data, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 def add_exercise(request):
