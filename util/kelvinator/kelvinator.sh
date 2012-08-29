@@ -53,7 +53,7 @@ video_file=`basename $1`
 if [[ $using_s3 == 1 ]]; then
     echo "$me: setting up working directory: ${working_dir}"
     mkdir -p ${working_dir} 
-    s3cmd get $1 ${working_dir}/$video_file
+    s3cmd -v get $1 ${working_dir}/$video_file
 
     pushd ${working_dir}   # yes, this is fragile
 fi
@@ -94,7 +94,7 @@ done < $myFile
 
 if [[ $using_s3 == 1 ]]; then
     echo "$me: copying frames to target: $source_dir/$frame_dir"
-    s3cmd put --recursive $frame_dir ${source_dir}/
+    s3cmd -v put --recursive $frame_dir ${source_dir}/
 
     popd
     echo "$me: cleaning up working directory: $working_dir"
