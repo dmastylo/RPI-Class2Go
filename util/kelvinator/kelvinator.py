@@ -1,4 +1,5 @@
 import subprocess
+import os
 
 def run(target):
     target_url="s3://%(bucket)s%(path)s" % target
