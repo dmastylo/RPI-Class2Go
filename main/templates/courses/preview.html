@@ -14,34 +14,68 @@ Natural language processing is the technology for dealing with our most ubiquito
     The course starts on {{common_page_data.course.calendar_start}}.  The course staff will contact you with an email introduction when the date approaches.  Hope to see you online this term!
   </div>
   {% else %}
-    <div class="span5 alert alert-info"><i class="icon-info-sign"></i>Hi {{user.first_name}} {{user.last_name}}.  It looks we already have record of you at Stanford Online.  Would you like to register for this class?
+    <div class="span5 alert alert-info"><i class="icon-info-sign"></i>Hi {{user.first_name}} {{user.last_name}}.  It looks we already have record of you at Stanford Online.  Would you like to register for {{common_page_data.course.title}}?
     <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}?redirect_to={{request.path}}" method="POST">
     <input type="submit" id="login_button" class="btn" value="Enroll" /></div>
     {% csrf_token %}
   {% endif %}
 {% else %}
-<div class="span5">
-  {% if form.errors %}
-  <div class="alert alert-error">
-      <button class="close" data-dismiss="alert">×</button>
-      Please correct the errors below.
-  </div>
-  {% endif %}
-
-  <div class="registration">
-	  <div class="well">
-            <h2 class="span12 pagination-centered"> Signup </h2>
-	    	<form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post">
-		         {% csrf_token %}
-		         <table>
-                    {{ form.as_table }}
-		         </table>
-		         <div class="form-actions">
-		    	<input type="submit" value="Register" class="btn btn-primary btn-large" />
-			    </div>
-            </form>
-	  </div>
+{% if display_login %}
+   <div class="span5">
+       {% if login_form.errors %}
+       <div class="alert alert-error">
+           <button class="close" data-dismiss="alert">×</button>
+           Uh-oh.  We couldn't find username and password you entered.  Try again?
+       </div>
+       {% endif %}
+       <div class="well">
+       <h3>Login to Stanford Online</h3>
+       <form method="post" action="{% url 'courses.preview.views.preview_login' common_page_data.course_prefix common_page_data.course_suffix %}" class="form-vertical">  
+           {% csrf_token %}
+           <table>
+               <tr>
+                   <td>{{ login_form.username.label_tag }}</td>
+                   <td>{{ login_form.username }}</td>
+               </tr>
+               <tr>
+                   <td>{{ login_form.password.label_tag }}</td>
+                   <td>{{ login_form.password }}</td>
+               </tr>
+           </table>
+           
+           <input type="submit" value="Login" class="btn" />
+           <input type="hidden" name="next" value="{{ next }}" />
+       </form>
+       </div>
+       
    </div>
-</div>
+
+
+{% else %}
+    <div class="span5">
+      {% for error in form.email.errors %}
+          {% if "in use" in error %}
+          <div class="alert alert-error">
+              <button class="close" data-dismiss="alert">×</button>
+              Someone with the email address you entered already has an account.  Perhaps you'd like to <a class="btn" href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login">Login</a> instead?
+          </div>
+          {% endif %}
+      {% endfor %}
+      <div class="registration">
+          <div class="well">
+                <h2 class="span12 pagination-centered"> Signup </h2>
+                <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post">
+                     {% csrf_token %}
+                     <table>
+                        {{ form.as_table }}
+                     </table>
+                     <div class="form-actions">
+                    <input type="submit" value="Register" class="btn btn-primary btn-large" />
+                    </div>
+                </form>
+          </div>
+       </div>
+    </div>
+    {% endif %}
 {% endif %}
 {% endblock r_column_content %}
