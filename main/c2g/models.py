@@ -646,6 +646,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     def runtime(self):
+        if not self.duration:
+            return "Runtime unavailable"
         m, s = divmod(self.duration, 60)
         h, m = divmod(m, 60)
         if h:
