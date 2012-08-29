@@ -19,5 +19,6 @@ run_list(
     "recipe[class2go-database.py]",
 #    "recipe[class2go-collectstatic]",
     "recipe[class2go-kelvinator]",
+    "recipe[s3cmd]",
     "recipe[class2go-bitnami-apache-restart]"
 )
