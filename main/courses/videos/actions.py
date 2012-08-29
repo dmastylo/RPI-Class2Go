@@ -17,7 +17,7 @@ import re
 from datetime import datetime
 from courses.actions import auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
-    
+
 ### Videos ###
 
 @require_POST
@@ -26,12 +26,12 @@ def add_video(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    
+
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.view', course_prefix, course_suffix)
-    
+
     index = len(Video.objects.filter(topic_id=request.POST.get("topic_id")))
-    
+
     staging_video = Video(
         course=common_page_data['staging_course'],
         topic_id=int(request.POST.get("topic_id")),
@@ -44,9 +44,9 @@ def add_video(request):
         index=index
     )
     staging_video.save()
-    
+
     staging_video.create_production_instance()
-    
+
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
@@ -88,19 +88,19 @@ def delete_video(request):
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     except:
         raise Http404
-        
+
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
-        
+
     video = Video.objects.get(id=request.POST.get("video_id"))
     video.delete()
     video.image.delete()
-    
+
     return redirect(request.META['HTTP_REFERER'])
-    
+
 @require_POST
 def save_video_progress(request):
-    
+
     videoRecId = request.POST['videoRec']
     playTime = request.POST['playTime']
     videoRec = VideoActivity.objects.get(id=videoRecId)
@@ -128,7 +128,7 @@ def oauth(request):
 
 
         video = Video.objects.get(pk=request.GET.get('state'))
-        
+
         my_media_group = gdata.media.Group(
             title=gdata.media.Title(text=video.title),
             description=gdata.media.Description(description_type='plain',
@@ -153,7 +153,7 @@ def oauth(request):
 
         parts = str(video.handle).split("#$!")
         return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(parts[0], parts[1], video.slug)))
-    
+
 #    return redirect('courses.videosviews.list', course_prefix, course_suffix)
     #return redirect("http://" + request.META['HTTP_HOST'] + "/nlp/Fall2012/videos")
 
@@ -190,7 +190,7 @@ def upload(request):
             new_video.file = None
             new_video.save()
             new_video.file = form.cleaned_data['file']
-            
+
             new_video.save()
             new_video.create_production_instance()
             print new_video.file.url
@@ -202,8 +202,8 @@ def upload(request):
             #eventually should store an access token, so they don't have to give permission everytime
             return redirect(authUrl)
         #    return redirect("http://" + request.META['HTTP_HOST'])
-        
-    
+
+
     else:
         form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
