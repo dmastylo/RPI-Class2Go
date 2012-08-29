@@ -41,16 +41,16 @@ working_dir="${working_path}/extract-${today_epoch}"
 mydir=`pwd`
 
 source_dir="."
-using_s3=false
+using_s3=0
 # if first character is a slash, then full path, extract it
 # otherwise assume it's right here.  
 if [[ ${1:0:5} == "s3://" || ${1:0:5} == "S3://" ]]; then
     source_dir=`dirname $1`
-    using_s3=true
+    using_s3=1
 fi
 video_file=`basename $1`
 
-if [[ $using_s3 ]]; then
+if [[ $using_s3 == 1 ]]; then
     echo "$me: setting up working directory: ${working_dir}"
     mkdir -p ${working_dir} 
     s3cmd get $1 ${working_dir}/$video_file
@@ -73,7 +73,7 @@ fi
 #Runs ffmpeg to extract frames at a certain interval
 echo
 echo "$me: Starting Extraction (ffmpeg)"
-ffmpeg -i $video_file -r $2 -f image2 jpegs/img%3d.jpeg 
+ffmpeg -i $video_file -r $2 -f image2 -s vga jpegs/img%3d.jpeg 
 
 #Runs extractFrames to list frames to be deleted
 echo
@@ -92,7 +92,7 @@ done < $myFile
 # if we are doing in place then we are done.  But if we are using S3 we need to 
 # upload files (and manifest) back up there
 
-if [[ $using_s3 ]]; then
+if [[ $using_s3 == 1 ]]; then
     echo "$me: copying frames to target: $source_dir/$frame_dir"
     s3cmd sync $frame_dir $source_dir/
 
