@@ -776,7 +776,7 @@ label {
   color: red;
 }
 
-.fieldWrapper.errors {
+.fieldWrapper.errors label{
   color: red;
 }
 

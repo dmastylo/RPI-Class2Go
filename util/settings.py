@@ -51,6 +51,7 @@ MIDDLEWARE_CLASSES = (
 thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
     thispath+'/kelvinator',
+    thispath+'/kelvinator/templates',
 )
 
 INSTALLED_APPS = (

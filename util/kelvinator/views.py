@@ -1,11 +1,13 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from forms import ExtractForm
 import kelvinator
 
 def healthcheck(request):
     return HttpResponse("I'm alive!")
 
+def nobodyhome(request):
+    return render_to_response('nobodyhome.html')
 
 def extract(request):
     if request.method == 'POST': # If the form has been submitted...
