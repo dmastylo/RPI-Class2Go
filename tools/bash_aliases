@@ -20,6 +20,11 @@ function stageapp {
     ssh -A bitnami@${hoststage}.stage.c2gops.com
 }
 
+function jenkins {
+    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
+    ssh -A ubuntu@jenkins.dev.c2gops.com
+}
+
 # function stagedb {
 #     ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
 #     ssh -At bitnami@${hoststage}.stage.c2gops.com "class2go/django-project/manage.py dbshell"
@@ -46,13 +51,15 @@ function buglist-sprint {
     done
 }
 
-function buglist-unprioritized {
-    ghi list -s open | egrep -v '[P0]|[P1]|[P2]'
-}
-
 function buglist-counts {
     NOW=`date -u +"%F %R UTC"`
-    YESTERDAY=`date --date="yesterday"`
+    case `uname` in
+        "Darwin" )
+            YESTERDAY=`date -v -1d` ;;
+        * )
+            YESTERDAY=`date --date="yesterday"` ;;
+    esac
+
     for l in P0 P1 P2; do
         # echo -ne "${NOW}\t"
         echo -ne "$l\t"
@@ -64,8 +71,36 @@ function buglist-counts {
     done
 }
 
+function buglist-active {
+    case `uname` in
+        "Darwin" )
+            YESTERDAY=`date -v -1d` ;;
+        * )
+            YESTERDAY=`date --date="yesterday"` ;;
+    esac
+    echo -ne '# Marked as Not Done, '
+    ghi list -s open --since "${YESTERDAY}"  | grep -v '3-Done'
+    echo -ne '# Marked as Done, '
+    ghi list -s open --since "${YESTERDAY}"  | egrep '^#|3-Done'
+    ghi list -s closed --since "${YESTERDAY}"
+}
+
 function buglist-hot {
     ghi list -s open -l P0 | grep -v '3-Done' 
+}
+
+function buglist-to-triage {
+    ghi list -s open | egrep -v '[P0]|[P1]|[P2]|[P3]'
+}
+
+function buglist-new-to-triage {
+    case `uname` in
+        "Darwin" )
+            YESTERDAY=`date -v -1d` ;;
+        * )
+            YESTERDAY=`date --date="yesterday"` ;;
+    esac
+    ghi list -s open --since "${YESTERDAY}" | egrep -v "[P0]|[P1]|[P2]|[P3]"
 }
 
 function buglist-goalline {
@@ -79,10 +114,21 @@ function buglist-goalline {
     buglist-hot
 
     echo; echo
+    echo "-------- NEW BUGS THAT NEED TRIAGE"
+    echo
+    buglist-new-to-triage
+
+    echo; echo
+    echo "-------- ALL ACTIVE ISSUES"
+    echo
+    buglist-active
+
+    echo; echo
     echo "Notes:"
     echo "- Counts and bug lists exclude bugs marked with \"3-Done\" label."
-    echo "- Active are opened or commented on in the prior 24 hours, doesn't include closed bugs."
-    echo "- Bugs are sorted with most recent activity on top"
+    echo "- \"Active\" means opened or commented-on in the prior 24 hours."
+    echo "- Bugs are sorted with most recent activity on top."
+    echo "- \"Needs triage\" means not labeled with P0, P1, P2, or P3."
 }
 
 

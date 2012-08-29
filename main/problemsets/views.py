@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, render
 from django.template import RequestContext
@@ -25,8 +25,6 @@ def list(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    print "ASDNAJDSNAJDSAJDSNAJKNDSAJKDSNAD"
-    print request
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
 
@@ -66,7 +64,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
 #@auth_view_wrapper
 def attempt(request, problemId):
     user = request.user
-    
+
     exercise_type = request.POST['exercise_type']
     if exercise_type == 'problemset':
         problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
@@ -80,7 +78,7 @@ def attempt(request, problemId):
                                            problem_type = request.POST['problem_type'],
                                            user_selection_val = request.POST['user_selection_val'],
                                            user_choices = request.POST['user_choices'])
-        
+
     elif exercise_type == 'video':
         video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
         problem_activity = ProblemActivity(student = user,
@@ -93,9 +91,7 @@ def attempt(request, problemId):
                                            problem_type = request.POST['problem_type'],
                                            user_selection_val = request.POST['user_selection_val'],
                                            user_choices = request.POST['user_choices'])
-        
-        
-           
+
     #In case no problem id is specified in template
     try:
         problem_activity.problem = request.POST['problem_identifier']
@@ -104,9 +100,10 @@ def attempt(request, problemId):
 
     problem_activity.save()
     if request.POST['complete'] == "1":
-        return HttpResponse("complete")
+        activityConfirmation = '{"exercise_status":"complete", "attempt_num": ', problem_activity.attempt_number, '}' 
     else:
-        return HttpResponse("wrong")
+        activityConfirmation = '{"exercise_status":"wrong", "attempt_num": ', problem_activity.attempt_number, '}'
+    return HttpResponse(activityConfirmation)
 
 @auth_is_course_admin_view_wrapper
 def create_form(request, course_prefix, course_suffix):

@@ -638,15 +638,6 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 production_videoToEx.image.video_time = production_videoToEx.video_time
                 production_videoToEx.image.save()
 
-    def save(self, *args, **kwargs):
-        if not self.duration:
-            if self.type == "youtube" and self.url:
-                print "**** tryna get duration from yt vid id!!!! ****"
-                yt_service = gdata.youtube.service.YouTubeService()
-                entry = yt_service.GetYouTubeVideoEntry(video_id=self.url)
-                self.duration = entry.media.duration.seconds
-        super(Video, self).save(*args, **kwargs)
-
     def is_synced(self):
         prod_instance = self.image
         if self.exercises_changed() == True:
@@ -671,6 +662,16 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def dl_link(self):
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+
+    def runtime(self):
+        if not self.duration:
+            return "Runtime unavailable"
+        m, s = divmod(self.duration, 60)
+        h, m = divmod(m, 60)
+        if h:
+            return "%d:%02d:%02d" % (h, m, s)
+        else:
+            return "%d:%02d" % (m, s)
 
     def validate_unique(self, exclude=None):
         errors = {}
@@ -975,7 +976,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
         questions_completed = 0
         for psetToEx in psetToExs:
-            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
+            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('time_created')
             for exercise_activity in exercise_activities:
                 if exercise_activity.attempt_number == submissions_permitted:
                     questions_completed += 1
@@ -994,7 +995,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
         total_score = 0.0
         for psetToEx in psetToExs:
-            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('attempt_number')
+            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('time_created')
             exercise_percent = 100
             for exercise_activity in exercise_activities:
                 if exercise_activity.attempt_number > submissions_permitted:

@@ -112,6 +112,7 @@
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
     var path = '/static/graphics/videos/nlp/' + encodeURIComponent("{{ video.title }}") + '/jpegs/';
+    //var path = 'http://dev/{{course.prefix}}/{{course.suffix}}/videos/{{ video.id}}/thumbnails/';
     var thumbManifest = {};
     var psManifest = {};
     var loadThumbManifest = function (data, textStatus, jqXHR) { 
@@ -203,17 +204,15 @@
         height: '430',
         width: '710',
         videoId: '{{video.url}}',
-        /* [@wescott] commented out below for Kevin for the 8/1/12 demo */
-        /*playerVars: { 'rel': 0, 'start': {{video_rec.start_seconds}} },*/
         playerVars: { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} },
-    });
+        });
     }
 
     {% if video_rec %}
     window.onbeforeunload = function() {
         vidTime = Math.floor(player.getCurrentTime());
-        /* [@wescott] commented out below for Kevin for the 8/1/12 demo */
-        $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+        duration = player.getDuration();
+        $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, duration: duration, csrfmiddlewaretoken: '{{ csrf_token }}'}});
     }
     {% endif %}
 </script>

@@ -739,10 +739,10 @@ var Khan = (function() {
 
         // [@wescott] Is this problem set formative or summative?
         // Default is formative, but check problem set div for summative CSS
-        // class; otherwise, check the class name on the article element in 
+        // class; otherwise, check the class name on the article element in
         // the page
         exAssessType = 'formative';
-        if ($("div.summative").length || $("div.assessive").length || 
+        if ($("div.summative").length || $("div.assessive").length ||
             $("article.summative").length || $("article.summative").length) {
             exAssessType = 'summative';
         }
@@ -1295,7 +1295,7 @@ var Khan = (function() {
 
         // [@wescott] If summative problem set, add note about penalties per try
         if (exAssessType == "summative") {
-            var maxAttempts, penaltyPct;
+            var maxAttempts, penaltyPct, alreadyAttempted;
             var maxCredit = 100; 
             if (typeof c2gConfig != "undefined") {
                 maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
@@ -1304,10 +1304,25 @@ var Khan = (function() {
                 maxAttempts = 3;
                 penaltyPct = "25%";
             }
-            $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
-            $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
-            $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">0</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
-            $("#check-answer-button").val("Submit Answer");
+            var exerciseRef = ($('.current-question').data("problem")) ? parseInt($('.current-question').data("problem")) : id;
+            if (typeof userPSData != "undefined" && userPSData[exerciseRef]) {
+                if (userPSData[exerciseRef]["already_attempted"]) {
+                    alreadyAttempted = userPSData[exerciseRef]["already_attempted"];
+                } else {
+                    alreadyAttempted = 0;
+                }
+                if (userPSData[exerciseRef]['correct']) {
+                    $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
+                } else {
+                    if (alreadyAttempted > 0) {
+                        maxCredit -= alreadyAttempted * parseInt(penaltyPct); 
+                    } 
+                    $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
+                    $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
+                    $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
+                    $("#check-answer-button").val("Submit Answer");
+                }
+            }
         }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
@@ -2714,7 +2729,7 @@ var Khan = (function() {
         //Gets the problem ID which is (problem number)-(variation)
         problem_identifier = $('#workarea').children('div').attr('id');
         exercise_filename = exercise.data('fileName');
-        exercise_type = $('#exercise_type').val();
+        exercise_type = $('#exercise_type').val() || 'problemset';
         video_id = $('#video_id').val();
         // [@wescott] pset_id of -1 will cause error, but right now just used for in-video
         // Needs to have a real problem set associated with videos
@@ -2744,13 +2759,12 @@ var Khan = (function() {
             url: "/problemsets/attempt/2",
             type: "POST",
             data: data,
-            dataType: "text",
+            dataType: "json",
             xhrFields: xhrFields,
 
             // Backup the response locally, for later use
-            success: function(xhrData) {
-                //alert(data)
-                if (xhrData == "complete") {
+            success: function(data, txtStatus, jqXHR) {
+                if (data['exercise_status'] == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                 } else {
                     var maxCredit = 100;
@@ -2762,7 +2776,7 @@ var Khan = (function() {
 
                     // since page displays last attempt count, the display will be behind by one
                     // (i.e. with max of 3 attempts, by the time "Attempts so far" shows as "3",
-                    // the credit should reflect "0%") 
+                    // the credit should reflect "0%")
                     if (newAttCt > (maxAttempts - 1)) {
                         $('#max-credit').text(0);
                     } else {
@@ -2778,7 +2792,7 @@ var Khan = (function() {
                 $(Khan).trigger("updateUserExercise", data);
 
                 if ($.isFunction(fn)) {
-                    fn(xhrData);
+                    fn(data);
                 }
             },
 
@@ -2946,18 +2960,18 @@ var Khan = (function() {
             }
 
             /*
-            if (typeof userPSData == "undefined" || 
-                    $.isEmptyObject(userPSData) || 
+            if (typeof userPSData == "undefined" ||
+                    $.isEmptyObject(userPSData) ||
                     typeof userPSData.userAnswer == "undefined") {
                 makeProblem(exercises.length - 1);
-            } 
+            }
             */
 
         // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
         }).done(setTimeout(function () { dfd.resolve(); }, 5000));
         /*
         }).done(function () {
-            (function pollExercises() { 
+            (function pollExercises() {
                 if (exercises.length == listOfExercises.length) {
                     dfd.resolve();
                 } else {
@@ -3088,7 +3102,7 @@ var Khan = (function() {
                         makeProblem($('.current-question').data('problem'));
                     } else {
                         if ($('#workarea .loading').length == 0) {
-                            $('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                            $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt($('.current-question').data("problem")) + 1) + '...</p>');
                         }
                         $('#workarea .loading').append('.');
                         setTimeout(function () { KhanC2G.remoteExPollCount++; pollForRemoteEx(); }, 500);
@@ -3096,7 +3110,7 @@ var Khan = (function() {
                 };
                 pollForRemoteEx();
             })();
-            
+
         }
 
     }
@@ -3139,6 +3153,7 @@ var Khan = (function() {
                     li.data('user_selection_val', userQDataObj.user_selection_val);
                     li.data('correct', userQDataObj.correct);
                     li.data('user_choices', userQDataObj.user_choices);
+                    li.data('already_attempted', userQDataObj.already_attempted);
                 }
                 if (li.data('correct')) {
                     li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
@@ -3174,12 +3189,12 @@ var Khan = (function() {
                     }
                 };
             }, 1000);
-    
+
             return dfd.promise();
 
         };
 
-        // [@wescott] This replaces the radio button choices in the #solutionarea with the exact 
+        // [@wescott] This replaces the radio button choices in the #solutionarea with the exact
         // choices that were given to the user when he/she answered the question before; userSelection
         // is what the user actually chose
         var reconstructChoices = function (choices, userSelection) {
@@ -3192,7 +3207,7 @@ var Khan = (function() {
                     $('#solutionarea li:last input').get(0).checked = true;
                 }
                 $('#solutionarea li:last label').append('<span class="value">' + choices[i] + '</span>');
-            } 
+            }
         };
 
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
@@ -3207,7 +3222,10 @@ var Khan = (function() {
             }
             if ($('.current-question').data('user_selection_val')) {
                 if ($('#testinput').length) {
-                    $('#testinput').val($('.current-question').data('user_selection_val')).attr('disabled','disabled');
+                    $('#testinput').val($('.current-question').data('user_selection_val'));
+                    if ($('.current-question').data('correct')) {
+                        $('#testinput').attr('disabled','disabled');
+                    }
                 } else if ($('#solutionarea input:radio').length) {
                     reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
                 }
@@ -3288,12 +3306,12 @@ var Khan = (function() {
                 var userPrevSel = $(ev.target).data("user_selection_val");
                 var validUserChoices = $(ev.target).data("user_choices");
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
-                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an 
-                // empty array within a string, which is a non-empty string; have to convert to a real array and 
+                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an
+                // empty array within a string, which is a non-empty string; have to convert to a real array and
                 // check its length
                 if (userChoicesLen > 0 && $(ev.target).data("correct")) {
                     var choicesArr = $.parseJSON($(ev.target).data("user_choices"));
-                    var userSel = userPrevSel; 
+                    var userSel = userPrevSel;
                     reconstructChoices(choicesArr, userSel);
                     $('#check-answer-button').attr('disabled', 'disabled');
                 } else if (userPrevSel && $(ev.target).data("correct")) {
@@ -3331,7 +3349,7 @@ var Khan = (function() {
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
                 if (userChoicesLen > 0 && $(ev.target).data("correct")) {
                     var choicesArr = $.parseJSON($(this).data("user_choices"));
-                    var userSel = userPrevSel; 
+                    var userSel = userPrevSel;
                     reconstructChoices(choicesArr, userSel);
                     $('#check-answer-button').attr('disabled', 'disabled');
                 } else if (userPrevSel && $(ev.target).data("correct")) {
@@ -3351,8 +3369,8 @@ var Khan = (function() {
         };
         */
 
-        // [@wescott] Make use of event delegation by setting click handler on the common 
-        // questions-stack parent 
+        // [@wescott] Make use of event delegation by setting click handler on the common
+        // questions-stack parent
         function stackClickHandler(ev) {
 
             ev.stopPropagation();
@@ -3361,7 +3379,7 @@ var Khan = (function() {
             var thisCard = (clickTarget.tagName == 'li') ? $(clickTarget) : $(clickTarget).closest('li');
             if (thisCard.length == 0) {
                 return;
-            } 
+            }
 
             // whichever is the current card, make it not the current card
             thisCard.trigger('mouseout');
@@ -3386,7 +3404,8 @@ var Khan = (function() {
                     makeProblem(thisCard.data('problem'));
                 } else {
                     if ($('#workarea .loading').length == 0) {
-                        $('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                        //$('#workarea').append('<p class="loading">Loading Exercise...</p>');
+                        $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt(thisCard.data("problem")) + 1) + '...</p>');
                     }
                     $('#workarea .loading').append('.');
                     //setTimeout(pollForRemoteEx, 500);
@@ -3401,12 +3420,12 @@ var Khan = (function() {
                 var userPrevSel = thisCard.data("user_selection_val");
                 var validUserChoices = thisCard.data("user_choices");
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON(thisCard.data("user_choices")).length : 0;
-                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an 
-                // empty array within a string, which is a non-empty string; have to convert to a real array and 
+                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an
+                // empty array within a string, which is a non-empty string; have to convert to a real array and
                 // check its length
                 if (userChoicesLen > 0 && thisCard.data("correct")) {
                     var choicesArr = $.parseJSON(thisCard.data("user_choices"));
-                    var userSel = userPrevSel; 
+                    var userSel = userPrevSel;
                     reconstructChoices(choicesArr, userSel);
                     $('#check-answer-button').attr('disabled', 'disabled');
                 } else if (userPrevSel && $(ev.target).data("correct")) {
@@ -3420,7 +3439,7 @@ var Khan = (function() {
                     }
                 }
             });
-            
+
         }
 
         // [@wescott] Still within initC2GStacks()
