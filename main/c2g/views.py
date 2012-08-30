@@ -34,3 +34,8 @@ def home(request):
 def healthcheck(request):
     return HttpResponse("I'm alive!")
 
+def throw500(request):
+    raise BaseException('Testing the exception--http500 mechanism')
+
+def throw404(request):
+    raise Http404

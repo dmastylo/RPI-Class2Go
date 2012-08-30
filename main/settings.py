@@ -11,6 +11,7 @@ import djcelery
 djcelery.setup_loader()
 
 
+
 # If PRODUCTION flag not set in Database.py, then set it now.
 try:
     PRODUCTION
@@ -21,6 +22,7 @@ if PRODUCTION == True:
     DEBUG = False
 else:
     DEBUG = True
+
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -255,7 +257,7 @@ LOGGING = {
     },
     'loggers': {
         '': {
-            'handlers':['logfile', 'console'],
+            'handlers':['logfile', 'console','mail_admins'],
             'propagate': True,
             'level':'DEBUG',
         },
@@ -279,6 +281,8 @@ SESSION_COOKIE_AGE = 3*30*24*3600
 EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
+SERVER_EMAIL = 'sophi-dev@cs.stanford.edu'
+
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
     DEFAULT_FROM_EMAIL = "c2g-dev@cs.stanford.edu" #probably change for production

@@ -15,7 +15,12 @@ urlpatterns = patterns('',
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that
     # won't be redirected or change
     url(r'_health$', 'c2g.views.healthcheck'),
+                       
+    # Testing the error pages (404 and 500)
+    url(r'^_throw500$', 'c2g.views.throw500'),
+    url(r'^_throw404$', 'c2g.views.throw404'),
 
+                       
     # Commented out the following 2 urls since point to a signup page which is
     # no longer required.
 #    url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),
@@ -23,9 +28,11 @@ urlpatterns = patterns('',
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
 
-     #for data collection
-     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
-     url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),
+
+                       
+    #for data collection
+    url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
+    url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),
 
     # accounts app for user management
     url(r'^accounts/profile/?$', 'accounts.views.profile', name='accounts_profile'),
