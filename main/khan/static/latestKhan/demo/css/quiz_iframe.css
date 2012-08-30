@@ -415,7 +415,7 @@ div#buttonDiv {
 #outer-wrapper #page-container {margin: 0;}
 #container .topic-exercise-badge, #container .exercises-stack {width:0;}
 .exercises-card {width:79%;}
-.edit-video {float: right; margin-top: 1.3em; margin-right: 12em;}
+.edit-video {margin:10px 0 20px;}
 article { border: none; }
 .exercises-header .section-headline {display: none;}
 #problemarea {display: none;}

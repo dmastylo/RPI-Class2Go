@@ -20,17 +20,16 @@
 
 {% block m_column_content %}
 <link rel="stylesheet" href="{{STATIC_URL}}latestKhan/demo/css/quiz_iframe.css" />
-<div id="c2g_layout_m_column" class="span9">
+<div id="c2g_layout_m_column" class="khan-template">
   {% if user.is_authenticated %}
-
-    {% if common_page_data.course_mode == 'staging' and common_page_data.is_course_admin %}
-      <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
-    {% endif %}
 
     {% if video.title == 'Defining Minimum Edit Distance'%}
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
     {% elif video.title %} 
         <h2 class="section-headline">{{video.title}}</h2>
+        {% if common_page_data.course_mode == 'staging' and common_page_data.is_course_admin %}
+          <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
+        {% endif %}
             <!-- Hardcoding select content of khan-site.html -->
             <div id="page-container">
                 <div id="page-container-inner">
