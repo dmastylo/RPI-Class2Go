@@ -69,13 +69,22 @@ prefix for these.
 
 13. Install South, the database schema migration tool: (this will
     be inside the virtualenv)
-    easy_install South
+    pip install South
 
 14. Install modules for Amazon S3
     pip install django_storages
     pip install boto
  
-15. Setup initial db.
+15. Install GData (2.0.17)
+    pip install gdata
+
+16. Patch GData and storages
+    (instructions coming)
+
+17. Install Celery ecosystem
+    pip install django-celery django-celery-email pytz
+
+18. Setup initial db.
     ./manage.py syncdb
     ./manage.py migrate
 
