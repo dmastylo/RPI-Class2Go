@@ -2,6 +2,7 @@ from c2g.models import Course, AdditionalPage
 from django.contrib.auth.models import User, Group
 import datetime
 import logging
+from database import AWS_STORAGE_BUCKET_NAME
 
 logger=logging.getLogger(__name__)
 
@@ -75,6 +76,7 @@ def get_common_page_data(request, prefix, suffix):
         'course_info_pages':course_info_pages,
         'view_mode': view_mode,
         'current_datetime':current_datetime,
-        'effective_current_datetime':effective_current_datetime
+        'effective_current_datetime':effective_current_datetime,
+        'aws_storage_bucket_name':AWS_STORAGE_BUCKET_NAME,
     }
     return page_data
