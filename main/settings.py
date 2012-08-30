@@ -276,7 +276,7 @@ LOGGING = {
 SESSION_COOKIE_AGE = 3*30*24*3600
 
 # Actually send email
-EMAIL_ALWAYS_ACTUALLY_SEND = True
+EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
 # For Production, or if override is set, actually send email

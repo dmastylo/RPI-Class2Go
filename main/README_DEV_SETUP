@@ -27,7 +27,7 @@ prefix for these.
 
 3. Install Homebrew:
     /usr/bin/ruby -e "$(/usr/bin/curl -fksSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)"
-
+    
 4. Install Python (we are expecting 2.7.x):
     brew install readline sqlite gdbm 
     brew install python --universal --framework 
@@ -69,13 +69,22 @@ prefix for these.
 
 13. Install South, the database schema migration tool: (this will
     be inside the virtualenv)
-    easy_install South
+    pip install South
 
 14. Install modules for Amazon S3
     pip install django_storages
     pip install boto
  
-15. Setup initial db.
+15. Install GData (2.0.17)
+    pip install gdata
+
+16. Patch GData and storages
+    (instructions coming)
+
+17. Install Celery ecosystem
+    pip install django-celery django-celery-email pytz
+
+18. Setup initial db.
     ./manage.py syncdb
     ./manage.py migrate
 
@@ -261,4 +270,5 @@ python manage.py runserver 8100
 02. Take a look in c2g/views.py as there are some parameters that affect which data gets created. Note, if you choose the delete_current_data option it will delete your current django users so you’ll have to recreate those users if you want.
 
 03. To run the script that populates the data do "manage.py help db_populate" first. This will tell you where to setup the params for the test data. 
+
 
