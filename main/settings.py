@@ -6,6 +6,11 @@ from os import path
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
 
+#Added for celery
+import djcelery
+djcelery.setup_loader()
+
+
 # If PRODUCTION flag not set in Database.py, then set it now.
 try:
     PRODUCTION
@@ -132,6 +137,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages'
 )
 
+
 # the mode should be set in your database.py, but if it's not, assume
 # we're in a dev environment (careful!)
 try:
@@ -153,6 +159,8 @@ INSTALLED_APPS = (
                       'django.contrib.admindocs',
                       'registration',
                       'south',
+                      'djcelery',
+                      #'kombu.transport.django',
                       'c2g',
                       'courses',
                       'courses.forums',
@@ -163,6 +171,9 @@ INSTALLED_APPS = (
                       'problemsets',
                       'django.contrib.flatpages',
                       'storages',
+                      'celerytest',
+                      'djcelery_email',
+                      'kelvinator',
                       )
 if class2go_mode != "prod":
     INSTALLED_APPS += (
@@ -265,13 +276,14 @@ LOGGING = {
 SESSION_COOKIE_AGE = 3*30*24*3600
 
 # Actually send email
-EMAIL_ALWAYS_ACTUALLY_SEND = False
+EMAIL_ALWAYS_ACTUALLY_SEND = True
 
 # Email Settings
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
     DEFAULT_FROM_EMAIL = "c2g-dev@cs.stanford.edu" #probably change for production
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend' 
     EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
     EMAIL_PORT = 587
     EMAIL_HOST_USER = SES_SMTP_USER
@@ -281,4 +293,16 @@ if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = LOGGING_DIR + 'emails_sent.log'
+
+#CELERY-email
+CELERY_EMAIL_TASK_CONFIG = {
+    'rate_limit' : '5/s',
+    'max_retries' : 0,
+}
+
+#CELERY
+BROKER_TRANSPORT='sqs'
+BROKER_USER = AWS_ACCESS_KEY_ID
+BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
+BROKER_TRANSPORT_OPTIONS = {'region': 'us-west-1', 'queue_name_prefix' : 'celery-'}
 
