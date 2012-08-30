@@ -1305,24 +1305,34 @@ var Khan = (function() {
                 penaltyPct = "25%";
             }
             var exerciseRef = ($('.current-question').data("problem")) ? parseInt($('.current-question').data("problem")) : id;
-            if (typeof userPSData != "undefined" && userPSData[exerciseRef]) {
-                if (userPSData[exerciseRef]["already_attempted"]) {
-                    alreadyAttempted = userPSData[exerciseRef]["already_attempted"];
-                } else {
-                    alreadyAttempted = 0;
-                }
-                if (userPSData[exerciseRef]['correct']) {
-                    $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
-                } else {
-                    if (alreadyAttempted > 0) {
-                        maxCredit -= alreadyAttempted * parseInt(penaltyPct); 
-                    } 
-                    $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
-                    $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
-                    $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
-                    $("#check-answer-button").val("Submit Answer");
-                }
+
+            // [@wescott] Default to no attempts
+            alreadyAttempted = 0;
+            if (typeof userPSData != "undefined" && 
+                    userPSData[exerciseRef] && 
+                    userPSData[exerciseRef]["already_attempted"]) {
+                alreadyAttempted = userPSData[exerciseRef]["already_attempted"];
             }
+
+            // [@wescott] If it's been attempted at all
+            if (alreadyAttempted > 0) {
+                maxCredit -= alreadyAttempted * parseInt(penaltyPct); 
+            } 
+            
+            // [@wescott] If user got this one right, remove penalty description and 
+            // replace with summary
+            if (typeof userPSData != "undefined" && userPSData[exerciseRef] && userPSData[exerciseRef]['correct']) {
+                $('#solutionarea').remove('p');
+                $('#check-answer-button').hide();
+                $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
+            } else {
+                $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
+                $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
+                $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
+                $("#check-answer-button").val("Submit Answer");
+                $("#check-answer-button").show();
+            }
+
         }
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
@@ -3207,6 +3217,9 @@ var Khan = (function() {
                     $('#solutionarea li:last input').get(0).checked = true;
                 }
                 $('#solutionarea li:last label').append('<span class="value">' + choices[i] + '</span>');
+            }
+            if ($('.current-question').data('correct')) {
+                $('#solutionarea input').attr('disabled','disabled');
             }
         };
 
