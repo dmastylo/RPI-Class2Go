@@ -1316,7 +1316,7 @@ var Khan = (function() {
 
             // [@wescott] If it's been attempted at all
             if (alreadyAttempted > 0) {
-                maxCredit = (alreadyAttempted < maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
+                maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
             } 
             
             // [@wescott] If user got this one right, remove penalty description and 
@@ -1331,6 +1331,15 @@ var Khan = (function() {
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
                 $("#check-answer-button").val("Submit Answer");
                 $("#check-answer-button").show();
+            }
+
+            if ($('#submit-problemset-button').length) {
+                $('#submit-problemset-button').show();
+            } else {
+                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+                $('#submit-problemset-button').click(function () {
+                    location.href = c2gConfig.progressUrl;
+                });
             }
 
         }
