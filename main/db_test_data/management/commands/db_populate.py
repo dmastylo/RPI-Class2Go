@@ -118,7 +118,7 @@ def create_courses(institutions,users):
         'calendar_start': datetime(2013, 7, 27),
         'calendar_end': datetime(2013, 8, 12),
         'list_publicly': 1,
-        'handle':'nlp#$!Fall2012',
+        'handle':'nlp--Fall2012',
         'members': users,
     }
     create_course_nlp(data, users)
@@ -132,7 +132,7 @@ def create_courses(institutions,users):
             'calendar_start': datetime(2013, 7, 27),
             'calendar_end': datetime(2013, 8, 12),
             'list_publicly': 1,
-            'handle':'crypto#$!Fall2012',
+            'handle':'crypto--Fall2012',
             'members': users,
     }
 

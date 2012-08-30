@@ -18,7 +18,7 @@ def upload(request):
             new_file.course = common_page_data['course']
             new_file.index = new_file.section.getNextIndex()
             new_file.mode = 'staging'
-            new_file.handle = course_prefix + "#$!" + course_suffix
+            new_file.handle = course_prefix + "--" + course_suffix
 
             new_file.save()
             new_file.create_production_instance()
