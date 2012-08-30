@@ -1249,6 +1249,10 @@ var Khan = (function() {
             }
         }
 
+        // [@wescott] Hide solutionarea until ready
+        //console.log('Hiding solution area...');
+        $('#solutionarea').css('visibility', 'hidden');
+
         // Generate a type of problem
         // (this includes possibly generating the multiple choice problems,
         // if this fails then we will need to try generating another one.)
@@ -1926,8 +1930,15 @@ var Khan = (function() {
                 });
         }
 
+        //console.log('Showing solution area for ' + id);
+        if (typeof userPSData == "undefined" || 
+            typeof userPSData[id] == "undefined" ||
+            !userPSData[id]["correct"]) {
+            $('#solutionarea').css('visibility', 'visible');
+        }
+
         return answerType;
-    }
+    }   // end makeProblem
 
     function clearExistingProblem() {
         $("#solutionarea").html("");
@@ -3232,6 +3243,7 @@ var Khan = (function() {
             if ($('.current-question').data('correct')) {
                 $('#solutionarea input').attr('disabled','disabled');
             }
+            $('#solutionarea').css('visibility', 'visible');
         };
 
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
