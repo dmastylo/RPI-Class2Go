@@ -2,7 +2,8 @@
 #outer-wrapper, #page-container {background:#fff;}
 
 #questions-stack {/*display: none;*/ position:absolute; font-size: 150%; top: 30px; left: -60px; z-index:5}
-#questions-stack li { background-color: #fff; border: 2px solid #ccc; border-radius: 3px; color: #999; cursor: pointer; margin-top: -.3em; padding: 0 .5em; } 
+#questions-stack ol { list-style: none; margin: 0; }
+#questions-stack li { background-color: #fff; border: 2px solid #ccc; border-radius: 3px; color: #999; cursor: pointer; margin-top: -.3em; padding: 3px .5em; } 
 
 /* #questions-to-do {display: none; font-size: 150%; top: 30px; left: -60px; z-index:5} */
 #questions-stack #questions-to-do ol li { /* -webkit-transform:rotate(-17deg); -ms-transform:rotate(-17deg); -moz-transform:rotate(-17deg); -o-transform:rotate(-17deg)*/ }
