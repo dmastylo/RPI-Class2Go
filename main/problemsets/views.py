@@ -163,7 +163,7 @@ def create_action(request):
             new_pset = form.save(commit=False)
             new_pset.course = common_page_data['course']
             new_pset.mode = 'staging'
-            new_pset.handle = course_prefix + "#$!" + course_suffix
+            new_pset.handle = course_prefix + "--" + course_suffix
             new_pset.path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+new_pset.slug+"/load_problem_set"
 
             new_pset.save()
@@ -239,7 +239,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
             file_name = file_content.name
 
             exercise = Exercise()
-            exercise.handle = request.POST['course_prefix'] + '#$!' + request.POST['course_suffix']
+            exercise.handle = request.POST['course_prefix'] + '--' + request.POST['course_suffix']
             exercise.fileName = file_name
             exercise.file.save(file_name, file_content)
             exercise.save()

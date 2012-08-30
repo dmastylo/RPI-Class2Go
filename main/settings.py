@@ -173,8 +173,8 @@ INSTALLED_APPS = (
                       'problemsets',
                       'django.contrib.flatpages',
                       'storages',
-                      'celerytest',
-                      'djcelery_email',
+                      #'celerytest',
+                      #'djcelery_email',
                       'kelvinator',
                       )
 if class2go_mode != "prod":
