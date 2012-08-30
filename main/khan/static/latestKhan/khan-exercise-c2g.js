@@ -3208,8 +3208,8 @@ var Khan = (function() {
         // choices that were given to the user when he/she answered the question before; userSelection
         // is what the user actually chose
         var reconstructChoices = function (choices, userSelection) {
-            $('#solutionarea').empty();
-            $('#solutionarea').append('<ul></ul>');
+            $('#solutionarea ul').empty().remove();
+            $('#solutionarea').prepend('<ul></ul>');
             for (var i = 0; i < choices.length; i += 1) {
                 $('#solutionarea ul').append('<li><label></label></li>');
                 $('#solutionarea li:last label').append('<input type="radio" name="solution" value="' + i + '"/>');
