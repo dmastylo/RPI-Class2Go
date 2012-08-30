@@ -73,7 +73,8 @@ fi
 #Runs ffmpeg to extract frames at a certain interval
 echo
 echo "$me: Starting Extraction (ffmpeg)"
-ffmpeg -i $video_file -r $2 -f image2 -s vga jpegs/img%3d.jpeg 
+# ffmpeg -i $video_file -r $2 -f image2 -s vga jpegs/img%3d.jpeg 
+ffmpeg -i $video_file -r $2 -f image2 jpegs/img%3d.jpeg 
 
 #Runs extractFrames to list frames to be deleted
 echo
