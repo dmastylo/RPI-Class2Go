@@ -17,6 +17,7 @@ class S3UploadForm(forms.ModelForm):
         if instance and instance.id:
             del self.fields['file']
             del self.fields['url']
+        self.fields['slug'].help_text = "A unique identifier that will be shown in the URL"
 
     def clean_url(self):
         url = self.cleaned_data['url']
