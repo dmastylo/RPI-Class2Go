@@ -5,7 +5,7 @@ from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
 from courses.actions import auth_view_wrapper
 from courses.forums.forms import PiazzaAuthForm
-from main.database import PIAZZA_ENDPOINT, PIAZZA_KEY, PIAZZA_SECRET
+from database import PIAZZA_ENDPOINT, PIAZZA_KEY, PIAZZA_SECRET
 from OAuthSimple import OAuthSimple
 
 @auth_view_wrapper
