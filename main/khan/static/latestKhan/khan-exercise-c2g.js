@@ -2753,6 +2753,8 @@ var Khan = (function() {
         $('#solutionarea span.value').each(function () {
             user_choices.push($(this).text());
         });
+        // [@wescott] Correct attempt count for when a user reloads the page
+        data['attempt_number'] = parseInt($('#attempt-count').text()) + 1;
         data = $.extend(data, {"problem_identifier": problem_identifier});
         data = $.extend(data, {"exercise_filename": exercise_filename});
         data = $.extend(data, {"exercise_type": exercise_type});
