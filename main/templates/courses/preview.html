@@ -29,7 +29,7 @@ Natural language processing is the technology for dealing with our most ubiquito
        </div>
        {% endif %}
        <div class="well">
-       <h3>Login to Stanford Online</h3>
+       <h3>Confirm your login name</h3>
        <form method="post" action="{% url 'courses.preview.views.preview_login' common_page_data.course_prefix common_page_data.course_suffix %}" class="form-vertical">  
            {% csrf_token %}
            <table>
@@ -46,6 +46,7 @@ Natural language processing is the technology for dealing with our most ubiquito
            <input type="submit" value="Login" class="btn" />
            <input type="hidden" name="next" value="{{ next }}" />
        </form>
+           <a href="{% url 'auth_password_reset' %}">Forgot My Password</a>
        </div>
        
    </div>
