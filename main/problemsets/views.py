@@ -25,8 +25,6 @@ def list(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    print "ASDNAJDSNAJDSAJDSNAJKNDSAJKDSNAD"
-    print request
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
 

@@ -109,6 +109,24 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
 
     def __unicode__(self):
         return self.title
+    
+    def get_all_students(self):
+        """
+        Returns a QUERY_SET of all students
+        """
+        return self.student_group.user_set.all()
+    
+    def get_all_course_admins(self):
+        """
+        Returns a QUERY_SET of all staff
+        """
+        return (self.instructor_group.user_set.all() | self.tas_group.user_set.all())
+    
+    def get_all_members(self):
+        """
+        Returns a QUERY_SET of all course members
+        """
+        return (self.get_all_students() | self.get_all_course_admins())
 
     def create_production_instance(self):
         production_instance = Course(institution = self.institution,
