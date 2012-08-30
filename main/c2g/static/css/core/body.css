@@ -366,11 +366,11 @@ small.date {
   background-color: #820000;
 }
 
-.video-list-item {
+.course-list-item {
     overflow:hidden;
     padding:10px 20px;
 }
-.video-list-item .progress {
+.course-list-item .progress {
     width:400px;
     margin-top:5px;
 }
