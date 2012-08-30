@@ -1206,56 +1206,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	-ms-filter: none;
 }
 
-
-/* http://meyerweb.com/eric/tools/css/reset/
-   v2.0 | 20110126
-   License: none (public domain)
-*/
-
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
-}
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
-	display: block;
-}
-body {
-	line-height: 1;
-}
-ol, ul {
-	list-style: none;
-}
-blockquote, q {
-	quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
-}
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-
 /* End Reset */
 /* Clearfix */
 .clearfix:before,
@@ -1270,24 +1220,6 @@ table {
 
 .clearfix {
     *zoom: 1;
-}
-/* End Clearfix */
-
-html, body {
-    height: 100%;
-}
-html {
-    overflow-y: scroll;
-}
-
-body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 12px;
-    margin: 0;
-    color: #444;
-    line-height: 22px;
-    /* extend background to cover #page-container on horizontal scroll */
-    min-width: 1000px;
 }
 
 
@@ -1319,7 +1251,7 @@ article {
 
 /* Basic typography for the entire site */
 
-h1, h2, h3, h4, h5 { color: #111; font-family: "MuseoSans500", sans-serif; }
+/*h1, h2, h3, h4, h5 { color: #111; font-family: "MuseoSans500", sans-serif; }
 h1 {font-size:25px; margin-bottom: 22px;}
     .main-headline, .section-headline { padding-top: 22px; }
     .main-headline a, .section-headline a { text-decoration: none;}
@@ -1331,19 +1263,19 @@ h2 {font-size:20px; margin-bottom: 22px;}
 h3 {font-size:18px; margin-bottom: 22px;}
 h4 {font-size:15px; margin-bottom: 22px;}
 h5 {font-size: 15px; margin-bottom: -22px;}
-p { font-size: 14px; margin: 22px 0;}
+p { font-size: 14px; margin: 22px 0;}*/
 
 .pulls { margin-bottom: 9px; } /* "Pulls" the next block element up by halving the margin. */
 .pulled { margin-top: 9px; margin-bottom: 27px; } /* Preserves vertical rhythm. Not always necessary */
 
-b, strong { font-weight: bold; }
+/*b, strong { font-weight: bold; }
 em { font-style: italic; }
 
 .tiny { font-size: 10px; }
 .right { text-align: right; }
 .left { text-align: left; }
 .center { text-align: center; }
-.justify { text-align: justify; }
+.justify { text-align: justify; }*/
 
 a.simple-link { text-decoration: none; }
 a.simple-link:hover { text-decoration: underline; }
@@ -1431,7 +1363,7 @@ hr.thin {
 }
 
 /* Links in the header and footer don't change color when visited. */
-a:link,
+/*a:link,
 a:visited,
 header a:visited,
 footer a:visited,
@@ -1449,7 +1381,7 @@ a:visited {
 a:link:hover, a:link:focus, a:visited:hover, a:visited:focus {
     color: #678D00;
     text-decoration: underline;
-}
+}*/
 
 /*
  * Hide links with href=# and other script-requiring elements from non-scripting users,
@@ -1467,11 +1399,11 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
     -webkit-appearance: none;
 }
 
-header, footer {
+/*header, footer {
     display: block;
     width: 100%;
     font-family: "MuseoSans300", sans-serif;
-}
+}*/
 
 footer {
     height: 208px;
@@ -4280,7 +4212,7 @@ a.nodeLabel:hover {
 
 img.throbber { position: absolute; }
 
-form { display: inline; }
+/*form { display: inline; }*/
 
 a.control, a.control:visited, a.control:focus, a.control:link { color: #0075b1; }
 a.control:hover { color: #DD6900; }
@@ -4733,10 +4665,10 @@ div.topic-condensed {
     background-image: url(http://www.khanacademy.org/'/images/progress-animated.gif');
 }
 
-.modal.generic-dialog {
+/*.modal.generic-dialog {
   position: fixed;
   /* set the point on which top and left operate to the middle top edge*/
-  width: 500px;
+  /*width: 500px;
   margin: 0 0 0 -250px;
   top: 60px;
   left: 50%;
@@ -4744,10 +4676,10 @@ div.topic-condensed {
 
 .modal .generic-message {
     margin: 10px 0;
-}
+}*/
 
-.modal .generic-button {
-    /* TODO (jasonrr): Float can't be used with display: inline-block; What's this doing? */
+/* TODO (jasonrr): Float can't be used with display: inline-block; What's this doing? */
+/*.modal .generic-button {
     display: inline-block;
     float: right;
     font-size: 90%;
@@ -4763,7 +4695,7 @@ div.topic-condensed {
 .modal .generic-title {
     color: #1054AA;
     font-size: 21px;
-}
+}*/
 
 .ui-tooltip, .qtip {
     font-size: 100%;
@@ -5181,7 +5113,7 @@ div.topic-condensed {
 
 .hide { display: none; }
 
-.modal-backdrop {
+/*.modal-backdrop {
   background-color: #000000;
   position: fixed;
   top: 0;
@@ -5220,8 +5152,6 @@ div.topic-condensed {
   border: 1px solid #999;
   border: 1px solid rgba(0, 0, 0, 0.3);
   *border: 1px solid #999;
-  /* IE6-7 */
-
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
@@ -5284,7 +5214,7 @@ div.topic-condensed {
 }
 .fade.in {
   opacity: 1;
-}
+}*/
 
 
 ul.inline-list, ul.inline-list li {

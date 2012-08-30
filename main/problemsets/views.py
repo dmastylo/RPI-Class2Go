@@ -45,7 +45,8 @@ def show(request, course_prefix, course_suffix, pset_slug):
     psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
     activity_list = []
     for psetToEx in psetToExs:
-        attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-time_created')
+        #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-time_created')
+        attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-complete', '-attempt_number')
         if len(attempts) > 0:
             activity_list.append(attempts[0])
     return render_to_response('problemsets/problemset.html',
@@ -53,7 +54,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
                                'pset': ps,
                                'pset_url':ps.path,
                                'pset_type':ps.assessment_type,
-                               'pset_penalty':ps.late_penalty,
+                               'pset_penalty':ps.resubmission_penalty,
                                'pset_attempts_allowed':ps.submissions_permitted,
                                'activity_list': activity_list,
                               },

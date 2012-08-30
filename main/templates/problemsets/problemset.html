@@ -64,7 +64,8 @@ var c2gConfig = {
     user: {{user.id}},
     problemType: '{{pset_type}}',
     penaltyPct: '{{pset_penalty}}',
-    maxAttempts: '{{pset_attempts_allowed}}'
+    maxAttempts: '{{pset_attempts_allowed}}',
+    progressUrl: '/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/problemsets'
 };
 var userPSData = {};
 {% for activity in activity_list %}
