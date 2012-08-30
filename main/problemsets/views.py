@@ -68,26 +68,28 @@ def attempt(request, problemId):
     exercise_type = request.POST['exercise_type']
     if exercise_type == 'problemset':
         problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
+        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise))
         problem_activity = ProblemActivity(student = user,
                                            problemset_to_exercise = problemset_to_exercise,
                                            complete = request.POST['complete'],
                                            attempt_content = request.POST['attempt_content'],
                                            count_hints = request.POST['count_hints'],
                                            time_taken = request.POST['time_taken'],
-                                           attempt_number = request.POST['attempt_number'],
+                                           attempt_number = attempts + 1,
                                            problem_type = request.POST['problem_type'],
                                            user_selection_val = request.POST['user_selection_val'],
                                            user_choices = request.POST['user_choices'])
 
     elif exercise_type == 'video':
         video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
+        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise))
         problem_activity = ProblemActivity(student = user,
                                            video_to_exercise = video_to_exercise,
                                            complete = request.POST['complete'],
                                            attempt_content = request.POST['attempt_content'],
                                            count_hints = request.POST['count_hints'],
                                            time_taken = request.POST['time_taken'],
-                                           attempt_number = request.POST['attempt_number'],
+                                           attempt_number = attempts + 1,
                                            problem_type = request.POST['problem_type'],
                                            user_selection_val = request.POST['user_selection_val'],
                                            user_choices = request.POST['user_choices'])
@@ -100,7 +102,7 @@ def attempt(request, problemId):
 
     problem_activity.save()
     if request.POST['complete'] == "1":
-        activityConfirmation = '{"exercise_status":"complete", "attempt_num": ', problem_activity.attempt_number, '}' 
+        activityConfirmation = '{"exercise_status":"complete", "attempt_num": ', problem_activity.attempt_number, '}'
     else:
         activityConfirmation = '{"exercise_status":"wrong", "attempt_num": ', problem_activity.attempt_number, '}'
     return HttpResponse(activityConfirmation)
