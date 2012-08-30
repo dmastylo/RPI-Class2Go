@@ -1316,7 +1316,7 @@ var Khan = (function() {
 
             // [@wescott] If it's been attempted at all
             if (alreadyAttempted > 0) {
-                maxCredit -= alreadyAttempted * parseInt(penaltyPct); 
+                maxCredit = (alreadyAttempted < maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
             } 
             
             // [@wescott] If user got this one right, remove penalty description and 
