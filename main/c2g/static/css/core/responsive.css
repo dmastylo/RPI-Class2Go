@@ -16,6 +16,7 @@
 .clearfix:before,
 .clearfix:after {
   display: table;
+  line-height: 0;
   content: "";
 }
 
@@ -34,10 +35,9 @@
 .input-block-level {
   display: block;
   width: 100%;
-  min-height: 28px;
+  min-height: 30px;
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
-      -ms-box-sizing: border-box;
           box-sizing: border-box;
 }
 
@@ -58,33 +58,37 @@
   display: none !important;
 }
 
-@media (max-width: 767px) {
-  .visible-phone {
-    display: inherit !important;
-  }
-  .hidden-phone {
-    display: none !important;
-  }
+.visible-desktop {
+  display: inherit !important;
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
   .hidden-desktop {
     display: inherit !important;
   }
   .visible-desktop {
-    display: none !important;
+    display: none !important ;
   }
-}
-
-@media (min-width: 768px) and (max-width: 979px) {
   .visible-tablet {
     display: inherit !important;
   }
   .hidden-tablet {
     display: none !important;
   }
+}
+
+@media (max-width: 767px) {
   .hidden-desktop {
     display: inherit !important;
   }
   .visible-desktop {
-    display: none !important ;
+    display: none !important;
+  }
+  .visible-phone {
+    display: inherit !important;
+  }
+  .hidden-phone {
+    display: none !important;
   }
 }
 
