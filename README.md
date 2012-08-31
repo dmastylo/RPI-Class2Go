@@ -25,7 +25,7 @@ Here is what is important to us.
 
 * *Open*. The platform is open source to make it easier for users
     (faculty members) to give us feedback on what we are doing.
-    Eventually we would love to have others use the platform, or
+    We would love to have others use the platform, or
     to collaborate with similar efforts in other places.
 
 * *Portable*. We believe strongly that valuable course content
