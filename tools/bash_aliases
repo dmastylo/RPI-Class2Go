@@ -89,7 +89,6 @@ function buglist-hot {
     ghi list -s open -l P0 | grep -v '3-Done' 
 }
 
-
 function buglist-to-triage {
     if [[ $1 == "new" ]]; then
         case `uname` in
@@ -99,14 +98,22 @@ function buglist-to-triage {
                 YESTERDAY=`date --date="yesterday"` ;;
         esac
         sinceparam="--since ${YESTERDAY}"
+        sincemsg=" (PRIOR 24 HORUS)"
     else
         sinceparam=""
+        sincemsg=""
     fi
-    echo "MISSING PRIORITY"
-    ghi list -s open ${sinceparam} | egrep -v "[P0]|[P1]|[P2]|[P3]"
+
+    echo "MISSING PRIORITY${sincemsg}"
+    ghi list -s open ${sinceparam} \
+        | grep -v "NO-ASGN" \
+        | grep -v "\[P0\]" \
+        | grep -v "\[P1\]" \
+        | grep -v "\[P2\]" \
+        | grep -v "\[P3\]" 
     echo
-    echo "NOT ASSIGNED"
-    ghi list -s open ${sinceparam} | egrep "^#|NO-ASGN"
+    echo "NOT ASSIGNED${sincemsg}"
+    ghi list -s open ${sinceparam} | grep -E "^#|NO-ASGN"
 }
 
 function buglist-goalline {
@@ -120,9 +127,9 @@ function buglist-goalline {
     buglist-hot
 
     echo; echo
-    echo "-------- NEW BUGS THAT NEED TRIAGE"
+    echo "-------- ACTIVE BUGS THAT NEED TRIAGE"
     echo
-    buglist-new-to-triage
+    buglist-to-triage new
 
     echo; echo
     echo "-------- ALL ACTIVE ISSUES"
