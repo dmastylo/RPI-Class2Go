@@ -1,24 +1,24 @@
 name "util"
-description "Class2Go utility node"
+description "sophi utility node"
 
 override_attributes({
-    "class2go-bitnami-django" => {
+    "sophi-bitnami-django" => {
             "django-app" => "util"
             }
 })
 
 run_list(
 #   "recipe[chef-client]",
-    "recipe[class2go-update]",
+    "recipe[sophi-update]",
     "recipe[gdata]",
-    "recipe[class2go-base]",
-    "recipe[class2go-python]",
-    "recipe[class2go-bitnami-django]",
-    "recipe[class2go-deploy]",
-    "recipe[class2go-logging]",
-    "recipe[class2go-database.py]",
-#    "recipe[class2go-collectstatic]",
-    "recipe[class2go-kelvinator]",
+    "recipe[sophi-base]",
+    "recipe[sophi-python]",
+    "recipe[sophi-bitnami-django]",
+    "recipe[sophi-deploy]",
+    "recipe[sophi-logging]",
+    "recipe[sophi-database.py]",
+#    "recipe[sophi-collectstatic]",
+    "recipe[sophi-kelvinator]",
     "recipe[s3cmd]",
-    "recipe[class2go-bitnami-apache-restart]"
+    "recipe[sophi-bitnami-apache-restart]"
 )

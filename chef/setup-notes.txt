@@ -1,0 +1,15 @@
+CREATE STAGING APPSERVER:
+knife ec2 server create -I ami-0a4ac63a -x bitnami -N app100.stage --region us-west-2 -Z us-west-2b -f t1.micro -G stage -E stage -r 'role[appserver]'
+
+CREATE PRODUCTION APPSERVER:
+knife ec2 server create -I ami-0a4ac63a -x bitnami -N app1.prod --region us-west-2 -Z us-west-2b -f t1.micro -G prod -E prod -r 'role[appserver]'
+
+CREATE STAGING UTIL:
+
+knife ec2 server create -I ami-0a4ac63a -x bitnami -N util100.stage --region us-west-2 -Z us-west-2b -f m1.small -G stage -E stage -r 'role[util]'
+
+IMAGES:
+
+ami-0a4ac63a - bitnami django-stack 1.4.1, EBS   (user = bitnami)
+ami-4438b474 - Ubuntu 64-bit 12.04 LTS with EBS   (user = ubuntu)
+

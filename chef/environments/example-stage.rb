@@ -1,5 +1,5 @@
 name "stage"
-description "Class2Go Staging Environment"
+description "Sophi Staging Environment"
 
 default_attributes \
     "aws" => {
@@ -10,14 +10,14 @@ default_attributes \
         "ses_user" =>  "DDDDDDDDDDDDDDDDDDDD",
         "ses_passwd" => "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
     },
-    "class2go" => {
+    "sophi" => {
         "production" => "False",
-        "admin_name" => "Class2Go",
-        "admin_email" => "c2gops@gmail.com"
+        "admin_name" => "Sophi Operations",
+        "admin_email" => "sophi-ops@cs.stanford.edu"
     },
     "piazza" => {
         "endpoint" => "https://piazza.com/basic_lti",
-        "key" => "class2go",
+        "key" => "sophi",
         "secret" => "XXXXXXXXXXXXXXXXXXXXXXXXX"
     }
 
