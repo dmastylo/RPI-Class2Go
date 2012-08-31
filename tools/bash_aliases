@@ -36,16 +36,16 @@ alias localdb="~/src/class2go/django-project/manage.py dbshell"
 ## PROJECT MANAGEMENT JUNK
 ##
 
-function buglist-sprint {
-    if [[ $# -ne 1 ]]; then
-        echo "usage: buglist-sprint <milestone>"
-        return 1
+function buglist-by-dev {
+    if [[ $# -eq 1 ]]; then
+        sprintparam="-M $1"
     fi
+
     for a in dcadams halawa jbau jinpa kelvindo kluo sefk shalinguyen wescott; do
         for p in P0 P1
         do
             echo "--------- $a ($p) ---------"
-            ghi list -l $p -u $a -q -M $1
+            ghi list -l $p -u $a -q $sprintparam
         done
         echo; echo
     done
@@ -89,18 +89,24 @@ function buglist-hot {
     ghi list -s open -l P0 | grep -v '3-Done' 
 }
 
-function buglist-to-triage {
-    ghi list -s open | egrep -v '[P0]|[P1]|[P2]|[P3]'
-}
 
-function buglist-new-to-triage {
-    case `uname` in
-        "Darwin" )
-            YESTERDAY=`date -v -1d` ;;
-        * )
-            YESTERDAY=`date --date="yesterday"` ;;
-    esac
-    ghi list -s open --since "${YESTERDAY}" | egrep -v "[P0]|[P1]|[P2]|[P3]"
+function buglist-to-triage {
+    if [[ $1 == "new" ]]; then
+        case `uname` in
+            "Darwin" )
+                YESTERDAY=`date -v -1d` ;;
+            * )
+                YESTERDAY=`date --date="yesterday"` ;;
+        esac
+        sinceparam="--since ${YESTERDAY}"
+    else
+        sinceparam=""
+    fi
+    echo "MISSING PRIORITY"
+    ghi list -s open ${sinceparam} | egrep -v "[P0]|[P1]|[P2]|[P3]"
+    echo
+    echo "NOT ASSIGNED"
+    ghi list -s open ${sinceparam} | egrep "^#|NO-ASGN"
 }
 
 function buglist-goalline {
