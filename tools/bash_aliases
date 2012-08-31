@@ -98,7 +98,7 @@ function buglist-to-triage {
                 YESTERDAY=`date --date="yesterday"` ;;
         esac
         sinceparam="--since ${YESTERDAY}"
-        sincemsg=" (PRIOR 24 HORUS)"
+        sincemsg=" (PRIOR 24 HOURS)"
     else
         sinceparam=""
         sincemsg=""
