@@ -1,8 +1,8 @@
 name "appserver"
-description "Class2Go appserver node"
+description "sophi appserver node"
 
 override_attributes({
-    "class2go-bitnami-django" => {
+    "sophi-bitnami-django" => {
             "django-app" => "main"
             }
 })
@@ -14,14 +14,14 @@ override_attributes({
 
 run_list(
 #   "recipe[chef-client]",
-#   "recipe[class2go-update]",
+#   "recipe[sophi-update]",
     "recipe[gdata]",
-    "recipe[class2go-base]",
-    "recipe[class2go-python]",
-    "recipe[class2go-bitnami-django]",
-    "recipe[class2go-deploy]",
-    "recipe[class2go-logging]",
-    "recipe[class2go-database.py]",
-    "recipe[class2go-collectstatic]",
-    "recipe[class2go-bitnami-apache-restart]"
+    "recipe[sophi-base]",
+    "recipe[sophi-python]",
+    "recipe[sophi-bitnami-django]",
+    "recipe[sophi-deploy]",
+    "recipe[sophi-logging]",
+    "recipe[sophi-database.py]",
+    "recipe[sophi-collectstatic]",
+    "recipe[sophi-bitnami-apache-restart]"
 )
