@@ -32,11 +32,12 @@
 		  {% endif %}
 	      {% else %}
 	        {{ field.label_tag }}
+	        {% if field.help_text %}
+	          <span class="help-block">{{ field.help_text }}</span>
+	        {% endif %}
 	        {{ field }}
 	      {% endif %}
-	      {% if field.help_text %}
-	        <span class="help-block">{{ field.help_text }}</span>
-	      {% endif %}
+	     
 	      {{ field.errors }}
 	    </div>
 	  {% endfor %}

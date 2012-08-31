@@ -1061,6 +1061,8 @@ var Khan = (function() {
 
     function makeProblem(id, seed) {
 
+        //console.log('makeProblem called with id ' + id);
+    
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
 
@@ -1282,6 +1284,7 @@ var Khan = (function() {
         } else {
             // Making the problem failed, let's try again
             problem.remove();
+            //console.log("Making the problem failed, let's try again");
             makeProblem(id, randomSeed);
             return;
         }
@@ -2084,17 +2087,21 @@ var Khan = (function() {
         }
 
         function handleSubmit() {
+            //console.log("handleSubmit called");
             var pass = validator();
 
             // Stop if the user didn't enter a response
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
 
-            if (checkIfAnswerEmpty()) {
+            // [@wescott] Don't check for empty if this is a summative exercise
+            //console.log(exAssessType);
+            if (exAssessType != "summative" && checkIfAnswerEmpty()) {
                 return false;
             } else {
                 guessLog.push(validator.guess);
             }
+            //console.log("still in handleSubmit");
 
             // Stop if the form is already disabled and we're waiting for a response.
             if ($("#answercontent input").not("#hint,#next-question-button").is(":disabled")) {
@@ -2203,6 +2210,8 @@ var Khan = (function() {
                 fast: (typeof userExercise !== "undefined" && userExercise.secondsPerFastProblem >= data.time_taken)
             });
 
+            //console.log("pass...");
+            //console.log(pass);
             return false;
         }
 
@@ -2834,6 +2843,8 @@ var Khan = (function() {
 
             // Handle error edge case
             error: function(xhr) {
+
+                //console.log(xhr);
                 // Clear the queue so we don't spit out a bunch of
                 // queued up requests after the error
                 if (queue && requestQueue[queue]) {
@@ -3109,7 +3120,9 @@ var Khan = (function() {
 
             // [@wescott] Set up cards so the first one not done is the "current card"
             (function configureCards () {
+                //console.log('configureCards called');
                 var cardArr = $('#questions-stack li').toArray();
+                //console.log($('li.current-question'));
                 $('li.current-question').removeClass('current-question');
                 for (var c = 0; c <= cardArr.length; c += 1) {
                     if ($(cardArr[c]).hasClass('correctly-answered')) {
@@ -3119,22 +3132,34 @@ var Khan = (function() {
                         break;
                     }
                 }
+
+                // [@wescott] Handle case where user returns to problemset page
+                // after answering all questions correctly; make first question
+                // current
+                if ($('.current-question').length == 0) {
+                    $(cardArr[0]).addClass('current-question');
+                }
+
                 KhanC2G.remoteExPollCount = 0;
                 var pollForRemoteEx = function() {
 
+                    // [@wescott] Another safeguard for no current-question cards
+                    var pID = $('.current-question').data("problem") || 0;
+                    //console.log(pID);
                     if (KhanC2G.remoteExPollCount > 50) {
-                        $('#workarea .loading').text("Exercise " + (parseInt($('.current-question').data("problem")) + 1) + " could not be loaded.");
+                        $('#workarea .loading').text("Exercise " + (parseInt(pID) + 1) + " could not be loaded.");
                         KhanC2G.remoteExPollCount = 0;
                         return;
                     }
 
-                    if (KhanC2G.remoteExercises[$('.current-question').data('problem')]) {
+                    if (KhanC2G.remoteExercises[pID]) {
                         $('#workarea').remove('.loading');
                         KhanC2G.remoteExPollCount = 0;
-                        makeProblem($('.current-question').data('problem'));
+                        //console.log("configureCards, remote exercise here, so call makeProblem");
+                        makeProblem(pID);
                     } else {
                         if ($('#workarea .loading').length == 0) {
-                            $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt($('.current-question').data("problem")) + 1) + '...</p>');
+                            $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt(pID) + 1) + '...</p>');
                         }
                         $('#workarea .loading').append('.');
                         setTimeout(function () { KhanC2G.remoteExPollCount++; pollForRemoteEx(); }, 500);
@@ -3249,21 +3274,26 @@ var Khan = (function() {
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
         // value, if the user has already answered it
         $.when(checkForInputs()).then(function () {
-            //console.log("when in effect...");
-            if ($('.current-question').data('problem')) {
-                makeProblem($('.current-question').data('problem'));
-            } else {
-                KhanC2G.problemIdx = 0;
-                makeProblem(KhanC2G.problemIdx);
-            }
-            if ($('.current-question').data('user_selection_val')) {
+            //console.log("initC2GStacks, makeProblem about to be called...");
+            var pID = $('.current-question').data('problem') || 0;
+            KhanC2G.problemIdx = pID;
+            makeProblem(KhanC2G.problemIdx);
+
+            var userSelectionVal = (userPSData[pID] && userPSData[pID]['user_selection_val']) || $('.current-question').data("user_selection_val"); 
+            //if ($('.current-question').data('user_selection_val')) {
+            if (userSelectionVal) {
                 if ($('#testinput').length) {
-                    $('#testinput').val($('.current-question').data('user_selection_val'));
+                    //$('#testinput').val($('.current-question').data('user_selection_val'));
+                    $('#testinput').val(userSelectionVal);
                     if ($('.current-question').data('correct')) {
                         $('#testinput').attr('disabled','disabled');
                     }
+                    $('#solutionarea').css('visibility', 'visible');
                 } else if ($('#solutionarea input:radio').length) {
-                    reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
+                    //reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
+                    var userChoice = (userPSData[pID] && userPSData[pID]['user_choices']) || $('.current-question').data('user_choices');
+                    var choiceArr = ($.isArray(userChoice)) ? userChoice : $.parseJSON(userChoice);
+                    reconstructChoices(choiceArr, userSelectionVal);
                 }
             }
         }).always(function () {
@@ -3309,6 +3339,7 @@ var Khan = (function() {
             if (next.length) {
                 // [@wescott] Again, we don't need to randomize
                 //makeProblem(next.data('problem'), next.data('randseed'));
+                //console.log("Next question button clicked, going to makeProblem...");
                 makeProblem(next.data('problem'));
             }
 
@@ -3437,6 +3468,7 @@ var Khan = (function() {
                 if (KhanC2G.remoteExercises[thisCard.data('problem')]) {
                     $('#workarea').remove('.loading');
                     KhanC2G.remoteExPollCount = 0;
+                    //console.log("A card must have been clicked, run makeProblem...");
                     makeProblem(thisCard.data('problem'));
                 } else {
                     if ($('#workarea .loading').length == 0) {
@@ -3467,6 +3499,7 @@ var Khan = (function() {
                 } else if (userPrevSel && $(ev.target).data("correct")) {
                     $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
                     $('#check-answer-button').attr('disabled', 'disabled');
+                    $('#solutionarea').css('visibility', 'visible');
                 } else {
                     if ($('input#testinput').length) {
                         $('input#testinput').removeAttr('disabled');

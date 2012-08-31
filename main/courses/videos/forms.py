@@ -18,6 +18,7 @@ class S3UploadForm(forms.ModelForm):
             del self.fields['file']
             del self.fields['url']
         self.fields['slug'].help_text = "A unique identifier that will be shown in the URL"
+        self.fields['file'].help_text = "Select the mp4 video file on your machine to upload"
 
     def clean_url(self):
         url = self.cleaned_data['url']

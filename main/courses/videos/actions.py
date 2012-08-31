@@ -151,7 +151,7 @@ def oauth(request):
         video.image.duration = video.duration
         video.image.save()
 
-        parts = str(video.handle).split("#$!")
+        parts = str(video.handle).split("--")
         return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(parts[0], parts[1], video.slug)))
 
 #    return redirect('courses.videosviews.list', course_prefix, course_suffix)
@@ -182,7 +182,7 @@ def upload(request):
         if form.is_valid():
             new_video.index = new_video.section.getNextIndex()
             new_video.mode = 'staging'
-            new_video.handle = course_prefix + "#$!" + course_suffix
+            new_video.handle = course_prefix + "--" + course_suffix
 
             # Bit of jiggery pokery to so that the id is set when the upload_path function is called.
             # Now storing file with id appended to the file path so that thumbnail and associated manifest files
