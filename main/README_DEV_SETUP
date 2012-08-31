@@ -27,7 +27,7 @@ prefix for these.
 
 3. Install Homebrew:
     /usr/bin/ruby -e "$(/usr/bin/curl -fksSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)"
-
+    
 4. Install Python (we are expecting 2.7.x):
     brew install readline sqlite gdbm 
     brew install python --universal --framework 
@@ -270,4 +270,5 @@ python manage.py runserver 8100
 02. Take a look in c2g/views.py as there are some parameters that affect which data gets created. Note, if you choose the delete_current_data option it will delete your current django users so you’ll have to recreate those users if you want.
 
 03. To run the script that populates the data do "manage.py help db_populate" first. This will tell you where to setup the params for the test data. 
+
 

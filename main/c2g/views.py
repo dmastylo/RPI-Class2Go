@@ -26,7 +26,7 @@ def home(request):
         else:
             course_student_member = 'False'
         
-        viewable_handle = course.handle.replace('#$!', '/')
+        viewable_handle = course.handle.replace('--', '/')
         available_course_list.append((course.title, course.handle, viewable_handle, course_student_member))
         
     return render_to_response('courses/signup.html', {'request': request, 'available_course_list': available_course_list}, context_instance=RequestContext(request))
@@ -34,3 +34,8 @@ def home(request):
 def healthcheck(request):
     return HttpResponse("I'm alive!")
 
+def throw500(request):
+    raise BaseException('Testing the exception--http500 mechanism')
+
+def throw404(request):
+    raise Http404
