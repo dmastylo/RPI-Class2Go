@@ -42,12 +42,16 @@ function buglist-by-dev {
     fi
 
     for a in dcadams halawa jbau jinpa kelvindo kluo sefk shalinguyen wescott; do
-        for p in P0 P1
-        do
+        for p in P0 P1; do
             echo "--------- $a ($p) ---------"
             ghi list -l $p -u $a -q $sprintparam
         done
         echo; echo
+    done
+
+    for p in P0 P1; do
+        echo "--------- nobody ($p) ---------"
+        ghi list -l $p -s open ${sinceparam} -q $sprintparam | grep -E "^#|NO-ASGN"
     done
 }
 
