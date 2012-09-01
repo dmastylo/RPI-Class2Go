@@ -1305,8 +1305,8 @@ var Khan = (function() {
             var maxAttempts, penaltyPct, alreadyAttempted;
             var maxCredit = 100; 
             if (typeof c2gConfig != "undefined") {
-                maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
-                penaltyPct = c2gConfig.penaltyPct + "%";
+                maxAttempts = (typeof c2gConfig.maxAttempts != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+                penaltyPct = (typeof c2gConfig.penaltyPct != "undefined") ? c2gConfig.penaltyPct + "%" : "25%";
             } else {
                 maxAttempts = 3;
                 penaltyPct = "25%";
@@ -1345,7 +1345,7 @@ var Khan = (function() {
             } else {
                 $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                 $('#submit-problemset-button').click(function () {
-                    location.href = c2gConfig.progressUrl;
+                    location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
                 });
             }
 
@@ -2783,13 +2783,18 @@ var Khan = (function() {
             user_choices.push($(this).text());
         });
         // [@wescott] Correct attempt count for when a user reloads the page
-        data['attempt_number'] = parseInt($('#attempt-count').text()) + 1;
+        if ($.isNumeric($('#attempt-count').text())) {
+            data['attempt_number'] = parseInt($('#attempt-count').text()) + 1;
+        }
         data = $.extend(data, {"problem_identifier": problem_identifier});
         data = $.extend(data, {"exercise_filename": exercise_filename});
         data = $.extend(data, {"exercise_type": exercise_type});
         data = $.extend(data, {"video_id": video_id});
         data = $.extend(data, {"pset_id": pset_id});
         data = $.extend(data, {"user_selection_val": user_selection_val});
+        //if (exAssessType == "summative") {
+        //    data['attempt_content'] = $('input:radio[name=solution]:checked').next('span.value').text();
+        //}
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         //URL starts with problemsets/attempt to direct to a view to collect data.
@@ -2809,7 +2814,7 @@ var Khan = (function() {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                 } else {
                     var maxCredit = 100;
-                    var maxAttempts = (c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+                    var maxAttempts = (typeof c2gConfig != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
 
                     var attCt = $('#attempt-count').text();
                     var newAttCt = parseInt(attCt) + 1;
@@ -2821,7 +2826,8 @@ var Khan = (function() {
                     if (newAttCt > (maxAttempts - 1)) {
                         $('#max-credit').text(0);
                     } else {
-                        $('#max-credit').text(maxCredit - (c2gConfig.penaltyPct * newAttCt));
+                        var penaltyPct = (typeof c2gConfig != "undefined" && typeof c2gConfig.penaltyPct != "undefined") ? parseInt(c2gConfig.penaltyPct) : 0;
+                        $('#max-credit').text(maxCredit - (penaltyPct * newAttCt));
                     }
                 }
 
@@ -3279,7 +3285,7 @@ var Khan = (function() {
             KhanC2G.problemIdx = pID;
             makeProblem(KhanC2G.problemIdx);
 
-            var userSelectionVal = (userPSData[pID] && userPSData[pID]['user_selection_val']) || $('.current-question').data("user_selection_val"); 
+            var userSelectionVal = (typeof userPSData != "undefined" && userPSData[pID] && userPSData[pID]['user_selection_val']) || $('.current-question').data("user_selection_val"); 
             //if ($('.current-question').data('user_selection_val')) {
             if (userSelectionVal) {
                 if ($('#testinput').length) {
@@ -3343,13 +3349,16 @@ var Khan = (function() {
                 makeProblem(next.data('problem'));
             }
 
-            if ((c2gConfig.problemType == 'summative' || c2gConfig.problemType == 'assessive') && $('#questions-unviewed li').length == 0) {
+            // [@wescott] if this is a summative problem set and all questions have been viewed
+            if (typeof c2gConfig != "undefined" && typeof c2gConfig.problemType != "undefined" && 
+                (c2gConfig.problemType == 'summative' || c2gConfig.problemType == 'assessive') && 
+                $('#questions-unviewed li').length == 0) {
                 if ($('#submit-problemset-button').length) {
                     $('#submit-problemset-button').show();
                 } else {
                     $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                     $('#submit-problemset-button').click(function () {
-                        location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : '/nlp/Fall2012/problemsets';
+                        location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
                     });
                 }
             }

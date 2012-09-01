@@ -20,6 +20,19 @@ urlpatterns = patterns('',
     url(r'^_throw500$', 'c2g.views.throw500'),
     url(r'^_throw404$', 'c2g.views.throw404'),
 
+    url(r'^honor_code$', 'c2g.views.hc'),
+    url(r'^terms_of_service$', 'c2g.views.tos'),
+
+                       
+    # Commented out the following 2 urls since point to a signup page which is
+    # no longer required.
+#    url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),
+#    url(r'^courses/signup/?$', 'courses.actions.signup'),
+
+#    url(r'^class2go/', include('class2go.foo.urls')),
+
+
+                       
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
     url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),

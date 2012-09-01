@@ -44,15 +44,15 @@ prefix for these.
 7. Install python's virtual env
     pip install virtualenv 
 
-8. Create the class2go virtual env 
-    virtualenv django-class2go --no-site-packages    
+8. Create the sophi virtual env (if you want) 
+    virtualenv sophi-venv --no-site-packages    
 
-    This should create the django-class2go directory under the
+    This should create the sophi-venv directory under the
     directory where this README is found.  All our django stuff
     will happen in there now.
 
 9. Start using the virtual environment that we just created.  
-    . ./django-class2go/bin/activate
+    . ./sophi-venv/bin/activate
 
     WARNING:  you need to do this from whatever shell you're using.
     You can tell this because is puts an environment indicator at

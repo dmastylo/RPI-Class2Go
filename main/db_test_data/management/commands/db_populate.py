@@ -3,6 +3,7 @@ from c2g.models import *
 from django.contrib.auth.models import User,Group
 from datetime import datetime
 from random import randrange
+from django.db import connection, transaction
 
 class Command(BaseCommand):
     help = "Populates the db with test development data. \n This command is <not> available on production for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
@@ -41,6 +42,13 @@ def delete_db_data():
 
     Group.objects.all().delete()
     User.objects.all().delete()
+
+    #reset auto-increment counters
+    cursor = connection.cursor()
+
+    # Data modifying operation - commit required
+    cursor.execute('alter table c2g_videos auto_increment = 1')
+
 
 def create_users():
     # Create professor accounts
@@ -233,11 +241,15 @@ def create_course_nlp(data, users):
     data['slug']='P1'
     data['description'] = 'This is the first problem set. Practice some question on Regular Expressions. Remember to work your problems out on a separate piece of paper first because you only get one try on these. Miss on and you have a D!'
     data['title'] = 'Problem Set 1: Regular Expressions'
-    data['path']='/static/latestKhan/exercises/P1.html'
+    data['path']='/nlp/Fall2012/problemsets/P1/load_problem_set'
     data['due_date']='2012-07-20'
-    data['partial_credit_deadline']='2012-07-27'
-
-    #pset1 = create_problem_set(data, users)
+    data['partial_credit_deadline']='2012-09-27'
+    data['grace_period']='2012-10-27'
+    data['late_penalty']=1
+    data['submissions_permitted']=0
+    data['resubmission_penalty']=25
+    
+    pset1 = create_problem_set(data, users)
 
     data['course'] = course
     data['section'] = sections[1]
@@ -245,41 +257,25 @@ def create_course_nlp(data, users):
     data['slug']='P2'
     data['description'] = 'This problem set will test your knowledge of Joint Probability. Each question is worth one point and your final exam is worth 100 points so these questions are basically useless. But you have to do them because an incomplete assignment disallows you from passing the class. Have fun with this problem set!'
     data['title']='Problem Set 2: Joint Probability'
-    data['path']='/static/latestKhan/exercises/P2.html'
+    data['path']='/nlp/Fall2012/problemsets/P2/load_problem_set'
     data['due_date']='2012-07-27'
     data['partial_credit_deadline']='2012-08-03'
+    data['grace_period']='2012-10-27'
+    data['late_penalty']=1
+    data['submissions_permitted']=0
+    data['resubmission_penalty']=25
 
     # Removing second problem set
     # KELVIN TODO -- fix create_problem_set so it handles two problem sets referencing the same exercises
     # duplicate exercise entries screws other things up.
     #
-    # pset2 = create_problem_set(data, users)
+    pset2 = create_problem_set(data, users)
 
     #Create exercises
+    exercise1_1 = save_exercise(pset1, "xx_P1_Regexp.html", 1, 'nlp--Fall2012', 'nlp/Fall2012/exercises/xx_P1_Regexp.html')
+    exercise1_2 = save_exercise(pset1, "xx_P1_Tokenize.html", 2, 'nlp--Fall2012', 'nlp/Fall2012/exercises/xx_P1_Tokenize.html')
 
-#    exercise1_1 = save_exercise(pset1, "P1_Levenshtein.html", 1)
-#    exercise1_2 = save_exercise(pset1, "P1_Regexp.html", 2)
-#    exercise1_3 = save_exercise(pset1, "P1_Tokenize.html", 3)
-
-#    exercise2_1 = save_exercise(pset2, "P2_Add_one_smoothing.html", 1)
-#    exercise2_2 = save_exercise(pset2, "P2_Joint.html", 2)
-#    exercise2_3 = save_exercise(pset2, "P2_Lexical1.html", 3)
-#    exercise2_4 = save_exercise(pset2, "P2_NER1.html", 4)
-#    exercise2_5 = save_exercise(pset2, "P2_Spelling.html", 5)
-
-    #Create problems
-
-    # save_problem(exercise1_1, 'p1')
-    # save_problem(exercise1_1, 'p2')
-    # save_problem(exercise1_2, 'p1')
-    # save_problem(exercise1_3, 'p1')
-
-    # save_problem(exercise2_1, 'p1')
-    # save_problem(exercise2_1, 'p2')
-    # save_problem(exercise2_2, 'p1')
-    # save_problem(exercise2_3, 'p1')
-    # save_problem(exercise2_4, 'p1')
-    # save_problem(exercise2_5, 'p1')
+    exercise2_1 = save_exercise(pset2, "xx_P2_Lexical1.html", 1, 'nlp--Fall2012', 'nlp/Fall2012/exercises/xx_P2_Lexical1.html')
 
     # Create news events
     titles = [
@@ -313,7 +309,7 @@ def create_course_crypto(data, users):
     user4=User.objects.get(username='dcadams_auto');
     user5=User.objects.get(username='jinpa_auto');
     user6=User.objects.get(username='halawa_auto');
-    
+
     # Create the user groups
     r = randrange(0,100000000)
     student_group = Group.objects.create(name="Student Group for class2go course " + data['handle'] + " %d" % r)
@@ -411,8 +407,12 @@ def create_course_crypto(data, users):
     data['path']='/static/latestKhan/exercises/P1.html'
     data['due_date']='2012-07-20'
     data['partial_credit_deadline']='2012-07-27'
+    data['grace_period']='2013-07-27'
+    data['late_penalty'] = 5
+    data['submissions_permitted'] = 0
+    data['resubmission_penalty'] = 10
 
-    #pset1 = create_problem_set(data, users)
+  #  pset1 = create_problem_set(data, users)
 
     data['course'] = course
     data['section'] = sections[1]
@@ -432,7 +432,16 @@ def create_course_crypto(data, users):
 
     #Create exercises
 
-#    exercise1_1 = save_exercise(pset1, "P1_Levenshtein.html", 1)
+    #exercise1_1 = save_exercise(pset1, "xx_P1_Levenshtein_1Q.html", 1, 'crypto#$!Fall2012')
+    
+  #  url = 'http://localhost:8080/nlp/Fall2012/problemsets/P1/manage_exercise'
+  #  payload = {'user': 'professor_1', 'password': 'class2go'}
+
+  #  r = requests.post(url, data=payload)
+  #  print '------' + str(r.text)
+  #  print '++++++' + str(r.status_code)
+    
+    
 #    exercise1_2 = save_exercise(pset1, "P1_Regexp.html", 2)
 #    exercise1_3 = save_exercise(pset1, "P1_Tokenize.html", 3)
 
@@ -464,7 +473,6 @@ def create_course_crypto(data, users):
     ]
     for i in range(3):
         create_news_event(course,titles[i])
-
 
 
 
@@ -537,6 +545,10 @@ def create_problem_set(data, users):
         path = data['path'],
         due_date = data['due_date'],
         partial_credit_deadline = data['partial_credit_deadline'],
+        grace_period = data['grace_period'],
+        late_penalty = data['late_penalty'],
+        submissions_permitted = data['submissions_permitted'],
+        resubmission_penalty = data['resubmission_penalty'],
         description = data['description'],
         mode='staging',
         index=data['index'],
@@ -559,13 +571,18 @@ def create_problem_set(data, users):
     return problem_set
 
 
-def save_exercise(problemSet, fileName, number):
+def save_exercise(problemSet, fileName, number, handle, file):
     ex = Exercise(fileName = fileName)
+    ex.file = file
+    ex.handle = handle
     ex.save()
+
     psetToEx = ProblemSetToExercise(problemSet = problemSet,
                                     exercise = ex,
                                     number = number)
     psetToEx.save()
+    #psetToEx.create_production_instance()
+
     return ex
 
 def save_problem(exercise, slug):
