@@ -24,10 +24,10 @@
     
     <label class='header'>Course URL</label>
     <label class='explanation'>Fill in the two fields below using only alphabets, numbers, and/or underscores.</label>
-    <label class='explanation'>Examples:&nbsp;&nbsp;http://class2go.stanford.edu/nlp/2012_public&nbsp;&nbsp;,&nbsp;&nbsp;http://class2go.stanford.edu/cs108/winter_2013</label>
+    <label class='explanation'>Examples:&nbsp;&nbsp;http://sophi.stanford.edu/nlp/2012_public&nbsp;&nbsp;,&nbsp;&nbsp;http:/sophi.stanford.edu/cs108/winter_2013</label>
     <table>
         <tr>
-            <td>http://class2go.stanford.edu/</td>
+            <td>http://sophi.stanford.edu/</td>
             <td><input type='text' id='id_prefix' name='prefix' style='width:120px;' /></td>
             <td>/</td>
             <td><input type='text' id='id_suffix' name='suffix' style='width:120px;' /></td>
@@ -58,7 +58,7 @@
     </table>
     
     <!--label class='header'>Institution</label>
-    <label class='explanation'>If your desired institution is not listed below, please contact the Class2Go support team to add it.</label>
+    <label class='explanation'>If your desired institution is not listed below, please contact the Sophi support team to add it.</label>
     <select name='institution'>
         {% for institution in institutions %}
             <option value="{{institution.id}}">{{institution.title}}</option>
