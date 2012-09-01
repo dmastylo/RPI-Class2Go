@@ -400,6 +400,8 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
 
     def dl_link(self):
+        if not self.file.storage.exists(self.file.name):
+            return ""
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     class Meta:
@@ -661,6 +663,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return True
 
     def dl_link(self):
+        if not self.file.storage.exists(self.file.name):
+            return ""
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     def runtime(self):

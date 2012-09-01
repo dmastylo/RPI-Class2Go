@@ -173,8 +173,8 @@ INSTALLED_APPS = (
                       'problemsets',
                       'django.contrib.flatpages',
                       'storages',
-                      #'celerytest',
-                      #'djcelery_email',
+                      'celerytest',
+                      'djcelery_email',
                       'kelvinator',
                       )
 if class2go_mode != "prod":
@@ -278,7 +278,7 @@ LOGGING = {
 SESSION_COOKIE_AGE = 3*30*24*3600
 
 # Actually send email
-EMAIL_ALWAYS_ACTUALLY_SEND = False
+EMAIL_ALWAYS_ACTUALLY_SEND = True
 
 # Email Settings
 SERVER_EMAIL = 'sophi-dev@cs.stanford.edu'
