@@ -4,6 +4,9 @@ description "Sophi Staging Environment"
 default_attributes \
     "aws" => {
         "database_host" => "stage.AAAAAAAAAAAA.us-west-2.rds.amazonaws.com",
+        "database_instance" => "sophi",
+        "database_user" => "sophi",
+        "database_password" => "sophi",
         "storage_bucket" => "stage-c2g",
         "access_key" => "BBBBBBBBBBBBBBBBBBBB",
         "access_secret" => "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",

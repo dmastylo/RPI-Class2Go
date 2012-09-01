@@ -4,6 +4,9 @@ description "Sophi Production Environment"
 default_attributes \
     "aws" => {
         "database_host" => "prod.AAAAAAAAAAAA.us-west-2.rds.amazonaws.com",
+        "database_instance" => "sophi",
+        "database_user" => "sophi",
+        "database_password" => "sophi",
         "storage_bucket" => "prod-c2g",
         "access_key" => "BBBBBBBBBBBBBBBBBBBB",
         "access_secret" => "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
