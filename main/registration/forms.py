@@ -53,8 +53,13 @@ class RegistrationForm(forms.Form):
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password (again)"))
     
+    tos = forms.BooleanField(widget=forms.CheckboxInput(attrs=attrs_dict),
+                                 label=_(u'I have read and agree to the Honor Code and Terms of Service'),
+                                 error_messages={'required': _("You must agree to register")})
+
     course_prefix = forms.CharField(widget=forms.HiddenInput(),required=False)
     course_suffix = forms.CharField(widget=forms.HiddenInput(),required=False)
+    
     
     def clean_username(self):
         """

@@ -39,3 +39,9 @@ def throw500(request):
 
 def throw404(request):
     raise Http404
+
+def hc(request):
+    return render_to_response('honor_code.html',{},RequestContext(request))
+
+def tos(request):
+    return render_to_response('TOS.html',{},RequestContext(request))

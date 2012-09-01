@@ -20,6 +20,9 @@ urlpatterns = patterns('',
     url(r'^_throw500$', 'c2g.views.throw500'),
     url(r'^_throw404$', 'c2g.views.throw404'),
 
+    url(r'^honor_code$', 'c2g.views.hc'),
+    url(r'^terms_of_service$', 'c2g.views.tos'),
+
                        
     # Commented out the following 2 urls since point to a signup page which is
     # no longer required.
