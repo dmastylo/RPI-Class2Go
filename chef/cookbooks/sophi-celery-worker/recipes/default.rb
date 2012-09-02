@@ -28,9 +28,33 @@ end
 # it appears that just trying to put in the background like this won't work, most 
 # likely because this isn't running in an interactive shell
 #
-execute "celery worker start" do
-    cwd node['system']['admin_home'] + "/sophi/main"
-    user "root"
-    command "./manage.py celery worker --loglevel=info --settings=settings_util &"
-    action :run
+# execute "celery worker start" do
+#    cwd node['system']['admin_home'] + "/sophi/main"
+#    user "root"
+#    command "./manage.py celery worker --loglevel=info --settings=settings_util &"
+#    action :run
+#end
+
+cookbook_file "celeryd init script" do
+    source "celeryd-init-script"
+    path "/etc/init.d/celeryd"
+    owner "root"
+    group "root"
+    mode 00755
+    action :create
+end
+
+template "celeryd init config" do
+    source "celeryd-init-config"
+    path "/etc/default/celeryd"
+    owner "root"
+    group "root"
+    mode 00755
+    action :create
+end
+
+service "celeryd" do
+    start_command "/etc/init.d/celeryd start --settings=settings_util"
+    supports :status => true, :restart => true, :reload => true
+    action [ :enable, :start ]
 end
