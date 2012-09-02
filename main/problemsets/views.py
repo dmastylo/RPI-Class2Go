@@ -69,7 +69,7 @@ def attempt(request, problemId):
     exercise_type = request.POST['exercise_type']
     if exercise_type == 'problemset':
         problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise).exclude(attempt_content='hint'))
+        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise, student=request.user).exclude(attempt_content='hint'))
         # Chokes if user_selection_val isn't provided, so set to blank
         post_selection_val = request.POST.get('user_selection_val', '')
         # Only increment attempts if it's not a hint request
@@ -88,7 +88,7 @@ def attempt(request, problemId):
 
     elif exercise_type == 'video':
         video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise).exclude(attempt_content='hint'))
+        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise, student=request.user).exclude(attempt_content='hint'))
         # Chokes if user_selection_val isn't provided, so set to blank
         post_selection_val = request.POST.get('user_selection_val', '')
         # Only increment attempts if it's not a hint request
@@ -331,8 +331,11 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     except:
         raise Http404
 
-    exercise = Exercise.objects.distinct().get(problemSet__course=common_page_data["course"], fileName=exercise_name)
-
+    
+    try:
+        exercise = Exercise.objects.distinct().get(problemSet__course=common_page_data["course"], fileName=exercise_name)
+    except Exercise.DoesNotExist:
+        exercise = Exercise.objects.distinct().get(video__course=common_page_data["course"], fileName=exercise_name)
     # return the contents of the file as an HTTP response.  Trust that it's there.
     #
     # TODO: put exception handling around this, figure out how to handle S3 errors

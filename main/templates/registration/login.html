@@ -17,7 +17,7 @@
 
 {% else %}
 
-<form method="post" action="{% url 'auth_login' %}" class="form-vertical">  
+<form method="post" action="{% url 'auth_login' %}?next={{ next }}" class="form-vertical">  
 {% csrf_token %}
 
 <table>
@@ -32,6 +32,7 @@
 </table>
 
 <input type="submit" value="Login" class="btn" />
+&nbsp; <a href="{% url 'auth_password_reset' %}">Forgot my password</a>
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
