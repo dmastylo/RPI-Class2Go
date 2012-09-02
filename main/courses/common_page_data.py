@@ -56,8 +56,11 @@ def get_common_page_data(request, prefix, suffix):
         view_mode = 'view'
     
     # Course info pages
-    course_info_pages = AdditionalPage.objects.getByCourseAndMenuSlug(course=course, menu_slug='course_info')
-        
+    course_info_pages = []
+    for page in AdditionalPage.objects.getByCourseAndMenuSlug(course=course, menu_slug='course_info').all():
+        if request.session['course_mode'] == 'staging' or page.description:
+            course_info_pages.append(page)
+    
     current_datetime = datetime.datetime.now()
     effective_current_datetime = current_datetime
     
