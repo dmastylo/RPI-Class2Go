@@ -1,4 +1,4 @@
-# Django settings for class2go project.
+# Django settings for Sophi project.
 
 from database import *
 from os import path
