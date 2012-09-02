@@ -1,0 +1,29 @@
+{
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "name": "sophi-base-bitnami",
+  "version": "0.0.1",
+  "suggestions": {
+  },
+  "providing": {
+  },
+  "platforms": {
+  },
+  "conflicting": {
+  },
+  "groupings": {
+  },
+  "recommendations": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "replacing": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "description": "Installs/Configures sophi-base-bitnami",
+  "license": "All rights reserved",
+  "recipes": {
+  },
+  "attributes": {
+  },
+  "dependencies": {
+  }
+}
