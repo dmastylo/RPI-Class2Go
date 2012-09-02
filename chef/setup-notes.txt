@@ -6,7 +6,8 @@ knife ec2 server create -I ami-0a4ac63a -x bitnami -N app1.prod --region us-west
 
 CREATE STAGING UTIL:
 
-knife ec2 server create -I ami-0a4ac63a -x bitnami -N util100.stage --region us-west-2 -Z us-west-2b -f m1.small -G stage -E stage -r 'role[util]'
+knife ec2 server create -I ami-4438b474 -x ubuntu -N util100.stage --region us-west-2 -Z us-west-2b -f m1.small -G stage -E stage -r 'role[util]'
+
 
 IMAGES:
 

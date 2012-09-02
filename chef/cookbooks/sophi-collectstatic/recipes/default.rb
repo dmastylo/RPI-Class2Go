@@ -8,8 +8,8 @@
 #
 
 execute "collectstatic" do
-    cwd "/home/bitnami/sophi/main"
+    cwd node['system']['admin_home'] + "/sophi/main"
+    user node['system']['admin_user']
     command "python manage.py collectstatic --noinput --clear"
-    user "bitnami"
 end
 
