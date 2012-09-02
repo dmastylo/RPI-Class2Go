@@ -100,6 +100,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     year = models.IntegerField(null=True, blank=True)
     calendar_start = models.DateField(null=True, blank=True)
     calendar_end = models.DateField(null=True, blank=True)
+    contact = models.CharField(max_length=255, null = True, blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
     # Since all environments (dev, staging, prod) go against production piazza, things will get
@@ -141,6 +142,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             year = self.year,
             calendar_start = self.calendar_start,
             calendar_end = self.calendar_end,
+            contact = self.contact,
             list_publicly = 0,
             image = self,
             mode = 'production',
@@ -271,7 +273,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     def getNextIndex(self):
         # We will not return len(children)+1 since this approach is not fail safe. If an index is skipped for whatever reason, we want to make sure we are still robust
+        # So what if the children list is empty?
         children = self.getChildren()
+        if len(children) == 0 :
+            return 1
         return children[-1].index+1
 
     def __unicode__(self):
