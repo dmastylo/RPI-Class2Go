@@ -5,10 +5,10 @@ end
 
 
 template "dot-s3cfg" do
-    path "/home/bitnami/.s3cfg"
+    path node['system']['admin_home'] + "/.s3cfg"
     source "dot-s3cfg.erb"
-    owner "bitnami"
-    group "bitnami"
-    mode "0644"
+    owner node['system']['admin_user']
+    owner node['system']['admin_group']
+    mode 00644
 end
 
