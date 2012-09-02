@@ -101,7 +101,8 @@ Natural language processing is the technology for dealing with our most ubiquito
                         {{form.tos.errors}} {{form.tos}} I agree to Stanford Online's 
                         <a href="{% url 'c2g.views.hc' %}" target="_blank" >Honor Code</a> and <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>
                     </p>
-                    <input type="submit" value="Register" class="btn btn-primary btn-large" />
+                    <input type="submit" value="Register" class="btn btn-primary btn-large" /> &nbsp; Already have an account?  <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login"> Login instead</a>
+
                     </div>
                 </form>
           </div>
