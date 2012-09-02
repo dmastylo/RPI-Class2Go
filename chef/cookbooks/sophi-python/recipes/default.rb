@@ -4,48 +4,60 @@
 # possibly some interop problem with the quirky bitnami python setup?
 # don't know but easy_install works, so let's go with that for now.
 
-# execute "install_pip" do
-#     command "easy_install pip"
-#     user "root"
-# end
-
-# following commands used to use "pip install" instead of "easy_install"
-
-
-execute "install_django_storages" do
-    command "easy_install django-storages"
-    user "root"
+easy_install_package "django-storages" do
+    action :install
 end
 
-execute "install_boto" do
-    command "easy_install boto"
-    user "root"
+easy_install_package "boto" do
+    action :install
 end
 
-execute "celery-support" do
-    command "easy_install django-celery django-celery-email pytz"
-    user "root"
+easy_install_package "django-celery" do
+    action :install
 end
 
 
 # We need to patch the storage boto backend (see issue #70)
-# I think it's OK to leave the patch file around 
 
-cookbook_file "/tmp/s3boto_response_header_issue70.patch" do
-    source "s3boto_response_header_issue70.patch"
-    owner "root"
-    group "root"
-    mode 0644
-    action :create
-end
+# -N to patch makes it ignore patches already applied.  Even then if one
+# patch returns 1 if a block is skipped -- returns 2 if somehing really
+# bad happens.  So allow 1 as an OK return code.
 
-execute "patch_storages_boto_backend" do
-    cwd "/opt/bitnami/python/lib/python2.7/site-packages/django_storages-1.1.5-py2.7.egg/storages/backends"
+bash "patch-boto" do
+    code <<-SCRIPT_END
+storages_loc_init=`python -c 'import storages; print storages.__file__'`
+storages_loc=`dirname ${storages_loc_init}`/backends
+echo "Applying patch in ${storages_loc}"
+cd $storages_loc
+
+patch -N <<PATCH_END
+--- s3boto.py	2012-08-17 17:21:51.000000000 -0700
++++ s3boto.py~	2012-08-17 16:12:34.000000000 -0700
+@@ -333,14 +333,14 @@
+         # Parse the last_modified string to a local datetime object.
+         return _parse_datestring(entry.last_modified)
+ 
+-    def url(self, name):
++    def url(self, name, response_headers=None):
+         name = self._normalize_name(self._clean_name(name))
+         if self.custom_domain:
+             return "%s://%s/%s" % ('https' if self.secure_urls else 'http',
+                                    self.custom_domain, name)
+         return self.connection.generate_url(self.querystring_expire,
+             method='GET', bucket=self.bucket.name, key=self._encode_name(name),
+-            query_auth=self.querystring_auth, force_http=not self.secure_urls)
++            query_auth=self.querystring_auth, response_headers=response_headers, force_http=not self.secure_urls)
+ 
+     def get_available_name(self, name):
+         """ Overwrite existing file with the same name. """
+PATCH_END
+
+rc=$?
+echo "patch command returned $rc"
+exit $rc
+    SCRIPT_END
+    
     user "root"
-    # -N to patch makes it ignore patches already applied.  Even then if one
-    # patch returns 1 if a block is skipped -- returns 2 if somehing really
-    # bad happens.  So allow 1 as an OK return code
-    command "patch -N < /tmp/s3boto_response_header_issue70.patch"
     returns [0, 1]
     action :run
 end
