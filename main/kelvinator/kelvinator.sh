@@ -35,7 +35,7 @@ echo "$me: PROCESSING: $1"
 echo
 
 # we assume that working_path is writeable
-working_path="/opt/class2go/kelvinator"
+working_path="/opt/sophi/kelvinator"
 today_epoch=`date +%s`
 working_dir="${working_path}/extract-${today_epoch}"
 mydir=`pwd`
@@ -73,7 +73,8 @@ fi
 #Runs ffmpeg to extract frames at a certain interval
 echo
 echo "$me: Starting Extraction (ffmpeg)"
-ffmpeg -i $video_file -r $2 -f image2 -s vga jpegs/img%3d.jpeg 
+# ffmpeg -i $video_file -r $2 -f image2 -s vga jpegs/img%3d.jpeg 
+ffmpeg -i $video_file -r $2 -f image2 jpegs/img%3d.jpeg 
 
 #Runs extractFrames to list frames to be deleted
 echo

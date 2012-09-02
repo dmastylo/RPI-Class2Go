@@ -63,6 +63,7 @@ prefix for these.
 
 11. Install MySQL-python (this will be inside the virtualenv)
     pip install MySQL-python
+        (8/31 - needed apt-get install python-mysqldb on ubuntu)
 
 12. Install python image library (this will be inside the virtualenv)
     pip install PIL

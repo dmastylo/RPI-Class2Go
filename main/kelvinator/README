@@ -15,4 +15,4 @@ Usage: ./kelvinator [input video file] [frames rate] [difference threshold]
 
 Requirements for usage:
 	ffmpeg must be installed
-	Python packages NumPy and SciPy must me installed
+    PIL must be installed

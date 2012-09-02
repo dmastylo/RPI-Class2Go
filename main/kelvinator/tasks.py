@@ -5,10 +5,7 @@ from celery import task
 
 @task()
 def run(path, frames, threshold):
-    #local for now
-    #target_url="s3://%(bucket)s%(path)s" % target
     mylocation=os.path.dirname(__file__)
-
     logfile = open("/var/log/django/kelvinator.log", "a")
 
     subprocess.Popen(
@@ -16,3 +13,4 @@ def run(path, frames, threshold):
         stdout=logfile, stderr=logfile,
         cwd=mylocation,
     )
+
