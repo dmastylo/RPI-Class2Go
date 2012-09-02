@@ -331,8 +331,11 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     except:
         raise Http404
 
-    exercise = Exercise.objects.distinct().get(problemSet__course=common_page_data["course"], fileName=exercise_name)
-
+    
+    try:
+        exercise = Exercise.objects.distinct().get(problemSet__course=common_page_data["course"], fileName=exercise_name)
+    except Exercise.DoesNotExist:
+        exercise = Exercise.objects.distinct().get(video__course=common_page_data["course"], fileName=exercise_name)
     # return the contents of the file as an HTTP response.  Trust that it's there.
     #
     # TODO: put exception handling around this, figure out how to handle S3 errors
