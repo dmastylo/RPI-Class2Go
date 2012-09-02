@@ -1,0 +1,29 @@
+{
+  "recipes": {
+  },
+  "attributes": {
+  },
+  "description": "Installs/Configures sophi-database-config",
+  "maintainer_email": "YOUR_EMAIL",
+  "conflicting": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "version": "0.0.1",
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "dependencies": {
+  },
+  "providing": {
+  },
+  "recommendations": {
+  },
+  "license": "All rights reserved",
+  "groupings": {
+  },
+  "platforms": {
+  },
+  "name": "sophi-database-config",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n"
+}

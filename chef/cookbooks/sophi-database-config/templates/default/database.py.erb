@@ -10,14 +10,14 @@ DATABASES = {
 }
 
 # Set PRODUCTION to True so we don't show stackdumps on errors
-PRODUCTION = <%= @node[:sophi][:production] %>
+PRODUCTION = <%= @node[:main][:production] %>
 
 # Put your name and email address here, so Django serious errors can come to you
 ADMINS = (
-        ('<%= @node[:sophi][:admin_name] %>', '<%= @node[:sophi][:admin_email] %>')
+        ('<%= @node[:main][:admin_name] %>', '<%= @node[:main][:admin_email] %>')
         )
 
-SECRET_KEY = 'sophi'
+SECRET_KEY = '<%= @node[:main][:django_secret] %>'
 
 AWS_ACCESS_KEY_ID = '<%= @node[:aws][:access_key] %>'
 AWS_SECRET_ACCESS_KEY = '<%= @node[:aws][:access_secret] %>'

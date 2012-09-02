@@ -7,24 +7,25 @@
 # All rights reserved - Do Not Redistribute
 #
 
-git "/home/bitnami/sophi" do
+git "sophi-sourcecode" do
     repository "https://github.com/Stanford-Online/sophi.git"
-    user "bitnami"
-    group "root"
+    destination node['system']['admin_home'] + "/sophi"
+    user node['system']['admin_user']
+    group node['system']['admin_group']
     action :sync
 end
 
 directory "/opt/sophi" do
-    owner "bitnami"
-    group "root"
-    mode "0755"
+    owner node['system']['admin_user']
+    group node['system']['admin_group']
+    mode 00755
     action :create
 end
 
 directory "/opt/sophi/static" do
-    owner "bitnami"
-    group "root"
-    mode "0755"
+    owner node['system']['admin_user']
+    group node['system']['admin_group']
+    mode 00755
     action :create
 end
 
@@ -32,7 +33,7 @@ end
 # see http://wiki.opscode.com/display/chef/Deploy+Resource
 
 # deploy "/home/bitnami" do
-#  repo "git@github.com/jbau/sophi"
+#  repo "git@github.com/Stanford-Onilne/sophi"
 #  revision "HEAD" 
 #  user "sefk"
 #  enable_submodules true
