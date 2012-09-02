@@ -10,6 +10,7 @@
                 <li {% block home_link_class %}{% endblock home_link_class %}>
                     <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
                 </li>
+                {% if common_page_data.course_mode == 'staging' or common_page_data.course_info_pages|length > 0 %}
                 <li class="dropdown{% block course_info_link_class %}{% endblock course_info_link_class %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -21,6 +22,7 @@
                         {% endif %}
                     </ul>
                 </li>
+                {% endif %}
                 <li {% block course_materials_link_class %}{% endblock course_materials_link_class %}>
                     <a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Course Materials</a>
                 </li>

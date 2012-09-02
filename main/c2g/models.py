@@ -402,7 +402,12 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     def dl_link(self):
         if not self.file.storage.exists(self.file.name):
             return ""
-        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+        
+        url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+        # url_parts = url.split('?')
+        # if len(url_parts) > 1:
+            # url = url_parts[0]
+        return url
 
     class Meta:
         db_table = u'c2g_files'
