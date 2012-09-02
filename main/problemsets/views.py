@@ -69,7 +69,7 @@ def attempt(request, problemId):
     exercise_type = request.POST['exercise_type']
     if exercise_type == 'problemset':
         problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise))
+        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise).exclude(attempt_content='hint'))
         # Chokes if user_selection_val isn't provided, so set to blank
         post_selection_val = request.POST.get('user_selection_val', '')
         # Only increment attempts if it's not a hint request
@@ -88,7 +88,7 @@ def attempt(request, problemId):
 
     elif exercise_type == 'video':
         video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise))
+        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise).exclude(attempt_content='hint'))
         # Chokes if user_selection_val isn't provided, so set to blank
         post_selection_val = request.POST.get('user_selection_val', '')
         # Only increment attempts if it's not a hint request
