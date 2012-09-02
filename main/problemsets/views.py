@@ -69,30 +69,40 @@ def attempt(request, problemId):
     exercise_type = request.POST['exercise_type']
     if exercise_type == 'problemset':
         problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise))
+        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise).exclude(attempt_content='hint'))
+        # Chokes if user_selection_val isn't provided, so set to blank
+        post_selection_val = request.POST.get('user_selection_val', '')
+        # Only increment attempts if it's not a hint request
+        if request.POST['attempt_content'] != 'hint':
+            attempts += 1
         problem_activity = ProblemActivity(student = user,
                                            problemset_to_exercise = problemset_to_exercise,
                                            complete = request.POST['complete'],
                                            attempt_content = request.POST['attempt_content'],
                                            count_hints = request.POST['count_hints'],
                                            time_taken = request.POST['time_taken'],
-                                           attempt_number = attempts + 1,
+                                           attempt_number = attempts,
                                            problem_type = request.POST['problem_type'],
-                                           user_selection_val = request.POST['user_selection_val'],
+                                           user_selection_val = post_selection_val,
                                            user_choices = request.POST['user_choices'])
 
     elif exercise_type == 'video':
         video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise))
+        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise).exclude(attempt_content='hint'))
+        # Chokes if user_selection_val isn't provided, so set to blank
+        post_selection_val = request.POST.get('user_selection_val', '')
+        # Only increment attempts if it's not a hint request
+        if request.POST['attempt_content'] != 'hint':
+            attempts += 1
         problem_activity = ProblemActivity(student = user,
                                            video_to_exercise = video_to_exercise,
                                            complete = request.POST['complete'],
                                            attempt_content = request.POST['attempt_content'],
                                            count_hints = request.POST['count_hints'],
                                            time_taken = request.POST['time_taken'],
-                                           attempt_number = attempts + 1,
+                                           attempt_number = attempts,
                                            problem_type = request.POST['problem_type'],
-                                           user_selection_val = request.POST['user_selection_val'],
+                                           user_selection_val = post_selection_val,
                                            user_choices = request.POST['user_choices'])
 
     #In case no problem id is specified in template
@@ -104,6 +114,8 @@ def attempt(request, problemId):
     problem_activity.save()
     if request.POST['complete'] == "1":
         activityConfirmation = '{"exercise_status":"complete", "attempt_num": ', problem_activity.attempt_number, '}'
+    elif request.POST['attempt_content'] == "hint":
+        activityConfirmation = '{"exercise_status":"hint", "attempt_num": ', problem_activity.attempt_number, '}'
     else:
         activityConfirmation = '{"exercise_status":"wrong", "attempt_num": ', problem_activity.attempt_number, '}'
     return HttpResponse(activityConfirmation)
