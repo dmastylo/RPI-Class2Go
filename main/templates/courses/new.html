@@ -34,6 +34,9 @@
         </tr>
     </table>
     
+    <label class='header'>Course contact email</label>
+    <input type='text' id='id_contact' name='contact' style='width: 600px;'/>
+    
     <label class='header'>When does the course go live, and when does it end?</label>
     <table>
         <tr>
@@ -76,6 +79,13 @@ function ValidateAndSubmit() {
         alert("Error: Title must not be empty and must be at most 100 characters long.");
         return;
     }
+    
+    contact= $("#id_contact").val();
+    if (contact.length == 0) {
+        alert("Error: Please specify course contact email.");
+        return;
+    }
+    
     prefix = $("#id_prefix").val(); suffix = $("#id_suffix").val();
     if (!prefix.match(/^[a-zA-Z0-9_-]+$/) || !suffix.match(/^[a-zA-Z0-9_-]+$/)) {
         alert("Error: Both URL slugs must be non-empty and can contain only lower case alphabets, numbers, or underscores.");
