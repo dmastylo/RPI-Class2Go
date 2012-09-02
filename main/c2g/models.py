@@ -273,7 +273,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     def getNextIndex(self):
         # We will not return len(children)+1 since this approach is not fail safe. If an index is skipped for whatever reason, we want to make sure we are still robust
+        # So what if the children list is empty?
         children = self.getChildren()
+        if len(children) == 0 :
+            return 1
         return children[-1].index+1
 
     def __unicode__(self):
