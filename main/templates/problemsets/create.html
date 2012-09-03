@@ -3,7 +3,7 @@
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
     <h3>Create New Problem Set</h3>
-    <form action="{% url 'problemsets.views.create_action' %}" method="POST" class="form-vertical">
+    <form action="{% url 'problemsets.views.create_action' %}" method="POST" class="form-vertical"  id="create_edit_form">
         
         {% include 'problemsets/create_edit_common.html' %}
 
