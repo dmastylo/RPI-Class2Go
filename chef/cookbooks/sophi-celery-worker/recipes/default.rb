@@ -17,6 +17,12 @@ execute "celery worker local database setup" do
     action :run
 end
 
+file "celery database file permissions" do
+    path "/opt/sophi/celery/celerydb.sqlite"
+    mode 00777
+    action :create
+end
+
 cookbook_file "celeryd init script" do
     source "celeryd-init-script"
     path "/etc/init.d/celeryd"
@@ -31,12 +37,12 @@ template "celeryd init config" do
     path "/etc/default/celeryd"
     owner "root"
     group "root"
-    mode 00755
+    mode 00644
     action :create
 end
 
 service "celeryd" do
-    start_command "/etc/init.d/celeryd start --settings=settings_util"
+    start_command "/etc/init.d/celeryd start"
     supports :status => true, :restart => true, :reload => true
     action [ :enable, :start ]
 end
