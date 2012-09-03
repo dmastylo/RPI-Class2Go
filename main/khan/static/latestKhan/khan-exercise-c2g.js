@@ -1078,6 +1078,23 @@ var Khan = (function() {
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
 
+        // [@wescott] Store locally 
+        var seedKey = c2gConfig.user || 'anon';
+        seedKey += '-';
+        if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
+            seedKey += 'ps-' + $('#pset_id').val();
+        } else if ($('#exercise_type').length && $('#exercise_type').val() === 'video') {
+            seedKey += 'vid-' + $('#video_id').val();
+        }
+        seedKey += '-' + id;
+        localStorage.setItem(seedKey, problemSeed);
+
+        // store in userPSData object
+        if (typeof userPSData != "undefined") {
+            if (typeof userPSData[id] == "undefined") userPSData[id] = {};
+            userPSData[id]['problemSeed'] = problemSeed;
+        }
+
         // Check to see if we want to test a specific problem
         if (testMode) {
             id = typeof id !== "undefined" ? id : Khan.query.problem;
@@ -1119,10 +1136,11 @@ var Khan = (function() {
         exercise = problem.parents("div.exercise").eq(0);
 
         // JASON BAU -- for C2G problems sets we want to display the exercise title
-        if (exercise.data('title'))
+        if (exercise.data('title')) {
             $("#container .exercises-header h2").children().last().text(exercise.data('title')[0]);
-        else
+        } else {
             $("#container .exercises-header h2").children().last().text(exercise.attr('title'));
+        }
         // Work with a clone to avoid modifying the original
         problem = problem.clone();
 
@@ -1250,6 +1268,7 @@ var Khan = (function() {
                 answerType = "number";
             }
         }
+
 
         // [@wescott] Hide solutionarea until ready
         //console.log('Hiding solution area...');
@@ -1940,6 +1959,11 @@ var Khan = (function() {
             $('#solutionarea').css('visibility', 'visible');
         }
 
+        // [@wescott] Keep tabs on current problem index
+        if (typeof c2gConfig != "undefined") {
+            c2gConfig.currentProblemIdx = id;
+        }
+
         return answerType;
     }   // end makeProblem
 
@@ -2096,7 +2120,7 @@ var Khan = (function() {
 
             // [@wescott] Don't check for empty if this is a summative exercise
             //console.log(exAssessType);
-            if (exAssessType != "summative" && checkIfAnswerEmpty()) {
+            if (exAssessType !== "summative" && checkIfAnswerEmpty()) {
                 return false;
             } else {
                 guessLog.push(validator.guess);
@@ -3286,17 +3310,14 @@ var Khan = (function() {
             makeProblem(KhanC2G.problemIdx);
 
             var userSelectionVal = (typeof userPSData != "undefined" && userPSData[pID] && userPSData[pID]['user_selection_val']) || $('.current-question').data("user_selection_val"); 
-            //if ($('.current-question').data('user_selection_val')) {
             if (userSelectionVal) {
                 if ($('#testinput').length) {
-                    //$('#testinput').val($('.current-question').data('user_selection_val'));
                     $('#testinput').val(userSelectionVal);
                     if ($('.current-question').data('correct')) {
                         $('#testinput').attr('disabled','disabled');
                     }
                     $('#solutionarea').css('visibility', 'visible');
                 } else if ($('#solutionarea input:radio').length) {
-                    //reconstructChoices($('.current-question').data('user_choices'), $('.current-question').data('user_selection_val'));
                     var userChoice = (userPSData[pID] && userPSData[pID]['user_choices']) || $('.current-question').data('user_choices');
                     var choiceArr = ($.isArray(userChoice)) ? userChoice : $.parseJSON(userChoice);
                     reconstructChoices(choiceArr, userSelectionVal);
