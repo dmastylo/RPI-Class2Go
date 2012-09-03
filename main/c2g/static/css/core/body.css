@@ -375,6 +375,34 @@ small.date {
     margin-top:5px;
 }
 
+/* Forms
+-------------------------------------------------- */
+.errorlist {
+  margin-bottom: 20px;
+  color: red;
+}
+
+.fieldWrapper.errors label{
+  color: red;
+}
+
+.fieldWrapper.errors input[type="text"] {
+  border-color: red;
+}
+
+.fieldWrapper label {
+  font-weight: bold;
+}
+
+.fieldWrapper select {
+  width: auto;
+}
+
+.fieldWrapper input[type="file"] {
+  height: auto;
+  line-height: normal;
+  margin-bottom: 9px;
+}
 
 /* Footer
 -------------------------------------------------- */
