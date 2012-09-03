@@ -176,6 +176,7 @@ INSTALLED_APPS = (
                       'celerytest',
                       'djcelery_email',
                       'kelvinator',
+                      'db_scripts'
                       )
 if class2go_mode != "prod":
     INSTALLED_APPS += (
