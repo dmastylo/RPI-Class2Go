@@ -1,7 +1,8 @@
 # Django settings for Sophi project.
 
 from database import *
-from os import path
+from os import path, getuid
+from pwd import getpwuid
 #ADDED FOR url tag future
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
@@ -10,7 +11,14 @@ django.template.add_to_builtins('django.templatetags.future')
 import djcelery
 djcelery.setup_loader()
 
-
+# the sophi_instance should be "prod" or "stage" or something like that
+# if it hasn't been set then get the user name
+# since we use this for things like queue names, we want to keep this unique
+# to keep things from getting cross wired
+try:
+    SOPHI_INSTANCE
+except NameError:
+    SOPHI_INSTANCE=getpwuid(getuid())[0]
 
 # If PRODUCTION flag not set in Database.py, then set it now.
 try:
@@ -22,7 +30,6 @@ if PRODUCTION == True:
     DEBUG = False
 else:
     DEBUG = True
-
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -176,6 +183,7 @@ INSTALLED_APPS = (
                       'celerytest',
                       'djcelery_email',
                       'kelvinator',
+                      'db_scripts'
                       )
 if class2go_mode != "prod":
     INSTALLED_APPS += (
@@ -285,7 +293,7 @@ SERVER_EMAIL = 'sophi-dev@cs.stanford.edu'
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
-    DEFAULT_FROM_EMAIL = "c2g-dev@cs.stanford.edu" #probably change for production
+    DEFAULT_FROM_EMAIL = "sophi-dev@cs.stanford.edu" #probably change for production
     #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend' 
     EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
@@ -308,5 +316,8 @@ CELERY_EMAIL_TASK_CONFIG = {
 BROKER_TRANSPORT='sqs'
 BROKER_USER = AWS_ACCESS_KEY_ID
 BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
-BROKER_TRANSPORT_OPTIONS = {'region': 'us-west-1', 'queue_name_prefix' : 'celery-'}
+BROKER_TRANSPORT_OPTIONS = {
+    'region': 'us-west-2', 
+    'queue_name_prefix' : SOPHI_INSTANCE+'-',
+}
 

@@ -6,8 +6,9 @@ override_attributes \
         "django-app" => "main"
         },
     "system" => {
-        "admin_user" => "bitnami",
-        "admin_home" => "/home/bitnami"
+        "admin_user" =>  "bitnami",
+        "admin_group" => "bitnami",
+        "admin_home" =>  "/home/bitnami"
     }
 
 # For now not doing an update/upgrade before everything else since it

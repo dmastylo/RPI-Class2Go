@@ -14,17 +14,17 @@ function buglist-by-dev {
         sprintparam="-M $1"
     fi
 
-    for a in dcadams halawa jbau jinpa kelvindo kluo sefk shalinguyen wescott; do
+    for a in dcadams halawa jbau jinpa sefk wescott shalinguyen kelvindo kluo ; do
         for p in P0 P1; do
-            echo "--------- $a ($p) ---------"
-            ghi list -l $p -u $a -q $sprintparam
+            echo "**** $a ($p) ****"
+            ghi list -s open -l $p -u $a -q $sprintparam | grep -v '\[3-Done\]'
         done
         echo; echo
     done
 
     for p in P0 P1; do
-        echo "--------- nobody ($p) ---------"
-        ghi list -l $p -s open ${sinceparam} -q $sprintparam | grep -E "^#|NO-ASGN"
+        echo "**** nobody ($p) ****"
+        ghi list -l $p -s open ${sinceparam} -q $sprintparam | grep -v '\[3-Done\]' | grep -E "^#|NO-ASGN"
     done
 }
 
@@ -97,6 +97,11 @@ function buglist-goalline {
     echo "-------- COUNTS OF OPEN ISSUES "
     echo
     buglist-counts
+
+    echo; echo
+    echo "-------- OPEN P0's AND P1's BY DEVELOPER"
+    echo
+    buglist-by-dev
 
     echo; echo
     echo "-------- ALL OPEN P0 ISSUES"
