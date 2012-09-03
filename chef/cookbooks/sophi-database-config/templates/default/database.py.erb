@@ -11,7 +11,7 @@ DATABASES = {
 
 # When PRODUCTION=True we don't show stackdumps on errors
 PRODUCTION = <%= @node[:main][:production] %>
-SOPHI_INSTANCE = <%= @node[:main][:instance] %>
+SOPHI_INSTANCE = '<%= @node[:main][:instance] %>'
 
 # Put your name and email address here, so Django serious errors can come to you
 ADMINS = (
