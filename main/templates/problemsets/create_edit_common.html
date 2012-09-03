@@ -72,19 +72,21 @@
                     {{ form.assessment_type }}
                 </div>
             </div>
-            <div class="control-group">
-                <label class="control-label">Number of Submissions Permitted</label>
-                <div class="controls">
-                    {{ form.submissions_permitted.errors }}
-                    {{ form.submissions_permitted }}
-                    <span class="help-block">Use 0 for unlimited submissions</span>
+            <div id="div_penalties" style="display:none;">
+                <div class="control-group">
+                    <label class="control-label">Number of Submissions Permitted</label>
+                    <div class="controls">
+                        {{ form.submissions_permitted.errors }}
+                        {{ form.submissions_permitted }}
+                        <span class="help-block">Use 0 for unlimited submissions</span>
+                    </div>
                 </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label">Penalty % per Resubmission</label>
-                <div class="controls">
-                    {{ form.resubmission_penalty.errors }}
-                    {{ form.resubmission_penalty }}
+                <div class="control-group">
+                    <label class="control-label">Penalty % per Resubmission</label>
+                    <div class="controls">
+                        {{ form.resubmission_penalty.errors }}
+                        {{ form.resubmission_penalty }}
+                    </div>
                 </div>
             </div>
             <div class="control-group">
@@ -99,6 +101,19 @@
 
 
         <script>
+            $(document).ready(function () {
+                $("#id_assessment_type_0").click(function() {
+                    $("#div_penalties").hide();
+                });
+                $("#id_assessment_type_1").click(function() {
+                    $("#div_penalties").show();
+                });
+                
+                if ($("#id_assessment_type_1").attr('checked') == "checked") {
+                    $("div_penalties").show();
+                }
+            });
+            
             function setPenalties(default_attempts_permitted, default_attempt_penalty)
             {
                 var attempts_permitted = document.getElementById("id_submissions_permitted");

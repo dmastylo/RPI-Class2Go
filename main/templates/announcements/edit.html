@@ -48,7 +48,7 @@
         <input type="hidden" name="revert" id="revert" value="0" />
         {% csrf_token %}
         
-        <input type="button" class="btn btn-primary" value="Save and Publish" onclick="SaveAnnouncement(1,0);" />
+        <input type="button" class="btn btn-primary" value="Save and Make Ready" onclick="SaveAnnouncement(1,0);" />
         <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement(0,0);" />
         {% if announcement.image %}
             <input type="button" class="btn" value="Revert" onclick="SaveAnnouncement(0,1);" />
