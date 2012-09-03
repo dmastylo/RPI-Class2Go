@@ -231,28 +231,28 @@ def delete_exercise(request):
     toDelete.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], request.POST['video_slug'],)))
 
+#enforce order by sorting by video_time
 def get_video_exercises(request):
+    import json
     video = Video.objects.get(id = request.GET['video_id'])
     videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')
-    json_list = []
+    json_list = {}
     for videoToEx in videoToExs:
-        json_string = "\"" + str(videoToEx.video_time) + "\": {\"time\": " + str(videoToEx.video_time) + ", \"problemDiv\": \"" + str(videoToEx.exercise_id) + "\"}"
-        json_list.append(json_string)
-
-    json_string = "{" + ','.join( map( str, json_list )) + "}"
+        json_list[str(videoToEx.video_time)]={}
+        json_list[str(videoToEx.video_time)]['time']=videoToEx.video_time
+        json_list[str(videoToEx.video_time)]['problemDiv']=videoToEx.exercise_id
+    json_string = json.dumps(json_list)
     return HttpResponse(json_string)
 
+#enforce order by sorting by video_time
 @auth_view_wrapper
 def load_video_problem_set(request, course_prefix, course_suffix, video_id):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
 
-    ex_list = Exercise.objects.filter(videotoexercise__video_id=video_id)
+    vex_list = VideoToExercise.objects.select_related('exercise', 'video').filter(video_id=video_id).order_by('video_time')
+
     file_names = []
-    for ex in ex_list:
+    for vex in vex_list:
         #Remove the .html from the end of the file name
-        file_names.append(ex.fileName[:-5])
+        file_names.append(vex.exercise.fileName[:-5])
     # assessment type is hard-coded because all in-video exercises are formative
     return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names, 'assessment_type': 'formative'},context_instance=RequestContext(request))
