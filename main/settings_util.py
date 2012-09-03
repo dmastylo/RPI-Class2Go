@@ -293,7 +293,7 @@ SERVER_EMAIL = 'sophi-dev@cs.stanford.edu'
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
-    DEFAULT_FROM_EMAIL = "c2g-dev@cs.stanford.edu" #probably change for production
+    DEFAULT_FROM_EMAIL = "sophi-dev@cs.stanford.edu" #probably change for production
     #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend' 
     EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
