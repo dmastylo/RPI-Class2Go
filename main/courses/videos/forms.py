@@ -16,7 +16,6 @@ class S3UploadForm(forms.ModelForm):
         instance = getattr(self, 'instance', None)
         if instance and instance.id:
             del self.fields['file']
-            del self.fields['url']
         else:
             self.fields['file'].help_text = "Select the mp4 video file on your machine to upload"
         self.fields['slug'].help_text = "A unique identifier that will be shown in the URL"

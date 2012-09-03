@@ -50,9 +50,11 @@ def view(request, course_prefix, course_suffix, slug):
     video = None
     video_rec = None
     if request.user.is_authenticated():
-        #video = Video.objects.get(course=common_page_data['production_course'], slug=slug)
         video = Video.objects.get(course=common_page_data['course'], slug=slug)
-        #video_rec = request.user.videoactivity_set.filter(video=video)
+        if video.mode == 'production':
+            staging_version = video.image
+            video = staging_version
+            
         video_rec = request.user.videoactivity_set.filter(video=video)
         if video_rec:
             video_rec = video_rec[0]
