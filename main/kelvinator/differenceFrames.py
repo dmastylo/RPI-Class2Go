@@ -3,7 +3,7 @@ import os
 
 import math
 import operator
-from PIL import Image
+import Image            # this is PIL
 
 def createManifest(keepList, keepIndicies, frameRate):
     outfile = "jpegs/manifest.txt"
