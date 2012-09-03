@@ -130,6 +130,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
             $('#' + questions[qTime]["problemDiv"]).show();
             $('#' + questions[qTime]["problemDiv"]).css('z-index', 100);
             $('#problemarea').css('z-index', 2);
+            $('#problemarea').show()
             $('#answer_area').fadeIn('slow');
 
             //hide index navigation panel
