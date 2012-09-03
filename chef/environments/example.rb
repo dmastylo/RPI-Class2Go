@@ -18,6 +18,7 @@ default_attributes \
     },
     "main" => {
         "production" => "False",
+        "instance" => "stage",
         "admin_name" => "Sophi Development",
         "admin_email" => "sophi-dev@cs.stanford.edu",
         "django_secret" => "sophi"
