@@ -1,16 +1,17 @@
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '<%= @node[:aws][:database_instance] %>',                      # Or path to database file if using sqlite3.
-        'USER': '<%= @node[:aws][:database_user] %>',                      # Not used with sqlite3.
-        'PASSWORD': '<%= @node[:aws][:database_password] %>',                  # Not used with sqlite3.
-        'HOST': '<%= @node[:aws][:database_host] %>',   # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': '<%= @node[:aws][:database_instance] %>',
+        'USER': '<%= @node[:aws][:database_user] %>',
+        'PASSWORD': '<%= @node[:aws][:database_password] %>',
+        'HOST': '<%= @node[:aws][:database_host] %>',
+        'PORT': '',
     }
 }
 
-# Set PRODUCTION to True so we don't show stackdumps on errors
+# When PRODUCTION=True we don't show stackdumps on errors
 PRODUCTION = <%= @node[:main][:production] %>
+SOPHI_INSTANCE = '<%= @node[:main][:instance] %>'
 
 # Put your name and email address here, so Django serious errors can come to you
 ADMINS = (
