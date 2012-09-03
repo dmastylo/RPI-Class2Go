@@ -117,8 +117,7 @@ var c2gConfig = {
 
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
-    var path = '/static/graphics/videos/nlp/' + encodeURIComponent("{{ video.title }}") + '/jpegs/';
-    //var path = 'http://dev/{{course.prefix}}/{{course.suffix}}/videos/{{ video.id}}/thumbnails/';
+    var path='http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{{video.id}}/jpegs/';
     var thumbManifest = {};
     var psManifest = {};
     var loadThumbManifest = function (data, textStatus, jqXHR) { 
