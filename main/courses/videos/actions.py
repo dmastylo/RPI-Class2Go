@@ -14,6 +14,8 @@ import gdata.youtube.service
 import urllib2, urllib, json
 import re
 
+import kelvinator.tasks
+
 from datetime import datetime
 from courses.actions import auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
@@ -194,6 +196,10 @@ def upload(request):
             new_video.save()
             new_video.create_production_instance()
             print new_video.file.url
+
+            s3_path="s3://"+common_page_data['aws_storage_bucket_name']+"/"+new_video.file.name
+            # TODO: make these parameters settable
+            kelvinator.tasks.run.delay(s3_path, "1", "1000")
 
             if new_video.url:
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
