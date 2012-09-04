@@ -15,7 +15,7 @@ def save_order(request):
     if not common_page_data['is_course_admin']:
         redirect('courses.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'])
     
-    sections = ContentSection.objects.filter(course=common_page_data['staging_course'])
+    sections = ContentSection.objects.filter(course=common_page_data['draft_course'])
     
     for section in sections:
         section.index = request.POST.get("order_"+str(section.id))

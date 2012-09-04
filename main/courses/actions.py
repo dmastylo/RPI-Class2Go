@@ -76,10 +76,10 @@ def add_section(request):
 
     index = len(ContentSection.objects.filter(course=common_page_data['course']))
 
-    staging_section = ContentSection(course=common_page_data['staging_course'], title=request.POST.get("title"), index=index, mode='staging')
-    staging_section.save()
+    draft_section = ContentSection(course=common_page_data['draft_course'], title=request.POST.get("title"), index=index, mode='draft')
+    draft_section.save()
 
-    staging_section.create_production_instance()
+    draft_section.create_ready_instance()
 
     return redirect(request.META['HTTP_REFERER'])
 
@@ -154,13 +154,13 @@ def change_live_datetime(request):
 
     if list_type == 'course_materials':
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
-        template = 'courses/staging/course_materials.html'
+        template = 'courses/draft/course_materials.html'
     elif list_type == 'problemsets':
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_pset_content=True)
-        template = 'problemsets/staging/list.html'
+        template = 'problemsets/draft/list.html'
     else:
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True)
-        template = 'videos/staging/list.html'
+        template = 'videos/draft/list.html'
     return render(request, template,
                   {'common_page_data': request.common_page_data,
                    'section_structures': section_structures,
@@ -198,7 +198,7 @@ def signup(request):
     handle = request.POST.get('handle')
 
     user = request.user
-    course = Course.objects.get(handle=handle, mode = "production")
+    course = Course.objects.get(handle=handle, mode = "ready")
     if not is_member_of_course(course, user):
         student_group = Group.objects.get(id=course.student_group_id)
         student_group.user_set.add(user)

@@ -49,11 +49,11 @@ class C2GUnitTests(TestCase):
         """
         self.assertEqual(len(Course.objects.all()),4)
                          
-        c = Course.objects.filter(handle='nlp--Fall2012', mode = 'production')
+        c = Course.objects.filter(handle='nlp--Fall2012', mode = 'ready')
         for ci in c: 
             self.assertEqual(ci.title, u'Natural Language Processing')
 
-        c = Course.objects.filter(handle='crypto--Fall2012', mode = 'production')
+        c = Course.objects.filter(handle='crypto--Fall2012', mode = 'ready')
         for ci in c:
             self.assertEqual(ci.title, u'Introductory Cryptography')
                                

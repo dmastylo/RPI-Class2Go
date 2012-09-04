@@ -5,12 +5,12 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
-    {% include "staging/item_checkbox_functions.html" %}
-    {% include "videos/staging/video_management_section.html" %}
+    {% include "draft/item_checkbox_functions.html" %}
+    {% include "videos/draft/video_management_section.html" %}
 
     {% for section_structure in section_structures %}
     <div class="well">
-        {% include "content_sections/staging/section.html" %}
+        {% include "content_sections/draft/section.html" %}
     </div>
     {% empty %}
         <p style='margin: 20px;'>No videos have been added to this section.</p>

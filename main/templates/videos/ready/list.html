@@ -7,7 +7,7 @@
 <div id="c2g_layout_m_column" class="span12">
     {% if user.is_authenticated %}
         {% for section_structure in section_structures %}
-            {% include "content_sections/production/section.html" %}
+            {% include "content_sections/ready/section.html" %}
         {% empty %}
             <p style='margin: 20px;'>No content to display.</p>
         {% endfor %}
