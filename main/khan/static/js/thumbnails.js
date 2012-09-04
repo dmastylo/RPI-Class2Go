@@ -282,18 +282,18 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
         addQuizSlide: function (idxTime) {
             var indexDiv = document.getElementById('slideIndex');
             var tempDiv = document.createElement('div');
-            var greyDiv = document.createElement('div');
+            //var greyDiv = document.createElement('div');
             $(tempDiv).addClass('divInIndex').addClass('quiz-thumb').attr('id','slideIndex'+idxTime+'s');
-            $(greyDiv).addClass('greyOverlay').html("<br/><br/>Quiz");
+            //$(greyDiv).addClass('greyOverlay').html("<br/><br/>Quiz");
             var slideImg = document.createElement('img');
-            slideImg.src = 'q_'+idxTime+'.jpg';
-
-            tempDiv.appendChild(greyDiv);
+            //slideImg.src = 'q_'+idxTime+'.jpg';
+            slideImg.src = '/static/graphics/core/question.png';
+            //tempDiv.appendChild(greyDiv);
             tempDiv.appendChild(slideImg);
 
             tempDiv.onclick=(function (time) {return function(evt) {
-            player.seekTo(time-1);
-            thumbSet.selectSlide(time);
+                                player.seekTo(time-0.5);
+                                thumbSet.selectSlide(time);
             };})(idxTime);
             $('#slideIndex').append(tempDiv);
             return tempDiv;

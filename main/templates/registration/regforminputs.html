@@ -1,0 +1,43 @@
+{% csrf_token %}
+<table>
+    <tr>
+        <th><label for="id_username">{{form.username.label}}:</label></th>
+        <td>{{form.username.errors}}{{ form.username }}</td>
+    </tr>
+    <tr>
+        <th><label for="id_email">{{form.email.label}}:</label></th>
+        <td>{{form.email.errors}}{{ form.email }}</td>
+    </tr>
+    <tr>
+        <th><label for="id_first_name">{{form.first_name.label}}:</label></th>
+        <td>{{form.first_name.errors}}{{ form.first_name }}</td>
+    </tr>
+    <tr>
+        <th><label for="id_last_name">{{form.last_name.label}}:</label></th>
+        <td>{{form.last_name.errors}}{{ form.last_name }}</td>
+    </tr>
+    <tr>
+        <th><label for="id_password1">{{form.password1.label}}:</label></th>
+        <td>{{form.password1.errors}}{{ form.password1 }}</td>
+    </tr>
+    <tr>
+        <th><label for="id_password2">{{form.password2.label}}:</label></th>
+        <td>{{form.password2.errors}}{{ form.password2 }}</td>
+    </tr>
+    
+    <tr>
+        <th><label for="id_birth_year">{{form.birth_year.label}}:</label></th>
+        <td>{{form.birth_year.errors}}{{ form.birth_year }}</td>
+    </tr>
+    <tr>
+        <th><label for="id_gender">{{form.gender.label}}:</label></th>
+        <td>{{form.gender.errors}}{{ form.gender }}</td>
+    </tr>
+    <tr>
+        <th><label for="id_education">{{form.education.label}}:</label></th>
+        <td>{{form.education.errors}}{{ form.education }}</td>
+    </tr>
+    
+</table>
+{{form.course_prefix}}{{form.course_suffix}}
+
