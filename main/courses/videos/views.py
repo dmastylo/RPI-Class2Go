@@ -239,10 +239,16 @@ def get_video_exercises(request):
     video = Video.objects.get(id = request.GET['video_id'])
     videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')
     json_list = {}
+    order = 0
     for videoToEx in videoToExs:
         json_list[str(videoToEx.video_time)]={}
         json_list[str(videoToEx.video_time)]['time']=videoToEx.video_time
         json_list[str(videoToEx.video_time)]['problemDiv']=videoToEx.exercise_id
+        json_list[str(videoToEx.video_time)]['order']=order
+        json_list[str(videoToEx.video_time)]['fileName']=videoToEx.exercise.fileName
+
+        order=order+1
+
     json_string = json.dumps(json_list)
     return HttpResponse(json_string)
 

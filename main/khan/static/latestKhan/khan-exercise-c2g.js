@@ -289,6 +289,10 @@ var Khan = (function() {
     // The main Khan Module
     var Khan = {
         modules: {},
+            
+        getExercises:function() {return exercises;},
+        getProblems:function() {return exercises.children(".problems").children();},
+
 
         // So modules can use file paths properly
         urlBase: urlBase,
@@ -460,7 +464,7 @@ var Khan = (function() {
 
                 head.appendChild(script);
             })(urls[i]); }
-
+            
             runCallback();
 
             function runCallback() {
@@ -758,7 +762,7 @@ var Khan = (function() {
                         currentEx = exArr.shift();
                         // [@wescott] Passing "remoteExercises" to loadExercise too,
                         // so it can check original list of exercises that should be coming
-                        loadExercise.call(currentEx, remoteExercises.toArray()).done(function () {
+                        loadExercise.call(currentEx).done(function () {
                             controlLoad(exArr);
                         });
                     } else {
@@ -1992,6 +1996,8 @@ var Khan = (function() {
     KhanC2G.clearExistingProblem=clearExistingProblem;
     KhanC2G.makeProblem=makeProblem;
     KhanC2G.makeProblemBag=makeProblemBag;
+    KhanC2G.getExercises=function(){return exercises;} ;
+    KhanC2G.getProblems=function(){return  exercises.children(".problems").children();};
 
     function renderNextProblem(nextUserExercise) {
         clearExistingProblem();
