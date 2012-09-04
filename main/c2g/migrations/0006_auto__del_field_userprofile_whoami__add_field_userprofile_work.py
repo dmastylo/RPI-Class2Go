@@ -8,71 +8,23 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'UserProfile.client_ip'
-        db.add_column(u'c2g_user_profiles', 'client_ip',
-                      self.gf('django.db.models.fields.GenericIPAddressField')(max_length=39, null=True),
-                      keep_default=False)
+        # Deleting field 'UserProfile.whoami'
+        db.delete_column(u'c2g_user_profiles', 'whoami')
 
-        # Adding field 'UserProfile.user_agent'
-        db.add_column(u'c2g_user_profiles', 'user_agent',
-                      self.gf('django.db.models.fields.CharField')(max_length=256, null=True),
-                      keep_default=False)
-
-        # Adding field 'UserProfile.referrer'
-        db.add_column(u'c2g_user_profiles', 'referrer',
-                      self.gf('django.db.models.fields.CharField')(max_length=256, null=True),
-                      keep_default=False)
-
-        # Adding field 'UserProfile.accept_language'
-        db.add_column(u'c2g_user_profiles', 'accept_language',
-                      self.gf('django.db.models.fields.CharField')(max_length=64, null=True),
-                      keep_default=False)
-
-        # Adding field 'UserProfile.client_ip_first'
-        db.add_column(u'c2g_user_profiles', 'client_ip_first',
-                      self.gf('django.db.models.fields.GenericIPAddressField')(max_length=39, null=True),
-                      keep_default=False)
-
-        # Adding field 'UserProfile.user_agent_first'
-        db.add_column(u'c2g_user_profiles', 'user_agent_first',
-                      self.gf('django.db.models.fields.CharField')(max_length=256, null=True),
-                      keep_default=False)
-
-        # Adding field 'UserProfile.referrer_first'
-        db.add_column(u'c2g_user_profiles', 'referrer_first',
-                      self.gf('django.db.models.fields.CharField')(max_length=256, null=True),
-                      keep_default=False)
-
-        # Adding field 'UserProfile.accept_language_first'
-        db.add_column(u'c2g_user_profiles', 'accept_language_first',
-                      self.gf('django.db.models.fields.CharField')(max_length=64, null=True),
+        # Adding field 'UserProfile.work'
+        db.add_column(u'c2g_user_profiles', 'work',
+                      self.gf('django.db.models.fields.CharField')(max_length=128, null=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'UserProfile.client_ip'
-        db.delete_column(u'c2g_user_profiles', 'client_ip')
+        # Adding field 'UserProfile.whoami'
+        db.add_column(u'c2g_user_profiles', 'whoami',
+                      self.gf('django.db.models.fields.CharField')(max_length=128, null=True),
+                      keep_default=False)
 
-        # Deleting field 'UserProfile.user_agent'
-        db.delete_column(u'c2g_user_profiles', 'user_agent')
-
-        # Deleting field 'UserProfile.referrer'
-        db.delete_column(u'c2g_user_profiles', 'referrer')
-
-        # Deleting field 'UserProfile.accept_language'
-        db.delete_column(u'c2g_user_profiles', 'accept_language')
-
-        # Deleting field 'UserProfile.client_ip_first'
-        db.delete_column(u'c2g_user_profiles', 'client_ip_first')
-
-        # Deleting field 'UserProfile.user_agent_first'
-        db.delete_column(u'c2g_user_profiles', 'user_agent_first')
-
-        # Deleting field 'UserProfile.referrer_first'
-        db.delete_column(u'c2g_user_profiles', 'referrer_first')
-
-        # Deleting field 'UserProfile.accept_language_first'
-        db.delete_column(u'c2g_user_profiles', 'accept_language_first')
+        # Deleting field 'UserProfile.work'
+        db.delete_column(u'c2g_user_profiles', 'work')
 
 
     models = {
@@ -295,20 +247,13 @@ class Migration(SchemaMigration):
         },
         'c2g.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "u'c2g_user_profiles'"},
-            'accept_language': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
-            'accept_language_first': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'birth_year': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
-            'client_ip': ('django.db.models.fields.GenericIPAddressField', [], {'max_length': '39', 'null': 'True'}),
-            'client_ip_first': ('django.db.models.fields.GenericIPAddressField', [], {'max_length': '39', 'null': 'True'}),
             'education': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'referrer': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
-            'referrer_first': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
             'site_data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'}),
-            'user_agent': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
-            'user_agent_first': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'})
+            'work': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True'})
         },
         'c2g.video': {
             'Meta': {'object_name': 'Video', 'db_table': "u'c2g_videos'"},

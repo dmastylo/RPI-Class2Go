@@ -492,6 +492,7 @@ class UserProfile(models.Model):
     gender = models.CharField(max_length=64, null=True)
     birth_year = models.CharField(max_length=64, null=True)
     education = models.CharField(max_length=64, null=True)
+    work = models.CharField(max_length=128,null=True)
 
     client_ip = models.GenericIPAddressField(null=True)
     user_agent = models.CharField(max_length=256, null=True)

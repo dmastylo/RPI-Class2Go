@@ -45,3 +45,6 @@ def hc(request):
 
 def tos(request):
     return render_to_response('TOS.html',{},RequestContext(request))
+
+def privacy(request):
+    return render_to_response('privacy.html',{},RequestContext(request))

@@ -7,9 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    # Home page redirects to our one course page for now.  We will want to remove
-    # this before we go to production of course.
-    url(r'^$', redirect_to, {'url': '/nlp/Fall2012/'}),
+    #For each course we'll want to add one of these to go to the latest version.
     url(r'^nlp$', redirect_to, {'url': '/nlp/Fall2012/'}),
 
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that
@@ -22,6 +20,7 @@ urlpatterns = patterns('',
 
     url(r'^honor_code$', 'c2g.views.hc'),
     url(r'^terms_of_service$', 'c2g.views.tos'),
+    url(r'^privacy$', 'c2g.views.privacy'),
 
                        
     # Commented out the following 2 urls since point to a signup page which is

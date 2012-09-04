@@ -1,19 +1,4 @@
 .shaded {
-<<<<<<< HEAD
-	margin: 10px;
-	padding: 10px;
-	
-	background: #f4f4e0;
-	background: -moz-linear-gradient(top, #f0f0e0, #f8f8E8);
-	background: -webkit-gradient(linear, left top, left bottom, from(#f0f0e0), to(#f8f8E8));
-	
-	border: #f0f0e0;
-	border-radius: 10px;
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
-	-khtml-border-radius: 10px;
-	-o-border-radius: 10px;
-=======
     margin: 10px;
     padding: 10px;
     
@@ -27,7 +12,6 @@
     -webkit-border-radius: 10px;
     -khtml-border-radius: 10px;
     -o-border-radius: 10px;
->>>>>>> 718741d3c4d9a71e19c4579a2cc1f30c927fea0f
 }
 
 .framed {
