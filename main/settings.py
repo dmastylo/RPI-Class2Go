@@ -131,6 +131,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'convenience_redirect.redirector.convenience_redirector',
     'courses.common_page_data_middleware.common_data',
+    'courses.user_profiling_middleware.user_profiling',
 )
 
 ROOT_URLCONF = 'urls'
