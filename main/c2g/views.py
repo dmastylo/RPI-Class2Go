@@ -48,3 +48,6 @@ def tos(request):
 
 def privacy(request):
     return render_to_response('privacy.html',{},RequestContext(request))
+
+def contactus(request):
+    return render_to_response('contactus.html',{},RequestContext(request))

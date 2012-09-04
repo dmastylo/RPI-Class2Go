@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^honor_code$', 'c2g.views.hc'),
     url(r'^terms_of_service$', 'c2g.views.tos'),
     url(r'^privacy$', 'c2g.views.privacy'),
+    url(r'^contactus$', 'c2g.views.contactus'),
 
                        
     # Commented out the following 2 urls since point to a signup page which is
