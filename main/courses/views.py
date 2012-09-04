@@ -6,6 +6,7 @@ from c2g.models import *
 from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 import re
+from django.contrib import messages
 
 from courses.forms import *
 
@@ -62,6 +63,7 @@ def main(request, course_prefix, course_suffix):
 
         index_list.sort(key = index)
         full_index_list.append(index_list)
+
 
     return render_to_response('courses/view.html',
             {'common_page_data': common_page_data,

@@ -18,6 +18,9 @@ urlpatterns = patterns('',
     url(r'^_throw500$', 'c2g.views.throw500'),
     url(r'^_throw404$', 'c2g.views.throw404'),
 
+    #Testing messages
+    url(r'^_test_messages$', 'c2g.views.test_messages'),
+
     url(r'^honor_code$', 'c2g.views.hc'),
     url(r'^terms_of_service$', 'c2g.views.tos'),
     url(r'^privacy$', 'c2g.views.privacy'),
