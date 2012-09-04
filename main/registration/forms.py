@@ -7,6 +7,9 @@ Forms and validation code for user registration.
 from django.contrib.auth.models import User
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.forms.extras.widgets import Select
+ 
+import datetime
 import logging
 logger = logging.getLogger('form')
 
@@ -33,26 +36,34 @@ class RegistrationForm(forms.Form):
     username = forms.RegexField(regex=r'^[\w.@+-]+$',
                                 max_length=30,
                                 widget=forms.TextInput(attrs=attrs_dict),
-                                label=_("Choose a Username"),
+                                label=_("Choose a Username*"),
                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
-                             label=_("Your E-mail"))
+                             label=_("Your E-mail*"))
     first_name = forms.RegexField(regex=r'^[\w ]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
-                                  label=_("Your First Name"),
+                                  label=_("Your First Name*"),
                                   error_messages={'invalid': _("This value may contain only letters and numbers.")})
     last_name = forms.RegexField(regex=r'^[\w ]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
-                                  label=_("Your Last Name"),
+                                  label=_("Your Last Name*"),
                                   error_messages={'invalid': _("This value may contain only letters and numbers.")})
-    birth_year = forms.CharField(label=_("Your year of birth"))
-    gender = forms.ChoiceField(label=_("Your gender"), choices=(("Female","Female"),
+    max_age=110
+    min_age=10
+    first_year=datetime.date.today().year-max_age
+    last_year=datetime.date.today().year-min_age
+    YEARS=map(lambda y: (str(y),str(y)), range(last_year, first_year, -1))
+    YEARS.insert(0,('decline',''))
+    birth_year = forms.ChoiceField(choices=YEARS,label=_("Your year of birth"))
+    gender = forms.ChoiceField(label=_("Your gender"), choices=(('decline',''),
+                                                                ("Female","Female"),
                                                                 ("Male","Male"),
                                                                 ("Non-Traditional","Non-Traditional")))
-    education = forms.ChoiceField(label=_("Highest Ed completed"), choices=(('Doctorate','Doctorate'),
+    education = forms.ChoiceField(label=_("Highest degree received"), choices=(('decline',''),
+                                                                            ('Doctorate','Doctorate'),
                                                                             ('MastersOrProfessional','Masters or Professional'),
                                                                             ('Bachelors','Bachelors'),
                                                                             ('Associate','Associate'),
@@ -61,7 +72,7 @@ class RegistrationForm(forms.Form):
                                                                             ('Elementary','Elementary'),
                                                                             ('None','None'),
                                                                             ('Other','Other'),))
-    work = forms.ChoiceField(label=_("I am currently"), choices=(
+    work = forms.ChoiceField(label=_("I am currently"), choices=(  ('decline',''),
                                                                    ('undergrad','An undergraduate'),
                                                                    ('gradStudent','An grad student'),
                                                                    ('HSStudent','An high school (or younger) student'),
@@ -82,9 +93,9 @@ class RegistrationForm(forms.Form):
                                                                    ('Retired','Retired'),
                                                                    ('Other','Other'),))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
-                                label=_("Password"))
+                                label=_("Password*"))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
-                                label=_("Password (again)"))
+                                label=_("Password (again)*"))
     
     tos = forms.BooleanField(widget=forms.CheckboxInput(attrs=attrs_dict),
                                  label=_(u'I have read and agree to the Honor Code and Terms of Service'),

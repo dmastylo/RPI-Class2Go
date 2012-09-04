@@ -21,7 +21,7 @@ def main(request, course_prefix, course_suffix):
         raise Http404
 
 
-    announcement_list = Announcement.objects.getByCourse(course=common_page_data['course'])
+    announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')
     if len(announcement_list) > 10:
         many_announcements = True
         announcement_list = announcement_list[0:10]
@@ -66,6 +66,7 @@ def main(request, course_prefix, course_suffix):
     return render_to_response('courses/view.html',
             {'common_page_data': common_page_data,
              'announcement_list': announcement_list,
+             'many_announcements':many_announcements,
              'news_list': news_list,
              'contentsection_list': contentsection_list,
              'video_list': video_list,
