@@ -27,7 +27,7 @@
         <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
     {% elif video.title %} 
         <h2 class="section-headline">{{video.title}}</h2>
-        {% if common_page_data.course_mode == 'staging' and common_page_data.is_course_admin %}
+        {% if common_page_data.course_mode == 'draft' and common_page_data.is_course_admin %}
           <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
         {% endif %}
             <!-- Hardcoding select content of khan-site.html -->

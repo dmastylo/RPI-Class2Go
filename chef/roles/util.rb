@@ -1,5 +1,5 @@
 name "util"
-description "Sophi utility node -- on top of UBUNTU"
+description "class2go utility node -- on top of UBUNTU"
 
 override_attributes \
     "system" => {
@@ -10,14 +10,14 @@ override_attributes \
 
 run_list(
 #   "recipe[chef-client]",
-    "recipe[sophi-apt-update]",
+    "recipe[class2go-apt-update]",
     "recipe[gdata]",
-    "recipe[sophi-base-ubuntu]",
-    "recipe[sophi-python]",
-    "recipe[sophi-deploy]",
-    "recipe[sophi-logging]",
-    "recipe[sophi-database-config]",
+    "recipe[class2go-base-ubuntu]",
+    "recipe[class2go-python]",
+    "recipe[class2go-deploy]",
+    "recipe[class2go-logging]",
+    "recipe[class2go-database-config]",
     "recipe[s3cmd]",
-    "recipe[sophi-util-kelvinator]",
-    "recipe[sophi-celery-worker]"
+    "recipe[class2go-util-kelvinator]",
+    "recipe[class2go-celery-worker]"
 )

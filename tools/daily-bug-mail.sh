@@ -6,5 +6,5 @@
 . ./bash_bug_reports
 
 TODAY=`date +"%A %D"`
-buglist-goalline | mail -s "Sophi Bug Summary - ${TODAY}" sophi-dev@cs.stanford.edu,mitchell@cs.stanford.edu
+buglist-goalline | mail -s "Class2Go Bug Summary - ${TODAY}" c2g-dev@cs.stanford.edu,mitchell@cs.stanford.edu
 

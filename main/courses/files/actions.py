@@ -17,11 +17,11 @@ def upload(request):
             new_file = form.save(commit=False)
             new_file.course = common_page_data['course']
             new_file.index = new_file.section.getNextIndex()
-            new_file.mode = 'staging'
+            new_file.mode = 'draft'
             new_file.handle = course_prefix + "--" + course_suffix
 
             new_file.save()
-            new_file.create_production_instance()
+            new_file.create_ready_instance()
             return redirect('courses.views.course_materials', course_prefix, course_suffix)
     else:
         form = FileUploadForm(course=common_page_data['course'])

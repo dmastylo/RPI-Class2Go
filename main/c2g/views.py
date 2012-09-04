@@ -19,7 +19,7 @@ def home(request):
     
     
     now = datetime.now()
-    courses = Course.objects.filter(calendar_start__gt=now, mode="production")
+    courses = Course.objects.filter(calendar_start__gt=now, mode="ready")
     available_course_list = []
     for course in courses:
         if is_member_of_course(course, request.user):

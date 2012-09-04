@@ -1,0 +1,121 @@
+<div class="container-fluid">
+    <a href="javascript:selectAll()">Select all</a> / <a href="javascript:unselectAll()">Unselect all</a>
+    <div class="pull-right" style="width:700px;margin-left: 20px;">
+        <form name="commit_form" action="{% url 'courses.actions.commit' %}" method="POST">
+            <input type="hidden" id="commit_ids" name="commit_ids" value="" />
+            <input type="button" value="Make Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="commit_clicked()"/>Copy the draft version of selected items to ready
+            <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+            <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+            {% csrf_token %}
+        </form>
+        <script type="text/javascript">
+        function commit_clicked() {
+            document.getElementById("commit_ids").value = getCheckedIds();
+            if (document.getElementById("commit_ids").value == '') {
+                alert('Nothing selected to commit.');
+                return;
+            }
+            document.forms.commit_form.submit();
+        }        
+        </script>
+        <form name="revert_form" action="{% url 'courses.actions.revert' %}" method="POST">
+            <input type="hidden" id="revert_ids" name="revert_ids" value="" />
+            <input type="button" value="Reset to Ready" class="btn" style='width: 150px; margin-right: 10px;' onclick="revert_clicked()"/>Reset the draft version of selected items back to ready
+            <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+            <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+            {% csrf_token %}
+        </form>
+        <script type="text/javascript">
+        function revert_clicked() {
+            document.getElementById("revert_ids").value = getCheckedIds();
+            if (document.getElementById("revert_ids").value == '') {
+                alert('Nothing selected to reset.');
+                return;
+            }
+            
+            r = confirm("Resetting any item will cause any changes to the draft version to be discarded. Are you sure you want to reset all of the selected items?")
+            if (!r) return;
+            
+            document.forms.revert_form.submit();
+        }
+        </script>
+        <form name="change_live_datetime_form" action="{% url 'courses.actions.change_live_datetime' %}" method="POST" onsubmit="return apply_clicked()">
+            <input type="hidden" id="change_live_datetime_ids" name="change_live_datetime_ids" value="" />
+	    <input type="submit" name="action" value="Make Ready and Go Live" class="btn" style='margin-bottom: 9px' onclick="clicked=this.value"/>
+            <label for="id_live_datetime" style="display:inline">or go live</label>
+	    {{ form.live_datetime }}
+            <input type="submit" name="action" value="Set Live Date" class="btn" style='margin: 0 0 9px 10px' onclick="clicked=this.value"/>
+	    {{ form.live_datetime.errors }}
+            <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+            <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+	    <input type="hidden" name="list_type" value="course_materials" />
+            {% csrf_token %}
+        </form>
+        <script type="text/javascript">
+	var clicked;
+        function apply_clicked() {
+            document.getElementById("change_live_datetime_ids").value = getCheckedIds();
+            if (document.getElementById("change_live_datetime_ids").value == '') {
+                if (clicked == "Make Ready and Go Live") {
+                    alert('Nothing selected to make ready and go live.');
+                }
+                else {
+                    alert('Nothing selected to set the live date for.');
+                }
+                return false;
+            }
+	    return true;
+        }
+        </script>
+        
+        {% block addl_content_management_content %}{% endblock addl_content_management_content %}
+    </div>
+    <label class="pull-right"><b>With selected:</b></label>
+</div>
+<script type="text/javascript">
+function getCheckedIds() {
+    all_inputs = document.getElementsByTagName('input');
+    is_first = true;
+    id_str = '';
+    for (var i = 0; i < all_inputs.length; i++) {
+        input = all_inputs[i];
+        if (input.hasAttribute('type') && input.getAttribute('type') == 'checkbox' && input.checked) {
+            if (is_first) {
+                is_first = false;
+            } else {
+                id_str += ',';
+            }
+            id_str += input.id;
+        }
+    }
+    return id_str;
+}
+</script>
+<div class="well tight" style="overflow:hidden;">
+    <div class="pull-left">
+    <input type="button" value="New section" onclick="$('#new_section_form').toggle();" class="btn" style="margin-left: 20px;" />
+    <a class="btn" style="margin-left: 5px;" href="{% url 'courses.content_sections.views.reorder' common_page_data.course_prefix common_page_data.course_suffix %}">Re-order Sections</a>
+    <a class="btn btn-primary" style="margin-left: 30px;" href="{% url 'courses.videos.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">New Video</a>
+    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'problemsets.views.create_form' common_page_data.course_prefix common_page_data.course_suffix %}">New Problem Set</a>
+    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.additional_pages.views.add_section_page' common_page_data.course_prefix common_page_data.course_suffix %}">New Static Page</a>
+    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.files.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">New File</a>
+    </div>
+    <div class="pull-right" id="new_section_form" style="display:none;padding-right:15px;">
+        <form action="{% url 'courses.actions.add_section' %}" method="POST" class="form-inline" style="margin-bottom:0;">
+            <div class="control-group" style="margin:0;">
+                <label class="control-label">Title for new section</label>
+                <input name="title" id="title" type="text" />
+                <input type="submit" value="Create" class="btn" />
+                <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+                <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+            </div>
+            {% csrf_token %}
+        </form>
+    </div>
+</div>
+
+{% include "videos/draft/delete_video_form.html" %}
+{% include "problemsets/draft/delete_problem_set_form.html" %}
+{% include "additional_pages/draft/delete_additional_page_form.html" %}
+{% include "files/draft/delete_file_form.html" %}
+{% include "content_sections/draft/delete_content_section_form.html" %}

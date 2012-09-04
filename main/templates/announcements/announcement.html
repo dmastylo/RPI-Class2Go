@@ -1,5 +1,5 @@
 <div class="announcement">
-    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
     <small class="date"> {{announcement.last_updated}}</small>
     <div class="announcement-actions">
         <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><i class="icon-edit icon-large"></i> Edit</a>
@@ -11,7 +11,7 @@
     <h4>{{announcement.title}}</h4>
     {% autoescape off %}<p>{{announcement.description}}</p>{% endautoescape %}
 
-    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
         {% if announcement.is_synced %}
         <span class="badge badge-success">
             <i class="icon-ok icon-large"></i> <strong>Published!</strong>

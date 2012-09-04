@@ -22,7 +22,7 @@ def main(request, course_prefix, course_suffix):
         raise Http404
 
 
-    announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')
+    announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
         many_announcements = True
         announcement_list = announcement_list[0:10]
@@ -31,7 +31,7 @@ def main(request, course_prefix, course_suffix):
     
     if request.user.is_authenticated():
         is_logged_in = 1
-        news_list = common_page_data['production_course'].newsevent_set.all().order_by('-time_created')[0:5]
+        news_list = common_page_data['ready_course'].newsevent_set.all().order_by('-time_created')[0:5]
     else:
         is_logged_in = 0
         news_list = []
@@ -86,7 +86,7 @@ def course_materials(request, course_prefix, course_suffix):
     section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
 
     form = None
-    if request.common_page_data['course_mode'] == "staging":
+    if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
     
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
