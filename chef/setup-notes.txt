@@ -18,6 +18,10 @@ PRODUCTION
 
 knife ec2 server create -I ami-4438b474 -x ubuntu -N util1.prod --region us-west-2 -Z us-west-2b -f m1.small -G prod -E prod -r 'role[util]'
 
+DEV
+
+knife ec2 server create -I ami-4438b474 -x ubuntu -N util1.dev --region us-west-2 -Z us-west-2b -f t1.micro -G dev -E dev -r 'role[util]'
+
 
 -------- IMAGES
 

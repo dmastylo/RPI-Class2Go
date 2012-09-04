@@ -17,7 +17,6 @@ run_list(
     "recipe[sophi-deploy]",
     "recipe[sophi-logging]",
     "recipe[sophi-database-config]",
-    "recipe[sophi-util-database-config]",
     "recipe[s3cmd]",
     "recipe[sophi-util-kelvinator]",
     "recipe[sophi-celery-worker]"

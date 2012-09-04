@@ -2,8 +2,7 @@
 
 from database import *
 from os import path
-#from os import path, getuid
-#from pwd import getpwuid
+from os import path
 #ADDED FOR url tag future
 import django.template
 django.template.add_to_builtins('django.templatetags.future')
@@ -16,11 +15,15 @@ djcelery.setup_loader()
 # if it hasn't been set then get the user name
 # since we use this for things like queue names, we want to keep this unique
 # to keep things from getting cross wired
-# try:
-    # SOPHI_INSTANCE
-# except NameError:
-    # SOPHI_INSTANCE=getpwuid(getuid())[0]
-SOPHI_INSTANCE = 'halawa'
+try:
+    SOPHI_INSTANCE
+except NameError:
+    try:
+        from os import getuid
+        from pwd import getpwuid
+        SOPHI_INSTANCE=getpwuid(getuid())[0]
+    except:
+        SOPHI_INSTANCE="unknown"
 
 # If PRODUCTION flag not set in Database.py, then set it now.
 try:

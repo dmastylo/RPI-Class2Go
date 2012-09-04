@@ -158,11 +158,11 @@ iframe::-webkit-scrollbar-thumb {
 
 div.greyOverlay, div.quizOverlay {
     z-index: 5;
-    opacity:.8;
+    opacity:.2;
     padding: 0px;
     margin: 0px;
     border: none;
-    background: grey;
+    background: black;
     position: absolute;
     top: 0px;
     left: 0px;

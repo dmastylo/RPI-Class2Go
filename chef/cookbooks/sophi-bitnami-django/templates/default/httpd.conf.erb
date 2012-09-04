@@ -263,6 +263,7 @@ LogLevel warn
     #
     LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
     LogFormat "%h %l %u %t \"%r\" %>s %b" common
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b" class2go
 
     <IfModule logio_module>
       # You need to enable mod_logio.c to use %I and %O
@@ -276,7 +277,7 @@ LogLevel warn
     # define per-<VirtualHost> access logfiles, transactions will be
     # logged therein and *not* in this file.
     #
-    CustomLog "logs/access_log" common
+    CustomLog "logs/access_log" class2go
 
     #
     # If you prefer a logfile with access, agent, and referer information

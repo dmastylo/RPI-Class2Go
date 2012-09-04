@@ -289,6 +289,10 @@ var Khan = (function() {
     // The main Khan Module
     var Khan = {
         modules: {},
+            
+        getExercises:function() {return exercises;},
+        getProblems:function() {return exercises.children(".problems").children();},
+
 
         // So modules can use file paths properly
         urlBase: urlBase,
@@ -460,7 +464,7 @@ var Khan = (function() {
 
                 head.appendChild(script);
             })(urls[i]); }
-
+            
             runCallback();
 
             function runCallback() {
@@ -758,7 +762,7 @@ var Khan = (function() {
                         currentEx = exArr.shift();
                         // [@wescott] Passing "remoteExercises" to loadExercise too,
                         // so it can check original list of exercises that should be coming
-                        loadExercise.call(currentEx, remoteExercises.toArray()).done(function () {
+                        loadExercise.call(currentEx).done(function () {
                             controlLoad(exArr);
                         });
                     } else {
@@ -986,7 +990,7 @@ var Khan = (function() {
             }
 
             // Generate a new problem
-            //console.log("In finishRender, generating new problem with no arguments");
+            console.log("In finishRender, generating new problem with no arguments");
             makeProblem();
 
         }
@@ -1061,7 +1065,8 @@ var Khan = (function() {
 
     function makeProblem(id, seed) {
 
-        //console.log('makeProblem called with id ' + id);
+        console.log('makeProblem called with id ' + id + ' and seed ' + seed);
+        console.log(typeof seed);
     
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
@@ -1087,12 +1092,15 @@ var Khan = (function() {
             seedKey += 'vid-' + $('#video_id').val();
         }
         seedKey += '-' + id;
+        console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
         localStorage.setItem(seedKey, problemSeed);
 
         // store in userPSData object
         if (typeof userPSData != "undefined") {
+            console.log('userPSData for id ' + id + ' not defined, creating...');
             if (typeof userPSData[id] == "undefined") userPSData[id] = {};
-            userPSData[id]['problemSeed'] = problemSeed;
+            console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in userPSData');
+            userPSData[id]['problemSeed'] = parseInt(problemSeed);
         }
 
         // Check to see if we want to test a specific problem
@@ -1303,7 +1311,7 @@ var Khan = (function() {
         } else {
             // Making the problem failed, let's try again
             problem.remove();
-            //console.log("Making the problem failed, let's try again");
+            console.log("Making the problem failed, let's try again");
             makeProblem(id, randomSeed);
             return;
         }
@@ -1992,6 +2000,8 @@ var Khan = (function() {
     KhanC2G.clearExistingProblem=clearExistingProblem;
     KhanC2G.makeProblem=makeProblem;
     KhanC2G.makeProblemBag=makeProblemBag;
+    KhanC2G.getExercises=function(){return exercises;} ;
+    KhanC2G.getProblems=function(){return  exercises.children(".problems").children();};
 
     function renderNextProblem(nextUserExercise) {
         clearExistingProblem();
@@ -2019,7 +2029,7 @@ var Khan = (function() {
 
             if (testMode) {
                 // Just generate a new problem from existing exercise
-                //console.log("In testMode, calling makeProblem without an argument");
+                console.log("In testMode, calling makeProblem without an argument");
                 makeProblem();
             } else {
                 loadAndRenderExercise(nextUserExercise);
@@ -3175,6 +3185,10 @@ var Khan = (function() {
 
                     // [@wescott] Another safeguard for no current-question cards
                     var pID = $('.current-question').data("problem") || 0;
+                    var pSeed = 0;  // Fallback
+                    if ($('.current-question') && $('.current-question').data("problem_seed")) {
+                        pSeed = parseInt($('.current-question').data("problem_seed"));
+                    }
                     //console.log(pID);
                     if (KhanC2G.remoteExPollCount > 50) {
                         $('#workarea .loading').text("Exercise " + (parseInt(pID) + 1) + " could not be loaded.");
@@ -3185,8 +3199,8 @@ var Khan = (function() {
                     if (KhanC2G.remoteExercises[pID]) {
                         $('#workarea').remove('.loading');
                         KhanC2G.remoteExPollCount = 0;
-                        //console.log("configureCards, remote exercise here, so call makeProblem");
-                        makeProblem(pID);
+                        console.log("configureCards, remote exercise here, so call makeProblem");
+                        makeProblem(pID, pSeed);
                     } else {
                         if ($('#workarea .loading').length == 0) {
                             $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt(pID) + 1) + '...</p>');
@@ -3237,6 +3251,7 @@ var Khan = (function() {
                 //li.data('randseed',Math.floor(Math.random()*100000));
                 if (typeof userPSData != "undefined" && userPSData[idx.toString()]) {
                     var userQDataObj = userPSData[idx.toString()];
+                    li.data('problem_seed', parseInt(userQDataObj.problem_seed));
                     li.data('user_selection_val', userQDataObj.user_selection_val);
                     li.data('correct', userQDataObj.correct);
                     li.data('user_choices', userQDataObj.user_choices);
@@ -3306,8 +3321,13 @@ var Khan = (function() {
         $.when(checkForInputs()).then(function () {
             //console.log("initC2GStacks, makeProblem about to be called...");
             var pID = $('.current-question').data('problem') || 0;
-            KhanC2G.problemIdx = pID;
-            makeProblem(KhanC2G.problemIdx);
+            var pSeed = 0;  // Fallback
+            if ($('.current-question') && $('.current-question').data('problem_seed')) {
+                pSeed = parseInt($('.current-question').data('problem_seed'));
+            }
+            //KhanC2G.problemIdx = pID;
+            console.log('checkForInputs() done, so now calling makeProblem');
+            makeProblem(pID, pSeed);
 
             var userSelectionVal = (typeof userPSData != "undefined" && userPSData[pID] && userPSData[pID]['user_selection_val']) || $('.current-question').data("user_selection_val"); 
             if (userSelectionVal) {
@@ -3320,7 +3340,9 @@ var Khan = (function() {
                 } else if ($('#solutionarea input:radio').length) {
                     var userChoice = (userPSData[pID] && userPSData[pID]['user_choices']) || $('.current-question').data('user_choices');
                     var choiceArr = ($.isArray(userChoice)) ? userChoice : $.parseJSON(userChoice);
-                    reconstructChoices(choiceArr, userSelectionVal);
+                    // [@wescott] Shouldn't need to reconstruct anymore, if problem called with
+                    // proper seed
+                    //reconstructChoices(choiceArr, userSelectionVal);
                 }
             }
         }).always(function () {
@@ -3366,8 +3388,8 @@ var Khan = (function() {
             if (next.length) {
                 // [@wescott] Again, we don't need to randomize
                 //makeProblem(next.data('problem'), next.data('randseed'));
-                //console.log("Next question button clicked, going to makeProblem...");
-                makeProblem(next.data('problem'));
+                console.log("Next question button clicked, going to makeProblem...");
+                makeProblem(next.data('problem'), next.data('problem_seed'));
             }
 
             // [@wescott] if this is a summative problem set and all questions have been viewed
@@ -3498,8 +3520,8 @@ var Khan = (function() {
                 if (KhanC2G.remoteExercises[thisCard.data('problem')]) {
                     $('#workarea').remove('.loading');
                     KhanC2G.remoteExPollCount = 0;
-                    //console.log("A card must have been clicked, run makeProblem...");
-                    makeProblem(thisCard.data('problem'));
+                    console.log("A card must have been clicked, run makeProblem...");
+                    makeProblem(thisCard.data('problem'), thisCard.data('problem_seed'));
                 } else {
                     if ($('#workarea .loading').length == 0) {
                         //$('#workarea').append('<p class="loading">Loading Exercise...</p>');
@@ -3524,7 +3546,7 @@ var Khan = (function() {
                 if (userChoicesLen > 0 && thisCard.data("correct")) {
                     var choicesArr = $.parseJSON(thisCard.data("user_choices"));
                     var userSel = userPrevSel;
-                    reconstructChoices(choicesArr, userSel);
+                    //reconstructChoices(choicesArr, userSel);
                     $('#check-answer-button').attr('disabled', 'disabled');
                 } else if (userPrevSel && $(ev.target).data("correct")) {
                     $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
