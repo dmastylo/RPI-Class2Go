@@ -19,7 +19,8 @@
 		    <div class="form-actions">
                 <p>
                 {{form.tos.errors}} {{form.tos}} I agree to Stanford Online's 
-                <a href="{% url 'c2g.views.hc' %}" target="_blank" >Honor Code</a> and <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>
+                <a href="{% url 'c2g.views.hc' %}" target="_blank" >Honor Code</a>, <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>, and <a href="{% url 'c2g.views.privacy' %}" target="_blank">Privacy Policy</a>
+
                 </p>
 		    	<input type="submit" value="Register" class="btn btn-primary btn-large" /> &nbsp; Already have an account?  <a href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}"> Login instead</a>
 			</div>
