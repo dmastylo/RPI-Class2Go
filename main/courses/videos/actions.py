@@ -197,7 +197,8 @@ def upload(request):
             new_video.create_production_instance()
             print new_video.file.url
 
-            s3_path="s3://"+common_page_data['aws_storage_bucket_name']+"/"+new_video.file.name
+            # TODO: don't hardcode the AWS location 
+            s3_path="https://s3-us-west-2.amazonaws.com/"+common_page_data['aws_storage_bucket_name']+"/"+urllib.quote_plus(new_video.file.name,"/")
             # TODO: make these parameters settable
             kelvinator.tasks.run.delay(s3_path, "1", "1000")
 
