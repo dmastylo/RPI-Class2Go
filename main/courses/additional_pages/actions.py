@@ -32,10 +32,10 @@ def add(request):
     else:
         index = section.getNextIndex()
         
-    staging_page = AdditionalPage(course=common_page_data['staging_course'], menu_slug=menu_slug, section=section, title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='staging')
-    staging_page.save()
+    draft_page = AdditionalPage(course=common_page_data['draft_course'], menu_slug=menu_slug, section=section, title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='draft')
+    draft_page.save()
     
-    staging_page.create_production_instance()
+    draft_page.create_ready_instance()
     
     if request.POST.get("menu_slug") == "":
         return redirect('courses.views.course_materials', course_prefix, course_suffix)
@@ -70,7 +70,7 @@ def save_order(request):
     if not common_page_data['is_course_admin']:
         redirect('courses.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'])
     
-    pages = AdditionalPage.objects.filter(course=common_page_data['staging_course'])
+    pages = AdditionalPage.objects.filter(course=common_page_data['draft_course'])
     for page in pages:
         page.index = request.POST.get("order_"+str(page.id))
         page.save()

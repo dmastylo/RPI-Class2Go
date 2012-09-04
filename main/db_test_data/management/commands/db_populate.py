@@ -6,7 +6,7 @@ from random import randrange, shuffle
 from django.db import connection, transaction
 
 class Command(BaseCommand):
-    help = "Populates the db with test development data. \n This command is <not> available on production for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
+    help = "Populates the db with test development data. \n This command is <not> available on ready for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
     
     option_list = BaseCommand.option_list + (
         make_option('--massive',
@@ -20,10 +20,11 @@ class Command(BaseCommand):
         delete_db_data()
         
         if options['massive']:
-            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':20}
+            # Don't create fewer than 4 profs, 4 tas, 4 readonly tas, and 40 students
+            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':40}
             content_counts = {'num_massive_courses':1, 'num_sections_per_course':2, 'num_videos_per_section':5}
         else:
-            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':40}
+            user_counts = {'num_professors':4, 'num_tas':4, 'num_readonly_tas':4, 'num_students':40}
             content_counts = {'num_massive_courses':0, 'num_sections_per_course':2, 'num_videos_per_section':5}
             
         
@@ -76,7 +77,7 @@ def create_users(user_counts):
     for i in range(user_counts['num_professors']):
         professors.append(User.objects.create_user('professor_' + str(i)))
         professors[i].set_password('class2go')
-        professors[i].first_name = "Tess"
+        professors[i].first_name = "Test"
         professors[i].last_name = "Teacher"
         professors[i].email = "professor_%d@stanford.edu" % i
         professors[i].is_staff = 1
@@ -165,7 +166,7 @@ def create_courses(institutions,users,content_counts):
     }
     print "      Creating nlp course\r"
     print "      ------------------- \r"
-    create_course_nlp(data, users)
+    create_course_nlp(data, {'professors':users['professors'][0:3],'tas':users['tas'][0:3],'readonly_tas':users['readonly_tas'][0:3],'students':users['students'][0:39]})
 
     data = {
             'institution': institutions[0],
@@ -182,7 +183,7 @@ def create_courses(institutions,users,content_counts):
     }
     print "      Creating crypto course\r"
     print "      ---------------------- \r"
-    create_course_crypto(data, users)
+    create_course_crypto(data, {'professors':users['professors'][0:3],'tas':users['tas'][0:3],'readonly_tas':users['readonly_tas'][0:3],'students':users['students'][0:39]})
     
     # Massive: Create num_massive_courses massive courses
     for i in range(content_counts['num_massive_courses']):
@@ -231,12 +232,12 @@ def create_course_massive(index, users, institutions, content_counts):
             calendar_start = start_date,
             calendar_end = end_date,
             list_publicly = 1,
-            mode='staging',
+            mode='draft',
             handle = "course"+str(index) + "--" + term + str(year)
         )
 
     course.save()
-    course.create_production_instance()
+    course.create_ready_instance()
     
     # Add random users to course
     print "      Creating massive course %d of %d >> Adding Users >> Professors \r" % (index,content_counts['num_massive_courses'])
@@ -271,10 +272,10 @@ def create_course_massive(index, users, institutions, content_counts):
         description=str_,
         slug='overview',
         index=0,
-        mode='staging',
+        mode='draft',
     )
     op.save()
-    op.create_production_instance()
+    op.create_ready_instance()
     
     # Create between 5 and 15 other course info menu pages
     num_pages = randrange(5,15)
@@ -290,10 +291,10 @@ def create_course_massive(index, users, institutions, content_counts):
             description=str_,
             slug='course_%d_page_%d' % (index, i),
             index=i+1,
-            mode='staging',
+            mode='draft',
         )
         p.save()
-        p.create_production_instance()
+        p.create_ready_instance()
         
     # Add 20 announcements
     print "      Creating massive course %d of %d >>  Adding announcements\r" % (index,content_counts['num_massive_courses'])
@@ -309,7 +310,7 @@ def create_course_massive(index, users, institutions, content_counts):
             course = course
         )
         a.save()
-        a.create_production_instance()
+        a.create_ready_instance()
         
         
     # Add exercises
@@ -347,38 +348,39 @@ def create_course_massive(index, users, institutions, content_counts):
     print "      Creating massive course %d of %d >>  Adding content sections\r" % (index,content_counts['num_massive_courses'])
     
     for i in range(content_counts['num_sections_per_course']):
-        staging_section = ContentSection(course=course, title="Section %d in Course %d" % (i, index), index=i, mode='staging')
-        staging_section.save()
-        staging_section.create_production_instance()
+        draft_section = ContentSection(course=course, title="Section %d in Course %d" % (i, index), index=i, mode='draft')
+        draft_section.save()
+        draft_section.create_ready_instance()
         
         # Create 5 videos
         yt_index = randrange(0,6)
         for j in range(5):
-            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5\r" % (index,content_counts['num_massive_courses'], i, j)
-            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Creating video objects\r" % (index,content_counts['num_massive_courses'], i, j)
+            print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
+            print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Creating video objects\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
             video = Video(
                 course = course,
-                section = staging_section,
+                section = draft_section,
                 title = "Video " + str(j) + " in Section " + str(i) + " in Course " +  str(index),
                 description = "Description for Video " + str(j) + " in Section " + str(i) + " in Course " +  str(index),
                 type = "youtube",
                 url = yt_ids[yt_index],
                 duration = durations[yt_index],
                 slug = "section_" + str(i) + "_video_" + str(j),
-                mode = 'staging',
+                mode = 'draft',
                 handle = "course"+str(index) + "--" + term + str(year),
                 index = j,
             )
             video.save()
-            video.create_production_instance()
+            video.create_ready_instance()
+            prod = video.image; prod.live_datetime = datetime.now(); prod.save();
             
             # Add Exercises to Videos
-            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Adding exercises to video\r" % (index,content_counts['num_massive_courses'], i, j)
+            print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding exercises to video\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
             v2es = []
             for exercise in exercises:
-                v2e = VideoToExercise(video=video, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='staging')
+                v2e = VideoToExercise(video=video, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='draft')
                 v2e.save()
-                v2e = VideoToExercise(video=video.image, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='production')
+                v2e = VideoToExercise(video=video.image, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='ready')
                 v2e.save()
                 v2es.append(v2e)
             
@@ -399,31 +401,32 @@ def create_course_massive(index, users, institutions, content_counts):
                             
                 stud_index += 1
                 if num_students > 500 and stud_index%500 == 0:
-                    print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Adding student video activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, j, stud_index, num_students)
+                    print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding student video activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j, stud_index, num_students)
                             
         # Create 1 static page
-        print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 static page\r" % (index,content_counts['num_massive_courses'], i)
+        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 static page\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
         str_ = ""
         for j in range(1000):
             str_ += "Page for section %d in massive course %d" % (i, index)
             
         p = AdditionalPage(
             course=course,
-            section = staging_section,
+            section = draft_section,
             title= "Page for section %d in massive course %d" % (i, index),
             description=str_,
             slug='course_%d_section_%d_page' % (index, i),
             index=6,
-            mode='staging',
+            mode='draft',
         )
         p.save()
-        p.create_production_instance()
+        p.create_ready_instance()
+        prod = p.image; prod.live_datetime = datetime.now(); prod.save();
                     
         # Create 1 problem set
-        print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 problem set\r" % (index,content_counts['num_massive_courses'], i)
+        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 problem set\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
         ps = ProblemSet(
             course = course,
-            section = staging_section,
+            section = draft_section,
             slug = "course_"+str(index)+"_section_"+str(i)+"_ps",
             title = "Problem set for section %d" % i,
             description = "PS Description",
@@ -437,12 +440,13 @@ def create_course_massive(index, users, institutions, content_counts):
             randomize = False,
         )
         ps.save()
-        ps.create_production_instance()
+        ps.create_ready_instance()
+        prod = ps.image; prod.live_datetime = datetime.now(); prod.save();
         
         for k in range(len(exercises)):
-            ps2e = ProblemSetToExercise(problemSet=ps, exercise=exercises[k], number=k, is_deleted=0, mode='staging')
+            ps2e = ProblemSetToExercise(problemSet=ps, exercise=exercises[k], number=k, is_deleted=0, mode='draft')
             ps2e.save()
-            ps2e = ProblemSetToExercise(problemSet=ps.image, exercise=exercises[k], number=k, is_deleted=0, mode='production')
+            ps2e = ProblemSetToExercise(problemSet=ps.image, exercise=exercises[k], number=k, is_deleted=0, mode='ready')
             ps2e.save()
             
             stud_index = 0
@@ -456,7 +460,7 @@ def create_course_massive(index, users, institutions, content_counts):
                     
                 stud_index += 1
                 if num_students > 500 and stud_index%500 == 0:
-                    print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 problem set >> Exercise %d of 4 >> Student activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, k, stud_index, num_students)
+                    print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 problem set >> Exercise %d of 4 >> Student activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], k, stud_index, num_students)
             
         
         
@@ -492,11 +496,11 @@ def create_course_nlp(data, users):
             calendar_start = data['calendar_start'],
             calendar_end = data['calendar_end'],
             list_publicly = data['list_publicly'],
-            mode='staging',
+            mode='draft',
             handle = data['handle'])
 
     course.save()
-    course.create_production_instance()
+    course.create_ready_instance()
 
     # Create the overview page
     op = AdditionalPage(
@@ -506,10 +510,10 @@ def create_course_nlp(data, users):
         description='Natural language processing is the technology for dealing with our most ubiquitous product: human language, as it appears in emails, web pages, tweets, product descriptions, newspaper stories, social media, and scientific articles, in thousands of languages and varieties. In the past decade, successful natural language processing applications have become part of our everyday experience, from spelling and grammar correction in word processors to machine translation on the web, from email spam detection to automatic question answering, from detecting people\'s opinions about products or services to extracting appointments from your email. In this class, you\'ll learn the fundamental algorithms and mathematical models for human alanguage processing and how you can use them to solve practical problems in dealing with language data wherever you encounter it.',
         slug='overview',
         index=0,
-        mode='staging',
+        mode='draft',
     )
     op.save()
-    op.create_production_instance()
+    op.create_ready_instance()
 
     # Create announcements
     titles = [
@@ -655,11 +659,11 @@ def create_course_crypto(data, users):
             calendar_start = data['calendar_start'],
             calendar_end = data['calendar_end'],
             list_publicly = data['list_publicly'],
-            mode='staging',
+            mode='draft',
             handle = data['handle'])
 
     course.save()
-    course.create_production_instance()
+    course.create_ready_instance()
 
     # Create the overview page
     op = AdditionalPage(
@@ -669,10 +673,10 @@ def create_course_crypto(data, users):
         description='Cryptography is an indispensable tool for protecting information in computer systems. This course explains the inner workings of cryptographic primitives and how to correctly use them. Students will learn how to reason about the security of cryptographic constructions and how to apply this knowledge to real-world applications.',
         slug='overview',
         index=0,
-        mode='staging',
+        mode='draft',
     )
     op.save()
-    op.create_production_instance()
+    op.create_ready_instance()
 
     # Create announcements
     titles = [
@@ -798,20 +802,20 @@ def create_announcement(course, title, description, index, owner):
         description = description,
         index = index,
         owner = owner,
-        mode = 'staging',
+        mode = 'draft',
     )
     announcement.save()
-    announcement.create_production_instance()
+    announcement.create_ready_instance()
 
 def create_content_section(course, title, index):
     section = ContentSection(
         course=course,
         title=title,
         index=index,
-        mode='staging',
+        mode='draft',
     )
     section.save()
-    section.create_production_instance()
+    section.create_ready_instance()
     return section
 
 def create_video(data, users):
@@ -827,11 +831,11 @@ def create_video(data, users):
         slug=data['slug'],
         file="default",
         index=data['index'],
-        mode='staging',
+        mode='draft',
         handle=data['course'].handle,
     )
     video.save()
-    video.create_production_instance()
+    video.create_ready_instance()
 
     for user in users['students']:
         video_activity = VideoActivity(
@@ -865,15 +869,15 @@ def create_problem_set(data, users):
         submissions_permitted = data['submissions_permitted'],
         resubmission_penalty = data['resubmission_penalty'],
         description = data['description'],
-        mode='staging',
+        mode='draft',
         index=data['index'],
     )
     problem_set.save()
-    prod_instance =  problem_set.create_production_instance()
+    prod_instance =  problem_set.create_ready_instance()
 
     problem_set.save()
 
-    # @todo: Create exercises, problems, and user activity for problem sets based on the new staging/production paradigm
+    # @todo: Create exercises, problems, and user activity for problem sets based on the new draft/ready paradigm
 
     #Shouldn't need to populate exercises since they can be uploaded now
     #save_exercise(problem_set, "P1_Levenshtein.html", 1)
@@ -896,7 +900,7 @@ def save_exercise(problemSet, fileName, number, handle, file):
                                     exercise = ex,
                                     number = number)
     psetToEx.save()
-    #psetToEx.create_production_instance()
+    #psetToEx.create_ready_instance()
 
     return ex
 

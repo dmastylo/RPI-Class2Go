@@ -29,7 +29,7 @@ def list(request, course_prefix, course_suffix):
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
 
     form = None
-    if request.common_page_data['course_mode'] == "staging":
+    if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
 
     return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list', 'form': form}, context_instance=RequestContext(request))
@@ -184,12 +184,12 @@ def create_action(request):
         if form.is_valid():
             new_pset = form.save(commit=False)
             new_pset.course = common_page_data['course']
-            new_pset.mode = 'staging'
+            new_pset.mode = 'draft'
             new_pset.handle = course_prefix + "--" + course_suffix
             new_pset.path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+new_pset.slug+"/load_problem_set"
 
             new_pset.save()
-            new_pset.create_production_instance()
+            new_pset.create_ready_instance()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_pset.slug,)))
 
     else:
@@ -267,7 +267,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
             exercise.save()
 
             index = len(ProblemSetToExercise.objects.getByProblemset(pset))
-            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='staging')
+            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
             psetToEx.save()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
@@ -288,7 +288,7 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(ProblemSetToExercise.objects.getByProblemset(pset)), is_deleted=0, mode='staging')
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(ProblemSetToExercise.objects.getByProblemset(pset)), is_deleted=0, mode='draft')
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 

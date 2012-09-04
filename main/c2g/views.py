@@ -18,7 +18,7 @@ def home(request):
     
     
     now = datetime.now()
-    courses = Course.objects.filter(calendar_start__gt=now, mode="production")
+    courses = Course.objects.filter(calendar_start__gt=now, mode="ready")
     available_course_list = []
     for course in courses:
         if is_member_of_course(course, request.user):
@@ -48,3 +48,6 @@ def tos(request):
 
 def privacy(request):
     return render_to_response('privacy.html',{},RequestContext(request))
+
+def contactus(request):
+    return render_to_response('contactus.html',{},RequestContext(request))

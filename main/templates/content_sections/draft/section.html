@@ -21,25 +21,25 @@
         {% for item in section_structure.items %}
             {% ifequal item.type 'additional_page' %}
                 <li id="additional_page_{{item.additional_page.id}}" class="ui-state-default" style="padding: 3px;">
-                    {% include "additional_pages/staging/additional_page_list_item.html" %}
+                    {% include "additional_pages/draft/additional_page_list_item.html" %}
                     <input type="hidden" name="order_additional_page_{{item.additional_page.id}}" value="{{forloop.counter0}}" />
                 </li>
             {% endifequal %}
             {% ifequal item.type 'problem_set' %}
                 <li id="problem_set_{{item.problem_set.id}}" class="ui-state-default" style="padding: 3px;">
-                    {% include "problemsets/staging/problemset_list_item.html" %}
+                    {% include "problemsets/draft/problemset_list_item.html" %}
                     <input type="hidden" name="order_problem_set_{{item.problem_set.id}}" value="{{forloop.counter0}}" />
                 </li>
             {% endifequal %}
             {% ifequal item.type 'video' %}
                 <li id="video_{{item.video.id}}" class="ui-state-default" style="padding: 3px;">
-                    {% include "videos/staging/video_list_item.html" %}
+                    {% include "videos/draft/video_list_item.html" %}
                     <input type="hidden" name="order_video_{{item.video.id}}" value="{{forloop.counter0}}" />
                 </li>
             {% endifequal %}
 	    {% ifequal item.type 'file' %}
 		<li id="file_{{item.file.id}}" class="ui-state-default" style="padding: 3px;">
-		    {% include "files/staging/file_list_item.html" %}
+		    {% include "files/draft/file_list_item.html" %}
 		    <input type="hidden" name="order_file_{{item.file.id}}" value="{{forloop.counter0}}" />
 		</li>
 	    {% endifequal %}
