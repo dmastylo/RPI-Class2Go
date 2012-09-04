@@ -40,7 +40,15 @@ def show(request, course_prefix, course_suffix, pset_slug):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
-    ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
+    try:
+        ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
+    except:
+        data = {'common_page_data': common_page_data}
+        data['error_text'] = 'This Problemset is not visible in the student view at this time. Please note that students will not reach this page.'
+        return render_to_response('problemsets/error.html',
+                              data,
+                              context_instance=RequestContext(request))
+        
     problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
     activity_list = []
