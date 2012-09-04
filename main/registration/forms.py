@@ -48,6 +48,19 @@ class RegistrationForm(forms.Form):
                                   widget=forms.TextInput(attrs=attrs_dict),
                                   label=_("Your Last Name"),
                                   error_messages={'invalid': _("This value may contain only letters and numbers.")})
+    birth_year = forms.CharField(label=_("Your year of birth"))
+    gender = forms.ChoiceField(label=_("Your gender"), choices=(("Female","Female"),
+                                                                ("Male","Male"),
+                                                                ("Non-Traditional","Non-Traditional")))
+    education = forms.ChoiceField(label=_("Highest Ed completed"), choices=(('Doctorate','Doctorate'),
+                                                                            ('MastersOrProfessional','Masters or Professional'),
+                                                                            ('Bachelors','Bachelors'),
+                                                                            ('SomeCollege','Some years of College'),
+                                                                            ('HighSchool','Secondary/High School'),
+                                                                            ('Middle','Middle school/Jr. High'),
+                                                                            ('Elementary','Elementary'),
+                                                                            ('None','None'),
+                                                                            ('Other','Other'),))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password"))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),

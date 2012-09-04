@@ -489,6 +489,10 @@ class StudentSection(TimestampMixin, Deletable, models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, db_index=True)
     site_data = models.TextField(blank=True)
+    gender = models.CharField(max_length=64, null=True)
+    birth_year = models.CharField(max_length=64, null=True)
+    education = models.CharField(max_length=64, null=True)
+
     class Meta:
         db_table = u'c2g_user_profiles'
 

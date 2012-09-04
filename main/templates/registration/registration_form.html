@@ -15,35 +15,7 @@
 	<h1>Register for Sophi</h1>
 	<div class="well">
 		<form action="{% url 'registration_register' %}" method="post">
-		    {% csrf_token %}
-		    <table>
-                <tr>
-                    <th><label for="id_username">{{form.username.label}}:</label></th>
-                    <td>{{form.username.errors}}{{ form.username }}</td>
-                </tr>
-                <tr>
-                    <th><label for="id_email">{{form.email.label}}:</label></th>
-                    <td>{{form.email.errors}}{{ form.email }}</td>
-                </tr>
-                <tr>
-                    <th><label for="id_first_name">{{form.first_name.label}}:</label></th>
-                    <td>{{form.first_name.errors}}{{ form.first_name }}</td>
-                </tr>
-                <tr>
-                    <th><label for="id_last_name">{{form.last_name.label}}:</label></th>
-                    <td>{{form.last_name.errors}}{{ form.last_name }}</td>
-                </tr>
-                <tr>
-                    <th><label for="id_password1">{{form.password1.label}}:</label></th>
-                    <td>{{form.password1.errors}}{{ form.password1 }}</td>
-                </tr>
-                <tr>
-                    <th><label for="id_password2">{{form.password2.label}}:</label></th>
-                    <td>{{form.password2.errors}}{{ form.password2 }}</td>
-                </tr>
-                
-            </table>
-            {{form.course_prefix}}{{form.course_suffix}}
+		    {% include 'registration/regforminputs.html' %}
 		    <div class="form-actions">
                 <p>
                 {{form.tos.errors}} {{form.tos}} I agree to Stanford Online's 
