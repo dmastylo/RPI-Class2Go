@@ -40,7 +40,7 @@ class SimpleBackend(object):
         new_user.first_name, new_user.last_name = kwargs['first_name'], kwargs['last_name']
         new_user.save()
         profile = new_user.get_profile()
-        profile.education, profile.gender, profile.birth_year = kwargs['education'], kwargs['gender'], kwargs['birth_year']
+        profile.education, profile.gender, profile.birth_year, profile.work = kwargs['education'], kwargs['gender'], kwargs['birth_year'], kwargs['work']
         profile.save()
         login(request, new_user)
         signals.user_registered.send(sender=self.__class__,
