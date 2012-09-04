@@ -7,9 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    # Home page redirects to our one course page for now.  We will want to remove
-    # this before we go to production of course.
-    url(r'^$', redirect_to, {'url': '/nlp/Fall2012/'}),
+    #For each course we'll want to add one of these to go to the latest version.
     url(r'^nlp$', redirect_to, {'url': '/nlp/Fall2012/'}),
 
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that

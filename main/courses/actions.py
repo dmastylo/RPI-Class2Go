@@ -115,38 +115,34 @@ def revert(request):
 @auth_is_course_admin_view_wrapper
 def change_live_datetime(request):
     list_type = request.POST.get('list_type')
+    action = request.POST.get('action')
     form = LiveDateForm(request.POST)
     if form.is_valid():
-        new_live_datetime = form.cleaned_data['live_datetime']
+        if action == "Make Ready and Go Live":
+            new_live_datetime = datetime.now()
+        else:
+            new_live_datetime = form.cleaned_data['live_datetime']
 
         ids = request.POST.get("change_live_datetime_ids").split(",")
 
         for id in ids:
             parts = id.split('_')
             if parts[0] == 'video':
-                video = Video.objects.get(id=parts[1])
-                video.live_datetime = new_live_datetime
-                video.image.live_datetime = new_live_datetime
-                video.save()
-                video.image.save()
+                content = Video.objects.get(id=parts[1])
             elif parts[0] == 'problemset':
-                pset = ProblemSet.objects.get(id=parts[1])
-                pset.live_datetime = new_live_datetime
-                pset.image.live_datetime = new_live_datetime
-                pset.save()
-                pset.image.save()
+                content = ProblemSet.objects.get(id=parts[1])
             elif parts[0] == 'additionalpage':
-                page = AdditionalPage.objects.get(id=parts[1])
-                page.live_datetime = new_live_datetime
-                page.image.live_datetime = new_live_datetime
-                page.save()
-                page.image.save()
+                content = AdditionalPage.objects.get(id=parts[1])
             elif parts[0] == 'file':
-                file = File.objects.get(id=parts[1])
-                file.live_datetime = new_live_datetime
-                file.image.live_datetime = new_live_datetime
-                file.save()
-                file.image.save()
+                content = File.objects.get(id=parts[1])
+
+            if action == "Make Ready and Go Live":
+                content.commit()
+            content.live_datetime = new_live_datetime
+            content.image.live_datetime = new_live_datetime
+            content.save()
+            content.image.save()
+
         if list_type == 'course_materials':
             return redirect('courses.views.course_materials', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
         elif list_type == 'problemsets':

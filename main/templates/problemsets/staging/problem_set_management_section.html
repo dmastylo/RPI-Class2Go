@@ -39,32 +39,38 @@
             document.forms.revert_form.submit();
         }
         </script>
-        
-        <form name="change_live_datetime_form" action="{% url 'courses.actions.change_live_datetime' %}" method="POST">
+        <form name="change_live_datetime_form" action="{% url 'courses.actions.change_live_datetime' %}" method="POST" onsubmit="return apply_clicked()">
             <input type="hidden" id="change_live_datetime_ids" name="change_live_datetime_ids" value="" />
-	    {{ form.live_datetime.errors }}
-	    <label for="id_live_datetime" style="display:inline">Go live</label>
+            <input type="submit" name="action" value="Make Ready and Go Live" class="btn" style='margin-bottom: 9px' onclick="clicked=this.value"/>
+	    <label for="id_live_datetime" style="display:inline">or go live</label>
 	    {{ form.live_datetime }}
-            <input type="button" value="Set Live Date" class="btn" style='margin: 0 0 9px 10px' onclick="apply_clicked()"/>
-	        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+            <input type="submit" name="action" value="Set Live Date" class="btn" style='margin: 0 0 9px 10px' onclick="clicked=this.value"/>
+	    {{ form.live_datetime.errors }}
+	    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
             <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
 	    <input type="hidden" name="list_type" value="problemsets" />
             {% csrf_token %}
         </form>
         <script type="text/javascript">
+	var clicked;
         function apply_clicked() {
             document.getElementById("change_live_datetime_ids").value = getCheckedIds();
             if (document.getElementById("change_live_datetime_ids").value == '') {
-                alert('Nothing selected to change the live date for.');
-                return;
+                if (clicked == "Make Ready and Go Live") {
+                    alert('Nothing selected to make ready and go live.');
+                }
+                else {
+                    alert('Nothing selected to set the live date for.');
+                }
+                return false;
             }
-            document.forms.change_live_datetime_form.submit();
+	    return true;
         }
         </script>
         
         {% block addl_content_management_content %}{% endblock addl_content_management_content %}
     </div>
-    <label style="float: right;"><b>With selected:</b></label>
+    <label class="pull-right"><b>With selected:</b></label>
 </div>
 <script type="text/javascript">
 function getCheckedIds() {
