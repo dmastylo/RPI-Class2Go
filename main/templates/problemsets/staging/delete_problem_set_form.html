@@ -1,6 +1,0 @@
-<form name="delete_problem_set_form" action="{% url 'problemsets.actions.delete_problemset' %}" method="POST">
-    <input type="hidden" name="problem_set_id" id="delete_problem_set_id" />
-    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-    {% csrf_token %}
-</form>

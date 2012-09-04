@@ -41,7 +41,7 @@ def main(request, course_prefix, course_suffix, slug):
     except:
         raise Http404
     
-    if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'staging' and common_page_data['view_mode'] == 'edit':
+    if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft' and common_page_data['view_mode'] == 'edit':
         template = 'additional_pages/edit.html'
     else:
         template = 'additional_pages/view.html'

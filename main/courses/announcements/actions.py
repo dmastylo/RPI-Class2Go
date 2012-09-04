@@ -24,12 +24,12 @@ def add_announcement(request):
         title=request.POST.get("title"),
         description=request.POST.get("description"),
         index=index,
-        mode='staging',
+        mode='draft',
         owner=request.user,
     )
     announcement.save()
     
-    announcement.create_production_instance()
+    announcement.create_ready_instance()
     
     if request.POST.get("commit") == '1':
         announcement.commit()

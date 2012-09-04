@@ -34,20 +34,20 @@ def add_video(request):
 
     index = len(Video.objects.filter(topic_id=request.POST.get("topic_id")))
 
-    staging_video = Video(
-        course=common_page_data['staging_course'],
+    draft_video = Video(
+        course=common_page_data['draft_course'],
         topic_id=int(request.POST.get("topic_id")),
         title=request.POST.get("title"),
         #description=request.POST.get("description"),
         type='youtube',
         url=request.POST.get("yt_id"),
         slug=request.POST.get("slug"),
-        mode='staging',
+        mode='draft',
         index=index
     )
-    staging_video.save()
+    draft_video.save()
 
-    staging_video.create_production_instance()
+    draft_video.create_ready_instance()
 
     return redirect(request.META['HTTP_REFERER'])
 
@@ -183,7 +183,7 @@ def upload(request):
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=new_video)
         if form.is_valid():
             new_video.index = new_video.section.getNextIndex()
-            new_video.mode = 'staging'
+            new_video.mode = 'draft'
             new_video.handle = course_prefix + "--" + course_suffix
 
             # Bit of jiggery pokery to so that the id is set when the upload_path function is called.
@@ -194,7 +194,7 @@ def upload(request):
             new_video.file = form.cleaned_data['file']
 
             new_video.save()
-            new_video.create_production_instance()
+            new_video.create_ready_instance()
             print new_video.file.url
 
             # TODO: don't hardcode the AWS location 

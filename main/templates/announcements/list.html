@@ -5,7 +5,7 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
-    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
     <div>
         <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
         <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
@@ -13,7 +13,7 @@
     {% include "announcements/delete_announcement_form.html" %}
     {% endif %}
     
-    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
         {% include "announcements/new_announcement.html" %}
     {% endif %}
     
@@ -26,7 +26,7 @@
 </div>
 {% endblock m_column_content %}
 
-{% if common_page_data.is_course_admin  and common_page_data.course_mode == 'staging' %}
+{% if common_page_data.is_course_admin  and common_page_data.course_mode == 'draft' %}
     {% block addl_scripts %}
     {% include "controls/tinymce.html" %}
     {% endblock addl_scripts %}
