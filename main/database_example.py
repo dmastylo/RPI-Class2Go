@@ -14,6 +14,13 @@ SECRET_KEY = ''
 # Set PRODUCTION to True so we don't show stackdumps on errors
 PRODUCTION = False
 
+# The instance is the group of servers correspond to a C2G stack.  Some good 
+# values for this are:
+#    "your_name" if you want to stay isolated (thi is the default if missing)
+#    "dev" to use the stable dev network util server
+#    "stage" or "prod" for something in produciton -- are you sure you want to do that?
+INSTANCE="dev"
+
 # Put your name and email address here, so Django serious errors can come to you
 ADMINS = (
         ('Class2Go Dev', "YOURNAME@stanford.edu")

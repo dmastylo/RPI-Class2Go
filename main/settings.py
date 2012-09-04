@@ -16,14 +16,14 @@ djcelery.setup_loader()
 # since we use this for things like queue names, we want to keep this unique
 # to keep things from getting cross wired
 try:
-    SOPHI_INSTANCE
+    INSTANCE
 except NameError:
     try:
         from os import getuid
         from pwd import getpwuid
-        SOPHI_INSTANCE=getpwuid(getuid())[0]
+        INSTANCE=getpwuid(getuid())[0]
     except:
-        SOPHI_INSTANCE="unknown"
+        INSTANCE="unknown"
 
 # If PRODUCTION flag not set in Database.py, then set it now.
 try:
@@ -324,6 +324,6 @@ BROKER_USER = AWS_ACCESS_KEY_ID
 BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
 BROKER_TRANSPORT_OPTIONS = {
     'region': 'us-west-2', 
-    'queue_name_prefix' : SOPHI_INSTANCE+'-',
+    'queue_name_prefix' : INSTANCE+'-',
 }
 
