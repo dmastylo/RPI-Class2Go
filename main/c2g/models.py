@@ -409,9 +409,9 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return ""
         
         url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
-        # url_parts = url.split('?')
-        # if len(url_parts) > 1:
-            # url = url_parts[0]
+        url_parts = str(url).split('?')
+        if len(url_parts) > 1:
+            url = url_parts[0]
         return url
 
     class Meta:
