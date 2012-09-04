@@ -1,25 +1,44 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError, make_option
 from c2g.models import *
 from django.contrib.auth.models import User,Group
 from datetime import datetime
-from random import randrange
+from random import randrange, shuffle
 from django.db import connection, transaction
 
 class Command(BaseCommand):
     help = "Populates the db with test development data. \n This command is <not> available on production for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
-
+    
+    option_list = BaseCommand.option_list + (
+        make_option('--massive',
+            action='store_true',
+            dest='massive',
+            default=False,
+            help='Populate the DB with mass-scale data (Warning: Can take a very long time to create the data on slower machines)'),
+        )
+        
     def handle(self, *args, **options):
         delete_db_data()
-
+        
+        if options['massive']:
+            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':20}
+            content_counts = {'num_massive_courses':1, 'num_sections_per_course':2, 'num_videos_per_section':5}
+        else:
+            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':40}
+            content_counts = {'num_massive_courses':0, 'num_sections_per_course':2, 'num_videos_per_section':5}
+            
+        
         # Create users
-        users = create_users()
+        print "      Creating users \r"
+        print "      ----------------- \r"
+        users = create_users(user_counts)
 
         # Create institutions
         institutions = create_institutions()
 
         # Create courses
-        create_courses(institutions, users)
-
+        create_courses(institutions, users, content_counts)
+        
+        print "      ----------------------------- \r"
         print "      Successfully populated the db \r"
 
 
@@ -50,10 +69,11 @@ def delete_db_data():
     cursor.execute('alter table c2g_videos auto_increment = 1')
 
 
-def create_users():
+def create_users(user_counts):
+
     # Create professor accounts
     professors = []
-    for i in range(3):
+    for i in range(user_counts['num_professors']):
         professors.append(User.objects.create_user('professor_' + str(i)))
         professors[i].set_password('class2go')
         professors[i].first_name = "Tess"
@@ -61,36 +81,48 @@ def create_users():
         professors[i].email = "professor_%d@stanford.edu" % i
         professors[i].is_staff = 1
         professors[i].save()
+        
+        if user_counts['num_professors'] > 500 and (i%500 == 0):
+            print "      Creating users >> Creating professors >> (%d/%d)complete\r" % (i,user_counts['num_professors'])
 
     # Create TA accounts
     tas = []
-    for i in range(3):
+    for i in range(user_counts['num_tas']):
         tas.append(User.objects.create_user('ta_' + str(i)))
         tas[i].set_password('class2go')
         tas[i].first_name = "Alan"
         tas[i].last_name = "Assistant"
         tas[i].email = "ta_%d@stanford.edu" % i
         tas[i].save()
+        
+        if user_counts['num_tas'] > 500 and (i%500 == 0):
+            print "      Creating users >> Creating tas >> (%d/%d)complete\r" % (i,user_counts['num_tas'])
 
     # Create Readonly-TA accounts
     readonly_tas = []
-    for i in range(3):
+    for i in range(user_counts['num_readonly_tas']):
         readonly_tas.append(User.objects.create_user('readonly_ta_' + str(i)))
         readonly_tas[i].set_password('class2go')
         readonly_tas[i].first_name = "Roger"
         readonly_tas[i].last_name = "Readonly"
         readonly_tas[i].email = "readonly_ta_%d@stanford.edu" % i
         readonly_tas[i].save()
+        
+        if user_counts['num_readonly_tas'] > 500 and (i%500 == 0):
+            print "      Creating users >> Creating read-only tas >> (%d/%d)complete\r" % (i,user_counts['num_readonly_tas'])
 
     # Create student accounts
     students = []
-    for i in range(40):
+    for i in range(user_counts['num_students']):
         students.append(User.objects.create_user('student_' + str(i)))
         students[i].set_password('class2go')
         students[i].first_name = "Sarah"
         students[i].last_name = "Student"
         students[i].email = "student_%d@stanford.edu" % i
         students[i].save()
+        
+        if user_counts['num_students'] > 500 and (i%500 == 0):
+            print "      Creating users >> Creating students >> (%d/%d)complete\r" % (i,user_counts['num_students'])
 
     return {'professors':professors, 'tas':tas, 'readonly_tas':readonly_tas, 'students':students}
 
@@ -115,8 +147,9 @@ def create_institutions():
 
     return institutions
 
-def create_courses(institutions,users):
-    # Currently, only create the NLP course
+def create_courses(institutions,users,content_counts):
+        
+    # NLP Course
     data = {
         'institution': institutions[0],
         'title': 'Natural Language Processing',
@@ -130,6 +163,8 @@ def create_courses(institutions,users):
         'handle':'nlp--Fall2012',
         'members': users,
     }
+    print "      Creating nlp course\r"
+    print "      ------------------- \r"
     create_course_nlp(data, users)
 
     data = {
@@ -145,8 +180,286 @@ def create_courses(institutions,users):
             'handle':'crypto--Fall2012',
             'members': users,
     }
-
+    print "      Creating crypto course\r"
+    print "      ---------------------- \r"
     create_course_crypto(data, users)
+    
+    # Massive: Create num_massive_courses massive courses
+    for i in range(content_counts['num_massive_courses']):
+        print "      Creating massive course %d of %d \r" % (i,content_counts['num_massive_courses'])
+        print "      ------------------------------------- \r"
+        create_course_massive(i, users, institutions, content_counts)
+        
+def create_course_massive(index, users, institutions, content_counts):
+    
+    terms = ["Fall", "Winter", "Spring", "Summer"]
+    term_index = 0
+    term = terms[term_index]
+    
+    year = 2012
+    
+    if term == "Fall":
+        start_date = datetime(year, 9, randrange(1,21))
+        end_date = datetime(year, 12, randrange(15,31))
+    elif term == "Winter":
+        start_date = datetime(year, 1, randrange(1,21))
+        end_date = datetime(year, 3, randrange(15,31))
+    elif term == "Spring":
+        start_date = datetime(year, 4, randrange(1,21))
+        end_date = datetime(year, 6, randrange(1,10))
+    elif term == "Summer":
+        start_date = datetime(year, 6, randrange(21,30))
+        end_date = datetime(year, 9, randrange(1,4))
+
+    # Create the course instances
+    print "      Creating massive course %d of %d >> Creating course instances \r" % (index,content_counts['num_massive_courses'])
+    student_group = Group.objects.create(name="Student Group for massive course " + " %d" % index)
+    instructor_group = Group.objects.create(name="Instructor Group for massive course " + " %d" % index)
+    tas_group = Group.objects.create(name="TAS Group for massive course " + " %d" % index)
+    readonly_tas_group = Group.objects.create(name="Readonly TAS Group for massive course " + " %d" % index)
+    
+    course = Course(
+            institution = institutions[0],
+            student_group = student_group,
+            instructor_group = instructor_group,
+            tas_group = tas_group,
+            readonly_tas_group = readonly_tas_group,
+            title = "Massive Course %d" % index,
+            description = "Massive course %d description" % index,
+            term = term,
+            year = year,
+            calendar_start = start_date,
+            calendar_end = end_date,
+            list_publicly = 1,
+            mode='staging',
+            handle = "course"+str(index) + "--" + term + str(year)
+        )
+
+    course.save()
+    course.create_production_instance()
+    
+    # Add random users to course
+    print "      Creating massive course %d of %d >> Adding Users >> Professors \r" % (index,content_counts['num_massive_courses'])
+    for i in range(len(users['professors'])):
+        instructor_group.user_set.add(users['professors'][i])
+    
+    print "      Creating massive course %d of %d >> Adding Users >> TAs \r" % (index,content_counts['num_massive_courses'])
+    for i in range(len(users['tas'])):
+        tas_group.user_set.add(users['tas'][i])
+    
+    print "      Creating massive course %d of %d >> Adding Users >> Read-only TAs \r" % (index,content_counts['num_massive_courses'])
+    for i in range(len(users['readonly_tas'])):
+        readonly_tas_group.user_set.add(users['readonly_tas'][i])
+    
+    print "      Creating massive course %d of %d >> Adding Users >> Students \r" % (index,content_counts['num_massive_courses'])  
+    num_students = len(users['students'])
+    for i in range(num_students):
+        student_group.user_set.add(users['students'][i])
+        if num_students > 500 and i%500 == 0:
+            print "      Creating massive course %d of %d >> Adding Users >> Students >> (%d/%d) complete \r" % (index,content_counts['num_massive_courses'],i,num_students)
+    
+    print "      Creating massive course %d of %d >>  Adding course info pages\r" % (index,content_counts['num_massive_courses'])
+    # Create the overview page
+    str_ = ""
+    for i in range(1000):
+        str_ += "Overview for massive course %d" % index
+        
+    op = AdditionalPage(
+        course=course,
+        menu_slug='course_info',
+        title="Overview for massive course %d" % index,
+        description=str_,
+        slug='overview',
+        index=0,
+        mode='staging',
+    )
+    op.save()
+    op.create_production_instance()
+    
+    # Create between 5 and 15 other course info menu pages
+    num_pages = randrange(5,15)
+    for i in range(num_pages):
+        str_ = ""
+        for j in range(1000):
+            str_ += "Page %d for massive course %d" % (i, index)
+            
+        p = AdditionalPage(
+            course=course,
+            menu_slug='course_info',
+            title= "Page %d for massive course %d" % (i, index),
+            description=str_,
+            slug='course_%d_page_%d' % (index, i),
+            index=i+1,
+            mode='staging',
+        )
+        p.save()
+        p.create_production_instance()
+        
+    # Add 20 announcements
+    print "      Creating massive course %d of %d >>  Adding announcements\r" % (index,content_counts['num_massive_courses'])
+    for i in range(20):
+        str_ = ""
+        for j in range(100):
+            str_ += "Announcement %d for Course %d" % (i, index)
+        
+        a = Announcement(
+            owner = course.instructor_group.user_set.all()[0],
+            title = "Announcement %d for Course %d" % (i, index),
+            description = str_,
+            course = course
+        )
+        a.save()
+        a.create_production_instance()
+        
+        
+    # Add exercises
+    print "      Creating massive course %d of %d >>  Adding exercises\r" % (index,content_counts['num_massive_courses'])
+    exercise1 = Exercise(
+        fileName = "P1_Levenshtein.html",
+        handle = "course"+str(index) + "--" + term + str(year)
+    )
+    exercise1.save()
+    
+    exercise2 = Exercise(
+        fileName = "P1_Porter.html",
+        handle = "course"+str(index) + "--" + term + str(year)
+    )
+    exercise2.save()
+    
+    exercise3 = Exercise(
+        fileName = "P1_Regexp.html",
+        handle = "course"+str(index) + "--" + term + str(year)
+    )
+    exercise3.save()
+    
+    exercise4 = Exercise(
+        fileName = "P1_Tokenize.html",
+        handle = "course"+str(index) + "--" + term + str(year)
+    )
+    exercise4.save()
+    
+    exercises = [exercise1, exercise2, exercise3, exercise4]
+    
+    
+    # Sections, each with 5 videos, 1 problem set, and 1 static page
+    yt_ids = ['BJiVRIPVNxU','dBVlwb15SBM','zJSqHRuD2C4','WMC3AjgYf3A','xOfEYI61f3k','Gh63CeMzav8','LRq7om7vMEc']
+    durations = [722, 686, 366, 866, 426, 355, 522]
+    print "      Creating massive course %d of %d >>  Adding content sections\r" % (index,content_counts['num_massive_courses'])
+    
+    for i in range(content_counts['num_sections_per_course']):
+        staging_section = ContentSection(course=course, title="Section %d in Course %d" % (i, index), index=i, mode='staging')
+        staging_section.save()
+        staging_section.create_production_instance()
+        
+        # Create 5 videos
+        yt_index = randrange(0,6)
+        for j in range(5):
+            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5\r" % (index,content_counts['num_massive_courses'], i, j)
+            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Creating video objects\r" % (index,content_counts['num_massive_courses'], i, j)
+            video = Video(
+                course = course,
+                section = staging_section,
+                title = "Video " + str(j) + " in Section " + str(i) + " in Course " +  str(index),
+                description = "Description for Video " + str(j) + " in Section " + str(i) + " in Course " +  str(index),
+                type = "youtube",
+                url = yt_ids[yt_index],
+                duration = durations[yt_index],
+                slug = "section_" + str(i) + "_video_" + str(j),
+                mode = 'staging',
+                handle = "course"+str(index) + "--" + term + str(year),
+                index = j,
+            )
+            video.save()
+            video.create_production_instance()
+            
+            # Add Exercises to Videos
+            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Adding exercises to video\r" % (index,content_counts['num_massive_courses'], i, j)
+            v2es = []
+            for exercise in exercises:
+                v2e = VideoToExercise(video=video, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='staging')
+                v2e.save()
+                v2e = VideoToExercise(video=video.image, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='production')
+                v2e.save()
+                v2es.append(v2e)
+            
+            # Create view progress and exercise attempts for 75% of the users
+            stud_index = 0
+            for student in course.student_group.user_set.all():
+                if randrange(0,3) > 0:
+                    view_activity = VideoActivity(student = student, video = video.image, course = course.image, start_seconds = randrange(0,durations[yt_index]))
+                    view_activity.save()
+                    
+                    for k in range(len(v2es)):
+                        if v2es[k].video_time < view_activity.start_seconds:
+                            problem_activity = ProblemActivity(
+                                student = student,
+                                video_to_exercise = v2es[k]
+                            )
+                            problem_activity.save()
+                            
+                stud_index += 1
+                if num_students > 500 and stud_index%500 == 0:
+                    print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Adding student video activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, j, stud_index, num_students)
+                            
+        # Create 1 static page
+        print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 static page\r" % (index,content_counts['num_massive_courses'], i)
+        str_ = ""
+        for j in range(1000):
+            str_ += "Page for section %d in massive course %d" % (i, index)
+            
+        p = AdditionalPage(
+            course=course,
+            section = staging_section,
+            title= "Page for section %d in massive course %d" % (i, index),
+            description=str_,
+            slug='course_%d_section_%d_page' % (index, i),
+            index=6,
+            mode='staging',
+        )
+        p.save()
+        p.create_production_instance()
+                    
+        # Create 1 problem set
+        print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 problem set\r" % (index,content_counts['num_massive_courses'], i)
+        ps = ProblemSet(
+            course = course,
+            section = staging_section,
+            slug = "course_"+str(index)+"_section_"+str(i)+"_ps",
+            title = "Problem set for section %d" % i,
+            description = "PS Description",
+            due_date = datetime(2012, 9,19),
+            grace_period = datetime(2012, 9,19),
+            partial_credit_deadline = datetime(2012, 9,19),
+            assessment_type = 'formative',
+            late_penalty = 30,
+            submissions_permitted = 3,
+            resubmission_penalty = 30,
+            randomize = False,
+        )
+        ps.save()
+        ps.create_production_instance()
+        
+        for k in range(len(exercises)):
+            ps2e = ProblemSetToExercise(problemSet=ps, exercise=exercises[k], number=k, is_deleted=0, mode='staging')
+            ps2e.save()
+            ps2e = ProblemSetToExercise(problemSet=ps.image, exercise=exercises[k], number=k, is_deleted=0, mode='production')
+            ps2e.save()
+            
+            stud_index = 0
+            for student in course.student_group.user_set.all():
+                if randrange(0,3) > 0:
+                    problem_activity = ProblemActivity(
+                        student = student,
+                        problemset_to_exercise = ps2e
+                    )
+                    problem_activity.save()
+                    
+                stud_index += 1
+                if num_students > 500 and stud_index%500 == 0:
+                    print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 problem set >> Exercise %d of 4 >> Student activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, k, stud_index, num_students)
+            
+        
+        
 
 def create_course_nlp(data, users):
     # Create the user groups
