@@ -20,10 +20,11 @@ class Command(BaseCommand):
         delete_db_data()
         
         if options['massive']:
-            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':20}
+            # Don't create fewer than 4 profs, 4 tas, 4 readonly tas, and 40 students
+            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':40}
             content_counts = {'num_massive_courses':1, 'num_sections_per_course':2, 'num_videos_per_section':5}
         else:
-            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':40}
+            user_counts = {'num_professors':4, 'num_tas':4, 'num_readonly_tas':4, 'num_students':40}
             content_counts = {'num_massive_courses':0, 'num_sections_per_course':2, 'num_videos_per_section':5}
             
         
@@ -76,7 +77,7 @@ def create_users(user_counts):
     for i in range(user_counts['num_professors']):
         professors.append(User.objects.create_user('professor_' + str(i)))
         professors[i].set_password('class2go')
-        professors[i].first_name = "Tess"
+        professors[i].first_name = "Test"
         professors[i].last_name = "Teacher"
         professors[i].email = "professor_%d@stanford.edu" % i
         professors[i].is_staff = 1
@@ -165,7 +166,7 @@ def create_courses(institutions,users,content_counts):
     }
     print "      Creating nlp course\r"
     print "      ------------------- \r"
-    create_course_nlp(data, users)
+    create_course_nlp(data, {'professors':users['professors'][0:3],'tas':users['tas'][0:3],'readonly_tas':users['readonly_tas'][0:3],'students':users['students'][0:39]})
 
     data = {
             'institution': institutions[0],
@@ -182,7 +183,7 @@ def create_courses(institutions,users,content_counts):
     }
     print "      Creating crypto course\r"
     print "      ---------------------- \r"
-    create_course_crypto(data, users)
+    create_course_crypto(data, {'professors':users['professors'][0:3],'tas':users['tas'][0:3],'readonly_tas':users['readonly_tas'][0:3],'students':users['students'][0:39]})
     
     # Massive: Create num_massive_courses massive courses
     for i in range(content_counts['num_massive_courses']):
@@ -354,8 +355,8 @@ def create_course_massive(index, users, institutions, content_counts):
         # Create 5 videos
         yt_index = randrange(0,6)
         for j in range(5):
-            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5\r" % (index,content_counts['num_massive_courses'], i, j)
-            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Creating video objects\r" % (index,content_counts['num_massive_courses'], i, j)
+            print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
+            print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Creating video objects\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
             video = Video(
                 course = course,
                 section = staging_section,
@@ -371,9 +372,10 @@ def create_course_massive(index, users, institutions, content_counts):
             )
             video.save()
             video.create_production_instance()
+            prod = video.image; prod.live_datetime = datetime.now(); prod.save();
             
             # Add Exercises to Videos
-            print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Adding exercises to video\r" % (index,content_counts['num_massive_courses'], i, j)
+            print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding exercises to video\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
             v2es = []
             for exercise in exercises:
                 v2e = VideoToExercise(video=video, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='staging')
@@ -399,10 +401,10 @@ def create_course_massive(index, users, institutions, content_counts):
                             
                 stud_index += 1
                 if num_students > 500 and stud_index%500 == 0:
-                    print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding Video %d of 5 >> Adding student video activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, j, stud_index, num_students)
+                    print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding student video activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j, stud_index, num_students)
                             
         # Create 1 static page
-        print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 static page\r" % (index,content_counts['num_massive_courses'], i)
+        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 static page\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
         str_ = ""
         for j in range(1000):
             str_ += "Page for section %d in massive course %d" % (i, index)
@@ -418,9 +420,10 @@ def create_course_massive(index, users, institutions, content_counts):
         )
         p.save()
         p.create_production_instance()
+        prod = p.image; prod.live_datetime = datetime.now(); prod.save();
                     
         # Create 1 problem set
-        print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 problem set\r" % (index,content_counts['num_massive_courses'], i)
+        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 problem set\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
         ps = ProblemSet(
             course = course,
             section = staging_section,
@@ -438,6 +441,7 @@ def create_course_massive(index, users, institutions, content_counts):
         )
         ps.save()
         ps.create_production_instance()
+        prod = ps.image; prod.live_datetime = datetime.now(); prod.save();
         
         for k in range(len(exercises)):
             ps2e = ProblemSetToExercise(problemSet=ps, exercise=exercises[k], number=k, is_deleted=0, mode='staging')
@@ -456,7 +460,7 @@ def create_course_massive(index, users, institutions, content_counts):
                     
                 stud_index += 1
                 if num_students > 500 and stud_index%500 == 0:
-                    print "      Creating massive course %d of %d >>  Adding content section %d of 17 >> Adding 1 problem set >> Exercise %d of 4 >> Student activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, k, stud_index, num_students)
+                    print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 problem set >> Exercise %d of 4 >> Student activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], k, stud_index, num_students)
             
         
         
