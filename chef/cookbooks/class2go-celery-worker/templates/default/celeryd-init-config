@@ -4,7 +4,7 @@ CELERYD_NODES="w1"
 #CELERYD_NODES="w1 w2 w3"
 
 # Where to chdir at start.
-CELERYD_CHDIR="<%= @node['system']['admin_home'] %>/sophi/main"
+CELERYD_CHDIR="<%= @node['system']['admin_home'] %>/class2go/main"
 
 # How to call "manage.py celeryd_multi"
 CELERYD_MULTI="$CELERYD_CHDIR/manage.py celeryd_multi"
