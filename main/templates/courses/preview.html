@@ -3,6 +3,7 @@
 {% block topnav %} {% endblock topnav %}
 {% block navbar %} {% endblock navbar %}
 {% block r_column_content %}
+<div class="row-fluid">
 {% block course_description %}
 
 {% endblock course_description %}
@@ -17,6 +18,7 @@
     <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}?redirect_to={{request.path}}" method="POST">
     <input type="submit" id="login_button" class="btn" value="Enroll" /></div>
     {% csrf_token %}
+    </form>
   {% endif %}
 {% else %}
 {% if display_login %}
@@ -45,7 +47,8 @@
            <input type="submit" value="Login" class="btn" />
            <input type="hidden" name="next" value="{{ next }}" />
        </form>
-           <a href="{% url 'auth_password_reset' %}">Forgot My Password</a>
+           <a href="{% url 'auth_password_reset' %}">Forgot My Password</a> &nbsp; &nbsp;
+           <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Registration</a>
        </div>
        
    </div>
@@ -62,8 +65,8 @@
           {% endif %}
       {% endfor %}
       <div class="registration">
-          <div class="well row-fluid">
-                <h2 class="span12 pagination-centered"> Signup </h2>
+          <div class="well span12">
+                <h2 class=" pagination-centered"> Signup </h2>
                 <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post">
                     {% include "registration/regforminputs.html" %}  
                     <div class="form-actions">
@@ -81,4 +84,5 @@
     </div>
     {% endif %}
 {% endif %}
+</div>
 {% endblock r_column_content %}

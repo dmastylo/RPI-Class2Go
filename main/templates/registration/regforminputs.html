@@ -1,5 +1,7 @@
 {% csrf_token %}
-<table>
+{{form.course_prefix}}{{form.course_suffix}}
+
+<table >
     <tr>
         <th><label for="id_username">{{form.username.label}}:</label></th>
         <td>{{form.username.errors}}{{ form.username }}</td>
@@ -41,7 +43,5 @@
         <th><label for="id_work">{{form.work.label}}:</label></th>
         <td>{{form.work.errors}}{{ form.work }}</td>
     </tr>
-    
 </table>
-{{form.course_prefix}}{{form.course_suffix}}
-
+    
