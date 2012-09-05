@@ -17,14 +17,10 @@
         <input type="hidden" name="commit" id="commit" value="0" />
         {% csrf_token %}
         
-<<<<<<< HEAD
-        <input type="button" class="btn btn-primary" value="Save and Make Ready" onclick="SaveAnnouncement('1');" />
-=======
         <input type="button" class="btn btn-primary" value="Save and Publish" onclick="SaveAnnouncement('1');" />
         <!-- commenting out Save As Draft button, since it's published right away
         <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement('0');" />
         -->
->>>>>>> 7a18e480e0e61585dd1ec5c914e736bd564109a0
         <input type="button" class="btn" value="Cancel" onclick="CancelNewAnnouncement()"/>
     </form>
     <script type="text/javascript">
