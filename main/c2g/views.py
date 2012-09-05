@@ -7,7 +7,8 @@ from models import Course
 from courses.actions import is_member_of_course
 from courses.actions import auth_view_wrapper
 from django.contrib import messages
-
+from courses.common_page_data import get_common_page_data
+from c2g.models import Course
 ### C2G Core Views ###
 
 @auth_view_wrapper
@@ -51,7 +52,19 @@ def privacy(request):
     return render_to_response('privacy.html',{},RequestContext(request))
 
 def contactus(request):
-    return render_to_response('contactus.html',{},RequestContext(request))
+    try:
+      common_page_data = get_common_page_data(request, request.GET.get('pre'), request.GET.get('post'))
+      course = common_page_data['course']
+      staffmail=course.contact
+    except Course.DoesNotExist:
+      course=None
+      staffmail=''
+          
+    return render_to_response('contactus.html', 
+                              {'request': request,
+                               'course': course,
+                               'staffmail' : staffmail,
+                              },context_instance=RequestContext(request))
 
 def test_messages(request):
     messages.add_message(request,messages.INFO, 'Hello World Info')
