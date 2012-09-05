@@ -47,25 +47,22 @@ def view(request, course_prefix, course_suffix, slug):
     except:
         raise Http404
 
-    video = None
-    video_rec = None
-    if request.user.is_authenticated():
-        video = Video.objects.get(course=common_page_data['course'], slug=slug)
-        if video.mode == 'ready':
-            draft_version = video.image
-            video = draft_version
-            
-        video_rec = request.user.videoactivity_set.filter(video=video)
-        if video_rec:
-            video_rec = video_rec[0]
-        else:
-            #if student, needs to be an easy way to check if member of group
-            user_groups = request.user.groups.all()
-            for group in user_groups:
-                if group == common_page_data['course'].student_group:
-                    video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
-                    video_rec.save()
-                    break
+    video = Video.objects.get(course=common_page_data['course'], slug=slug)            
+    video_rec = request.user.videoactivity_set.filter(video=video)
+    if video_rec:
+        video_rec = video_rec[0]
+    else:
+        #if student, needs to be an easy way to check if member of group
+        user_groups = request.user.groups.all()
+        for group in user_groups:
+            if group == common_page_data['course'].student_group:
+                video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
+                video_rec.save()
+                break
+
+    if video.mode == 'ready':
+        draft_version = video.image
+        video = draft_version
 
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
 
