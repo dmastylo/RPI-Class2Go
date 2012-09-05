@@ -12,6 +12,7 @@ from django.db.models import Q
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
 from courses.forms import *
+from django.contrib import messages
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -43,11 +44,9 @@ def show(request, course_prefix, course_suffix, pset_slug):
     try:
         ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
     except:
-        data = {'common_page_data': common_page_data}
-        data['error_text'] = 'This Problemset is not visible in the student view at this time. Please note that students will not reach this page.'
-        return render_to_response('problemsets/error.html',
-                              data,
-                              context_instance=RequestContext(request))
+        messages.add_message(request,messages.ERROR, 'This Problemset is not visible in the student view at this time. Please note that students will not see this message.')
+        return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
+
         
     problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
