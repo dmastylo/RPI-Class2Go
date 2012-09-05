@@ -494,12 +494,12 @@ class UserProfile(models.Model):
     education = models.CharField(max_length=64, null=True)
     work = models.CharField(max_length=128,null=True)
 
-    client_ip = models.GenericIPAddressField(null=True)
+    client_ip = models.CharField(max_length=30, null=True)
     user_agent = models.CharField(max_length=256, null=True)
     referrer = models.CharField(max_length=256, null=True)
     accept_language = models.CharField(max_length=64, null=True)
 
-    client_ip_first = models.GenericIPAddressField(null=True)
+    client_ip_first = models.CharField(max_length=30, null=True)
     user_agent_first = models.CharField(max_length=256, null=True)
     referrer_first = models.CharField(max_length=256, null=True)
     accept_language_first = models.CharField(max_length=64, null=True)
