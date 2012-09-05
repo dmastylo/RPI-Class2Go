@@ -41,8 +41,11 @@ class Migration(SchemaMigration):
             ('year', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('calendar_start', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('calendar_end', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+            ('contact', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('list_publicly', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('handle', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, db_index=True)),
+            ('preview_only_mode', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('piazza_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
         ))
         db.send_create_signal('c2g', ['Course'])
 
@@ -138,8 +141,22 @@ class Migration(SchemaMigration):
         # Adding model 'UserProfile'
         db.create_table(u'c2g_user_profiles', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
             ('site_data', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('gender', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
+            ('birth_year', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
+            ('education', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
+            ('work', self.gf('django.db.models.fields.CharField')(max_length=128, null=True)),
+            ('client_ip', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
+            ('user_agent', self.gf('django.db.models.fields.CharField')(max_length=256, null=True)),
+            ('referrer', self.gf('django.db.models.fields.CharField')(max_length=256, null=True)),
+            ('accept_language', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
+            ('client_ip_first', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
+            ('user_agent_first', self.gf('django.db.models.fields.CharField')(max_length=256, null=True)),
+            ('referrer_first', self.gf('django.db.models.fields.CharField')(max_length=256, null=True)),
+            ('accept_language_first', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
         ))
         db.send_create_signal('c2g', ['UserProfile'])
 
@@ -158,7 +175,7 @@ class Migration(SchemaMigration):
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('type', self.gf('django.db.models.fields.CharField')(default='youtube', max_length=30)),
-            ('url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
+            ('url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('duration', self.gf('django.db.models.fields.IntegerField')(null=True)),
             ('slug', self.gf('django.db.models.fields.SlugField')(max_length=255, null=True)),
             ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
@@ -409,6 +426,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Course', 'db_table': "u'c2g_courses'"},
             'calendar_end': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'calendar_start': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'contact': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -420,6 +438,8 @@ class Migration(SchemaMigration):
             'list_publicly': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'piazza_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'preview_only_mode': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'readonly_tas_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'readonly_tas_group'", 'to': "orm['auth.Group']"}),
             'student_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'student_group'", 'to': "orm['auth.Group']"}),
             'syllabus': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -548,9 +568,23 @@ class Migration(SchemaMigration):
         },
         'c2g.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "u'c2g_user_profiles'"},
+            'accept_language': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
+            'accept_language_first': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
+            'birth_year': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
+            'client_ip': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'client_ip_first': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'education': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
+            'gender': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'referrer': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
+            'referrer_first': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
             'site_data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'}),
+            'user_agent': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
+            'user_agent_first': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
+            'work': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True'})
         },
         'c2g.video': {
             'Meta': {'object_name': 'Video', 'db_table': "u'c2g_videos'"},
@@ -571,7 +605,7 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'default': "'youtube'", 'max_length': '30'}),
-            'url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True'})
+            'url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         'c2g.videoactivity': {
             'Meta': {'object_name': 'VideoActivity', 'db_table': "u'c2g_video_activity'"},
