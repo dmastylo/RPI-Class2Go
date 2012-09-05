@@ -498,11 +498,13 @@ class UserProfile(models.Model):
     user_agent = models.CharField(max_length=256, null=True)
     referrer = models.CharField(max_length=256, null=True)
     accept_language = models.CharField(max_length=64, null=True)
+    last_update = models.DateTimeField(null=True)
 
     client_ip_first = models.CharField(max_length=30, null=True)
     user_agent_first = models.CharField(max_length=256, null=True)
     referrer_first = models.CharField(max_length=256, null=True)
     accept_language_first = models.CharField(max_length=64, null=True)
+    first_update = models.DateTimeField(null=True)
 
     class Meta:
         db_table = u'c2g_user_profiles'
