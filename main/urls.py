@@ -160,5 +160,7 @@ urlpatterns = patterns('',
     
     #Email
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),             
-                       
+    
+    #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),
 )

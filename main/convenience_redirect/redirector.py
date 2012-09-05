@@ -14,7 +14,6 @@ class convenience_redirector(object):
         'networking.class':{'host':'class.stanford.edu','prepend':'/networking/Fall2012'},
         'nlp.class':{'host':'class.stanford.edu','prepend':'/nlp/Fall2012'},
         'crypto.class':{'host':'class.stanford.edu','prepend':'/crypto/Fall2012'},
-
         
         }
 

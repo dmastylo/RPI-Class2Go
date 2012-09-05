@@ -17,6 +17,20 @@ from courses.actions import auth_view_wrapper
 def index(item): # define a index function for list items
  return item[1]
 
+current_courses = {
+    'nlp':{'pre':'nlp','post':'Fall2012'},
+    'crypto':{'pre':'crypto','post':'Fall2012'},
+    'solar':{'pre':'solar','post':'Fall2012'},
+    'networking':{'pre':'networking','post':'Fall2012'},
+    }
+
+def current_redirects(request, course_prefix):
+    if course_prefix in current_courses:
+        return redirect(reverse('courses.views.main',args=[current_courses[course_prefix]['pre'],  current_courses[course_prefix]['post']]))
+    #if not found, raise 404 in fall-thru
+    raise Http404 
+    
+
 def main(request, course_prefix, course_suffix):
     try:
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
