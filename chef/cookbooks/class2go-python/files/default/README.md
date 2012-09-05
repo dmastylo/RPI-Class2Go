@@ -11,7 +11,7 @@ generate_url call (which already supports response_headers).
 
 The patch contents have been copied into the recipe file.  So 
 if this is being modified, make sure to also update 
-    sophi-pythohn/recipes/default.rb
+    class2go-python/recipes/default.rb
 
 
 Top apply the patch manually...
