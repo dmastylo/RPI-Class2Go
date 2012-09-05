@@ -10,7 +10,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from registration.backends import get_backend
 from courses.common_page_data import get_common_page_data
-
+import urlparse
 import json
 import settings
 import logging
@@ -181,6 +181,11 @@ def register(request, backend, success_url=None, form_class=None,
     argument.
     
     """
+    
+    #explicitly upgrading
+    if settings.PRODUCTION and not request.is_secure():
+        return redirect('https://'+request.get_host()+request.get_full_path())
+    
     backend = get_backend(backend)
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
@@ -196,14 +201,14 @@ def register(request, backend, success_url=None, form_class=None,
                 cpd=get_common_page_data(request, request.POST.get('course_prefix'), request.POST.get('course_suffix'))
                 course_group = cpd['course'].student_group
                 course_group.user_set.add(new_user)
-                return redirect(reverse('courses.views.main', args=[request.POST.get('course_prefix'), request.POST.get('course_suffix')]))
+                return redirect(urlparse.urljoin('http://',reverse('courses.views.main', args=[request.POST.get('course_prefix'), request.POST.get('course_suffix')])))
             except:
                 pass
             if success_url is None:
                 to, args, kwargs = backend.post_registration_redirect(request, new_user)
-                return redirect(to, *args, **kwargs)
+                return redirect(urlparse.urljoin('http://',to), *args, **kwargs)
             else:
-                return redirect(success_url)
+                return redirect(urlparse.urljoin('http://',success_url))
     else:
         form = form_class(initial={'course_prefix':request.GET.get('pre'),'course_suffix':request.GET.get('post')})
     

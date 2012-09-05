@@ -16,6 +16,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import login
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import login as auth_login
+from django.conf import settings
 
 import json
 import settings
@@ -28,6 +29,10 @@ def preview(request, course_prefix, course_suffix):
     """
     Much code borrowed from registration.views.register
     """
+    #explicitly upgrading
+    if settings.PRODUCTION and not request.is_secure():
+        return redirect('https://'+request.get_host()+request.get_full_path())
+    
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     
@@ -59,7 +64,8 @@ def preview_login(request, course_prefix, course_suffix):
             redirect_to = 'courses.views.main'
         else:
             redirect_to = 'courses.preview.views.preview'
-        return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
+        #explicitly downgrading
+        return redirect('http://'+request.get_host()+reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
         context = RequestContext(request)                
@@ -87,7 +93,8 @@ def preview_reg(request, course_prefix, course_suffix):
             redirect_to = 'courses.views.main'
         else:
             redirect_to = 'courses.preview.views.preview'
-        return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
+        #explicitly downgrading
+        return redirect('http://'+request.get_host()+reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         login_form = AuthenticationForm(data=request.POST)
         context = RequestContext(request)                

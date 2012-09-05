@@ -7,9 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    #For each course we'll want to add one of these to go to the latest version.
-    url(r'^nlp$', redirect_to, {'url': '/nlp/Fall2012/'}),
-
+   
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that
     # won't be redirected or change
     url(r'_health$', 'c2g.views.healthcheck'),
