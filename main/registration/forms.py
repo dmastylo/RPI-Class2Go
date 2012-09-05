@@ -36,20 +36,20 @@ class RegistrationForm(forms.Form):
     username = forms.RegexField(regex=r'^[\w.@+-]+$',
                                 max_length=30,
                                 widget=forms.TextInput(attrs=attrs_dict),
-                                label=_("Choose a Username*"),
+                                label=_("Username (public identity in classes, forums, etc)*"),
                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
-                             label=_("Your E-mail*"))
+                             label=_("E-mail*"))
     first_name = forms.RegexField(regex=r'^[\w ]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
-                                  label=_("Your First Name*"),
+                                  label=_("First Name*"),
                                   error_messages={'invalid': _("This value may contain only letters and numbers.")})
     last_name = forms.RegexField(regex=r'^[\w ]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
-                                  label=_("Your Last Name*"),
+                                  label=_("Last Name*"),
                                   error_messages={'invalid': _("This value may contain only letters and numbers.")})
     max_age=110
     min_age=10
@@ -57,8 +57,8 @@ class RegistrationForm(forms.Form):
     last_year=datetime.date.today().year-min_age
     YEARS=map(lambda y: (str(y),str(y)), range(last_year, first_year, -1))
     YEARS.insert(0,('decline',''))
-    birth_year = forms.ChoiceField(choices=YEARS,label=_("Your year of birth"))
-    gender = forms.ChoiceField(label=_("Your gender"), choices=(('decline',''),
+    birth_year = forms.ChoiceField(choices=YEARS,label=_("Year of birth"))
+    gender = forms.ChoiceField(label=_("Gender"), choices=(('decline',''),
                                                                 ("Female","Female"),
                                                                 ("Male","Male"),
                                                                 ("Non-Traditional","Non-Traditional")))
