@@ -1103,6 +1103,11 @@ var Khan = (function() {
             userPSData[id]['problemSeed'] = parseInt(problemSeed);
         }
 
+        // store in current-question data object
+        if(!$('.current-question').data('problem_seed')) {
+            $('.current-question').data('problem_seed', parseInt(problemSeed));
+        }
+
         // Check to see if we want to test a specific problem
         if (testMode) {
             id = typeof id !== "undefined" ? id : Khan.query.problem;
@@ -1351,11 +1356,21 @@ var Khan = (function() {
             // [@wescott] If it's been attempted at all
             if (alreadyAttempted > 0) {
                 maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
+                console.log("Checking for previous answer for this problem...");
+                if (userPSData[exerciseRef]['user_selection_val']) {
+                    console.log("...found in userPSData");
+                    var userSelVal = parseInt(userPSData[exerciseRef]['user_selection_val']);
+                    $('#solutionarea input')[userSelVal].checked = true;
+                } else if ($('.current-question').data('user_selection_val')) {
+                    console.log("...found in current question's data object");
+                    var userSelVal = parseInt($('.current-question').data('user_selection_val'));
+                    $('#solutionarea input')[userSelVal].checked = true;
+                }
             } 
             
-            // [@wescott] If user got this one right, remove penalty description and 
-            // replace with summary
+            // [@wescott] If user got this one right, remove penalty description and replace with summary
             if (typeof userPSData != "undefined" && userPSData[exerciseRef] && userPSData[exerciseRef]['correct']) {
+                $('#solutionarea input').attr('disabled', 'disabled');
                 $('#solutionarea').remove('p');
                 $('#check-answer-button').hide();
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
@@ -2846,6 +2861,7 @@ var Khan = (function() {
             success: function(data, txtStatus, jqXHR) {
                 if (data['exercise_status'] == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                    $('.current-question').data("correct", true);
                 } else {
                     var maxCredit = 100;
                     var maxAttempts = (typeof c2gConfig != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
@@ -3200,7 +3216,11 @@ var Khan = (function() {
                         $('#workarea').remove('.loading');
                         KhanC2G.remoteExPollCount = 0;
                         console.log("configureCards, remote exercise here, so call makeProblem");
-                        makeProblem(pID, pSeed);
+                        if ($('.current-question').data('problem_seed')) {
+                            makeProblem(pID, pSeed);
+                        } else {
+                            makeProblem(pID);
+                        }
                     } else {
                         if ($('#workarea .loading').length == 0) {
                             $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt(pID) + 1) + '...</p>');
@@ -3299,6 +3319,8 @@ var Khan = (function() {
         // [@wescott] This replaces the radio button choices in the #solutionarea with the exact
         // choices that were given to the user when he/she answered the question before; userSelection
         // is what the user actually chose
+        // [@wescott] NO LONGER NECESSARY
+        /*
         var reconstructChoices = function (choices, userSelection) {
             $('#solutionarea ul').empty().remove();
             $('#solutionarea').prepend('<ul></ul>');
@@ -3315,6 +3337,7 @@ var Khan = (function() {
             }
             $('#solutionarea').css('visibility', 'visible');
         };
+        */
 
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
         // value, if the user has already answered it
@@ -3326,34 +3349,39 @@ var Khan = (function() {
                 pSeed = parseInt($('.current-question').data('problem_seed'));
             }
             //KhanC2G.problemIdx = pID;
-            console.log('checkForInputs() done, so now calling makeProblem');
-            makeProblem(pID, pSeed);
+            //console.log('checkForInputs() done, so now calling makeProblem');
+            //makeProblem(pID, pSeed);
 
-            var userSelectionVal = (typeof userPSData != "undefined" && userPSData[pID] && userPSData[pID]['user_selection_val']) || $('.current-question').data("user_selection_val"); 
+            var userSelectionVal = null;
+            if (typeof userPSData != "undefined" && 
+                userPSData[pID] && 
+                userPSData[pID]['user_selection_val']) {
+                userSelectionVal = userPSData[pID]['user_selection_val'];
+            } else if ($('.current-question').data("user_selection_val")) {
+                userSelectionVal = $('.current-question').data("user_selection_val");
+            } 
+
             if (userSelectionVal) {
                 if ($('#testinput').length) {
                     $('#testinput').val(userSelectionVal);
                     if ($('.current-question').data('correct')) {
                         $('#testinput').attr('disabled','disabled');
                     }
-                    $('#solutionarea').css('visibility', 'visible');
                 } else if ($('#solutionarea input:radio').length) {
                     var userChoice = (userPSData[pID] && userPSData[pID]['user_choices']) || $('.current-question').data('user_choices');
                     var choiceArr = ($.isArray(userChoice)) ? userChoice : $.parseJSON(userChoice);
-                    // [@wescott] Shouldn't need to reconstruct anymore, if problem called with
-                    // proper seed
-                    //reconstructChoices(choiceArr, userSelectionVal);
+                    $('#solutionarea input')[userSelectionVal].checked = true;
+                    if ($('.current-question').data('correct')) {
+                        $('#solutionarea input').attr('disabled','disabled');
+                    }
                 }
             }
-        }).always(function () {
-            //console.log("What gives?");
+
+            $('#solutionarea').css('visibility', 'visible');
         });
 
         // set class on last question to show it is the current one
         $('#questions-viewed li:first-child').addClass('current-question');
-
-        //$('#questions-unviewed').find('li').click(unviewedClickHandler);
-        //$('#questions-viewed').find('li').click(viewedClickHandler);
 
         $('#next-question-button').click(function () {
 
@@ -3375,8 +3403,6 @@ var Khan = (function() {
             currentQCard.removeClass('current-question');
 
             $('#questions-unviewed li:first-child').trigger('mouseout');
-            //$('#questions-unviewed li:first-child').unbind('click');
-            //$('#questions-unviewed li:first-child').click(viewedClickHandler);
             $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
             //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
@@ -3386,8 +3412,6 @@ var Khan = (function() {
             clearExistingProblem();
 
             if (next.length) {
-                // [@wescott] Again, we don't need to randomize
-                //makeProblem(next.data('problem'), next.data('randseed'));
                 console.log("Next question button clicked, going to makeProblem...");
                 makeProblem(next.data('problem'), next.data('problem_seed'));
             }
@@ -3411,83 +3435,6 @@ var Khan = (function() {
         $('#questions-unviewed').fadeIn('slow');
         $('#questions-viewed').fadeIn('slow');
 
-
-        // [@wescott] TODO: refactor 2 click handlers into one
-        // DONE. Will remove commented out handlers when I'm back
-        /*
-        function unviewedClickHandler(ev) {
-
-            if ($(this).hasClass('current-question')) {
-                return;
-            }
-
-            $.when(checkForInputs()).then(function () {
-                var userPrevSel = $(ev.target).data("user_selection_val");
-                var validUserChoices = $(ev.target).data("user_choices");
-                var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
-                // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an
-                // empty array within a string, which is a non-empty string; have to convert to a real array and
-                // check its length
-                if (userChoicesLen > 0 && $(ev.target).data("correct")) {
-                    var choicesArr = $.parseJSON($(ev.target).data("user_choices"));
-                    var userSel = userPrevSel;
-                    reconstructChoices(choicesArr, userSel);
-                    $('#check-answer-button').attr('disabled', 'disabled');
-                } else if (userPrevSel && $(ev.target).data("correct")) {
-                    $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
-                    $('#check-answer-button').attr('disabled', 'disabled');
-                } else {
-                    if ($('input#testinput').length) {
-                        $('input#testinput').removeAttr('disabled');
-                    } else if ($('input:radio').length) {
-                        $('input:radio').removeAttr('disabled');
-                    }
-                }
-            });
-
-            // [@wescott] redundant code removed; next button fn should just be triggered
-            $('#next-question-button').trigger('click');
-
-        };
-
-        function viewedClickHandler(ev) {
-
-            $(this).trigger('mouseout');
-            $('.current-question').removeClass('current-question');
-            $(this).addClass('current-question');
-            clearExistingProblem();
-            // [@wescott] Changing here again so it doesn't randomize
-            //makeProblem($(this).data('problem'), $(this).data('randseed'));
-            makeProblem($(this).data('problem'));
-
-            var userAnswer = $(this).data('userAnswer');
-
-            $.when(checkForInputs()).then(function () {
-                var userPrevSel = $(ev.target).data("user_selection_val");
-                var validUserChoices = $(ev.target).data("user_choices");
-                var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON($(ev.target).data("user_choices")).length : 0;
-                if (userChoicesLen > 0 && $(ev.target).data("correct")) {
-                    var choicesArr = $.parseJSON($(this).data("user_choices"));
-                    var userSel = userPrevSel;
-                    reconstructChoices(choicesArr, userSel);
-                    $('#check-answer-button').attr('disabled', 'disabled');
-                } else if (userPrevSel && $(ev.target).data("correct")) {
-                    $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
-                    $('#check-answer-button').attr('disabled', 'disabled');
-                } else {
-                    if ($('input#testinput').length) {
-                        $('input#testinput').val(userAnswer);
-                        //$('input#testinput').attr('disabled', 'disabled');
-                    } else if ($('input:radio[name=solution]').length && $.isNumeric(userAnswer)) {
-                        $('input:radio[name=solution]')[userAnswer].checked = true;
-                        //$('input:radio').attr('disabled', 'disabled');
-                    }
-                }
-            });
-
-        };
-        */
-
         // [@wescott] Make use of event delegation by setting click handler on the common
         // questions-stack parent
         function stackClickHandler(ev) {
@@ -3503,10 +3450,12 @@ var Khan = (function() {
             // whichever is the current card, make it not the current card
             thisCard.trigger('mouseout');
             if (!thisCard.hasClass('current-question')) {
+
                 $('.current-question').removeClass('current-question');
                 clearExistingProblem();
 
                 thisCard.addClass('current-question');
+
             }
 
             var pollForRemoteEx = function() {
@@ -3522,22 +3471,23 @@ var Khan = (function() {
                     KhanC2G.remoteExPollCount = 0;
                     console.log("A card must have been clicked, run makeProblem...");
                     makeProblem(thisCard.data('problem'), thisCard.data('problem_seed'));
+                    // [@wescott] Make solutionarea visible again
+                    $('#solutionarea').css('visibility', 'visible');
                 } else {
                     if ($('#workarea .loading').length == 0) {
-                        //$('#workarea').append('<p class="loading">Loading Exercise...</p>');
                         $('#workarea').append('<p class="loading">Loading Exercise ' + (parseInt(thisCard.data("problem")) + 1) + '...</p>');
                     }
                     $('#workarea .loading').append('.');
-                    //setTimeout(pollForRemoteEx, 500);
                     setTimeout(function () { KhanC2G.remoteExPollCount++; pollForRemoteEx(); }, 500);
                 }
             };
+
             pollForRemoteEx();
-            //makeProblem(thisCard.data('problem'));
 
             // load previous answers into the solution area
             $.when(checkForInputs()).then(function () {
                 var userPrevSel = thisCard.data("user_selection_val");
+                console.log("user selection was " + userPrevSel);
                 var validUserChoices = thisCard.data("user_choices");
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON(thisCard.data("user_choices")).length : 0;
                 // [@wescott] Just having something in "user_choices" doesn't mean it's valid, it could be an
