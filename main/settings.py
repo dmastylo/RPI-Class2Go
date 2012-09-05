@@ -196,6 +196,9 @@ if class2go_mode != "prod":
                         'db_test_data',
                        )
 
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 # Storage
 
 # By default we use S3 storage.  Make sure we have the settings we need.
