@@ -1,0 +1,51 @@
+{% extends 'courses/preview.html' %}
+{% load url from future %}
+
+{% block course_description %}
+
+<div class = "span7">
+    <style>
+        p {margin-bottom: 20px;}
+        li {margin-bottom: 20px;}
+    </style>
+
+    <div>
+
+        <div style="float: right;margin-left: 20px;">
+        <img src="{{STATIC_URL}}preview_media/solar--Fall2012/Bruce_Clemens.jpg" width="148" height="208" title="Bruce M. Clemens"/><br/>
+        <label><b>Bruce M. Clemens</b></label><br/>
+        </div>
+
+        <p align="justify">This course focuses on the operating principles and applications of emerging technological solutions to the energy demands of the world. We will begin with discussing the scale of global energy usage and requirements for possible solutions. Basic physics and chemistry of solar cells, fuel cells, and batteries will be discussed in quantitative detail. We will explore performance issues, including economics, from the ideal device to the installed system. Finally, we will end with the promise of materials research for providing next generation solutions.</p>
+
+    </div>
+
+    <h3>Prerequisites</h3>
+    <p align="justify">Prerequisites for this class include basic high school/freshman physics, chemistry, math and calculus.</p>
+
+    <h3>Course Structure</h3>
+    <p align="justify">The course will be delivered in the form of weekly units. Each unit will usually be structured around a particular topic/subtopic and will include videos interspersed with formative exercises and reading resources from the internet or content made available. Each unit will be followed by a graded problem set due that week.  The course will also have a final exam. Grades will solely be based on the problem sets and the final exam. An optional home project will also be announced later in the course.</p>
+
+    <h3>FAQ</h3>
+    <ol>
+        <li>
+        <b>Is there a textbook for the class?</b><br/>
+        There is no prescribed textbook for the class. There will be assigned or recommended readings which will be linked to or made available.
+        </li>
+        <li>
+        <b>Will there be a set pace and schedule?</b><br/>
+        Yes, there will be a weekly schedule of units. The problem sets will be on a fixed schedule with no late submissions, since solutions will be distributed. A synchronous class means everybody is thinking about the same thing and allows for helpful interactions between students.
+        </li>
+        <li>
+        <b>Will there be a forum for the class?</b><br/>
+        There will be a forum where students can discuss the content and ask questions to instructor and the teaching assistants.
+        </li>
+        <li>
+        <b>Do I need to know programming for this class?</b><br/>
+        No
+        </li>
+    </ol>
+    
+</div>
+
+{% endblock course_description %}
