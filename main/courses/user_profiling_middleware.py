@@ -18,7 +18,7 @@ class user_profiling(object):
                 except KeyError:
                     try:
                         profile.client_ip = request.META['REMOTE_ADDR']
-                    except:
+                    except KeyError:
                         pass
 
                 try:
@@ -33,7 +33,7 @@ class user_profiling(object):
                 
                 try:
                     profile.accept_language = request.META['HTTP_ACCEPT_LANGUAGE']
-                except:
+                except KeyError:
                     pass
 
                 if profile.client_ip_first is None:
