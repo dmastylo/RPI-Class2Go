@@ -1,29 +1,29 @@
 {
-  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
-  "suggestions": {
-  },
-  "platforms": {
-  },
-  "name": "sophi-deploy",
-  "attributes": {
-  },
   "license": "All rights reserved",
-  "description": "Installs/Configures sophi-deploy",
-  "version": "0.0.1",
   "recipes": {
+  },
+  "attributes": {
   },
   "providing": {
   },
-  "replacing": {
-  },
-  "conflicting": {
-  },
   "dependencies": {
   },
-  "recommendations": {
-  },
-  "maintainer_email": "YOUR_EMAIL",
   "groupings": {
   },
-  "maintainer": "YOUR_COMPANY_NAME"
+  "suggestions": {
+  },
+  "description": "Installs/Configures class2go-deploy",
+  "version": "0.0.1",
+  "conflicting": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "platforms": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "name": "class2go-deploy",
+  "replacing": {
+  },
+  "recommendations": {
+  }
 }
