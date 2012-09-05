@@ -23,9 +23,7 @@
 <div id="c2g_layout_m_column" class="khan-template">
   {% if user.is_authenticated %}
 
-    {% if video.title == 'Defining Minimum Edit Distance'%}
-        <iframe width="900" height="700" src="{{STATIC_URL}}latestKhan/demo/nlp_with_khan_multi2.html" frameborder="0" scrolling="no" allowfullscreen></iframe>
-    {% elif video.title %} 
+    {% if video.title %} 
         <h2 class="section-headline">{{video.title}}</h2>
         {% if common_page_data.course_mode == 'draft' and common_page_data.is_course_admin %}
           <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
@@ -142,10 +140,12 @@ var c2gConfig = {
     };
     $.getJSON(path + "manifest.txt", "", loadThumbManifest);
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
-    var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest);
+
+    var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
+    var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
 
     var initStacks = function () {
-        console.log("initStacks being run now");
+        //console.log("initStacks being run now");
         if (typeof KhanC2G != "undefined" && $.isArray(KhanC2G.remoteExercises)) {
             for (var i = 0; i < KhanC2G.remoteExercises.length; i += 1) {
                 KhanC2G.makeProblem(i); 
@@ -191,6 +191,13 @@ var c2gConfig = {
     $(document).ready(function () {
         window.setTimeout(initStacks, 2000);
     });
+    {% if video_rec %}
+    window.onbeforeunload = function() {
+        vidTime = Math.floor(player.getCurrentTime());
+        duration = player.getDuration();
+        $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, duration: duration, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+    }
+    {% endif %}
 </script>
 
 {% else %}
