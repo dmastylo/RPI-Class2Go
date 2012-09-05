@@ -103,6 +103,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     contact = models.CharField(max_length=255, null = True, blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
+    preview_only_mode = models.BooleanField(default=True)
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
     # Just use epoch seconds to make it unique.
