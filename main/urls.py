@@ -150,6 +150,8 @@ urlpatterns = patterns('',
     url(r'^upload_file/?', 'courses.files.actions.upload'),
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
 
+    # Landing Page
+    url(r'^/?$', 'courses.landing.views.landing'),
 
     #Preview
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview/$', 'courses.preview.views.preview'),

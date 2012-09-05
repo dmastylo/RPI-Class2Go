@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block topnav %} {% endblock topnav %}
+{% block navbar %} {% endblock navbar %}
+{% load url from future %}
+
+{% block m_column_content %}
+
+<div class="row-fluid">
+    <div class="span8">
+        <h2>
+            <a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">Networking</a>
+        </h2>
+
+    <p>
+        <i>Taught by Nick McKeown and Philip Levis</i>
+    </p>
+
+    <p align="justify">
+	This is an introductory course on computer networking,
+	specifically the Internet. It focuses on explaining how the
+	Internet works, ranging from how bits are modulated on wires
+	and in wireless to application-level protocols like BitTorrent
+	and HTTP. Students implement a handful of low-level protocols
+	and services, including reliable transport, IP forwarding,
+	and a Network Address Translation device. Students gain
+	experience reading and understanding RFCs (Internet protocol
+	specifications) as statements of what a system should do.
+	The course grounds many of the concepts in current practice
+	and recent developments, such as net neutrality and DNS
+	security.
+    </p>
+    </div>
+
+</div>
+
+<div class="row-fluid">
+    <div class="span8">
+        <h2>
+            <a href="{% url 'courses.views.main' 'solar' 'Fall2012' %}">Solar</a>
+        </h2>
+
+    <p>
+        <i>Taught by Bruce Clemens</i>
+    </p>
+
+    <p align="justify">
+    This course focuses on the operating principles and applications
+    of emerging technological solutions to the energy demands of
+    the world. We will begin with discussing the scale of global
+    energy usage and requirements for possible solutions. Basic
+    physics and chemistry of solar cells, fuel cells, and batteries
+    will be discussed in quantitative detail. We will explore
+    performance issues, including economics, from the ideal device
+    to the installed system. Finally, we will end with the promise
+    of materials research for providing next generation solutions.
+    </p>
+
+    </div>
+
+</div>
+{% endblock m_column_content %}
