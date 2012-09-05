@@ -35,8 +35,8 @@ class RegistrationForm(forms.Form):
     """
     username = forms.RegexField(regex=r'^[\w.@+-]+$',
                                 max_length=30,
-                                widget=forms.TextInput(attrs=attrs_dict),
-                                label=_("Username (public identity in classes, forums, etc)*"),
+                                widget=forms.TextInput(attrs=dict(attrs_dict,placeholder='Your public identity in classes, etc.')),
+                                label=_("Choose a Username*"),
                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
