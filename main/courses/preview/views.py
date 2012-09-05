@@ -31,6 +31,9 @@ def preview(request, course_prefix, course_suffix):
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     
+    if request.common_page_data['is_course_admin']:
+        return redirect(reverse('courses.views.main', args=[course_prefix, course_suffix]))
+    
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)

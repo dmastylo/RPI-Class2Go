@@ -9,7 +9,13 @@ class convenience_redirector(object):
     127.0.0.1:8000 -> localhost:8000
     """
     redirect_dict = {
-        '127.0.0.1':'localhost'
+        '127.0.0.1':{'host':'localhost','prepend':''},
+        'solar.class':{'host':'class.stanford.edu','prepend':'/solar/Fall2012'},
+        'networking.class':{'host':'class.stanford.edu','prepend':'/networking/Fall2012'},
+        'nlp.class':{'host':'class.stanford.edu','prepend':'/nlp/Fall2012'},
+        'crypto.class':{'host':'class.stanford.edu','prepend':'/crypto/Fall2012'},
+
+        
         }
 
     def process_request(self, request):
@@ -20,9 +26,20 @@ class convenience_redirector(object):
         if ('HTTP_HOST' not in request.META):
             return None #if we can't determine HOST we will proceed as usual
         (domain, sep, port) = request.META['HTTP_HOST'].partition(':')
+              
         scheme = 'https' if request.is_secure() else 'http' 
+                
+        if port=='' :
+            port_str= ''
+        elif port=='80' and (not request.is_secure()):
+            port_str= ''
+        elif port=='443' and request.is_secure():
+            port_str= ''
+        else:
+            port_str= ':' + port
+
         if (domain in self.redirect_dict):
-            return HttpResponseRedirect(scheme + '://' + self.redirect_dict[domain] + ':' + port + request.get_full_path())
+            return HttpResponseRedirect(scheme + '://' + self.redirect_dict[domain]['host'] + port_str + self.redirect_dict[domain]['prepend'] + request.get_full_path())
         return None #fallthrough
             
         
