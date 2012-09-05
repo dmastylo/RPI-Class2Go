@@ -1097,10 +1097,12 @@ var Khan = (function() {
 
         // store in userPSData object
         if (typeof userPSData != "undefined") {
-            console.log('userPSData for id ' + id + ' not defined, creating...');
-            if (typeof userPSData[id] == "undefined") userPSData[id] = {};
-            console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in userPSData');
-            userPSData[id]['problemSeed'] = parseInt(problemSeed);
+            console.log(userPSData.problems);
+            if (typeof userPSData.problems == "undefined") userPSData.problems = [];
+            console.log(userPSData.problems[id]);
+            if (typeof userPSData.problems[id] == "undefined") userPSData.problems[id] = {};
+            console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in userPSData.problems');
+            userPSData.problems[id]['problem_seed'] = parseInt(problemSeed);
         }
 
         // store in current-question data object
@@ -1336,6 +1338,7 @@ var Khan = (function() {
         if (exAssessType == "summative") {
             var maxAttempts, penaltyPct, alreadyAttempted;
             var maxCredit = 100; 
+            // [@wescott] Check c2gConfig first, which defines overall Problem Set parameters
             if (typeof c2gConfig != "undefined") {
                 maxAttempts = (typeof c2gConfig.maxAttempts != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
                 penaltyPct = (typeof c2gConfig.penaltyPct != "undefined") ? c2gConfig.penaltyPct + "%" : "25%";
@@ -1348,18 +1351,19 @@ var Khan = (function() {
             // [@wescott] Default to no attempts
             alreadyAttempted = 0;
             if (typeof userPSData != "undefined" && 
-                    userPSData[exerciseRef] && 
-                    userPSData[exerciseRef]["already_attempted"]) {
-                alreadyAttempted = userPSData[exerciseRef]["already_attempted"];
+                    typeof userPSData.problems != "undefined" && 
+                    userPSData.problems[exerciseRef] && 
+                    userPSData.problems[exerciseRef]["already_attempted"]) {
+                alreadyAttempted = userPSData.problems[exerciseRef]["already_attempted"];
             }
 
             // [@wescott] If it's been attempted at all
             if (alreadyAttempted > 0) {
                 maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
                 console.log("Checking for previous answer for this problem...");
-                if (userPSData[exerciseRef]['user_selection_val']) {
+                if (userPSData.problems[exerciseRef]['user_selection_val']) {
                     console.log("...found in userPSData");
-                    var userSelVal = parseInt(userPSData[exerciseRef]['user_selection_val']);
+                    var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
                     $('#solutionarea input')[userSelVal].checked = true;
                 } else if ($('.current-question').data('user_selection_val')) {
                     console.log("...found in current question's data object");
@@ -1369,7 +1373,10 @@ var Khan = (function() {
             } 
             
             // [@wescott] If user got this one right, remove penalty description and replace with summary
-            if (typeof userPSData != "undefined" && userPSData[exerciseRef] && userPSData[exerciseRef]['correct']) {
+            if (typeof userPSData != "undefined" && 
+                typeof userPSData.problems != "undefined" &&
+                userPSData.problems[exerciseRef] && 
+                userPSData.problems[exerciseRef]['correct']) {
                 $('#solutionarea input').attr('disabled', 'disabled');
                 $('#solutionarea').remove('p');
                 $('#check-answer-button').hide();
@@ -1977,8 +1984,9 @@ var Khan = (function() {
 
         //console.log('Showing solution area for ' + id);
         if (typeof userPSData == "undefined" || 
-            typeof userPSData[id] == "undefined" ||
-            !userPSData[id]["correct"]) {
+            typeof userPSData.problems == "undefined" ||
+            typeof userPSData.problems[id] == "undefined" ||
+            !userPSData.problems[id]["correct"]) {
             $('#solutionarea').css('visibility', 'visible');
         }
 
@@ -3269,8 +3277,10 @@ var Khan = (function() {
                 //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
                 li.data('problem',idx);
                 //li.data('randseed',Math.floor(Math.random()*100000));
-                if (typeof userPSData != "undefined" && userPSData[idx.toString()]) {
-                    var userQDataObj = userPSData[idx.toString()];
+                if (typeof userPSData != "undefined" && 
+                    typeof userPSData.problems != "undefined" && 
+                    userPSData.problems[idx.toString()]) {
+                    var userQDataObj = userPSData.problems[idx.toString()];
                     li.data('problem_seed', parseInt(userQDataObj.problem_seed));
                     li.data('user_selection_val', userQDataObj.user_selection_val);
                     li.data('correct', userQDataObj.correct);
@@ -3354,9 +3364,10 @@ var Khan = (function() {
 
             var userSelectionVal = null;
             if (typeof userPSData != "undefined" && 
-                userPSData[pID] && 
-                userPSData[pID]['user_selection_val']) {
-                userSelectionVal = userPSData[pID]['user_selection_val'];
+                typeof userPSData.problems != "undefined" && 
+                userPSData.problems[pID] && 
+                userPSData.problems[pID]['user_selection_val']) {
+                userSelectionVal = userPSData.problems[pID]['user_selection_val'];
             } else if ($('.current-question').data("user_selection_val")) {
                 userSelectionVal = $('.current-question').data("user_selection_val");
             } 
@@ -3368,7 +3379,11 @@ var Khan = (function() {
                         $('#testinput').attr('disabled','disabled');
                     }
                 } else if ($('#solutionarea input:radio').length) {
-                    var userChoice = (userPSData[pID] && userPSData[pID]['user_choices']) || $('.current-question').data('user_choices');
+                    if (userPSData.problems[pID] && userPSData.problems[pID]['user_choices']) {
+                        var userChoice = userPSData.problems[pID]['user_choices'];
+                    } else if ($('.current-question').data('user_choices')) {
+                        var userChoice = $('.current-question').data('user_choices');
+                    }
                     var choiceArr = ($.isArray(userChoice)) ? userChoice : $.parseJSON(userChoice);
                     $('#solutionarea input')[userSelectionVal].checked = true;
                     if ($('.current-question').data('correct')) {

@@ -68,16 +68,18 @@ var c2gConfig = {
     progressUrl: '/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/problemsets'
 };
 var userPSData = {};
+userPSData.problems = [];
 {% for activity in activity_list %}
-    userPSData["{{ activity.problemset_to_exercise.number}}"] = {
-        {% if activity.seed != "" %}
-        problem_seed: {{ activity.seed }},
-        {% endif %}
+    userPSData.problems.push({
+        card_number: {{ activity.problemset_to_exercise.number }},
         user_selection_val: "{{ activity.user_selection_val }}",
         user_choices: unescape("{{ activity.user_choices }}"),
         already_attempted: {{ activity.attempt_number }},
+        {% if activity.seed != "" %}
+        problem_seed: {{ activity.seed }},
+        {% endif %}
         correct: {% if activity.complete == 1 %}true{% else %}false{% endif %}
-    };
+    });
 {% endfor %}
 
 $(function() {
