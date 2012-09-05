@@ -26,7 +26,7 @@ from registration.views import register
 
 
 urlpatterns = patterns('',
-                       url(r'^register/$',
+                       url(r'^register/?$',
                            register,
                            {'backend': 'registration.backends.simple.SimpleBackend'},
                            name='registration_register'),
