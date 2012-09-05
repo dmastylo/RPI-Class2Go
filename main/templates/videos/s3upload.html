@@ -5,7 +5,7 @@
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
     <h3>Upload Videos</h3>
-	<form name="upload_form" action="{% url 'courses.videos.actions.upload' %}" method="POST" enctype="multipart/form-data">
+	<form id="videoform" name="upload_form" action="{% url 'courses.videos.actions.upload' %}" method="POST" enctype="multipart/form-data">
 	  {% csrf_token %}
 	  <fieldset class="well">
 	  {% for field in form %}
@@ -44,7 +44,15 @@
 	  </fieldset>
 	  <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
 	  <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-	  <input type="submit" value="Upload" class="btn"/>
+	  <div class="form-actions">
+	    <div>Clicking below will upload your video to Amazon, and from there it will be uploaded to Youtube if you did not specify a Youtube Video ID.</div>
+	    <ul>
+	      <li>You may be asked to sign into Google/YouTube if you're not signed in already.</li>
+	      <li>If you haven't uploaded a video via Sophi already, you will be asked to grant us permissions to "Manage your YouTube account". Please OK that.</li>
+	      <li>Do not close this window, it will terminate the upload. It may take a long time. We are currently working to make this asynchronous.</li>
+	    </ul>
+	    <input type="submit" value="Upload" class="btn btn-primary"/>
+	  </div>
 	</form>
   {% else %}
     <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to upload videos.</h4>
@@ -54,7 +62,14 @@
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery.blockUI.js"></script>
 <script>
+
+$('#videoform').submit(function() {
+    $.blockUI({fadeIn: 0, message:"Uploading, this could take several minutes...", css: {'font-size': '20px', padding:'15px', '-webkit-border-radius':'5px', '-moz-border-radius':'5px', 'border-radius':'5px'}});
+    return true;
+});
+
 function showOption(div_id, checked) {
     if (div_id == "yt_id") {
         field_id = "id_url"
