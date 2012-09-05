@@ -76,6 +76,8 @@ class RegistrationForm(forms.Form):
                                                                    ('undergrad','An undergraduate'),
                                                                    ('gradStudent','An grad student'),
                                                                    ('HSStudent','An high school (or younger) student'),
+                                                                   ('Unemployed','Unemployed'),
+                                                                   ('Retired','Retired'),
                                                                    ('----','-------------------'),
                                                                    ('Software','In the software industry'),
                                                                    ('Hardware','In the hardware industry'),
@@ -89,8 +91,6 @@ class RegistrationForm(forms.Form):
                                                                    ('RetailServicesTransportationFood','In the retail service, transportation or food industries'),
                                                                    ('ManufacturingConstruction','In manufacturing or construction'),
                                                                    ('AnotherIndustry','In another industry'),
-                                                                   ('Unemployed','Unemployed'),
-                                                                   ('Retired','Retired'),
                                                                    ('Other','Other'),))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password*"))
