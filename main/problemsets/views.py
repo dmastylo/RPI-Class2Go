@@ -12,6 +12,7 @@ from django.db.models import Q
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
 from courses.forms import *
+from django.contrib import messages
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -29,7 +30,7 @@ def list(request, course_prefix, course_suffix):
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=False, get_pset_content=True)
 
     form = None
-    if request.common_page_data['course_mode'] == "staging":
+    if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
 
     return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list', 'form': form}, context_instance=RequestContext(request))
@@ -43,11 +44,9 @@ def show(request, course_prefix, course_suffix, pset_slug):
     try:
         ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
     except:
-        data = {'common_page_data': common_page_data}
-        data['error_text'] = 'This Problemset is not visible in the student view at this time. Please note that students will not reach this page.'
-        return render_to_response('problemsets/error.html',
-                              data,
-                              context_instance=RequestContext(request))
+        messages.add_message(request,messages.ERROR, 'This Problemset is not visible in the student view at this time. Please note that students will not see this message.')
+        return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
+
         
     problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
@@ -184,12 +183,12 @@ def create_action(request):
         if form.is_valid():
             new_pset = form.save(commit=False)
             new_pset.course = common_page_data['course']
-            new_pset.mode = 'staging'
+            new_pset.mode = 'draft'
             new_pset.handle = course_prefix + "--" + course_suffix
             new_pset.path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+new_pset.slug+"/load_problem_set"
 
             new_pset.save()
-            new_pset.create_production_instance()
+            new_pset.create_ready_instance()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_pset.slug,)))
 
     else:
@@ -267,7 +266,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
             exercise.save()
 
             index = len(ProblemSetToExercise.objects.getByProblemset(pset))
-            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='staging')
+            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
             psetToEx.save()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
@@ -288,7 +287,7 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(ProblemSetToExercise.objects.getByProblemset(pset)), is_deleted=0, mode='staging')
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(ProblemSetToExercise.objects.getByProblemset(pset)), is_deleted=0, mode='draft')
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 

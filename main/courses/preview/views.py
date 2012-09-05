@@ -34,7 +34,7 @@ def preview(request, course_prefix, course_suffix):
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)
-    return render_to_response('courses/preview.html',
+    return render_to_response('previews/'+request.common_page_data['course'].handle+'.html',
                               {'form': form,
                                'login_form': login_form,
                               'common_page_data': request.common_page_data,
@@ -60,7 +60,7 @@ def preview_login(request, course_prefix, course_suffix):
     else:
         form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
         context = RequestContext(request)                
-        return render_to_response('courses/preview.html',
+        return render_to_response('previews/'+request.common_page_data['course'].handle+'.html',
                           {'form': form,
                           'login_form': login_form,
                           'common_page_data': request.common_page_data,
@@ -88,7 +88,7 @@ def preview_reg(request, course_prefix, course_suffix):
     else:
         login_form = AuthenticationForm(data=request.POST)
         context = RequestContext(request)                
-        return render_to_response('courses/preview.html',
+        return render_to_response('previews/'+request.common_page_data['course'].handle+'.html',
                                       {'form': form,
                                       'login_form': login_form,
                                       'common_page_data': request.common_page_data,

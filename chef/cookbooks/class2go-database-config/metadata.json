@@ -1,0 +1,29 @@
+{
+  "recommendations": {
+  },
+  "dependencies": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "attributes": {
+  },
+  "providing": {
+  },
+  "conflicting": {
+  },
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "replacing": {
+  },
+  "name": "class2go-database-config",
+  "maintainer": "YOUR_COMPANY_NAME",
+  "description": "Installs/Configures class2go-database-config",
+  "groupings": {
+  },
+  "platforms": {
+  },
+  "version": "0.0.1",
+  "recipes": {
+  },
+  "suggestions": {
+  },
+  "license": "All rights reserved"
+}

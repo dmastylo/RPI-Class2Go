@@ -35,7 +35,7 @@ echo "$me: PROCESSING: $1"
 echo
 
 # we assume that working_path is writeable
-working_path="/opt/sophi/kelvinator"
+working_path="/opt/class2go/kelvinator"
 today_epoch=`date +%s`
 working_dir="${working_path}/extract-${today_epoch}"
 mydir=`pwd`

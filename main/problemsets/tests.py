@@ -21,7 +21,7 @@ class SimpleTest(TestCase):
         """
         Tests that we can access the basic test problem set pages
         """
-        resp = self.client.get('/nlp/staging/problemsets/P1')
+        resp = self.client.get('/nlp/draft/problemsets/P1')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('pset_url' in resp.context)
         self.assertEqual(resp.context['pset_url'], '/static/latestKhan/exercises/P1.html')

@@ -99,7 +99,7 @@ class RegistrationForm(forms.Form):
     
     tos = forms.BooleanField(widget=forms.CheckboxInput(attrs=attrs_dict),
                                  label=_(u'I have read and agree to the Honor Code and Terms of Service'),
-                                 error_messages={'required': _("You must agree to register")})
+                                 error_messages={'required': _("You must agree in order to register")})
 
     course_prefix = forms.CharField(widget=forms.HiddenInput(),required=False)
     course_suffix = forms.CharField(widget=forms.HiddenInput(),required=False)

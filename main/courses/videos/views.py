@@ -30,12 +30,12 @@ def list(request, course_prefix, course_suffix):
         video = Video.objects.get(pk=request.GET['vid'])
         video.url = request.GET['id']
         video.save()
-        video.create_production_instance()
+        video.create_ready_instance()
 
     section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True)
 
     form = None
-    if request.common_page_data['course_mode'] == "staging":
+    if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
 
     return render_to_response('videos/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'video_list', 'form': form}, context_instance=RequestContext(request))
@@ -51,9 +51,9 @@ def view(request, course_prefix, course_suffix, slug):
     video_rec = None
     if request.user.is_authenticated():
         video = Video.objects.get(course=common_page_data['course'], slug=slug)
-        if video.mode == 'production':
-            staging_version = video.image
-            video = staging_version
+        if video.mode == 'ready':
+            draft_version = video.image
+            video = draft_version
             
         video_rec = request.user.videoactivity_set.filter(video=video)
         if video_rec:
@@ -151,7 +151,7 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
             exercise.save()
 
             video_time = request.POST['video_time']
-            videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='staging')
+            videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='draft')
             videoToEx.save()
             return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
@@ -198,7 +198,7 @@ def add_existing_exercises(request):
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
         video_time = 0
-        videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=False, video_time=video_time, mode="staging")
+        videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=False, video_time=video_time, mode="draft")
         videoToEx.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
@@ -228,7 +228,7 @@ def save_exercises(request):
 
 def delete_exercise(request):
     print "KN#KJNJWNKAJDSAJNDSNAJKD"
-    toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='staging', is_deleted=False)
+    toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='draft', is_deleted=False)
     toDelete.delete()
     toDelete.save()
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], request.POST['video_slug'],)))

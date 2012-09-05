@@ -1,0 +1,29 @@
+{
+  "maintainer": "YOUR_COMPANY_NAME",
+  "maintainer_email": "YOUR_EMAIL",
+  "recipes": {
+  },
+  "dependencies": {
+  },
+  "version": "0.0.1",
+  "license": "All rights reserved",
+  "description": "Installs/Configures class2go-collectstatic",
+  "name": "class2go-collectstatic",
+  "attributes": {
+  },
+  "conflicting": {
+  },
+  "suggestions": {
+  },
+  "platforms": {
+  },
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "groupings": {
+  },
+  "replacing": {
+  },
+  "providing": {
+  },
+  "recommendations": {
+  }
+}

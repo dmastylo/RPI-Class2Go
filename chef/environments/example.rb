@@ -1,15 +1,15 @@
-name "stage"
-description "Sophi Staging Environment"
+name "example"
+description "class2go Example Environment"
 
 default_attributes \
         # AWS GLOBAL
         "access_key" => "aaaaaaaaaaaaaaaaaaaa",
         "access_secret" => "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
         # RDS
-        "database_host" => "stage.cccccccccccc.us-west-2.rds.amazonaws.com",
-        "database_instance" => "sophi",
-        "database_user" => "sophi",
-        "database_password" => "dddddddddd",    # minimum 8 chars
+        "database_host" => "env.cccccccccccc.us-west-2.rds.amazonaws.com",
+        "database_instance" => "class2go",
+        "database_user" => "xxxxxxxxxxxx",
+        "database_password" => "dddddddddd",
         # S3
         "storage_bucket" => "stage-c2g",
         # SES
@@ -19,15 +19,15 @@ default_attributes \
     "main" => {
         "production" => "False",
         "instance" => "stage",
-        "admin_name" => "Sophi Development",
-        "admin_email" => "sophi-dev@cs.stanford.edu",
-        "django_secret" => "sophi"
+        "admin_name" => "Class2Go Example",
+        "admin_email" => "c2g-dev@cs.stanford.edu",
+        "django_secret" => "class2go"
     },
     "util" => {
-        "celery_database" => "/opt/sophi/celery/celerydb.sqlite"
+        "celery_database" => "/opt/class2go/celery/celerydb.sqlite"
     },
     "piazza" => {
         "endpoint" => "https://piazza.com/basic_lti",
-        "key" => "class2go",        # old test account, OK
+        "key" => "hhhhhhhhhhhh",
         "secret" => "ggggggggggggggg"
     }

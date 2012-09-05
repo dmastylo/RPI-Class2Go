@@ -17,7 +17,7 @@ class user_profiling(object):
                     profile.client_ip = request.META['X-FORWARDED-FOR']
                 except KeyError:
                     try:
-                        profile.client_ip = request.META['X-FORWARDED-FOR']
+                        profile.client_ip = request.META['REMOTE_ADDR']
                     except:
                         pass
 
@@ -36,7 +36,7 @@ class user_profiling(object):
                 except:
                     pass
 
-                if profile.client_ip is None:
+                if profile.client_ip_first is None:
                     profile.client_ip_first = profile.client_ip
                     profile.user_agent_first = profile.user_agent
                     profile.referrer_first = profile.referrer

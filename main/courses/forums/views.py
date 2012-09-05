@@ -15,9 +15,9 @@ def view(request, course_prefix, course_suffix):
     except:
         raise Http404
 
-    # Only use the production course (for the piazza_id) since Piazza has no notion
+    # Only use the ready course (for the piazza_id) since Piazza has no notion
     # of draft/live.
-    course = common_page_data['production_course']
+    course = common_page_data['ready_course']
 
     lti_params = {
         "lti_message_type": "basic-lti-launch-request",

@@ -6,6 +6,7 @@ from datetime import datetime
 from models import Course
 from courses.actions import is_member_of_course
 from courses.actions import auth_view_wrapper
+from django.contrib import messages
 
 ### C2G Core Views ###
 
@@ -18,7 +19,7 @@ def home(request):
     
     
     now = datetime.now()
-    courses = Course.objects.filter(calendar_start__gt=now, mode="production")
+    courses = Course.objects.filter(calendar_start__gt=now, mode="ready")
     available_course_list = []
     for course in courses:
         if is_member_of_course(course, request.user):
@@ -48,3 +49,14 @@ def tos(request):
 
 def privacy(request):
     return render_to_response('privacy.html',{},RequestContext(request))
+
+def contactus(request):
+    return render_to_response('contactus.html',{},RequestContext(request))
+
+def test_messages(request):
+    messages.add_message(request,messages.INFO, 'Hello World Info')
+    messages.add_message(request,messages.SUCCESS, 'Hello World Success')
+    messages.add_message(request,messages.WARNING, 'Hello World Warning')
+    messages.add_message(request,messages.ERROR, 'Hello World Error')
+            
+    return HttpResponse("Messages Submitted, go back to regular page to view")

@@ -10,14 +10,14 @@
                 <li {% block home_link_class %}{% endblock home_link_class %}>
                     <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
                 </li>
-                {% if common_page_data.course_mode == 'staging' or common_page_data.course_info_pages|length > 0 %}
+                {% if common_page_data.course_mode == 'draft' or common_page_data.course_info_pages|length > 0 %}
                 <li class="dropdown{% block course_info_link_class %}{% endblock course_info_link_class %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         {% for page in common_page_data.course_info_pages %}
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
                         {% endfor %}
-                        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'staging' %}
+                        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
                             <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Manage pages ...</a></li>
                         {% endif %}
                     </ul>
@@ -58,7 +58,27 @@
 {% endblock navbar %}
 
 {% block content %}
-{% block course_notification %}{% endblock %}
+{% block messages %}
+{% if messages %}
+    {% for message in messages %}
+        {% if 'success' in message.tags %}
+         <div class="alert alert-success"><i class="icon-ok"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        {% endif %}
+        {% if 'error' in message.tags %}
+        <div class="alert alert-error"><i class="icon-fire"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        {% endif %}
+        {% if 'warning' in message.tags %}
+        <div class="alert alert-warning"><i class="icon-warning-sign"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        {% endif %}
+        {% if 'info' in message.tags %}
+        <div class="alert alert-info"><i class="icon-info-sign"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        {% endif %}
+
+    {% endfor %}
+
+{% endif %}
+{% endblock messages %}
+{% block course_notification %}{% endblock course_notification %}
 
 <div class="container-fluid body-content">
     <div class="row-fluid">

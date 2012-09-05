@@ -103,7 +103,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     contact = models.CharField(max_length=255, null = True, blank=True)
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
-    # Since all environments (dev, staging, prod) go against production piazza, things will get
+    # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
     # Just use epoch seconds to make it unique.
     piazza_id = models.IntegerField(null=True, blank=True)
@@ -129,8 +129,8 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
         """
         return (self.get_all_students() | self.get_all_course_admins())
 
-    def create_production_instance(self):
-        production_instance = Course(institution = self.institution,
+    def create_ready_instance(self):
+        ready_instance = Course(institution = self.institution,
             student_group = self.student_group,
             instructor_group = self.instructor_group,
             tas_group = self.tas_group,
@@ -145,57 +145,57 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             contact = self.contact,
             list_publicly = 0,
             image = self,
-            mode = 'production',
+            mode = 'ready',
             handle = self.handle,
             piazza_id = int(time.mktime(time.gmtime())),
         )
-        production_instance.save()
-        self.image = production_instance
+        ready_instance.save()
+        self.image = ready_instance
         self.save()
 
     def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'institution' in clone_fields:
-            production_instance.institution = self.institution
+            ready_instance.institution = self.institution
         if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
+            ready_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
-            production_instance.description = self.description
+            ready_instance.description = self.description
         if not clone_fields or 'syllabus' in clone_fields:
-            production_instance.syllabus = self.syllabus
+            ready_instance.syllabus = self.syllabus
         if not clone_fields or 'term' in clone_fields:
-            production_instance.term = self.term
+            ready_instance.term = self.term
         if not clone_fields or 'year' in clone_fields:
-            production_instance.year = self.year
+            ready_instance.year = self.year
         if not clone_fields or 'calendar_start' in clone_fields:
-            production_instance.calendar_start = self.calendar_start
+            ready_instance.calendar_start = self.calendar_start
         if not clone_fields or 'calendar_end' in clone_fields:
-            production_instance.calendar_end = self.calendar_end
+            ready_instance.calendar_end = self.calendar_end
 
-        production_instance.save()
+        ready_instance.save()
 
     def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'institution' in clone_fields:
-            self.institution = production_instance.institution
+            self.institution = ready_instance.institution
         if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
+            self.title = ready_instance.title
         if not clone_fields or 'description' in clone_fields:
-            self.description = production_instance.description
+            self.description = ready_instance.description
         if not clone_fields or 'syllabus' in clone_fields:
-            self.syllabus = production_instance.syllabus
+            self.syllabus = ready_instance.syllabus
         if not clone_fields or 'term' in clone_fields:
-            self.term = production_instance.term
+            self.term = ready_instance.term
         if not clone_fields or 'year' in clone_fields:
-            self.year = production_instance.year
+            self.year = ready_instance.year
         if not clone_fields or 'calendar_start' in clone_fields:
-            self.calendar_start = production_instance.calendar_start
+            self.calendar_start = ready_instance.calendar_start
         if not clone_fields or 'calendar_end' in clone_fields:
-            self.calendar_end = production_instance.calendar_end
+            self.calendar_end = ready_instance.calendar_end
 
         self.save()
 
@@ -211,37 +211,37 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
     title = models.CharField(max_length=255, null=True, blank=True)
     objects = ContentSectionManager()
 
-    def create_production_instance(self):
-        production_instance = ContentSection(
+    def create_ready_instance(self):
+        ready_instance = ContentSection(
             course=self.course.image,
             title=self.title,
             index=self.index,
-            mode='production',
+            mode='ready',
             image=self,
         )
-        production_instance.save()
-        self.image=production_instance
+        ready_instance.save()
+        self.image=ready_instance
         self.save()
 
     def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
+            ready_instance.title = self.title
         if not clone_fields or 'index' in clone_fields:
-            production_instance.index = self.index
+            ready_instance.index = self.index
 
-        production_instance.save()
+        ready_instance.save()
 
     def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
+            self.title = ready_instance.title
         if not clone_fields or 'index' in clone_fields:
-            self.index = production_instance.index
+            self.index = ready_instance.index
 
         self.save()
 
@@ -292,14 +292,14 @@ class AdditionalPageManager(models.Manager):
 
     def getSectionPagesByCourse(self, course):
         # Additional pages displayed under sections have a live_datetime effect.
-        if course.mode == 'staging':
+        if course.mode == 'draft':
             return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__lt=now).order_by('section','index')
 
     def getBySection(self, section):
-        if section.mode == 'staging':
+        if section.mode == 'draft':
             return self.filter(section=section, is_deleted=0).order_by('index')
         else:
             now = datetime.now()
@@ -314,12 +314,12 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
     slug = models.CharField(max_length=255, null=True, blank=True)
     objects = AdditionalPageManager()
 
-    def create_production_instance(self):
+    def create_ready_instance(self):
         image_section = None
         if self.section:
             image_section = self.section.image
 
-        production_instance = AdditionalPage(
+        ready_instance = AdditionalPage(
             course=self.course.image,
             title=self.title,
             description=self.description,
@@ -327,37 +327,37 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             section = image_section,
             slug=self.slug,
             index=self.index,
-            mode='production',
+            mode='ready',
             image=self,
         )
-        production_instance.save()
-        self.image=production_instance
+        ready_instance.save()
+        self.image=ready_instance
         self.save()
 
     def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-        if not self.image: self.create_production_instance()
+        if self.mode != 'draft': return;
+        if not self.image: self.create_ready_instance()
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
+            ready_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
-            production_instance.description = self.description
+            ready_instance.description = self.description
         if not clone_fields or 'index' in clone_fields:
-            production_instance.index = self.index
+            ready_instance.index = self.index
 
-        production_instance.save()
+        ready_instance.save()
 
     def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
+            self.title = ready_instance.title
         if not clone_fields or 'description' in clone_fields:
-            self.description = production_instance.description
+            self.description = ready_instance.description
         if not clone_fields or 'index' in clone_fields:
-            self.index = production_instance.index
+            self.index = ready_instance.index
 
         self.save()
 
@@ -374,7 +374,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
 class FileManager(models.Manager):
     def getByCourse(self, course):
-        if course.mode == 'staging':
+        if course.mode == 'draft':
             return self.filter(course=course,is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
@@ -388,20 +388,20 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     handle = models.CharField(max_length=255, null=True, db_index=True)
     objects = FileManager()
 
-    def create_production_instance(self):
-        production_instance = File(
+    def create_ready_instance(self):
+        ready_instance = File(
             course=self.course.image,
             section=self.section.image,
             title=self.title,
             file=self.file,
             image = self,
             index = self.index,
-            mode = 'production',
+            mode = 'ready',
             handle = self.handle,
             live_datetime = self.live_datetime,
         )
-        production_instance.save()
-        self.image = production_instance
+        ready_instance.save()
+        self.image = ready_instance
         self.save()
 
     def dl_link(self):
@@ -409,9 +409,9 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return ""
         
         url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
-        # url_parts = url.split('?')
-        # if len(url_parts) > 1:
-            # url = url_parts[0]
+        url_parts = str(url).split('?')
+        if len(url_parts) > 1:
+            url = url_parts[0]
         return url
 
     class Meta:
@@ -428,39 +428,39 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
     description = models.TextField(blank=True)
     objects = AnnouncementManager()
 
-    def create_production_instance(self):
-        production_instance = Announcement(
+    def create_ready_instance(self):
+        ready_instance = Announcement(
             course=self.course.image,
             title=self.title,
             description=self.description,
             owner = self.owner,
-            mode='production',
+            mode='ready',
             image=self,
         )
-        production_instance.save()
-        self.image=production_instance
+        ready_instance.save()
+        self.image=ready_instance
         self.save()
 
     def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-        if not self.image: self.create_production_instance()
+        if self.mode != 'draft': return;
+        if not self.image: self.create_ready_instance()
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
+            ready_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
-            production_instance.description = self.description
+            ready_instance.description = self.description
 
-        production_instance.save()
+        ready_instance.save()
 
     def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
+            self.title = ready_instance.title
         if not clone_fields or 'description' in clone_fields:
-            self.description = production_instance.description
+            self.description = ready_instance.description
 
         self.save()
 
@@ -494,12 +494,12 @@ class UserProfile(models.Model):
     education = models.CharField(max_length=64, null=True)
     work = models.CharField(max_length=128,null=True)
 
-    client_ip = models.GenericIPAddressField(null=True)
+    client_ip = models.CharField(max_length=30, null=True)
     user_agent = models.CharField(max_length=256, null=True)
     referrer = models.CharField(max_length=256, null=True)
     accept_language = models.CharField(max_length=64, null=True)
 
-    client_ip_first = models.GenericIPAddressField(null=True)
+    client_ip_first = models.CharField(max_length=30, null=True)
     user_agent_first = models.CharField(max_length=256, null=True)
     referrer_first = models.CharField(max_length=256, null=True)
     accept_language_first = models.CharField(max_length=64, null=True)
@@ -515,14 +515,14 @@ post_save.connect(create_user_profile, sender=User)
 
 class VideoManager(models.Manager):
     def getByCourse(self, course):
-        if course.mode == 'staging':
+        if course.mode == 'draft':
             return self.filter(course=course,is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
     def getBySection(self, section):
-        if section.mode == 'staging':
+        if section.mode == 'draft':
             return self.filter(section=section, is_deleted=0).order_by('index')
         else:
             now = datetime.now()
@@ -542,8 +542,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 #    kelvinator = models.IntegerField("K-Threshold", default=15)
     objects = VideoManager()
 
-    def create_production_instance(self):
-        production_instance = Video(
+    def create_ready_instance(self):
+        ready_instance = Video(
             course=self.course.image,
             section=self.section.image,
             title=self.title,
@@ -555,115 +555,115 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             file=self.file,
             image = self,
             index = self.index,
-            mode = 'production',
+            mode = 'ready',
             handle = self.handle,
             live_datetime = self.live_datetime,
         )
-        production_instance.save()
-        self.image = production_instance
+        ready_instance.save()
+        self.image = ready_instance
         self.save()
 
     def exercises_changed(self):
-        production_instance = self.image
-        staging_videoToExs = VideoToExercise.objects.getByVideo(self)
-        production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
-        if len(staging_videoToExs) != len(production_videoToExs):
+        ready_instance = self.image
+        draft_videoToExs = VideoToExercise.objects.getByVideo(self)
+        ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
+        if len(draft_videoToExs) != len(ready_videoToExs):
             return True
-        for staging_videoToEx in staging_videoToExs:
-            if not staging_videoToEx.image:
+        for draft_videoToEx in draft_videoToExs:
+            if not draft_videoToEx.image:
                 return True
         return False
 
     def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-        if not self.image: self.create_production_instance()
+        if self.mode != 'draft': return;
+        if not self.image: self.create_ready_instance()
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
+            ready_instance.title = self.title
         if not clone_fields or 'section' in clone_fields:
-            production_instance.section = self.section.image
+            ready_instance.section = self.section.image
         if not clone_fields or 'description' in clone_fields:
-            production_instance.description = self.description
+            ready_instance.description = self.description
         if not clone_fields or 'slug' in clone_fields:
-            production_instance.slug = self.slug
+            ready_instance.slug = self.slug
         if not clone_fields or 'file' in clone_fields:
-            production_instance.file = self.file
+            ready_instance.file = self.file
         if not clone_fields or 'live_datetime' in clone_fields:
-            production_instance.live_datetime = self.live_datetime
+            ready_instance.live_datetime = self.live_datetime
 
-        production_instance.save()
+        ready_instance.save()
 
         if self.exercises_changed() == True:
-            staging_videoToExs =  VideoToExercise.objects.getByVideo(self)
-            production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
+            draft_videoToExs =  VideoToExercise.objects.getByVideo(self)
+            ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
             #Delete all previous relationships
-            for production_videoToEx in production_videoToExs:
-                production_videoToEx.delete()
-                production_videoToEx.save()
+            for ready_videoToEx in ready_videoToExs:
+                ready_videoToEx.delete()
+                ready_videoToEx.save()
 
-        #Create brand new copies of staging relationships
-            for staging_videoToEx in staging_videoToExs:
-                production_videoToEx = VideoToExercise(video = production_instance,
-                                                    exercise = staging_videoToEx.exercise,
-                                                    video_time = staging_videoToEx.video_time,
+        #Create brand new copies of draft relationships
+            for draft_videoToEx in draft_videoToExs:
+                ready_videoToEx = VideoToExercise(video = ready_instance,
+                                                    exercise = draft_videoToEx.exercise,
+                                                    video_time = draft_videoToEx.video_time,
                                                     is_deleted = 0,
-                                                    mode = 'production',
-                                                    image = staging_videoToEx)
-                production_videoToEx.save()
-                staging_videoToEx.image = production_videoToEx
-                staging_videoToEx.save()
+                                                    mode = 'ready',
+                                                    image = draft_videoToEx)
+                ready_videoToEx.save()
+                draft_videoToEx.image = ready_videoToEx
+                draft_videoToEx.save()
 
         else:
-            staging_videoToExs = VideoToExercise.objects.getByVideo(self)
-            for staging_videoToEx in staging_videoToExs:
-                staging_videoToEx.image.video_time = staging_videoToEx.video_time
-                staging_videoToEx.image.save()
+            draft_videoToExs = VideoToExercise.objects.getByVideo(self)
+            for draft_videoToEx in draft_videoToExs:
+                draft_videoToEx.image.video_time = draft_videoToEx.video_time
+                draft_videoToEx.image.save()
 
     def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
+            self.title = ready_instance.title
         if not clone_fields or 'section' in clone_fields:
-            self.section = production_instance.section.image
+            self.section = ready_instance.section.image
         if not clone_fields or 'description' in clone_fields:
-            self.description = production_instance.description
+            self.description = ready_instance.description
         if not clone_fields or 'slug' in clone_fields:
-            self.slug = production_instance.slug
+            self.slug = ready_instance.slug
         if not clone_fields or 'file' in clone_fields:
-            self.file = production_instance.file
+            self.file = ready_instance.file
         if not clone_fields or 'live_datetime' in clone_fields:
-            self.live_datetime = production_instance.live_datetime
+            self.live_datetime = ready_instance.live_datetime
 
         self.save()
 
         if self.exercises_changed() == True:
-            staging_videoToExs = VideoToExercise.objects.getByVideo(self)
-            production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
+            draft_videoToExs = VideoToExercise.objects.getByVideo(self)
+            ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
             #Delete all previous relationships
-            for staging_videoToEx in staging_videoToExs:
-                staging_videoToEx.delete()
-                staging_videoToEx.save()
+            for draft_videoToEx in draft_videoToExs:
+                draft_videoToEx.delete()
+                draft_videoToEx.save()
 
-        #Create brand new copies of staging relationships
-            for production_videoToEx in production_videoToExs:
-                staging_videoToEx = VideoToExercise(video = self,
-                                                    exercise = production_videoToEx.exercise,
-                                                    video_time = production_videoToEx.video_time,
+        #Create brand new copies of draft relationships
+            for ready_videoToEx in ready_videoToExs:
+                draft_videoToEx = VideoToExercise(video = self,
+                                                    exercise = ready_videoToEx.exercise,
+                                                    video_time = ready_videoToEx.video_time,
                                                     is_deleted = 0,
-                                                    mode = 'staging',
-                                                    image = production_videoToEx)
-                staging_videoToEx.save()
-                production_videoToEx.image = staging_videoToEx
-                production_videoToEx.save()
+                                                    mode = 'draft',
+                                                    image = ready_videoToEx)
+                draft_videoToEx.save()
+                ready_videoToEx.image = draft_videoToEx
+                ready_videoToEx.save()
 
         else:
-            production_videoToExs = VideoToExercise.objects.getByVideo(production_instance)
-            for production_videoToEx in production_videoToExs:
-                production_videoToEx.image.video_time = production_videoToEx.video_time
-                production_videoToEx.image.save()
+            ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
+            for ready_videoToEx in ready_videoToExs:
+                ready_videoToEx.image.video_time = ready_videoToEx.video_time
+                ready_videoToEx.image.save()
 
     def is_synced(self):
         prod_instance = self.image
@@ -681,9 +681,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.live_datetime != prod_instance.live_datetime:
             return False
-        staging_videoToExs = VideoToExercise.objects.getByVideo(self)
-        for staging_videoToEx in staging_videoToExs:
-            if staging_videoToEx.video_time != staging_videoToEx.image.video_time:
+        draft_videoToExs = VideoToExercise.objects.getByVideo(self)
+        for draft_videoToEx in draft_videoToExs:
+            if draft_videoToEx.video_time != draft_videoToEx.image.video_time:
                 return False
         return True
 
@@ -747,14 +747,14 @@ class VideoActivity(models.Model):
 
 class ProblemSetManager(models.Manager):
     def getByCourse(self, course):
-        if course.mode == 'staging':
+        if course.mode == 'draft':
             return self.filter(course=course,is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
     def getBySection(self, section):
-        if section.mode == 'staging':
+        if section.mode == 'draft':
             return self.filter(section=section, is_deleted=0).order_by('index')
         else:
             now = datetime.now()
@@ -777,8 +777,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     randomize = models.BooleanField()
     objects = ProblemSetManager()
 
-    def create_production_instance(self):
-        production_instance = ProblemSet(
+    def create_ready_instance(self):
+        ready_instance = ProblemSet(
             course=self.course.image,
             section=self.section.image,
             slug=self.slug,
@@ -795,146 +795,146 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             resubmission_penalty=self.resubmission_penalty,
             index=self.index,
             image = self,
-            mode = 'production',
+            mode = 'ready',
         )
-        production_instance.save()
-        self.image = production_instance
+        ready_instance.save()
+        self.image = ready_instance
         self.save()
-        return production_instance
+        return ready_instance
 
     def exercises_changed(self):
-        production_instance = self.image
-        staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
-        production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
-        if len(staging_psetToExs) != len(production_psetToExs):
+        ready_instance = self.image
+        draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
+        if len(draft_psetToExs) != len(ready_psetToExs):
             return True
-        for staging_psetToEx in staging_psetToExs:
-            if not staging_psetToEx.image:
+        for draft_psetToEx in draft_psetToExs:
+            if not draft_psetToEx.image:
                 return True
         return False
 
     def commit(self, clone_fields = None):
-        if self.mode != 'staging': return;
-        if not self.image: self.create_production_instance()
+        if self.mode != 'draft': return;
+        if not self.image: self.create_ready_instance()
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'section' in clone_fields:
-            production_instance.section = self.section.image
+            ready_instance.section = self.section.image
         if not clone_fields or 'title' in clone_fields:
-            production_instance.title = self.title
+            ready_instance.title = self.title
         if not clone_fields or 'description' in clone_fields:
-            production_instance.description = self.description
+            ready_instance.description = self.description
         if not clone_fields or 'path' in clone_fields:
-            production_instance.path = self.path
+            ready_instance.path = self.path
         if not clone_fields or 'slug' in clone_fields:
-            production_instance.slug = self.slug
+            ready_instance.slug = self.slug
         if not clone_fields or 'index' in clone_fields:
-            production_instance.index = self.index
+            ready_instance.index = self.index
         if not clone_fields or 'live_datetime' in clone_fields:
-            production_instance.live_datetime = self.live_datetime
+            ready_instance.live_datetime = self.live_datetime
         if not clone_fields or 'due_date' in clone_fields:
-            production_instance.due_date = self.due_date
+            ready_instance.due_date = self.due_date
         if not clone_fields or 'grace_period' in clone_fields:
-            production_instance.grace_period = self.grace_period
+            ready_instance.grace_period = self.grace_period
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
-            production_instance.partial_credit_deadline = self.partial_credit_deadline
+            ready_instance.partial_credit_deadline = self.partial_credit_deadline
         if not clone_fields or 'assessment_type' in clone_fields:
-            production_instance.assessment_type = self.assessment_type
+            ready_instance.assessment_type = self.assessment_type
         if not clone_fields or 'late_penalty' in clone_fields:
-            production_instance.late_penalty = self.late_penalty
+            ready_instance.late_penalty = self.late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
-            production_instance.submissions_permitted = self.submissions_permitted
+            ready_instance.submissions_permitted = self.submissions_permitted
         if not clone_fields or 'resubmission_penalty' in clone_fields:
-            production_instance.resubmission_penalty = self.resubmission_penalty
+            ready_instance.resubmission_penalty = self.resubmission_penalty
 
-        production_instance.save()
+        ready_instance.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
-            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
+            draft_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
+            ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
             #Delete all previous relationships
-            for production_psetToEx in production_psetToExs:
-                production_psetToEx.delete()
-                production_psetToEx.save()
+            for ready_psetToEx in ready_psetToExs:
+                ready_psetToEx.delete()
+                ready_psetToEx.save()
 
-        #Create brand new copies of staging relationships
-            for staging_psetToEx in staging_psetToExs:
-                production_psetToEx = ProblemSetToExercise(problemSet = production_instance,
-                                                    exercise = staging_psetToEx.exercise,
-                                                    number = staging_psetToEx.number,
+        #Create brand new copies of draft relationships
+            for draft_psetToEx in draft_psetToExs:
+                ready_psetToEx = ProblemSetToExercise(problemSet = ready_instance,
+                                                    exercise = draft_psetToEx.exercise,
+                                                    number = draft_psetToEx.number,
                                                     is_deleted = 0,
-                                                    mode = 'production',
-                                                    image = staging_psetToEx)
-                production_psetToEx.save()
-                staging_psetToEx.image = production_psetToEx
-                staging_psetToEx.save()
+                                                    mode = 'ready',
+                                                    image = draft_psetToEx)
+                ready_psetToEx.save()
+                draft_psetToEx.image = ready_psetToEx
+                draft_psetToEx.save()
 
         else:
-            staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
-            for staging_psetToEx in staging_psetToExs:
-                staging_psetToEx.image.number = staging_psetToEx.number
-                staging_psetToEx.image.save()
+            draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+            for draft_psetToEx in draft_psetToExs:
+                draft_psetToEx.image.number = draft_psetToEx.number
+                draft_psetToEx.image.save()
 
     def revert(self, clone_fields = None):
-        if self.mode != 'staging': return;
+        if self.mode != 'draft': return;
 
-        production_instance = self.image
+        ready_instance = self.image
         if not clone_fields or 'section' in clone_fields:
-            self.section = production_instance.section.image
+            self.section = ready_instance.section.image
         if not clone_fields or 'title' in clone_fields:
-            self.title = production_instance.title
+            self.title = ready_instance.title
         if not clone_fields or 'description' in clone_fields:
-            self.description = production_instance.description
+            self.description = ready_instance.description
         if not clone_fields or 'path' in clone_fields:
-            self.path = production_instance.path
+            self.path = ready_instance.path
         if not clone_fields or 'slug' in clone_fields:
-            self.slug = production_instance.slug
+            self.slug = ready_instance.slug
         if not clone_fields or 'index' in clone_fields:
-            self.index = production_instance.index
+            self.index = ready_instance.index
         if not clone_fields or 'live_datetime' in clone_fields:
-            self.live_datetime = production_instance.live_datetime
+            self.live_datetime = ready_instance.live_datetime
         if not clone_fields or 'due_date' in clone_fields:
-            self.due_date = production_instance.due_date
+            self.due_date = ready_instance.due_date
         if not clone_fields or 'grace_period' in clone_fields:
-            self.grace_period = production_instance.grace_period
+            self.grace_period = ready_instance.grace_period
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
-            self.partial_credit_deadline = production_instance.partial_credit_deadline
+            self.partial_credit_deadline = ready_instance.partial_credit_deadline
         if not clone_fields or 'assessment_type' in clone_fields:
-            self.assessment_type = production_instance.assessment_type
+            self.assessment_type = ready_instance.assessment_type
         if not clone_fields or 'late_penalty' in clone_fields:
-            self.late_penalty = production_instance.late_penalty
+            self.late_penalty = ready_instance.late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
-            self.submissions_permitted = production_instance.submissions_permitted
+            self.submissions_permitted = ready_instance.submissions_permitted
         if not clone_fields or 'resubmission_penalty' in clone_fields:
-            self.resubmission_penalty = production_instance.resubmission_penalty
+            self.resubmission_penalty = ready_instance.resubmission_penalty
 
         self.save()
 
         if self.exercises_changed() == True:
-            staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
-            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
+            draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+            ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
             #Delete all previous relationships
-            for staging_psetToEx in staging_psetToExs:
-                staging_psetToEx.delete()
-                staging_psetToEx.save()
+            for draft_psetToEx in draft_psetToExs:
+                draft_psetToEx.delete()
+                draft_psetToEx.save()
 
-        #Create brand new copies of staging relationships
-            for production_psetToEx in production_psetToExs:
-                staging_psetToEx = ProblemSetToExercise(problemSet = self,
-                                                    exercise = production_psetToEx.exercise,
-                                                    number = production_psetToEx.number,
+        #Create brand new copies of draft relationships
+            for ready_psetToEx in ready_psetToExs:
+                draft_psetToEx = ProblemSetToExercise(problemSet = self,
+                                                    exercise = ready_psetToEx.exercise,
+                                                    number = ready_psetToEx.number,
                                                     is_deleted = 0,
-                                                    mode = 'staging',
-                                                    image = production_psetToEx)
-                staging_psetToEx.save()
-                production_psetToEx.image = staging_psetToEx
-                production_psetToEx.save()
+                                                    mode = 'draft',
+                                                    image = ready_psetToEx)
+                draft_psetToEx.save()
+                ready_psetToEx.image = draft_psetToEx
+                ready_psetToEx.save()
 
         else:
-            production_psetToExs = ProblemSetToExercise.objects.getByProblemset(production_instance)
-            for production_psetToEx in production_psetToExs:
-                production_psetToEx.image.number = production_psetToEx.number
-                production_psetToEx.image.save()
+            ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
+            for ready_psetToEx in ready_psetToExs:
+                ready_psetToEx.image.number = ready_psetToEx.number
+                ready_psetToEx.image.save()
 
 
     def is_synced(self):
@@ -969,9 +969,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.resubmission_penalty != image.resubmission_penalty:
             return False
-        staging_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
-        for staging_psetToEx in staging_psetToExs:
-            if staging_psetToEx.number != staging_psetToEx.image.number:
+        draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        for draft_psetToEx in draft_psetToExs:
+            if draft_psetToEx.number != draft_psetToEx.image.number:
                 return False
         return True
 
