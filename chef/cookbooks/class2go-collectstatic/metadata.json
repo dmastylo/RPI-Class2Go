@@ -1,29 +1,29 @@
 {
-  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
-  "replacing": {
+  "maintainer": "YOUR_COMPANY_NAME",
+  "maintainer_email": "YOUR_EMAIL",
+  "recipes": {
+  },
+  "dependencies": {
+  },
+  "version": "0.0.1",
+  "license": "All rights reserved",
+  "description": "Installs/Configures class2go-collectstatic",
+  "name": "class2go-collectstatic",
+  "attributes": {
+  },
+  "conflicting": {
   },
   "suggestions": {
   },
-  "license": "All rights reserved",
-  "dependencies": {
-  },
   "platforms": {
   },
-  "description": "Installs/Configures sophi-collectstatic",
-  "conflicting": {
-  },
-  "recommendations": {
-  },
-  "maintainer": "YOUR_COMPANY_NAME",
-  "providing": {
-  },
-  "version": "0.0.1",
-  "recipes": {
-  },
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
   "groupings": {
   },
-  "attributes": {
+  "replacing": {
   },
-  "maintainer_email": "YOUR_EMAIL",
-  "name": "sophi-collectstatic"
+  "providing": {
+  },
+  "recommendations": {
+  }
 }

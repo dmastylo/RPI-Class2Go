@@ -1,29 +1,29 @@
 {
-  "replacing": {
+  "version": "0.0.1",
+  "groupings": {
+  },
+  "name": "class2go-refresh-testdb",
+  "suggestions": {
   },
   "maintainer": "YOUR_COMPANY_NAME",
-  "description": "Installs/Configures sophi-refresh-testdb",
-  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
-  "conflicting": {
+  "replacing": {
+  },
+  "providing": {
   },
   "dependencies": {
   },
-  "suggestions": {
+  "attributes": {
   },
-  "license": "All rights reserved",
   "recipes": {
   },
-  "groupings": {
-  },
-  "recommendations": {
+  "license": "All rights reserved",
+  "maintainer_email": "YOUR_EMAIL",
+  "conflicting": {
   },
   "platforms": {
   },
-  "name": "sophi-refresh-testdb",
-  "version": "0.0.1",
-  "providing": {
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "recommendations": {
   },
-  "attributes": {
-  },
-  "maintainer_email": "YOUR_EMAIL"
+  "description": "Installs/Configures class2go-refresh-testdb"
 }
