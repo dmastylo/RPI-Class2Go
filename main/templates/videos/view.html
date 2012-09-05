@@ -142,10 +142,12 @@ var c2gConfig = {
     };
     $.getJSON(path + "manifest.txt", "", loadThumbManifest);
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
-    var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest);
+
+    var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
+    var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
 
     var initStacks = function () {
-        console.log("initStacks being run now");
+        //console.log("initStacks being run now");
         if (typeof KhanC2G != "undefined" && $.isArray(KhanC2G.remoteExercises)) {
             for (var i = 0; i < KhanC2G.remoteExercises.length; i += 1) {
                 KhanC2G.makeProblem(i); 
@@ -191,6 +193,13 @@ var c2gConfig = {
     $(document).ready(function () {
         window.setTimeout(initStacks, 2000);
     });
+    {% if video_rec %}
+    window.onbeforeunload = function() {
+        vidTime = Math.floor(player.getCurrentTime());
+        duration = player.getDuration();
+        $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: {{video_rec.id}}, playTime: vidTime, duration: duration, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+    }
+    {% endif %}
 </script>
 
 {% else %}

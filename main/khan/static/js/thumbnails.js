@@ -41,7 +41,14 @@ function onPlayerStateChange(event) {
 }
 
 var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) {
-    console.log('initThumbnails');
+    //console.log('initThumbnails');
+    var pVarsExternal = {};
+    //console.log("arguments...");
+    //console.log(arguments);
+    if (arguments[3]) {
+        pVarsExternal = arguments[3];
+    }
+
     var thumbSet = {
 
         // Set up global vars
@@ -97,13 +104,26 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
 
         // add player to the page
         createPlayer: function (vid) {
+
+            // [@wescott] This is where we read in any additional playerVars sent
+            // to the initThumbnails fn
+            var pVarsInternal = {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0}; 
+            //console.log("pVarsInternal is initially...");
+            //console.log(pVarsInternal);
+
+            $.extend(pVarsInternal, pVarsExternal);
+
+            //console.log("pVarsInternal is now...");
+            //console.log(pVarsInternal);
+
             player = new YT.Player('player', {
                 height: vidPlayerHeight,
                 width: vidPlayerWidth,
                 videoId: vid,
                 // wmode: transparent  makes HTML goes on top of Flash
                 // fs: disable full screen
-                playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0},
+                //playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0},
+                playerVars: pVarsInternal,
                 events: {
                     'onReady': onPlayerReady,
                     'onStateChange': onPlayerStateChange,
@@ -224,7 +244,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
         },
 
         setupNavPanel: function (){
-            console.log('setupNavPanel')
+            //console.log('setupNavPanel')
             var merged = Array();
 
             for (time in slideIndices) {
