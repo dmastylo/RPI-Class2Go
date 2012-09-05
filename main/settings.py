@@ -26,6 +26,8 @@ except NameError:
         INSTANCE="unknown"
 
 # If PRODUCTION flag not set in Database.py, then set it now.
+#PRODUCTION = True
+
 try:
     PRODUCTION
 except NameError:
@@ -290,6 +292,8 @@ LOGGING = {
         },
     }
 }
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Session Settings
 SESSION_COOKIE_AGE = 3*30*24*3600
