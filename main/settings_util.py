@@ -7,7 +7,7 @@ from settings import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/opt/sophi/celery/celerydb.sqlite',
+        'NAME': '/opt/class2go/celery/celerydb.sqlite',
     }
 }
 
