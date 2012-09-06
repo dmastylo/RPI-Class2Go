@@ -59,10 +59,6 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     visible_status = "<span style='color:green;'>Live</span>"
 
                             item['visible_status'] = visible_status
-                            
-                        url_parts = str(file.file.url).split("?")
-                        if len(url_parts) > 1:
-                            item['sanitised_url'] = url_parts[0]
 
                         section_dict['items'].append(item)
 
