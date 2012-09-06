@@ -9,12 +9,8 @@ class convenience_redirector(object):
     127.0.0.1:8000 -> localhost:8000
     """
     redirect_dict = {
-        '127.0.0.1':{'host':'localhost','prepend':''},
-        'solar.class':{'host':'class.stanford.edu','prepend':'/solar/Fall2012'},
-        'networking.class':{'host':'class.stanford.edu','prepend':'/networking/Fall2012'},
-        'nlp.class':{'host':'class.stanford.edu','prepend':'/nlp/Fall2012'},
-        'crypto.class':{'host':'class.stanford.edu','prepend':'/crypto/Fall2012'},
-        
+        'solar.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/solar/Fall2012'},
+        'networking.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/networking/Fall2012'},        
         }
 
     def process_request(self, request):
