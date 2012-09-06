@@ -29,6 +29,10 @@ def preview(request, course_prefix, course_suffix):
     """
     Much code borrowed from registration.views.register
     """
+    if request.common_page_data['is_course_admin']:
+        return redirect('http://'+request.get_host()+reverse('courses.views.main', args=[course_prefix, course_suffix]))
+    
+    
     #explicitly upgrading
     if settings.PRODUCTION and not request.is_secure():
         return redirect('https://'+request.get_host()+request.get_full_path())
@@ -36,9 +40,7 @@ def preview(request, course_prefix, course_suffix):
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     
-    if request.common_page_data['is_course_admin']:
-        return redirect(reverse('courses.views.main', args=[course_prefix, course_suffix]))
-    
+   
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)
