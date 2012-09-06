@@ -52,14 +52,18 @@ def privacy(request):
     return render_to_response('privacy.html',{},RequestContext(request))
 
 def contactus(request):
-    try:
-      common_page_data = get_common_page_data(request, request.GET.get('pre'), request.GET.get('post'))
-      course = common_page_data['course']
-      staffmail=course.contact
-    except Course.DoesNotExist:
-      course=None
-      staffmail=''
-          
+    if request.GET.get('pre') and request.GET.get('post'):
+        try:
+            common_page_data = get_common_page_data(request, request.GET.get('pre'), request.GET.get('post'))
+            course = common_page_data['course']
+            staffmail=course.contact
+        except Course.DoesNotExist:
+            course=None
+            staffmail=''
+    else:
+        course=None
+        staffmail=''
+
     return render_to_response('contactus.html', 
                               {'request': request,
                                'course': course,
