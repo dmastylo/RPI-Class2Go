@@ -9,8 +9,19 @@ class convenience_redirector(object):
     127.0.0.1:8000 -> localhost:8000
     """
     redirect_dict = {
+        'cs144.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/cs144/Fall2012/preview'},
+        'networking.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/networking/Fall2012/preview'}, 
+        'matsci256.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/matsci256/Fall2012/preview'},
         'solar.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/solar/Fall2012/preview'},
-        'networking.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/networking/Fall2012/preview'},        
+        'security.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/security/Fall2012/preview'},
+        'cs224n.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/cs224n/Fall2012/preview'},        
+        'nlp.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/nlp/Fall2012/preview'},
+        'psych30.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/psych30/Fall2012/preview'}, 
+        'perception.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/perception/Fall2012/preview'},
+        'nano.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/nano/Fall2012/preview'},
+        'crypto.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/crypto/Fall2012/preview'},
+        'test.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/test/Fall2012/preview'},        
+
         }
 
     def process_request(self, request):
