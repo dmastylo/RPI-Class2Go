@@ -3135,7 +3135,8 @@ var Khan = (function() {
 
         function injectExerciseFrameMarkup(htmlExercise) {
 
-            $("#container .exercises-body .current-card-contents").html(htmlExercise);
+            //$("#container .exercises-body .current-card-contents").html(htmlExercise);
+            $("#container .exercises-body .current-card-contents").prepend(htmlExercise);
 
         }
 
