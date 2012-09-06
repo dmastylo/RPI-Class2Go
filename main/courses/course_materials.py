@@ -68,6 +68,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     if video.image and video.section_id == section.id:
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
 
+                        videoToExs = VideoToExercise.objects.getByVideo(video)
+                        numQuestions = len(videoToExs)
+
                         if common_page_data['course_mode'] == 'draft':
                             prod_video = video.image
                             if not prod_video.live_datetime:
@@ -94,6 +97,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                 else:
                                     item['completed_percent'] = 0
 
+                        item['numQuestions'] = numQuestions
                         section_dict['items'].append(item)
 
             if get_pset_content:
@@ -102,6 +106,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     if problem_set.section_id == section.id:
                         item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
 
+                        psetToExs = ProblemSetToExercise.objects.getByProblemset(problem_set)
+                        numQuestions = len(psetToExs)
+                            
                         if common_page_data['course_mode'] == 'draft':
                             prod_problem_set = problem_set.image
                             if not prod_problem_set.live_datetime:
@@ -119,8 +126,6 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
                             item['visible_status'] = visible_status
                         else:
-                            psetToExs = ProblemSetToExercise.objects.getByProblemset(problem_set)
-                            numQuestions = len(psetToExs)
 
                             numCompleted = problem_set.get_progress(common_page_data['request'].user)
                             score = problem_set.get_score(common_page_data['request'].user)
@@ -130,12 +135,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                 progress = 0
                             else:
                                 progress = 100.0*numCompleted/numQuestions
-
-                            item['numQuestions'] = numQuestions
+                                
                             item['numCompleted'] = numCompleted
                             item['score'] = score
                             item['progress'] = progress
 
+                        item['numQuestions'] = numQuestions
                         section_dict['items'].append(item)
 
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
