@@ -40,19 +40,23 @@ def current_redirects(request, course_prefix):
     
 
 def main(request, course_prefix, course_suffix):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except Course.DoesNotExist:
-        raise Http404
+    #Common page data is already run in middleware
+    #try:
+    #    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+    #except Course.DoesNotExist:
+    #    raise Http404
 
-    
+    common_page_data=request.common_page_data
     ##JASON 9/5/12###
     ##For Launch, but I don't think it needs to be removed later##
     if common_page_data['course'].preview_only_mode:
         if not common_page_data['is_course_admin']:
             return redirect(reverse('courses.preview.views.preview',args=[course_prefix, course_suffix]))
 
-    
+    #downgrade explicitly
+    if request.is_secure():
+        return redirect('http://'+request.get_host()+request.get_full_path())
+                
     
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
