@@ -9,8 +9,8 @@ class convenience_redirector(object):
     127.0.0.1:8000 -> localhost:8000
     """
     redirect_dict = {
-        'solar.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/solar/Fall2012'},
-        'networking.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/networking/Fall2012'},        
+        'solar.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/solar/Fall2012/preview'},
+        'networking.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/networking/Fall2012/preview'},        
         }
 
     def process_request(self, request):
@@ -34,6 +34,7 @@ class convenience_redirector(object):
             port_str= ':' + port
 
         if (domain in self.redirect_dict):
+            scheme='https' ###OVERRIDE hack
             return HttpResponseRedirect(scheme + '://' + self.redirect_dict[domain]['host'] + port_str + self.redirect_dict[domain]['prepend'] + request.get_full_path())
         return None #fallthrough
             
