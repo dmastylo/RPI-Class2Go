@@ -1,85 +1,74 @@
-{% extends 'courses/preview.html' %}
-{% load url from future %}
+{% extends 'courses/preview.html' %} {% load url from future %}
 
 {% block course_description %}
 
-<div class = "span7">
-    <style>
-        p {margin-bottom: 20px;}
-        li {margin-bottom: 20px;}
-    </style>
+<div class = "span7"> <style> p {margin-bottom: 20px;} li {margin-bottom: 20px;} </style>
 
-    <h3>Class begins October 8, 2012</h3>
+<h3>Class begins October 8, 2012</h3>
 
-    <p align=center>
-    <iframe width="560" height="315" src="http://www.youtube.com/embed/o4Y_0uug_Oc" frameborder="0" allowfullscreen></iframe>
-    </p>
+<p align=center> <iframe width="560" height="315"
+src="http://www.youtube.com/embed/o4Y_0uug_Oc?rel=0" frameborder="0" allowfullscreen="true"></iframe>
+</p>
 
-    <h3>Biographies</h3>
-    <div>
-
-        <div style="float: left;margin-right: 20px;">
-        <img src="{{STATIC_URL}}preview_media/networking--Fall2012/Nick_McKeown.jpg" width="148" height="208" title="Nick McKeown"/><br/>
-        <!--label><b>Nick McKeown</b></label><br/-->
-        </div>
-
-        <p align="justify">
-        <b>Nick McKeown</b> has been a Professor of Electrical Engineering and Computer Science at
-        Stanford University since 1995. He grew up in the UK and received his BEng from Leeds
-        University in 1986. He moved to the US in 1989 to do an MS and PhD in Electrical
-        Engineering and Computer Science at University of California at Berkeley. For many years
-        his research focused on the analysis, architecture and design of high performance packet
-        switches. More recently, he has researched mostly on software-defined networks, new
-        Internet architectures and how to evolve the Internet. He loves research problems that are
-        intellectually interesting and also have an opportunity to improve the practice of
-        networking. He co-founded several companies based on technology started at Stanford,
-        including Abrizio (high performance switching), NEMO (network memory), and Nicira
-        (software defined networks). He is a Fellow of the IEEE, ACM, Royal Academy of Engineering
-        (UK) and the National Academy of Engineering (US). He received the BCS Lovelace Award in
-        2005, the IEEE Kobayashi Award in 2009 and the ACM Sigcomm Award in 2012. He believes the
-        right answer to an engineering problem is always beautiful, and almost always very simple.
-        </p>
-
-    </div>
-    <div>
-
-        <div style="float: left;margin-right: 20px;">
-        <img src="{{STATIC_URL}}preview_media/networking--Fall2012/Phil_Levis.jpg" width="148" height="208" title="Phil Levis"/><br/>
-        <!--label><b>Phil Levis</b></label><br/-->
-        </div>
-
-        <p align="justify">
-        <b>Philip Levis</b> is an Associate Professor of Computer Science and Electrical Engineering at
-        Stanford University. He received his Sc.B. from Brown University in 1999, his M.S. from
-        the University of Colorado at Boulder in 2001, and his Ph.D. from UC Berkeley in 2005. In
-        2008 he received an NSF CAREER award and a Microsoft Research New Faculty Fellowship. He
-        researches the design and implementation of networked systems, including operating systems
-        and protocols for embedded wireless devices, wireless mesh protocols, network
-        infrastructure for virtual worlds, and energy efficient computing. The results of his
-        research, including the TinyOS operating system, nesC language, Trickle algorithm, and the
-        collection tree protocol (CTP), have been adopted by tens of thousands of users and
-        researchers worldwide. He is a co-founder and the President of Kumu Networks. He really
-        likes excellent engineering and has a self-destructive aversion to low-hanging fruit.
-        </p>
-
-    </div>
-    <br/><br/>
-    
-    <h3>About the Course</h3>
-    <p align="justify">
-        This is an introductory course on computer networking, specifically the Internet. It
-        focuses on explaining how the Internet works, ranging from how bits are modulated on wires
-        and in wireless to application-level protocols like BitTorrent and HTTP. Students
-        implement a handful of low-level protocols and services, including reliable transport, IP
-        forwarding, and a Network Address Translation device. Students gain experience reading and
-        understanding RFCs (Internet protocol specifications) as statements of what a system should
-        do. The course grounds many of the concepts in current practice and recent developments,
-        such as net neutrality and DNS security.
-    </p>
-
-    <h3>Prerequisistes</h3>
-    <p align="justify">Students need an introductory course in probability, a strong understanding of bits andbytes, and knowledge of how computers lay out data in memory.</p>
+<div style="float: left;margin-right: 20px;"> <img
+src="{{STATIC_URL}}preview_media/networking--Fall2012/400x400NetworkingLogo.jpg" width="208"
+height="208" title="Image Credit: The Opte Project"/><br/> <!--label><b>Nick McKeown</b></label><br/-->
 </div>
+
+<h3>About the Course</h3> <p align="justify"> This is an introductory course on computer
+networking, specifically the Internet. It focuses on explaining how the Internet works,
+ranging from how bits are modulated on wires and in wireless to application-level
+protocols like BitTorrent and HTTP. Students implement a handful of low-level protocols
+and services, including reliable transport, IP forwarding, and a Network Address
+Translation device. Students gain experience reading and understanding RFCs (Internet
+protocol specifications) as statements of what a system should do. The course grounds many
+of the concepts in current practice and recent developments, such as net neutrality and
+DNS security. </p>
+
+<h3>Biographies</h3> <div>
+
+<div style="float: right;margin-left: 20px;"> <img
+src="{{STATIC_URL}}preview_media/networking--Fall2012/Nick_McKeown.jpg" width="148"
+height="208" title="Nick McKeown"/><br/> <!--label><b>Nick McKeown</b></label><br/-->
+</div>
+
+<p align="justify"> <b>Nick McKeown</b>has been a Professor of Electrical Engineering and
+Computer Science at Stanford University since 1995. He grew up in the UK and received his
+BEng from Leeds University in 1986. He moved to the US in 1989 to do an MS and PhD in
+Electrical Engineering and Computer Science at University of California at Berkeley. His
+research group works on new Internet architectures, software-defined networks and how to
+make routers faster. He co-founded several companies based on technology started at
+Stanford. He is a member of the National Academy of Engineering and recently received the
+ACM Sigcomm "Lifetime Achievement" Award. </p>
+
+</div> 
+<br></br><br></br>
+<div>
+
+<div style="float: left;margin-right: 20px;"> <img
+src="{{STATIC_URL}}preview_media/networking--Fall2012/Phil_Levis.jpg" width="148"
+height="208" title="Phil Levis"/><br/> <!--label><b>Phil Levis</b></label><br/--> </div>
+
+<p align="justify"> <b>Philip Levis</b> is an Associate Professor of Computer Science and
+Electrical Engineering at Stanford University. He received his Sc.B. from Brown University
+in 1999, his M.S. from the University of Colorado at Boulder in 2001, and his Ph.D. from
+UC Berkeley in 2005. In 2008 he received an NSF CAREER award and a Microsoft Research New
+Faculty Fellowship. He researches the design and implementation of networked systems,
+including operating systems and protocols for embedded wireless devices, wireless mesh
+protocols, network infrastructure for virtual worlds, and energy efficient computing. The
+results of his research, including the TinyOS operating system, nesC language, Trickle
+algorithm, and the collection tree protocol (CTP), have been adopted by tens of thousands
+of users and researchers worldwide. He is a co-founder and the President of Kumu Networks.
+He really likes excellent engineering and has a self-destructive aversion to low-hanging
+fruit. </p>
+
+</div> <br/><br/>
+
+
+
+<h3>Prerequisistes</h3> <p align="justify">Students need an introductory course in
+probability, a strong understanding of bits and bytes, and knowledge of how computers lay
+out data in memory.</p> </div>
 
 {% endblock course_description %}
 
