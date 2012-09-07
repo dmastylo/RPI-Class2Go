@@ -17,7 +17,7 @@ class S3UploadForm(forms.ModelForm):
         if instance and instance.id:
             del self.fields['file']
         else:
-            self.fields['file'].help_text = "Select the mp4 video file on your machine to upload"
+            self.fields['file'].help_text = "Select the mp4 video file on your machine to upload - you need to do this even if the file is already on YouTube so that we can provide downloads and generate a thumbnail index."
         self.fields['slug'].help_text = "A unique identifier that will be shown in the URL"
     
     def clean_url(self):
