@@ -23,6 +23,8 @@ consult a specific backend's documentation for details.
 
 """
 
+from registration.forms import *
+
 from django.conf.urls.defaults import *
 
 from django.contrib.auth import views as auth_views
@@ -39,7 +41,8 @@ urlpatterns = patterns('',
                            name='auth_logout'),
                        url(r'^password/change/$',
                            auth_views.password_change,
-                           {'template_name': 'registration/password_change_form.html'},
+                           {'template_name': 'registration/password_change_form.html',
+                             'password_change_form':PasswordChangeForm},
                            name='auth_password_change'),
                        url(r'^password/change/done/$',
                            auth_views.password_change_done,
