@@ -741,10 +741,9 @@ var Khan = (function() {
         // Initialize to an empty jQuery set
         exercises = jQuery();
 
-        // [@wescott] Is this problem set formative or summative?
-        // Default is formative, but check problem set div for summative CSS
-        // class; otherwise, check the class name on the article element in
-        // the page
+        // [@wescott] Is this problem set formative or summative? Default is 
+        // formative, but check problem set div for summative CSS class; 
+        // otherwise, check the class name on the article element in the page
         exAssessType = 'formative';
         if ($("div.summative").length || $("div.assessive").length ||
             $("article.summative").length || $("article.summative").length) {
@@ -757,11 +756,11 @@ var Khan = (function() {
             if (remoteExercises.length) {
 
                 KhanC2G.remoteExercises = [];
+                // [@wescott] controlLoad is a helper to ensure exercise fetching 
+                // happens sequentially and synchronously
                 var controlLoad = function(exArr) {
                     if (exArr.length > 0) {
                         currentEx = exArr.shift();
-                        // [@wescott] Passing "remoteExercises" to loadExercise too,
-                        // so it can check original list of exercises that should be coming
                         loadExercise.call(currentEx).done(function () {
                             controlLoad(exArr);
                         });
@@ -1083,7 +1082,7 @@ var Khan = (function() {
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
 
-        // [@wescott] Store locally 
+        // [@wescott] Store locally, OK if overwrites previous value 
         var seedKey = c2gConfig.user || 'anon';
         seedKey += '-';
         if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
@@ -2982,7 +2981,6 @@ var Khan = (function() {
         // C2G: we use a different place for the exercises (originally was with the rest of the static files)
         // since we need to get from S3
         var dfd = $.Deferred();
-        var listOfExercises = arguments[0];
 
         $.ajaxSetup({timeout:10000});
         $.get(urlBaseExercise + "exercises/" + fileName, function(data, status, xhr) {
@@ -3066,27 +3064,9 @@ var Khan = (function() {
 
             }
 
-            /*
-            if (typeof userPSData == "undefined" ||
-                    $.isEmptyObject(userPSData) ||
-                    typeof userPSData.userAnswer == "undefined") {
-                makeProblem(exercises.length - 1);
-            }
-            */
-
         // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
         }).done(setTimeout(function () { dfd.resolve(); }, 5000));
-        /*
-        }).done(function () {
-            (function pollExercises() {
-                if (exercises.length == listOfExercises.length) {
-                    dfd.resolve();
-                } else {
-                    setTimeout(pollExercises, 500);
-                }
-            })();
-        });
-        */
+
         return dfd.promise();
     }
 
@@ -3135,6 +3115,8 @@ var Khan = (function() {
 
         function injectExerciseFrameMarkup(htmlExercise) {
 
+            // [@wescott] Need prepend, as slow connection causes video div to be overwritten
+            // for in-video exercises
             //$("#container .exercises-body .current-card-contents").html(htmlExercise);
             $("#container .exercises-body .current-card-contents").prepend(htmlExercise);
 
@@ -3181,7 +3163,6 @@ var Khan = (function() {
 
             // [@wescott] moves to viewed list, as it's currently being viewed
             var first = $('#questions-viewed li:first-child');
-            //makeProblem(first.data('problem'), first.data('randseed'))
 
             // [@wescott] Set up cards so the first one not done is the "current card"
             (function configureCards () {
@@ -3327,29 +3308,6 @@ var Khan = (function() {
 
         };
 
-        // [@wescott] This replaces the radio button choices in the #solutionarea with the exact
-        // choices that were given to the user when he/she answered the question before; userSelection
-        // is what the user actually chose
-        // [@wescott] NO LONGER NECESSARY
-        /*
-        var reconstructChoices = function (choices, userSelection) {
-            $('#solutionarea ul').empty().remove();
-            $('#solutionarea').prepend('<ul></ul>');
-            for (var i = 0; i < choices.length; i += 1) {
-                $('#solutionarea ul').append('<li><label></label></li>');
-                $('#solutionarea li:last label').append('<input type="radio" name="solution" value="' + i + '"/>');
-                if (i == userSelection) {
-                    $('#solutionarea li:last input').get(0).checked = true;
-                }
-                $('#solutionarea li:last label').append('<span class="value">' + choices[i] + '</span>');
-            }
-            if ($('.current-question').data('correct')) {
-                $('#solutionarea input').attr('disabled','disabled');
-            }
-            $('#solutionarea').css('visibility', 'visible');
-        };
-        */
-
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
         // value, if the user has already answered it
         $.when(checkForInputs()).then(function () {
@@ -3359,9 +3317,6 @@ var Khan = (function() {
             if ($('.current-question') && $('.current-question').data('problem_seed')) {
                 pSeed = parseInt($('.current-question').data('problem_seed'));
             }
-            //KhanC2G.problemIdx = pID;
-            //console.log('checkForInputs() done, so now calling makeProblem');
-            //makeProblem(pID, pSeed);
 
             var userSelectionVal = null;
             if (typeof userPSData != "undefined" && 
@@ -3512,7 +3467,6 @@ var Khan = (function() {
                 if (userChoicesLen > 0 && thisCard.data("correct")) {
                     var choicesArr = $.parseJSON(thisCard.data("user_choices"));
                     var userSel = userPrevSel;
-                    //reconstructChoices(choicesArr, userSel);
                     $('#check-answer-button').attr('disabled', 'disabled');
                 } else if (userPrevSel && $(ev.target).data("correct")) {
                     $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
