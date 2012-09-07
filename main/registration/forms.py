@@ -13,6 +13,8 @@ from django.forms.extras.widgets import Select
 import datetime
 import logging
 logger = logging.getLogger('form')
+ 
+from django.contrib.auth.forms import SetPasswordForm
 
 # I put this on all required fields, because it's easier to pick up
 # on them with CSS or JavaScript if they have a class of "required"
@@ -93,8 +95,12 @@ class RegistrationForm(forms.Form):
                                                                    ('ManufacturingConstruction','In manufacturing or construction'),
                                                                    ('AnotherIndustry','In another industry'),
                                                                    ('Other','Other'),))
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
-                                label=_("Password*"))
+
+    password1 = forms.RegexField(regex=r'(?=.*\d)',
+                                 min_length=6,
+                                 widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
+                                 label=_("Password*"),
+                                 error_messages={'invalid': _("This value must contain 1 number.")})
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password (again)*"))
     
@@ -188,47 +194,30 @@ class RegistrationFormNoFreeEmail(RegistrationForm):
         return self.cleaned_data['email']
 
 
-#########COPYING AND PASTING CODE!!!!############
-##JASON is doing this.  David, fix if you can####
-class SetPasswordForm(forms.Form):
-    """
-        A form that lets a user change set his/her password without entering the
-        old password
-        """
-    error_messages = {
-        'password_mismatch': _("The two password fields didn't match wooww."),
-    }
-    new_password1 = forms.CharField(label=_("New password TEST"),
-                                    widget=forms.PasswordInput)
-    new_password2 = forms.CharField(label=_("New password confirmation"),
-                                    widget=forms.PasswordInput)
+class SetPasswordFormC2G(SetPasswordForm):
+ #   """
+ #       A form that lets a user change set his/her password without entering the
+ #       old password
+ #       """
+    
+    new_password1 = forms.RegexField(regex=r'(?=.*\d)',
+                                  min_length=6,
+                                 widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
+                                label=_("Password*"),
+                                error_messages={'invalid': _("This value must contain 1 number.")})
+    
     
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(SetPasswordForm, self).__init__(*args, **kwargs)
-    
-    def clean_new_password2(self):
-        password1 = self.cleaned_data.get('new_password1')
-        password2 = self.cleaned_data.get('new_password2')
-        if password1 and password2:
-            if password1 != password2:
-                raise forms.ValidationError(
-                                            self.error_messages['password_mismatch'])
-        return password2
-    
-    def save(self, commit=True):
-        self.user.set_password(self.cleaned_data['new_password1'])
-        if commit:
-            self.user.save()
-        return self.user
 
 
-class PasswordChangeForm(SetPasswordForm):
+class PasswordChangeFormC2G(SetPasswordFormC2G):
     """
         A form that lets a user change his/her password by entering
         their old password.
         """
-    error_messages = dict(SetPasswordForm.error_messages, **{
+    error_messages = dict(SetPasswordFormC2G.error_messages, **{
                           'password_incorrect': _("Your old password was entered incorrectly. "
                                                   "Please enter it again."),
                           })
@@ -244,7 +233,7 @@ class PasswordChangeForm(SetPasswordForm):
             raise forms.ValidationError(
                                         self.error_messages['password_incorrect'])
         return old_password
-PasswordChangeForm.base_fields.keyOrder = ['old_password', 'new_password1',
+PasswordChangeFormC2G.base_fields.keyOrder = ['old_password', 'new_password1',
                                            'new_password2']
 
 
