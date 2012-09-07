@@ -18,18 +18,3 @@ else
     cp -n main/jenkins/database_ci.py main/database.py
 fi
 
-python main/manage.py syncdb
-if [[ $? -ne 0 ]]; then
-    exit $?
-fi
-
-python main/manage.py migrate
-if [[ $? -ne 0 ]]; then
-    exit $?
-fi
-
-python main/manage.py db_populate
-if [[ $? -ne 0 ]]; then
-    exit $?
-fi
-
