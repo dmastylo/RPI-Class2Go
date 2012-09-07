@@ -1,9 +1,14 @@
 #!/bin/bash -ex
+#
+# Assumes current working directory is root of repo (class2go)
+#
 
-cp database_ci.py ../database.py
+# -n prevents clobber if already there 
+cp -n main/jenkins/database_ci.py main/database.py
 
-cd ..
-python manage.py syncdb
-python manage.py migrate
-python manage.py db_populate
+python main/manage.py syncdb
+
+python main/manage.py migrate
+
+python main/manage.py db_populate
 
