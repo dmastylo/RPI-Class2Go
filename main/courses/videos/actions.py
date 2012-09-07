@@ -160,7 +160,7 @@ def oauth(request):
     #return redirect("http://" + request.META['HTTP_HOST'] + "/nlp/Fall2012/videos")
 
 def GetOAuth2Url(request, video):
-    client_id = "287022098794.apps.googleusercontent.com"
+    client_id = settings.GOOGLE_CLIENT_ID
     redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
     response_type = "code"
     scope = "https://gdata.youtube.com"

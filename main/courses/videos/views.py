@@ -82,14 +82,6 @@ def edit(request, course_prefix, course_suffix, slug):
              'form': form,
              })
 
-def GetOAuth2Url(request):
-    client_id = "287022098794.apps.googleusercontent.com"
-    redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
-    response_type = "code"
-    scope = "https://gdata.youtube.com"
-
-    return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type
-
 @auth_is_course_admin_view_wrapper
 def upload(request, course_prefix, course_suffix):
     try:
