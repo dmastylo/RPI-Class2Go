@@ -41,10 +41,6 @@ def main(request, course_prefix, course_suffix):
         if not common_page_data['is_course_admin']:
             return redirect(reverse('courses.preview.views.preview',args=[course_prefix, course_suffix]))
 
-    #downgrade explicitly
-    if request.is_secure():
-        return redirect('http://'+request.get_host()+request.get_full_path())
-                
     
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:

@@ -11,6 +11,8 @@ from django.core.urlresolvers import reverse
 from registration.backends import get_backend
 from courses.common_page_data import get_common_page_data
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
+from django.views.decorators.csrf import csrf_protect
+
 import json
 import settings
 import urlparse
@@ -98,6 +100,9 @@ def activate(request, backend,
                               kwargs,
                               context_instance=context)
 
+@sensitive_post_parameters()
+@never_cache
+@csrf_protect
 @upgrade_to_https_and_downgrade_upon_redirect
 def register(request, backend, success_url=None, form_class=None,
              disallowed_url='registration_disallowed',
