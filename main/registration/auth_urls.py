@@ -28,10 +28,10 @@ from registration.forms import *
 from django.conf.urls.defaults import *
 
 from django.contrib.auth import views as auth_views
-from registration.login_wrapper import ssl_wrapped_login
+from registration.login_wrapper import *
 urlpatterns = patterns('',
                        url(r'^login/?$',
-                           ssl_wrapped_login,
+                           login,
                            {'template_name': 'registration/login.html'},
                            name='auth_login'),
                        url(r'^logout/?$',
@@ -40,7 +40,7 @@ urlpatterns = patterns('',
                            'next_page': '/'},
                            name='auth_logout'),
                        url(r'^password/change/$',
-                           auth_views.password_change,
+                           password_change,
                            {'template_name': 'registration/password_change_form.html',
                              'password_change_form':PasswordChangeFormC2G},
                            name='auth_password_change'),
@@ -52,7 +52,8 @@ urlpatterns = patterns('',
                            auth_views.password_reset,
                            name='auth_password_reset'),
                        url(r'^password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-                           auth_views.password_reset_confirm,
+                           password_reset_confirm,
+                           {'set_password_form':SetPasswordFormC2G},
                            name='auth_password_reset_confirm'),
                        url(r'^password/reset/complete/$',
                            auth_views.password_reset_complete,

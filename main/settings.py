@@ -299,7 +299,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_AGE = 3*30*24*3600
 
 # Actually send email
-EMAIL_ALWAYS_ACTUALLY_SEND = True
+EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
 SERVER_EMAIL = 'c2g-dev@cs.stanford.edu'
