@@ -18,6 +18,8 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth import login as auth_login
 from django.conf import settings
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
+from django.views.decorators.debug import sensitive_post_parameters
+
 import json
 import settings
 

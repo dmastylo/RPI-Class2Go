@@ -12,6 +12,8 @@ from registration.backends import get_backend
 from courses.common_page_data import get_common_page_data
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
 
 import json
 import settings
