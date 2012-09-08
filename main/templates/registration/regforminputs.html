@@ -1,6 +1,7 @@
 {% csrf_token %}
 {{form.course_prefix}}{{form.course_suffix}}
 
+{{ form.non_field_errors }}
 <table >
     <tr>
         <th><label for="id_username"><a href="#" rel="tooltip" title="Your username is used to log on to the site, and may be used as your public identity in classes.  You won't be able to change it once it's set.">{{form.username.label}}:</label></th>
