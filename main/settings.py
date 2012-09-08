@@ -131,6 +131,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
     'convenience_redirect.redirector.convenience_redirector',
     'courses.common_page_data_middleware.common_data',
     'courses.user_profiling_middleware.user_profiling',
