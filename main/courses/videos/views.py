@@ -52,13 +52,9 @@ def view(request, course_prefix, course_suffix, slug):
     if video_rec:
         video_rec = video_rec[0]
     else:
-        #if student, needs to be an easy way to check if member of group
-        user_groups = request.user.groups.all()
-        for group in user_groups:
-            if group == common_page_data['course'].student_group:
-                video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
-                video_rec.save()
-                break
+        #note student field to be renamed to user, VideoActivity for all users now
+        video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
+        video_rec.save()
 
     if video.mode == 'ready':
         draft_version = video.image
