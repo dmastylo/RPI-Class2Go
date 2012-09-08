@@ -10,7 +10,7 @@ class user_profiling(object):
     The results end up in the UserProfile model.
     """
     def process_view (self, request, view_func, view_args, view_kwargs):
-        if request.user.is_authenticated:
+        if request.user.is_authenticated():
             try:
                 profile = request.user.get_profile()
                 try:
@@ -44,8 +44,8 @@ class user_profiling(object):
 
                 profile.save()
 
-            except AttributeError:
-                # Some users might not have a user profile object (like a superuser)
+            except UserProfile.DoesNotExist:
+                # Some users might not have a user profile object
                 # that's OK, don't do any tracking for those
                 pass
 
