@@ -6,41 +6,53 @@
   {% if user.is_authenticated %}
     <h3>Upload Videos</h3>
 	<form id="videoform" name="upload_form" action="{% url 'courses.videos.actions.upload' %}" method="POST" enctype="multipart/form-data">
+
 	  {% csrf_token %}
 	  <fieldset class="well">
-	  {% for field in form %}
-	    <div class="fieldWrapper {% if field.errors %}errors{% endif %}">
-	      {% if field.name == "url" %}
-	        <label>
-		  <a href="#" rel="tooltip" title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><i class="icon-info-sign"></i>Already on Youtube?  Enter Video ID</a>
-		  {% if field.value %}
-		    <input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" checked /></label>
-		    <div id="yt_id">{{ field }}</div>
-		  {% else %}
-		    <input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" /></label>
-		    <div id="yt_id" style="display:none">{{ field }}</div>
-		  {% endif %}
-	      {% elif field.name == "live_datetime" %}
-	        <label>
-		  <a href="#" rel="tooltip" title="If you're ready to set a live date for the video, check here.  If you're not ready to decide on a live date yet, you can leave this box unchecked."><i class="icon-info-sign"></i>Set Live Date</a>
-		  {% if field.value %}
-		    <input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" checked /></label>
-	            <div id="live_date">{{ field }}</div>
-		  {% else %}
-		    <input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" /></label>
-	            <div id="live_date" style="display:none">{{ field }}</div>
-		  {% endif %}
-	      {% else %}
-	        {{ field.label_tag }}
-	        {% if field.help_text %}
-	          <span class="help-block">{{ field.help_text }}</span>
-	        {% endif %}
-	        {{ field }}
-	      {% endif %}
+      
+      <table>
+        <tr>
+        <td>
+		  {% for field in form %}
+			<div class="fieldWrapper {% if field.errors %}errors{% endif %}">
+			  {% if field.name == "url" %}
+				<label>
+			  <a href="#" rel="tooltip" title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><i class="icon-info-sign"></i>Already on YouTube?  Enter Video ID</a>
+			  {% if field.value %}
+				<input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" checked /></label>
+				<div id="yt_id">{{ field }}</div>
+			  {% else %}
+				<input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" /></label>
+				<div id="yt_id" style="display:none">{{ field }}</div>
+			  {% endif %}
+			  {% elif field.name == "live_datetime" %}
+				<label>
+			  <a href="#" rel="tooltip" title="If you're ready to set a live date for the video, check here.  If you're not ready to decide on a live date yet, you can leave this box unchecked."><i class="icon-info-sign"></i>Set Live Date</a>
+			  {% if field.value %}
+				<input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" checked /></label>
+					<div id="live_date">{{ field }}</div>
+			  {% else %}
+				<input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" /></label>
+					<div id="live_date" style="display:none">{{ field }}</div>
+			  {% endif %}
+			  {% else %}
+				{{ field.label_tag }}
+				{% if field.help_text %}
+				  <span class="help-block">{{ field.help_text }}</span>
+				{% endif %}
+				{{ field }}
+			  {% endif %}
 	     
 	      {{ field.errors }}
 	    </div>
 	  {% endfor %}
+	  
+	        </td>
+			<td>
+		       <b><font color="#FF0000">Important:</b></font> If you are logged into any Google services (e.g. Google Docs, Gmail, YouTube) with a Google ID other than the Course YouTube ID, please <a href="https://www.google.com/accounts/Logout" target="_blank">logout</a> of your Google account.
+			</td>
+			</tr>
+		</table>
 	  </fieldset>
 	  <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
 	  <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
@@ -48,7 +60,7 @@
 	    <div>Clicking below will upload your video to Amazon, and from there it will be uploaded to Youtube if you did not specify a Youtube Video ID.</div>
 	    <ul>
 	      <li>You may be asked to sign into Google/YouTube if you're not signed in already. If you're signed in to any Google service, such as Google Docs, Gmail, or YouTube, your video may be uploaded to the wrong YouTube account. Please make sure you're signed in to the course YouTube account.</li>
-	      <li>If you haven't uploaded a video via Sophi already, you will be asked to grant us permissions to "Manage your YouTube account". Please OK that.</li>
+	      <li>If you haven't uploaded a video via Class2Go already, you will be asked to grant us permissions to "Manage your YouTube account". Please OK that.</li>
 	      <li>Do not close this window, it will terminate the upload. It may take a long time. We are currently working to make this asynchronous.</li>
 	    </ul>
 	    <input type="submit" value="Upload" class="btn btn-primary"/>
