@@ -11,6 +11,8 @@ from courses.common_page_data import get_common_page_data
 from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
+from gdata.media import YOUTUBE_NAMESPACE
+from atom import ExtensionElement
 import urllib2, urllib, json
 import re
 import settings
@@ -139,8 +141,9 @@ def oauth(request):
                     text='Education',
                     label='Education')],
             )
-
-        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
+        
+        extension = ExtensionElement('accessControl', namespace=YOUTUBE_NAMESPACE, attributes={'action': 'list', 'permission': 'denied'})
+        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group, extension_elements=[extension])
 
         entry = yt_service.InsertVideoEntry(video_entry, video.file)
         #print entry.id.ToString()
