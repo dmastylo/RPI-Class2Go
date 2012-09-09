@@ -2,14 +2,23 @@
 
 ## source this from your login shell
 
-alias app.prod="ssh -A bitnami@app1.prod.c2gops.com"
-alias util.prod="ssh -A ubuntu@util1.prod.c2gops.com"
+prod_domain="prod.c2gops.com"
+stage_domain="stage2.c2gops.com"
+dev_domain="stage2.c2gops.com"
 
-alias app.stage="ssh -A bitnami@app1.stage2.c2gops.com"
-alias util.stage="ssh -A ubuntu@util1.stage2.c2gops.com"
+ssh_options="-A"
 
-alias jenkins="ssh -A ubuntu@jenkins.dev.c2gops.com"
-alias deploy="ssh -A deploy.dev.c2gops.com"  # as user
+alias app.prod="ssh ${ssh_options} bitnami@app1.${prod_domain}"
+alias util.prod="ssh ${ssh_options} ubuntu@util1.${prod_domain}"
+
+alias app.stage="ssh ${ssh_options} bitnami@app1.${stage_domain}"
+alias app1.stage="ssh ${ssh_options} bitnami@app1.${stage_domain}"
+alias app2.stage="ssh ${ssh_options} bitnami@app2.${stage_domain}"
+alias util.stage="ssh ${ssh_options} ubuntu@util1.${stage_domain}"
+alias util1.stage="ssh ${ssh_options} ubuntu@util1.${stage_domain}"
+
+alias jenkins="ssh ${ssh_options} ubuntu@jenkins.${dev_domain}"
+alias deploy="ssh ${ssh_options} deploy.${dev_domain}"  # as user
 
 alias localdb="~/src/class2go/main/manage.py dbshell"
 
