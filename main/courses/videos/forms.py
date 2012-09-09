@@ -28,7 +28,7 @@ class S3UploadForm(forms.ModelForm):
                 entry = yt_service.GetYouTubeVideoEntry(video_id=url)
                 self.instance.duration = entry.media.duration.seconds
             except gdata.service.RequestError:
-                raise forms.ValidationError('Invalid Youtube video ID.')
+                raise forms.ValidationError('Invalid YouTube video ID.')
         return url
 
     class Meta:
