@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
         try:
             site = Site.objects.get(id=1)
-            site.domain = 'sophi.stanford.edu'
+            site.domain = 'class.stanford.edu'
             site.name = 'Stanford Online'
             site.save()
             print "Site updated successfully."
