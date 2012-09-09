@@ -81,7 +81,7 @@ def main(request, course_prefix, course_suffix):
             if file.section.id == contentsection.id:
                 file_parts=re.split('\.',file.file.url)
                 file_extension=file_parts.pop()
-                if file_extension=="html":
+                if file_extension in ("html", "htm"):
                     icon_type="globe"
                 elif (file_extension in ("ppt", "pptx")):
                     icon_type="list-alt"
