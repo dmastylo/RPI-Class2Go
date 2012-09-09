@@ -2,33 +2,14 @@
 
 ## source this from your login shell
 
-hoststage="app1"
-hostprod="app1"
+alias app.prod="ssh -A bitnami@app1.prod.c2gops.com"
+alias util.prod="ssh -A ubuntu@util1.prod.c2gops.com"
 
-function prodapp {
-    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
-    ssh -A bitnami@${hostprod}.prod.c2gops.com
-}
+alias app.stage="ssh -A bitnami@app1.stage2.c2gops.com"
+alias util.stage="ssh -A ubuntu@util1.stage2.c2gops.com"
 
-# function proddb {
-#     ssh-add -l | grep -q "c2g-prod" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
-#     ssh -At bitnami@${hostprod}.stage.c2gops.com "sophi/django-project/manage.py dbshell"
-# }
+alias jenkins="ssh -A ubuntu@jenkins.dev.c2gops.com"
+alias deploy="ssh -A deploy.dev.c2gops.com"  # as user
 
-function stageapp {
-    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-    ssh -A bitnami@${hoststage}.stage.c2gops.com
-}
-
-function jenkins {
-    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-    ssh -A ubuntu@jenkins.dev.c2gops.com
-}
-
-# function stagedb {
-#     ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-#     ssh -At bitnami@${hoststage}.stage.c2gops.com "sophi/django-project/manage.py dbshell"
-# }
-
-alias localdb="~/src/sophi/django-project/manage.py dbshell"
+alias localdb="~/src/class2go/main/manage.py dbshell"
 
