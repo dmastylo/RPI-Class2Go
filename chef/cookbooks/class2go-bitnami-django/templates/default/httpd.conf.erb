@@ -480,9 +480,15 @@ SSLRandomSeed startup builtin
 SSLRandomSeed connect builtin
 </IfModule>
 
+# Security 
+ServerSignature Off
+ServerTokens Prod
+
+# Jason's settings to improve perf (see #590)
 LoadModule wsgi_module modules/mod_wsgi.so
-WSGIPythonHome /opt/bitnami/python
-    
+#WSGIPythonHome /opt/bitnami/python
+WSGIDaemonProcess www.site.com threads=15 maximum-requests=10000 python-path=/home/bitnami/class2go/main:/opt/bitnami/python
+WSGIProcessGroup www.site.com    
 # Security 
 ServerSignature Off
 ServerTokens Prod
