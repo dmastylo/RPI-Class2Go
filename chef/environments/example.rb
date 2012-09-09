@@ -2,6 +2,7 @@ name "example"
 description "class2go Example Environment"
 
 default_attributes \
+    "aws" => {
         # AWS GLOBAL
         "access_key" => "aaaaaaaaaaaaaaaaaaaa",
         "access_secret" => "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
@@ -32,7 +33,7 @@ default_attributes \
         "secret" => "ggggggggggggggg"
     },
     "google" => {
-        yt_service_developer_key => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        google_client_id => "nnnnnnnnnnnn.apps.googleusercontent.com",
-        google_client_secret => "sssssssssssssssssssss"
+        "yt_service_developer_key" => "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "google_client_id" => "nnnnnnnnnnnn.apps.googleusercontent.com",
+        "google_client_secret" => "sssssssssssssssssssss"
     }
