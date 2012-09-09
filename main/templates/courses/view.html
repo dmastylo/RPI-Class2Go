@@ -49,9 +49,10 @@
       		 	            {% endifequal %}
       		 		    {% ifequal item.0 'file' %}
 					{% if is_logged_in %}
-					    <li><a href="{{item.4}}"><i class="icon-file"></i> {{item.5}}</a></li>
+					
+					    <li><a href="{{item.4}}"><i class="icon-{{item.6}}"></i> {{item.5}}</a></li>
 					{% else %}
-					    <li><i class="icon-file"></i> {{item.5}}<li>
+					    <li><i class="icon-{{item.6}}"></i> {{item.5}}<li>
 					{% endif %}
 				    {% endifequal %}
 				{% endifequal %}
