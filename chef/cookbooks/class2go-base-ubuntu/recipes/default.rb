@@ -1,3 +1,14 @@
+file "/etc/hostname" do
+  content node.name
+end
+
+template "/home/ubuntu/.bash_aliases" do
+    source "bash_aliases.erb"
+    owner "ubuntu"
+    group "ubuntu"
+    mode "0644"
+end
+
 package "git" do
     action :install
 end

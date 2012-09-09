@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# append prompt with a red prefix
+
+PS1="\[\e[1;31m\]<%= @node[:main][:instance].upcase %> "${PS1}
