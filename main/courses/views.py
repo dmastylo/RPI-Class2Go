@@ -79,7 +79,19 @@ def main(request, course_prefix, course_suffix):
 
         for file in file_list:
             if file.section.id == contentsection.id:
-                index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title))
+                file_parts=re.split('\.',file.file.url)
+                file_extension=file_parts.pop().lower()
+                if file_extension in ("html", "htm"):
+                    icon_type="globe"
+                elif (file_extension in ("ppt", "pptx")):
+                    icon_type="list-alt"
+                elif (file_extension in ('jpg', 'png', 'gif', 'jpeg')):
+                    icon_type="picture"  
+                elif (file_extension in ('mp3', 'aac')):
+                    icon_type="music"
+                else:
+                    icon_type="file"
+                index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
         index_list.sort(key = index)
         full_index_list.append(index_list)
