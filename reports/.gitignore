@@ -1,2 +1,6 @@
-class2go_users.png
-users_by_day.dat
+*.dat
+*.txt
+*.png
+*.jpg
+*.jpeg
+*.gif
