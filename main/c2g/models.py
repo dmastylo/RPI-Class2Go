@@ -501,6 +501,9 @@ class UserProfile(TimestampMixin, models.Model):
     user_agent_first = models.CharField(max_length=256, null=True)
     referrer_first = models.CharField(max_length=256, null=True)
     accept_language_first = models.CharField(max_length=64, null=True)
+    
+    def __unicode__(self):
+        return self.user.username
 
     class Meta:
         db_table = u'c2g_user_profiles'
@@ -1123,6 +1126,7 @@ class NewsEvent(models.Model):
     class Meta:
         db_table = u'c2g_news_events'
 
+#Should probably slate this EditProfileForm for moving to a different file
 class EditProfileForm(forms.Form):
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
