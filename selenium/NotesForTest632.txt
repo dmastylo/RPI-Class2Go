@@ -1,0 +1,8 @@
+Pre-requisites for this test
+
+1. db_populate
+2. Login as Professor_0
+2. Publish and make live Problem Set 1: Regular Expressions
+3. Run the test in Selenium
+
+Last item in the test fails due to #632
