@@ -9,13 +9,14 @@ DATABASES = {
     }
 }
 
-# When PRODUCTION=True we don't show stackdumps on errors
+# When PRODUCTION=True we don't show stackdumps on errors.  Careful, no quotes.
 PRODUCTION = <%= @node[:main][:production] %>
-SOPHI_INSTANCE = '<%= @node[:main][:instance] %>'
+
+INSTANCE = '<%= @node[:main][:instance] %>'
 
 # Put your name and email address here, so Django serious errors can come to you
 ADMINS = (
-        ('<%= @node[:main][:admin_name] %>', '<%= @node[:main][:admin_email] %>')
+        ('<%= @node[:main][:admin_name] %>', '<%= @node[:main][:admin_email] %>'),
         )
 
 SECRET_KEY = '<%= @node[:main][:django_secret] %>'
