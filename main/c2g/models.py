@@ -112,6 +112,14 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     def __unicode__(self):
         return self.title
     
+    def _get_prefix(self):
+        return self.handle.split("--")[0]
+    prefix = property(_get_prefix)
+
+    def _get_suffix(self):
+        return self.handle.split("--")[1]
+    suffix = property(_get_suffix)
+
     def get_all_students(self):
         """
         Returns a QUERY_SET of all students
