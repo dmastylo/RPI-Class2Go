@@ -1070,29 +1070,70 @@ var Khan = (function() {
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
 
+        // [@wescott] Build and return a localStorage key
+        function getLSSeedKey () {
+            var seedKey = c2gConfig.user || 'anon';
+            seedKey += '-';
+            if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
+                seedKey += 'ps-' + $('#pset_id').val();
+            } else if ($('#exercise_type').length && $('#exercise_type').val() === 'video') {
+                seedKey += 'vid-' + $('#video_id').val();
+            }
+            seedKey += '-' + id;
+            return seedKey;
+        }
+
+        // [@wescott] Has a problem seed been stored? Only should factor in for non-video exercises
+        function getLocalSeed () {
+            // if not in-video ex, try the seed data stored in the question card
+            if ($('#exercise_type').val() != "video" && $('.current-question').data('problem_seed')) {
+                console.log("current-question card has seed");
+                return $('.current-question').data('problem_seed');
+            // otherwise, if not in-video ex, try one stored in localStorage
+            } else if ($('#exercise_type').val() != "video" && getLSSeedKey()) {
+                console.log("localStorage has seed");
+                return localStorage.getItem(getLSSeedKey());
+            // finally, try the userPSData object
+            } else if (typeof userPSData != "undefined" && 
+                        typeof userPSData.problems != "undefined" &&
+                        typeof userPSData.problems[id] != "undefined") {
+                console.log("userPSData has seed");
+                return userPSData.problems[id]["problem_seed"]; // "undefined" here evals to falsey
+            }
+            // no seed has been stored locally
+            console.log("no local seed");
+            return null;
+        }
+
+        console.log("This is what seed is: " + seed);
         // Allow passing in a random seed
         if (typeof seed !== "undefined") {
             problemSeed = seed;
-
+            console.log("Seed must not have been undefined");
+        // [@wescott] Check to see if there has been a seed stored for this problem
+        } else if (getLocalSeed()) {
+            console.log("Local seed found, so getting that");
+            problemSeed = parseInt(getLocalSeed());
         // In either of these testing situations,
         } else if ((testMode && Khan.query.test != null) || user == null) {
+            console.log("Either testmode is true and test exists in query string...");
+            console.log(testMode);
+            console.log(Khan.query.test);
+            console.log("...or user is null");
+            console.log(user);
             problemSeed = randomSeed % bins;
         }
+
+        console.log("seed again is " + seed);
+        console.log("randomSeed is " + randomSeed);
+        console.log("problemSeed is " + problemSeed);
 
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
 
         // [@wescott] Store locally, OK if overwrites previous value 
-        var seedKey = c2gConfig.user || 'anon';
-        seedKey += '-';
-        if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
-            seedKey += 'ps-' + $('#pset_id').val();
-        } else if ($('#exercise_type').length && $('#exercise_type').val() === 'video') {
-            seedKey += 'vid-' + $('#video_id').val();
-        }
-        seedKey += '-' + id;
         console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
-        localStorage.setItem(seedKey, problemSeed);
+        localStorage.setItem(getLSSeedKey(), problemSeed);
 
         // store in userPSData object
         if (typeof userPSData != "undefined") {
@@ -3157,7 +3198,6 @@ var Khan = (function() {
             }
             */
 
-
             // Generate the initial problem when dependencies are done being loaded
             //var answerType = makeProblem();
 
@@ -3165,7 +3205,7 @@ var Khan = (function() {
             var first = $('#questions-viewed li:first-child');
 
             // [@wescott] Set up cards so the first one not done is the "current card"
-            (function configureCards () {
+            function configureCards () {
                 //console.log('configureCards called');
                 var cardArr = $('#questions-stack li').toArray();
                 //console.log($('li.current-question'));
@@ -3220,7 +3260,11 @@ var Khan = (function() {
                     }
                 };
                 pollForRemoteEx();
-            })();
+            }
+            console.log($('#exercise_type').val());
+            if ($('#exercise_type').val() != "video") {
+                configureCards();
+            }
 
         }
 
@@ -3486,6 +3530,41 @@ var Khan = (function() {
         // [@wescott] Still within initC2GStacks()
 
     }
+
+    KhanC2G.initVideoExercises = function () {
+        $('.current-card-contents').append($('div.content'));
+        $('.current-card-contents').css('min-height', '600px');
+        $('div.content').css('position', 'absolute').css('top', '10px').css('left','10px');
+
+        $('#container').css('padding-top',0);
+        $('#examples-show').hide();
+
+        var skipBtn = document.createElement('input');
+        $(skipBtn).attr('id', 'skip-button');
+        $(skipBtn).attr('type', 'button');
+        $(skipBtn).attr('value', 'Skip Question');
+        $(skipBtn).attr('title', 'Skip this question and return to the video');
+        $(skipBtn).addClass('simple-button').addClass('green').addClass('full-width');
+        $('#check-answer-button').after($(skipBtn));
+        $(skipBtn).click(function () { $('#next-question-button').trigger('click'); })
+        $('#next-question-button').val("Correct! Resume Video");
+
+        $('#next-question-button').unbind('click');
+        $('#next-question-button').click(function () {
+
+            $('#questionBG').remove();
+            $('#questionPane').remove();
+            $('#problemarea').css('z-index', 0);
+
+            $('#playerdiv').fadeTo('slow', 1.0);
+            $('.video-overlay-question').hide();
+            $('.video-overlay-hint').hide();
+            $('#answer_area').fadeOut('slow');
+            $("#slideIndex").show();
+
+            player.playVideo();
+        });
+    };
 
     return Khan;
 
