@@ -22,6 +22,10 @@ from django.views.decorators.debug import sensitive_post_parameters
 
 import json
 import settings
+import os.path
+
+import logging
+logger=logging.getLogger("foo")
 
 backend = get_backend('registration.backends.simple.SimpleBackend')
 form_class = RegistrationFormUniqueEmail
@@ -42,7 +46,12 @@ def preview(request, course_prefix, course_suffix):
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)
-    return render_to_response('previews/'+request.common_page_data['course'].handle+'.html',
+    template_name='previews/default.html'
+    class_template='previews/'+request.common_page_data['course'].handle+'.html'
+    logger.info(settings.TEMPLATE_DIRS)
+    if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
+        template_name=class_template
+    return render_to_response(template_name,
                               {'form': form,
                                'login_form': login_form,
                               'common_page_data': request.common_page_data,
