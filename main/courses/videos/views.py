@@ -52,13 +52,9 @@ def view(request, course_prefix, course_suffix, slug):
     if video_rec:
         video_rec = video_rec[0]
     else:
-        #if student, needs to be an easy way to check if member of group
-        user_groups = request.user.groups.all()
-        for group in user_groups:
-            if group == common_page_data['course'].student_group:
-                video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
-                video_rec.save()
-                break
+        #note student field to be renamed to user, VideoActivity for all users now
+        video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
+        video_rec.save()
 
     if video.mode == 'ready':
         draft_version = video.image
@@ -81,14 +77,6 @@ def edit(request, course_prefix, course_suffix, slug):
              'slug': slug,
              'form': form,
              })
-
-def GetOAuth2Url(request):
-    client_id = "287022098794.apps.googleusercontent.com"
-    redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
-    response_type = "code"
-    scope = "https://gdata.youtube.com"
-
-    return "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&scope=" + scope + "&response_type=" + response_type
 
 @auth_is_course_admin_view_wrapper
 def upload(request, course_prefix, course_suffix):

@@ -741,10 +741,9 @@ var Khan = (function() {
         // Initialize to an empty jQuery set
         exercises = jQuery();
 
-        // [@wescott] Is this problem set formative or summative?
-        // Default is formative, but check problem set div for summative CSS
-        // class; otherwise, check the class name on the article element in
-        // the page
+        // [@wescott] Is this problem set formative or summative? Default is 
+        // formative, but check problem set div for summative CSS class; 
+        // otherwise, check the class name on the article element in the page
         exAssessType = 'formative';
         if ($("div.summative").length || $("div.assessive").length ||
             $("article.summative").length || $("article.summative").length) {
@@ -757,11 +756,11 @@ var Khan = (function() {
             if (remoteExercises.length) {
 
                 KhanC2G.remoteExercises = [];
+                // [@wescott] controlLoad is a helper to ensure exercise fetching 
+                // happens sequentially and synchronously
                 var controlLoad = function(exArr) {
                     if (exArr.length > 0) {
                         currentEx = exArr.shift();
-                        // [@wescott] Passing "remoteExercises" to loadExercise too,
-                        // so it can check original list of exercises that should be coming
                         loadExercise.call(currentEx).done(function () {
                             controlLoad(exArr);
                         });
@@ -1071,29 +1070,70 @@ var Khan = (function() {
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
 
+        // [@wescott] Build and return a localStorage key
+        function getLSSeedKey () {
+            var seedKey = c2gConfig.user || 'anon';
+            seedKey += '-';
+            if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
+                seedKey += 'ps-' + $('#pset_id').val();
+            } else if ($('#exercise_type').length && $('#exercise_type').val() === 'video') {
+                seedKey += 'vid-' + $('#video_id').val();
+            }
+            seedKey += '-' + id;
+            return seedKey;
+        }
+
+        // [@wescott] Has a problem seed been stored? Only should factor in for non-video exercises
+        function getLocalSeed () {
+            // if not in-video ex, try the seed data stored in the question card
+            if ($('#exercise_type').val() != "video" && $('.current-question').data('problem_seed')) {
+                console.log("current-question card has seed");
+                return $('.current-question').data('problem_seed');
+            // otherwise, if not in-video ex, try one stored in localStorage
+            } else if ($('#exercise_type').val() != "video" && getLSSeedKey()) {
+                console.log("localStorage has seed");
+                return localStorage.getItem(getLSSeedKey());
+            // finally, try the userPSData object
+            } else if (typeof userPSData != "undefined" && 
+                        typeof userPSData.problems != "undefined" &&
+                        typeof userPSData.problems[id] != "undefined") {
+                console.log("userPSData has seed");
+                return userPSData.problems[id]["problem_seed"]; // "undefined" here evals to falsey
+            }
+            // no seed has been stored locally
+            console.log("no local seed");
+            return null;
+        }
+
+        console.log("This is what seed is: " + seed);
         // Allow passing in a random seed
         if (typeof seed !== "undefined") {
             problemSeed = seed;
-
+            console.log("Seed must not have been undefined");
+        // [@wescott] Check to see if there has been a seed stored for this problem
+        } else if (getLocalSeed()) {
+            console.log("Local seed found, so getting that");
+            problemSeed = parseInt(getLocalSeed());
         // In either of these testing situations,
         } else if ((testMode && Khan.query.test != null) || user == null) {
+            console.log("Either testmode is true and test exists in query string...");
+            console.log(testMode);
+            console.log(Khan.query.test);
+            console.log("...or user is null");
+            console.log(user);
             problemSeed = randomSeed % bins;
         }
+
+        console.log("seed again is " + seed);
+        console.log("randomSeed is " + randomSeed);
+        console.log("problemSeed is " + problemSeed);
 
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
 
-        // [@wescott] Store locally 
-        var seedKey = c2gConfig.user || 'anon';
-        seedKey += '-';
-        if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
-            seedKey += 'ps-' + $('#pset_id').val();
-        } else if ($('#exercise_type').length && $('#exercise_type').val() === 'video') {
-            seedKey += 'vid-' + $('#video_id').val();
-        }
-        seedKey += '-' + id;
+        // [@wescott] Store locally, OK if overwrites previous value 
         console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
-        localStorage.setItem(seedKey, problemSeed);
+        localStorage.setItem(getLSSeedKey(), problemSeed);
 
         // store in userPSData object
         if (typeof userPSData != "undefined") {
@@ -1334,71 +1374,82 @@ var Khan = (function() {
         $("#answercontent input").not("#check-answer-button")
             .removeAttr("disabled");
 
-        // [@wescott] If summative problem set, add note about penalties per try
-        if (exAssessType == "summative") {
-            var maxAttempts, penaltyPct, alreadyAttempted;
-            var maxCredit = 100; 
-            // [@wescott] Check c2gConfig first, which defines overall Problem Set parameters
-            if (typeof c2gConfig != "undefined") {
-                maxAttempts = (typeof c2gConfig.maxAttempts != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
-                penaltyPct = (typeof c2gConfig.penaltyPct != "undefined") ? c2gConfig.penaltyPct + "%" : "25%";
-            } else {
-                maxAttempts = 3;
-                penaltyPct = "25%";
-            }
-            var exerciseRef = ($('.current-question').data("problem")) ? parseInt($('.current-question').data("problem")) : id;
+        var maxAttempts, penaltyPct, alreadyAttempted;
+        var maxCredit = 100; 
+        // [@wescott] Check c2gConfig first, which defines overall Problem Set parameters
+        if (typeof c2gConfig != "undefined") {
+            maxAttempts = (typeof c2gConfig.maxAttempts != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+            penaltyPct = (typeof c2gConfig.penaltyPct != "undefined") ? c2gConfig.penaltyPct + "%" : "25%";
+        } else {
+            maxAttempts = 3;
+            penaltyPct = "25%";
+        }
+        var exerciseRef = ($('.current-question').data("problem")) ? parseInt($('.current-question').data("problem")) : id;
 
-            // [@wescott] Default to no attempts
-            alreadyAttempted = 0;
-            if (typeof userPSData != "undefined" && 
-                    typeof userPSData.problems != "undefined" && 
-                    userPSData.problems[exerciseRef] && 
-                    userPSData.problems[exerciseRef]["already_attempted"]) {
-                alreadyAttempted = userPSData.problems[exerciseRef]["already_attempted"];
-            }
-
-            // [@wescott] If it's been attempted at all
-            if (alreadyAttempted > 0) {
-                maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
-                console.log("Checking for previous answer for this problem...");
-                if (userPSData.problems[exerciseRef]['user_selection_val']) {
-                    console.log("...found in userPSData");
-                    var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
-                    $('#solutionarea input')[userSelVal].checked = true;
-                } else if ($('.current-question').data('user_selection_val')) {
-                    console.log("...found in current question's data object");
-                    var userSelVal = parseInt($('.current-question').data('user_selection_val'));
-                    $('#solutionarea input')[userSelVal].checked = true;
-                }
-            } 
-            
-            // [@wescott] If user got this one right, remove penalty description and replace with summary
-            if (typeof userPSData != "undefined" && 
-                typeof userPSData.problems != "undefined" &&
+        // [@wescott] Default to no attempts
+        alreadyAttempted = 0;
+        if (typeof userPSData != "undefined" && 
+                typeof userPSData.problems != "undefined" && 
                 userPSData.problems[exerciseRef] && 
-                userPSData.problems[exerciseRef]['correct']) {
-                $('#solutionarea input').attr('disabled', 'disabled');
-                $('#solutionarea').remove('p');
-                $('#check-answer-button').hide();
+                userPSData.problems[exerciseRef]["already_attempted"]) {
+            alreadyAttempted = userPSData.problems[exerciseRef]["already_attempted"];
+        }
+
+        // [@wescott] If it's been attempted at all
+        if (alreadyAttempted > 0) {
+            maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
+            console.log("Checking for previous answer for this problem...");
+            if (userPSData.problems[exerciseRef]['user_selection_val']) {
+                console.log("...found in userPSData");
+                var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
+                if ($('#solutionarea input:radio').length) {
+                    $('#solutionarea input')[userSelVal].checked = true;
+                } else {
+                    $('#solutionarea #testinput').val(userSelVal);
+                }
+            } else if ($('.current-question').data('user_selection_val')) {
+                console.log("...found in current question's data object");
+                var userSelVal = parseInt($('.current-question').data('user_selection_val'));
+                if ($('#solutionarea input:radio').length) {
+                    $('#solutionarea input')[userSelVal].checked = true;
+                } else {
+                    $('#solutionarea #testinput').val(userSelVal);
+                }
+            }
+        } 
+        
+        // [@wescott] If user got this one right, remove penalty description and replace with summary
+        if (typeof userPSData != "undefined" && 
+            typeof userPSData.problems != "undefined" &&
+            userPSData.problems[exerciseRef] && 
+            userPSData.problems[exerciseRef]['correct']) {
+            $('#solutionarea input').attr('disabled', 'disabled');
+            $('#solutionarea').remove('p');
+            $('#check-answer-button').hide();
+            $('.hint-box').hide();
+            if (exAssessType == "summative") {
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
-            } else {
+            }
+        } else {
+            // [@wescott] If summative problem set, add note about penalties per try
+            if (exAssessType == "summative") {
                 $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
                 $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
-                $("#check-answer-button").val("Submit Answer");
-                $("#check-answer-button").show();
             }
-
-            if ($('#submit-problemset-button').length) {
-                $('#submit-problemset-button').show();
-            } else {
-                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
-                $('#submit-problemset-button').click(function () {
-                    location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
-                });
-            }
-
+            $("#check-answer-button").val("Submit Answer");
+            $("#check-answer-button").show();
         }
+
+        if ($('#submit-problemset-button').length) {
+            $('#submit-problemset-button').show();
+        } else {
+            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+            $('#submit-problemset-button').click(function () {
+                location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
+            });
+        }
+       
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
             $("#examples-show").show();
@@ -2982,7 +3033,6 @@ var Khan = (function() {
         // C2G: we use a different place for the exercises (originally was with the rest of the static files)
         // since we need to get from S3
         var dfd = $.Deferred();
-        var listOfExercises = arguments[0];
 
         $.ajaxSetup({timeout:10000});
         $.get(urlBaseExercise + "exercises/" + fileName, function(data, status, xhr) {
@@ -3066,27 +3116,9 @@ var Khan = (function() {
 
             }
 
-            /*
-            if (typeof userPSData == "undefined" ||
-                    $.isEmptyObject(userPSData) ||
-                    typeof userPSData.userAnswer == "undefined") {
-                makeProblem(exercises.length - 1);
-            }
-            */
-
         // [@wescott] setTimeout below is to allow enough time for last exercise to be properly loaded
         }).done(setTimeout(function () { dfd.resolve(); }, 5000));
-        /*
-        }).done(function () {
-            (function pollExercises() {
-                if (exercises.length == listOfExercises.length) {
-                    dfd.resolve();
-                } else {
-                    setTimeout(pollExercises, 500);
-                }
-            })();
-        });
-        */
+
         return dfd.promise();
     }
 
@@ -3135,6 +3167,8 @@ var Khan = (function() {
 
         function injectExerciseFrameMarkup(htmlExercise) {
 
+            // [@wescott] Need prepend, as slow connection causes video div to be overwritten
+            // for in-video exercises
             //$("#container .exercises-body .current-card-contents").html(htmlExercise);
             $("#container .exercises-body .current-card-contents").prepend(htmlExercise);
 
@@ -3175,16 +3209,14 @@ var Khan = (function() {
             }
             */
 
-
             // Generate the initial problem when dependencies are done being loaded
             //var answerType = makeProblem();
 
             // [@wescott] moves to viewed list, as it's currently being viewed
             var first = $('#questions-viewed li:first-child');
-            //makeProblem(first.data('problem'), first.data('randseed'))
 
             // [@wescott] Set up cards so the first one not done is the "current card"
-            (function configureCards () {
+            function configureCards () {
                 //console.log('configureCards called');
                 var cardArr = $('#questions-stack li').toArray();
                 //console.log($('li.current-question'));
@@ -3239,7 +3271,11 @@ var Khan = (function() {
                     }
                 };
                 pollForRemoteEx();
-            })();
+            }
+            console.log($('#exercise_type').val());
+            if ($('#exercise_type').val() != "video") {
+                configureCards();
+            }
 
         }
 
@@ -3327,29 +3363,6 @@ var Khan = (function() {
 
         };
 
-        // [@wescott] This replaces the radio button choices in the #solutionarea with the exact
-        // choices that were given to the user when he/she answered the question before; userSelection
-        // is what the user actually chose
-        // [@wescott] NO LONGER NECESSARY
-        /*
-        var reconstructChoices = function (choices, userSelection) {
-            $('#solutionarea ul').empty().remove();
-            $('#solutionarea').prepend('<ul></ul>');
-            for (var i = 0; i < choices.length; i += 1) {
-                $('#solutionarea ul').append('<li><label></label></li>');
-                $('#solutionarea li:last label').append('<input type="radio" name="solution" value="' + i + '"/>');
-                if (i == userSelection) {
-                    $('#solutionarea li:last input').get(0).checked = true;
-                }
-                $('#solutionarea li:last label').append('<span class="value">' + choices[i] + '</span>');
-            }
-            if ($('.current-question').data('correct')) {
-                $('#solutionarea input').attr('disabled','disabled');
-            }
-            $('#solutionarea').css('visibility', 'visible');
-        };
-        */
-
         // [@wescott] When the inputs are available, pre-populate current one with the current question's
         // value, if the user has already answered it
         $.when(checkForInputs()).then(function () {
@@ -3359,9 +3372,6 @@ var Khan = (function() {
             if ($('.current-question') && $('.current-question').data('problem_seed')) {
                 pSeed = parseInt($('.current-question').data('problem_seed'));
             }
-            //KhanC2G.problemIdx = pID;
-            //console.log('checkForInputs() done, so now calling makeProblem');
-            //makeProblem(pID, pSeed);
 
             var userSelectionVal = null;
             if (typeof userPSData != "undefined" && 
@@ -3512,7 +3522,9 @@ var Khan = (function() {
                 if (userChoicesLen > 0 && thisCard.data("correct")) {
                     var choicesArr = $.parseJSON(thisCard.data("user_choices"));
                     var userSel = userPrevSel;
-                    //reconstructChoices(choicesArr, userSel);
+                    if ($('#solutionarea input:radio').length) {
+                        $('#solutionarea input:radio')[userSel].checked = true;
+                    }
                     $('#check-answer-button').attr('disabled', 'disabled');
                 } else if (userPrevSel && $(ev.target).data("correct")) {
                     $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
@@ -3524,6 +3536,7 @@ var Khan = (function() {
                     } else if ($('input:radio').length) {
                         $('input:radio').removeAttr('disabled');
                     }
+                    $('#check-answer-button').removeAttr('disabled');
                 }
             });
 
@@ -3532,6 +3545,41 @@ var Khan = (function() {
         // [@wescott] Still within initC2GStacks()
 
     }
+
+    KhanC2G.initVideoExercises = function () {
+        $('.current-card-contents').append($('div.content'));
+        $('.current-card-contents').css('min-height', '600px');
+        $('div.content').css('position', 'absolute').css('top', '10px').css('left','10px');
+
+        $('#container').css('padding-top',0);
+        $('#examples-show').hide();
+
+        var skipBtn = document.createElement('input');
+        $(skipBtn).attr('id', 'skip-button');
+        $(skipBtn).attr('type', 'button');
+        $(skipBtn).attr('value', 'Skip Question');
+        $(skipBtn).attr('title', 'Skip this question and return to the video');
+        $(skipBtn).addClass('simple-button').addClass('green').addClass('full-width');
+        $('#check-answer-button').after($(skipBtn));
+        $(skipBtn).click(function () { $('#next-question-button').trigger('click'); })
+        $('#next-question-button').val("Correct! Resume Video");
+
+        $('#next-question-button').unbind('click');
+        $('#next-question-button').click(function () {
+
+            $('#questionBG').remove();
+            $('#questionPane').remove();
+            $('#problemarea').css('z-index', 0);
+
+            $('#playerdiv').fadeTo('slow', 1.0);
+            $('.video-overlay-question').hide();
+            $('.video-overlay-hint').hide();
+            $('#answer_area').fadeOut('slow');
+            $("#slideIndex").show();
+
+            player.playVideo();
+        });
+    };
 
     return Khan;
 

@@ -17,14 +17,20 @@ from django.contrib.auth.views import login
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import login as auth_login
 from django.conf import settings
+from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
+from django.views.decorators.debug import sensitive_post_parameters
 
 import json
 import settings
+import os.path
+
+import logging
+logger=logging.getLogger("foo")
 
 backend = get_backend('registration.backends.simple.SimpleBackend')
 form_class = RegistrationFormUniqueEmail
 
-@never_cache
+@upgrade_to_https_and_downgrade_upon_redirect
 def preview(request, course_prefix, course_suffix):
     """
     Much code borrowed from registration.views.register
@@ -32,11 +38,7 @@ def preview(request, course_prefix, course_suffix):
     if request.common_page_data['is_course_admin']:
         return redirect('http://'+request.get_host()+reverse('courses.views.main', args=[course_prefix, course_suffix]))
     
-    
-    #explicitly upgrading
-    if settings.PRODUCTION and not request.is_secure():
-        return redirect('https://'+request.get_host()+request.get_full_path())
-    
+       
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     
@@ -44,17 +46,23 @@ def preview(request, course_prefix, course_suffix):
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)
-    return render_to_response('previews/'+request.common_page_data['course'].handle+'.html',
+    template_name='previews/default.html'
+    class_template='previews/'+request.common_page_data['course'].handle+'.html'
+    logger.info(settings.TEMPLATE_DIRS)
+    if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
+        template_name=class_template
+    return render_to_response(template_name,
                               {'form': form,
                                'login_form': login_form,
                               'common_page_data': request.common_page_data,
                               'display_login': request.GET.__contains__('login')},
                               context_instance=context)
 
-
+@sensitive_post_parameters()
 @never_cache
 @require_POST
 @csrf_protect
+@upgrade_to_https_and_downgrade_upon_redirect
 def preview_login(request, course_prefix, course_suffix):
     """
     Login to c2g in preview mode
@@ -66,8 +74,7 @@ def preview_login(request, course_prefix, course_suffix):
             redirect_to = 'courses.views.main'
         else:
             redirect_to = 'courses.preview.views.preview'
-        #explicitly downgrading
-        return redirect('http://'+request.get_host()+reverse(redirect_to, args=[course_prefix, course_suffix]))
+        return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
         context = RequestContext(request)                
@@ -78,10 +85,11 @@ def preview_login(request, course_prefix, course_suffix):
                           'display_login': True},
                           context_instance=context)
 
-
+@sensitive_post_parameters()
 @require_POST
 @csrf_protect
 @never_cache
+@upgrade_to_https_and_downgrade_upon_redirect
 def preview_reg(request, course_prefix, course_suffix):
     """
     Registering for a course in preview mode
@@ -95,8 +103,7 @@ def preview_reg(request, course_prefix, course_suffix):
             redirect_to = 'courses.views.main'
         else:
             redirect_to = 'courses.preview.views.preview'
-        #explicitly downgrading
-        return redirect('http://'+request.get_host()+reverse(redirect_to, args=[course_prefix, course_suffix]))
+        return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         login_form = AuthenticationForm(data=request.POST)
         context = RequestContext(request)                

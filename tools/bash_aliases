@@ -2,33 +2,23 @@
 
 ## source this from your login shell
 
-hoststage="app1"
-hostprod="app1"
+prod_domain="prod.c2gops.com"
+stage_domain="stage2.c2gops.com"
+dev_domain="dev.c2gops.com"
 
-function prodapp {
-    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
-    ssh -A bitnami@${hostprod}.prod.c2gops.com
-}
+ssh_options="-A"
 
-# function proddb {
-#     ssh-add -l | grep -q "c2g-prod" || echo "ERROR: no \"c2g-prod\" key in your ssh agent, this probably won't work"
-#     ssh -At bitnami@${hostprod}.stage.c2gops.com "sophi/django-project/manage.py dbshell"
-# }
+alias app.prod="ssh ${ssh_options} bitnami@app1.${prod_domain}"
+alias util.prod="ssh ${ssh_options} ubuntu@util1.${prod_domain}"
 
-function stageapp {
-    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-    ssh -A bitnami@${hoststage}.stage.c2gops.com
-}
+alias app.stage="ssh ${ssh_options} bitnami@app1.${stage_domain}"
+alias app1.stage="ssh ${ssh_options} bitnami@app1.${stage_domain}"
+alias app2.stage="ssh ${ssh_options} bitnami@app2.${stage_domain}"
+alias util.stage="ssh ${ssh_options} ubuntu@util1.${stage_domain}"
+alias util1.stage="ssh ${ssh_options} ubuntu@util1.${stage_domain}"
 
-function jenkins {
-    ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-    ssh -A ubuntu@jenkins.dev.c2gops.com
-}
+alias jenkins="ssh ${ssh_options} ubuntu@jenkins.${dev_domain}"
+alias deploy="ssh ${ssh_options} deploy.${dev_domain}"  # as user
 
-# function stagedb {
-#     ssh-add -l | grep -q "c2g-stag" || echo "ERROR: no \"c2g-stag\" key in your ssh agent, this probably won't work"
-#     ssh -At bitnami@${hoststage}.stage.c2gops.com "sophi/django-project/manage.py dbshell"
-# }
-
-alias localdb="~/src/sophi/django-project/manage.py dbshell"
+alias localdb="~/src/class2go/main/manage.py dbshell"
 

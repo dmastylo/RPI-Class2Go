@@ -11,8 +11,11 @@ from courses.common_page_data import get_common_page_data
 from courses.videos.forms import *
 import gdata.youtube
 import gdata.youtube.service
+from gdata.media import YOUTUBE_NAMESPACE
+from atom import ExtensionElement
 import urllib2, urllib, json
 import re
+import settings
 
 import kelvinator.tasks
 
@@ -117,8 +120,8 @@ def oauth(request):
     if 'code' in request.GET:
         code = request.GET.get('code')
 #        print code
-        client_id = "287022098794.apps.googleusercontent.com"
-        client_secret = "vqCgk8qv1XKKtiKGfR8vTq_w"
+        client_id = settings.GOOGLE_CLIENT_ID
+        client_secret = settings.GOOGLE_CLIENT_SECRET
         redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
 
         post_data = [('code', code), ('client_id', client_id), ('client_secret', client_secret), ('redirect_uri', redirect_uri), ('grant_type', 'authorization_code')]
@@ -126,8 +129,7 @@ def oauth(request):
         content = json.loads(result.read())
 
         yt_service = gdata.youtube.service.YouTubeService(additional_headers={'Authorization': "Bearer "+content['access_token']})
-        yt_service.developer_key = 'AI39si5GlWcy9S4eVFtajbVZk-DjFEhlM4Zt7CYzJG3f2bwIpsBSaGd8SCWts6V5lbqBHJYXAn73-8emsZg5zWt4EUlJJ4rpQA'
-
+        yt_service.developer_key = settings.YT_SERVICE_DEVELOPER_KEY 
 
         video = Video.objects.get(pk=request.GET.get('state'))
 
@@ -139,8 +141,9 @@ def oauth(request):
                     text='Education',
                     label='Education')],
             )
-
-        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
+        
+        extension = ExtensionElement('accessControl', namespace=YOUTUBE_NAMESPACE, attributes={'action': 'list', 'permission': 'denied'})
+        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group, extension_elements=[extension])
 
         entry = yt_service.InsertVideoEntry(video_entry, video.file)
         #print entry.id.ToString()
@@ -160,7 +163,7 @@ def oauth(request):
     #return redirect("http://" + request.META['HTTP_HOST'] + "/nlp/Fall2012/videos")
 
 def GetOAuth2Url(request, video):
-    client_id = "287022098794.apps.googleusercontent.com"
+    client_id = settings.GOOGLE_CLIENT_ID
     redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
     response_type = "code"
     scope = "https://gdata.youtube.com"

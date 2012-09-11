@@ -1,3 +1,14 @@
+file "/etc/hostname" do
+  content node.name
+end
+
+template "/home/ubuntu/.bash_aliases" do
+    source "bash_aliases.erb"
+    owner "ubuntu"
+    group "ubuntu"
+    mode "0644"
+end
+
 package "git" do
     action :install
 end
@@ -46,3 +57,9 @@ end
 easy_install_package "PIL" do
     action :install
 end
+
+# Use lynx to flatten out HTML emails
+package "lynx-cur" do
+    action :install
+end
+

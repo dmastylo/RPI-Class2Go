@@ -16,8 +16,10 @@ class common_data(object):
             ('course_suffix' not in view_kwargs)):
             #No course information in the URL.  There is a special case that has it as a POST parameter (Why?)
             #Handle those here
-            if ((not request.POST.__contains__('course_prefix') or 
-                    (not request.POST.__contains__('course_suffix')))):
+            if ((not request.POST.__contains__('course_prefix')) or
+                (not request.POST.get('course_prefix')) or
+                (not request.POST.__contains__('course_suffix')) or
+                (not request.POST.get('course_suffix'))):
                 return None
             else:
                 #The course info is in the POST in this case

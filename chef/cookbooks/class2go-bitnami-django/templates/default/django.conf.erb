@@ -3,6 +3,7 @@ Alias /static "/opt/class2go/static"
 <Directory '/opt/class2go/static'>
 Order allow,deny
 Allow from all
+AddOutputFilterByType DEFLATE text/html text/javascript text/css application/javascript image/png
 </Directory>
 
 Alias /favicon.ico "/opt/class2go/static/graphics/core/favicon.ico"
@@ -14,3 +15,4 @@ WSGIScriptAlias / "/opt/bitnami/apps/django/scripts/django.wsgi"
 Order allow,deny
 Allow from all
 </Directory>
+

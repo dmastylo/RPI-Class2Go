@@ -8,10 +8,13 @@ from django.contrib.auth.models import User
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.extras.widgets import Select
- 
+
+
 import datetime
 import logging
 logger = logging.getLogger('form')
+ 
+from django.contrib.auth.forms import SetPasswordForm
 
 # I put this on all required fields, because it's easier to pick up
 # on them with CSS or JavaScript if they have a class of "required"
@@ -92,8 +95,12 @@ class RegistrationForm(forms.Form):
                                                                    ('ManufacturingConstruction','In manufacturing or construction'),
                                                                    ('AnotherIndustry','In another industry'),
                                                                    ('Other','Other'),))
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
-                                label=_("Password*"))
+
+    password1 = forms.RegexField(regex=r'(?=.*\d)',
+                                 min_length=6,
+                                 widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
+                                 label=_("Password*"),
+                                 error_messages={'invalid': _("This value must contain 1 number.")})
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password (again)*"))
     
@@ -185,3 +192,49 @@ class RegistrationFormNoFreeEmail(RegistrationForm):
         if email_domain in self.bad_domains:
             raise forms.ValidationError(_("Registration using free email addresses is prohibited. Please supply a different email address."))
         return self.cleaned_data['email']
+
+
+class SetPasswordFormC2G(SetPasswordForm):
+ #   """
+ #       A form that lets a user change set his/her password without entering the
+ #       old password
+ #       """
+    
+    new_password1 = forms.RegexField(regex=r'(?=.*\d)',
+                                  min_length=6,
+                                 widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
+                                label=_("Password*"),
+                                error_messages={'invalid': _("This value must contain 1 number.")})
+    
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(SetPasswordForm, self).__init__(*args, **kwargs)
+
+
+class PasswordChangeFormC2G(SetPasswordFormC2G):
+    """
+        A form that lets a user change his/her password by entering
+        their old password.
+        """
+    error_messages = dict(SetPasswordFormC2G.error_messages, **{
+                          'password_incorrect': _("Your old password was entered incorrectly. "
+                                                  "Please enter it again."),
+                          })
+    old_password = forms.CharField(label=_("Old password"),
+                                   widget=forms.PasswordInput)
+    
+    def clean_old_password(self):
+        """
+            Validates that the old_password field is correct.
+            """
+        old_password = self.cleaned_data["old_password"]
+        if not self.user.check_password(old_password):
+            raise forms.ValidationError(
+                                        self.error_messages['password_incorrect'])
+        return old_password
+PasswordChangeFormC2G.base_fields.keyOrder = ['old_password', 'new_password1',
+                                           'new_password2']
+
+
+#######################################################################################

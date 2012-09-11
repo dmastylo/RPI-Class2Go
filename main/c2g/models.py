@@ -112,6 +112,14 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     def __unicode__(self):
         return self.title
     
+    def _get_prefix(self):
+        return self.handle.split("--")[0]
+    prefix = property(_get_prefix)
+
+    def _get_suffix(self):
+        return self.handle.split("--")[1]
+    suffix = property(_get_suffix)
+
     def get_all_students(self):
         """
         Returns a QUERY_SET of all students
@@ -410,9 +418,6 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return ""
         
         url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
-        url_parts = str(url).split('?')
-        if len(url_parts) > 1:
-            url = url_parts[0]
         return url
 
     class Meta:
@@ -504,6 +509,9 @@ class UserProfile(TimestampMixin, models.Model):
     user_agent_first = models.CharField(max_length=256, null=True)
     referrer_first = models.CharField(max_length=256, null=True)
     accept_language_first = models.CharField(max_length=64, null=True)
+    
+    def __unicode__(self):
+        return self.user.username
 
     class Meta:
         db_table = u'c2g_user_profiles'
@@ -692,6 +700,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if not self.file.storage.exists(self.file.name):
             return ""
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+
+    def ret_url(self):
+        return "https://www.youtube.com/analytics#fi=v-" + self.url + ",r=retention"
 
     def runtime(self):
         if not self.duration:
@@ -1123,6 +1134,7 @@ class NewsEvent(models.Model):
     class Meta:
         db_table = u'c2g_news_events'
 
+#Should probably slate this EditProfileForm for moving to a different file
 class EditProfileForm(forms.Form):
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)

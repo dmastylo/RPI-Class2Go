@@ -17,26 +17,14 @@ from courses.actions import auth_view_wrapper
 def index(item): # define a index function for list items
  return item[1]
 
-current_courses = {
-    'cs144':{'pre':'cs144','post':'Fall2012'},
-    'networking':{'pre':'networking','post':'Fall2012'},
-    'matsci256':{'pre':'matsci256','post':'Fall2012'},
-    'solar':{'pre':'solar','post':'Fall2012'},
-    'security':{'pre':'security','post':'Fall2012'},
-    'cs224n':{'pre':'cs224n','post':'Fall2012'},
-    'nlp':{'pre':'nlp','post':'Fall2012'},
-    'psych30':{'pre':'psych30','post':'Fall2012'},
-    'perception':{'pre':'perception','post':'Fall2012'},
-    'nano':{'pre':'nano','post':'Fall2012'},
-    'crypto':{'pre':'crypto','post':'Fall2012'},
-    'test':{'pre':'test','post':'Fall2012'},
-    }
+
+curTerm = 'Fall2012'
 
 def current_redirects(request, course_prefix):
-    if course_prefix in current_courses:
-        return redirect(reverse('courses.views.main',args=[current_courses[course_prefix]['pre'],  current_courses[course_prefix]['post']]))
-    #if not found, raise 404 in fall-thru
-    raise Http404 
+    if Course.objects.filter(handle=course_prefix+'--'+curTerm).exists():
+        return redirect(reverse('courses.views.main',args=[course_prefix, curTerm]))
+    else: 
+        raise Http404
     
 
 def main(request, course_prefix, course_suffix):
@@ -53,10 +41,6 @@ def main(request, course_prefix, course_suffix):
         if not common_page_data['is_course_admin']:
             return redirect(reverse('courses.preview.views.preview',args=[course_prefix, course_suffix]))
 
-    #downgrade explicitly
-    if request.is_secure():
-        return redirect('http://'+request.get_host()+request.get_full_path())
-                
     
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
@@ -95,7 +79,19 @@ def main(request, course_prefix, course_suffix):
 
         for file in file_list:
             if file.section.id == contentsection.id:
-                index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title))
+                file_parts=re.split('\.',file.file.url)
+                file_extension=file_parts.pop().lower()
+                if file_extension in ("html", "htm"):
+                    icon_type="globe"
+                elif (file_extension in ("ppt", "pptx")):
+                    icon_type="list-alt"
+                elif (file_extension in ('jpg', 'png', 'gif', 'jpeg')):
+                    icon_type="picture"  
+                elif (file_extension in ('mp3', 'aac')):
+                    icon_type="music"
+                else:
+                    icon_type="file"
+                index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
         index_list.sort(key = index)
         full_index_list.append(index_list)

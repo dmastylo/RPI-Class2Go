@@ -567,6 +567,7 @@ def create_course_nlp(data, users):
     data['late_penalty']=1
     data['submissions_permitted']=0
     data['resubmission_penalty']=25
+    data['assessment_type']='formative'
     
     pset1 = create_problem_set(data, users)
 
@@ -583,6 +584,7 @@ def create_course_nlp(data, users):
     data['late_penalty']=1
     data['submissions_permitted']=0
     data['resubmission_penalty']=25
+    data['assessment_type']='formative'
 
     # Removing second problem set
     # KELVIN TODO -- fix create_problem_set so it handles two problem sets referencing the same exercises
@@ -871,6 +873,7 @@ def create_problem_set(data, users):
         description = data['description'],
         mode='draft',
         index=data['index'],
+        assessment_type=data['assessment_type']
     )
     problem_set.save()
     prod_instance =  problem_set.create_ready_instance()
