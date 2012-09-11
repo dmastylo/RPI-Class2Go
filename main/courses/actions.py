@@ -136,7 +136,7 @@ def change_live_datetime(request):
             elif parts[0] == 'file':
                 content = File.objects.get(id=parts[1])
 
-            if action == "Make Ready and Go Live":
+            if action == "Make Ready and Go Live" and parts[0] != 'file':
                 content.commit()
             content.live_datetime = new_live_datetime
             content.image.live_datetime = new_live_datetime
