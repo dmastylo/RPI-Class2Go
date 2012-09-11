@@ -1,27 +1,28 @@
-Sophi 
+Class2Go 
 ========
 
-Sophi is Stanford's internal platform for on-line courses. We began
-building Sophi in June 2012. A team of eight has worked on it through
-the summer. It will launch in Fall 2012 to host a handful of internal
-and open Stanford classes.
+Class2Go is Stanford's internal platform for on-line courses. We
+began building Class2Go in June 2012. A team of eight has worked on
+it through the summer. It will launch in Fall 2012 to host a handful
+of internal classes, and two open Stanford classes: [Computer
+Networking] [net] and [Solar Cells, Fuel Cells, and Batteries] [sol]
+  [net]: http://networking.class.stanford.edu/
+  [sol]: http://solar.class.stanford.edu/
 
-(TODO: list of classes, links here)
-
-Sophi is intended to be an open platform for learning and research.
+Class2Go is intended to be an open platform for learning and research.
 Professors will have direct access to the data for their classes
 to learn how their students learn. We will facilitate experiments.
 This could be A/B/N testing of how different things affect student
 learning, or even bespoke code to try out interesting new features.
 
 If you are interested in discussing with us, the team can be reached 
-at <sophi@cs.stanford.edu>
+at <class2go-contact@cs.stanford.edu>
 
 
 Philosophy 
 ----------
 
-Here is what is important to us.
+There are som principles that have guided our project:
 
 * *Open*. The platform is open source to make it easier for users
     (faculty members) to give us feedback on what we are doing.
