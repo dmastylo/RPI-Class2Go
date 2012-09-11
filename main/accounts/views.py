@@ -10,13 +10,23 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 
+from c2g.models import Course
 
 def index(request):
     return HttpResponse("Hello, world. You're at the user index.")
 
 
 def profile(request):
-    return render_to_response('accounts/profile.html', {'request': request}, context_instance=RequestContext(request))
+    course_list = Course.objects.all()
+    groups = request.user.groups.all()
+    courses = []
+    for g in groups:
+        for c in course_list:
+            if g.id == c.student_group_id or g.id == c.instructor_group_id or g.id == c.tas_group_id or g.id == c.readonly_tas_group_id:
+                courses.append(c)
+                break
+
+    return render_to_response('accounts/profile.html', {'request': request, 'courses': courses}, context_instance=RequestContext(request))
 
 def edit(request):
     return render_to_response('accounts/edit.html', {'request':request}, context_instance=RequestContext(request))
