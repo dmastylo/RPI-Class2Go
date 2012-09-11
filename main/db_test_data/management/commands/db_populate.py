@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         delete_db_data()
         
-        if options['massive']:
+        if ('massive' in options) and (options['massive']):
             # Don't create fewer than 4 profs, 4 tas, 4 readonly tas, and 40 students
             user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':40}
             content_counts = {'num_massive_courses':1, 'num_sections_per_course':2, 'num_videos_per_section':5}
@@ -77,7 +77,7 @@ def create_users(user_counts):
     for i in range(user_counts['num_professors']):
         professors.append(User.objects.create_user('professor_' + str(i)))
         professors[i].set_password('class2go')
-        professors[i].first_name = "Test"
+        professors[i].first_name = "Tess"
         professors[i].last_name = "Teacher"
         professors[i].email = "professor_%d@stanford.edu" % i
         professors[i].is_staff = 1
