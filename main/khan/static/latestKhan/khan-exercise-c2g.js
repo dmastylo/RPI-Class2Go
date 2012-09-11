@@ -1374,71 +1374,82 @@ var Khan = (function() {
         $("#answercontent input").not("#check-answer-button")
             .removeAttr("disabled");
 
-        // [@wescott] If summative problem set, add note about penalties per try
-        if (exAssessType == "summative") {
-            var maxAttempts, penaltyPct, alreadyAttempted;
-            var maxCredit = 100; 
-            // [@wescott] Check c2gConfig first, which defines overall Problem Set parameters
-            if (typeof c2gConfig != "undefined") {
-                maxAttempts = (typeof c2gConfig.maxAttempts != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
-                penaltyPct = (typeof c2gConfig.penaltyPct != "undefined") ? c2gConfig.penaltyPct + "%" : "25%";
-            } else {
-                maxAttempts = 3;
-                penaltyPct = "25%";
-            }
-            var exerciseRef = ($('.current-question').data("problem")) ? parseInt($('.current-question').data("problem")) : id;
+        var maxAttempts, penaltyPct, alreadyAttempted;
+        var maxCredit = 100; 
+        // [@wescott] Check c2gConfig first, which defines overall Problem Set parameters
+        if (typeof c2gConfig != "undefined") {
+            maxAttempts = (typeof c2gConfig.maxAttempts != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
+            penaltyPct = (typeof c2gConfig.penaltyPct != "undefined") ? c2gConfig.penaltyPct + "%" : "25%";
+        } else {
+            maxAttempts = 3;
+            penaltyPct = "25%";
+        }
+        var exerciseRef = ($('.current-question').data("problem")) ? parseInt($('.current-question').data("problem")) : id;
 
-            // [@wescott] Default to no attempts
-            alreadyAttempted = 0;
-            if (typeof userPSData != "undefined" && 
-                    typeof userPSData.problems != "undefined" && 
-                    userPSData.problems[exerciseRef] && 
-                    userPSData.problems[exerciseRef]["already_attempted"]) {
-                alreadyAttempted = userPSData.problems[exerciseRef]["already_attempted"];
-            }
-
-            // [@wescott] If it's been attempted at all
-            if (alreadyAttempted > 0) {
-                maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
-                console.log("Checking for previous answer for this problem...");
-                if (userPSData.problems[exerciseRef]['user_selection_val']) {
-                    console.log("...found in userPSData");
-                    var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
-                    $('#solutionarea input')[userSelVal].checked = true;
-                } else if ($('.current-question').data('user_selection_val')) {
-                    console.log("...found in current question's data object");
-                    var userSelVal = parseInt($('.current-question').data('user_selection_val'));
-                    $('#solutionarea input')[userSelVal].checked = true;
-                }
-            } 
-            
-            // [@wescott] If user got this one right, remove penalty description and replace with summary
-            if (typeof userPSData != "undefined" && 
-                typeof userPSData.problems != "undefined" &&
+        // [@wescott] Default to no attempts
+        alreadyAttempted = 0;
+        if (typeof userPSData != "undefined" && 
+                typeof userPSData.problems != "undefined" && 
                 userPSData.problems[exerciseRef] && 
-                userPSData.problems[exerciseRef]['correct']) {
-                $('#solutionarea input').attr('disabled', 'disabled');
-                $('#solutionarea').remove('p');
-                $('#check-answer-button').hide();
+                userPSData.problems[exerciseRef]["already_attempted"]) {
+            alreadyAttempted = userPSData.problems[exerciseRef]["already_attempted"];
+        }
+
+        // [@wescott] If it's been attempted at all
+        if (alreadyAttempted > 0) {
+            maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
+            console.log("Checking for previous answer for this problem...");
+            if (userPSData.problems[exerciseRef]['user_selection_val']) {
+                console.log("...found in userPSData");
+                var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
+                if ($('#solutionarea input:radio').length) {
+                    $('#solutionarea input')[userSelVal].checked = true;
+                } else {
+                    $('#solutionarea #testinput').val(userSelVal);
+                }
+            } else if ($('.current-question').data('user_selection_val')) {
+                console.log("...found in current question's data object");
+                var userSelVal = parseInt($('.current-question').data('user_selection_val'));
+                if ($('#solutionarea input:radio').length) {
+                    $('#solutionarea input')[userSelVal].checked = true;
+                } else {
+                    $('#solutionarea #testinput').val(userSelVal);
+                }
+            }
+        } 
+        
+        // [@wescott] If user got this one right, remove penalty description and replace with summary
+        if (typeof userPSData != "undefined" && 
+            typeof userPSData.problems != "undefined" &&
+            userPSData.problems[exerciseRef] && 
+            userPSData.problems[exerciseRef]['correct']) {
+            $('#solutionarea input').attr('disabled', 'disabled');
+            $('#solutionarea').remove('p');
+            $('#check-answer-button').hide();
+            $('.hint-box').hide();
+            if (exAssessType == "summative") {
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
-            } else {
+            }
+        } else {
+            // [@wescott] If summative problem set, add note about penalties per try
+            if (exAssessType == "summative") {
                 $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
                 $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
-                $("#check-answer-button").val("Submit Answer");
-                $("#check-answer-button").show();
             }
-
-            if ($('#submit-problemset-button').length) {
-                $('#submit-problemset-button').show();
-            } else {
-                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
-                $('#submit-problemset-button').click(function () {
-                    location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
-                });
-            }
-
+            $("#check-answer-button").val("Submit Answer");
+            $("#check-answer-button").show();
         }
+
+        if ($('#submit-problemset-button').length) {
+            $('#submit-problemset-button').show();
+        } else {
+            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+            $('#submit-problemset-button').click(function () {
+                location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
+            });
+        }
+       
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
             $("#examples-show").show();
@@ -3511,6 +3522,9 @@ var Khan = (function() {
                 if (userChoicesLen > 0 && thisCard.data("correct")) {
                     var choicesArr = $.parseJSON(thisCard.data("user_choices"));
                     var userSel = userPrevSel;
+                    if ($('#solutionarea input:radio').length) {
+                        $('#solutionarea input:radio')[userSel].checked = true;
+                    }
                     $('#check-answer-button').attr('disabled', 'disabled');
                 } else if (userPrevSel && $(ev.target).data("correct")) {
                     $('input#testinput').val(userPrevSel).attr('disabled', 'disabled');
@@ -3522,6 +3536,7 @@ var Khan = (function() {
                     } else if ($('input:radio').length) {
                         $('input:radio').removeAttr('disabled');
                     }
+                    $('#check-answer-button').removeAttr('disabled');
                 }
             });
 
