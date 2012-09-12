@@ -6,7 +6,11 @@ DATABASES = {
         'PASSWORD': '<%= @node[:aws][:database_password] %>',
         'HOST': '<%= @node[:aws][:database_host] %>',
         'PORT': '',
-    }
+    },
+    'celery': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/opt/class2go/celery/celerydb.sqlite',
+    },
 }
 
 # When PRODUCTION=True we don't show stackdumps on errors.  Careful, no quotes.

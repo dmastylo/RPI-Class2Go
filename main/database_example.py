@@ -6,7 +6,12 @@ DATABASES = {
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
+    },
+    'celery': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/opt/class2go/celery/celerydb.sqlite',
+    },
+
 }
 
 SECRET_KEY = ''
@@ -22,8 +27,10 @@ PRODUCTION = False
 INSTANCE="dev"
 
 # Put your name and email address here, so Django serious errors can come to you
+# the trailing comma after the list is important so Python correctly interprets 
+# this as a list of lists
 ADMINS = (
-        ('Class2Go Dev', "YOURNAME@stanford.edu")
+        ('Class2Go Dev', "YOURNAME@stanford.edu"),
         )
 
 # For using S3 Storage, specify these with real settings

@@ -1154,3 +1154,23 @@ class EditProfileForm(forms.Form):
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
     email = forms.CharField(max_length=30)
+
+
+class CourseEmail(TimestampMixin, models.Model):
+    TO_OPTIONS =(('myself','myself'),
+                 ('staff','staff'),
+                 ('students','students'),
+                 ('all','all'),
+                 )
+    course = models.ForeignKey(Course)
+    sender = models.ForeignKey(User)
+    to = models.CharField(max_length=64, choices=TO_OPTIONS, default='myself')
+    hash = models.CharField(max_length=128, db_index=True)
+    subject = models.CharField(max_length=128, blank=True)
+    html_message = models.TextField(null=True, blank=True)
+
+    
+    def __unicode__(self):
+        return self.subject
+    class Meta:
+        db_table = u'c2g_course_emails'
