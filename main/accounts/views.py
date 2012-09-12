@@ -11,6 +11,7 @@ from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 
 from c2g.models import Course
+from accounts.forms import *
 
 def index(request):
     return HttpResponse("Hello, world. You're at the user index.")
@@ -29,15 +30,19 @@ def profile(request):
     return render_to_response('accounts/profile.html', {'request': request, 'courses': courses}, context_instance=RequestContext(request))
 
 def edit(request):
-    return render_to_response('accounts/edit.html', {'request':request}, context_instance=RequestContext(request))
+    uform = EditUserForm(instance=request.user)
+    pform = EditProfileForm(instance=request.user.get_profile())
+    return render_to_response('accounts/edit.html', {'request':request, 'uform':uform, 'pform':pform}, context_instance=RequestContext(request))
 
 def save_edits(request):
-    user = request.user
-    user.first_name = request.POST['first_name']
-    user.last_name = request.POST['last_name']
-    user.email = request.POST['email']
-    user.save()
-    return HttpResponseRedirect(reverse('accounts.views.profile'))
+    uform = EditUserForm(request.POST, instance=request.user)
+    pform = EditProfileForm(request.POST, instance=request.user.get_profile())
+    if uform.is_valid() and pform.is_valid():
+        uform.save()
+        pform.save()
+        return HttpResponseRedirect(reverse('accounts.views.profile'))
+    
+    return render_to_response('accounts/edit.html', {'request':request, 'uform':uform, 'pform':pform}, context_instance=RequestContext(request))
 
 def logout(request):
     logout(request)
