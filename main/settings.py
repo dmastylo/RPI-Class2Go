@@ -155,15 +155,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages'
 )
 
-
-# the mode should be set in your database.py, but if it's not, assume
-# we're in a dev environment (careful!)
-try:
-        class2go_mode
-except NameError:
-        class2go_mode = 'dev'
-
-
 INSTALLED_APPS = (
                       'django.contrib.auth',
                       'django.contrib.contenttypes',
