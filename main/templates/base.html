@@ -8,10 +8,14 @@
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
+
     <!--[if IE 7]>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
     <![endif]-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!--[if lte IE 8]>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/core/respond.min.js"></script>
+    <![endif]-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
     {% endblock top_scripts %}
     {% block addl_stylesheets %}{% endblock addl_stylesheets %}
@@ -162,7 +166,6 @@
     {% block bottom_scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/core/css3-mediaqueries.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
     {% endblock bottom_scripts %}
     <script type="text/javascript">
