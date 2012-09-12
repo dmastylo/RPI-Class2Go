@@ -1,8 +1,8 @@
 <li class="well tight course-list-item" style="overflow:hidden">
-    <div class="span1" style="margin-left:-10px;">
-        <i class="icon-book" style="font-size:40px; color:#999;opacity:.3;margin-top:10px"></i>
+    <div class="pull-left" style="margin-left:-10px; width:50px;">
+        <i class="icon-book" style="font-size:40px; color:#999;opacity:.3"></i>
     </div>
-    <div class="span11">
+    <div style="overflow:hidden;margin-right:10px">
         <h4 style="margin-top:10px;display:inline;"><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4>
     </div>
 </li>
