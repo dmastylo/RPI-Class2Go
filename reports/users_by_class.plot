@@ -1,4 +1,4 @@
-set terminal png font "/Library/Fonts/Arial.ttf" 14 size 600,400
+set terminal png font 14 size 600,400
 set output "users_by_class.png"
 
 set nokey
