@@ -135,6 +135,7 @@ def create_form(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
+
     data = {'common_page_data': common_page_data}
     form = CreateProblemSet(course=common_page_data['course'],
                             initial={'late_penalty':10,
@@ -174,9 +175,9 @@ def create_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-
+    import logging;logger=logging.getLogger(__name__);logger.info('create_action')
     data = {'common_page_data': common_page_data, 'course_prefix': course_prefix, 'course_suffix': course_suffix}
-
+    
     if request.method == 'POST':
         pset = ProblemSet(course = common_page_data['course'])
         form = CreateProblemSet(request.POST, request.FILES, course=common_page_data['course'], instance=pset)
@@ -187,6 +188,9 @@ def create_action(request):
             new_pset.handle = course_prefix + "--" + course_suffix
             new_pset.path = "/"+request.POST['course_prefix']+"/"+request.POST['course_suffix']+"/problemsets/"+new_pset.slug+"/load_problem_set"
 
+            new_pset.save()
+            section = new_pset.section
+            new_pset.index = section.getNextIndex()
             new_pset.save()
             new_pset.create_ready_instance()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], new_pset.slug,)))

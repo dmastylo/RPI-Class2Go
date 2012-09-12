@@ -286,7 +286,11 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         children = self.getChildren()
         if len(children) == 0 :
             return 1
-        return children[-1].index+1
+        
+        if children[-1].index == None:
+            return len(children)+1
+        else:
+            return children[-1].index+1
 
     def __unicode__(self):
         return self.title

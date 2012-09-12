@@ -77,8 +77,8 @@ class RegistrationForm(forms.Form):
                                                                             ('Other','Other'),))
     work = forms.ChoiceField(label=_("I am currently"), choices=(  ('decline',''),
                                                                    ('undergrad','An undergraduate'),
-                                                                   ('gradStudent','An grad student'),
-                                                                   ('HSStudent','An high school (or younger) student'),
+                                                                   ('gradStudent','A graduate student'),
+                                                                   ('HSStudent','A high school (or younger) student'),
                                                                    ('Unemployed','Unemployed'),
                                                                    ('Retired','Retired'),
                                                                    ('----','-------------------'),
