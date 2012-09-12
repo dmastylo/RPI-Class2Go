@@ -721,7 +721,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def runtime(self):
         if not self.duration:
-            return "Runtime unavailable"
+            return "Runtime not yet available"
         m, s = divmod(self.duration, 60)
         h, m = divmod(m, 60)
         if h:
