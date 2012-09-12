@@ -23,11 +23,8 @@ set linestyle 2 lt 3 lw 3
 # set xlabel "Date"
 set ylabel "Users" 
 set title "Class2Go Users"
-set output "class2go_users.png"
+set output "users_by_day.png"
 plot "users_by_day.dat" using 1:2 with boxes ls 1 fill solid 0.3 title "new", \
    "" u 1:($2 + 100):($2) with labels notitle, \
    "" using 1:2 s cumul ls 2 title "cumulative"
 
-# set title "Class2Go Total Users"
-# set output "users_total.png"
-# plot "users_by_day.dat" using 1:2 s cumul 
