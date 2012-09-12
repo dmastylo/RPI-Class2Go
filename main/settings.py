@@ -299,7 +299,10 @@ DATABASE_ROUTERS = ['c2g.routers.CeleryDBRouter',]
 
 
 # Actually send email
-EMAIL_ALWAYS_ACTUALLY_SEND = False
+try:
+   EMAIL_ALWAYS_ACTUALLY_SEND
+except NameError:
+   EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
 SERVER_EMAIL = 'class2go-noreply@cs.stanford.edu'
@@ -318,8 +321,8 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = LOGGING_DIR + 'emails_sent.log'
 
-#Max number of emails sent by each worker, should probably be something like 200
-EMAILS_PER_WORKER = 1
+#Max number of emails sent by each worker, defaults to 200
+#EMAILS_PER_WORKER = 200
 
 #CELERY
 BROKER_TRANSPORT='sqs'
