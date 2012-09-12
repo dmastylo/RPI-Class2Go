@@ -6,7 +6,12 @@ DATABASES = {
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
+    },
+    'celery': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/opt/class2go/celery/celerydb.sqlite',
+    },
+
 }
 
 SECRET_KEY = ''
