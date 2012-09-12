@@ -194,7 +194,7 @@ INSTALLED_APPS = (
                       'kelvinator',
                       'db_scripts'
                       )
-if class2go_mode != "prod":
+if INSTANCE != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
                        )
