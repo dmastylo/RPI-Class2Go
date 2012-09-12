@@ -27,8 +27,10 @@ PRODUCTION = False
 INSTANCE="dev"
 
 # Put your name and email address here, so Django serious errors can come to you
+# the trailing comma after the list is important so Python correctly interprets 
+# this as a list of lists
 ADMINS = (
-        ('Class2Go Dev', "YOURNAME@stanford.edu")
+        ('Class2Go Dev', "YOURNAME@stanford.edu"),
         )
 
 # For using S3 Storage, specify these with real settings
