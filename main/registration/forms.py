@@ -44,16 +44,16 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
                              label=_("E-mail*"))
-    first_name = forms.RegexField(regex=r'^[\w ]+$',
+    first_name = forms.RegexField(regex=r'^[\w -]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
                                   label=_("First Name*"),
-                                  error_messages={'invalid': _("This value may contain only letters and numbers.")})
-    last_name = forms.RegexField(regex=r'^[\w ]+$',
+                                  error_messages={'invalid': _("This value may contain only letters and dashes")})
+    last_name = forms.RegexField(regex=r'^[\w -]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
                                   label=_("Last Name*"),
-                                  error_messages={'invalid': _("This value may contain only letters and numbers.")})
+                                  error_messages={'invalid': _("This value may contain only letters and dashes")})
     max_age=110
     min_age=10
     first_year=datetime.date.today().year-max_age
@@ -77,8 +77,8 @@ class RegistrationForm(forms.Form):
                                                                             ('Other','Other'),))
     work = forms.ChoiceField(label=_("I am currently"), choices=(  ('decline',''),
                                                                    ('undergrad','An undergraduate'),
-                                                                   ('gradStudent','An grad student'),
-                                                                   ('HSStudent','An high school (or younger) student'),
+                                                                   ('gradStudent','A graduate student'),
+                                                                   ('HSStudent','A high school (or younger) student'),
                                                                    ('Unemployed','Unemployed'),
                                                                    ('Retired','Retired'),
                                                                    ('----','-------------------'),
