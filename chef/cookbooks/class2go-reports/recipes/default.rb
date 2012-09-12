@@ -1,3 +1,7 @@
+package "sendmail" do
+    action :install
+end
+
 package "mpack" do
     action :install
 end
@@ -15,14 +19,14 @@ template "mysql-client-config" do
 end
 
 cron "users_by_class" do
-    hour "9"
+    hour "9"   # GMT
     minute "0"
-    command node['system']['admin_home'] + "/class2go/reports/users_by_class.sh olteam@cs.stanford.edu,c2g-dev@cs.stanford.edu"
+    command "(cd #{node['system']['admin_home']}/class2go/reports; ./users_by_class.sh olteam@cs.stanford.edu,c2g-dev@cs.stanford.edu)"
 end
 
 cron "users_by_day" do
-    hour "9"
+    hour "9"   # GMT
     minute "10"
-    command node['system']['admin_home'] + "/class2go/reports/users_by_day.sh olteam@cs.stanford.edu,c2g-dev@cs.stanford.edu"
+    command "(cd #{node['system']['admin_home']}/class2go/reports; ./users_by_day.sh olteam@cs.stanford.edu,c2g-dev@cs.stanford.edu)"
 end
 
