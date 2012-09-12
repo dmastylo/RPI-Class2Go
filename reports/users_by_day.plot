@@ -17,8 +17,8 @@ set mxtics 0
 set xtics 86400
 set boxwidth 20000 absolute
 
-set linestyle 1 lt 1 lw 1
-set linestyle 2 lt 3 lw 3 
+set style line 1 lt 1 lw 1
+set style line 2 lt 3 lw 3 
 
 # set xlabel "Date"
 set ylabel "Users" 
