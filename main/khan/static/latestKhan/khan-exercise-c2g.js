@@ -1403,7 +1403,7 @@ var Khan = (function() {
                 console.log("...found in userPSData");
                 var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
                 if ($('#solutionarea input:radio').length) {
-                    $('#solutionarea input')[userSelVal].checked = true;
+                    $('#solutionarea input:radio')[userSelVal].checked = true;
                 } else {
                     $('#solutionarea #testinput').val(userSelVal);
                 }
@@ -1411,7 +1411,7 @@ var Khan = (function() {
                 console.log("...found in current question's data object");
                 var userSelVal = parseInt($('.current-question').data('userEntered'));
                 if ($('#solutionarea input:radio').length) {
-                    $('#solutionarea input')[userSelVal].checked = true;
+                    $('#solutionarea input:radio')[userSelVal].checked = true;
                 } else {
                     $('#solutionarea #testinput').val(userSelVal);
                 }
@@ -3189,7 +3189,6 @@ var Khan = (function() {
         }
 
         function finishSitePrep() {
-            //debugger;
 
             prepareSite();
 
@@ -3356,12 +3355,13 @@ var Khan = (function() {
         $('#questions-stack').click(stackClickHandler);
 
         //populate 1 questions-to-do for each exercise
-        var curNumProbs=0;
+        var curNumProbs = c2gProbCount = 0;
         $(exercises).filter(".exercise").each(function(idx, elem) {
+
+                //debugger;
 
                 //Figure out how many problems there are in this exercise
                 var probsInExercise=$(elem).children('.problems').children().length;
-                KhanC2G.PSActivityLog.totalProblems = probsInExercise;                
 
                 $(elem).data('problemsStartAtIndex',curNumProbs);
                 $(elem).data('numberOfProblems',probsInExercise);
@@ -3397,12 +3397,13 @@ var Khan = (function() {
                 } else {
                     $('#questions-unviewed ol').append(li);
                 }
+                c2gProbCount += 1;
+
                 curNumProbs+=probsInExercise;
 
             });
 
-        console.log("curNumProbs...");
-        console.log(curNumProbs);
+        KhanC2G.PSActivityLog.totalProblems = c2gProbCount;                
 
         // [C2G] It takes some time for the answer_area inputs to show up with page, exercise,
         // et al loading, then makeProblem() being called
@@ -3498,6 +3499,16 @@ var Khan = (function() {
 
             //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
             var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
+
+            var currentCardIdx = currentQCard.data("problemIndex");
+            var totalCards = $('#questions-stack li');
+            var totalCardsLen = totalCards.length;
+            if (currentCardIdx >= totalCardsLen) {
+                next = $(totalCards[0]);
+            } else {
+                next = $(totalCards[currentCardIdx + 1]);
+            }
+
             next.addClass('current-question');
 
             clearExistingProblem();
