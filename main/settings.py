@@ -185,12 +185,12 @@ INSTALLED_APPS = (
                       'courses.announcements',
                       'courses.videos',
                       'courses.video_exercises',
+                      'courses.email_members',
                       'khan',
                       'problemsets',
                       'django.contrib.flatpages',
                       'storages',
                       'celerytest',
-                      'djcelery_email',
                       'kelvinator',
                       'db_scripts'
                       )
@@ -272,7 +272,8 @@ LOGGING = {
         },
         'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
         }
     },
     'loggers': {
@@ -301,17 +302,21 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Session Settings
 SESSION_COOKIE_AGE = 3*30*24*3600
 
+
+# Database routing
+DATABASE_ROUTERS = ['c2g.routers.CeleryDBRouter',]
+
+
 # Actually send email
 EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
-SERVER_EMAIL = 'c2g-dev@cs.stanford.edu'
+SERVER_EMAIL = 'class2go-noreply@cs.stanford.edu'
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
-    DEFAULT_FROM_EMAIL = "c2g-dev@cs.stanford.edu" #probably change for production
-    #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_BACKEND = 'djcelery_email.backends.CeleryEmailBackend' 
+    DEFAULT_FROM_EMAIL = "class2go-noreply@cs.stanford.edu" #probably change for production
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
     EMAIL_PORT = 587
     EMAIL_HOST_USER = SES_SMTP_USER
@@ -322,11 +327,8 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = LOGGING_DIR + 'emails_sent.log'
 
-#CELERY-email
-CELERY_EMAIL_TASK_CONFIG = {
-    'rate_limit' : '5/s',
-    'max_retries' : 0,
-}
+#Max number of emails sent by each worker, should probably be something like 200
+EMAILS_PER_WORKER = 1
 
 #CELERY
 BROKER_TRANSPORT='sqs'

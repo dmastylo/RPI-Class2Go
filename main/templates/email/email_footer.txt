@@ -1,0 +1,5 @@
+
+----
+This email was automatically sent from Stanford Online to {{first_name}} {{last_name}}. 
+You are receiving this email at address {{ email }} because you are enrolled in {{ course_title }}.
+{{ url }}

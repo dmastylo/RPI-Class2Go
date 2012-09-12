@@ -23,7 +23,7 @@
           {{form.to}}
         <label for="id_subject">{{ form.subject.label }}: {{form.subject.errors}}</label> 
         {{form.subject}}
-        <label for="id_to">{{ form.message.label }}:  {{form.subject.errors}}</label> 
+        <label for="id_message">{{ form.message.label }}:  {{form.message.errors}}</label>
         {{form.message}}
         <input class="btn" type="submit" value="Send">
     </form>
@@ -33,5 +33,5 @@
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
-
+{% include "controls/tinymce.html" %}
 {% endblock addl_scripts %}
