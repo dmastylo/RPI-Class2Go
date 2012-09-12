@@ -17,7 +17,7 @@
             {% autoescape off %}{{ item.visible_status }}{% endautoescape %}
         </td>
         <td width="60"><a id="additionalpage_{{item.additional_page.id}}_title" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">Edit</a></td>
-        <td width="120"></td>
+        <td width="140"></td>
         <td width="20">
             <a href="javascript:DeleteAdditionalPage('{{item.additional_page.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
         </td>

@@ -175,7 +175,6 @@ def create_action(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    import logging;logger=logging.getLogger(__name__);logger.info('create_action')
     data = {'common_page_data': common_page_data, 'course_prefix': course_prefix, 'course_suffix': course_suffix}
     
     if request.method == 'POST':

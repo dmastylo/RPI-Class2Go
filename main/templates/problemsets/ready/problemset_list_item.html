@@ -1,10 +1,9 @@
-<li class="well course-list-item" style="overflow:hidden">
+<li class="well tight course-list-item" style="overflow:hidden">
     <div class="pull-left" style="margin-left:-10px; width:50px;">
-        <i class="icon-pencil" style="font-size:40px; color:#999;opacity:.3;margin-top:10px"></i>
+        <i class="icon-pencil" style="font-size:40px; color:#999;opacity:.3"></i>
     </div>
-    <div class="pull-left">
+    <div style="overflow:hidden;margin-right:10px">
         <h4 style="margin-top:10px;display:inline;"><a href="problemsets/{{item.problem_set.slug}}">{{item.problem_set.title}}</a></h4>
-        <div>
             <p>{{item.problem_set.description}}</p>
             <p><strong>Full Credit Deadline:</strong> {{item.problem_set.due_date}} PST<br>
             <strong>Partial Credit Deadline:</strong> {{item.problem_set.partial_credit_deadline}} PST</p>
@@ -17,6 +16,5 @@
             {% else %}
                 <span class="label">In Progress: {{item.numCompleted}} of {{item.numQuestions}}</span>
             {% endif %}
-        </div>
     </div>
 </li>

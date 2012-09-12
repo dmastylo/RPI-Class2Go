@@ -269,6 +269,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         additionalpages = AdditionalPage.objects.getBySection(section=self)
         for item in additionalpages:
             dict_list.append({'item':item, 'index':item.index})
+            
+        files = File.objects.getBySection(section=self)
+        for item in files:
+            dict_list.append({'item':item, 'index':item.index})
 
         sorted_dict_list = sorted(dict_list, key=lambda k: k['index'])
 
@@ -392,6 +396,13 @@ class FileManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            
+    def getBySection(self, section):
+        if section.mode == 'draft':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -710,7 +721,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def runtime(self):
         if not self.duration:
-            return "Runtime unavailable"
+            return "Runtime not yet available"
         m, s = divmod(self.duration, 60)
         h, m = divmod(m, 60)
         if h:

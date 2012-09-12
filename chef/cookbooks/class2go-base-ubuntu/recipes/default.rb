@@ -1,5 +1,5 @@
 file "/etc/hostname" do
-  content node.name
+  content node.name+".c2gops.com"
 end
 
 template "/home/ubuntu/.bash_aliases" do
