@@ -1388,20 +1388,20 @@ var Khan = (function() {
 
         // [C2G] Default to no attempts
         alreadyAttempted = 0;
-        if (typeof userPSData != "undefined" && 
-                typeof userPSData.problems != "undefined" && 
-                userPSData.problems[exerciseRef] && 
-                userPSData.problems[exerciseRef]["already_attempted"]) {
-            alreadyAttempted = userPSData.problems[exerciseRef]["already_attempted"];
+        if (typeof KhanC2G.PSActivityLog != "undefined" && 
+                typeof KhanC2G.PSActivityLog.problems != "undefined" && 
+                KhanC2G.PSActivityLog.problems[exerciseRef] && 
+                KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"]) {
+            alreadyAttempted = KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"];
         }
 
         // [C2G] If it's been attempted at all
         if (alreadyAttempted > 0) {
             maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
             console.log("Checking for previous answer for this problem...");
-            if (userPSData.problems[exerciseRef]['user_selection_val']) {
+            if (KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered']) {
                 console.log("...found in userPSData");
-                var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
+                var userSelVal = parseInt(KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered']);
                 if ($('#solutionarea input:radio').length) {
                     $('#solutionarea input:radio')[userSelVal].checked = true;
                 } else {
@@ -1419,10 +1419,10 @@ var Khan = (function() {
         } 
         
         // [C2G] If user got this one right, remove penalty description and replace with summary
-        if (typeof userPSData != "undefined" && 
-            typeof userPSData.problems != "undefined" &&
-            userPSData.problems[exerciseRef] && 
-            userPSData.problems[exerciseRef]['correct']) {
+        if (typeof KhanC2G.PSActivityLog != "undefined" && 
+            typeof KhanC2G.PSActivityLog.problems != "undefined" &&
+            KhanC2G.PSActivityLog.problems[exerciseRef] && 
+            KhanC2G.PSActivityLog.problems[exerciseRef]['correct']) {
             $('#solutionarea input').attr('disabled', 'disabled');
             $('#solutionarea').remove('p');
             $('#check-answer-button').hide();
@@ -3347,10 +3347,31 @@ var Khan = (function() {
         $('#questions-stack').click(stackClickHandler);
 
         //populate 1 questions-to-do for each exercise
-        var curNumProbs = c2gProbCount = 0;
+        var curNumProbs = 0;
+        KhanC2G.PSActivityLog.totalProblems = 0;
+
+        // turn userPSData.problems into a local associative array 
+        var attemptedProblems = {};
+        var userPSProblemsLen = userPSData.problems.length;
+        for (var p = 0; p < userPSProblemsLen; p += 1) {
+            attemptedProblems[userPSData.problems[p].problem_index] = userPSData.problems[p];
+        }
+
+        console.log("attemptedProblems ***");
+        console.log(attemptedProblems);
+        console.log(JSON.stringify(attemptedProblems));
+
         $(exercises).filter(".exercise").each(function(idx, elem) {
 
+                console.log("KhanC2G.PSActivityLog");
+                console.log(KhanC2G.PSActivityLog.totalProblems);
                 //debugger;
+                if (typeof userPSData != "undefined" && 
+                    typeof userPSData.problems != "undefined" && 
+                    userPSData.problems[idx.toString()]) {
+                    console.log("Found entry in userPSData!");
+                    console.log(userPSData.problems[idx.toString()]);
+                }
 
                 //Figure out how many problems there are in this exercise
                 var probsInExercise=$(elem).children('.problems').children().length;
@@ -3369,10 +3390,8 @@ var Khan = (function() {
                 //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
                 li.data('problemIndex',idx);
                 //li.data('randseed',Math.floor(Math.random()*100000));
-                if (typeof userPSData != "undefined" && 
-                    typeof userPSData.problems != "undefined" && 
-                    userPSData.problems[idx.toString()]) {
-                    var userQDataObj = userPSData.problems[idx.toString()];
+                if (typeof attemptedProblems != "undefined" && attemptedProblems[idx.toString()]) {
+                    var userQDataObj = attemptedProblems[idx.toString()];
                     li.data('problemSeed', parseInt(userQDataObj.problem_seed));
                     li.data('userEntered', userQDataObj.user_selection_val);
                     li.data('correct', userQDataObj.correct);
@@ -3383,25 +3402,25 @@ var Khan = (function() {
                     li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
                 }
 
+                // Merge list item data into KhanC2G.PSActivityLog so they're synched
+                KhanC2G.PSActivityLog.addProblem(li.data());            
+
                 $.extend(li.data(), $(elem).data());
                 if (idx == 0) {
                     $('#questions-viewed ol').append(li);
                 } else {
                     $('#questions-unviewed ol').append(li);
                 }
-                c2gProbCount += 1;
+
+                KhanC2G.PSActivityLog.totalProblems += 1;
 
                 curNumProbs+=probsInExercise;
 
             });
 
-        KhanC2G.PSActivityLog.totalProblems = c2gProbCount;                
-        for (var i = 0; i < KhanC2G.PSActivityLog.totalProblems; i += 1) {
-            KhanC2G.PSActivityLog.addProblem();            
-        }
-
         // This will be important when a user returns to the page after 
         // having attempted at least one problem
+        /*
         if (typeof userPSData != "undefined" && userPSData.problems) {
             for (var p = 0; p < userPSData.problems.length; p += 1) {
                 var problemObj = KhanC2G.PSActivityLog.problems[userPSData.problems[p].problem_index];
@@ -3414,6 +3433,7 @@ var Khan = (function() {
                 problemObj.correct = userPSData.problems[p].correct;
             }
         }
+        */
 
         // [C2G] It takes some time for the answer_area inputs to show up with page, exercise,
         // et al loading, then makeProblem() being called
@@ -3450,11 +3470,11 @@ var Khan = (function() {
             }
 
             var userSelectionVal = null;
-            if (typeof userPSData != "undefined" && 
-                typeof userPSData.problems != "undefined" && 
-                userPSData.problems[pID] && 
-                userPSData.problems[pID]['user_selection_val']) {
-                userSelectionVal = userPSData.problems[pID]['user_selection_val'];
+            if (typeof KhanC2G.PSActivityLog != "undefined" && 
+                typeof KhanC2G.PSActivityLog.problems != "undefined" && 
+                KhanC2G.PSActivityLog.problems[pID] && 
+                KhanC2G.PSActivityLog.problems[pID]['userEntered']) {
+                userSelectionVal = KhanC2G.PSActivityLog.problems[pID]['userEntered'];
             } else if ($('.current-question').data("userEntered")) {
                 userSelectionVal = $('.current-question').data("userEntered");
             } 
@@ -3466,12 +3486,6 @@ var Khan = (function() {
                         $('#testinput').attr('disabled','disabled');
                     }
                 } else if ($('#solutionarea input:radio').length) {
-                    if (userPSData.problems[pID] && userPSData.problems[pID]['user_choices']) {
-                        var userChoice = userPSData.problems[pID]['user_choices'];
-                    } else if ($('.current-question').data('userChoices')) {
-                        var userChoice = $('.current-question').data('userChoices');
-                    }
-                    var choiceArr = ($.isArray(userChoice)) ? userChoice : $.parseJSON(userChoice);
                     $('#solutionarea input')[userSelectionVal].checked = true;
                     if ($('.current-question').data('correct')) {
                         $('#solutionarea input').attr('disabled','disabled');
