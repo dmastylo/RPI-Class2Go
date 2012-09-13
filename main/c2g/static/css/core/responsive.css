@@ -62,6 +62,32 @@
   display: inherit !important;
 }
 
+.nav-collapse.collapse {
+  
+}
+/*#c2g_layout_topbar .navbar .navbar-inner {
+  background:url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
+  min-height:34px;
+}
+#c2g_layout_topbar .navbar .navbar-inner .container-fluid {
+  padding:0;
+}
+.navbar .nav {
+    border-left:1px solid #999;
+}
+.navbar .nav > li > a {
+    color:#333;
+}
+.navbar .nav .active > a, .navbar .nav .active > a:hover {
+    color:#820000;
+    background:#eadeb9;
+    background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
+}
+.navbar .nav > li > a {
+    padding: 7px 10px 8px;
+    border-right:1px solid #999;
+}*/
+
 @media (min-width: 768px) and (max-width: 979px) {
   .hidden-desktop {
     display: inherit !important;
@@ -77,6 +103,12 @@
   }
 }
 
+/*@media (min-width: 768px) {
+  .nav-collapse.collapse {
+    display:block !important;
+  }
+}*/
+
 @media (max-width: 767px) {
   .hidden-desktop {
     display: inherit !important;
@@ -89,6 +121,9 @@
   }
   .hidden-phone {
     display: none !important;
+  }
+  .top-nav li .btn {
+    margin-right:-20px !important;
   }
 }
 
@@ -229,7 +264,7 @@
     display: inline-block;
     width: auto;
   }
-    .navbar-fixed-top,
+  .navbar-fixed-top,
   .navbar-fixed-bottom {
   }
   .navbar-fixed-top {
@@ -989,9 +1024,37 @@
   }*/
 }
 
-@media (min-width: 768px) {
+
+#c2g_layout_topbar .navbar .navbar-inner {
+    background:#e3ca93 url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
+    min-height:0;
+}
+#c2g_layout_topbar .navbar .navbar-inner .container-fluid {
+    padding:0;
+}
+.navbar .nav {
+    border-left:1px solid #999;
+}
+.navbar .nav > li > a {
+    color:#333;
+}
+.navbar .nav .active > a, .navbar .nav .active > a:hover {
+    color:#820000;
+    background:#eadeb9;
+    background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
+}
+.navbar .nav > li > a {
+    padding: 7px 10px 8px;
+    border-right:1px solid #999;
+}
+
+@media (min-width: 767px) {
+  .nav-collapse.collapse {
+    height:0;
+    overflow:hidden;
+  }
   #c2g_layout_topbar .navbar .navbar-inner {
-    background:url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
+    background:#e3ca93 url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
     min-height:34px;
   }
   #c2g_layout_topbar .navbar .navbar-inner .container-fluid {
@@ -1012,11 +1075,11 @@
       padding: 7px 10px 8px;
       border-right:1px solid #999;
   }
-  .nav-collapse.collapse {
+  /*.nav-collapse.collapse {
     height: auto !important;
     overflow: visible !important;
   }
-  /*.logo {
+  .logo {
     width:308px;
     height:21px;
     text-indent:-999px;
