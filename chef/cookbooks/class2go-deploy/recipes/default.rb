@@ -12,6 +12,7 @@ git "class2go-sourcecode" do
     destination node['system']['admin_home'] + "/class2go"
     user node['system']['admin_user']
     group node['system']['admin_group']
+    revision node['main']['git_branch']
     action :sync
 end
 
