@@ -47,8 +47,14 @@
                     <li class="visible-phone"><a href="{% url 'registration_register' %}">Register</a></li>
                 {% endif %}
                 {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
-                    {% if common_page_data.is_course_admin %}
-                        <li {% block course_admin_link %}{% endblock course_admin_link %}><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Course Administration</a></li>
+                    {% if common_page_data.course_mode == 'draft' %}
+                        <li class="dropdown"{% block course_admin_link %}{% endblock course_admin_link %}>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Administration<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                              <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">Email Course Members</a></li>
+                              <!-- <li><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Coming Soon!</a></li> -->
+                            </ul>
+                        </li>
                     {% endif %}
                 {% endif %}
             </ul>
