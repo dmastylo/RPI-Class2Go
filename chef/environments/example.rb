@@ -1,3 +1,7 @@
+# The General Rule: only make additions to this file, or change values.
+# Changing the keys themselves would have to be done in conjunction with
+# all recipes using it, which is tricky since Chef is a shared resource.
+ 
 name "example"
 description "class2go Example Environment"
 
