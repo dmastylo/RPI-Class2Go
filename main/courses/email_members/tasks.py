@@ -59,7 +59,9 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
     p = Popen(['lynx','-stdin','-dump'], stdin=PIPE, stdout=PIPE)
     (plaintext, err_from_stderr) = p.communicate(input=msg.html_message) #use lynx to get plaintext
     from_addr = course_title + ' Staff <class2go-noreply@cs.stanford.edu>'
-    
+
+    if err_from_stderr:
+        logger.info(err_from_stderr)
 
     try:
 
