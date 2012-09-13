@@ -9,6 +9,10 @@ from c2g.models import Course, CourseEmail
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.sites.models import Site
+from collections import deque
+from smtplib import SMTPException
+from celery.task import current
+
 import random
 import math
 import time
@@ -25,14 +29,22 @@ def delegate_emails(hash_for_msg, total_num_emails, course_title, course_url, qu
        to https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets
     '''
     num_workers=int(math.ceil(float(total_num_emails)/float(EMAILS_PER_WORKER)))
+    recipient_qset = User.objects.all() #put recipients in a QuerySet
+    recipient_qset.query = query #again, this is supported practice for reconstructing a queryset from a pickle,
+    recipient_qset.only('email','first_name','last_name')
+    recipient_list = map(lambda r: (r.first_name, r.last_name, r.email), list(recipient_qset))
+    
+    chunk=int(math.ceil(float(total_num_emails)/float(num_workers)))
+
     for i in range(num_workers):
-        course_email_with_celery.delay(hash_for_msg,query, i,num_workers,total_num_emails,course_title,course_url)
+        to_list=recipient_list[i*chunk:i*chunk+chunk]
+        course_email_with_celery.delay(hash_for_msg, to_list, False, course_title, course_url)
     return num_workers
 
 
 
-@task(default_retry_delay=30)
-def course_email_with_celery(hash_for_msg, query, worker_id=0, num_workers=1,total_num_emails=1,course_title='', course_url=''):
+@task(default_retry_delay=15, max_retries=5)
+def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_title='', course_url=''):
     """
         Takes a subject and an html formatted email and sends it from sender to all addresses
         in the to_list, with each recipient being the only "to".  Emails are sent multipart, in both
@@ -49,14 +61,6 @@ def course_email_with_celery(hash_for_msg, query, worker_id=0, num_workers=1,tot
     from_addr = course_title + ' Staff <class2go-noreply@cs.stanford.edu>'
     
 
-    recipient_qset = User.objects.all() #put recipients in a QuerySet
-    recipient_qset.query = query #again, this is supported practice for reconstructing a queryset from a pickle,
-                                 #per https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets
-    
-
-    chunk=int(math.ceil(float(total_num_emails)/float(num_workers)))
-    recipient_qset=recipient_qset[worker_id*chunk:worker_id*chunk+chunk]
-
     try:
 
         connection = get_connection() #get mail connection from settings
@@ -65,42 +69,47 @@ def course_email_with_celery(hash_for_msg, query, worker_id=0, num_workers=1,tot
 
         rg = random.SystemRandom(random.randint(0,100000))
 
-        for user in recipient_qset.only('first_name','last_name','email'):
+        while to_list:
+            (first_name, last_name, email) = to_list[-1]
             html_footer = render_to_string('email/email_footer.html',
                                            {'course_title':course_title,
                                            'url':course_url,
-                                           'first_name':user.first_name,
-                                           'last_name':user.last_name,
-                                           'email':user.email,
+                                           'first_name':first_name,
+                                           'last_name':last_name,
+                                           'email':email,
                                            })
             
             plain_footer = render_to_string('email/email_footer.txt',
                                             {'course_title':course_title,
                                             'url':course_url,
-                                            'first_name':user.first_name,
-                                            'last_name':user.last_name,
-                                            'email':user.email,
+                                            'first_name':first_name,
+                                            'last_name':last_name,
+                                            'email':email,
                                             })
             
-            email_msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer, from_addr, [user.email], connection=connection)
+            email_msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer, from_addr, [email], connection=connection)
             email_msg.attach_alternative(msg.html_message+html_footer,'text/html')
-            #connection.open() ##safe to call many times b/c will just return if connection already exists
+            
+            if throttle or current.request.retries > 0: #throttle if we tried a few times and got the rate limiter
+                time.sleep(0.2)
+
             
             #CHAOS!
             #if rg.randint(0,50) == 1:
-               #raise BaseException('Randomly generated exception to test email robustness')
+            #   raise SMTPException(1,'Randomly generated exception to test email robustness')
 
             connection.send_messages([email_msg])
-            logger.info('Email with hash ' + hash_for_msg + ' sent to ' + user.email)
+            logger.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
             
             num_sent +=1
-            #time.sleep(0.2)
-
+            to_list.pop()
+        
         connection.close()
         return num_sent
 
-    except SMTPDataError as exc:
-        raise course_email_with_celery.retry(exc=exc)
+    except SMTPException as exc:
+        raise course_email_with_celery.retry(arg=[hash_for_msg, to_list, current.request.retries>0, course_title,
+                                                  course_url], exc=exc, countdown=(2 ** current.request.retries)*15)
 
 
 @task()

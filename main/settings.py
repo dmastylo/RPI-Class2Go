@@ -322,8 +322,8 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = LOGGING_DIR + 'emails_sent.log'
 
-#Max number of emails sent by each worker, defaults to 200
-#EMAILS_PER_WORKER = 200
+#Max number of emails sent by each worker, defaults to 10
+#EMAILS_PER_WORKER = 10
 
 #CELERY
 CELERY_ACKS_LATE = True
