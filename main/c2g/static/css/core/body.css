@@ -324,6 +324,10 @@ small.date {
     margin-bottom:1em;
     text-align:center;
 }
+.registration .well h2 {
+    margin-top:15px;
+    text-align:center;
+}
 
 /* Profile Info
 -------------------------------------------------- */

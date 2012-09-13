@@ -99,7 +99,7 @@
       {% endfor %}
       <div class="registration">
           <div class="well span12">
-                <h2 class=" pagination-centered"> Signup </h2>
+                <h2>Signup</h2>
                 <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post">
                     {% include "registration/regforminputs.html" %}  
                     <div class="form-actions">
