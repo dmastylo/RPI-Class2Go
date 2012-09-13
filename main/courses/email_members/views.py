@@ -31,6 +31,7 @@ def email_members(request, course_prefix, course_suffix):
     if request.method == "POST":
         form = EmailForm(data=request.POST)
         if form.is_valid():
+            course = request.common_page_data['course']
             email = CourseEmail(course=request.common_page_data['course'],
                                 sender=request.user,
                                 to=form.cleaned_data['to'],
@@ -48,8 +49,12 @@ def email_members(request, course_prefix, course_suffix):
                 recipient_qset = request.common_page_data['course'].get_all_course_admins()
             elif form.cleaned_data['to'] == "myself":
                 recipient_qset = User.objects.filter(id=request.user.id)
-            
-            courses.email_members.tasks.delegate_emails.delay(email.hash, recipient_qset.count())
+            courses.email_members.tasks.delegate_emails.delay(email.hash,
+                                                              recipient_qset.count(),
+                                                              request.common_page_data['course'].title,
+                                                              request.build_absolute_uri(reverse('courses.views.main', args=[course_prefix, course_suffix])),
+                                                              recipient_qset.query
+                                                             )
             success_msg = "Your email was successfully queued for sending"
             
         else:

@@ -2,3 +2,4 @@ database.py
 database_util.py
 *.pyc
 django-core
+celery.log
