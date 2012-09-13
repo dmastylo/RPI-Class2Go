@@ -2113,6 +2113,8 @@ var Khan = (function() {
     }
 
     function prepareSite() {
+        console.log("prepareSite called");
+
         // TODO(david): Don't add homepage elements with "exercise" class
         exercises = exercises.add($("div.exercise").detach());
 
@@ -2768,7 +2770,7 @@ var Khan = (function() {
         if (window.ModalVideo) {
             ModalVideo.hookup();
         }
-    }
+    }   // end of prepareSite function
 
     if (!testMode) {
         // testMode automatically prepares itself in loadModules,
@@ -3124,12 +3126,16 @@ var Khan = (function() {
 
     function loadModules() {
 
+        console.log("loadModules called");
+
         modulesLoaded = true;
 
         // Load module dependencies
         Khan.loadScripts($.map(Khan.modules, function(mod, name) {
             return mod;
         }), function() {
+
+            console.log("loadScripts has completed, anon function called which will load khan-exercise.html");
 
             $(function() {
                 // Inject the site markup, if it doesn't exist
@@ -3145,7 +3151,7 @@ var Khan = (function() {
                                 url: urlBase + "exercises/khan-exercise.html",
                                 dataType: "text",
                                 success: function(htmlExercise) {
-
+                                    console.log("khan-exercise.html successfully loaded");
                                     //injectTestModeSite(html, htmlExercise);
                                    injectExerciseFrameMarkup(htmlExercise);
                                    finishSitePrep();
@@ -3167,6 +3173,7 @@ var Khan = (function() {
 
         function injectExerciseFrameMarkup(htmlExercise) {
 
+            console.log("injectExerciseFrameMarkup called");
             // [C2G] Need prepend, as slow connection causes video div to be overwritten
             // for in-video exercises
             //$("#container .exercises-body .current-card-contents").html(htmlExercise);
@@ -3189,6 +3196,8 @@ var Khan = (function() {
         }
 
         function finishSitePrep() {
+
+            console.log("finishSitePrep called");
 
             prepareSite();
 
@@ -3219,7 +3228,7 @@ var Khan = (function() {
 
             // [C2G] Set up cards so the first one not done is the "current card"
             function configureCards () {
-                //console.log('configureCards called');
+                console.log('configureCards called');
                 var cardArr = $('#questions-stack li').toArray();
                 //console.log($('li.current-question'));
                 $('li.current-question').removeClass('current-question');
@@ -3286,6 +3295,7 @@ var Khan = (function() {
     //var c2gProblemBag;
 
     function initC2GActivityLog () {
+        console.log("initC2GActivityLog called");
         KhanC2G.PSActivityLog = {};
         KhanC2G.PSActivityLog.exerciseType = ($('#exercise_type').length) ? ($('#exercise_type').val()) : "problemset";
         if (typeof exAssessType != "undefined") {
@@ -3303,15 +3313,14 @@ var Khan = (function() {
         KhanC2G.PSActivityLog.problems = [];
 
         KhanC2G.PSActivityLog.addProblem = function (obj) {
-            // NOTE: problemNumber is not necessarily the order in the 
-            // problems array
+            console.log("addProblem called");
             var _self = this;
             if (obj) {
                 _self.problems.push(obj);
             } else {
-                var problemNum = _self.problems.length + 1;
+                var problemIdx = _self.problems.length;
                 var emptyProblem = {
-                    problemNumber: problemNum,
+                    problemIndex: problemIdx,
                     problemSeed: null,
                     exerciseFile: "",
                     viewed: false,
@@ -3323,28 +3332,11 @@ var Khan = (function() {
             }
         }
 
-        // This will be important when a user returns to the page after 
-        // having attempted at least one problem
-        if (typeof userPSData != "undefined" && userPSData.problems) {
-            var recordedProbsLen = userPSData.problems.length;
-            for (var p = 0; p < recordedProbsLen; p += 1) {
-                var translatedObj = {};
-                translatedObj.problemNumber = userPSData.problems[p].card_number;
-                translatedObj.problemSeed = userPSData.problems[p].problem_seed;
-                translatedObj.viewed = true;
-                translatedObj.attempts = userPSData.problems[p].already_attempted;
-                translatedObj.userChoices = userPSData.problems[p].user_choices;
-                translatedObj.userEntered = userPSData.problems[p].user_selection_val;
-                translatedObj.correct = userPSData.problems[p].correct;
-
-                KhanC2G.PSActivityLog.addProblem(translatedObj);
-            }
-        }
 
     }
 
     function initC2GStacks(exercises) {
-
+        console.log("initC2GStacks called");
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
@@ -3404,6 +3396,24 @@ var Khan = (function() {
             });
 
         KhanC2G.PSActivityLog.totalProblems = c2gProbCount;                
+        for (var i = 0; i < KhanC2G.PSActivityLog.totalProblems; i += 1) {
+            KhanC2G.PSActivityLog.addProblem();            
+        }
+
+        // This will be important when a user returns to the page after 
+        // having attempted at least one problem
+        if (typeof userPSData != "undefined" && userPSData.problems) {
+            for (var p = 0; p < userPSData.problems.length; p += 1) {
+                var problemObj = KhanC2G.PSActivityLog.problems[userPSData.problems[p].problem_index];
+                problemObj.problemIndex = userPSData.problems[p].problem_index;
+                problemObj.problemSeed = userPSData.problems[p].problem_seed;
+                problemObj.viewed = true;
+                problemObj.attempts = userPSData.problems[p].already_attempted;
+                problemObj.userChoices = userPSData.problems[p].user_choices;
+                problemObj.userEntered = userPSData.problems[p].user_selection_val;
+                problemObj.correct = userPSData.problems[p].correct;
+            }
+        }
 
         // [C2G] It takes some time for the answer_area inputs to show up with page, exercise,
         // et al loading, then makeProblem() being called
