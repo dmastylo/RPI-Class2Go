@@ -247,7 +247,7 @@ def run(s3_path, arg_keyframes_per_minute='0'):
             report += "\t" + key + ":\t" + item[key] + "\n\n"
     
     ### Cleanup ###
-    #cleanUp(video_path)
+    cleanUp(video_path)
     
     return report
     
