@@ -18,18 +18,21 @@ logger = logging.getLogger(__name__)
 EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 10)
 
 @task()
-def delegate_emails(hash_for_msg, total_num_emails):
+def delegate_emails(hash_for_msg, total_num_emails, course_title, course_url, query ):
     '''Delegates emails by spinning up appropriate number of sender workers
+       Tries to minimize DB accesses performed by each worker.
+       Especially passing query forming a queryset, which is ok practice according
+       to https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets
     '''
     num_workers=int(math.ceil(float(total_num_emails)/float(EMAILS_PER_WORKER)))
     for i in range(num_workers):
-        course_email_with_celery.delay(hash_for_msg,i,num_workers)
+        course_email_with_celery.delay(hash_for_msg,query, i,num_workers,total_num_emails,course_title,course_url)
     return num_workers
 
 
 
 @task(default_retry_delay=30)
-def course_email_with_celery(hash_for_msg, worker_id=0, num_workers=1):
+def course_email_with_celery(hash_for_msg, query, worker_id=0, num_workers=1,total_num_emails=1,course_title='', course_url=''):
     """
         Takes a subject and an html formatted email and sends it from sender to all addresses
         in the to_list, with each recipient being the only "to".  Emails are sent multipart, in both
@@ -40,29 +43,18 @@ def course_email_with_celery(hash_for_msg, worker_id=0, num_workers=1):
         out of a set with ids 0 to num_workers-1, in homage to the fact that python lists are zero based.
     """
     msg = CourseEmail.objects.get(hash=hash_for_msg)
-    course = msg.course
     
     p = Popen(['lynx','-stdin','-dump'], stdin=PIPE, stdout=PIPE)
     (plaintext, err_from_stderr) = p.communicate(input=msg.html_message) #use lynx to get plaintext
-    course_title=course.title
-    from_addr = course.title + ' Staff <class2go-noreply@cs.stanford.edu>'
+    from_addr = course_title + ' Staff <class2go-noreply@cs.stanford.edu>'
     
-    (course_prefix, delimiter, course_suffix) = course.handle.partition('--')
-    site = Site.objects.get(id=1)
 
-    course_url='http://'+site.domain+reverse('courses.views.main', args=[course_prefix, course_suffix])
-    recipient_qset = User.objects.none() #put recipients in a QuerySet
+    recipient_qset = User.objects.all() #put recipients in a QuerySet
+    recipient_qset.query = query #again, this is supported practice for reconstructing a queryset from a pickle,
+                                 #per https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets
     
-    if msg.to == "all" :
-        recipient_qset = course.get_all_members()
-    elif msg.to == "students" :
-        recipient_qset = course.get_all_students()
-    elif msg.to == "staff" :
-        recipient_qset = course.get_all_course_admins()
-    elif msg.to == "myself":
-        recipient_qset = User.objects.filter(id=msg.sender.id)
 
-    chunk=int(math.ceil(float(recipient_qset.count())/float(num_workers)))
+    chunk=int(math.ceil(float(total_num_emails)/float(num_workers)))
     recipient_qset=recipient_qset[worker_id*chunk:worker_id*chunk+chunk]
 
     try:
@@ -107,7 +99,7 @@ def course_email_with_celery(hash_for_msg, worker_id=0, num_workers=1):
         connection.close()
         return num_sent
 
-    except BaseException as exc:
+    except SMTPDataError as exc:
         raise course_email_with_celery.retry(exc=exc)
 
 
