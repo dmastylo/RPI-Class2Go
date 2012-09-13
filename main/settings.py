@@ -197,6 +197,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # By default we use S3 storage.  Make sure we have the settings we need.
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
 try:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
@@ -325,11 +326,14 @@ else:
 #EMAILS_PER_WORKER = 200
 
 #CELERY
+CELERY_ACKS_LATE = True
+
 BROKER_TRANSPORT='sqs'
 BROKER_USER = AWS_ACCESS_KEY_ID
 BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
 BROKER_TRANSPORT_OPTIONS = {
     'region': 'us-west-2', 
     'queue_name_prefix' : INSTANCE+'-',
+    'visibility_timeout' : 7200,
 }
 

@@ -9,10 +9,13 @@ from c2g.models import Course, CourseEmail
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.sites.models import Site
-
+import random
 import math
+import time
+import logging
+logger = logging.getLogger(__name__)
 
-EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 200)
+EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 10)
 
 @task()
 def delegate_emails(hash_for_msg, total_num_emails):
@@ -23,7 +26,9 @@ def delegate_emails(hash_for_msg, total_num_emails):
         course_email_with_celery.delay(hash_for_msg,i,num_workers)
     return num_workers
 
-@task()
+
+
+@task(default_retry_delay=30)
 def course_email_with_celery(hash_for_msg, worker_id=0, num_workers=1):
     """
         Takes a subject and an html formatted email and sends it from sender to all addresses
@@ -60,36 +65,51 @@ def course_email_with_celery(hash_for_msg, worker_id=0, num_workers=1):
     chunk=int(math.ceil(float(recipient_qset.count())/float(num_workers)))
     recipient_qset=recipient_qset[worker_id*chunk:worker_id*chunk+chunk]
 
-    connection = get_connection() #get mail connection from settings
-    connection.open()
-    num_sent=0
+    try:
 
-    for user in recipient_qset.only('first_name','last_name','email'):
-        html_footer = render_to_string('email/email_footer.html',
-                                       {'course_title':course_title,
-                                       'url':course_url,
-                                       'first_name':user.first_name,
-                                       'last_name':user.last_name,
-                                       'email':user.email,
-                                       })
-        
-        plain_footer = render_to_string('email/email_footer.txt',
-                                        {'course_title':course_title,
-                                        'url':course_url,
-                                        'first_name':user.first_name,
-                                        'last_name':user.last_name,
-                                        'email':user.email,
-                                        })
-        
-        email_msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer, from_addr, [user.email], connection=connection)
-        email_msg.attach_alternative(msg.html_message+html_footer,'text/html')
-        connection.open() ##safe to call many times b/c will just return if connection already exists
-        
-        connection.send_messages([email_msg])
-        num_sent +=1
+        connection = get_connection() #get mail connection from settings
+        connection.open()
+        num_sent=0
 
-    connection.close()
-    return num_sent
+        rg = random.SystemRandom(random.randint(0,100000))
+
+        for user in recipient_qset.only('first_name','last_name','email'):
+            html_footer = render_to_string('email/email_footer.html',
+                                           {'course_title':course_title,
+                                           'url':course_url,
+                                           'first_name':user.first_name,
+                                           'last_name':user.last_name,
+                                           'email':user.email,
+                                           })
+            
+            plain_footer = render_to_string('email/email_footer.txt',
+                                            {'course_title':course_title,
+                                            'url':course_url,
+                                            'first_name':user.first_name,
+                                            'last_name':user.last_name,
+                                            'email':user.email,
+                                            })
+            
+            email_msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer, from_addr, [user.email], connection=connection)
+            email_msg.attach_alternative(msg.html_message+html_footer,'text/html')
+            #connection.open() ##safe to call many times b/c will just return if connection already exists
+            
+            #CHAOS!
+            #if rg.randint(0,50) == 1:
+               #raise BaseException('Randomly generated exception to test email robustness')
+
+            connection.send_messages([email_msg])
+            logger.info('Email with hash ' + hash_for_msg + ' sent to ' + user.email)
+            
+            num_sent +=1
+            #time.sleep(0.2)
+
+        connection.close()
+        return num_sent
+
+    except BaseException as exc:
+        raise course_email_with_celery.retry(exc=exc)
+
 
 @task()
 def email_with_celery(subject,html_msg,sender,recipient_email_list,course_title='',course_url=''):
