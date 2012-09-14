@@ -1480,15 +1480,18 @@ var Khan = (function() {
             $("#check-answer-button").show();
         }
 
-        if ($('#submit-problemset-button').length) {
-            $('#submit-problemset-button').show();
-        } else {
-            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
-            $('#submit-problemset-button').click(function () {
-                location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
-            });
+        if (exAssessType == "summative" && $('.current-question').is($('#questions-stack li:last'))) {
+            if ($('#submit-problemset-button').length) {
+                $('#submit-problemset-button').parent().show();
+            } else {
+                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+                $('#submit-problemset-button').click(function () {
+                    location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
+                });
+            }
+        } else if ($('#submit-problemset-button').length) {
+            $('#submit-problemset-button').parent().hide();
         }
-       
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
             $("#examples-show").show();
@@ -3598,17 +3601,18 @@ var Khan = (function() {
             }
 
             // [C2G] if this is a summative problem set and all questions have been viewed
-            if (typeof c2gConfig != "undefined" && typeof c2gConfig.problemType != "undefined" && 
-                (c2gConfig.problemType == 'summative' || c2gConfig.problemType == 'assessive') && 
-                $('#questions-unviewed li').length == 0) {
+            if ((exAssessType == "summative" || KhanC2G.PSActivityLog.assessType == "summative") && 
+                $('.current-question').is($('#questions-stack li:last'))) {
                 if ($('#submit-problemset-button').length) {
-                    $('#submit-problemset-button').show();
+                    $('#submit-problemset-button').parent().show();
                 } else {
                     $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                     $('#submit-problemset-button').click(function () {
                         location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
                     });
                 }
+            } else if ($('#submit-problemset-button').length) {
+                $('#submit-problemset-button').parent().hide();
             }
 
         });
