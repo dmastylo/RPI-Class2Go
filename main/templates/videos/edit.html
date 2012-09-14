@@ -5,7 +5,10 @@
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
     <h3>Edit video</h3>
-      <form name="upload_form" action="{% url 'courses.videos.actions.edit_video' %}" method="POST" enctype="multipart/form-data">
+      <form name="reset_form" style="display:none" action="{% url 'courses.videos.actions.reset_video' common_page_data.course_prefix common_page_data.course_suffix slug %}" method="POST">
+        {% csrf_token %}
+      </form>
+      <form name="upload_form" action="{% url 'courses.videos.actions.edit_video' common_page_data.course_prefix common_page_data.course_suffix slug %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <fieldset class="well">
         {% for field in form %}
@@ -21,24 +24,22 @@
 	      <div>{{ field }}</div>
 	    {% else %}
               {{ field.label_tag }}
+	      {% if field.help_text %}
+              <span class="help-block">{{ field.help_text }}</span>
+              {% endif %}
               {{ field }}
 	    {% endif %}
-	    {% if field.help_text %}
-              <span class="help-block">{{ field.help_text }}</span>
-            {% endif %}
 	    {{ field.errors }}
 	  </div>
         {% endfor %}
 	</fieldset>
-        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />	
-	<input type="hidden" name="video_slug" value="{{slug}}" />
 	<div class="form-actions">
 	  <input type="submit" name="action" value="Save and Set as Ready" class="btn btn-primary" />
 	  <input type="submit" name="action" value="Save as Draft" class="btn" />
-	  <input type="submit" name="action" value="Reset to Ready" class="btn" />
+	  <input type="button" name="action" value="Reset to Ready" class="btn" onclick="document.forms.reset_form.submit()" />
 	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
 	</div>
+      </form>
   {% else %}
     <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to edit videos.</h4>
   {% endif %}
