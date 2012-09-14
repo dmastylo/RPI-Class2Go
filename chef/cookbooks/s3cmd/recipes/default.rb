@@ -17,8 +17,8 @@ end
 template "dot-s3cfg" do
     path node['system']['admin_home'] + "/.s3cfg"
     source "dot-s3cfg.erb"
-    owner daemon
-    owner daemon
+    owner "daemon"
+    owner "daemon"
     mode 00600
 end
 
