@@ -14,9 +14,9 @@ directory "/opt/class2go" do
     action :create
 end
 
-template "s3cfg.conf" do
-    path "/opt/class2go/s3cfg.conf"
-    source "s3cfg_conf.erb"
+template "s3cmd.conf" do
+    path "/opt/class2go/s3cmd.conf"
+    source "s3cmd_conf.erb"
     owner node['system']['admin_user']
     owner node['system']['admin_group']
     mode 00644
