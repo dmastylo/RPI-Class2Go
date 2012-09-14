@@ -1072,6 +1072,7 @@ var Khan = (function() {
 
         // [C2G] Build and return a localStorage key
         function getLSSeedKey () {
+            console.log("getLSSeedKey called");
             var seedKey = c2gConfig.user || 'anon';
             seedKey += '-';
             if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
@@ -1080,25 +1081,55 @@ var Khan = (function() {
                 seedKey += 'vid-' + $('#video_id').val();
             }
             seedKey += '-' + id;
+            console.log("seedKey: " + seedKey)
             return seedKey;
         }
 
-        // [C2G] Has a problem seed been stored? Only should factor in for non-video exercises
+        // [C2G] Has a problem seed been stored? Only important for non-video exercises
+        // 1. Check data object of current question card (list item)
+        // 2. Check data on KhanC2G.PSActivityLog
+        // 3. Check localStorage
+        // 4. Check userPSData object (last resort, as it's a little messier)
         function getLocalSeed () {
-            // if not in-video ex, try the seed data stored in the question card
-            if ($('#exercise_type').val() != "video" && $('.current-question').data('problemSeed')) {
+            console.log("getLocalSeed called");
+            // If in-video exercise, no problems should be called with seeds
+            // (because we want to allow random answer choices for these exercises)
+            if ($('#exercise_type').val() == "video") {
+                return null;
+            }
+
+            // try the seed data stored in the question card
+            console.log("$('.current-question') problemSeed...");
+            console.log($('.current-question').data("problemSeed"));
+            console.log("KhanC2G.PSActivityLog.problems[id].problemSeed...");
+            console.log(KhanC2G.PSActivityLog.problems[id].problemSeed);
+            console.log("userPSData.problems"); 
+            console.log(userPSData.problems[id]); 
+            if ($('.current-question').data('problemSeed')) {
                 console.log("current-question card has seed");
                 return $('.current-question').data('problemSeed');
-            // otherwise, if not in-video ex, try one stored in localStorage
-            } else if ($('#exercise_type').val() != "video" && getLSSeedKey()) {
+            // try one stored in KhanC2G.PSActivityLog 
+            } else if (typeof KhanC2G != "undefined" &&
+                        typeof KhanC2G.PSActivityLog != "undefined" &&
+                        typeof KhanC2G.PSActivityLog.problems != "undefined" &&
+                        typeof KhanC2G.PSActivityLog.problems[id] != "undefined" &&
+                        typeof KhanC2G.PSActivityLog.problems[id].problemSeed != "undefined") {
+                return KhanC2G.PSActivityLog.problems[id].problemSeed;
+            // try one stored in localStorage
+            } else if (localStorage.getItem(getLSSeedKey())) {
                 console.log("localStorage has seed");
                 return localStorage.getItem(getLSSeedKey());
             // finally, try the userPSData object
             } else if (typeof userPSData != "undefined" && 
                         typeof userPSData.problems != "undefined" &&
-                        typeof userPSData.problems[id] != "undefined") {
+                        typeof userPSData.problems.length > 0) {
                 console.log("userPSData has seed");
-                return userPSData.problems[id]["problem_seed"]; // "undefined" here evals to falsey
+                var userPSDataProbLen = userPSData.problems.length;
+                for (var p = 0; p < userPSDataProbLen; p += 1) {
+                    if (userPSData.problems[p].problem_index = id) {
+                        return userPSData.problems[p].problem_seed; 
+                    }
+                }
             }
             // no seed has been stored locally
             console.log("no local seed");
@@ -1131,23 +1162,29 @@ var Khan = (function() {
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
 
-        // [C2G] Store locally, OK if overwrites previous value 
-        console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
-        localStorage.setItem(getLSSeedKey(), problemSeed);
+        // [C2G] Store locally
+        if (!localStorage.getItem(getLSSeedKey())) {
+            console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
+            localStorage.setItem(getLSSeedKey(), problemSeed);
+        } else {
+            console.log("No need to add to localStorage");
+        }
 
-        // store in userPSData object
-        if (typeof userPSData != "undefined") {
-            console.log(userPSData.problems);
-            if (typeof userPSData.problems == "undefined") userPSData.problems = [];
-            console.log(userPSData.problems[id]);
-            if (typeof userPSData.problems[id] == "undefined") userPSData.problems[id] = {};
-            console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in userPSData.problems');
-            userPSData.problems[id]['problem_seed'] = parseInt(problemSeed);
+        // store in KhanC2G.PSActivityLog object
+        var loggedProbSeed = KhanC2G.PSActivityLog.problems[id]["problemSeed"];
+        if (!loggedProbSeed) {
+            console.log('Adding problemSeed ' + problemSeed + ' to PSActivityLog for #' + id);
+            KhanC2G.PSActivityLog.problems[id]['problemSeed'] = parseInt(problemSeed);
+        } else {
+            console.log("No need to add to PSActivityLog");
         }
 
         // store in current-question data object
         if(!$('.current-question').data('problemSeed')) {
+            console.log('Adding problemSeed ' + problemSeed + ' to current-question #' + id);
             $('.current-question').data('problemSeed', parseInt(problemSeed));
+        } else {
+            console.log("No need to add to current-question");
         }
 
         // Check to see if we want to test a specific problem
@@ -1400,18 +1437,18 @@ var Khan = (function() {
             maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
             console.log("Checking for previous answer for this problem...");
             if (KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered']) {
-                console.log("...found in userPSData");
-                var userSelVal = parseInt(KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered']);
+                console.log("...found in PSActivityLog");
+                var userSelVal = KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered'];
                 if ($('#solutionarea input:radio').length) {
-                    $('#solutionarea input:radio')[userSelVal].checked = true;
+                    $('#solutionarea input:radio')[parseInt(userSelVal)].checked = true;
                 } else {
                     $('#solutionarea #testinput').val(userSelVal);
                 }
             } else if ($('.current-question').data('userEntered')) {
                 console.log("...found in current question's data object");
-                var userSelVal = parseInt($('.current-question').data('userEntered'));
+                var userSelVal = $('.current-question').data('userEntered');
                 if ($('#solutionarea input:radio').length) {
-                    $('#solutionarea input:radio')[userSelVal].checked = true;
+                    $('#solutionarea input:radio')[parseInt(userSelVal)].checked = true;
                 } else {
                     $('#solutionarea #testinput').val(userSelVal);
                 }
@@ -2907,6 +2944,13 @@ var Khan = (function() {
         //}
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
+        // store user_selection_val
+        console.log("Storing user's answer in current-question");
+        $('.current-question').data("userEntered", user_selection_val);
+        var problemIdx = $('.current-question').data("problemIndex");
+        console.log("Storing user's answer in PSActivityLog");
+        KhanC2G.PSActivityLog.problems[problemIdx].userEntered = user_selection_val;
+
         //URL starts with problemsets/attempt to direct to a view to collect data.
         //problemId is the id of the problem the information is being created for
         var request = {
@@ -3632,8 +3676,10 @@ var Khan = (function() {
                     $('#solutionarea').css('visibility', 'visible');
                 } else {
                     if ($('input#testinput').length) {
+                        if (userPrevSel) $('input#testinput').val(userPrevSel); 
                         $('input#testinput').removeAttr('disabled');
                     } else if ($('input:radio').length) {
+                        if (userPrevSel) $('#solutionarea input:radio')[userPrevSel].checked = true; 
                         $('input:radio').removeAttr('disabled');
                     }
                     $('#check-answer-button').removeAttr('disabled');
