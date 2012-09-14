@@ -1162,29 +1162,31 @@ var Khan = (function() {
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
 
-        // [C2G] Store locally
-        if (!localStorage.getItem(getLSSeedKey())) {
-            console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
-            localStorage.setItem(getLSSeedKey(), problemSeed);
-        } else {
-            console.log("No need to add to localStorage");
-        }
+        if (KhanC2G.PSActivityLog.exerciseType == 'problemset') {
+            // [C2G] Store locally
+            if (!localStorage.getItem(getLSSeedKey())) {
+                console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
+                localStorage.setItem(getLSSeedKey(), problemSeed);
+            } else {
+                console.log("No need to add to localStorage");
+            }
 
-        // store in KhanC2G.PSActivityLog object
-        var loggedProbSeed = KhanC2G.PSActivityLog.problems[id]["problemSeed"];
-        if (!loggedProbSeed) {
-            console.log('Adding problemSeed ' + problemSeed + ' to PSActivityLog for #' + id);
-            KhanC2G.PSActivityLog.problems[id]['problemSeed'] = parseInt(problemSeed);
-        } else {
-            console.log("No need to add to PSActivityLog");
-        }
+            // store in KhanC2G.PSActivityLog object
+            var loggedProbSeed = KhanC2G.PSActivityLog.problems[id]["problemSeed"];
+            if (!loggedProbSeed) {
+                console.log('Adding problemSeed ' + problemSeed + ' to PSActivityLog for #' + id);
+                KhanC2G.PSActivityLog.problems[id]['problemSeed'] = parseInt(problemSeed);
+            } else {
+                console.log("No need to add to PSActivityLog");
+            }
 
-        // store in current-question data object
-        if(!$('.current-question').data('problemSeed')) {
-            console.log('Adding problemSeed ' + problemSeed + ' to current-question #' + id);
-            $('.current-question').data('problemSeed', parseInt(problemSeed));
-        } else {
-            console.log("No need to add to current-question");
+            // store in current-question data object
+            if(!$('.current-question').data('problemSeed')) {
+                console.log('Adding problemSeed ' + problemSeed + ' to current-question #' + id);
+                $('.current-question').data('problemSeed', parseInt(problemSeed));
+            } else {
+                console.log("No need to add to current-question");
+            }
         }
 
         // Check to see if we want to test a specific problem
@@ -2234,9 +2236,7 @@ var Khan = (function() {
         }
 
         function handleSubmit() {
-            //console.log("handleSubmit called");
             var pass = validator();
-
             // Stop if the user didn't enter a response
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
@@ -2360,7 +2360,7 @@ var Khan = (function() {
             //console.log("pass...");
             //console.log(pass);
             return false;
-        }
+        }   // end of handleSubmit
 
         // Watch for when the next button is clicked
         $("#next-question-button").click(function(ev) {
@@ -2945,11 +2945,14 @@ var Khan = (function() {
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         // store user_selection_val
-        console.log("Storing user's answer in current-question");
-        $('.current-question').data("userEntered", user_selection_val);
-        var problemIdx = $('.current-question').data("problemIndex");
-        console.log("Storing user's answer in PSActivityLog");
-        KhanC2G.PSActivityLog.problems[problemIdx].userEntered = user_selection_val;
+        console.log("*** " + data.attempt_content + " ***");
+        if (KhanC2G.PSActivityLog.exerciseType == 'problemset' && data.attempt_content != "hint") {
+            console.log("Storing user's answer in current-question");
+            $('.current-question').data("userEntered", user_selection_val);
+            var problemIdx = $('.current-question').data("problemIndex");
+            console.log("Storing user's answer in PSActivityLog");
+            KhanC2G.PSActivityLog.problems[problemIdx].userEntered = user_selection_val;
+        }
 
         //URL starts with problemsets/attempt to direct to a view to collect data.
         //problemId is the id of the problem the information is being created for
@@ -3357,7 +3360,8 @@ var Khan = (function() {
         KhanC2G.PSActivityLog.problems = [];
 
         KhanC2G.PSActivityLog.addProblem = function (obj) {
-            console.log("addProblem called");
+            console.log("addProblem called with...");
+            console.log(obj);
             var _self = this;
             if (obj) {
                 _self.problems.push(obj);
@@ -3394,18 +3398,19 @@ var Khan = (function() {
         var curNumProbs = 0;
         KhanC2G.PSActivityLog.totalProblems = 0;
 
-        // turn userPSData.problems into a local associative array 
-        var attemptedProblems = {};
-        var userPSProblemsLen = userPSData.problems.length;
-        for (var p = 0; p < userPSProblemsLen; p += 1) {
-            attemptedProblems[userPSData.problems[p].problem_index] = userPSData.problems[p];
-        }
+        if (KhanC2G.PSActivityLog.exerciseType == 'problemset') { 
+            // turn userPSData.problems into a local associative array 
+            var attemptedProblems = {};
+            var userPSProblemsLen = userPSData.problems.length;
+            for (var p = 0; p < userPSProblemsLen; p += 1) {
+                attemptedProblems[userPSData.problems[p].problem_index] = userPSData.problems[p];
+            }
 
-        console.log("attemptedProblems ***");
-        console.log(attemptedProblems);
-        console.log(JSON.stringify(attemptedProblems));
+            console.log("attemptedProblems ***");
+            console.log(attemptedProblems);
+            console.log(JSON.stringify(attemptedProblems));
 
-        $(exercises).filter(".exercise").each(function(idx, elem) {
+            $(exercises).filter(".exercise").each(function(idx, elem) {
 
                 console.log("KhanC2G.PSActivityLog");
                 console.log(KhanC2G.PSActivityLog.totalProblems);
@@ -3434,6 +3439,10 @@ var Khan = (function() {
                 //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
                 li.data('problemIndex',idx);
                 //li.data('randseed',Math.floor(Math.random()*100000));
+                console.log("*** attemptedProblems ***");
+                console.log(attemptedProblems);
+                console.log(attemptedProblems[idx.toString()]);
+                console.log(attemptedProblems[idx]);
                 if (typeof attemptedProblems != "undefined" && attemptedProblems[idx.toString()]) {
                     var userQDataObj = attemptedProblems[idx.toString()];
                     li.data('problemSeed', parseInt(userQDataObj.problem_seed));
@@ -3446,6 +3455,8 @@ var Khan = (function() {
                     li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
                 }
 
+                console.log("current question gets this data:");
+                console.log(li.data());
                 // Merge list item data into KhanC2G.PSActivityLog so they're synched
                 KhanC2G.PSActivityLog.addProblem(li.data());            
 
@@ -3461,7 +3472,7 @@ var Khan = (function() {
                 curNumProbs+=probsInExercise;
 
             });
-
+        }
         // This will be important when a user returns to the page after 
         // having attempted at least one problem
         /*
