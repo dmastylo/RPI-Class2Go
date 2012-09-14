@@ -19,7 +19,7 @@ def get_common_page_data(request, prefix, suffix):
     is_course_member = False
     
     user_groups = request.user.groups.all()
-    logger.info("here")
+    #logger.info("here")
     for g in user_groups:
         if g.id == course.student_group_id:
             is_course_member = True
