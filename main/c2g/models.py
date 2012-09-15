@@ -324,11 +324,11 @@ class AdditionalPageManager(models.Manager):
 
 class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
-    menu_slug = models.CharField(max_length=255, null=True, blank=True)
+    menu_slug = models.SlugField(max_length=255, null=True, blank=True)
     section = models.ForeignKey(ContentSection, null=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
-    slug = models.CharField(max_length=255, null=True, blank=True)
+    slug = models.SlugField(max_length=255, null=True, blank=True)
     objects = AdditionalPageManager()
 
     def create_ready_instance(self):
