@@ -19,14 +19,14 @@ end
 directory "/opt/class2go" do
     owner node['system']['admin_user']
     group node['system']['admin_group']
-    mode 00755
+    mode 00777
     action :create
 end
 
 directory "/opt/class2go/static" do
     owner node['system']['admin_user']
     group node['system']['admin_group']
-    mode 00755
+    mode 00777
     action :create
 end
 
