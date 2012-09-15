@@ -56,30 +56,31 @@ def add_video(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
-def edit_video(request):
-    course_prefix = request.POST.get("course_prefix")
-    course_suffix = request.POST.get("course_suffix")
-    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    slug = request.POST.get("video_slug")
+def edit_video(request, course_prefix, course_suffix, slug):
+    common_page_data = request.common_page_data
+    video = common_page_data['course'].video_set.all().get(slug=slug)
 
-    if not common_page_data['is_course_admin']:
-        return redirect('courses.views.main', course_prefix, course_suffix)
+    action = request.POST['action']
+    form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
+    if form.is_valid():
+        form.save()
+        if action == "Save and Set as Ready":
+            video.commit()
+        return redirect('courses.videos.views.list', course_prefix, course_suffix)
 
-    if request.method == 'POST':
-        video = common_page_data['course'].video_set.all().get(slug=slug)
+    return render(request, 'videos/edit.html',
+                  {'common_page_data': common_page_data,
+                   'slug': slug,
+                   'form': form,
+                   })
 
-        action = request.POST['action']
-        if action == "Reset to Ready":
-            video.revert()
-            form = S3UploadForm(course=common_page_data['course'], instance=video)
-        else:
-            form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
-            if form.is_valid():
-                form.save()
-                if action == "Save and Set as Ready":
-                    video.commit()
-                return redirect('courses.videos.views.list', course_prefix, course_suffix)
-
+@require_POST
+@auth_is_course_admin_view_wrapper
+def reset_video(request, course_prefix, course_suffix, slug):
+    common_page_data = request.common_page_data
+    video = common_page_data['course'].video_set.all().get(slug=slug)
+    video.revert()
+    form = S3UploadForm(course=common_page_data['course'], instance=video)
     return render(request, 'videos/edit.html',
                   {'common_page_data': common_page_data,
                    'slug': slug,
