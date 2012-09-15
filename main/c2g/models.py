@@ -613,6 +613,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             ready_instance.slug = self.slug
         if not clone_fields or 'file' in clone_fields:
             ready_instance.file = self.file
+        if not clone_fields or 'url' in clone_fields:
+            ready_instance.url = self.url
         if not clone_fields or 'live_datetime' in clone_fields:
             ready_instance.live_datetime = self.live_datetime
 
@@ -658,6 +660,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.slug = ready_instance.slug
         if not clone_fields or 'file' in clone_fields:
             self.file = ready_instance.file
+        if not clone_fields or 'url' in clone_fields:
+            self.url = ready_instance.url
         if not clone_fields or 'live_datetime' in clone_fields:
             self.live_datetime = ready_instance.live_datetime
 
@@ -702,6 +706,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.slug != prod_instance.slug:
             return False
         if self.file != prod_instance.file:
+            return False
+        if self.url != prod_instance.url:
             return False
         if self.live_datetime != prod_instance.live_datetime:
             return False
