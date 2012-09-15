@@ -93,10 +93,17 @@ done < $myFile
 # if we are doing in place then we are done.  But if we are using S3 we need to 
 # upload files (and manifest) back up there
 
+# In production we will want to use a config file in a known good place; in dev
+# you probably use the default location (in your home dir)
+s3cmd_confopt=""
+if [[ -r /opt/class2go/s3cmd.conf ]]; then
+    s3cmd_confopt="--config /opt/class2go/s3cmd.conf"
+fi
+
 if [[ $using_s3 == 1 ]]; then
     s3_url="s3:/$source_path"
     echo "$me: copying frames to target: $s3_url/$frame_dir"
-    s3cmd -v put --recursive $frame_dir ${s3_url}/
+    s3cmd $s3cmd_confopt -v put --recursive $frame_dir ${s3_url}/
 
     popd
     echo "$me: cleaning up working directory: $working_dir"
