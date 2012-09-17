@@ -30,12 +30,13 @@
             </h1>
         </div>
         <div id="c2g_layout_topbar">
+            <p class="hide-text hidden"><a href="#main-content">Jump to content</a></p>
             {% block navbar %}
             {% ifequal user.is_staff True %}
             <div class="navbar">
                 <div class="navbar-inner">
                     <div class="container-fluid">
-                        <ul class="nav">
+                        <ul class="nav" role="navigation">
                             <li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
                         </ul>
                         <!--form class="navbar-search hidden-phone" action="">
@@ -99,7 +100,7 @@
         
         
         {% block content %}
-        <div class="container-fluid body-content">
+        <div id="main-content" class="container-fluid body-content" role="main">
             <div class="row-fluid">
                 {% block l_column_content %}
                     {% for available_course in available_course_list %}
