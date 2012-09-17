@@ -1472,7 +1472,7 @@ var Khan = (function() {
         } else {
             // [C2G] If summative problem set, add note about penalties per try
             if (exAssessType == "summative") {
-                $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
+                $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted for credit. </p>');
                 $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
             }
@@ -2973,6 +2973,13 @@ var Khan = (function() {
                 if (data['exercise_status'] == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                     $('.current-question').data("correct", true);
+                    if ($('.current-question').is($('#questions-stack li:last'))) {
+                        $('#next-question-button').val('Correct! View Summary');
+                        $('#next-question-button').unbind('click');
+                        $('#next-question-button').click(function () {
+                            location.href = c2gConfig.progessUrl;
+                        });
+                    }
                 } else {
                     var maxCredit = 100;
                     var maxAttempts = (typeof c2gConfig != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
@@ -3475,6 +3482,13 @@ var Khan = (function() {
                 curNumProbs+=probsInExercise;
 
             });
+
+            // [C2G] Add "View Progress" button to all problem sets
+            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" value="View Problem Set Progress"/></div>');
+            $('#view-progress-button').click(function () {
+                location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
+            });
+
         }
         // This will be important when a user returns to the page after 
         // having attempted at least one problem
@@ -3580,11 +3594,12 @@ var Khan = (function() {
             $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
             //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
-            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
+            //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
 
             var currentCardIdx = currentQCard.data("problemIndex");
             var totalCards = $('#questions-stack li');
             var totalCardsLen = totalCards.length;
+            var next = null;
             if (currentCardIdx >= totalCardsLen) {
                 next = $(totalCards[0]);
             } else {
@@ -3599,6 +3614,7 @@ var Khan = (function() {
                 console.log("Next question button clicked, going to makeProblem...");
                 makeProblem(next.data('problemIndex'), next.data('problemSeed'));
             }
+
 
             // [C2G] if this is a summative problem set and all questions have been viewed
             if ((exAssessType == "summative" || KhanC2G.PSActivityLog.assessType == "summative") && 
