@@ -3559,6 +3559,7 @@ var Khan = (function() {
                 pSeed = parseInt($('.current-question').data('problemSeed'));
             }
 
+            // [C2G] What did user enter last?
             var userSelectionVal = null;
             if (typeof KhanC2G.PSActivityLog != "undefined" && 
                 typeof KhanC2G.PSActivityLog.problems != "undefined" && 
@@ -3569,6 +3570,7 @@ var Khan = (function() {
                 userSelectionVal = $('.current-question').data("userEntered");
             } 
 
+            // [C2G] If user entered something previously...
             if (userSelectionVal) {
                 if ($('#testinput').length) {
                     $('#testinput').val(userSelectionVal);
@@ -3580,6 +3582,13 @@ var Khan = (function() {
                     if ($('.current-question').data('correct')) {
                         $('#solutionarea input').attr('disabled','disabled');
                     }
+                }
+            // [C2G] Otherwise, clear value so other problem answers don't bleed over
+            } else {
+                if ($('#testinput').length) {
+                    $('#testinput').val("");
+                } else if ($('#solutionarea input:radio:checked').length) {
+                    $('#solutionarea input:radio:checked').attr('checked', false);
                 }
             }
 
@@ -3725,10 +3734,19 @@ var Khan = (function() {
                     $('#solutionarea').css('visibility', 'visible');
                 } else {
                     if ($('input#testinput').length) {
-                        if (userPrevSel) $('input#testinput').val(userPrevSel); 
+                        if (userPrevSel) {
+                            $('input#testinput').val(userPrevSel); 
+                        } else {
+                            $('input#testinput').val("");   // explicitly clear 
+                        }
                         $('input#testinput').removeAttr('disabled');
                     } else if ($('input:radio').length) {
-                        if (userPrevSel) $('#solutionarea input:radio')[userPrevSel].checked = true; 
+                        if (userPrevSel) {
+                            $('#solutionarea input:radio')[userPrevSel].checked = true; 
+                        } else {
+                            // explicitly clear 
+                            $('#solutionarea input:radio:checked').attr('checked', false); 
+                        }
                         $('input:radio').removeAttr('disabled');
                     }
                     $('#check-answer-button').removeAttr('disabled');
