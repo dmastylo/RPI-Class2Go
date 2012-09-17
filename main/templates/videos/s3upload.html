@@ -17,7 +17,7 @@
 			<div class="fieldWrapper {% if field.errors %}errors{% endif %}">
 			  {% if field.name == "url" %}
 				<label>
-			  <a href="#" rel="tooltip" title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><i class="icon-info-sign"></i>Already on YouTube?  Enter Video ID</a>
+			  <a href="#" rel="tooltip" title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><em class="icon-info-sign"></em>Already on YouTube?  Enter Video ID</a>
 			  {% if field.value %}
 				<input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" checked /></label>
 				<div id="yt_id">{{ field }}</div>
@@ -27,7 +27,7 @@
 			  {% endif %}
 			  {% elif field.name == "live_datetime" %}
 				<label>
-			  <a href="#" rel="tooltip" title="If you're ready to set a live date for the video, check here.  If you're not ready to decide on a live date yet, you can leave this box unchecked."><i class="icon-info-sign"></i>Set Live Date</a>
+			  <a href="#" rel="tooltip" title="If you're ready to set a live date for the video, check here.  If you're not ready to decide on a live date yet, you can leave this box unchecked."><em class="icon-info-sign"></em>Set Live Date</a>
 			  {% if field.value %}
 				<input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" checked /></label>
 					<div id="live_date">{{ field }}</div>
