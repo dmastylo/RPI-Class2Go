@@ -1,11 +1,8 @@
 <li class="course-list-item">
     <div class="pull-left">
         <em class="icon-file"></em>
-	{% if item.file.dl_link %}
-        <div style="margin-top:7px;text-align:center;font-weight:bold"><a href="{{item.file.dl_link}}" style="padding:0px 1px 0px 7px;margin-top:5px;" class="btn" title="download"><em class="icon-download-alt"></em></a></div>
-	{% endif %}
     </div>
     <div class="course-list-content">
-        <h4><a href="{{item.file.file.url}}">{{item.file.title}}</a></h4>
+        <h4><a href="{{item.file.file.url}}">{{item.file.title}}</a>{% if item.file.dl_link %}<a href="{{item.file.dl_link}}" class="btn btn-mini" title="download"><em class="icon-download-alt"></em> Download</a></div>{% endif %}</h4>
     </div>
 </li>

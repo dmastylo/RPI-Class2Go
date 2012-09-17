@@ -1,12 +1,9 @@
 <li class="course-list-item">
     <div class="pull-left">
         <em class="icon-facetime-video"></em>
-	{% if item.video.dl_link %}
-	   <div style="margin-top:7px;text-align:center;font-weight:bold"><a href="{{item.video.dl_link}}" style="padding:0px 1px 0px 7px;margin-top:5px;" class="btn" title="download"><em class="icon-download-alt"></em></a></div>
-	{% endif %}
     </div>
     <div class="course-list-content">
-        <h4><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a> ({{item.video.runtime}})</h4>
+        <h4><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a> ({{item.video.runtime}}){% if item.video.dl_link %}<a href="{{item.video.dl_link}}" class="btn btn-mini" title="download"><em class="icon-download-alt"></em> Download</a>{% endif %}</h4>
 	<div>{{item.video.description}}</div>
         <div class="progress progress-danger progress-striped">
             <div class="bar" style="width:{{item.completed_percent}}%"></div>
