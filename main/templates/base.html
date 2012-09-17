@@ -26,7 +26,7 @@
     <div id="viewport">
         <div id="global-header">
             <h1 class="stanford-logo">
-                <a href="http://www.stanford.edu">Stanford University</a>
+                <a href="http://www.stanford.edu">Stanford Online</a>
             </h1>
         </div>
         <div id="c2g_layout_topbar">
@@ -81,7 +81,7 @@
                         {% csrf_token %}
                     </form>
                 </li>
-                <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></b>!</span></li>
+                <li class="hidden-phone"><span>Welcome <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
             {% else %}
                 {% if common_page_data.ready_course.institution_only %}
                 <li class="hidden-phone">
@@ -111,7 +111,7 @@
                                 {% csrf_token %}
                             </form>
                         {% else %}
-                            {{available_course.0}} ({{available_course.2}})<b>Already signed up</b>    
+                            {{available_course.0}} ({{available_course.2}})<strong>Already signed up</strong>    
                         {% endifequal %}  
                 	{% endfor %}
                 {% endblock %}
