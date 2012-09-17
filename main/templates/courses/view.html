@@ -24,21 +24,21 @@
                     {% ifequal content_section.id item.3 %}
                         {% ifequal item.0 'video' %} 
                             {% if is_logged_in %}
-                                <li><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><em class="icon-facetime-video"></em> {{item.5}}</a></li>
+                                <li><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Video"><em class="icon-facetime-video"></em> {{item.5}}</a></li>
       		 		            {% else %}
                                 <li><em class="icon-facetime-video"></em> {{item.5}}</li>
                             {% endif %}
                         {% endifequal %}
                             {% ifequal item.0 'pset' %}
                                 {% if is_logged_in %}
-                                <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><em class="icon-pencil"></em> {{item.5}}</a></li>
+                                <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Problem Set"><em class="icon-pencil"></em> {{item.5}}</a></li>
       		 	                {% else %}
                                 <li><em class="icon-pencil"></em> {{item.5}}</li>
       		 	                {% endif %}
                             {% endifequal %}
                         {% ifequal item.0 'additional_page' %}
                             {% if is_logged_in %}
-                                <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><em class="icon-book"></em> {{item.5}}</a></li>
+                                <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Page"><em class="icon-book"></em> {{item.5}}</a></li>
       		 	                {% else %}
                                 <li><em class="icon-book"></em> {{item.5}}</li>
       		 	                {% endif %}

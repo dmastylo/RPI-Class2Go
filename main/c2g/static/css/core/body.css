@@ -379,11 +379,38 @@ small.date {
 
 .course-list-item {
     overflow:hidden;
-    padding:10px 20px;
+    padding:5px 0px;
+    border-bottom:1px solid #eee;
 }
 .course-list-item .progress {
     width:400px;
     margin-top:5px;
+}
+.course-list-item .icon-pencil,
+.course-list-item .icon-book,
+.course-list-item .icon-file,
+.course-list-item .icon-facetime-video {
+    font-size:40px; 
+    color:#999;
+    opacity:.3;
+    padding-left:5px;
+    padding-top:5px;
+}
+.course-list-item .pull-left {
+    margin-left:-10px;
+    width:60px;
+}
+.course-list-item .course-list-content {
+    overflow:hidden;
+    margin-right:10px;
+    margin-bottom:5px;
+}
+.course-list-item .course-list-content h4 {
+    margin-top:10px;
+    display:inline;
+}
+.course-list-item .course-list-content label {
+    margin-bottom:10px;
 }
 
 /* Forms
