@@ -24,7 +24,7 @@
   {% if user.is_authenticated %}
 
     {% if video.title %} 
-        <h2 class="section-headline">{{video.title}}</h2>
+        <h3 class="section-headline">{{video.title}}</h3>
         {% if common_page_data.course_mode == 'draft' and common_page_data.is_course_admin %}
           <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
         {% endif %}
