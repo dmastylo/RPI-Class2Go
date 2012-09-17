@@ -38,3 +38,18 @@ function multitail-prod {
         -c- \
         -l 'ssh ubuntu@util1.prod.c2gops.com "tail -f /var/log/django/kelvinator.log"' 
 }
+
+function multitail-stage {
+    multitail -s 2  \
+        --config /usr/local/etc/multitail.conf \
+        -CS apache \
+        -l 'ssh bitnami@app1.stage.c2gops.com "tail -f stack/apache2/logs/access_log"' \
+        -l 'ssh bitnami@app2.stage.c2gops.com "tail -f stack/apache2/logs/access_log"' \
+        -c- \
+        -l 'ssh ubuntu@util1.stage.c2gops.com "tail -f /var/log/celery/*.log"' \
+        -CS apache_error \
+        -l 'ssh bitnami@app1.stage.c2gops.com "tail -f stack/apache2/logs/error_log"' \
+        -l 'ssh bitnami@app2.stage.c2gops.com "tail -f stack/apache2/logs/error_log"' \
+        -c- \
+        -l 'ssh ubuntu@util1.stage.c2gops.com "tail -f /var/log/django/kelvinator.log"' 
+}

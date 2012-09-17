@@ -9,8 +9,8 @@ import problemsets.views
 
 class SimpleTest(TestCase):
 
-    course_prefix="nlp"
-    course_suffix="fall2012"
+    course_prefix="networking"
+    course_suffix="Fall2012"
     course_url="/"+course_prefix+"/"+course_suffix
     course_name="Natural Language Processing"
     course_title_search_string="<h2>"+course_name+"</h2>"
