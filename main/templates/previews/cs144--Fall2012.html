@@ -1,10 +1,16 @@
 {% extends 'courses/preview.html' %} {% load url from future %}
-
+{% block signup_form %}
+<div class="span5">
+<div class="alert alert-success"><i class="icon-ok"></i>
+This is a Stanford University course and not open to the public.  The public edition is <a href="http://networking.class.stanford.edu">here</a>.  You will be able to sign-in to the course with your SUNet ID starting September 24.
+</div>
+</div>
+{% endblock signup_form %}
 {% block course_description %}
 
 <div class = "span7"> <style> p {margin-bottom: 20px;} li {margin-bottom: 20px;} </style>
 
-<h3>Class begins October 8, 2012</h3>
+<h3>Fall Quarter, 2012.  Starting September 24.</h3>
 
 <p align=center> <iframe width="560" height="315"
 src="https://www.youtube.com/embed/o4Y_0uug_Oc?rel=0&showinfo=0" frameborder="0" allowfullscreen="true"></iframe>
@@ -66,7 +72,7 @@ fruit. </p>
 
 
 
-<h3>Prerequisistes</h3> <p align="justify">Students need an introductory course in
+<h3>Prerequisites</h3> <p align="justify">Students need an introductory course in
 probability, a strong understanding of bits and bytes, and knowledge of how computers lay
 out data in memory.</p> </div>
 
