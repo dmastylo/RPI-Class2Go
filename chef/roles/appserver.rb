@@ -22,6 +22,7 @@ run_list(
     "recipe[class2go-base-bitnami]",
     "recipe[class2go-python]",
     "recipe[class2go-bitnami-django]",
+    "recipe[bitnami-shib]",
     "recipe[class2go-deploy]",
     "recipe[class2go-logging]",
     "recipe[class2go-database-config]",
