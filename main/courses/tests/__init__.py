@@ -1,3 +1,3 @@
 from tests import *
-from test_course_name import *
+# from test_course_name import *
 
