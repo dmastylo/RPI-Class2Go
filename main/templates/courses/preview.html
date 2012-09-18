@@ -26,6 +26,9 @@
 {% block course_description %}
 
 {% endblock course_description %}
+
+{% block signup_form %}
+    
 {% if user.is_authenticated %}
   {% if common_page_data.is_course_member %}
   <div class="span5">
@@ -114,4 +117,6 @@
     {% endif %}
 {% endif %}
 </div>
+
+{% endblock signup_form %}
 {% endblock r_column_content %}
