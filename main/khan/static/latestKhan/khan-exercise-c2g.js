@@ -2381,6 +2381,15 @@ var Khan = (function() {
             $("#next-question-button").click();
         });
 
+        // [C2G] Add ARIA Live Region info to hintsarea
+        $('#hintsarea').attr('role', 'region');
+        $('#hintsarea').attr('aria-live', 'polite');
+        $('#hintsarea').attr('aria-atomic', true);
+        $('#hintsarea').attr('aria-relevant', 'additions text');
+        // [C2G] Set up corresponding hint button
+        $('#hint').attr('title', 'Click to add a hint to the hint area');
+        $('#hint').attr('aria-controls', 'hintsarea');
+
         // Watch for when the "Get a Hint" button is clicked
         $("#hint").click(function() {
 
@@ -2617,6 +2626,7 @@ var Khan = (function() {
         });
 
         $("#scratchpad-show")
+            .attr('title', 'Click to toggle scratchpad area')
             .click(function(e) {
                 e.preventDefault();
                 Khan.scratchpad.toggle();
