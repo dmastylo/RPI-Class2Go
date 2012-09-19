@@ -120,8 +120,10 @@ def change_live_datetime(request):
     if form.is_valid():
         if action == "Make Ready and Go Live":
             new_live_datetime = datetime.now()
-        else:
+        elif action == "Set Live Date":
             new_live_datetime = form.cleaned_data['live_datetime']
+        else:
+            new_live_datetime = None
 
         ids = request.POST.get("change_live_datetime_ids").split(",")
 
