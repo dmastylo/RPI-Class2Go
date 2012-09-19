@@ -1427,16 +1427,26 @@ var Khan = (function() {
 
         // [C2G] Default to no attempts
         alreadyAttempted = 0;
+        isCorrect = false;
         if (typeof KhanC2G.PSActivityLog != "undefined" && 
                 typeof KhanC2G.PSActivityLog.problems != "undefined" && 
-                KhanC2G.PSActivityLog.problems[exerciseRef] && 
-                KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"]) {
-            alreadyAttempted = KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"];
+                KhanC2G.PSActivityLog.problems[exerciseRef]) {
+            if (KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"]) {
+                alreadyAttempted = KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"];
+            }
+            if (KhanC2G.PSActivityLog.problems[exerciseRef]["correct"]) {
+                isCorrect = true;
+            }
         }
 
         // [C2G] If it's been attempted at all
         if (alreadyAttempted > 0) {
-            maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
+            maxCredit = (alreadyAttempted < maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
+            // if last attempt was correct and user hasn't exceeded the maximum number
+            // of attempts, it shouldn't be deducted from score; add back in 1x penaltyPct
+            if (isCorrect && (alreadyAttempted <= maxAttempts)) {
+                maxCredit = 100 - ((alreadyAttempted - 1) * parseInt(penaltyPct));
+            }
             console.log("Checking for previous answer for this problem...");
             if (KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered']) {
                 console.log("...found in PSActivityLog");
@@ -2942,6 +2952,7 @@ var Khan = (function() {
         $('#solutionarea span.value').each(function () {
             user_choices.push($(this).text());
         });
+        console.log('*** ATTEMPTS: ' + data['attempt_number'] + ' ***');
         // [C2G] Correct attempt count for when a user reloads the page
         if ($.isNumeric($('#attempt-count').text())) {
             data['attempt_number'] = parseInt($('#attempt-count').text()) + 1;
@@ -2980,6 +2991,19 @@ var Khan = (function() {
 
             // Backup the response locally, for later use
             success: function(data, txtStatus, jqXHR) {
+
+                // [C2G] Record attempts, right or wrong
+                var attCt = $('#attempt-count').text();
+                var newAttCt = (data['attempt_num']) ? data['attempt_num'] : parseInt(attCt) + 1;
+                $('#attempt-count').text(newAttCt);
+                
+                var currentProblemIdx = $('.current-question').data("problemIndex");
+                var currentProblemLog = KhanC2G.PSActivityLog.problems[currentProblemIdx];
+                if (currentProblemLog) {
+                    currentProblemLog.alreadyAttempted = newAttCt;
+                }
+
+                // [C2G] If user got question correct
                 if (data['exercise_status'] == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                     $('.current-question').data("correct", true);
@@ -2993,10 +3017,6 @@ var Khan = (function() {
                 } else {
                     var maxCredit = 100;
                     var maxAttempts = (typeof c2gConfig != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
-
-                    var attCt = $('#attempt-count').text();
-                    var newAttCt = parseInt(attCt) + 1;
-                    $('#attempt-count').text(newAttCt);
 
                     // since page displays last attempt count, the display will be behind by one
                     // (i.e. with max of 3 attempts, by the time "Attempts so far" shows as "3",
