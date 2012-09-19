@@ -33,8 +33,8 @@ end
 # To be really super sure that we are on the branch we mean to be on
 # go to the directory and do a pull
 execute "git checkout" do
-    command "git pull origin " + node['main']['git_branch']
-    path node['system']['admin_home'] + "/class2go"
+    command "git checkout " + node['main']['git_branch']
+    cwd node['system']['admin_home'] + "/class2go"
     user node['system']['admin_user']
     group node['system']['admin_group']
     action :run
@@ -43,9 +43,9 @@ end
 # ... and then do a reset hard HEAD.  This handles the case where we were
 # inadvertently ahead of the production branch, which can happen if you 
 # happen to be on master first.
-execute "git reset" do
+execute "git reset hard" do
     command "git reset --hard HEAD"
-    path node['system']['admin_home'] + "/class2go"
+    cwd node['system']['admin_home'] + "/class2go"
     user node['system']['admin_user']
     group node['system']['admin_group']
     action :run
