@@ -989,7 +989,6 @@ var Khan = (function() {
             }
 
             // Generate a new problem
-            console.log("In finishRender, generating new problem with no arguments");
             makeProblem();
 
         }
@@ -1064,15 +1063,11 @@ var Khan = (function() {
 
     function makeProblem(id, seed) {
 
-        console.log('makeProblem called with id ' + id + ' and seed ' + seed);
-        console.log(typeof seed);
-    
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
 
         // [C2G] Build and return a localStorage key
         function getLSSeedKey () {
-            console.log("getLSSeedKey called");
             var seedKey = c2gConfig.user || 'anon';
             seedKey += '-';
             if ($('#exercise_type').length && $('#exercise_type').val() === 'problemset') {
@@ -1081,7 +1076,6 @@ var Khan = (function() {
                 seedKey += 'vid-' + $('#video_id').val();
             }
             seedKey += '-' + id;
-            console.log("seedKey: " + seedKey)
             return seedKey;
         }
 
@@ -1091,7 +1085,6 @@ var Khan = (function() {
         // 3. Check localStorage
         // 4. Check userPSData object (last resort, as it's a little messier)
         function getLocalSeed () {
-            console.log("getLocalSeed called");
             // If in-video exercise, no problems should be called with seeds
             // (because we want to allow random answer choices for these exercises)
             if ($('#exercise_type').val() == "video") {
@@ -1099,14 +1092,7 @@ var Khan = (function() {
             }
 
             // try the seed data stored in the question card
-            console.log("$('.current-question') problemSeed...");
-            console.log($('.current-question').data("problemSeed"));
-            console.log("KhanC2G.PSActivityLog.problems[id].problemSeed...");
-            console.log(KhanC2G.PSActivityLog.problems[id].problemSeed);
-            console.log("userPSData.problems"); 
-            console.log(userPSData.problems[id]); 
             if ($('.current-question').data('problemSeed')) {
-                console.log("current-question card has seed");
                 return $('.current-question').data('problemSeed');
             // try one stored in KhanC2G.PSActivityLog 
             } else if (typeof KhanC2G != "undefined" &&
@@ -1117,13 +1103,11 @@ var Khan = (function() {
                 return KhanC2G.PSActivityLog.problems[id].problemSeed;
             // try one stored in localStorage
             } else if (localStorage.getItem(getLSSeedKey())) {
-                console.log("localStorage has seed");
                 return localStorage.getItem(getLSSeedKey());
             // finally, try the userPSData object
             } else if (typeof userPSData != "undefined" && 
                         typeof userPSData.problems != "undefined" &&
                         typeof userPSData.problems.length > 0) {
-                console.log("userPSData has seed");
                 var userPSDataProbLen = userPSData.problems.length;
                 for (var p = 0; p < userPSDataProbLen; p += 1) {
                     if (userPSData.problems[p].problem_index = id) {
@@ -1132,32 +1116,19 @@ var Khan = (function() {
                 }
             }
             // no seed has been stored locally
-            console.log("no local seed");
             return null;
         }
 
-        console.log("This is what seed is: " + seed);
         // Allow passing in a random seed
         if (typeof seed !== "undefined") {
             problemSeed = seed;
-            console.log("Seed must not have been undefined");
         // [C2G] Check to see if there has been a seed stored for this problem
         } else if (getLocalSeed()) {
-            console.log("Local seed found, so getting that");
             problemSeed = parseInt(getLocalSeed());
         // In either of these testing situations,
         } else if ((testMode && Khan.query.test != null) || user == null) {
-            console.log("Either testmode is true and test exists in query string...");
-            console.log(testMode);
-            console.log(Khan.query.test);
-            console.log("...or user is null");
-            console.log(user);
             problemSeed = randomSeed % bins;
         }
-
-        console.log("seed again is " + seed);
-        console.log("randomSeed is " + randomSeed);
-        console.log("problemSeed is " + problemSeed);
 
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
@@ -1165,27 +1136,18 @@ var Khan = (function() {
         if (KhanC2G.PSActivityLog.exerciseType == 'problemset') {
             // [C2G] Store locally
             if (!localStorage.getItem(getLSSeedKey())) {
-                console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
                 localStorage.setItem(getLSSeedKey(), problemSeed);
-            } else {
-                console.log("No need to add to localStorage");
             }
 
             // store in KhanC2G.PSActivityLog object
             var loggedProbSeed = KhanC2G.PSActivityLog.problems[id]["problemSeed"];
             if (!loggedProbSeed) {
-                console.log('Adding problemSeed ' + problemSeed + ' to PSActivityLog for #' + id);
                 KhanC2G.PSActivityLog.problems[id]['problemSeed'] = parseInt(problemSeed);
-            } else {
-                console.log("No need to add to PSActivityLog");
             }
 
             // store in current-question data object
             if(!$('.current-question').data('problemSeed')) {
-                console.log('Adding problemSeed ' + problemSeed + ' to current-question #' + id);
                 $('.current-question').data('problemSeed', parseInt(problemSeed));
-            } else {
-                console.log("No need to add to current-question");
             }
         }
 
@@ -1397,7 +1359,6 @@ var Khan = (function() {
         } else {
             // Making the problem failed, let's try again
             problem.remove();
-            console.log("Making the problem failed, let's try again");
             makeProblem(id, randomSeed);
             return;
         }
@@ -1447,9 +1408,7 @@ var Khan = (function() {
             if (isCorrect && (alreadyAttempted <= maxAttempts)) {
                 maxCredit = 100 - ((alreadyAttempted - 1) * parseInt(penaltyPct));
             }
-            console.log("Checking for previous answer for this problem...");
             if (KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered']) {
-                console.log("...found in PSActivityLog");
                 var userSelVal = KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered'];
                 if ($('#solutionarea input:radio').length) {
                     $('#solutionarea input:radio')[parseInt(userSelVal)].checked = true;
@@ -1457,7 +1416,6 @@ var Khan = (function() {
                     $('#solutionarea #testinput').val(userSelVal);
                 }
             } else if ($('.current-question').data('userEntered')) {
-                console.log("...found in current question's data object");
                 var userSelVal = $('.current-question').data('userEntered');
                 if ($('#solutionarea input:radio').length) {
                     $('#solutionarea input:radio')[parseInt(userSelVal)].checked = true;
@@ -2155,7 +2113,6 @@ var Khan = (function() {
 
             if (testMode) {
                 // Just generate a new problem from existing exercise
-                console.log("In testMode, calling makeProblem without an argument");
                 makeProblem();
             } else {
                 loadAndRenderExercise(nextUserExercise);
@@ -2165,7 +2122,6 @@ var Khan = (function() {
     }
 
     function prepareSite() {
-        console.log("prepareSite called");
 
         // TODO(david): Don't add homepage elements with "exercise" class
         exercises = exercises.add($("div.exercise").detach());
@@ -2952,7 +2908,7 @@ var Khan = (function() {
         $('#solutionarea span.value').each(function () {
             user_choices.push($(this).text());
         });
-        console.log('*** ATTEMPTS: ' + data['attempt_number'] + ' ***');
+        
         // [C2G] Correct attempt count for when a user reloads the page
         if ($.isNumeric($('#attempt-count').text())) {
             data['attempt_number'] = parseInt($('#attempt-count').text()) + 1;
@@ -2969,12 +2925,9 @@ var Khan = (function() {
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         // store user_selection_val
-        console.log("*** " + data.attempt_content + " ***");
         if (KhanC2G.PSActivityLog.exerciseType == 'problemset' && data.attempt_content != "hint") {
-            console.log("Storing user's answer in current-question");
             $('.current-question').data("userEntered", user_selection_val);
             var problemIdx = $('.current-question').data("problemIndex");
-            console.log("Storing user's answer in PSActivityLog");
             KhanC2G.PSActivityLog.problems[problemIdx].userEntered = user_selection_val;
         }
 
@@ -3213,16 +3166,12 @@ var Khan = (function() {
 
     function loadModules() {
 
-        console.log("loadModules called");
-
         modulesLoaded = true;
 
         // Load module dependencies
         Khan.loadScripts($.map(Khan.modules, function(mod, name) {
             return mod;
         }), function() {
-
-            console.log("loadScripts has completed, anon function called which will load khan-exercise.html");
 
             $(function() {
                 // Inject the site markup, if it doesn't exist
@@ -3238,7 +3187,6 @@ var Khan = (function() {
                                 url: urlBase + "exercises/khan-exercise.html",
                                 dataType: "text",
                                 success: function(htmlExercise) {
-                                    console.log("khan-exercise.html successfully loaded");
                                     //injectTestModeSite(html, htmlExercise);
                                    injectExerciseFrameMarkup(htmlExercise);
                                    finishSitePrep();
@@ -3260,7 +3208,6 @@ var Khan = (function() {
 
         function injectExerciseFrameMarkup(htmlExercise) {
 
-            console.log("injectExerciseFrameMarkup called");
             // [C2G] Need prepend, as slow connection causes video div to be overwritten
             // for in-video exercises
             //$("#container .exercises-body .current-card-contents").html(htmlExercise);
@@ -3283,8 +3230,6 @@ var Khan = (function() {
         }
 
         function finishSitePrep() {
-
-            console.log("finishSitePrep called");
 
             prepareSite();
 
@@ -3315,7 +3260,6 @@ var Khan = (function() {
 
             // [C2G] Set up cards so the first one not done is the "current card"
             function configureCards () {
-                console.log('configureCards called');
                 var cardArr = $('#questions-stack li').toArray();
                 //console.log($('li.current-question'));
                 $('li.current-question').removeClass('current-question');
@@ -3354,7 +3298,6 @@ var Khan = (function() {
                     if (KhanC2G.remoteExercises[pID]) {
                         $('#workarea').remove('.loading');
                         KhanC2G.remoteExPollCount = 0;
-                        console.log("configureCards, remote exercise here, so call makeProblem");
                         if ($('.current-question').data('problemSeed')) {
                             makeProblem(pID, pSeed);
                         } else {
@@ -3370,7 +3313,7 @@ var Khan = (function() {
                 };
                 pollForRemoteEx();
             }
-            console.log($('#exercise_type').val());
+            
             if ($('#exercise_type').val() != "video") {
                 configureCards();
             }
@@ -3382,7 +3325,6 @@ var Khan = (function() {
     //var c2gProblemBag;
 
     function initC2GActivityLog () {
-        console.log("initC2GActivityLog called");
         KhanC2G.PSActivityLog = {};
         KhanC2G.PSActivityLog.exerciseType = ($('#exercise_type').length) ? ($('#exercise_type').val()) : "problemset";
         if (typeof exAssessType != "undefined") {
@@ -3400,8 +3342,6 @@ var Khan = (function() {
         KhanC2G.PSActivityLog.problems = [];
 
         KhanC2G.PSActivityLog.addProblem = function (obj) {
-            console.log("addProblem called with...");
-            console.log(obj);
             var _self = this;
             if (obj) {
                 _self.problems.push(obj);
@@ -3424,7 +3364,6 @@ var Khan = (function() {
     }
 
     function initC2GStacks(exercises) {
-        console.log("initC2GStacks called");
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
@@ -3446,20 +3385,12 @@ var Khan = (function() {
                 attemptedProblems[userPSData.problems[p].problem_index] = userPSData.problems[p];
             }
 
-            console.log("attemptedProblems ***");
-            console.log(attemptedProblems);
-            console.log(JSON.stringify(attemptedProblems));
-
             $(exercises).filter(".exercise").each(function(idx, elem) {
 
-                console.log("KhanC2G.PSActivityLog");
-                console.log(KhanC2G.PSActivityLog.totalProblems);
                 //debugger;
                 if (typeof userPSData != "undefined" && 
                     typeof userPSData.problems != "undefined" && 
                     userPSData.problems[idx.toString()]) {
-                    console.log("Found entry in userPSData!");
-                    console.log(userPSData.problems[idx.toString()]);
                 }
 
                 //Figure out how many problems there are in this exercise
@@ -3479,10 +3410,6 @@ var Khan = (function() {
                 //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
                 li.data('problemIndex',idx);
                 //li.data('randseed',Math.floor(Math.random()*100000));
-                console.log("*** attemptedProblems ***");
-                console.log(attemptedProblems);
-                console.log(attemptedProblems[idx.toString()]);
-                console.log(attemptedProblems[idx]);
                 if (typeof attemptedProblems != "undefined" && attemptedProblems[idx.toString()]) {
                     var userQDataObj = attemptedProblems[idx.toString()];
                     li.data('problemSeed', parseInt(userQDataObj.problem_seed));
@@ -3495,8 +3422,6 @@ var Khan = (function() {
                     li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
                 }
 
-                console.log("current question gets this data:");
-                console.log(li.data());
                 // Merge list item data into KhanC2G.PSActivityLog so they're synched
                 KhanC2G.PSActivityLog.addProblem(li.data());            
 
@@ -3668,7 +3593,6 @@ var Khan = (function() {
             clearExistingProblem();
 
             if (next.length) {
-                console.log("Next question button clicked, going to makeProblem...");
                 makeProblem(next.data('problemIndex'), next.data('problemSeed'));
             }
 
@@ -3727,7 +3651,6 @@ var Khan = (function() {
                 if (KhanC2G.remoteExercises[thisCard.data('problemIndex')]) {
                     $('#workarea').remove('.loading');
                     KhanC2G.remoteExPollCount = 0;
-                    console.log("A card must have been clicked, run makeProblem...");
                     makeProblem(thisCard.data('problemIndex'), thisCard.data('problemSeed'));
                     // [C2G] Make solutionarea visible again
                     $('#solutionarea').css('visibility', 'visible');
@@ -3745,7 +3668,6 @@ var Khan = (function() {
             // load previous answers into the solution area
             $.when(checkForInputs()).then(function () {
                 var userPrevSel = thisCard.data("userEntered");
-                console.log("user selection was " + userPrevSel);
                 var validUserChoices = thisCard.data("userChoices");
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON(thisCard.data("userChoices")).length : 0;
                 // [C2G] Just having something in "user_choices" doesn't mean it's valid, it could be an
