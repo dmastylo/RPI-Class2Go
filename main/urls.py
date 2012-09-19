@@ -33,7 +33,7 @@ urlpatterns = patterns('',
 #    url(r'^class2go/', include('class2go.foo.urls')),
    
     #shibboleth login
-    url(r'^shib-login/?$', 'accounts.views.shib_login'),
+    url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
                        
                        
     #for data collection

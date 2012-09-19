@@ -104,6 +104,8 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
     preview_only_mode = models.BooleanField(default=True)
+    institution_only = models.BooleanField(default=False)
+    
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
     # Just use epoch seconds to make it unique.
@@ -156,6 +158,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             image = self,
             mode = 'ready',
             handle = self.handle,
+            institution_only = self.institution_only,
             piazza_id = int(time.mktime(time.gmtime())),
         )
         ready_instance.save()
@@ -514,6 +517,8 @@ class UserProfile(TimestampMixin, models.Model):
     birth_year = models.CharField(max_length=64, null=True)
     education = models.CharField(max_length=64, null=True)
     work = models.CharField(max_length=128,null=True)
+
+    institutions = models.ManyToManyField(Institution) #these are confirmed institutions via shib or other trusted verifier
 
     client_ip = models.CharField(max_length=30, null=True)
     user_agent = models.CharField(max_length=256, null=True)
@@ -1161,22 +1166,43 @@ class EditProfileForm(forms.Form):
     last_name = forms.CharField(max_length=30)
     email = forms.CharField(max_length=30)
 
+class Email(TimestampMixin, models.Model):
+    sender = models.ForeignKey(User)
+    hash = models.CharField(max_length=128, db_index=True)
+    subject = models.CharField(max_length=128, blank=True)
+    html_message = models.TextField(null=True, blank=True)    
+    class Meta:
+        abstract = True
 
-class CourseEmail(TimestampMixin, models.Model):
+class CourseEmail(Email, models.Model):
     TO_OPTIONS =(('myself','myself'),
                  ('staff','staff'),
                  ('students','students'),
                  ('all','all'),
                  )
     course = models.ForeignKey(Course)
-    sender = models.ForeignKey(User)
     to = models.CharField(max_length=64, choices=TO_OPTIONS, default='myself')
-    hash = models.CharField(max_length=128, db_index=True)
-    subject = models.CharField(max_length=128, blank=True)
-    html_message = models.TextField(null=True, blank=True)
 
     
     def __unicode__(self):
         return self.subject
     class Meta:
         db_table = u'c2g_course_emails'
+
+class EmailAddr(models.Model):
+    name = models.CharField(max_length=128, null=True, blank=True)
+    addr = models.EmailField(max_length=128)
+    def __unicode__(self):
+       return self.addr
+
+class MailingList(models.Model):
+    name = models.CharField(max_length=128, blank=True)
+    members = models.ManyToManyField(EmailAddr)
+    def __unicode__(self):
+        return self.name
+
+class ListEmail(Email, models.Model):
+    from_name = models.CharField(max_length=128, blank=True)
+    to_list = models.ForeignKey(MailingList)
+    def __unicode__(self):
+        return self.subject
