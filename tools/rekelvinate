@@ -47,45 +47,44 @@ def get_missing():
 
     # example: u'nlp/Fall2012/videos/39/jpegs/manifest.txt'
     # video regexp has to handle spaces in video name
-    video_re=re.compile(r"(\w*)/(\w*)/videos/(\w*)/[^/]+$")
-    manifest_re=re.compile(r"(\w*)/(\w*)/videos/(\w*)/jpegs/manifest.txt$")
-    video_id_field=3
+    video_re=re.compile(r"(\w*/\w*/videos/\w*)/[^/]+$")
+    manifest_re=re.compile(r"(\w*/\w*/videos/\w*)/jpegs/manifest.txt$")
 
-    videos={}   # dict of video_id, full S3 path to video
+    videos={}   # dict of first part of path (up to video id), full S3 path to video
     videos_skip=[]   # ID's of videos with errors, to be skipped
 
     # first scan for all videos
     for path_result in contents_set:
         path = path_result.name
-        video_match = video_re.match(path)
-        if video_match:
-            video_id = video_match.group(video_id_field)
-            if video_id in videos:
-                printv("WARNING: duplicate videos found for ID " + video_id + ", skipping")
-                printv("    " + videos[video_id])
+        match = video_re.match(path)
+        if match:
+            key = match.group(1)
+            if key in videos:
+                printv("WARNING: duplicate videos found: " + key)
+                printv("    " + videos[key])
                 printv("    " + path)
-                videos_skip.append(video_id)
-            else:
-                printv("found video " + path)
-                videos[video_id] = path
+                videos_skip.append(key)
+                next
+            printv("found video " + path)
+            videos[key] = path
 
-    # now scan for manifests to see which videos to remove.  Doing this
-    # in two passes to handle duplicate video_id case
+    # remove videos that have manifests
     for path_result in contents_set:
         path = path_result.name
-        manifest_match = manifest_re.match(path)
-        if manifest_match:
-            video_id = video_match.group(video_id_field)
-            if any(video_id in v for v in videos_skip):
-                printv("found manifest, but skipping because of a dup: " + path)
-                next;
-            if video_id in videos:
-                printv("found manifest, removed: " + deleted)
-                deleted = videos.pop(manifest_match.group(video_id_field))
-            else:
-                printv("found manifest w/out video, ignored: " + path)
+        match = manifest_re.match(path)
+        if match:
+            key = match.group(1)
+            if key in videos:
+                videos.pop(key)
 
-    return videos.values()
+    # remove dups (may have alrady been removed if one of the dups had a manifest)
+    for key in videos_skip:
+        if key in videos:
+            videos.pop(key)
+
+    paths=videos.values()
+    paths.sort()   # in place
+    return paths
 
 
 def initiate(missing):
