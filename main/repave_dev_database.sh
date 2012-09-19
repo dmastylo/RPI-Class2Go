@@ -34,9 +34,17 @@ DATABASES=`mysql --batch -e "show databases;"`
 
 if [[ ! $DATABASES =~ $DEV_DB_NAME ]]; then
     echo
-    echo "Error: I can't find a local database named \"${DEV_DB_NAME}\"."
+    echo "Error: I can't find a database named \"${DEV_DB_NAME}\"."
     echo "- maybe you've named your dev database something else?"
     echo "- maybe mysql is misconfigured (missing ~/.my.cnf)?"
+    echo "Bailing out"
+    exit 1
+fi
+
+if [[ $DATABASES =~ $INVALID_HOSTNAME ]]; then
+    echo 
+    echo "Error: I see you have a database containing the name \"${INVALID_HOSTNAME}\" in it."
+    echo "Stopping since this might be an indication of a production database."
     echo "Bailing out"
     exit 1
 fi

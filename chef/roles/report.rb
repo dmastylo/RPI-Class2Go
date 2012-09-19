@@ -1,5 +1,5 @@
-name "util"
-description "class2go utility node -- on top of UBUNTU"
+name "report"
+description "class2go reporting, feature on top of a UBUNTU util machine"
 
 override_attributes \
     "system" => {
@@ -18,6 +18,5 @@ run_list(
     "recipe[class2go-logging]",
     "recipe[class2go-database-config]",
     "recipe[s3cmd]",
-    "recipe[class2go-util-kelvinator]",
-    "recipe[class2go-celery-worker]"
+    "recipe[class2go-reports]"
 )
