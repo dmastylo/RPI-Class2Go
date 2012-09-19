@@ -61,4 +61,9 @@ def register(request, template_name='accounts/register.html'):
     return HttpResponse(t.render(c))
 
     
-
+@never_cache
+def shib_login(request):
+    string = ""
+    for k in request.META:
+        string += k + " : " + str(request.META[k]) + "<br />"
+    return HttpResponse(string)
