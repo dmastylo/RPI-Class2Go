@@ -14,6 +14,8 @@ from courses.forms import *
 
 from courses.actions import auth_view_wrapper
 
+from urlparse import urlparse
+
 def index(item): # define a index function for list items
  return item[1]
 
@@ -79,7 +81,8 @@ def main(request, course_prefix, course_suffix):
 
         for file in file_list:
             if file.section.id == contentsection.id:
-                file_parts=re.split('\.',file.file.url)
+                file_path=urlparse(file.file.url).path
+                file_parts=re.split('\.',file_path)
                 file_extension=file_parts.pop().lower()
                 if file_extension in ("html", "htm"):
                     icon_type="globe"
