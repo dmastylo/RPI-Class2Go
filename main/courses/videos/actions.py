@@ -5,6 +5,9 @@ from c2g.models import Course, Video
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
+import subprocess
+from celery import task
+
 from c2g.models import Course, Video, VideoActivity
 from courses.common_page_data import get_common_page_data
 
@@ -17,7 +20,8 @@ import urllib2, urllib, json
 import re
 import settings
 
-import kelvinator.tasks
+#import kelvinator.tasks
+import kelvinator.kelvinator
 
 from datetime import datetime
 from courses.actions import auth_is_course_admin_view_wrapper
@@ -199,12 +203,13 @@ def upload(request):
 
             new_video.save()
             new_video.create_ready_instance()
-            print new_video.file.url
+            #print new_video.file.url
 
             # TODO: don't hardcode the AWS location 
             s3_path="https://s3-us-west-2.amazonaws.com/"+common_page_data['aws_storage_bucket_name']+"/"+urllib.quote_plus(new_video.file.name,"/")
-            # TODO: make these parameters settable
-            kelvinator.tasks.run.delay(s3_path, "1", "1000")
+            
+            kelvinator.tasks.run.delay(video=new_video, kfpm=2)
+            
 
             if new_video.url:
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)

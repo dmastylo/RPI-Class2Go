@@ -57,3 +57,7 @@ PIAZZA_SECRET = "piazza_xxxxxxx"
 # SMTP INFO for SES -- Amazon Simple Email Service $1 per 10K recipients
 SES_SMTP_USER = "USER"
 SES_SMTP_PASSWD = "PWD"
+
+# Kelvinator Working Path: Is where the kelvinator will store and process intermediate files
+# Include a trailing slash!! Ex: /some/path/
+KELVINATOR_WORKING_PATH = ''
