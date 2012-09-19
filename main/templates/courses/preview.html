@@ -23,9 +23,14 @@
 
 {% block r_column_content %}
 <div class="row-fluid">
+    
+
 {% block course_description %}
 
 {% endblock course_description %}
+
+{% block signup_form %}
+    
 {% if user.is_authenticated %}
   {% if common_page_data.is_course_member %}
   <div class="span5">
@@ -113,5 +118,10 @@
     </div>
     {% endif %}
 {% endif %}
+    
+    
+{% endblock signup_form %}
+
+    
 </div>
 {% endblock r_column_content %}

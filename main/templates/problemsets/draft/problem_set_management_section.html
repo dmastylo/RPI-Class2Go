@@ -44,7 +44,9 @@
             <input type="submit" name="action" value="Make Ready and Go Live" class="btn" style='margin-bottom: 9px' onclick="clicked=this.value"/>
 	    <label for="id_live_datetime" style="display:inline">or go live</label>
 	    {{ form.live_datetime }}
-            <input type="submit" name="action" value="Set Live Date" class="btn" style='margin: 0 0 9px 10px' onclick="clicked=this.value"/>
+            <input type="submit" name="action" value="Set Live Date" class="btn" style='margin: 0 0 9px 0' onclick="clicked=this.value"/>
+	    or
+	    <input type="submit" name="action" value="Remove Live Date" class="btn" style='margin: 0 0 9px 0' onclick="clicked=this.value" />
 	    {{ form.live_datetime.errors }}
 	    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
             <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
@@ -59,9 +61,12 @@
                 if (clicked == "Make Ready and Go Live") {
                     alert('Nothing selected to make ready and go live.');
                 }
-                else {
+                else if (clicked == "Set Live Date") {
                     alert('Nothing selected to set the live date for.');
                 }
+	        else {
+	            alert('Nothing selected to remove the live date for.');
+	        }
                 return false;
             }
 	    return true;

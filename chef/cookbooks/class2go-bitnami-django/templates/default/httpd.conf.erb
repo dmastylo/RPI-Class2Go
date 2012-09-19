@@ -148,8 +148,9 @@ ServerAdmin you@example.com
 #
 # If your host doesn't have a registered DNS name, enter its IP address here.
 #
-ServerName localhost:80
+ServerName <%= @node[:apache][:servername] %>
 
+UseCanonicalName On
 #
 # DocumentRoot: The directory out of which you will serve your
 # documents. By default, all requests are taken from this directory, but
@@ -492,6 +493,6 @@ WSGIProcessGroup class2go
 
 Include "/opt/bitnami/apache2/conf/ssi.conf"
 
-Include "/opt/bitnami/apps/django/conf/django.conf"
+Include "/opt/bitnami/apps/django/conf/*.conf"
 
 Include "/opt/bitnami/apache2/conf/bitnami/httpd.conf"

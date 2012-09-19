@@ -39,6 +39,17 @@ function multitail-prod {
         -l 'ssh ubuntu@util1.prod.c2gops.com "tail -f /var/log/django/kelvinator.log"' 
 }
 
+
+
+function multitail-prod-util {
+    multitail -s 2  \
+        --config /usr/local/etc/multitail.conf \
+        -l 'ssh ubuntu@util1.prod.c2gops.com "tail -f /var/log/celery/*.log"' \
+        -l 'ssh ubuntu@util2.prod.c2gops.com "tail -f /var/log/celery/*.log"' 
+}
+
+
+
 function multitail-stage {
     multitail -s 2  \
         --config /usr/local/etc/multitail.conf \
