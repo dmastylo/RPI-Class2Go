@@ -31,8 +31,10 @@ urlpatterns = patterns('',
 #    url(r'^courses/signup/?$', 'courses.actions.signup'),
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
-
-
+   
+    #shibboleth login
+    url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
+                       
                        
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),

@@ -27,7 +27,12 @@
 	    </ul>
 	    {% endif %}
         </ul>
-        <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a></p>
+        
+        <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> 
+              {% if show_pwd_change %}
+              <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a>
+              {% endif %}
+        </p>
     {% else %}
         <h4> Please <a data-toggle="modal" href="#login-modal">log in</a> to view your profile </h4>
     {% endif %}

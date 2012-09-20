@@ -39,6 +39,14 @@ template "shibboleth2.xml" do
     mode "0644"
 end
 
+template "attribute-map.xml" do
+    path "/etc/shibboleth/attribute-map.xml"
+    source "attribute-map.xml.erb"
+    owner "root"
+    group "root"
+    mode "0644"
+end
+
 template "sp-key.pem" do
     path "/etc/shibboleth/sp-key.pem"
     source "sp-key.pem.erb"

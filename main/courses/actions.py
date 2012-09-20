@@ -8,7 +8,7 @@ from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
-
+from django.contrib import messages
 from courses.forms import *
 from c2g.models import *
 from random import randrange
@@ -23,9 +23,12 @@ def auth_view_wrapper(view):
         course = request.common_page_data['course']
 
         if user.is_authenticated() and not is_member_of_course(course, user):
+            messages.add_message(request,messages.ERROR, 'You must be a member of the course to view the content you chose.')      
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
 
         if not user.is_authenticated():
+            messages.add_message(request,messages.ERROR, 'You must be logged-in to view the content you chose.')
+
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
 
         return view(request, *args, **kw)
@@ -37,6 +40,7 @@ def auth_can_switch_mode_view_wrapper(view):
         if request.common_page_data['can_switch_mode']:
             return view(request, *args, **kw)
         else:
+            messages.add_message(request,messages.ERROR, "You don't have permission to view that content.")
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
     return inner
 
@@ -46,6 +50,7 @@ def auth_is_course_admin_view_wrapper(view):
         if request.common_page_data['is_course_admin']:
             return view(request, *args, **kw)
         else:
+            messages.add_message(request,messages.ERROR, "You don't have permission to view that content.")
             return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
     return inner
 
@@ -120,8 +125,10 @@ def change_live_datetime(request):
     if form.is_valid():
         if action == "Make Ready and Go Live":
             new_live_datetime = datetime.now()
-        else:
+        elif action == "Set Live Date":
             new_live_datetime = form.cleaned_data['live_datetime']
+        else:
+            new_live_datetime = None
 
         ids = request.POST.get("change_live_datetime_ids").split(",")
 
@@ -185,6 +192,10 @@ def is_member_of_course(course, user):
 @csrf_protect
 def signup_with_course(request, course_prefix, course_suffix):
     course = request.common_page_data['course']
+    if course.institution_only and (course.institution not in request.user.get_profile().institutions.all()):
+        messages.add_message(request,messages.ERROR, 'Registration in this course is restricted to ' + course.institution.title + '.  Perhaps you need to logout and login with your '+ course.institution.title + ' credentials?')
+        return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))
+
     if not is_member_of_course(course, request.user):
         student_group = Group.objects.get(id=course.student_group_id)
         student_group.user_set.add(request.user)
