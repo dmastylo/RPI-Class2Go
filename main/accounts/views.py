@@ -39,8 +39,16 @@ def profile(request):
             if g.id == c.student_group_id or g.id == c.instructor_group_id or g.id == c.tas_group_id or g.id == c.readonly_tas_group_id:
                 courses.append(c)
                 break
-
-    return render_to_response('accounts/profile.html', {'request': request, 'courses': courses}, context_instance=RequestContext(request))
+    
+    
+    allow_password_change  = True
+    if (not request.user.is_authenticated()) or (request.user.get_profile().institutions.filter(title='Stanford').exists()):
+        allow_password_change = False
+    return render_to_response('accounts/profile.html',
+                              {'request': request,
+                              'courses': courses,
+                              'show_pwd_change': allow_password_change,},
+                              context_instance=RequestContext(request))
 
 def edit(request):
     uform = EditUserForm(instance=request.user)
