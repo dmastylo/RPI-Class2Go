@@ -23,6 +23,7 @@ from registration import signals
 
 import random
 import os
+import string
 import base64
 
 def index(request):
@@ -103,7 +104,12 @@ def shib_login(request):
                 'Shib-Identity-Provider':'',}
         
         shib.update(request.META)
-            
+        #Clean up first name, last name, and email address
+        shib['sn'] = string.split(shib['sn'],";")[0]
+        shib['givenName'] = string.split(shib['givenName'],";")[0]
+        if not shib['mail']:
+            shib['mail'] = shib['eppn']
+
         if not User.objects.filter(username=shib['REMOTE_USER']).exists():
             #here, we need to create the new user
             ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
