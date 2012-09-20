@@ -5,7 +5,7 @@ class EmailForm(forms.Form):
                            choices = (('myself', 'Myself.  (Retains email inputs below after sending)'),
                                       ('staff', 'All Course Staff'),
                                       ('students', 'All Students'),
-                                      ('all', 'All Course Members'),),
+                                      ('all', 'Students and Staff'),),
                            widget = forms.Select(attrs={'class':'span5'}),
                            )
     subject =  forms.CharField(max_length=100, label="Subject", widget=forms.TextInput(attrs={'class':'span12'}))
