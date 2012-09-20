@@ -1,22 +1,81 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
-
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'ListEmail.from_name'
-        db.add_column('c2g_listemail', 'from_name',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=128, blank=True),
-                      keep_default=False)
+        
+        # Adding model 'EmailAddr'
+        db.create_table('c2g_emailaddr', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
+            ('addr', self.gf('django.db.models.fields.EmailField')(max_length=128)),
+        ))
+        db.send_create_signal('c2g', ['EmailAddr'])
+
+        # Adding model 'MailingList'
+        db.create_table('c2g_mailinglist', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+        ))
+        db.send_create_signal('c2g', ['MailingList'])
+
+        # Adding M2M table for field members on 'MailingList'
+        db.create_table('c2g_mailinglist_members', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('mailinglist', models.ForeignKey(orm['c2g.mailinglist'], null=False)),
+            ('emailaddr', models.ForeignKey(orm['c2g.emailaddr'], null=False))
+        ))
+        db.create_unique('c2g_mailinglist_members', ['mailinglist_id', 'emailaddr_id'])
+
+        # Adding model 'ListEmail'
+        db.create_table('c2g_listemail', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+            ('sender', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('hash', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
+            ('subject', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('html_message', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('from_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('to_list', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.MailingList'])),
+        ))
+        db.send_create_signal('c2g', ['ListEmail'])
+
+        # Adding field 'Course.institution_only'
+        db.add_column(u'c2g_courses', 'institution_only', self.gf('django.db.models.fields.BooleanField')(default=False), keep_default=False)
+
+        # Adding M2M table for field institutions on 'UserProfile'
+        db.create_table(u'c2g_user_profiles_institutions', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('userprofile', models.ForeignKey(orm['c2g.userprofile'], null=False)),
+            ('institution', models.ForeignKey(orm['c2g.institution'], null=False))
+        ))
+        db.create_unique(u'c2g_user_profiles_institutions', ['userprofile_id', 'institution_id'])
 
 
     def backwards(self, orm):
-        # Deleting field 'ListEmail.from_name'
-        db.delete_column('c2g_listemail', 'from_name')
+        
+        # Deleting model 'EmailAddr'
+        db.delete_table('c2g_emailaddr')
+
+        # Deleting model 'MailingList'
+        db.delete_table('c2g_mailinglist')
+
+        # Removing M2M table for field members on 'MailingList'
+        db.delete_table('c2g_mailinglist_members')
+
+        # Deleting model 'ListEmail'
+        db.delete_table('c2g_listemail')
+
+        # Deleting field 'Course.institution_only'
+        db.delete_column(u'c2g_courses', 'institution_only')
+
+        # Removing M2M table for field institutions on 'UserProfile'
+        db.delete_table('c2g_user_profiles_institutions')
 
 
     models = {
@@ -35,7 +94,7 @@ class Migration(SchemaMigration):
         },
         'auth.user': {
             'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 20, 11, 23, 12, 408649)'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -43,7 +102,7 @@ class Migration(SchemaMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 20, 11, 23, 12, 408500)'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -59,10 +118,10 @@ class Migration(SchemaMigration):
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'menu_slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'menu_slug': ('django.db.models.fields.SlugField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
@@ -104,6 +163,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.Course']"}),
             'institution': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Institution']", 'null': 'True'}),
+            'institution_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'instructor_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'instructor_group'", 'to': "orm['auth.Group']"}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
@@ -248,7 +308,7 @@ class Migration(SchemaMigration):
             'randomize': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'resubmission_penalty': ('django.db.models.fields.IntegerField', [], {}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '50'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '50', 'db_index': 'True'}),
             'submissions_permitted': ('django.db.models.fields.IntegerField', [], {}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
@@ -284,6 +344,7 @@ class Migration(SchemaMigration):
             'education': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'institutions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['c2g.Institution']", 'symmetrical': 'False'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'referrer': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
             'referrer_first': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
@@ -309,7 +370,7 @@ class Migration(SchemaMigration):
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'default': "'youtube'", 'max_length': '30'}),

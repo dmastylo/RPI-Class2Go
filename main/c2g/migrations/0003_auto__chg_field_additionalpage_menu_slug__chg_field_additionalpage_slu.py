@@ -8,55 +8,32 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'EmailAddr'
-        db.create_table('c2g_emailaddr', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
-            ('addr', self.gf('django.db.models.fields.EmailField')(max_length=128)),
-        ))
-        db.send_create_signal('c2g', ['EmailAddr'])
 
-        # Adding model 'MailingList'
-        db.create_table('c2g_mailinglist', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('c2g', ['MailingList'])
+        # Changing field 'AdditionalPage.menu_slug'
+        db.alter_column(u'c2g_additional_pages', 'menu_slug', self.gf('django.db.models.fields.SlugField')(max_length=255, null=True))
+        # Adding index on 'AdditionalPage', fields ['menu_slug']
+        db.create_index(u'c2g_additional_pages', ['menu_slug'])
 
-        # Adding M2M table for field members on 'MailingList'
-        db.create_table('c2g_mailinglist_members', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('mailinglist', models.ForeignKey(orm['c2g.mailinglist'], null=False)),
-            ('emailaddr', models.ForeignKey(orm['c2g.emailaddr'], null=False))
-        ))
-        db.create_unique('c2g_mailinglist_members', ['mailinglist_id', 'emailaddr_id'])
 
-        # Adding model 'ListEmail'
-        db.create_table('c2g_listemail', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
-            ('sender', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('hash', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
-            ('subject', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
-            ('html_message', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('to_list', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.MailingList'])),
-        ))
-        db.send_create_signal('c2g', ['ListEmail'])
+        # Changing field 'AdditionalPage.slug'
+        db.alter_column(u'c2g_additional_pages', 'slug', self.gf('django.db.models.fields.SlugField')(max_length=255, null=True))
+        # Adding index on 'AdditionalPage', fields ['slug']
+        db.create_index(u'c2g_additional_pages', ['slug'])
 
 
     def backwards(self, orm):
-        # Deleting model 'EmailAddr'
-        db.delete_table('c2g_emailaddr')
+        # Removing index on 'AdditionalPage', fields ['slug']
+        db.delete_index(u'c2g_additional_pages', ['slug'])
 
-        # Deleting model 'MailingList'
-        db.delete_table('c2g_mailinglist')
+        # Removing index on 'AdditionalPage', fields ['menu_slug']
+        db.delete_index(u'c2g_additional_pages', ['menu_slug'])
 
-        # Removing M2M table for field members on 'MailingList'
-        db.delete_table('c2g_mailinglist_members')
 
-        # Deleting model 'ListEmail'
-        db.delete_table('c2g_listemail')
+        # Changing field 'AdditionalPage.menu_slug'
+        db.alter_column(u'c2g_additional_pages', 'menu_slug', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
 
+        # Changing field 'AdditionalPage.slug'
+        db.alter_column(u'c2g_additional_pages', 'slug', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
 
     models = {
         'auth.group': {
@@ -172,12 +149,6 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'to': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
         },
-        'c2g.emailaddr': {
-            'Meta': {'object_name': 'EmailAddr'},
-            'addr': ('django.db.models.fields.EmailField', [], {'max_length': '128'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
-        },
         'c2g.exercise': {
             'Meta': {'object_name': 'Exercise', 'db_table': "u'c2g_exercises'"},
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True'}),
@@ -215,22 +186,6 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.TextField', [], {})
-        },
-        'c2g.listemail': {
-            'Meta': {'object_name': 'ListEmail'},
-            'hash': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
-            'html_message': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'sender': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'to_list': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.MailingList']"})
-        },
-        'c2g.mailinglist': {
-            'Meta': {'object_name': 'MailingList'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'members': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['c2g.EmailAddr']", 'symmetrical': 'False'})
         },
         'c2g.newsevent': {
             'Meta': {'object_name': 'NewsEvent', 'db_table': "u'c2g_news_events'"},

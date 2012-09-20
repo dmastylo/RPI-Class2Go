@@ -8,15 +8,24 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'MailingList.name'
-        db.add_column('c2g_mailinglist', 'name',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=128, blank=True),
-                      keep_default=False)
+        # Adding model 'CourseEmail'
+        db.create_table(u'c2g_course_emails', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
+            ('sender', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('to', self.gf('django.db.models.fields.CharField')(default='myself', max_length=64)),
+            ('hash', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
+            ('subject', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('html_message', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('c2g', ['CourseEmail'])
 
 
     def backwards(self, orm):
-        # Deleting field 'MailingList.name'
-        db.delete_column('c2g_mailinglist', 'name')
+        # Deleting model 'CourseEmail'
+        db.delete_table(u'c2g_course_emails')
 
 
     models = {
@@ -59,10 +68,10 @@ class Migration(SchemaMigration):
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'menu_slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'menu_slug': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
@@ -133,12 +142,6 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'to': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
         },
-        'c2g.emailaddr': {
-            'Meta': {'object_name': 'EmailAddr'},
-            'addr': ('django.db.models.fields.EmailField', [], {'max_length': '128'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
-        },
         'c2g.exercise': {
             'Meta': {'object_name': 'Exercise', 'db_table': "u'c2g_exercises'"},
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True'}),
@@ -176,23 +179,6 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.TextField', [], {})
-        },
-        'c2g.listemail': {
-            'Meta': {'object_name': 'ListEmail'},
-            'hash': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
-            'html_message': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'sender': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'to_list': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.MailingList']"})
-        },
-        'c2g.mailinglist': {
-            'Meta': {'object_name': 'MailingList'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'members': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['c2g.EmailAddr']", 'symmetrical': 'False'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'})
         },
         'c2g.newsevent': {
             'Meta': {'object_name': 'NewsEvent', 'db_table': "u'c2g_news_events'"},
