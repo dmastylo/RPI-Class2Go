@@ -27,6 +27,7 @@
     </form>
     {% endifnotequal %}
     <form name="edit_form" action="{% url 'courses.additional_pages.actions.save' %}" method="POST">
+	<fieldset class="well">
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
             <label class="control-label">Title</label>
@@ -49,20 +50,21 @@
         <div class="control-group">
             <label class="control-label">URL identifier</label>
             <div class="controls">
-                <input name="slug" id="slug" value="{{page.slug}}" type="text" />
+                <input name="slug" id="id_slug" value="{{page.slug}}" type="text" />
             </div>
+	    <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">Changing this also changes the ready version's slug, and will break external references if it is live.</div>
         </div>
         {% else %}
             <input type='hidden' name='slug' value='overview' />
         {% endifnotequal %}
-        
-        {% csrf_token %}
-        <br/>
+
+	{% csrf_token %}
         <input type="hidden" name="page_id" value="{{page.id}}" />
         <input type="hidden" name="commit" id="commit" value="0" />
         <input type="hidden" name="revert" id="revert" value="0" />
         <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}" />
         <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}" />
+        </fieldset>
         <div class="form-actions">
             <input type="button" value="Save and Set to Ready" onclick="Save(1,0);" class="btn btn-primary" />
             <input type="button" value="Save as Draft" onclick="Save(0,0);" class="btn" />
@@ -93,4 +95,9 @@
 
 {% block addl_scripts %}
 {% include "controls/tinymce.html" %}
+<script>
+$('#id_slug').focus(function() {
+    $('#slug_warning').show();
+});
+</script>
 {% endblock addl_scripts %}
