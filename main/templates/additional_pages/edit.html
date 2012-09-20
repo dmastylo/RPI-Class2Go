@@ -27,7 +27,7 @@
     </form>
     {% endifnotequal %}
     <form name="edit_form" action="{% url 'courses.additional_pages.actions.save' %}" method="POST">
-	<fieldset class="well">
+        <fieldset class="well">
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
             <label class="control-label">Title</label>
@@ -58,7 +58,7 @@
             <input type='hidden' name='slug' value='overview' />
         {% endifnotequal %}
 
-	{% csrf_token %}
+        {% csrf_token %}
         <input type="hidden" name="page_id" value="{{page.id}}" />
         <input type="hidden" name="commit" id="commit" value="0" />
         <input type="hidden" name="revert" id="revert" value="0" />
