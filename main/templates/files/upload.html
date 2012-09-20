@@ -9,7 +9,7 @@
         <div class="fieldWrapper">
           {{ field.errors }}
           {% if field.name == "live_datetime" %}
-            <b>Set Live Date</b> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
+            <strong>Set Live Date</strong> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
             <div id="live_date" style="display:none">{{ field }}</div>
           {% else %}
             {{ field.label_tag }}

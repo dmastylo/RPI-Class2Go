@@ -1,11 +1,8 @@
-<li class="well tight course-list-item" style="overflow:hidden">
-    <div class="pull-left" style="margin-left:-10px; width:50px;">
-        <i class="icon-file" style="font-size:40px; color:#999;opacity:.3"></i>
-	{% if item.file.dl_link %}
-        <div style="margin-top:7px;text-align:center;font-weight:bold"><a href="{{item.file.dl_link}}" style="padding:0px 1px 0px 7px;margin-top:5px;" class="btn"><i class="icon-download-alt"></i></a></div>
-	{% endif %}
+<li class="course-list-item">
+    <div class="pull-left">
+        <em class="icon-file"></em>
     </div>
-    <div style="overflow:hidden;margin-right:10px">
-        <h4 style="margin-top:10px;display:inline;"><a href="{{item.file.file.url}}">{{item.file.title}}</a></h4>
+    <div class="course-list-content">
+        <h4><a href="{{item.file.file.url}}">{{item.file.title}}</a>{% if item.file.dl_link %}<a href="{{item.file.dl_link}}" class="btn btn-mini" title="download"><em class="icon-download-alt"></em> Download</a></div>{% endif %}</h4>
     </div>
 </li>

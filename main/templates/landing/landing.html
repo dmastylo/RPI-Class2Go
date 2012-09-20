@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}Stanford Online | {{common_page_data.course.title}}{% endblock %}
 {% block topnav %} {% endblock topnav %}
 {% block navbar %} {% endblock navbar %}
 {% load url from future %}
@@ -15,7 +16,7 @@
         <i>Taught by Nick McKeown and Philip Levis</i>
     </p>
 
-    <p align="justify">
+    <p>
     This is an introductory course on computer networking, specifically
     the Internet. It focuses on explaining how the Internet works,
     ranging from how bits are modulated on wires and in wireless
@@ -41,7 +42,7 @@
         <i>Taught by Bruce Clemens</i>
     </p>
 
-    <p align="justify">
+    <p>
     This course focuses on the operating principles and applications
     of emerging technological solutions to the energy demands of
     the world. We will begin with discussing the scale of global

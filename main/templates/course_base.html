@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-
+{% block title %}Stanford Online | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 
 {% block navbar %}
 <div class="navbar">
     <div class="navbar-inner nav-collapse collapse">
         <div class="container-fluid">
-            <ul class="nav">
+            <ul class="nav" role="navigation">
                 <li {% block home_link_class %}{% endblock home_link_class %}>
                     <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
                 </li>
                 {% if common_page_data.course_mode == 'draft' or common_page_data.course_info_pages|length > 0 %}
                 <li class="dropdown{% block course_info_link_class %}{% endblock course_info_link_class %}">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<em class="caret"></em></a>
                     <ul class="dropdown-menu">
                         {% for page in common_page_data.course_info_pages %}
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
@@ -49,7 +49,7 @@
                 {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                     {% if common_page_data.course_mode == 'draft' %}
                         <li class="dropdown"{% block course_admin_link %}{% endblock course_admin_link %}>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Administration<b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Administration<em class="caret"></em></a>
                             <ul class="dropdown-menu">
                               <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">Email Course Members</a></li>
                               <!-- <li><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Coming Soon!</a></li> -->
@@ -68,16 +68,16 @@
 {% if messages %}
     {% for message in messages %}
         {% if 'success' in message.tags %}
-         <div class="alert alert-success"><i class="icon-ok"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+         <div class="alert alert-success"><em class="icon-ok"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
         {% endif %}
         {% if 'error' in message.tags %}
-        <div class="alert alert-error"><i class="icon-fire"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert alert-error"><em class="icon-fire"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
         {% endif %}
         {% if 'warning' in message.tags %}
-        <div class="alert alert-warning"><i class="icon-warning-sign"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert alert-warning"><em class="icon-warning-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
         {% endif %}
         {% if 'info' in message.tags %}
-        <div class="alert alert-info"><i class="icon-info-sign"></i><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert alert-info"><em class="icon-info-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
         {% endif %}
 
     {% endfor %}
@@ -86,7 +86,7 @@
 {% endblock messages %}
 {% block course_notification %}{% endblock course_notification %}
 
-<div class="container-fluid body-content">
+<div id="main-content" class="container-fluid body-content" role="main">
     <div class="row-fluid">
         {% block l_column_content %}{% endblock %}
         
