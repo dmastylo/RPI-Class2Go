@@ -3,7 +3,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block top_scripts %}
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css" />
+    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css" /-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
@@ -12,6 +13,9 @@
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
     <![endif]-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!--[if lte IE 8]>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/core/respond.min.js"></script>
+    <![endif]-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
     {% endblock top_scripts %}
     {% block addl_stylesheets %}{% endblock addl_stylesheets %}
@@ -21,23 +25,24 @@
 <body>
     <div id="viewport">
         <div id="global-header">
-            <div class="stanford-logo">
-                <a href="http://www.stanford.edu"><img src="{{ STATIC_URL }}graphics/core/header-stanford-logo.png" width="198" height="11" alt="Stanford University"></a>
-            </div>
+            <h1 class="stanford-logo">
+                <a href="http://www.stanford.edu">Stanford Online</a>
+            </h1>
         </div>
         <div id="c2g_layout_topbar">
+            <p class="hide-text hidden"><a href="#main-content">Jump to content</a></p>
             {% block navbar %}
             {% ifequal user.is_staff True %}
             <div class="navbar">
                 <div class="navbar-inner">
                     <div class="container-fluid">
-                        <ul class="nav">
+                        <ul class="nav" role="navigation">
                             <li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
                         </ul>
                         <!--form class="navbar-search hidden-phone" action="">
                             <div class="input-append">
                                 <input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
-                                <button class="btn btn-inverse btn-search" type="button"><i class="icon-search"></i></button>
+                                <button class="btn btn-inverse btn-search" type="button"><em class="icon-search"></em></button>
                             </div>
                         </form-->
                     </div>
@@ -46,7 +51,7 @@
             {% endifequal %}
             {% endblock navbar %}
             <div class="row-fluid">
-            <h1 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h1>
+            <h2 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
             {% block mode_switcher %}
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                 <div class="hidden-phone pull-right">
@@ -77,19 +82,25 @@
                         {% csrf_token %}
                     </form>
                 </li>
-                <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></b>!</span></li>
+                <li class="hidden-phone"><span>Welcome <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
             {% else %}
+                {% if common_page_data.ready_course.institution_only %}
+                <li class="hidden-phone">
+                    <a id="login_button" class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Login</a>
+                </li>
+                {% else %}
                 <li class="hidden-phone"><a id="login_button" class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Login</a></li>
                 <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
+                {% endif %}
             {% endif %}
-                <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
+                <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><em class="icon-reorder"></em></a></li>
             </div>
             {% endblock topnav %}
         </div>
         
         
         {% block content %}
-        <div class="container-fluid body-content">
+        <div id="main-content" class="container-fluid body-content" role="main">
             <div class="row-fluid">
                 {% block l_column_content %}
                     {% for available_course in available_course_list %}
@@ -101,7 +112,7 @@
                                 {% csrf_token %}
                             </form>
                         {% else %}
-                            {{available_course.0}} ({{available_course.2}})<b>Already signed up</b>    
+                            {{available_course.0}} ({{available_course.2}})<strong>Already signed up</strong>    
                         {% endifequal %}  
                 	{% endfor %}
                 {% endblock %}
@@ -125,7 +136,7 @@
         <form action="{% url 'auth_login' %}" method="POST" class="form-horizontal">
         <div class="modal-body">
             <div class="alert alert-info">
-                <i class="icon-info-sign"></i>New to Stanford Online? <strong><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Register here</a></strong>.
+                <em class="icon-info-sign"></em>New to Stanford Online? <strong><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Register here</a></strong>.
             </div>
             <fieldset>
                 <div class="control-group">

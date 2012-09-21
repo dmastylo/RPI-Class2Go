@@ -1,10 +1,10 @@
 Class2Go 
 ========
 
-Class2Go is Stanford's internal platform for on-line courses. We
+Class2Go is Stanford's internal open-source platform for on-line courses. We
 began building Class2Go in June 2012. A team of eight has worked on
-it through the summer. It will launch in Fall 2012 to host a handful
-of internal classes, and two open Stanford classes: [Computer
+it through the summer, and it is launching Fall 2012 for a handful
+of internal classes and two public classes (MOOC's): [Computer
 Networking] [net] and [Solar Cells, Fuel Cells, and Batteries] [sol]
   [net]: http://networking.class.stanford.edu/
   [sol]: http://solar.class.stanford.edu/

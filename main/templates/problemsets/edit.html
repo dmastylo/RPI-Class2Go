@@ -21,3 +21,11 @@
 </div>
 
 {% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script>
+$('#id_slug').focus(function() {
+    $('#slug_warning').show();
+});
+</script>
+{% endblock addl_scripts %}

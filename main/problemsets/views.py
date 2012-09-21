@@ -226,6 +226,12 @@ def edit_action(request):
                 pset.save()
                 if action == "Save and Set as Ready":
                     pset.commit()
+
+                #Make sure slug is same for draft and ready versions
+                if pset.slug != pset.image.slug:
+                    pset.image.slug = pset.slug
+                    pset.image.path = pset.path
+                    pset.image.save()
                 return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
 
     data['form'] = form

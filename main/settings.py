@@ -183,7 +183,8 @@ INSTALLED_APPS = (
                       'storages',
                       'celerytest',
                       'kelvinator',
-                      'db_scripts'
+                      'db_scripts',
+                      'convenience_redirect',
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (

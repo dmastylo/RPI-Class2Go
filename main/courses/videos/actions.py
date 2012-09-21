@@ -70,6 +70,11 @@ def edit_video(request, course_prefix, course_suffix, slug):
         form.save()
         if action == "Save and Set as Ready":
             video.commit()
+
+        #Make sure slug is same for draft and ready versions
+        if video.slug != video.image.slug:
+            video.image.slug = video.slug
+            video.image.save()
         return redirect('courses.videos.views.list', course_prefix, course_suffix)
 
     return render(request, 'videos/edit.html',

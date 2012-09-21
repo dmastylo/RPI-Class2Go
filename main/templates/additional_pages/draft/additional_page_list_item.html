@@ -1,15 +1,15 @@
 <table style="width:100%">
     <tr id="additional_page_{{item.additional_page.id}}">
         <td width="20" align="middle"><input type="checkbox" name="additionalpage_{{item.additional_page.id}}" id="additionalpage_{{item.additional_page.id}}" class="item_selector section_{{item.additional_page.section.id}}_item_selector" /></td>
-        <td><i class="icon-book" style="font-size:16px;opacity:.3;"></i> <h4 style="margin-top:10px;display:inline;"><a id="additionalpage_{{item.additional_page.id}}_title" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4></td>
+        <td><em class="icon-book" style="font-size:16px;opacity:.3;"></em> <h4 style="margin-top:10px;display:inline;"><a id="additionalpage_{{item.additional_page.id}}_title" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4></td>
         <td width="240">
             {% if item.additional_page.is_synced %}
             <div style="color: #00A000; padding: 0px;">
-                <i class="icon-ok" style="font-size:17px"></i> Draft=Ready
+                <em class="icon-ok" style="font-size:17px"></em> Draft=Ready
             </div>
             {% else %}
             <div style="color: #A07000; padding: 0px;">
-                <i class="icon-random" style="font-size:17px"></i> Draft Different From Ready
+                <em class="icon-random" style="font-size:17px"></em> Draft Different From Ready
             </div>
             {% endif %}
         </td>

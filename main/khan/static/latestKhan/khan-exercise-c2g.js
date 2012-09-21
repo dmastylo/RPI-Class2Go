@@ -989,7 +989,6 @@ var Khan = (function() {
             }
 
             // Generate a new problem
-            console.log("In finishRender, generating new problem with no arguments");
             makeProblem();
 
         }
@@ -1064,9 +1063,6 @@ var Khan = (function() {
 
     function makeProblem(id, seed) {
 
-        console.log('makeProblem called with id ' + id + ' and seed ' + seed);
-        console.log(typeof seed);
-    
         // Enable scratchpad (unless the exercise explicitly disables it later)
         Khan.scratchpad.enable();
 
@@ -1083,71 +1079,76 @@ var Khan = (function() {
             return seedKey;
         }
 
-        // [C2G] Has a problem seed been stored? Only should factor in for non-video exercises
+        // [C2G] Has a problem seed been stored? Only important for non-video exercises
+        // 1. Check data object of current question card (list item)
+        // 2. Check data on KhanC2G.PSActivityLog
+        // 3. Check localStorage
+        // 4. Check userPSData object (last resort, as it's a little messier)
         function getLocalSeed () {
-            // if not in-video ex, try the seed data stored in the question card
-            if ($('#exercise_type').val() != "video" && $('.current-question').data('problemSeed')) {
-                console.log("current-question card has seed");
+            // If in-video exercise, no problems should be called with seeds
+            // (because we want to allow random answer choices for these exercises)
+            if ($('#exercise_type').val() == "video") {
+                return null;
+            }
+
+            // try the seed data stored in the question card
+            if ($('.current-question').data('problemSeed')) {
                 return $('.current-question').data('problemSeed');
-            // otherwise, if not in-video ex, try one stored in localStorage
-            } else if ($('#exercise_type').val() != "video" && getLSSeedKey()) {
-                console.log("localStorage has seed");
+            // try one stored in KhanC2G.PSActivityLog 
+            } else if (typeof KhanC2G != "undefined" &&
+                        typeof KhanC2G.PSActivityLog != "undefined" &&
+                        typeof KhanC2G.PSActivityLog.problems != "undefined" &&
+                        typeof KhanC2G.PSActivityLog.problems[id] != "undefined" &&
+                        typeof KhanC2G.PSActivityLog.problems[id].problemSeed != "undefined") {
+                return KhanC2G.PSActivityLog.problems[id].problemSeed;
+            // try one stored in localStorage
+            } else if (localStorage.getItem(getLSSeedKey())) {
                 return localStorage.getItem(getLSSeedKey());
             // finally, try the userPSData object
             } else if (typeof userPSData != "undefined" && 
                         typeof userPSData.problems != "undefined" &&
-                        typeof userPSData.problems[id] != "undefined") {
-                console.log("userPSData has seed");
-                return userPSData.problems[id]["problem_seed"]; // "undefined" here evals to falsey
+                        typeof userPSData.problems.length > 0) {
+                var userPSDataProbLen = userPSData.problems.length;
+                for (var p = 0; p < userPSDataProbLen; p += 1) {
+                    if (userPSData.problems[p].problem_index = id) {
+                        return userPSData.problems[p].problem_seed; 
+                    }
+                }
             }
             // no seed has been stored locally
-            console.log("no local seed");
             return null;
         }
 
-        console.log("This is what seed is: " + seed);
         // Allow passing in a random seed
         if (typeof seed !== "undefined") {
             problemSeed = seed;
-            console.log("Seed must not have been undefined");
         // [C2G] Check to see if there has been a seed stored for this problem
         } else if (getLocalSeed()) {
-            console.log("Local seed found, so getting that");
             problemSeed = parseInt(getLocalSeed());
         // In either of these testing situations,
         } else if ((testMode && Khan.query.test != null) || user == null) {
-            console.log("Either testmode is true and test exists in query string...");
-            console.log(testMode);
-            console.log(Khan.query.test);
-            console.log("...or user is null");
-            console.log(user);
             problemSeed = randomSeed % bins;
         }
-
-        console.log("seed again is " + seed);
-        console.log("randomSeed is " + randomSeed);
-        console.log("problemSeed is " + problemSeed);
 
         // Set randomSeed to what problemSeed is (save problemSeed for recall later)
         randomSeed = problemSeed;
 
-        // [C2G] Store locally, OK if overwrites previous value 
-        console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in localStorage');
-        localStorage.setItem(getLSSeedKey(), problemSeed);
+        if (KhanC2G.PSActivityLog.exerciseType == 'problemset') {
+            // [C2G] Store locally
+            if (!localStorage.getItem(getLSSeedKey())) {
+                localStorage.setItem(getLSSeedKey(), problemSeed);
+            }
 
-        // store in userPSData object
-        if (typeof userPSData != "undefined") {
-            console.log(userPSData.problems);
-            if (typeof userPSData.problems == "undefined") userPSData.problems = [];
-            console.log(userPSData.problems[id]);
-            if (typeof userPSData.problems[id] == "undefined") userPSData.problems[id] = {};
-            console.log('Adding problemSeed ' + problemSeed + ' to problem #' + id + ' in userPSData.problems');
-            userPSData.problems[id]['problem_seed'] = parseInt(problemSeed);
-        }
+            // store in KhanC2G.PSActivityLog object
+            var loggedProbSeed = KhanC2G.PSActivityLog.problems[id]["problemSeed"];
+            if (!loggedProbSeed) {
+                KhanC2G.PSActivityLog.problems[id]['problemSeed'] = parseInt(problemSeed);
+            }
 
-        // store in current-question data object
-        if(!$('.current-question').data('problemSeed')) {
-            $('.current-question').data('problemSeed', parseInt(problemSeed));
+            // store in current-question data object
+            if(!$('.current-question').data('problemSeed')) {
+                $('.current-question').data('problemSeed', parseInt(problemSeed));
+            }
         }
 
         // Check to see if we want to test a specific problem
@@ -1358,7 +1359,6 @@ var Khan = (function() {
         } else {
             // Making the problem failed, let's try again
             problem.remove();
-            console.log("Making the problem failed, let's try again");
             makeProblem(id, randomSeed);
             return;
         }
@@ -1388,30 +1388,37 @@ var Khan = (function() {
 
         // [C2G] Default to no attempts
         alreadyAttempted = 0;
-        if (typeof userPSData != "undefined" && 
-                typeof userPSData.problems != "undefined" && 
-                userPSData.problems[exerciseRef] && 
-                userPSData.problems[exerciseRef]["already_attempted"]) {
-            alreadyAttempted = userPSData.problems[exerciseRef]["already_attempted"];
+        isCorrect = false;
+        if (typeof KhanC2G.PSActivityLog != "undefined" && 
+                typeof KhanC2G.PSActivityLog.problems != "undefined" && 
+                KhanC2G.PSActivityLog.problems[exerciseRef]) {
+            if (KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"]) {
+                alreadyAttempted = KhanC2G.PSActivityLog.problems[exerciseRef]["alreadyAttempted"];
+            }
+            if (KhanC2G.PSActivityLog.problems[exerciseRef]["correct"]) {
+                isCorrect = true;
+            }
         }
 
         // [C2G] If it's been attempted at all
         if (alreadyAttempted > 0) {
-            maxCredit = (alreadyAttempted <= maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
-            console.log("Checking for previous answer for this problem...");
-            if (userPSData.problems[exerciseRef]['user_selection_val']) {
-                console.log("...found in userPSData");
-                var userSelVal = parseInt(userPSData.problems[exerciseRef]['user_selection_val']);
+            maxCredit = (alreadyAttempted < maxAttempts) ? (maxCredit - alreadyAttempted * parseInt(penaltyPct)) : 0; 
+            // if last attempt was correct and user hasn't exceeded the maximum number
+            // of attempts, it shouldn't be deducted from score; add back in 1x penaltyPct
+            if (isCorrect && (alreadyAttempted <= maxAttempts)) {
+                maxCredit = 100 - ((alreadyAttempted - 1) * parseInt(penaltyPct));
+            }
+            if (KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered']) {
+                var userSelVal = KhanC2G.PSActivityLog.problems[exerciseRef]['userEntered'];
                 if ($('#solutionarea input:radio').length) {
-                    $('#solutionarea input')[userSelVal].checked = true;
+                    $('#solutionarea input:radio')[parseInt(userSelVal)].checked = true;
                 } else {
                     $('#solutionarea #testinput').val(userSelVal);
                 }
             } else if ($('.current-question').data('userEntered')) {
-                console.log("...found in current question's data object");
-                var userSelVal = parseInt($('.current-question').data('userEntered'));
+                var userSelVal = $('.current-question').data('userEntered');
                 if ($('#solutionarea input:radio').length) {
-                    $('#solutionarea input')[userSelVal].checked = true;
+                    $('#solutionarea input:radio')[parseInt(userSelVal)].checked = true;
                 } else {
                     $('#solutionarea #testinput').val(userSelVal);
                 }
@@ -1419,10 +1426,10 @@ var Khan = (function() {
         } 
         
         // [C2G] If user got this one right, remove penalty description and replace with summary
-        if (typeof userPSData != "undefined" && 
-            typeof userPSData.problems != "undefined" &&
-            userPSData.problems[exerciseRef] && 
-            userPSData.problems[exerciseRef]['correct']) {
+        if (typeof KhanC2G.PSActivityLog != "undefined" && 
+            typeof KhanC2G.PSActivityLog.problems != "undefined" &&
+            KhanC2G.PSActivityLog.problems[exerciseRef] && 
+            KhanC2G.PSActivityLog.problems[exerciseRef]['correct']) {
             $('#solutionarea input').attr('disabled', 'disabled');
             $('#solutionarea').remove('p');
             $('#check-answer-button').hide();
@@ -1433,7 +1440,7 @@ var Khan = (function() {
         } else {
             // [C2G] If summative problem set, add note about penalties per try
             if (exAssessType == "summative") {
-                $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted. </p>');
+                $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted for credit. </p>');
                 $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
             }
@@ -1441,15 +1448,18 @@ var Khan = (function() {
             $("#check-answer-button").show();
         }
 
-        if ($('#submit-problemset-button').length) {
-            $('#submit-problemset-button').show();
-        } else {
-            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
-            $('#submit-problemset-button').click(function () {
-                location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
-            });
+        if (exAssessType == "summative" && $('.current-question').is($('#questions-stack li:last'))) {
+            if ($('#submit-problemset-button').length) {
+                $('#submit-problemset-button').parent().show();
+            } else {
+                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+                $('#submit-problemset-button').click(function () {
+                    location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
+                });
+            }
+        } else if ($('#submit-problemset-button').length) {
+            $('#submit-problemset-button').parent().hide();
         }
-       
 
         if (examples !== null && validator.examples && validator.examples.length > 0) {
             $("#examples-show").show();
@@ -2103,7 +2113,6 @@ var Khan = (function() {
 
             if (testMode) {
                 // Just generate a new problem from existing exercise
-                console.log("In testMode, calling makeProblem without an argument");
                 makeProblem();
             } else {
                 loadAndRenderExercise(nextUserExercise);
@@ -2113,6 +2122,7 @@ var Khan = (function() {
     }
 
     function prepareSite() {
+
         // TODO(david): Don't add homepage elements with "exercise" class
         exercises = exercises.add($("div.exercise").detach());
 
@@ -2195,9 +2205,7 @@ var Khan = (function() {
         }
 
         function handleSubmit() {
-            //console.log("handleSubmit called");
             var pass = validator();
-
             // Stop if the user didn't enter a response
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
@@ -2321,7 +2329,7 @@ var Khan = (function() {
             //console.log("pass...");
             //console.log(pass);
             return false;
-        }
+        }   // end of handleSubmit
 
         // Watch for when the next button is clicked
         $("#next-question-button").click(function(ev) {
@@ -2338,6 +2346,15 @@ var Khan = (function() {
         $("#positive-reinforcement").click(function() {
             $("#next-question-button").click();
         });
+
+        // [C2G] Add ARIA Live Region info to hintsarea
+        $('#hintsarea').attr('role', 'region');
+        $('#hintsarea').attr('aria-live', 'polite');
+        $('#hintsarea').attr('aria-atomic', true);
+        $('#hintsarea').attr('aria-relevant', 'additions text');
+        // [C2G] Set up corresponding hint button
+        $('#hint').attr('title', 'Click to add a hint to the hint area');
+        $('#hint').attr('aria-controls', 'hintsarea');
 
         // Watch for when the "Get a Hint" button is clicked
         $("#hint").click(function() {
@@ -2575,6 +2592,7 @@ var Khan = (function() {
         });
 
         $("#scratchpad-show")
+            .attr('title', 'Click to toggle scratchpad area')
             .click(function(e) {
                 e.preventDefault();
                 Khan.scratchpad.toggle();
@@ -2768,7 +2786,7 @@ var Khan = (function() {
         if (window.ModalVideo) {
             ModalVideo.hookup();
         }
-    }
+    }   // end of prepareSite function
 
     if (!testMode) {
         // testMode automatically prepares itself in loadModules,
@@ -2890,6 +2908,7 @@ var Khan = (function() {
         $('#solutionarea span.value').each(function () {
             user_choices.push($(this).text());
         });
+        
         // [C2G] Correct attempt count for when a user reloads the page
         if ($.isNumeric($('#attempt-count').text())) {
             data['attempt_number'] = parseInt($('#attempt-count').text()) + 1;
@@ -2905,6 +2924,13 @@ var Khan = (function() {
         //}
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
+        // store user_selection_val
+        if (KhanC2G.PSActivityLog.exerciseType == 'problemset' && data.attempt_content != "hint") {
+            $('.current-question').data("userEntered", user_selection_val);
+            var problemIdx = $('.current-question').data("problemIndex");
+            KhanC2G.PSActivityLog.problems[problemIdx].userEntered = user_selection_val;
+        }
+
         //URL starts with problemsets/attempt to direct to a view to collect data.
         //problemId is the id of the problem the information is being created for
         var request = {
@@ -2918,16 +2944,32 @@ var Khan = (function() {
 
             // Backup the response locally, for later use
             success: function(data, txtStatus, jqXHR) {
+
+                // [C2G] Record attempts, right or wrong
+                var attCt = $('#attempt-count').text();
+                var newAttCt = (data['attempt_num']) ? data['attempt_num'] : parseInt(attCt) + 1;
+                $('#attempt-count').text(newAttCt);
+                
+                var currentProblemIdx = $('.current-question').data("problemIndex");
+                var currentProblemLog = KhanC2G.PSActivityLog.problems[currentProblemIdx];
+                if (currentProblemLog) {
+                    currentProblemLog.alreadyAttempted = newAttCt;
+                }
+
+                // [C2G] If user got question correct
                 if (data['exercise_status'] == "complete") {
                     $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
                     $('.current-question').data("correct", true);
+                    if ($('.current-question').is($('#questions-stack li:last'))) {
+                        $('#next-question-button').val('Correct! View Summary');
+                        $('#next-question-button').unbind('click');
+                        $('#next-question-button').click(function () {
+                            location.href = c2gConfig.progessUrl;
+                        });
+                    }
                 } else {
                     var maxCredit = 100;
                     var maxAttempts = (typeof c2gConfig != "undefined" && c2gConfig.maxAttempts > 0) ? c2gConfig.maxAttempts : 3;
-
-                    var attCt = $('#attempt-count').text();
-                    var newAttCt = parseInt(attCt) + 1;
-                    $('#attempt-count').text(newAttCt);
 
                     // since page displays last attempt count, the display will be behind by one
                     // (i.e. with max of 3 attempts, by the time "Attempts so far" shows as "3",
@@ -3145,7 +3187,6 @@ var Khan = (function() {
                                 url: urlBase + "exercises/khan-exercise.html",
                                 dataType: "text",
                                 success: function(htmlExercise) {
-
                                     //injectTestModeSite(html, htmlExercise);
                                    injectExerciseFrameMarkup(htmlExercise);
                                    finishSitePrep();
@@ -3189,7 +3230,6 @@ var Khan = (function() {
         }
 
         function finishSitePrep() {
-            //debugger;
 
             prepareSite();
 
@@ -3220,7 +3260,6 @@ var Khan = (function() {
 
             // [C2G] Set up cards so the first one not done is the "current card"
             function configureCards () {
-                //console.log('configureCards called');
                 var cardArr = $('#questions-stack li').toArray();
                 //console.log($('li.current-question'));
                 $('li.current-question').removeClass('current-question');
@@ -3259,7 +3298,6 @@ var Khan = (function() {
                     if (KhanC2G.remoteExercises[pID]) {
                         $('#workarea').remove('.loading');
                         KhanC2G.remoteExPollCount = 0;
-                        console.log("configureCards, remote exercise here, so call makeProblem");
                         if ($('.current-question').data('problemSeed')) {
                             makeProblem(pID, pSeed);
                         } else {
@@ -3275,7 +3313,7 @@ var Khan = (function() {
                 };
                 pollForRemoteEx();
             }
-            console.log($('#exercise_type').val());
+            
             if ($('#exercise_type').val() != "video") {
                 configureCards();
             }
@@ -3304,15 +3342,13 @@ var Khan = (function() {
         KhanC2G.PSActivityLog.problems = [];
 
         KhanC2G.PSActivityLog.addProblem = function (obj) {
-            // NOTE: problemNumber is not necessarily the order in the 
-            // problems array
             var _self = this;
             if (obj) {
                 _self.problems.push(obj);
             } else {
-                var problemNum = _self.problems.length + 1;
+                var problemIdx = _self.problems.length;
                 var emptyProblem = {
-                    problemNumber: problemNum,
+                    problemIndex: problemIdx,
                     problemSeed: null,
                     exerciseFile: "",
                     viewed: false,
@@ -3324,28 +3360,10 @@ var Khan = (function() {
             }
         }
 
-        // This will be important when a user returns to the page after 
-        // having attempted at least one problem
-        if (typeof userPSData != "undefined" && userPSData.problems) {
-            var recordedProbsLen = userPSData.problems.length;
-            for (var p = 0; p < recordedProbsLen; p += 1) {
-                var translatedObj = {};
-                translatedObj.problemNumber = userPSData.problems[p].card_number;
-                translatedObj.problemSeed = userPSData.problems[p].problem_seed;
-                translatedObj.viewed = true;
-                translatedObj.attempts = userPSData.problems[p].already_attempted;
-                translatedObj.userChoices = userPSData.problems[p].user_choices;
-                translatedObj.userEntered = userPSData.problems[p].user_selection_val;
-                translatedObj.correct = userPSData.problems[p].correct;
-
-                KhanC2G.PSActivityLog.addProblem(translatedObj);
-            }
-        }
 
     }
 
     function initC2GStacks(exercises) {
-
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
@@ -3356,12 +3374,27 @@ var Khan = (function() {
         $('#questions-stack').click(stackClickHandler);
 
         //populate 1 questions-to-do for each exercise
-        var curNumProbs=0;
-        $(exercises).filter(".exercise").each(function(idx, elem) {
+        var curNumProbs = 0;
+        KhanC2G.PSActivityLog.totalProblems = 0;
+
+        if (KhanC2G.PSActivityLog.exerciseType == 'problemset') { 
+            // turn userPSData.problems into a local associative array 
+            var attemptedProblems = {};
+            var userPSProblemsLen = userPSData.problems.length;
+            for (var p = 0; p < userPSProblemsLen; p += 1) {
+                attemptedProblems[userPSData.problems[p].problem_index] = userPSData.problems[p];
+            }
+
+            $(exercises).filter(".exercise").each(function(idx, elem) {
+
+                //debugger;
+                if (typeof userPSData != "undefined" && 
+                    typeof userPSData.problems != "undefined" && 
+                    userPSData.problems[idx.toString()]) {
+                }
 
                 //Figure out how many problems there are in this exercise
                 var probsInExercise=$(elem).children('.problems').children().length;
-                KhanC2G.PSActivityLog.totalProblems = probsInExercise;                
 
                 $(elem).data('problemsStartAtIndex',curNumProbs);
                 $(elem).data('numberOfProblems',probsInExercise);
@@ -3377,10 +3410,8 @@ var Khan = (function() {
                 //li.data('problem',curNumProbs+Math.floor(Math.random()*probsInExercise));
                 li.data('problemIndex',idx);
                 //li.data('randseed',Math.floor(Math.random()*100000));
-                if (typeof userPSData != "undefined" && 
-                    typeof userPSData.problems != "undefined" && 
-                    userPSData.problems[idx.toString()]) {
-                    var userQDataObj = userPSData.problems[idx.toString()];
+                if (typeof attemptedProblems != "undefined" && attemptedProblems[idx.toString()]) {
+                    var userQDataObj = attemptedProblems[idx.toString()];
                     li.data('problemSeed', parseInt(userQDataObj.problem_seed));
                     li.data('userEntered', userQDataObj.user_selection_val);
                     li.data('correct', userQDataObj.correct);
@@ -3391,18 +3422,63 @@ var Khan = (function() {
                     li.addClass("correctly-answered").append('<i class="icon-ok-sign"></i>');
                 }
 
+                // Merge list item data into KhanC2G.PSActivityLog so they're synched
+                KhanC2G.PSActivityLog.addProblem(li.data());            
+
                 $.extend(li.data(), $(elem).data());
                 if (idx == 0) {
                     $('#questions-viewed ol').append(li);
                 } else {
                     $('#questions-unviewed ol').append(li);
                 }
+
+                KhanC2G.PSActivityLog.totalProblems += 1;
+
                 curNumProbs+=probsInExercise;
 
             });
 
-        console.log("curNumProbs...");
-        console.log(curNumProbs);
+            // [C2G] Add keyboard nav to questions
+            $(document).keydown(function (ev) {
+                var allCards = $('#questions-stack li');
+                var currentIdx = parseInt(allCards.index($('.current-question')));
+                var moveToCard = function (idx) {
+                    idx = parseInt(idx);
+                    if (idx < 0) idx = allCards.length - 1;
+                    if (idx >= allCards.length) idx = 0;
+                    $(allCards[idx]).trigger("click");
+                };
+
+                if (ev.keyCode == "37" || ev.keyCode == "38") {
+                    moveToCard(currentIdx - 1);
+                } else if (ev.keyCode == "39" || ev.keyCode == "40") {
+                    moveToCard(currentIdx + 1);
+                }
+            });
+
+            // [C2G] Add "View Progress" button to all problem sets
+            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" value="View Problem Set Progress"/></div>');
+            $('#view-progress-button').click(function () {
+                location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
+            });
+
+        }
+        // This will be important when a user returns to the page after 
+        // having attempted at least one problem
+        /*
+        if (typeof userPSData != "undefined" && userPSData.problems) {
+            for (var p = 0; p < userPSData.problems.length; p += 1) {
+                var problemObj = KhanC2G.PSActivityLog.problems[userPSData.problems[p].problem_index];
+                problemObj.problemIndex = userPSData.problems[p].problem_index;
+                problemObj.problemSeed = userPSData.problems[p].problem_seed;
+                problemObj.viewed = true;
+                problemObj.attempts = userPSData.problems[p].already_attempted;
+                problemObj.userChoices = userPSData.problems[p].user_choices;
+                problemObj.userEntered = userPSData.problems[p].user_selection_val;
+                problemObj.correct = userPSData.problems[p].correct;
+            }
+        }
+        */
 
         // [C2G] It takes some time for the answer_area inputs to show up with page, exercise,
         // et al loading, then makeProblem() being called
@@ -3438,16 +3514,18 @@ var Khan = (function() {
                 pSeed = parseInt($('.current-question').data('problemSeed'));
             }
 
+            // [C2G] What did user enter last?
             var userSelectionVal = null;
-            if (typeof userPSData != "undefined" && 
-                typeof userPSData.problems != "undefined" && 
-                userPSData.problems[pID] && 
-                userPSData.problems[pID]['user_selection_val']) {
-                userSelectionVal = userPSData.problems[pID]['user_selection_val'];
+            if (typeof KhanC2G.PSActivityLog != "undefined" && 
+                typeof KhanC2G.PSActivityLog.problems != "undefined" && 
+                KhanC2G.PSActivityLog.problems[pID] && 
+                KhanC2G.PSActivityLog.problems[pID]['userEntered']) {
+                userSelectionVal = KhanC2G.PSActivityLog.problems[pID]['userEntered'];
             } else if ($('.current-question').data("userEntered")) {
                 userSelectionVal = $('.current-question').data("userEntered");
             } 
 
+            // [C2G] If user entered something previously...
             if (userSelectionVal) {
                 if ($('#testinput').length) {
                     $('#testinput').val(userSelectionVal);
@@ -3455,16 +3533,17 @@ var Khan = (function() {
                         $('#testinput').attr('disabled','disabled');
                     }
                 } else if ($('#solutionarea input:radio').length) {
-                    if (userPSData.problems[pID] && userPSData.problems[pID]['user_choices']) {
-                        var userChoice = userPSData.problems[pID]['user_choices'];
-                    } else if ($('.current-question').data('userChoices')) {
-                        var userChoice = $('.current-question').data('userChoices');
-                    }
-                    var choiceArr = ($.isArray(userChoice)) ? userChoice : $.parseJSON(userChoice);
                     $('#solutionarea input')[userSelectionVal].checked = true;
                     if ($('.current-question').data('correct')) {
                         $('#solutionarea input').attr('disabled','disabled');
                     }
+                }
+            // [C2G] Otherwise, clear value so other problem answers don't bleed over
+            } else {
+                if ($('#testinput').length) {
+                    $('#testinput').val("");
+                } else if ($('#solutionarea input:radio:checked').length) {
+                    $('#solutionarea input:radio:checked').attr('checked', false);
                 }
             }
 
@@ -3497,28 +3576,40 @@ var Khan = (function() {
             $('#questions-unviewed li:first-child').appendTo($('#questions-viewed').children('ol'));
 
             //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:last-child');
-            var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
+            //var next = (currentQCard.next().length) ? currentQCard.next() : $('#questions-viewed li:first-child');
+
+            var currentCardIdx = currentQCard.data("problemIndex");
+            var totalCards = $('#questions-stack li');
+            var totalCardsLen = totalCards.length;
+            var next = null;
+            if (currentCardIdx >= totalCardsLen) {
+                next = $(totalCards[0]);
+            } else {
+                next = $(totalCards[currentCardIdx + 1]);
+            }
+
             next.addClass('current-question');
 
             clearExistingProblem();
 
             if (next.length) {
-                console.log("Next question button clicked, going to makeProblem...");
                 makeProblem(next.data('problemIndex'), next.data('problemSeed'));
             }
 
+
             // [C2G] if this is a summative problem set and all questions have been viewed
-            if (typeof c2gConfig != "undefined" && typeof c2gConfig.problemType != "undefined" && 
-                (c2gConfig.problemType == 'summative' || c2gConfig.problemType == 'assessive') && 
-                $('#questions-unviewed li').length == 0) {
+            if ((exAssessType == "summative" || KhanC2G.PSActivityLog.assessType == "summative") && 
+                $('.current-question').is($('#questions-stack li:last'))) {
                 if ($('#submit-problemset-button').length) {
-                    $('#submit-problemset-button').show();
+                    $('#submit-problemset-button').parent().show();
                 } else {
                     $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                     $('#submit-problemset-button').click(function () {
                         location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
                     });
                 }
+            } else if ($('#submit-problemset-button').length) {
+                $('#submit-problemset-button').parent().hide();
             }
 
         });
@@ -3560,7 +3651,6 @@ var Khan = (function() {
                 if (KhanC2G.remoteExercises[thisCard.data('problemIndex')]) {
                     $('#workarea').remove('.loading');
                     KhanC2G.remoteExPollCount = 0;
-                    console.log("A card must have been clicked, run makeProblem...");
                     makeProblem(thisCard.data('problemIndex'), thisCard.data('problemSeed'));
                     // [C2G] Make solutionarea visible again
                     $('#solutionarea').css('visibility', 'visible');
@@ -3578,7 +3668,6 @@ var Khan = (function() {
             // load previous answers into the solution area
             $.when(checkForInputs()).then(function () {
                 var userPrevSel = thisCard.data("userEntered");
-                console.log("user selection was " + userPrevSel);
                 var validUserChoices = thisCard.data("userChoices");
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON(thisCard.data("userChoices")).length : 0;
                 // [C2G] Just having something in "user_choices" doesn't mean it's valid, it could be an
@@ -3597,8 +3686,19 @@ var Khan = (function() {
                     $('#solutionarea').css('visibility', 'visible');
                 } else {
                     if ($('input#testinput').length) {
+                        if (userPrevSel) {
+                            $('input#testinput').val(userPrevSel); 
+                        } else {
+                            $('input#testinput').val("");   // explicitly clear 
+                        }
                         $('input#testinput').removeAttr('disabled');
                     } else if ($('input:radio').length) {
+                        if (userPrevSel) {
+                            $('#solutionarea input:radio')[userPrevSel].checked = true; 
+                        } else {
+                            // explicitly clear 
+                            $('#solutionarea input:radio:checked').attr('checked', false); 
+                        }
                         $('input:radio').removeAttr('disabled');
                     }
                     $('#check-answer-button').removeAttr('disabled');

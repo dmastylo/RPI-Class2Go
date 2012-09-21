@@ -24,7 +24,7 @@
                 {% csrf_token %}
             </form>
         {% else %}
-            {{available_course.0}} ({{available_course.2}})<b>Already signed up</b>    
+            {{available_course.0}} ({{available_course.2}})<strong>Already signed up</strong>    
         {% endifequal %}            
     {% endfor %}
     

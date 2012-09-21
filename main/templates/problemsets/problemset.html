@@ -16,10 +16,10 @@
                     <header></header>
                     <div id="container" class="single-exercise visited-no-recolor" style="overflow: hidden;">
                         <article class="exercises-content clearfix {{ pset_type }}">
-                            <div class="exercises-header"><h2 class="section-headline">
+                            <div class="exercises-header"><h3 class="section-headline">
                                 <div class="topic-exercise-badge">&nbsp;</div>
                                 <span class="practice-exercise-topic-context"></span>
-                            </h2></div>
+                            </h3></div>
                             <div class="exercises-body">
                                 <div class="exercises-stack">&nbsp;</div>
                                 <div class="exercises-card current-card">
@@ -71,7 +71,7 @@ var userPSData = {};
 userPSData.problems = [];
 {% for activity in activity_list %}
     userPSData.problems.push({
-        card_number: {{ activity.problemset_to_exercise.number }},
+        problem_index: {{ activity.problemset_to_exercise.number }},
         user_selection_val: "{{ activity.user_selection_val }}",
         user_choices: unescape("{{ activity.user_choices }}"),
         already_attempted: {{ activity.attempt_number }},
