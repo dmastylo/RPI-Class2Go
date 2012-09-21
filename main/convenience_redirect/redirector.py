@@ -14,7 +14,7 @@ class convenience_redirector(object):
         'matsci256.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/matsci256/Fall2012/preview'},
         'solar.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/solar/Fall2012/preview'},
         'security.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/security/Fall2012/preview'},
-        'cs224n.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/cs224n/Fall2012/preview'},        
+        'cs224n.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/cs224n/Fall2012'},        
         'nlp.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/nlp/Fall2012/preview'},
         'psych30.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/psych30/Fall2012/preview'}, 
         'perception.class.stanford.edu':{'host':'class.stanford.edu','prepend':'/perception/Fall2012/preview'},
