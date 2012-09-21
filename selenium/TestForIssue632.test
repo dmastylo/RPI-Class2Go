@@ -52,6 +52,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>assertTextPresent</td>
+	<td>None of the above</td>
+	<td></td>
+</tr>
+<tr>
 	<td>verifyValue</td>
 	<td>id=check-answer-button</td>
 	<td>Try Again</td>
@@ -141,7 +146,6 @@
 	<td>None of the above</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

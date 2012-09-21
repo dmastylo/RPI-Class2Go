@@ -35,7 +35,7 @@ function confirm_change(){
         </div>
         <div class="fieldWrapper">
             {{ manage_form.video_time.errors }}
-            Video Time (s):{{ manage_form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            Video Time (in seconds):{{ manage_form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
             <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
@@ -60,7 +60,7 @@ function confirm_change(){
         </div>
     </form>
 
-    <h4>Set Exercise Times</h4>
+    <h4>Set Exercise Times (in seconds)</h4>
     <form action='{% url 'courses.videos.views.save_exercises' %}' method="POST" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="video_id" value={{video.id}}>

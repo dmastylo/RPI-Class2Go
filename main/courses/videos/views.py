@@ -27,7 +27,11 @@ def list(request, course_prefix, course_suffix):
     if 'id' in request.GET:
         #process Video model instance with this youtube id
         #and other stuff
-        video = Video.objects.get(pk=request.GET['vid'])
+        try:
+            video = Video.objects.get(pk=request.GET['vid'])
+        except Video.DoesNotExist:
+            raise Http404
+
         video.url = request.GET['id']
         video.save()
         video.create_ready_instance()
@@ -47,7 +51,11 @@ def view(request, course_prefix, course_suffix, slug):
     except:
         raise Http404
 
-    video = Video.objects.get(course=common_page_data['course'], slug=slug)            
+    try:
+        video = Video.objects.get(course=common_page_data['course'], slug=slug)
+    except Video.DoesNotExist:
+        raise Http404
+
     video_rec = request.user.videoactivity_set.filter(video=video)
     if video_rec:
         video_rec = video_rec[0]
@@ -64,11 +72,7 @@ def view(request, course_prefix, course_suffix, slug):
 
 @auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
-
+    common_page_data = request.common_page_data
     video = common_page_data['course'].video_set.all().get(slug=slug)
     form = S3UploadForm(course=common_page_data['course'], instance=video)
 
@@ -104,7 +108,11 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
         raise Http404
     data = {'common_page_data': common_page_data}
     manage_form = ManageExercisesForm(initial={'course':common_page_data['course'].id})
-    video = Video.objects.getByCourse(common_page_data['course']).get(slug=video_slug)
+    try:
+        video = Video.objects.getByCourse(common_page_data['course']).get(slug=video_slug)
+    except Video.DoesNotExist:
+        raise Http404
+
     videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=video_slug).order_by('video_time')
     used_exercises = []
     exercise_attempted = False
@@ -125,6 +133,9 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
         additional_form = AdditionalExercisesForm(request.POST, used_exercises=exercises)
 
         if manage_form.is_valid():
+            
+            #don't catch video DoesNotExist here because we want some tangible error to happen if
+            #the video id changes in form submission, like emailing us
             video = Video.objects.get(id=request.POST['video_id'])
             file_content = request.FILES['file']
             file_name = file_content.name
@@ -160,7 +171,10 @@ def add_exercise(request):
 #    except:
 #        raise Http404
 
+    #don't catch video DoesNotExist here because we want some tangible error to happen if
+    #the video id changes in form submission, like emailing us
     video = Video.objects.get(id=request.POST['video_id'])
+
     video_time = request.POST['videotime']
 
     file_content = request.FILES['exercise']
@@ -178,7 +192,11 @@ def add_exercise(request):
 
 @auth_is_course_admin_view_wrapper
 def add_existing_exercises(request):
+
+    #don't catch video DoesNotExist here because we want some tangible error action to happen if
+    #the video id changes in form submission, like mailing us
     video = Video.objects.get(id=request.POST['video_id'])
+
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
@@ -197,7 +215,11 @@ def save_exercises(request):
     course_prefix = request.POST['course_prefix']
     course_suffix = request.POST['course_suffix']
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+ 
+    #don't catch video DoesNotExist here because we want some tangible error action to happen if
+    #the video id changes in form submission, like mailing us
     video = Video.objects.get(id=request.POST['video_id'])
+
     action = request.POST['action']
     if action == 'Reset to Ready':
         video.revert()
@@ -212,17 +234,25 @@ def save_exercises(request):
         return HttpResponseRedirect(reverse('courses.videos.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'],)))
 
 def delete_exercise(request):
-    print "KN#KJNJWNKAJDSAJNDSNAJKD"
-    toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='draft', is_deleted=False)
-    toDelete.delete()
-    toDelete.save()
+    try:
+        toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='draft', is_deleted=False)
+        toDelete.delete()
+        toDelete.save()
+
+    except VideoToExercise.DoesNotExist:
+        pass  #Do nothing if asked to delete non-existent video-exercise-relationship
+
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], request.POST['video_slug'],)))
 
 #enforce order by sorting by video_time
 def get_video_exercises(request):
     import json
-    video = Video.objects.get(id = request.GET['video_id'])
-    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video).order_by('video_time')
+    try:
+        video = Video.objects.get(id = request.GET['video_id'])
+    except Video.DoesNotExist:
+        raise Http404
+    
+    videoToExs = VideoToExercise.objects.select_related('exercise', 'video').filter(video=video, is_deleted=False).order_by('video_time')
     json_list = {}
     order = 0
     for videoToEx in videoToExs:
@@ -241,7 +271,7 @@ def get_video_exercises(request):
 @auth_view_wrapper
 def load_video_problem_set(request, course_prefix, course_suffix, video_id):
 
-    vex_list = VideoToExercise.objects.select_related('exercise', 'video').filter(video_id=video_id).order_by('video_time')
+    vex_list = VideoToExercise.objects.select_related('exercise', 'video').filter(video_id=video_id, is_deleted=False).order_by('video_time')
 
     file_names = []
     for vex in vex_list:

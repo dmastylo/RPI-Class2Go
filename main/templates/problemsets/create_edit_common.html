@@ -7,16 +7,17 @@
                 <label class="control-label">Problem Set Title*</label>
                 <div class="controls">
                     {{ form.title.errors }}
-	                {{ form.title}}
                     <span class="help-block">A title that can include spaces that be shown when listing problem sets</span>
+	                {{ form.title}}
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label">URL Identifier for Problem Set*</label>
                 <div class="controls">
                     {{ form.slug.errors }}
-	                {{ form.slug}}
                     <span class="help-block">*A unique ID consisting of numbers and letters with no spaces to be used in the URL</span>
+	                {{ form.slug}}
+		    <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">Changing this also changes the ready version's slug, and will break external references if it is live.</div>
                 </div>
             </div>
             <div class="control-group">
@@ -61,8 +62,8 @@
                 <label class="control-label">Late Penalty</label>
                 <div class="controls">
                     {{ form.late_penalty.errors }}
-	                {{ form.late_penalty}}
                     <span class="help-block">% penalty for submitting between the end of grace period and partial credit deadline</span>
+	                {{ form.late_penalty}}
                 </div>
             </div>
             <div class="control-group assessment-type">

@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+
+from optparse import OptionParser
+import boto
+import os
+import time
+import re
+import tasks   # kelvinator
+
+def rekelvinate():
+    parser = OptionParser()
+    parser.add_option("-v", "--verbose", dest="verbose", action="store_true", 
+                      help="chatty mode")
+    parser.add_option("-l", "--list", dest="listonly", action="store_true",
+                      help="only list files needing kelvination, don't actually do")
+    parser.add_option("-c", "--class", dest="course_prefix",
+                      help="restrict to course prefix, like \"cs144\" or \"nlp\"")
+    parser.add_option("-b", "--bucket", dest="bucket", default="stage-c2g",
+                      help="S3 bucket to use (default=\"stage-c2g\")")
+    parser.add_option("-n", "--dry-run", dest="dryrun", default=False, action="store_true", 
+                      help="Don't acutally do")
+    parser.add_option("-m", "--max", dest="max", type="int", default=100000,
+                      help="Max number of to kick off")
+    parser.add_option("-d", "--delay", dest="delay", default=0, type="int",
+                      help="Seconds to sleep between initiating jobs")
+
+    global options
+    (options, args) = parser.parse_args()
+
+    if ('AWS_ACCESS_KEY_ID' not in os.environ 
+            or 'AWS_SECRET_ACCESS_KEY' not in os.environ):
+        parser.error("You need to set the AWS_ACCESS_KEY_ID and " +
+                "AWS_SECRET_ACCESS_KEY environment variables. We use " +
+                "these to access S3.")
+        return 1;
+
+    missing = search_s3()
+
+    if options.listonly:
+        for v in missing: print v
+        return
+
+    print "Videos missing slides: " + str(len(missing))
+    for i in range(min(options.max, len(missing))):
+        if i>0: time.sleep(options.delay)
+        
+        path = missing[i]
+        target = "s3://" + options.bucket + "/" + path
+        frames = 1
+        threshold = 1000
+
+        print "%2d" % i + ": " + target
+        if not options.dryrun: 
+            tasks.run.delay(target, frames, threshold)
+
+
+def printv(str):
+    if options.verbose: print str
+
+
+def search_s3():
+    conn=boto.connect_s3()
+    bucket=conn.get_bucket(options.bucket)
+    contents_set=bucket.list(options.course_prefix)
+
+    # example: u'nlp/Fall2012/videos/39/jpegs/manifest.txt'
+    # video regexp has to handle spaces in video name
+    video_re=re.compile(r"(\w*/\w*/videos/\w*)/[^/]+$")
+    manifest_re=re.compile(r"(\w*/\w*/videos/\w*)/jpegs/manifest.txt$")
+
+    videos={}        # dict: first part of path (up to video id), full S3 path 
+    videos_skip=[]   # list: ID's of videos with errors to skip
+
+    # scan for all videos
+    for path_result in contents_set:
+        path = path_result.name
+        match = video_re.match(path)
+        if match:
+            key = match.group(1)
+            if key in videos:
+                printv("WARNING: duplicate videos found: " + key)
+                printv("    " + videos[key])
+                printv("    " + path)
+                videos_skip.append(key)
+                next
+            printv("found video " + path)
+            videos[key] = path
+
+    # remove videos that have manifests
+    for path_result in contents_set:
+        path = path_result.name
+        match = manifest_re.match(path)
+        if match:
+            key = match.group(1)
+            if key in videos: videos.pop(key)
+
+    # remove dups (may have alrady been removed if one of the dups had a manifest)
+    for key in videos_skip:
+        if key in videos: videos.pop(key)
+
+    paths=videos.values()
+    paths.sort()   # in place
+    return paths
+
+
+
+if __name__ == "__main__":
+    rekelvinate()
+

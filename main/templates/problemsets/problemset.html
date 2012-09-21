@@ -71,7 +71,7 @@ var userPSData = {};
 userPSData.problems = [];
 {% for activity in activity_list %}
     userPSData.problems.push({
-        card_number: {{ activity.problemset_to_exercise.number }},
+        problem_index: {{ activity.problemset_to_exercise.number }},
         user_selection_val: "{{ activity.user_selection_val }}",
         user_choices: unescape("{{ activity.user_choices }}"),
         already_attempted: {{ activity.attempt_number }},

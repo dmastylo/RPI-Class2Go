@@ -13,7 +13,11 @@
             <li><strong>Username:</strong> {{ user.username }}</li>
             <li><strong>First Name:</strong> {{ user.first_name }}</li>
             <li><strong>Last Name:</strong> {{ user.last_name }}</li>
-            <li><strong>Email:</strong> {{ user.email }}</li>
+            <li><strong>E-mail:</strong> {{ user.email }}</li>
+	    <li><strong>Year of Birth:</strong> {{ user.get_profile.birth_year }}</li>
+	    <li><strong>Gender:</strong> {{user.get_profile.gender }}</li>
+	    <li><strong>Education:</strong> {{user.get_profile.education }}</li>
+	    <li><strong>Work:</strong> {{user.get_profile.work }}</li>
 	    <li class="pull-left"><strong>Courses:</strong></li>
 	    {% if courses %}
 	    <ul class="unstyled pull-left">
@@ -23,7 +27,12 @@
 	    </ul>
 	    {% endif %}
         </ul>
-        <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a></p>
+        
+        <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> 
+              {% if show_pwd_change %}
+              <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a>
+              {% endif %}
+        </p>
     {% else %}
         <h4> Please <a data-toggle="modal" href="#login-modal">log in</a> to view your profile </h4>
     {% endif %}

@@ -161,10 +161,10 @@ def create_courses(institutions,users,content_counts):
         'calendar_end': datetime(2013, 8, 12),
         'contact': 'nlp@123.com',
         'list_publicly': 1,
-        'handle':'nlp--Fall2012',
+        'handle':'networking--Fall2012',
         'members': users,
     }
-    print "      Creating nlp course\r"
+    print "      Creating networking course\r"
     print "      ------------------- \r"
     create_course_nlp(data, {'professors':users['professors'][0:3],'tas':users['tas'][0:3],'readonly_tas':users['readonly_tas'][0:3],'students':users['students'][0:39]})
 
@@ -560,7 +560,7 @@ def create_course_nlp(data, users):
     data['slug']='P1'
     data['description'] = 'This is the first problem set. Practice some question on Regular Expressions. Remember to work your problems out on a separate piece of paper first because you only get one try on these. Miss on and you have a D!'
     data['title'] = 'Problem Set 1: Regular Expressions'
-    data['path']='/nlp/Fall2012/problemsets/P1/load_problem_set'
+    data['path']='/networking/Fall2012/problemsets/P1/load_problem_set'
     data['due_date']='2012-07-20'
     data['partial_credit_deadline']='2012-09-27'
     data['grace_period']='2012-10-27'
@@ -577,7 +577,7 @@ def create_course_nlp(data, users):
     data['slug']='P2'
     data['description'] = 'This problem set will test your knowledge of Joint Probability. Each question is worth one point and your final exam is worth 100 points so these questions are basically useless. But you have to do them because an incomplete assignment disallows you from passing the class. Have fun with this problem set!'
     data['title']='Problem Set 2: Joint Probability'
-    data['path']='/nlp/Fall2012/problemsets/P2/load_problem_set'
+    data['path']='/networking/Fall2012/problemsets/P2/load_problem_set'
     data['due_date']='2012-07-27'
     data['partial_credit_deadline']='2012-08-03'
     data['grace_period']='2012-10-27'
@@ -593,10 +593,10 @@ def create_course_nlp(data, users):
     pset2 = create_problem_set(data, users)
 
     #Create exercises
-    exercise1_1 = save_exercise(pset1, "xx_P1_Regexp.html", 1, 'nlp--Fall2012', 'nlp/Fall2012/exercises/xx_P1_Regexp.html')
-    exercise1_2 = save_exercise(pset1, "xx_P1_Tokenize.html", 2, 'nlp--Fall2012', 'nlp/Fall2012/exercises/xx_P1_Tokenize.html')
+    exercise1_1 = save_exercise(pset1, "xx_P1_Regexp.html", 1, 'networking--Fall2012', 'networking/Fall2012/exercises/xx_P1_Regexp.html')
+    exercise1_2 = save_exercise(pset1, "xx_P1_Tokenize.html", 2, 'networking--Fall2012', 'networking/Fall2012/exercises/xx_P1_Tokenize.html')
 
-    exercise2_1 = save_exercise(pset2, "xx_P2_Lexical1.html", 1, 'nlp--Fall2012', 'nlp/Fall2012/exercises/xx_P2_Lexical1.html')
+    exercise2_1 = save_exercise(pset2, "xx_P2_Lexical1.html", 1, 'networking--Fall2012', 'networking/Fall2012/exercises/xx_P2_Lexical1.html')
 
     # Create news events
     titles = [

@@ -49,7 +49,7 @@ class C2GUnitTests(TestCase):
         """
         self.assertEqual(len(Course.objects.all()),4)
                          
-        c = Course.objects.filter(handle='nlp--Fall2012', mode = 'ready')
+        c = Course.objects.filter(handle='networking--Fall2012', mode = 'ready')
         for ci in c: 
             self.assertEqual(ci.title, u'Natural Language Processing')
 
@@ -62,5 +62,4 @@ class C2GUnitTests(TestCase):
         Tests that we can access the index page
         """
         resp=self.client.get('/')
-        self.assertEqual(resp.status_code,301)
-        self.assertIn("nlp/Fall2012", resp['Location'])
+        self.assertEqual(resp.status_code,200)

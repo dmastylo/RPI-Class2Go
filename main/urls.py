@@ -31,8 +31,10 @@ urlpatterns = patterns('',
 #    url(r'^courses/signup/?$', 'courses.actions.signup'),
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
-
-
+   
+    #shibboleth login
+    url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
+                       
                        
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
@@ -109,9 +111,10 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/?$', 'courses.videos.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/upload$', 'courses.videos.views.upload'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.videos.views.view'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit/?', 'courses.videos.views.edit'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit/?$', 'courses.videos.views.edit'),
     url(r'^add_video/?$', 'courses.videos.actions.add_video'),
-    url(r'^edit_video/?$', 'courses.videos.actions.edit_video'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit_video/?$', 'courses.videos.actions.edit_video'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/reset_video/?$', 'courses.videos.actions.reset_video'),
     url(r'^delete_video/?$', 'courses.videos.actions.delete_video'),
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),

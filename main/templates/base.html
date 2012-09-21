@@ -79,8 +79,14 @@
                 </li>
                 <li class="hidden-phone"><span>Welcome <b><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></b>!</span></li>
             {% else %}
+                {% if common_page_data.ready_course.institution_only %}
+                <li class="hidden-phone">
+                    <a id="login_button" class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Login</a>
+                </li>
+                {% else %}
                 <li class="hidden-phone"><a id="login_button" class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Login</a></li>
                 <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
+                {% endif %}
             {% endif %}
                 <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><i class="icon-reorder"></i></a></li>
             </div>

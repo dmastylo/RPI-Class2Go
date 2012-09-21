@@ -8,3 +8,8 @@ execute "restart-apache" do
     command "/opt/bitnami/ctlscript.sh restart apache"
     user "root"
 end
+
+execute "restart-shib" do
+    command "service shibd restart"
+    user "root"
+end
