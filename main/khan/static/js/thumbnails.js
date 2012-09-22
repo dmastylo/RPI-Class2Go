@@ -288,6 +288,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
             $(tempDiv).addClass('divInIndex').attr('id','slideIndex'+idxTime+'s');
             var slideImg = document.createElement('img');
             slideImg.src = slideIndices[idxTime].imgsrc;
+            $(slideImg).attr('alt', 'Jump to section ' + idxTime + ' of the video');
             slideIndices[idxTime].displayDiv = tempDiv;
             tempDiv.appendChild(slideImg);
             tempDiv.onclick=(function (time) {return function(evt) {
@@ -308,6 +309,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
             var slideImg = document.createElement('img');
             //slideImg.src = 'q_'+idxTime+'.jpg';
             slideImg.src = '/static/graphics/core/question.png';
+            $(slideImg).attr('alt', 'Go to quiz at section ' + idxTime);
             //tempDiv.appendChild(greyDiv);
             tempDiv.appendChild(slideImg);
 
