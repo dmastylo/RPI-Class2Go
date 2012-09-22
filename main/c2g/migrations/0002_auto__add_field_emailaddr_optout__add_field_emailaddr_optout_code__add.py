@@ -8,15 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding field 'EmailAddr.optout'
+        db.add_column('c2g_emailaddr', 'optout',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
         # Adding field 'EmailAddr.optout_code'
         db.add_column('c2g_emailaddr', 'optout_code',
-                      self.gf('django.db.models.fields.CharField')(default='optput', max_length=64),
+                      self.gf('django.db.models.fields.CharField')(default='optout', max_length=64),
+                      keep_default=False)
+
+        # Adding field 'ListEmail.from_addr'
+        db.add_column('c2g_listemail', 'from_addr',
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=128, blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
+        # Deleting field 'EmailAddr.optout'
+        db.delete_column('c2g_emailaddr', 'optout')
+
         # Deleting field 'EmailAddr.optout_code'
         db.delete_column('c2g_emailaddr', 'optout_code')
+
+        # Deleting field 'ListEmail.from_addr'
+        db.delete_column('c2g_listemail', 'from_addr')
 
 
     models = {
@@ -140,7 +156,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'optout': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'optout_code': ('django.db.models.fields.CharField', [], {'default': "'optput'", 'max_length': '64'})
+            'optout_code': ('django.db.models.fields.CharField', [], {'default': "'optout'", 'max_length': '64'})
         },
         'c2g.exercise': {
             'Meta': {'object_name': 'Exercise', 'db_table': "u'c2g_exercises'"},
@@ -182,6 +198,7 @@ class Migration(SchemaMigration):
         },
         'c2g.listemail': {
             'Meta': {'object_name': 'ListEmail'},
+            'from_addr': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'from_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'hash': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
             'html_message': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
