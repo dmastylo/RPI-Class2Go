@@ -6,6 +6,7 @@ from courses.actions import auth_is_course_admin_view_wrapper
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.core.mail import send_mail, send_mass_mail, EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
 from c2g.models import CourseEmail, EmailAddr
