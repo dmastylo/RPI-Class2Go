@@ -21,30 +21,28 @@ directory "/opt/class2go/static" do
     action :create
 end
 
-git "class2go-sourcecode" do
-    repository "https://github.com/Stanford-Online/class2go.git"
-    destination node['system']['admin_home'] + "/class2go"
-    user node['system']['admin_user']
-    group node['system']['admin_group']
-    revision node['main']['git_branch']
-    action :sync
-end
-
-# To be really super sure that we are on the branch we mean to be on
-# go to the directory and do a pull
 execute "git checkout" do
-    command "git checkout " + node['main']['git_branch']
+    command "git remote update"
     cwd node['system']['admin_home'] + "/class2go"
     user node['system']['admin_user']
     group node['system']['admin_group']
     action :run
 end
 
-# ... and then do a reset hard HEAD.  This handles the case where we were
-# inadvertently ahead of the production branch, which can happen if you 
-# happen to be on master first.
-execute "git reset hard" do
-    command "git reset --hard HEAD"
+# To be really super sure that we are on the branch we mean to be on
+# go to the directory and do a pull
+execute "git checkout" do
+    command "git checkout -f " + node['main']['git_branch']
+    cwd node['system']['admin_home'] + "/class2go"
+    user node['system']['admin_user']
+    group node['system']['admin_group']
+    action :run
+end
+
+# ... and then do a reset hard <branch>.  Unclear if this is even 
+# necessary, just being double-safe
+execute "git reset" do
+    command "git reset --hard " + node['main']['git_branch']
     cwd node['system']['admin_home'] + "/class2go"
     user node['system']['admin_user']
     group node['system']['admin_group']
