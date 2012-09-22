@@ -18,6 +18,8 @@ from django.db.models.signals import post_save
 from django import forms
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from hashlib import md5
+
 import gdata.youtube
 import gdata.youtube.service
 import os
@@ -1192,8 +1194,18 @@ class CourseEmail(Email, models.Model):
 class EmailAddr(models.Model):
     name = models.CharField(max_length=128, null=True, blank=True)
     addr = models.EmailField(max_length=128)
+    optout = models.BooleanField(default=False)
+    optout_code = models.CharField(max_length=64, default='optout')
     def __unicode__(self):
        return self.addr
+
+def write_optout_code(sender, instance, created, raw, **kwargs):
+    if created and not raw:  #create means that a new DB entry is created, raw is set when fixtures are being loaded
+        instance.optout_code = md5(instance.name+instance.addr+datetime.isoformat(datetime.now())).hexdigest()
+        instance.save()
+
+post_save.connect(write_optout_code, sender=EmailAddr)
+
 
 class MailingList(models.Model):
     name = models.CharField(max_length=128, blank=True)
@@ -1203,6 +1215,7 @@ class MailingList(models.Model):
 
 class ListEmail(Email, models.Model):
     from_name = models.CharField(max_length=128, blank=True)
+    from_addr = models.CharField(max_length=128, blank=True)
     to_list = models.ForeignKey(MailingList)
     def __unicode__(self):
         return self.subject
