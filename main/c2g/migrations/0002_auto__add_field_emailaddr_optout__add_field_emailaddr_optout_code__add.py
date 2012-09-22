@@ -8,32 +8,32 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding field 'EmailAddr.optout'
+        db.add_column('c2g_emailaddr', 'optout',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
-        # Changing field 'AdditionalPage.menu_slug'
-        db.alter_column(u'c2g_additional_pages', 'menu_slug', self.gf('django.db.models.fields.SlugField')(max_length=255, null=True))
-        # Adding index on 'AdditionalPage', fields ['menu_slug']
-        db.create_index(u'c2g_additional_pages', ['menu_slug'])
+        # Adding field 'EmailAddr.optout_code'
+        db.add_column('c2g_emailaddr', 'optout_code',
+                      self.gf('django.db.models.fields.CharField')(default='optout', max_length=64),
+                      keep_default=False)
 
-
-        # Changing field 'AdditionalPage.slug'
-        db.alter_column(u'c2g_additional_pages', 'slug', self.gf('django.db.models.fields.SlugField')(max_length=255, null=True))
-        # Adding index on 'AdditionalPage', fields ['slug']
-        db.create_index(u'c2g_additional_pages', ['slug'])
+        # Adding field 'ListEmail.from_addr'
+        db.add_column('c2g_listemail', 'from_addr',
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=128, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Removing index on 'AdditionalPage', fields ['slug']
-        db.delete_index(u'c2g_additional_pages', ['slug'])
+        # Deleting field 'EmailAddr.optout'
+        db.delete_column('c2g_emailaddr', 'optout')
 
-        # Removing index on 'AdditionalPage', fields ['menu_slug']
-        db.delete_index(u'c2g_additional_pages', ['menu_slug'])
+        # Deleting field 'EmailAddr.optout_code'
+        db.delete_column('c2g_emailaddr', 'optout_code')
 
+        # Deleting field 'ListEmail.from_addr'
+        db.delete_column('c2g_listemail', 'from_addr')
 
-        # Changing field 'AdditionalPage.menu_slug'
-        db.alter_column(u'c2g_additional_pages', 'menu_slug', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
-
-        # Changing field 'AdditionalPage.slug'
-        db.alter_column(u'c2g_additional_pages', 'slug', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
 
     models = {
         'auth.group': {
@@ -120,6 +120,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.Course']"}),
             'institution': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Institution']", 'null': 'True'}),
+            'institution_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'instructor_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'instructor_group'", 'to': "orm['auth.Group']"}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
@@ -148,6 +149,14 @@ class Migration(SchemaMigration):
             'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'to': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
+        },
+        'c2g.emailaddr': {
+            'Meta': {'object_name': 'EmailAddr'},
+            'addr': ('django.db.models.fields.EmailField', [], {'max_length': '128'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'optout': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'optout_code': ('django.db.models.fields.CharField', [], {'default': "'optout'", 'max_length': '64'})
         },
         'c2g.exercise': {
             'Meta': {'object_name': 'Exercise', 'db_table': "u'c2g_exercises'"},
@@ -186,6 +195,25 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.TextField', [], {})
+        },
+        'c2g.listemail': {
+            'Meta': {'object_name': 'ListEmail'},
+            'from_addr': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'from_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'hash': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'html_message': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'sender': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'to_list': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.MailingList']"})
+        },
+        'c2g.mailinglist': {
+            'Meta': {'object_name': 'MailingList'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'members': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['c2g.EmailAddr']", 'symmetrical': 'False'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'})
         },
         'c2g.newsevent': {
             'Meta': {'object_name': 'NewsEvent', 'db_table': "u'c2g_news_events'"},
@@ -276,6 +304,7 @@ class Migration(SchemaMigration):
             'education': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'institutions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['c2g.Institution']", 'symmetrical': 'False'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'referrer': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
             'referrer_first': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
