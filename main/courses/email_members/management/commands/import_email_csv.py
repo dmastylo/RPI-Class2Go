@@ -16,7 +16,7 @@ class Command(BaseCommand):
         name2, email address2
         
         If MailingList with list_name already exists, the command exits.  If an email address in the csv already
-        exists in an EmailAddr entry, a duplicate entry is not created, rather the existant one is used.
+        exists in an EmailAddr entry, a duplicate entry will be created.
         """
     
     def handle(self, *args, **options):
@@ -36,11 +36,6 @@ class Command(BaseCommand):
                     email = row[1].strip()
                     try: #add existing addr
                         validate_email(email)
-                        addr = EmailAddr.objects.get(addr=email)
-                        list.members.add(addr)
-                        list.save()
-                        num_imported = num_imported+1
-                    except EmailAddr.DoesNotExist: #create the email addr
                         try:
                             addr = EmailAddr(name=row[0].strip(),addr=email)
                             addr.save()
@@ -49,14 +44,6 @@ class Command(BaseCommand):
                             num_imported = num_imported+1
                         except Warning:
                             pass
-                    except EmailAddr.MultipleObjectsReturned: #only add the first one
-                        i=0
-                        for addr in EmailAddr.objects.filter(addr=email).all():
-                            if i==0:
-                                list.members.add(addr)
-                                list.save()
-                                num_imported = num_imported+1
-                            i=i+1
                     except ValidationError:
                         pass
         return "Successfully added %d entries to mailing list %s\n" % (num_imported , listname)
