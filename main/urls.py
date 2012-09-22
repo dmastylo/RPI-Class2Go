@@ -25,6 +25,9 @@ urlpatterns = patterns('',
     url(r'^contactus$', 'c2g.views.contactus'),
 
                        
+    #emailoptout
+    url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
+    
     # Commented out the following 2 urls since point to a signup page which is
     # no longer required.
 #    url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),

@@ -306,11 +306,11 @@ except NameError:
    EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
-SERVER_EMAIL = 'class2go-noreply@cs.stanford.edu'
+SERVER_EMAIL = 'noreply@class.stanford.edu'
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
-    DEFAULT_FROM_EMAIL = "class2go-noreply@cs.stanford.edu" #probably change for production
+    DEFAULT_FROM_EMAIL = "noreply@class.stanford.edu" #probably change for production
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
     EMAIL_PORT = 587
