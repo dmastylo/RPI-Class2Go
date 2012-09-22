@@ -3369,8 +3369,11 @@ var Khan = (function() {
         $('#problem-and-answer').css('position', 'relative');
 
         $('#problem-and-answer').append($('<div id="questions-stack"></div>'));
+        $('#questions-stack').append($('<h4 id="problemset-questions-head" class="hidden-accessible">Problem Set Questions</h4>'));
         $('#questions-stack').append($('<div id="questions-viewed"><ol></ol></div>'));
         $('#questions-stack').append($('<div id="questions-unviewed"><ol></ol></div>'));
+        $('#questions-stack').attr('role', 'navigation');
+        $('#questions-stack').attr('aria-labelledby', 'problemset-questions-head');
         $('#questions-stack').click(stackClickHandler);
 
         //populate 1 questions-to-do for each exercise
@@ -3400,7 +3403,8 @@ var Khan = (function() {
                 $(elem).data('numberOfProblems',probsInExercise);
                 var li = $("<li>");
 
-                li.text("Q" + (idx + 1));
+                li.append('<a id="Q' + (idx + 1) + '-link" href="#" title="Question ' + (idx + 1) + '"></a>');
+                li.find('a').text("Q" + (idx + 1));
                 //this data 'problem' will be used to index into the problems array
                 //the problems array is a flat array containing all problems from all exercises
                 //we do the counting above to get a problem index in the right range for this exercise
@@ -3621,6 +3625,7 @@ var Khan = (function() {
         // questions-stack parent
         function stackClickHandler(ev) {
 
+            ev.preventDefault();
             ev.stopPropagation();
             var clickTarget = ev.target;
             // if user clicks on green checkmark icon, find parent card upon which to trigger click
