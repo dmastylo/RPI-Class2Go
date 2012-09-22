@@ -15,6 +15,7 @@ from courses.forms import *
 from courses.actions import auth_view_wrapper
 
 from urlparse import urlparse
+import settings
 
 def index(item): # define a index function for list items
  return item[1]
@@ -41,7 +42,10 @@ def main(request, course_prefix, course_suffix):
     ##For Launch, but I don't think it needs to be removed later##
     if common_page_data['course'].preview_only_mode:
         if not common_page_data['is_course_admin']:
-            return redirect(reverse('courses.preview.views.preview',args=[course_prefix, course_suffix]))
+            redir = reverse('courses.preview.views.preview',args=[course_prefix, course_suffix])
+            if (settings.INSTANCE == 'stage' or settings.INSTANCE == 'prod'):
+                redir = 'https://'+request.get_host()+redir
+            return redirect(redir)
 
     
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
