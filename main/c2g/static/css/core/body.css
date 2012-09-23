@@ -20,7 +20,7 @@ a:hover {color:#820000;}
     padding-top:2px;
 }
 .well.tight .nav-list li a span {
-    width:190px;
+    width:80%;
     word-wrap:break-word;
     float:left;
     display:block;
