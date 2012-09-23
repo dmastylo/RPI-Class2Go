@@ -4,6 +4,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from courses.actions import auth_view_wrapper
 from courses.forums.forms import PiazzaAuthForm
+from c2g.models import PageVisitLog
 from database import PIAZZA_ENDPOINT, PIAZZA_KEY, PIAZZA_SECRET
 from OAuthSimple import OAuthSimple
 
@@ -35,6 +36,12 @@ def view(request, course_prefix, course_suffix):
         lti_params['roles'] = "Instructor"
     else:
         lti_params['roles'] = "Student"
+        visit_log = PageVisitLog(
+            course = course,
+            user = request.user,
+            page_type= 'forum',
+        )
+        visit_log.save()
 
     lti_params['context_id'] = course.piazza_id
     lti_params['context_label'] = request.common_page_data['course_prefix']
@@ -56,7 +63,7 @@ def view(request, course_prefix, course_suffix):
     form = PiazzaAuthForm(initial=signed_request['parameters'])
 
     # Set common_page_data['can_switch_mode'] to false to hide mode switcher on this page.
-    common_page_data['can_switch_mode'] = False
+    request.common_page_data['can_switch_mode'] = False
     
     return render_to_response('forums/piazza.html', {
             'common_page_data': request.common_page_data, 
