@@ -58,6 +58,3 @@ PIAZZA_SECRET = "piazza_xxxxxxx"
 SES_SMTP_USER = "USER"
 SES_SMTP_PASSWD = "PWD"
 
-# Kelvinator Working Path: Is where the kelvinator will store and process intermediate files
-# Include a trailing slash!! Ex: /some/path/
-KELVINATOR_WORKING_PATH = ''
