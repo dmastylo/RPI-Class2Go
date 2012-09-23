@@ -204,7 +204,7 @@ class SetPasswordFormC2G(SetPasswordForm):
                                   min_length=6,
                                  widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password*"),
-                                error_messages={'invalid': _("This value must contain 1 number.")})
+                                error_messages={'invalid': _("Your password must contain at least one number (0-9).")})
     
     
     def __init__(self, user, *args, **kwargs):
