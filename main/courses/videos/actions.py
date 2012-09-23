@@ -20,8 +20,7 @@ import urllib2, urllib, json
 import re
 import settings
 
-#import kelvinator.tasks
-import kelvinator.kelvinator
+import kelvinator.tasks
 
 from datetime import datetime
 from courses.actions import auth_is_course_admin_view_wrapper
@@ -213,8 +212,7 @@ def upload(request):
             # TODO: don't hardcode the AWS location 
             s3_path="https://s3-us-west-2.amazonaws.com/"+common_page_data['aws_storage_bucket_name']+"/"+urllib.quote_plus(new_video.file.name,"/")
             
-            kelvinator.tasks.run.delay(video=new_video, kfpm=2)
-            
+            kelvinator.tasks.kelvinate.delay(s3_path, 2)
 
             if new_video.url:
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
