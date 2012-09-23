@@ -61,8 +61,17 @@ class EditProfileForm(forms.ModelForm):
                                                                    ('RetailServicesTransportationFood','In the retail service, transportation or food industries'),
                                                                    ('ManufacturingConstruction','In manufacturing or construction'),
                                                                    ('AnotherIndustry','In another industry'),
-                                                                   ('Other','Other'),))    
+                                                                   ('Other','Other'),))
+    
+    piazza_name  = forms.RegexField(regex=r'^[\w -]+$',
+                                    required=False,
+                                    max_length=50,
+                                    label=_("Piazza handle"),
+                                    error_messages={'invalid': _("This value may contain only letters, numbers, underscores, spaces, and dashes")})
+    piazza_email = forms.EmailField(required=False,
+                                    label=_("Piazza email"), max_length=75)
 
+    
     class Meta:
         model = UserProfile
-        fields = ('birth_year', 'gender', 'education', 'work')
+        fields = ('birth_year', 'gender', 'education', 'work', 'piazza_name', 'piazza_email')
