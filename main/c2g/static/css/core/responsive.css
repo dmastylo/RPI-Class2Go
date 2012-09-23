@@ -131,6 +131,9 @@
 }
 
 @media (max-width: 480px) {
+  #global-header {
+    background:#8C1515;
+  }
   .nav-collapse {
     -webkit-transform: translate3d(0, 0, 0);
   }
@@ -1052,6 +1055,9 @@
 }
 
 @media (min-width: 767px) {
+  .registration .well {
+    min-width:400px;
+  }
   .nav-collapse.collapse {
     height:0;
     overflow:hidden;

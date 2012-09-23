@@ -182,6 +182,9 @@ small.date {
 #new_announcement_div {
     clear:left;
 }
+.course-description iframe {
+    width:100%;
+}
 
 /* Header
 -------------------------------------------------- */
@@ -190,7 +193,7 @@ small.date {
     width:100%;
 }
 .stanford-logo {
-    background:#8C1515 url(/static/graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
+    background:transparent url(/static/graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
     padding:13px 20px;
     width:198px;
     height:11px;
@@ -313,11 +316,10 @@ small.date {
 -------------------------------------------------- */
 .registration .well {
     margin:0 auto;
-    width:430px;
     background:#f8f6ea;
     padding:0;
 }
-.registration .well form table {
+.registration .well fieldset {
     margin:20px;
 }
 .registration .well form,.registration .well .form-actions {
@@ -334,6 +336,9 @@ small.date {
 .registration .well h2 {
     margin-top:15px;
     text-align:center;
+}
+.registration .form-horizontal .form-actions {
+    padding-left:20px;
 }
 
 /* Profile Info
