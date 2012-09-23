@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.exceptions import MultipleObjectsReturned
 from c2g.models import Video
 import urllib
 from django.db import connection, transaction
@@ -32,7 +32,7 @@ class Command(BaseCommand):
         except MultipleObjectsReturned:
             print "Found multiple videos named \"%s\"" % slug
             return
-        except ObjectDoesNotExist:
+        except Video.DoesNotExist:
             print "Video \"%s\" not found for handle \"%s\"" % (slug, handle)
             return
 
