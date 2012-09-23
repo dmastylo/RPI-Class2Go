@@ -1058,10 +1058,7 @@
   .registration .well {
     min-width:400px;
   }
-  .nav-collapse.collapse {
-    height:0;
-    overflow:hidden;
-  }
+ 
   #c2g_layout_topbar .navbar .navbar-inner {
     background:#e3ca93 url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
     min-height:34px;
@@ -1085,8 +1082,8 @@
       border-right:1px solid #999;
   }
   .nav-collapse.collapse {
-    height: auto !important;
-    overflow: visible !important;
+    height: auto;
+    overflow: visible;
   }
   /*.logo {
     width:308px;
