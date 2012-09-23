@@ -1084,11 +1084,11 @@
       padding: 7px 10px 8px;
       border-right:1px solid #999;
   }
-  /*.nav-collapse.collapse {
+  .nav-collapse.collapse {
     height: auto !important;
     overflow: visible !important;
   }
-  .logo {
+  /*.logo {
     width:308px;
     height:21px;
     text-indent:-999px;
