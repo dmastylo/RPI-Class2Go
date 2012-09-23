@@ -9,7 +9,22 @@ a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
 .well {border-color:#ddcf99;}
 .well.tight {padding:10px 0;background:#f8f6ea;}
-.well.tight .nav-list li a {padding:5px 15px;}
+.well.tight .nav-list li {clear:left;}
+.well.tight .nav-list li a {
+    padding:5px 15px;
+    overflow:hidden;
+}
+.well.tight .nav-list li a em {
+    float:left;
+    width:20px;
+    padding-top:2px;
+}
+.well.tight .nav-list li a span {
+    width:190px;
+    word-wrap:break-word;
+    float:left;
+    display:block;
+}
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
 
