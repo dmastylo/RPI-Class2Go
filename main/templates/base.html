@@ -26,10 +26,10 @@
     <div id="viewport">
         <div id="global-header">
             <h1 class="stanford-logo">
-                <a href="http://www.stanford.edu">Stanford Online</a>
+                <a href="http://www.stanford.edu">Stanford University</a>
             </h1>
         </div>
-        <div id="c2g_layout_topbar">
+        {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}
             <p class="hide-text hidden"><a href="#main-content">Jump to content</a></p>
             {% block navbar %}
             {% ifequal user.is_staff True %}
@@ -51,7 +51,10 @@
             {% endifequal %}
             {% endblock navbar %}
             <div class="row-fluid">
-            <h2 class="pull-left">{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
+            <div class="pull-left page-title">
+                <img src="{{ STATIC_URL }}graphics/core/top-banner-Stanford.png" alt="Stanford Online">
+                <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
+            </div>
             {% block mode_switcher %}
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                 <div class="hidden-phone pull-right">
