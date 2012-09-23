@@ -509,7 +509,24 @@ input[data-datetimepicker] {
     color:#fff;
     clear:left;
 }
-
+.class2go {
+    position:relative;
+    width:100%;
+    padding:40px 0 0;
+}
+.class2go a {
+    font-size:11px;
+    background:#f8f6ea;
+    padding:3px 10px;
+    position:absolute;
+    right:20px;
+    bottom:0;
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+    -khtml-border-radius: 5px 5px 0 0;
+    -o-border-radius: 5px 5px 0 0;
+}
 
 
 ul.exercise-list {
