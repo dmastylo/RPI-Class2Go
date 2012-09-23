@@ -209,9 +209,18 @@ small.date {
     display:inline-block;
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
 }
+#c2g_layout_topbar.preview-page {
+    width:auto;
+}
+#c2g_layout_topbar .page-title {
+    margin:20px 0 0 20px;
+}
+#c2g_layout_topbar .page-title img {
+    margin-bottom:25px;
+    margin-top:10px;
+}
 #c2g_layout_topbar h2 {
   font-weight: 300;
-  margin:20px 0 0 20px;
   font-size:30px;
 }
 #c2g_layout_topbar .top-nav a {
@@ -339,6 +348,9 @@ small.date {
 }
 .registration .form-horizontal .form-actions {
     padding-left:20px;
+}
+.preview-registration {
+    margin-top:-100px;
 }
 
 /* Profile Info

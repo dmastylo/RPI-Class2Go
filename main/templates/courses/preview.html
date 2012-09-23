@@ -22,6 +22,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
 {% endblock bottom_scripts %}
 
+{% block topbar %}<div id="c2g_layout_topbar" class="preview-page">{% endblock topbar %}
 
 {% block r_column_content %}
     
@@ -63,7 +64,7 @@
          Uh-oh.  We couldn't find username and password you entered.  Try again?
        </div>
        {% endif %}
-       <div class="well">
+       <div class="well preview-registration">
        <h3>Confirm your login name</h3>
        <form method="post" action="{% url 'courses.preview.views.preview_login' common_page_data.course_prefix common_page_data.course_suffix %}" class="form-vertical">  
            {% csrf_token %}
@@ -97,7 +98,7 @@
       {% endfor %}
       <div class="registration preview-registration">
           <div class="well">
-            <h2>Signup</h2>
+            <h2>Class2Go Signup</h2>
             <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post" class="form-horizontal">
               <fieldset>
               {% include "registration/regforminputs.html" %} 
