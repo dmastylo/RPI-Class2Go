@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load url from future %}
- 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% if user.is_authenticated %}
@@ -18,6 +17,11 @@
 	    <li><strong>Gender:</strong> {{user.get_profile.gender }}</li>
 	    <li><strong>Education:</strong> {{user.get_profile.education }}</li>
 	    <li><strong>Work:</strong> {{user.get_profile.work }}</li>
+        <hr />
+        <li><strong>Piazza handle:</strong> {{user.get_profile.piazza_name }}</li>
+        <li><strong>Piazza email:</strong> {{user.get_profile.piazza_email }}</li>
+            
+        <hr />
 	    <li class="pull-left"><strong>Courses:</strong></li>
 	    {% if courses %}
 	    <ul class="unstyled pull-left">

@@ -20,6 +20,9 @@ from django.contrib.auth.models import User, Group
 from c2g.models import Course, Institution
 from accounts.forms import *
 from registration import signals
+from django.core.validators import validate_email, RegexValidator
+from django.core.exceptions import ValidationError, MultipleObjectsReturned
+from django.http import HttpResponseBadRequest
 
 import random
 import os
@@ -55,6 +58,7 @@ def edit(request):
     pform = EditProfileForm(instance=request.user.get_profile())
     return render_to_response('accounts/edit.html', {'request':request, 'uform':uform, 'pform':pform}, context_instance=RequestContext(request))
 
+@csrf_protect
 def save_edits(request):
     uform = EditUserForm(request.POST, instance=request.user)
     pform = EditProfileForm(request.POST, instance=request.user.get_profile())
@@ -64,6 +68,37 @@ def save_edits(request):
         return HttpResponseRedirect(reverse('accounts.views.profile'))
     
     return render_to_response('accounts/edit.html', {'request':request, 'uform':uform, 'pform':pform}, context_instance=RequestContext(request))
+
+@csrf_protect
+@require_POST
+def save_piazza_opts(request):
+    email = request.POST.get('email')
+    name = request.POST.get('name')
+    str_id = request.POST.get('id')
+    try:
+        validate_email(email)
+    except ValidationError:
+        return HttpResponseBadRequest('You did not enter a valid email address.')
+    try:
+        nameValidator = RegexValidator(regex=r'^[\w -]+$')
+        nameValidator(name.strip())
+    except ValidationError:
+        return HttpResponseBadRequest('Names on Piazza should only contain letters, numbers, underscores, hyphens, and spaces.')
+    try:
+        int_id = int(str_id)
+    except ValueError:
+        return HttpResponseBadRequest('Not a integer id')
+    try:
+        user = User.objects.get(id=str_id)
+    except User.DoesNotExist:
+        return HttpResponseBadRequest('User not found')
+
+    profile=user.get_profile()
+    profile.piazza_name=name
+    profile.piazza_email=email
+    profile.save()
+    return HttpResponse("Successfully Saved Piazza Options")
+
 
 def logout(request):
     logout(request)
