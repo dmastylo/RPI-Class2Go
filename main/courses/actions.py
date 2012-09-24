@@ -196,7 +196,7 @@ def signup_with_course(request, course_prefix, course_suffix):
         messages.add_message(request,messages.ERROR, 'Registration in this course is restricted to ' + course.institution.title + '.  Perhaps you need to logout and login with your '+ course.institution.title + ' credentials?')
         return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))
 
-    if not is_member_of_course(course, request.user):
+    if request.user.is_authenticated() and (not is_member_of_course(course, request.user)):
         student_group = Group.objects.get(id=course.student_group_id)
         student_group.user_set.add(request.user)
     if (request.GET.__contains__('redirect_to')):
