@@ -203,7 +203,6 @@ try:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
     AWS_STORAGE_BUCKET_NAME
-    AWS_SECURE_STORAGE_BUCKET_NAME
 except NameError:
     # TODO: fail if not defined
     pass

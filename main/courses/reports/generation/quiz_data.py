@@ -1,7 +1,7 @@
 from c2g.models import *
 from courses.reports.data_aggregation.quiz_attempts import *
 import csv
-from database import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
+from database import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME
 from django.core.files.storage import default_storage
 from storages.backends.s3boto import S3BotoStorage
 
@@ -14,7 +14,11 @@ def gen_quiz_data_report(ready_course, ready_quiz, order_by, save_to_s3=False):
     res_table = ad['res_table']
     sorted_usernames = sorted(res_table.keys())
     
-    secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
+    if AWS_STORAGE_BUCKET_NAME == 'local':
+        secure_file_storage = default_storage
+    else:
+        aws_secure_bucket_storage_name = AWS_STORAGE_BUCKET_NAME.split('-')[0]+ '-secure-' +AWS_STORAGE_BUCKET_NAME.split('-')[1]
+        secure_file_storage = S3BotoStorage(bucket=aws_secure_bucket_storage_name, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
     
     txt_string = ""
     csv_rows = []
