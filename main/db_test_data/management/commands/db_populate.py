@@ -1,9 +1,11 @@
 from django.core.management.base import BaseCommand, CommandError, make_option
 from c2g.models import *
 from django.contrib.auth.models import User,Group
-from datetime import datetime
-from random import randrange, shuffle
+import time
+from datetime import datetime, timedelta
+from random import randrange, shuffle, randint
 from django.db import connection, transaction
+import math
 
 class Command(BaseCommand):
     help = "Populates the db with test development data. \n This command is <not> available on ready for obvious reasons. \n Settings can be made in file db_test_data/management/commands/db_populate.py"
@@ -60,6 +62,8 @@ def delete_db_data():
     ProblemActivity.objects.all().delete()
     NewsEvent.objects.all().delete()
 
+    PageVisitLog.objects.all().delete()
+    
     Group.objects.all().delete()
     User.objects.all().delete()
 
@@ -260,6 +264,10 @@ def create_course_massive(index, users, institutions, content_counts):
             print "      Creating massive course %d of %d >> Adding Users >> Students >> (%d/%d) complete \r" % (index,content_counts['num_massive_courses'],i,num_students)
     
     print "      Creating massive course %d of %d >>  Adding course info pages\r" % (index,content_counts['num_massive_courses'])
+    
+    # Create atrifical forum visit data
+    create_forum_visit_log_entries(course.image, users['students'])
+    
     # Create the overview page
     str_ = ""
     for i in range(1000):
@@ -340,6 +348,36 @@ def create_course_massive(index, users, institutions, content_counts):
     exercise4.save()
     
     exercises = [exercise1, exercise2, exercise3, exercise4]
+    exercise_answer_models = [
+        {
+            'answers': ['a','b','c','d'],
+            'correct_answer': 'b',
+            'answer_probabilities':[0.1,0.4,0.3,0.2],
+            'mean_answer_time':20,
+            'max_number_of_attempts': 5,
+        },
+        {
+            'answers': ['1','2','3','4','5','6','7','8','9','10'],
+            'correct_answer': '6',
+            'answer_probabilities':[0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1],
+            'mean_answer_time':30,
+            'max_number_of_attempts': 2,
+        },
+        {
+            'answers': ['1','2','3','4','5','6','7','8','9','10'],
+            'correct_answer': '5',
+            'answer_probabilities':[0.05,0.05,0.05,0.05,0.05,0.5,0.05,0.1,0.05,0.05],
+            'mean_answer_time':25,
+            'max_number_of_attempts': 6,
+        },
+        {
+            'answers': ['a','b','c','d'],
+            'correct_answer': 'c',
+            'answer_probabilities':[0.1,0.5,0.2,0.2],
+            'mean_answer_time':20,
+            'max_number_of_attempts': 5,
+        },
+    ]
     
     
     # Sections, each with 5 videos, 1 problem set, and 1 static page
@@ -372,37 +410,59 @@ def create_course_massive(index, users, institutions, content_counts):
             )
             video.save()
             video.create_ready_instance()
-            prod = video.image; prod.live_datetime = datetime.now(); prod.save();
+            prod = video.image; 
+            r = randrange(0,100)
+            if r < 33: prod.live_datetime = datetime.now()-timedelta(days=10);
+            elif r < 67: prod.live_datetime = datetime.now()-timedelta(days=20);
+            else: prod.live_datetime = datetime.now()+timedelta(days=20);
+            prod.save();
             
-            # Add Exercises to Videos
-            print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding exercises to video\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
-            v2es = []
-            for exercise in exercises:
-                v2e = VideoToExercise(video=video, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='draft')
-                v2e.save()
-                v2e = VideoToExercise(video=video.image, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='ready')
-                v2e.save()
-                v2es.append(v2e)
+            # Add Exercises to some of the videos
+            if j >= 2:
+                print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding exercises to video\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j)
+                v2es = []
+                for exercise in exercises:
+                    v2e = VideoToExercise(video=video, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='draft')
+                    v2e.save()
+                    v2e = VideoToExercise(video=video.image, exercise=exercise, video_time=randrange(10,durations[yt_index]-10), is_deleted=0, mode='ready')
+                    v2e.save()
+                    v2es.append(v2e)
+                
+                # Create view progress and exercise attempts for 75% of the users
+                stud_index = 0
+                for student in course.student_group.user_set.all():
+                    if randrange(0,3) > 0:
+                        view_activity = VideoActivity(student = student, video = video.image, course = course.image, start_seconds = randrange(0,durations[yt_index]))
+                        view_activity.save()
+                        
+                        create_video_view_log_entry(video=prod, user=student)
+                        if randrange(0,4) > 3:
+                            create_video_view_log_entry(video=prod, user=student)
+                        
+                        for k in range(len(v2es)):
+                            if v2es[k].video_time < view_activity.start_seconds:
+                                correct = False
+                                attempts_exhausted = False
+                                attempt_number = 0
+                                while not (correct or attempts_exhausted):
+                                    attempt = create_attempt(exercise_answer_models[k])
+                                    problem_activity = ProblemActivity(
+                                        student = student,
+                                        video_to_exercise = v2es[k],
+                                        attempt_content = attempt['attempt_content'],
+                                        time_taken = attempt['time_taken'],
+                                        complete = attempt['correct'],
+                                    )
+                                    problem_activity.save()
+                                    correct = attempt['correct']
+                                    attempt_number += 1
+                                    attempts_exhausted = attempt_number >= exercise_answer_models[k]['max_number_of_attempts']
+                                
+                    stud_index += 1
+                    if num_students > 500 and stud_index%500 == 0:
+                        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding student video activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j, stud_index, num_students)
             
-            # Create view progress and exercise attempts for 75% of the users
-            stud_index = 0
-            for student in course.student_group.user_set.all():
-                if randrange(0,3) > 0:
-                    view_activity = VideoActivity(student = student, video = video.image, course = course.image, start_seconds = randrange(0,durations[yt_index]))
-                    view_activity.save()
-                    
-                    for k in range(len(v2es)):
-                        if v2es[k].video_time < view_activity.start_seconds:
-                            problem_activity = ProblemActivity(
-                                student = student,
-                                video_to_exercise = v2es[k]
-                            )
-                            problem_activity.save()
-                            
-                stud_index += 1
-                if num_students > 500 and stud_index%500 == 0:
-                    print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding Video %d of 5 >> Adding student video activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], j, stud_index, num_students)
-                            
+            
         # Create 1 static page
         print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 static page\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
         str_ = ""
@@ -420,20 +480,30 @@ def create_course_massive(index, users, institutions, content_counts):
         )
         p.save()
         p.create_ready_instance()
-        prod = p.image; prod.live_datetime = datetime.now(); prod.save();
+        prod = p.image;
+        r = randrange(0,100)
+        if r < 33: prod.live_datetime = datetime.now()-timedelta(days=10);
+        elif r < 67: prod.live_datetime = datetime.now()-timedelta(days=21);
+        else: prod.live_datetime = datetime.now()+timedelta(days=101);
+        prod.save()
+        
+        for student in course.student_group.user_set.all():
+            create_additional_page_view_log_entry(additional_page=prod, user=student)
+            if randrange(0,4) > 3:
+                create_additional_page_view_log_entry(additional_page=prod, user=student)
                     
-        # Create 1 problem set
-        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 problem set\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
+        # Create 1 problem set with student activity
+        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding problem set 1\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
         ps = ProblemSet(
             course = course,
             section = draft_section,
-            slug = "course_"+str(index)+"_section_"+str(i)+"_ps",
-            title = "Problem set for section %d" % i,
+            slug = "course_"+str(index)+"_section_"+str(i)+"_ps_1",
+            title = "Problem set 1 for section %d" % i,
             description = "PS Description",
             due_date = datetime(2012, 9,19),
             grace_period = datetime(2012, 9,19),
             partial_credit_deadline = datetime(2012, 9,19),
-            assessment_type = 'formative',
+            assessment_type = 'summative',
             late_penalty = 30,
             submissions_permitted = 3,
             resubmission_penalty = 30,
@@ -441,7 +511,13 @@ def create_course_massive(index, users, institutions, content_counts):
         )
         ps.save()
         ps.create_ready_instance()
-        prod = ps.image; prod.live_datetime = datetime.now(); prod.save();
+        prod = ps.image;
+        
+        r = randrange(0,100)
+        if r < 33: prod.live_datetime = datetime.now()-timedelta(days=10);
+        elif r < 67: prod.live_datetime = datetime.now()-timedelta(days=19);
+        else: prod.live_datetime = datetime.now()+timedelta(days=99);
+        prod.save()
         
         for k in range(len(exercises)):
             ps2e = ProblemSetToExercise(problemSet=ps, exercise=exercises[k], number=k, is_deleted=0, mode='draft')
@@ -452,18 +528,72 @@ def create_course_massive(index, users, institutions, content_counts):
             stud_index = 0
             for student in course.student_group.user_set.all():
                 if randrange(0,3) > 0:
-                    problem_activity = ProblemActivity(
-                        student = student,
-                        problemset_to_exercise = ps2e
-                    )
-                    problem_activity.save()
+                    correct = False
+                    attempts_exhausted = False
+                    attempt_number = 0
+                    while not (correct or attempts_exhausted):
+                        attempt = create_attempt(exercise_answer_models[k])
+                        problem_activity = ProblemActivity(
+                            student = student,
+                            problemset_to_exercise = ps2e,
+                            attempt_content = attempt['attempt_content'],
+                            time_taken = attempt['time_taken'],
+                            complete = attempt['correct'],
+                        )
+                        problem_activity.save()
+                        correct = attempt['correct']
+                        attempt_number += 1
+                        attempts_exhausted = attempt_number >= exercise_answer_models[k]['max_number_of_attempts']
                     
                 stud_index += 1
                 if num_students > 500 and stud_index%500 == 0:
                     print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding 1 problem set >> Exercise %d of 4 >> Student activity (%d/%d)\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'], k, stud_index, num_students)
             
-        
-        
+        for student in course.student_group.user_set.all():
+            create_problemset_view_log_entry(problemset=prod, user=student)
+            if randrange(0,4) > 3:
+                create_problemset_view_log_entry(problemset=prod, user=student)
+                
+        # Create 1 problem set with no student activity
+        print "      Creating massive course %d of %d >>  Adding content section %d of %d >> Adding problem set 2\r" % (index,content_counts['num_massive_courses'], i, content_counts['num_sections_per_course'])
+        ps = ProblemSet(
+            course = course,
+            section = draft_section,
+            slug = "course_"+str(index)+"_section_"+str(i)+"_ps_2",
+            title = "Problem set 2 for section %d" % i,
+            description = "PS Description 2",
+            due_date = datetime(2012, 9,19),
+            grace_period = datetime(2012, 9,19),
+            partial_credit_deadline = datetime(2012, 9,19),
+            assessment_type = 'summative',
+            late_penalty = 30,
+            submissions_permitted = 3,
+            resubmission_penalty = 30,
+            randomize = False,
+        )
+        ps.save()
+        ps.create_ready_instance()
+        prod = ps.image;
+        r = randrange(0,100)
+        prod.live_datetime = datetime.now()-timedelta(days=10);
+        prod.save()
+
+def create_attempt(em):
+    attempt = {}
+    attempt['time_taken'] = randrange(math.floor(em['mean_answer_time']/2),math.floor(em['mean_answer_time']*1.5))
+    cmf = [i*100 for i in em['answer_probabilities']]
+    for i in range(1,len(cmf)): cmf[i] = cmf[i]+cmf[i-1]
+    r = randint(0,100)
+    selected_answer_index = 0
+    for i in range(1,len(cmf)):
+        if cmf[i-1] < r and r <= cmf[i]: selected_answer_index = i
+     
+    attempt['attempt_content'] = em['answers'][selected_answer_index]
+    if attempt['attempt_content'] == em['correct_answer']: attempt['correct'] = 1
+    else: attempt['correct'] = 0
+    
+    return attempt
+    
 
 def create_course_nlp(data, users):
     # Create the user groups
@@ -745,47 +875,6 @@ def create_course_crypto(data, users):
     data['due_date']='2012-07-27'
     data['partial_credit_deadline']='2012-08-03'
 
-    # Removing second problem set
-    # KELVIN TODO -- fix create_problem_set so it handles two problem sets referencing the same exercises
-    # duplicate exercise entries screws other things up.
-    #
-    # pset2 = create_problem_set(data, users)
-
-    #Create exercises
-
-    #exercise1_1 = save_exercise(pset1, "xx_P1_Levenshtein_1Q.html", 1, 'crypto#$!Fall2012')
-    
-  #  url = 'http://localhost:8080/nlp/Fall2012/problemsets/P1/manage_exercise'
-  #  payload = {'user': 'professor_1', 'password': 'class2go'}
-
-  #  r = requests.post(url, data=payload)
-  #  print '------' + str(r.text)
-  #  print '++++++' + str(r.status_code)
-    
-    
-#    exercise1_2 = save_exercise(pset1, "P1_Regexp.html", 2)
-#    exercise1_3 = save_exercise(pset1, "P1_Tokenize.html", 3)
-
-#    exercise2_1 = save_exercise(pset2, "P2_Add_one_smoothing.html", 1)
-#    exercise2_2 = save_exercise(pset2, "P2_Joint.html", 2)
-#    exercise2_3 = save_exercise(pset2, "P2_Lexical1.html", 3)
-#    exercise2_4 = save_exercise(pset2, "P2_NER1.html", 4)
-#    exercise2_5 = save_exercise(pset2, "P2_Spelling.html", 5)
-
-    #Create problems
-
-    # save_problem(exercise1_1, 'p1')
-    # save_problem(exercise1_1, 'p2')
-    # save_problem(exercise1_2, 'p1')
-    # save_problem(exercise1_3, 'p1')
-
-    # save_problem(exercise2_1, 'p1')
-    # save_problem(exercise2_1, 'p2')
-    # save_problem(exercise2_2, 'p1')
-    # save_problem(exercise2_3, 'p1')
-    # save_problem(exercise2_4, 'p1')
-    # save_problem(exercise2_5, 'p1')
-
     # Create news events
     titles = [
         'Crypto: Assignment 1 solutions and grades released',
@@ -820,8 +909,26 @@ def create_content_section(course, title, index):
     section.create_ready_instance()
     return section
 
+def create_additional_page_view_log_entry(additional_page, user):  
+        if (not additional_page.live_datetime) or additional_page.live_datetime > datetime.now(): return
+        
+        visit_datetime_range_end = int(time.time())
+        #visit_datetime_range_start = visit_datetime_range_end - 3*24*3600
+        visit_datetime_range_start = int(time.mktime(additional_page.live_datetime.timetuple()))
+        
+        if randrange(0,3) < 2:
+            visit_log = PageVisitLog(course = additional_page.course, page_type = 'additional_page', object_id = str(additional_page.id), user = user)
+            visit_log.save()
+            visit_log.time_created = datetime.fromtimestamp(randrange(visit_datetime_range_start, visit_datetime_range_end))
+            visit_log.save()
+            if randrange(0,4) == 3:
+                visit_log = PageVisitLog(course = additional_page.course, page_type = 'additional_page', object_id = str(additional_page.id), user = user)
+                visit_log.save()
+                visit_log.time_created = datetime.fromtimestamp(randrange(visit_datetime_range_start, visit_datetime_range_end))
+                visit_log.save()
+    
 def create_video(data, users):
-    # Also creates random progress for each user for each video
+    # Also creates random progress for each user for each video, and random visits to the video page
     video = Video(
         course=data['course'],
         section=data['section'],
@@ -838,7 +945,7 @@ def create_video(data, users):
     )
     video.save()
     video.create_ready_instance()
-
+    
     for user in users['students']:
         video_activity = VideoActivity(
             student=user,
@@ -847,6 +954,38 @@ def create_video(data, users):
             start_seconds = randrange(0,int(video.duration))
         )
         video_activity.save()
+
+def create_video_view_log_entry(video, user):
+    if (not video.live_datetime) or video.live_datetime > datetime.now(): return
+    
+    visit_datetime_range_end = int(time.time())
+    #visit_datetime_range_start = visit_datetime_range_end - 3*24*3600
+    visit_datetime_range_start = int(time.mktime(video.live_datetime.timetuple()))
+    
+    if randrange(0,3) < 2:
+        visit_log = PageVisitLog(course = video.course, page_type = 'video', object_id = str(video.id), user = user)
+        visit_log.save()
+        visit_log.time_created = datetime.fromtimestamp(randrange(visit_datetime_range_start, visit_datetime_range_end))
+        visit_log.save()
+        if randrange(0,4) == 3:
+            visit_log = PageVisitLog(course = video.course, page_type = 'video', object_id = str(video.id), user = user)
+            visit_log.save()
+            visit_log.time_created = datetime.fromtimestamp(randrange(visit_datetime_range_start, visit_datetime_range_end))
+            visit_log.save()
+
+def create_forum_visit_log_entries(course, students):
+    
+    visit_datetime_range_end = int(time.time())
+    visit_datetime_range_start = visit_datetime_range_end - 14*24*3600
+    
+    for stud in students:
+        num_visits = randrange(0,8)
+        for i in range(0,num_visits):
+            log_entry = PageVisitLog(course = course, page_type = 'forum', user = stud)
+            log_entry.save()
+            log_entry.time_created = datetime.fromtimestamp(randrange(visit_datetime_range_start,visit_datetime_range_end))
+            log_entry.save()
+        
 
 def create_news_event(course,title):
     event = NewsEvent(
@@ -880,18 +1019,25 @@ def create_problem_set(data, users):
 
     problem_set.save()
 
-    # @todo: Create exercises, problems, and user activity for problem sets based on the new draft/ready paradigm
-
-    #Shouldn't need to populate exercises since they can be uploaded now
-    #save_exercise(problem_set, "P1_Levenshtein.html", 1)
-    #save_exercise(problem_set, "P1_Regexp.html", 2)
-    #save_exercise(problem_set, "P1_Tokenize.html", 3)
-    #save_exercise(prod_instance, "P1_Levenshtein.html", 1)
-    #save_exercise(prod_instance, "P1_Regexp.html", 2)
-    #save_exercise(prod_instance, "P1_Tokenize.html", 3)
-
     return problem_set
 
+def create_problemset_view_log_entry(problemset, user):
+    if (not problemset.live_datetime) or problemset.live_datetime > datetime.now(): return
+    
+    visit_datetime_range_end = int(time.time())
+    #visit_datetime_range_start = visit_datetime_range_end - 3*24*3600
+    visit_datetime_range_start = int(time.mktime(problemset.live_datetime.timetuple()))
+    
+    if randrange(0,3) < 2:
+        visit_log = PageVisitLog(course = problemset.course, page_type = 'problemset', object_id = str(problemset.id), user = user)
+        visit_log.save()
+        visit_log.time_created = datetime.fromtimestamp(randrange(visit_datetime_range_start, visit_datetime_range_end))
+        visit_log.save()
+        if randrange(0,4) == 3:
+            visit_log = PageVisitLog(course = problemset.course, page_type = 'problemset', object_id = str(problemset.id), user = user)
+            visit_log.save()
+            visit_log.time_created = datetime.fromtimestamp(randrange(visit_datetime_range_start, visit_datetime_range_end))
+            visit_log.save()
 
 def save_exercise(problemSet, fileName, number, handle, file):
     ex = Exercise(fileName = fileName)
@@ -912,10 +1058,3 @@ def save_problem(exercise, slug):
                     slug = slug)
 
     problem.save()
-
-# def save_problem_activity(student, problem):
-    # problem_activity = ProblemActivity(student = student,
-                                        # course_id = course_id,
-                                        # problem = problem,
-                                        # problem_set = problem_set)
-    # problem_activity.save()

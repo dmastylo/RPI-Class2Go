@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, render
 from django.template import RequestContext
@@ -47,6 +47,14 @@ def show(request, course_prefix, course_suffix, pset_slug):
         messages.add_message(request,messages.ERROR, 'This Problemset is not visible in the student view at this time. Please note that students will not see this message.')
         return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
 
+    if not common_page_data['is_course_admin']:
+        visit_log = PageVisitLog(
+            course = common_page_data['ready_course'],
+            user = request.user,
+            page_type = 'problemset',
+            object_id = str(ps.id),
+        )
+        visit_log.save()
         
     problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
