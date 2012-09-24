@@ -21,14 +21,6 @@ directory "/opt/class2go/static" do
     action :create
 end
 
-execute "git checkout" do
-    command "git remote update"
-    cwd node['system']['admin_home'] + "/class2go"
-    user node['system']['admin_user']
-    group node['system']['admin_group']
-    action :run
-end
-
 # For initial machine bring up, check out the first time.  Doing as a
 # shell script so we can test first.
 bash "git clone" do
@@ -39,6 +31,14 @@ bash "git clone" do
         git clone https://github.com/Stanford-Online/class2go.git
     fi
     EOH
+end
+
+execute "git checkout" do
+    command "git remote update"
+    cwd node['system']['admin_home'] + "/class2go"
+    user node['system']['admin_user']
+    group node['system']['admin_group']
+    action :run
 end
 
 # Be really super sure that we get the revision we want
