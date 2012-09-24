@@ -29,8 +29,19 @@ execute "git checkout" do
     action :run
 end
 
-# To be really super sure that we are on the branch we mean to be on
-# go to the directory and do a pull
+# For initial machine bring up, check out the first time.  Doing as a
+# shell script so we can test first.
+bash "git clone" do
+    user node['system']['admin_user']
+    cwd node['system']['admin_home']
+    code <<-EOH
+    if [[ ! -d class2go ]]; then
+        git clone https://github.com/Stanford-Online/class2go.git
+    fi
+    EOH
+end
+
+# Be really super sure that we get the revision we want
 execute "git checkout" do
     command "git checkout -f " + node['main']['git_branch']
     cwd node['system']['admin_home'] + "/class2go"
