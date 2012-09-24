@@ -1,17 +1,43 @@
 {% extends "course_base.html" %}
 {% block title %}Stanford Online | {{common_page_data.course.title}} | Forums{% endblock %}
 {% load url from future %}
+{% block mode_switcher %}{% endblock mode_switcher %}
 
 {% block forums_link_class %}class="dropdown active"{% endblock forums_link_class %}
 
 {% block m_column_content %}
 
 <script type="text/javascript">
+    
+    var csrftoken = '{{csrf_token}}';
+
     function lti_submit() {
         var theform = document.getElementById("piazza_lti_form");
         theform.submit();
+        $('#confirm_lti').hide()
+        $('#piazza_iframe').show()
     }
+    function save_profile_then_lti_submit(){
+        $.ajax('/accounts/profile/save_piazza_opts',
+                {   headers: {'X-CSRFToken': csrftoken},
+                    type: 'POST',
+                    data: { name:$('#id_lis_person_name_full').val(),
+                            email:$('#id_lis_person_contact_email_primary').val(),
+                            id:{{request.user.id}} },
+                    error: function(jqXHR, status, errorMsg){
+                              $('#piazza_lti_form').before('<div id="error-alert" class="alert alert-error"><em class="icon-fire"></em><span id="error_msg"></span><button class="close" data-dismiss="alert">×</button></div>');
+                              $('#error_msg').text(jqXHR.responseText);
+                            },
+                    success: function(data,textStatus,jqXHR){
+                                lti_submit();
+                             }
+               }
+        )
+    }
+    
+    {% if not show_confirmation %}
     window.onload = lti_submit;
+    {% endif %}
 </script>
 
 
@@ -19,13 +45,28 @@
 {# Both the fields that Piazza needs to link up ther person, course, etc. to #}
 {# the accounts on their side. #}
 
+<div id="confirm_lti" class="well" {% if not show_confirmation %}style="visibility:hidden"{% endif %}>
+<h2>Link your account with Piazza<h2>
+<h3>You'll only see this once, and you can make changes later on your profile page (click on your name).</h3>
+    
 <form id="piazza_lti_form" name="piazza_lti_form" action="{{ piazza_target_url }}" method="post" target="piazza_iframe" encType="application/x-www-form-urlencoded">
-	{% csrf_token %}
     {% for field in form %}
+      {% if field.name == 'lis_person_name_full' %}
+        <label for="id_lis_person_name_full">Choose the name (or alias) that you'd like to be publicly known by on Piazza.  (If you've already chosen a handle on Piazza, this may not override your previous choice.)</label>
+        {{ field }}
+      {% elif field.name = 'lis_person_contact_email_primary' %}
+        <label for="id_lis_person_contact_email_primary">If you already have a Piazza account you'd like to use, please enter the email address associated with it.  Otherwise, enter an email address that will be used to create a new Piazza account for you.</label>
+        {{ field }}
+      {% else %}
         {{ field.as_hidden }}
+      {% endif %}
     {% endfor %}
+    <br />
+    <a class="btn" href="javascript:" onclick="save_profile_then_lti_submit()" >Submit</a>
 </form>
 
-<iframe name="piazza_iframe" frameBorder="0" style="margin: 0px; width: 100%; height: 1000px;"></iframe>
+</div>
+
+<iframe name="piazza_iframe"  id="piazza_iframe" frameBorder="0" style="display:none; margin: 0px; width: 100%; height: 1000px;"></iframe>
 
 {% endblock m_column_content %}

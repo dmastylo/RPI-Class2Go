@@ -203,10 +203,14 @@ try:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
     AWS_STORAGE_BUCKET_NAME
-    AWS_SECURE_STORAGE_BUCKET_NAME
 except NameError:
     # TODO: fail if not defined
     pass
+    
+try:
+    AWS_SECURE_STORAGE_BUCKET_NAME
+except NameError:
+    AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME.split('-')[0]+'-secure-'+AWS_STORAGE_BUCKET_NAME.split('-')[1]
 
 # Setting these variables to 'local' is the idiom for using local storage.
 if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
@@ -260,8 +264,7 @@ LOGGING = {
             'backupCount': 3,
         },
         'console':{
-            # consider "INFO" for better manage.py interactive commands
-            'level':'WARNING',
+            'level':'INFO',
             'class':'logging.StreamHandler',
             'formatter': 'simple'
         },

@@ -3,6 +3,10 @@ from django.contrib.auth.models import User,Group
 from courses.reports.data_aggregation.course_dashboard import *
 from datetime import datetime, timedelta
 from courses.reports.generation.C2GReportWriter import *
+import csv
+from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
+from django.core.files.storage import default_storage
+from storages.backends.s3boto import S3BotoStorage
 
 
 def gen_course_dashboard_report(ready_course, save_to_s3=False):
@@ -105,8 +109,11 @@ def gen_course_dashboard_report_old(course, save_to_s3=False):
         dd = get_course_dashboard_report_data(course)
         
         ### Output ###
-        secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
-                
+        if AWS_SECURE_STORAGE_BUCKET_NAME == 'local':
+            secure_file_storage = default_storage
+        else:
+            secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
+        
         csv_rows = []
         txt_string = ""
         
