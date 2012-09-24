@@ -28,7 +28,7 @@ class Command(BaseCommand):
         
     def handle(self, *args, **options):
         if len(args) != 3:
-            raise CommandError("Wrong number of arguments, %d instead of 3", len(args))
+            raise CommandError("Wrong number of arguments, %d instead of 3" % len(args))
         arg_prefix=args[0]
         arg_suffix=args[1]
         handle=arg_prefix+"--"+arg_suffix
