@@ -7,6 +7,7 @@ import kelvinator.tasks
 from django.conf import settings
 
 bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
+instance=getattr(settings, 'INSTANCE')
 
 class Command(BaseCommand):
     args="<prefix> <suffix> <video_slug> <key_frames>"
@@ -17,10 +18,11 @@ class Command(BaseCommand):
         "    prefix         generally the short name, like \"nlp\"\n" + \
         "    suffix         the term, like \"Fall2012\"\n" + \
         "    video_slug     slug, like \"regexp\"\n" + \
+        "    where          \"local\" or \"remote\" (default=\"remote\")\n" + \
         "    key_frames     target number of key frames per minute (default=2)" 
         
-    def handle(self, *args, **kwargs):
-        if len(args) < 3 or len(args) > 4:
+    def handle(self, *args, **options):
+        if len(args) < 3 or len(args) > 5:
             raise CommandError("Wrong number of arguments")
         arg_prefix=args[0]
         arg_suffix=args[1]
@@ -41,12 +43,23 @@ class Command(BaseCommand):
             return
             
         s3_path="https://s3-us-west-2.amazonaws.com/"+bucket+"/"+urllib.quote_plus(video.file.name,"/")
+
+        location="remote"
+        if len(args) > 3:
+            if args[3] == "local":
+                location = "local"
+            else:
+                print "Will kelvinate remotely, job queue = "+instance
         
         keyframes_per_minute = 2
-        if len(args) > 3:
-            keyframes_per_minute = args[3]
+        if len(args) > 5:
+            keyframes_per_minute = args[5]
         
-        kelvinator.tasks.kelvinate(s3_path, keyframes_per_minute)
-        
-        print "Kelvination complete"
+        if location == "local":
+            kelvinator.tasks.kelvinate(s3_path, keyframes_per_minute)
+            print "Kelvination complete"
+        else:
+            kelvinator.tasks.kelvinate.delay(s3_path, keyframes_per_minute)
+            print "Kelvination queued"
+
 
