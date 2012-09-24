@@ -1085,7 +1085,9 @@
     height: auto;
     overflow: visible;
   }
-  /*.logo {
+  /*
+  .logo {
+>>>>>>> 2f2acfc3a8c70550b67b8cbb534b8561f0cc44b1
     width:308px;
     height:21px;
     text-indent:-999px;

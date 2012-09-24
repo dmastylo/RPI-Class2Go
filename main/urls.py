@@ -25,6 +25,9 @@ urlpatterns = patterns('',
     url(r'^contactus$', 'c2g.views.contactus'),
 
                        
+    #emailoptout
+    url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
+    
     # Commented out the following 2 urls since point to a signup page which is
     # no longer required.
 #    url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),
@@ -52,8 +55,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/?', include(admin.site.urls)),
-
-    url(r'^extract$', 'kelvinator.views.extract'),
 
     # The following line is temprarily commented out until we figure out how django cascades its URL matching operations.
     # After this is figured out, the rest of the matches below shall be moved to courses.url.

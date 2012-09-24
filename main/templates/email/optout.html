@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% block m_column_content %}
+<div class="span10">
+    Your email address {% for email in email_list %} {{ email }} {% endfor %} has been unsubscribed.  You will not get any future mailings from Stanford Online except from courses in which you participate.
+</div>
+{% endblock m_column_content %}
