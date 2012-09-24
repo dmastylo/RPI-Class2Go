@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.sites.models import Site
 from collections import deque
-from smtplib import SMTPException
+from smtplib import SMTPException, SMTPServerDisconnected, SMTPDataError, SMTPConnectError
 from celery.task import current
 from django.contrib.sites.models import Site
 
@@ -66,7 +66,10 @@ def email_list(msg_hash, addr_list, throttle=False):
         connection = get_connection() #get mail connection from settings
         connection.open()
         num_sent=0
+        num_error=0
         
+        rg = random.SystemRandom(random.randint(0,100000))
+
         while addr_list:
             (name, email, optout, code) = addr_list[-1]
             if optout:
@@ -89,17 +92,41 @@ def email_list(msg_hash, addr_list, throttle=False):
             
                 if throttle or current.request.retries > 0: #throttle if we tried a few times and got the rate limiter
                     time.sleep(0.2)
-                    
-                connection.send_messages([email_msg])
-                logger.info('Email with hash ' + msg_hash + ' sent to ' + email)
-                    
-            num_sent +=1
+                
+                try: #nested try except blocks.
+                    #CHAOS!
+                    #if rg.randint(0,25) == 1:
+                    #    logger.info('RAISE 400!')
+                    #    raise SMTPDataError(400,'Randomly generated exception that should be retried.')
+                    #if rg.randint(0,25) == 1:
+                    #    logger.info('RAISE 500!')
+                    #    raise SMTPDataError(500,'Randomly generated exception that should NOT be retried.')
+                    connection.send_messages([email_msg])
+                    logger.info('Email with hash ' + msg_hash + ' sent to ' + email)
+                    num_sent +=1
+
+                except SMTPDataError as exc:
+                    #code map so far
+                    #554 : Message rejected: Address blacklisted
+                    #554 : Transaction failed: Missing final @domain
+                    #454 : Throttling failure: Maximum sending rate exceeded
+                    #According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure
+                    if exc.smtp_code >= 400 and exc.smtp_code < 500:
+                        raise exc # this will cause the outer handler to catch the exception and retry the entire task
+                    else:
+                        #this will fall through and not retry the message, since it will be popped
+                        logger.warn('Email with hash ' + msg_hash + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
+                        num_error += 1
+                        connection.open() #reopen connection, in case error closed it
+
+
             addr_list.pop()
 
         connection.close()
-        return num_sent
+        return "Sent %d, Fail %d" % (num_sent, num_error)
 
-    except SMTPException as exc:
+    except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
+        #error caught here cause the email to be retried.  The entire task is actually retried without popping the list
         raise email_list.retry(arg=[msg_hash, addr_list, current.request.retries>0], exc=exc, countdown=(2 ** current.request.retries)*15)
 
 
@@ -153,8 +180,10 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
         connection = get_connection() #get mail connection from settings
         connection.open()
         num_sent=0
+        num_error=0
 
         rg = random.SystemRandom(random.randint(0,100000))
+
 
         while to_list:
             (first_name, last_name, email) = to_list[-1]
@@ -181,20 +210,40 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
                 time.sleep(0.2)
 
             
-            #CHAOS!
-            #if rg.randint(0,50) == 1:
-            #   raise SMTPException(1,'Randomly generated exception to test email robustness')
+            try: #nested try except blocks.
+                #CHAOS!
+                #if rg.randint(0,25) == 1:
+                #    logger.info('RAISE 400!')
+                #    raise SMTPDataError(400,'Randomly generated exception that should be retried.')
+                #if rg.randint(0,25) == 1:
+                #    logger.info('RAISE 500!')
+                #    raise SMTPDataError(500,'Randomly generated exception that should NOT be retried.')
 
-            connection.send_messages([email_msg])
-            logger.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
+                connection.send_messages([email_msg])
+                logger.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
+                num_sent +=1
+
+            except SMTPDataError as exc:
+                #code map so far
+                #554 : Message rejected: Address blacklisted
+                #554 : Transaction failed: Missing final @domain
+                #454 : Throttling failure: Maximum sending rate exceeded
+                #According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure
+                if exc.smtp_code >= 400 and exc.smtp_code < 500:
+                    raise exc # this will cause the outer handler to catch the exception and retry the entire task
+                else:
+                    #this will fall through and not retry the message, since it will be popped
+                    logger.warn('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
+                    num_error += 1
+                    connection.open() #reopen connection, in case.
+
             
-            num_sent +=1
             to_list.pop()
         
         connection.close()
-        return num_sent
+        return "Sent %d, Fail %d" % (num_sent, num_error)
 
-    except SMTPException as exc:
+    except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
         raise course_email_with_celery.retry(arg=[hash_for_msg, to_list, current.request.retries>0, course_title, course_handle,
                                                   course_url], exc=exc, countdown=(2 ** current.request.retries)*15)
 

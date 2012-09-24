@@ -203,6 +203,7 @@ try:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
     AWS_STORAGE_BUCKET_NAME
+    AWS_SECURE_STORAGE_BUCKET_NAME
 except NameError:
     # TODO: fail if not defined
     pass
@@ -259,7 +260,7 @@ LOGGING = {
             'backupCount': 3,
         },
         'console':{
-            'level':'WARNING',
+            'level':'INFO',
             'class':'logging.StreamHandler',
             'formatter': 'simple'
         },
@@ -307,6 +308,7 @@ except NameError:
    EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
+
 SERVER_EMAIL = 'noreply@class.stanford.edu'
 
 # For Production, or if override is set, actually send email

@@ -36,7 +36,8 @@ function multitail-prod {
         -l 'ssh bitnami@app2.prod.c2gops.com "tail -f stack/apache2/logs/error_log"' \
         -l 'ssh bitnami@app3.prod.c2gops.com "tail -f stack/apache2/logs/error_log"' \
         -c- \
-        -l 'ssh ubuntu@util1.prod.c2gops.com "tail -f /var/log/django/kelvinator.log"' 
+        -l 'ssh ubuntu@util2.prod.c2gops.com "tail -f /var/log/celery/*.log"' \
+        -c- 
 }
 
 

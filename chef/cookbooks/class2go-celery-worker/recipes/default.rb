@@ -20,6 +20,8 @@ end
 file "celery database file permissions" do
     path "/opt/class2go/celery/celerydb.sqlite"
     mode 00777
+    owner "daemon"
+    group "daemon"
     action :create
 end
 
