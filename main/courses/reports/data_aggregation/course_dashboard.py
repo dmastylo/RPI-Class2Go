@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import time
 import math
 from django.db.models import Avg
-from courses.reports.data_aggregation.utility_functions import *
+#from courses.reports.data_aggregation.utility_functions import *
 
 def get_course_dashboard_report_data(draft_course):
     ready_course = draft_course.image

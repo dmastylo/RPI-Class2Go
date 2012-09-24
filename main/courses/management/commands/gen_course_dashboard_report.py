@@ -12,9 +12,9 @@ class Command(BaseCommand):
             print "No course handle supplied!"
             
         try:
-            course = Course.objects.get(handle= args[0], mode='draft')
+            course = Course.objects.get(handle= args[0], mode='ready')
         except:
             print "Failed to find course with given handle"
             return
             
-        print gen_course_dashboard_report(course)
+        gen_course_dashboard_report(course)

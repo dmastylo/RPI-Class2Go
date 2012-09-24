@@ -14,5 +14,5 @@ class Command(BaseCommand):
         now = datetime.now()
         active_courses = Course.objects.filter(mode='ready', calendar_start__lt=now, calendar_end__gt=now)
         for ready_course in active_courses:
-            gen_course_dashboard_report(ready_course.image, save_to_s3=True)
+            gen_course_dashboard_report(ready_course, save_to_s3=True)
             gen_course_quizzes_report(ready_course, save_to_s3=True)
