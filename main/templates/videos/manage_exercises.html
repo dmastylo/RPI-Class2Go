@@ -35,7 +35,7 @@ function confirm_change(){
         </div>
         <div class="fieldWrapper">
             {{ manage_form.video_time.errors }}
-            Video Time (in seconds):{{ manage_form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            Video Time (in seconds - whole numbers only):{{ manage_form.video_time }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
             <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
@@ -81,7 +81,8 @@ function confirm_change(){
     {% endfor %}
     </table>
 
-        <span class="help-block">After changing times, save before adding another exercise</span>
+        <span class="help-block">After changing times, save before adding another exercise.</span>
+        <span class="help-block">Only one exercise is permitted per timestamp.</span>
     </fieldset>
         <div class="form-actions">
             <input type="submit" name="action" value="Save and Set as Ready" class="btn btn-primary" />

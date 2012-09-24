@@ -11,11 +11,11 @@
 <div id="c2g_layout_m_column" class="span12">
     {% if page.is_synced %}
     <div class="alert alert-success">
-        <i class="icon-ok" style="font-size:17px"></i> <strong>Working=Ready</strong> The working and ready versions are the same.
+        <em class="icon-ok" style="font-size:17px"></em> <strong>Working=Ready</strong> The working and ready versions are the same.
     </div>
     {% else %}
     <div class="alert">
-        <i class="icon-random" style="font-size:17px"></i> Working version is different from ready.
+        <em class="icon-random" style="font-size:17px"></em> Working version is different from ready.
     </div>
     {% endif %}
     {% ifnotequal page.slug 'overview' %}

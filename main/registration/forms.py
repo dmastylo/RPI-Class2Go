@@ -100,7 +100,7 @@ class RegistrationForm(forms.Form):
                                  min_length=6,
                                  widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                  label=_("Password*"),
-                                 error_messages={'invalid': _("This value must contain 1 number.")})
+                                 error_messages={'invalid': _("Your password must contain at least one number (0-9)."), 'min_length': _("Your password must be at least 6 characters")})
     password2 = forms.CharField(widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password (again)*"))
     
@@ -204,7 +204,7 @@ class SetPasswordFormC2G(SetPasswordForm):
                                   min_length=6,
                                  widget=forms.PasswordInput(attrs=attrs_dict, render_value=False),
                                 label=_("Password*"),
-                                error_messages={'invalid': _("This value must contain 1 number.")})
+                                error_messages={'invalid': _("Your password must contain at least one number (0-9)."), 'min_length': _("Your password must be at least 6 characters")})
     
     
     def __init__(self, user, *args, **kwargs):

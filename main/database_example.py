@@ -37,6 +37,7 @@ ADMINS = (
 AWS_ACCESS_KEY_ID = 'AAAAAAAAAAAAAAAAAAAA'
 AWS_SECRET_ACCESS_KEY = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 AWS_STORAGE_BUCKET_NAME = 'dev-c2g'
+AWS_SECURE_STORAGE_BUCKET_NAME = 'dev-secure-c2g'
 
 # To use Local Storage.  You still need to define these three all to 'local'
 # and specify where you want those local files written
@@ -57,3 +58,4 @@ PIAZZA_SECRET = "piazza_xxxxxxx"
 # SMTP INFO for SES -- Amazon Simple Email Service $1 per 10K recipients
 SES_SMTP_USER = "USER"
 SES_SMTP_PASSWD = "PWD"
+

@@ -190,7 +190,13 @@ small.date {
     width:100%;
 }
 .stanford-logo {
-    padding:10px 20px;
+    background:#8C1515 url(/static/graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
+    padding:13px 20px;
+    width:198px;
+    height:11px;
+    text-indent: -999px;
+    display:block;
+    overflow:hidden;
 }
 #c2g_layout_topbar {
     position:relative;
@@ -200,9 +206,10 @@ small.date {
     display:inline-block;
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
 }
-#c2g_layout_topbar h1 {
+#c2g_layout_topbar h2 {
   font-weight: 300;
   margin:20px 0 0 20px;
+  font-size:30px;
 }
 #c2g_layout_topbar .top-nav a {
   color:white;
@@ -261,7 +268,7 @@ small.date {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 .toggle-views {
-    width: 246px;
+    width: 250px;
     padding: 7px 7px 0;
     color: #333;
     text-align: right;
@@ -324,6 +331,10 @@ small.date {
     margin-bottom:1em;
     text-align:center;
 }
+.registration .well h2 {
+    margin-top:15px;
+    text-align:center;
+}
 
 /* Profile Info
 -------------------------------------------------- */
@@ -368,11 +379,38 @@ small.date {
 
 .course-list-item {
     overflow:hidden;
-    padding:10px 20px;
+    padding:5px 0px;
+    border-bottom:1px solid #eee;
 }
 .course-list-item .progress {
     width:400px;
     margin-top:5px;
+}
+.course-list-item .icon-pencil,
+.course-list-item .icon-book,
+.course-list-item .icon-file,
+.course-list-item .icon-facetime-video {
+    font-size:40px; 
+    color:#999;
+    opacity:.3;
+    padding-left:5px;
+    padding-top:5px;
+}
+.course-list-item .pull-left {
+    margin-left:-10px;
+    width:60px;
+}
+.course-list-item .course-list-content {
+    overflow:hidden;
+    margin-right:10px;
+    margin-bottom:5px;
+}
+.course-list-item .course-list-content h4 {
+    margin-top:10px;
+    display:inline;
+}
+.course-list-item .course-list-content label {
+    margin-bottom:10px;
 }
 
 /* Forms
