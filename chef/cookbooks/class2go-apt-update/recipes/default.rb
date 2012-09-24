@@ -1,5 +1,6 @@
 execute "apt-get update" do
     command "apt-get update -q -y"
+    returns [0, 100]
     action :run
 end
 
