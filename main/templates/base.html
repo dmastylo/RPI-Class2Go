@@ -3,7 +3,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block top_scripts %}
-    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css" /-->
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
@@ -51,19 +50,17 @@
             </div>
             {% endifequal %}
             {% endblock navbar %}
-            <div class="row-fluid">
+            <div class="row-fluid" style="position:relative;">
             <div class="pull-left page-title">
                 <img src="{{ STATIC_URL }}graphics/core/top-banner-Stanford.png" alt="Stanford Online">
                 <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
             </div>
             {% block mode_switcher %}
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
-                <div class="hidden-phone pull-right">
+                <div class="hidden-phone" style="position:absolute;top:0;right:0;">
                     {% if common_page_data.can_switch_mode %}
                         <form data-c2g-tooltip class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST" data-placement="left" title="Choosing EDIT mode lets you edit the course site. Choosing LIVE mode lets you view the site as students will.">
-                            
                             <p>You are currently viewing:</p>
-                            
                             <div class="btn-group btn-views-toggle">
                                 <button type="submit" name="to_mode" value="draft" class="btn btn-mini{% ifequal common_page_data.course_mode 'draft' %} active{% endifequal %}">Edit</button>
                                 <button type="submit" name="to_mode" value="ready" class="btn btn-mini{% ifequal common_page_data.course_mode 'ready' %} active{% endifequal %}">Live</button>

@@ -281,15 +281,15 @@ small.date {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    background-color: #e0d096;
-    background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
+    /*background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
     background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e0d096), to(#cabb84));
     background-image: -webkit-linear-gradient(top, #e0d096, #cabb84);
     background-image: -o-linear-gradient(top, #e0d096, #cabb84);
     background-image: linear-gradient(top, #e0d096, #cabb84);
     background-repeat: repeat-x;
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);*/
+    background: #e0d096 url('../../graphics/core/bg-nav.png') repeat-x bottom center;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
@@ -297,6 +297,7 @@ small.date {
 .toggle-views {
     width: 250px;
     padding: 7px 7px 0;
+    *padding: 7px;
     color: #333;
     text-align: right;
     background:#ffc;
@@ -323,7 +324,7 @@ small.date {
 /* Body
 -------------------------------------------------- */
 .body-content {
-    padding-top:20px;
+    padding-top:20px !important;
     min-height:450px;
 }
 
