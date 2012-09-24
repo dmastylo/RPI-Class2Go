@@ -4,6 +4,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from courses.actions import auth_view_wrapper
 from courses.forums.forms import PiazzaAuthForm
+from c2g.models import PageVisitLog
 from database import PIAZZA_ENDPOINT, PIAZZA_KEY, PIAZZA_SECRET
 from OAuthSimple import OAuthSimple
 
@@ -26,15 +27,33 @@ def view(request, course_prefix, course_suffix):
     # lti_params['lis_person_name_family'] = request.user.last_name
     # lti_params['lis_person_name_given'] = request.user.first_name
     # lti_params['lis_person_name_full'] = request.user.first_name + " " + request.user.last_name
-
-    lti_params['lis_person_name_full'] = request.user.username
-    lti_params['lis_person_contact_email_primary'] = request.user.email
+            
+    profile = request.user.get_profile()
+    show_confirmation = False
+    if (not profile.piazza_name):
+        show_confirmation = True
+        lti_params['lis_person_name_full'] = request.user.first_name + " " + request.user.last_name
+    else:
+        lti_params['lis_person_name_full'] = profile.piazza_name
+        
+    if (not profile.piazza_email):
+        show_confirmation = True
+        lti_params['lis_person_contact_email_primary'] = request.user.email
+    else:
+        lti_params['lis_person_contact_email_primary'] = profile.piazza_email
+            
 
     # Piazza only supports two roles, instructor and strudent; TA's (readonly too) are instructors. 
     if request.common_page_data['is_course_admin']:
         lti_params['roles'] = "Instructor"
     else:
         lti_params['roles'] = "Student"
+        visit_log = PageVisitLog(
+            course = course,
+            user = request.user,
+            page_type= 'forum',
+        )
+        visit_log.save()
 
     lti_params['context_id'] = course.piazza_id
     lti_params['context_label'] = request.common_page_data['course_prefix']
@@ -55,9 +74,13 @@ def view(request, course_prefix, course_suffix):
 
     form = PiazzaAuthForm(initial=signed_request['parameters'])
 
+    # Set common_page_data['can_switch_mode'] to false to hide mode switcher on this page.
+    request.common_page_data['can_switch_mode'] = False
+    
     return render_to_response('forums/piazza.html', {
-            'common_page_data': request.common_page_data, 
-            'form': form, 
+            'common_page_data': request.common_page_data,
+            'show_confirmation': show_confirmation,
+            'form': form,
             'piazza_target_url': PIAZZA_ENDPOINT,
         }, context_instance=RequestContext(request))
 

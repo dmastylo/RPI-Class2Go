@@ -9,13 +9,29 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail, send_mass_mail, EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
-from c2g.models import CourseEmail
+from c2g.models import CourseEmail, EmailAddr
 import courses.email_members.tasks
 import pdb
 import datetime
 from hashlib import md5
 
 
+def optout(request,code):
+    """Opts mailing list members out of email we sent
+    """
+    email=""
+    email_list=[]
+    addr_qset=EmailAddr.objects.filter(optout_code=code)
+    for addr in addr_qset.iterator():
+        addr.optout=True
+        addr.save()
+        email_list.append(addr.addr)
+    return render_to_response('email/optout.html',
+                          {'email_list': email_list,},
+                          context_instance=RequestContext(request))
+
+
+    
 @sensitive_post_parameters()
 @csrf_protect
 @auth_is_course_admin_view_wrapper
@@ -52,6 +68,7 @@ def email_members(request, course_prefix, course_suffix):
             courses.email_members.tasks.delegate_emails.delay(email.hash,
                                                               recipient_qset.count(),
                                                               request.common_page_data['course'].title,
+                                                              request.common_page_data['course'].handle,
                                                               request.build_absolute_uri(reverse('courses.views.main', args=[course_prefix, course_suffix])),
                                                               recipient_qset.query
                                                              )

@@ -19,6 +19,5 @@ run_list(
     "recipe[class2go-database-config]",
     "recipe[s3cmd]",
     "recipe[class2go-util-kelvinator]",
-    "recipe[class2go-celery-worker]",
-    "recipe[class2go-reports]"
+    "recipe[class2go-celery-worker]"
 )

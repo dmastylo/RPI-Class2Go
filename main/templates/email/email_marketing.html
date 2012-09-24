@@ -1,0 +1,8 @@
+{% autoescape off %}
+
+{{ message }}
+
+{% endautoescape %}
+<br />--------<br />
+<p>This is an automated email from Stanford Online.  You may opt-out of receiving future emails like this by clicking this <a href="http://{{domain}}{% url 'courses.email_members.views.optout' optout_code %}">link.</a>
+</p>

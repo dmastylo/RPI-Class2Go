@@ -17,14 +17,14 @@ function buglist-by-dev {
     for a in dcadams halawa jbau jinpa sefk wescott shalinguyen kelvindo kluo ; do
         for p in P0 P1; do
             echo "**** $a ($p) ****"
-            ghi list -s open -l $p -u $a -q $sprintparam | grep -v '\[3-Done\]'
+            ghi list -q -s open -l $p -u $a -q $sprintparam | grep -v '\[3-Done\]'
         done
         echo; echo
     done
 
     for p in P0 P1; do
         echo "**** nobody ($p) ****"
-        ghi list -l $p -s open ${sinceparam} -q $sprintparam | grep -v '\[3-Done\]' | grep -E "^#|NO-ASGN"
+        ghi list -q -l $p -s open ${sinceparam} -q $sprintparam | grep -v '\[3-Done\]' | grep -E "^#|NO-ASGN"
     done
 }
 
@@ -40,9 +40,9 @@ function buglist-counts {
     for l in P0 P1 P2; do
         # echo -ne "${NOW}\t"
         echo -ne "$l\t"
-        ghi list -s open -l $l | grep -v '3-Done' | wc -l | tr -d ' ' | tr -d '\n'
+        ghi list -q -s open -l $l | grep -v '3-Done' | wc -l | tr -d ' ' | tr -d '\n'
 
-        ACTIVE=`ghi list -s open -l $l --since "${YESTERDAY}" | grep -v '3-Done' | wc -l | tr -d ' '`
+        ACTIVE=`ghi list -q -s open -l $l --since "${YESTERDAY}" | grep -v '3-Done' | wc -l | tr -d ' '`
         echo -ne "\t (${ACTIVE} active)"
         echo
     done

@@ -25,14 +25,19 @@ urlpatterns = patterns('',
     url(r'^contactus$', 'c2g.views.contactus'),
 
                        
+    #emailoptout
+    url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
+    
     # Commented out the following 2 urls since point to a signup page which is
     # no longer required.
 #    url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),
 #    url(r'^courses/signup/?$', 'courses.actions.signup'),
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
-
-
+   
+    #shibboleth login
+    url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
+                       
                        
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
@@ -42,6 +47,7 @@ urlpatterns = patterns('',
     url(r'^accounts/profile/?$', 'accounts.views.profile', name='accounts_profile'),
     url(r'^accounts/profile/edit/?', 'accounts.views.edit'),
     url(r'^accounts/profile/save_edits/?', 'accounts.views.save_edits'),
+    url(r'^accounts/profile/save_piazza_opts/?$', 'accounts.views.save_piazza_opts'),
 
     url(r'^accounts/', include('registration.backends.simple.urls')),
 
@@ -50,8 +56,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/?', include(admin.site.urls)),
-
-    url(r'^extract$', 'kelvinator.views.extract'),
 
     # The following line is temprarily commented out until we figure out how django cascades its URL matching operations.
     # After this is figured out, the rest of the matches below shall be moved to courses.url.
@@ -109,9 +113,10 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/?$', 'courses.videos.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/upload$', 'courses.videos.views.upload'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.videos.views.view'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit/?', 'courses.videos.views.edit'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit/?$', 'courses.videos.views.edit'),
     url(r'^add_video/?$', 'courses.videos.actions.add_video'),
-    url(r'^edit_video/?$', 'courses.videos.actions.edit_video'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit_video/?$', 'courses.videos.actions.edit_video'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/reset_video/?$', 'courses.videos.actions.reset_video'),
     url(r'^delete_video/?$', 'courses.videos.actions.delete_video'),
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
@@ -160,6 +165,13 @@ urlpatterns = patterns('',
     
     #Email
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),             
+    
+    #Reports
+    # url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/reports/?$', 'courses.reports.views.main'),
+    # url(r'^export_csv_dashboard$', 'courses.reports.views.export_csv_dashboard'),
+    # url(r'^export_csv_quiz_report$', 'courses.reports.views.export_csv_quiz_report'),
+    # url(r'^export_html_dashboard$', 'courses.reports.views.export_html_dashboard'),
+    # url(r'^export_html_quiz_report$', 'courses.reports.views.export_html_quiz_report'),
     
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),

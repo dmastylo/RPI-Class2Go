@@ -11,8 +11,8 @@
             <li><a href="#">1.4 Another nav item</a></li>
             <li><a href="#">1.5 Another nav item</a></li>
             <li class="divider"></li>
-            <li><a href="#"><i class="icon-flag"></i>Help</a></li>
-            <li><a href="#"><i class="icon-envelope-alt"></i>Contact</a></li>
+            <li><a href="#"><em class="icon-flag"></em>Help</a></li>
+            <li><a href="#"><em class="icon-envelope-alt"></em>Contact</a></li>
         </ul>
     </div>
 </div> -->
@@ -24,7 +24,7 @@
   {% if user.is_authenticated %}
 
     {% if video.title %} 
-        <h2 class="section-headline">{{video.title}}</h2>
+        <h3 class="section-headline">{{video.title}}</h3>
         {% if common_page_data.course_mode == 'draft' and common_page_data.is_course_admin %}
           <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
         {% endif %}

@@ -23,20 +23,25 @@
 
 {% block r_column_content %}
 <div class="row-fluid">
+    
+
 {% block course_description %}
 
 {% endblock course_description %}
+
+{% block signup_form %}
+    
 {% if user.is_authenticated %}
   {% if common_page_data.is_course_member %}
   <div class="span5">
-    <div class="alert alert-success"><i class="icon-heart"></i>You have signed up for {{common_page_data.course.title}}!</div>
+    <div class="alert alert-success"><em class="icon-heart"></em>You have signed up for {{common_page_data.course.title}}!</div>
     <p>The course starts on {{common_page_data.course.calendar_start}}.  The course staff will contact you with an email introduction when the date approaches.  Hope to see you online this term!</p>
       
     <p><a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Register or log-in someone else</a></p>
   </div>
   {% else %}
     <div class="span5">
-    <div class="alert alert-info"><i class="icon-info-sign"></i>Hi {{user.first_name}} {{user.last_name}}.  It looks we already have record of you at Stanford Online.  Would you like to register for {{common_page_data.course.title}}?
+    <div class="alert alert-info"><em class="icon-info-sign"></em>Hi {{user.first_name}} {{user.last_name}}.  It looks we already have record of you at Stanford Online.  Would you like to register for {{common_page_data.course.title}}?
     <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}?redirect_to={{request.path}}" method="POST">
     <input type="submit" id="login_button" class="btn" value="Enroll" />
     {% csrf_token %}
@@ -94,7 +99,7 @@
       {% endfor %}
       <div class="registration">
           <div class="well span12">
-                <h2 class=" pagination-centered"> Signup </h2>
+                <h2>Signup</h2>
                 <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post">
                     {% include "registration/regforminputs.html" %}  
                     <div class="form-actions">
@@ -113,5 +118,10 @@
     </div>
     {% endif %}
 {% endif %}
+    
+    
+{% endblock signup_form %}
+
+    
 </div>
 {% endblock r_column_content %}

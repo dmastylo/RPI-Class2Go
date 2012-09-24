@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html data-require="word-problems math subhints">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Lexical Semantics</title>
+    <script src="../khan-exercise.js"></script>
+</head>
+
+<body>
+    <div class="exercise">
+     
+        <div class="problems">
+            <div id="Lexical">
+                <div class="question">
+                <p>
+                    Assume we have a corpus of 1000 words and the following WordNet
+                    Hierarchy: <br/>
+
+                    <img src="images/Information_Content.png"
+                    alt="Node A has children B, C and D. Node B has children E and F. Node
+                    C has a child G. Node D has children H and I. Node E has children J
+                    and K. Node K has children O and P. Node H has children L, M, and N."
+                    height="300" width="650" />
+
+                    <br/>Now assume we collect the following count data for each of the
+                    words: <br/><br/> J = 100 <br/> O = 100 <br/> P = 100 <br/> F = 100
+                    <br/> G = 100 <br/> L = 100 <br/> M = 100 <br/> N = 100 <br/> I = 200
+                    <br/>
+
+                    <br/><br/>
+
+
+                    Assuming that all other words do not appear in the corpus, what is
+                    <code>\text{sim}_\text{resnick}(J, P)</code>? Round your answer to two decimal
+                    places (e.g. 0.35, 0.60, 1.43) and use natural log in your
+                    calculation.
+               	</p>
+                </div> <!--question-->
+                
+                
+            	<div class="solution" data-inexact data-max-error="0.0051" data-type="decimal">1.205</div> <!--solution-->
+              
+            </div> <!--prob1-->
+        </div> <!--problems-->
+        <div class="hints">
+            <p>Observe that there are no counts for internal nodes. Thus we can calculate
+            the probability of any node by only examining the counts of the leaves of the
+            subtree rooted at that node.</p>
+            <p>We can solve this problem by first taking the lowest common subsumer of the
+            two words. We can calculate the probability of that lowest common subsumer by
+            summing up the counts of words in the subtree rooted at the lowest common
+            subsumer (which in this case is simply summing over all the leaves) and
+            dividing that number by 1000, the number of words in the corpus. We then take
+            the negative log of that probability to obtain our answer.</p>
+            
+        </div> <!--hints-->
+    </div> <!--exercises-->
+
+</body>
+</html>
