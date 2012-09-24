@@ -34,8 +34,8 @@ class Command(BaseCommand):
                     help="Max number of to kick off"),
         make_option("-d", "--delay", dest="delay", default=0, type="int",
                     help="Seconds to sleep between initiating jobs"),
-        make_option("-f", "--frames", dest="target_keyframes", default=2, type="int",
-                    help="Target N key frames per minute"),
+        make_option("-f", "--frames", dest="target_frames", default=2, type="int",
+                    help="Target number of thumbnails per minute (default=2)"),
     ) + BaseCommand.option_list
 
 
@@ -97,11 +97,11 @@ class Command(BaseCommand):
 
                 if options['local']:
                     print "%d/%d: kelvinating: %s" % (i+1, upto, s3_path)
-                    kelvinator.tasks.kelvinate(s3_path, options['target_keyframes'])
+                    kelvinator.tasks.kelvinate(s3_path, options['target_frames'])
                 if options['remote']:
                     print "%d/%d: queueing remote kelvinator (%s): %s" \
                                 % (i+1, upto, instance, s3_path)
-                    kelvinator.tasks.kelvinate.delay(s3_path, options['target_keyframes'])
+                    kelvinator.tasks.kelvinate.delay(s3_path, options['target_frames'])
             return
 
 
