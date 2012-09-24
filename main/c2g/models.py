@@ -523,6 +523,8 @@ class UserProfile(TimestampMixin, models.Model):
     birth_year = models.CharField(max_length=64, null=True)
     education = models.CharField(max_length=64, null=True)
     work = models.CharField(max_length=128,null=True)
+    piazza_email = models.CharField(max_length=128,blank=True)
+    piazza_name = models.CharField(max_length=128,blank=True)
 
     institutions = models.ManyToManyField(Institution) #these are confirmed institutions via shib or other trusted verifier
 
