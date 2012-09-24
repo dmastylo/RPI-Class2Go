@@ -88,13 +88,14 @@ def gen_quiz_data_report(ready_course, ready_quiz, order_by, save_to_s3=False):
         
     # Write out the files
     if save_to_s3:
+        t = 'video' if isinstance(ready_quiz, Video) else 'problemset'
         dt = datetime.now()
-        csv_file = secure_file_storage.open("%s/%s/reports/quiz_data/csv/%02d_%02d_%02d__%02d_%02d_%02d-%s-Quiz-Data.csv" % (ready_course.handle.split('--')[0], ready_course.handle.split('--')[1], dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_quiz.slug), 'wb')
+        csv_file = secure_file_storage.open("%s/%s/reports/quiz_data/csv/%02d_%02d_%02d__%02d_%02d_%02d-%s-%s-Quiz-Data.csv" % (ready_course.handle.split('--')[0], ready_course.handle.split('--')[1], dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, t, ready_quiz.slug), 'wb')
         csv_writer = csv.writer(csv_file)
         csv_writer.writerows(csv_rows)
         csv_file.close()
         
-        txt_file = secure_file_storage.open("%s/%s/reports/quiz_data/txt/%02d_%02d_%02d__%02d_%02d_%02d-%s-Quiz-Data.txt" % (ready_course.handle.split('--')[0], ready_course.handle.split('--')[1], dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_quiz.slug), 'wb')
+        txt_file = secure_file_storage.open("%s/%s/reports/quiz_data/txt/%02d_%02d_%02d__%02d_%02d_%02d-%s-%s-Quiz-Data.txt" % (ready_course.handle.split('--')[0], ready_course.handle.split('--')[1], dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, t, ready_quiz.slug), 'wb')
         txt_file.write(txt_string)
         txt_file.close()
         

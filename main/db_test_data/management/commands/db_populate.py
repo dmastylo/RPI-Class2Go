@@ -23,7 +23,7 @@ class Command(BaseCommand):
         
         if ('massive' in options) and (options['massive']):
             # Don't create fewer than 4 profs, 4 tas, 4 readonly tas, and 40 students
-            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':40}
+            user_counts = {'num_professors':10, 'num_tas':10, 'num_readonly_tas':10, 'num_students':400}
             content_counts = {'num_massive_courses':1, 'num_sections_per_course':2, 'num_videos_per_section':5}
         else:
             user_counts = {'num_professors':4, 'num_tas':4, 'num_readonly_tas':4, 'num_students':40}
