@@ -1,6 +1,6 @@
 import csv
 #import Console
-from database import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
+from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
 from storages.backends.s3boto import S3BotoStorage
 from datetime import datetime, timedelta
 
