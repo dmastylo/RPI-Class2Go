@@ -27,7 +27,7 @@ class C2GReportWriter:
             secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
             self.csv_file = secure_file_storage.open("%s/%s/reports/dashboard/csv/%02d_%02d_%02d__%02d_%02d_%02d-%s-Dashboard.csv" % (course_prefix, course_suffix, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix), 'wb')
             self.txt_file = secure_file_storage.open("%s/%s/reports/dashboard/txt/%02d_%02d_%02d__%02d_%02d_%02d-%s-Dashboard.txt" % (course_prefix, course_suffix, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix), 'wb')
-            self.csv_writer = csv.writer(csv_file)
+            self.csv_writer = csv.writer(self.csv_file)
         #else:
             #self.console = Console.getconsole()
             
