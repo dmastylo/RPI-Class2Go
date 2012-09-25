@@ -70,9 +70,12 @@
     $(function(){
       
       {% for key, value in form.errors.items %}
-        {% if not key == "__all__" %}
+        {% if not key == "__all__" and not key == "tos" %}
           $('#label_{{key}}').popover('show');
           $('#id_{{key}}').focus(function(){$('#label_{{key}}').popover('hide');});
+        {% elif key == "tos" %}
+          $('#label_{{key}}').popover('show');
+          $('#id_{{key}}').click(function(){$('#label_{{key}}').popover('hide');});
         {% endif %}
       {% endfor %}
       
