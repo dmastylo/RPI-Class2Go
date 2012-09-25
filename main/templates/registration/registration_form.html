@@ -18,7 +18,8 @@
 		    {% include 'registration/regforminputs.html' %}
 		    <div class="form-actions">
                 <p>
-                {{form.tos.errors}} {{form.tos}} I agree to Stanford Online's <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>, 
+                <label id="label_tos" data-content="{% for error in form.tos.errors %}{{error}}<br />{% endfor %}"
+                    data-title="Terms of Service" data-trigger="manual" data-html="true" data-placement="left" data-delay="300"></label>  {{form.tos}} I agree to Stanford Online's <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>,
                 <a href="{% url 'c2g.views.tos' %}#honor" target="_blank" >Honor Code</a>, and <a href="{% url 'c2g.views.tos' %}#privacy" target="_blank">Privacy Policy</a>
 
                 </p>

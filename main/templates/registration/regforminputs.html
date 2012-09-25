@@ -1,11 +1,11 @@
 {% csrf_token %}
 {{form.course_prefix}}{{form.course_suffix}}
 
-{{ form.non_field_errors }}
 <table >
     <tr>
         <th><label for="id_username">{{form.username.label}}:</label></th>
-        <td>{{form.username.errors}}{{ form.username }}</td>
+        <td id="label_username" data-content="{% for error in form.username.errors %}{{error}}<br />{% endfor %}"
+            data-title="Username" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.username }}</td>
 
     </tr>
 
@@ -19,40 +19,78 @@
 
     <tr>
         <th><label for="id_email">{{form.email.label}}:</label></th>
-        <td>{{form.email.errors}}{{ form.email }}</td>
+        <td  id="label_email" data-content="{% for error in form.email.errors %}{{error}}<br />{% endfor %}"
+            data-title="Email" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.email }}</td>
     </tr>
     <tr>
         <th><label for="id_first_name">{{form.first_name.label}}:</label></th>
-        <td>{{form.first_name.errors}}{{ form.first_name }}</td>
+        <td id="label_first_name" data-content="{% for error in form.first_name.errors %}{{error}}<br />{% endfor %}"
+            data-title="First Name" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.first_name }}</td>
     </tr>
     <tr>
         <th><label for="id_last_name">{{form.last_name.label}}:</label></th>
-        <td>{{form.last_name.errors}}{{ form.last_name }}</td>
+        <td id="label_last_name" data-content="{% for error in form.last_name.errors %}{{error}}<br />{% endfor %}"
+            data-title="Last Name" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.last_name }}</td>
     </tr>
     <tr>
         <th><label for="id_password1">{{form.password1.label}}:</label></th>
-        <td>{{form.password1.errors}}{{ form.password1 }}</td>
+        <td id="label_password1" data-content="{% for error in form.password1.errors %}{{error}}<br />{% endfor %}{% for error in form.non_field_errors %}{% if 'password' in error %}{{error}}{% endif %}<br />{% endfor %}"
+            data-title="Password" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.password1 }}</td>
     </tr>
     <tr>
         <th><label for="id_password2">{{form.password2.label}}:</label></th>
-        <td>{{form.password2.errors}}{{ form.password2 }}</td>
+        <td id="label_password2" data-content="{% for error in form.password2.errors %}{{error}}<br />{% endfor %}"
+            data-title="Password (again)" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.password2 }}</td>
     </tr>
     
     <tr>
         <th><label for="id_birth_year">{{form.birth_year.label}}:</label></th>
-        <td>{{form.birth_year.errors}}{{ form.birth_year }}</td>
+        <td id="label_birth_year" data-content="{% for error in form.birth_year.errors %}{{error}}<br />{% endfor %}"
+            data-title="Birth Year" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.birth_year }}</td>
     </tr>
     <tr>
         <th><label for="id_gender">{{form.gender.label}}:</label></th>
-        <td>{{form.gender.errors}}{{ form.gender }}</td>
+        <td id="label_genderl" data-content="{% for error in form.gender.errors %}{{error}}<br />{% endfor %}"
+            data-title="Gender" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.gender }}</td>
     </tr>
     <tr>
         <th><label for="id_education">{{form.education.label}}:</label></th>
-        <td>{{form.education.errors}}{{ form.education }}</td>
+        <td id="label_education" data-content="{% for error in form.education.errors %}{{error}}<br />{% endfor %}"
+            data-title="Education" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.education }}</td>
     </tr>
     <tr>
         <th><label for="id_work">{{form.work.label}}:</label></th>
-        <td>{{form.work.errors}}{{ form.work }}</td>
+        <td id="label_work" data-content="{% for error in form.work.errors %}{{error}}<br />{% endfor %}"
+            data-title="Occupation" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.work }}</td>
     </tr>
 </table>
+
+
+<script>
+    $(function(){
+      
+      {% for key, value in form.errors.items %}
+        {% if not key == "__all__" %}
+          $('#label_{{key}}').popover('show');
+          $('#id_{{key}}').focus(function(){$('#label_{{key}}').popover('hide');});
+        {% endif %}
+      {% endfor %}
+      
+      {% for error in form.non_field_errors %}
+        {% if 'password' in error %}
+          $('#label_password1').popover('show');
+          $('#id_password1').focus(function(){$('#label_password1').popover('hide');});
+        {% endif %}
+      {% endfor %}
+      
+      $('.arrow').css('border-left-color','red');
+      });
+</script>
     
+<style>
+    .popover {color:red;}
+    .arrow {color:red;border-left-color:red;}
+    .popover-inner {color:red; background-color:red; border-width:1px}
+    .popover-title{padding:5px;margin-bottom:0px}
+    .popover-content{padding:5px}
+</style>
