@@ -1440,8 +1440,8 @@ var Khan = (function() {
         } else {
             // [C2G] If summative problem set, add note about penalties per try
             if (exAssessType == "summative") {
-                $('#solutionarea').append('<p><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted for credit. </p>');
-                $('#solutionarea p').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
+                $('#solutionarea').append('<p id="attempt-penalty-note"><strong>Note:</strong> Maximum of <strong>' + maxAttempts + '</strong> attempts accepted for credit. </p>');
+                $('#attempt-penalty-note').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
             }
             $("#check-answer-button").val("Submit Answer");
