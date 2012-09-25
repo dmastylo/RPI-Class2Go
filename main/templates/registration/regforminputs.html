@@ -10,7 +10,7 @@
     </tr>
 
     <tr>
-        <td colspan=2>
+        <td colspan="2">
             <p style="font-size:80%">Your username is your public identity on this site.
 	            You won't be able to change it, so choose a
                 "handle" that you are comfortable with.</p>
@@ -72,9 +72,12 @@
       {% for key, value in form.errors.items %}
         {% if not key == "__all__" and not key == "tos" %}
           $('#label_{{key}}').popover('show');
+          $('#label_{{key}}').data('popover').$tip.click(function(){$('#label_{{key}}').popover('hide');});
           $('#id_{{key}}').focus(function(){$('#label_{{key}}').popover('hide');});
+          $('#i')
         {% elif key == "tos" %}
           $('#label_{{key}}').popover('show');
+          $('#label_{{key}}').data('popover').$tip.click(function(){$('#label_{{key}}').popover('hide');});
           $('#id_{{key}}').click(function(){$('#label_{{key}}').popover('hide');});
         {% endif %}
       {% endfor %}
@@ -82,6 +85,7 @@
       {% for error in form.non_field_errors %}
         {% if 'password' in error %}
           $('#label_password1').popover('show');
+          $('#label_{{key}}').data('popover').$tip.click(function(){$('#label_{{key}}').popover('hide');});
           $('#id_password1').focus(function(){$('#label_password1').popover('hide');});
         {% endif %}
       {% endfor %}
