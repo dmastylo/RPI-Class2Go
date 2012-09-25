@@ -57,6 +57,27 @@
   display: none !important;
 }
 
+.hidden-accessible {
+  position: absolute !important;
+  height: 1px; width: 1px; 
+  overflow: hidden;
+  clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+#skip-nav {float:left;}
+
+#skip-nav a:focus {
+clip: auto;
+color: #900;
+height: 1em;
+left: 3px;
+overflow: visible;
+position: static;
+top: 72px;
+width: auto;
+}
+
 .hidden-desktop {
   display: none !important;
 }

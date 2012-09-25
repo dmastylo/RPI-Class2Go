@@ -1,3 +1,4 @@
+.simple-button:focus {outline: 2px double #39f;}
 #top-header, #footer {display:none;}
 #outer-wrapper, #page-container {background:#fff;}
 
