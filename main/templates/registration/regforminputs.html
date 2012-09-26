@@ -1,103 +1,128 @@
 {% csrf_token %}
 {{form.course_prefix}}{{form.course_suffix}}
 
-<table >
-    <tr>
-        <th><label for="id_username">{{form.username.label}}:</label></th>
-        <td id="label_username" data-content="{% for error in form.username.errors %}{{error}}<br />{% endfor %}"
-            data-title="Username" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.username }}</td>
-
-    </tr>
-
-    <tr>
-        <td colspan="2">
-            <p style="font-size:80%">Your username is your public identity on this site.
-	            You won't be able to change it, so choose a
-                "handle" that you are comfortable with.</p>
-        </td>
-    </tr>
-
-    <tr>
-        <th><label for="id_email">{{form.email.label}}:</label></th>
-        <td  id="label_email" data-content="{% for error in form.email.errors %}{{error}}<br />{% endfor %}"
-            data-title="Email" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.email }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_first_name">{{form.first_name.label}}:</label></th>
-        <td id="label_first_name" data-content="{% for error in form.first_name.errors %}{{error}}<br />{% endfor %}"
-            data-title="First Name" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.first_name }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_last_name">{{form.last_name.label}}:</label></th>
-        <td id="label_last_name" data-content="{% for error in form.last_name.errors %}{{error}}<br />{% endfor %}"
-            data-title="Last Name" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.last_name }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_password1">{{form.password1.label}}:</label></th>
-        <td id="label_password1" data-content="{% for error in form.password1.errors %}{{error}}<br />{% endfor %}{% for error in form.non_field_errors %}{% if 'password' in error %}{{error}}{% endif %}<br />{% endfor %}"
-            data-title="Password" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.password1 }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_password2">{{form.password2.label}}:</label></th>
-        <td id="label_password2" data-content="{% for error in form.password2.errors %}{{error}}<br />{% endfor %}"
-            data-title="Password (again)" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.password2 }}</td>
-    </tr>
-    
-    <tr>
-        <th><label for="id_birth_year">{{form.birth_year.label}}:</label></th>
-        <td id="label_birth_year" data-content="{% for error in form.birth_year.errors %}{{error}}<br />{% endfor %}"
-            data-title="Birth Year" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.birth_year }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_gender">{{form.gender.label}}:</label></th>
-        <td id="label_genderl" data-content="{% for error in form.gender.errors %}{{error}}<br />{% endfor %}"
-            data-title="Gender" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.gender }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_education">{{form.education.label}}:</label></th>
-        <td id="label_education" data-content="{% for error in form.education.errors %}{{error}}<br />{% endfor %}"
-            data-title="Education" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.education }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_work">{{form.work.label}}:</label></th>
-        <td id="label_work" data-content="{% for error in form.work.errors %}{{error}}<br />{% endfor %}"
-            data-title="Occupation" data-trigger="manual" data-html="true" data-placement="left" data-delay="300">{{ form.work }}</td>
-    </tr>
-</table>
+<div class="control-group">
+  <label for="id_username" class="control-label">{{form.username.label}}:</label>
+    <div class="controls">
+    {{ form.username }}
+    <span class="help-block">Your username is your public identity on this site. You won't be able to change it, so choose a "handle" that you are comfortable with.</span>
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_email" class="control-label">{{form.email.label}}:</label>
+  <div class="controls">
+    {{ form.email }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_first_name" class="control-label">{{form.first_name.label}}:</label>
+  <div class="controls">
+    {{ form.first_name }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_last_name" class="control-label">{{form.last_name.label}}:</label>
+  <div class="controls">
+    {{ form.last_name }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_password1" class="control-label">{{form.password1.label}}:</label>
+  <div class="controls">
+    {{ form.password1 }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_password2" class="control-label">{{form.password2.label}}:</label>
+  <div class="controls">
+    {{ form.password2 }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_birth_year" class="control-label">{{form.birth_year.label}}:</label>
+  <div class="controls">
+    {{ form.birth_year }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_gender" class="control-label">{{form.gender.label}}:</label>
+  <div class="controls">
+    {{ form.gender }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_education" class="control-label">{{form.education.label}}:</label>
+  <div class="controls">
+    {{ form.education }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_work" class="control-label">{{form.work.label}}:</label>
+  <div class="controls">
+    {{ form.work }}
+  </div>
+</div>
 
 
 <script>
-    $(function(){
-      
-      {% for key, value in form.errors.items %}
-        {% if not key == "__all__" and not key == "tos" %}
-          $('#label_{{key}}').popover('show');
-          $('#label_{{key}}').data('popover').$tip.click(function(){$('#label_{{key}}').popover('hide');});
-          $('#id_{{key}}').focus(function(){$('#label_{{key}}').popover('hide');});
-          $('#i')
-        {% elif key == "tos" %}
-          $('#label_{{key}}').popover('show');
-          $('#label_{{key}}').data('popover').$tip.click(function(){$('#label_{{key}}').popover('hide');});
-          $('#id_{{key}}').click(function(){$('#label_{{key}}').popover('hide');});
-        {% endif %}
-      {% endfor %}
-      
-      {% for error in form.non_field_errors %}
-        {% if 'password' in error %}
-          $('#label_password1').popover('show');
-          $('#label_{{key}}').data('popover').$tip.click(function(){$('#label_{{key}}').popover('hide');});
-          $('#id_password1').focus(function(){$('#label_password1').popover('hide');});
-        {% endif %}
-      {% endfor %}
-      
-      $('.arrow').css('border-left-color','red');
-      });
-</script>
     
+        $(function(){
+          
+                 function setupPopover(id,title_in,errorMsg){
+                      var options = {
+                          placement:'left',
+                          trigger:'manual',
+                          title:title_in,
+                          content:errorMsg,
+                          delay:300,
+                       };
+          
+                 $('#'+id).popover(options);
+                 $('#'+id).popover('show');
+          
+                 };
+           
+                 {% for key, value in form.errors.items %}
+                   {% if not key == "__all__" %}
+          
+                     errorMsg_{{key}}="{% for e in value %}<p>{{ e }}</p>{% endfor %}";
+                     setupPopover("id_{{key}}", "{{key}}".charAt(0).toUpperCase()+"{{key}}".slice(1), errorMsg_{{key}});
+                     $('#id_{{key}}').data('popover').$tip.click(function(){$('#id_{{key}}').popover('hide');});
+          
+                     {% if not key == "tos" %}
+                       $('#id_{{key}}').focus(function(){$('#id_{{key}}').popover('hide');});
+                     {% else %}
+                       $('#id_{{key}}').click(function(){$('#id_{{key}}').popover('hide');});
+                     {% endif %}
+          
+                   {% endif %}
+                 {% endfor %}
+           
+                 {% for error in form.non_field_errors %}
+                   {% if 'password' in error %}
+                     if ($('#id_password1').data('popover')) {
+                        $('#id_password1').data('popover').options.content += "<p>{{error}}</p>";
+                        $('#id_password1').popover('show');
+                     }
+                     else {
+                        setupPopover('id_password1','Password','<p>{{error}}</p>');
+                     }
+                     $('#id_password1').data('popover').$tip.click(function(){$('#id_password1').popover('hide');});
+                     $('#id_password1').focus(function(){$('#id_password1').popover('hide');});
+                   {% endif %}
+                 {% endfor %}
+              
+                 $('.arrow').css('border-left-color','red');
+          
+        });
+</script>
+
 <style>
-    .popover {color:red;}
-    .arrow {color:red;border-left-color:red;}
-    .popover-inner {color:red; background-color:red; border-width:1px}
-    .popover-title{padding:5px;margin-bottom:0px}
-    .popover-content{padding:5px}
+        .popover {color:red;}
+        .arrow {color:red;border-left-color:red;}
+        .popover-inner {color:red; background-color:red; border-width:1px}
+        .popover-title{padding:5px;margin-bottom:0px}
+        .popover-content{padding:5px}
 </style>
+
+
