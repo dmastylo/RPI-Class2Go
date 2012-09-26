@@ -9,7 +9,22 @@ a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
 .well {border-color:#ddcf99;}
 .well.tight {padding:10px 0;background:#f8f6ea;}
-.well.tight .nav-list li a {padding:5px 15px;}
+.well.tight .nav-list li {clear:left;}
+.well.tight .nav-list li a {
+    padding:5px 15px;
+    overflow:hidden;
+}
+.well.tight .nav-list li a em {
+    float:left;
+    width:20px;
+    padding-top:2px;
+}
+.well.tight .nav-list li a span {
+    width:80%;
+    word-wrap:break-word;
+    float:left;
+    display:block;
+}
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
 
@@ -182,6 +197,9 @@ small.date {
 #new_announcement_div {
     clear:left;
 }
+.course-description iframe {
+    width:100%;
+}
 
 /* Header
 -------------------------------------------------- */
@@ -190,7 +208,7 @@ small.date {
     width:100%;
 }
 .stanford-logo {
-    background:#8C1515 url(/static/graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
+    background:transparent url(/static/graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
     padding:13px 20px;
     width:198px;
     height:11px;
@@ -206,9 +224,18 @@ small.date {
     display:inline-block;
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
 }
+#c2g_layout_topbar.preview-page {
+    width:auto;
+}
+#c2g_layout_topbar .page-title {
+    margin:20px 0 0 20px;
+}
+#c2g_layout_topbar .page-title img {
+    margin-bottom:25px;
+    margin-top:10px;
+}
 #c2g_layout_topbar h2 {
   font-weight: 300;
-  margin:20px 0 0 20px;
   font-size:30px;
 }
 #c2g_layout_topbar .top-nav a {
@@ -254,15 +281,15 @@ small.date {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    background-color: #e0d096;
-    background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
+    /*background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
     background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e0d096), to(#cabb84));
     background-image: -webkit-linear-gradient(top, #e0d096, #cabb84);
     background-image: -o-linear-gradient(top, #e0d096, #cabb84);
     background-image: linear-gradient(top, #e0d096, #cabb84);
     background-repeat: repeat-x;
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);*/
+    background: #e0d096 url('../../graphics/core/bg-nav.png') repeat-x bottom center;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
@@ -270,6 +297,7 @@ small.date {
 .toggle-views {
     width: 250px;
     padding: 7px 7px 0;
+    *padding: 7px;
     color: #333;
     text-align: right;
     background:#ffc;
@@ -296,7 +324,7 @@ small.date {
 /* Body
 -------------------------------------------------- */
 .body-content {
-    padding-top:20px;
+    padding-top:20px !important;
     min-height:450px;
 }
 
@@ -313,11 +341,10 @@ small.date {
 -------------------------------------------------- */
 .registration .well {
     margin:0 auto;
-    width:430px;
     background:#f8f6ea;
     padding:0;
 }
-.registration .well form table {
+.registration .well fieldset {
     margin:20px;
 }
 .registration .well form,.registration .well .form-actions {
@@ -334,6 +361,12 @@ small.date {
 .registration .well h2 {
     margin-top:15px;
     text-align:center;
+}
+.registration .form-horizontal .form-actions {
+    padding-left:20px;
+}
+.preview-registration {
+    margin-top:-100px;
 }
 
 /* Profile Info
@@ -477,7 +510,24 @@ input[data-datetimepicker] {
     color:#fff;
     clear:left;
 }
-
+.class2go {
+    position:relative;
+    width:100%;
+    padding:40px 0 0;
+}
+.class2go a {
+    font-size:11px;
+    background:#f8f6ea;
+    padding:3px 10px;
+    position:absolute;
+    right:20px;
+    bottom:0;
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+    -khtml-border-radius: 5px 5px 0 0;
+    -o-border-radius: 5px 5px 0 0;
+}
 
 
 ul.exercise-list {
