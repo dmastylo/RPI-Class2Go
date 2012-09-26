@@ -4,7 +4,7 @@ from django.contrib.auth.models import User,Group
 from django.db import connection, transaction
 from courses.reports.generation.course_dashboard import *
 from courses.reports.generation.course_quizzes import *
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class Command(BaseCommand):
@@ -12,7 +12,7 @@ class Command(BaseCommand):
         
     def handle(self, *args, **options):
         now = datetime.now()
-        active_courses = Course.objects.filter(mode='ready', calendar_start__lt=now, calendar_end__gt=now)
+        active_courses = Course.objects.filter(mode='ready', calendar_start__lt=(now + timedelta(days=7)), calendar_end__gt=now)
         for ready_course in active_courses:
             gen_course_dashboard_report(ready_course.image, save_to_s3=True)
             # Don't run this report type until the performance fix is released
