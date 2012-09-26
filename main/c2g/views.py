@@ -50,6 +50,9 @@ def tos(request):
 
 def privacy(request):
     return render_to_response('privacy.html',{},RequestContext(request))
+    
+def faq(request):
+    return render_to_response('faq.html',{},RequestContext(request))
 
 def contactus(request):
     if request.GET.get('pre') and request.GET.get('post'):
