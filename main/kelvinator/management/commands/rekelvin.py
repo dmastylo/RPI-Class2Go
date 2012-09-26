@@ -10,7 +10,9 @@ import urllib
 import re
 import kelvinator.tasks
 
-bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
+aws_key=getattr(settings, 'AWS_ACCESS_KEY_ID')
+aws_secret=getattr(settings, 'AWS_SECRET_ACCESS_KEY')
+aws_bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
 instance=getattr(settings, 'INSTANCE')
 
 class Command(BaseCommand):
@@ -43,8 +45,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         def search_s3():
-            conn=boto.connect_s3()
-            bucket_conn=conn.get_bucket(bucket)
+            conn=boto.connect_s3(aws_key, aws_secret)
+            bucket_conn=conn.get_bucket(aws_bucket)
             contents_set=bucket_conn.list(options['course_prefix'])
 
             # example: u'nlp/Fall2012/videos/39/jpegs/manifest.txt'
@@ -93,7 +95,7 @@ class Command(BaseCommand):
                 if i>0: time.sleep(options['delay'])
                 
                 m=missing[i]
-                s3_path="https://s3-us-west-2.amazonaws.com/"+bucket+"/"+urllib.quote_plus(m,"/")
+                s3_path="https://s3-us-west-2.amazonaws.com/"+aws_bucket+"/"+urllib.quote_plus(m,"/")
 
                 if options['local']:
                     print "%d/%d: kelvinating: %s" % (i+1, upto, s3_path)
@@ -111,7 +113,7 @@ class Command(BaseCommand):
             parser.error("options -l and -r are mutually exclusive")
             return
 
-        if not options['quiet']: print "Bucket: " + bucket
+        if not options['quiet']: print "Bucket: " + aws_bucket
         missing = search_s3()
         if not options['quiet']: print "Total missing slides: %d" % len(missing) 
 
