@@ -58,7 +58,7 @@
             </ul>
         	{% endfor %}
         <ul class="nav nav-list">
-            <li><a href="#">Help/FAQs</a></li>
+            <li><a href="{% url 'c2g.views.faq' %}">Help/FAQs</a></li>
             <li><a href="{% url 'c2g.views.contactus' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Contact</a></li>
         </ul>
     </div>
