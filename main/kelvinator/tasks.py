@@ -20,14 +20,10 @@ import operator
 import Image
 import logging
 import time
+import tempfile
 from celery import task
 
 logger = logging.getLogger(__name__)
-    
-ts=str(int(time.mktime(time.localtime())))
-working_dir=getattr(settings, 'KELVINATOR_WORKING_PATH', "/tmp/kelvinator-"+ts)
-if working_dir[-1] != "/":
-    working_dir = working_dir[0:-1]
     
 # from http://mail.python.org/pipermail/image-sig/1997-March/000223.html
 def computeDiff(file1, file2):
@@ -62,7 +58,7 @@ def kelvinate(s3_path_raw, input_frames_per_min='0'):
 
     s3_path must be the path to the video file, not just to its parent folder
     """
-
+    
     extractionFrameRate = 1   # seconds
     startOffset = 3           # seconds
     
@@ -81,7 +77,8 @@ def kelvinate(s3_path_raw, input_frames_per_min='0'):
     course_suffix = s3_path_parts[-4]
     course_prefix = s3_path_parts[-5]
     
-    dir_create(working_dir)
+    working_dir=tempfile.mkdtemp(prefix="kelvinator-")
+    logger.info("Working directory: " + working_dir)
 
     jpeg_dir = working_dir + "/jpegs"
     dir_create(jpeg_dir)

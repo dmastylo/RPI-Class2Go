@@ -32,3 +32,11 @@ cron "users_by_day" do
     command "(cd #{node['system']['admin_home']}/class2go/reports; ./users_by_day.sh olteam@cs.stanford.edu,c2g-dev@cs.stanford.edu,nickm@stanford.edu,pal@cs.stanford.edu,bmc@stanford.edu)"
 end
 
+cron "generate main reports" do
+    hour "10"  # GMT
+    minute "20"
+    user node['system']['admin_user']
+    command "(cd #{node['system']['admin_home']}/class2go/main; ./manage.py gen_active_course_reports)"
+end
+
+
