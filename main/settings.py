@@ -210,7 +210,10 @@ except NameError:
 try:
     AWS_SECURE_STORAGE_BUCKET_NAME
 except NameError:
-    AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME.split('-')[0]+'-secure-'+AWS_STORAGE_BUCKET_NAME.split('-')[1]
+    if AWS_STORAGE_BUCKET_NAME.count('-') == 1:
+        AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME.split('-')[0]+'-secure-'+AWS_STORAGE_BUCKET_NAME.split('-')[1]
+    else:
+        AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME # If bucket name does not follow our S3 conventions, set secure bucket to be same as bucket
 
 # Setting these variables to 'local' is the idiom for using local storage.
 if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
