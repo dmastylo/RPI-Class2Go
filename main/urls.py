@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     url(r'^terms_of_service$', 'c2g.views.tos'),
     url(r'^privacy$', 'c2g.views.privacy'),
     url(r'^contactus$', 'c2g.views.contactus'),
+    url(r'^faq$', 'c2g.views.faq'),
 
                        
     #emailoptout
