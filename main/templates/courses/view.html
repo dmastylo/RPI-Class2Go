@@ -6,8 +6,8 @@
 {% block course_notification %}
 {% if user.is_authenticated and not common_page_data.is_course_member %}
 <div class="alert alert-info inline">
-    <em class="icon-info-sign"></em>You are not yet enrolled in this course. <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
-        <input type="submit" id="login_button" class="btn" value="Enroll" />
+    <em class="icon-info-sign"></em>You are not yet a member in this course. <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+        <input type="submit" id="login_button" class="btn" value="Join" />
         {% csrf_token %}
     </form>
 </div>
