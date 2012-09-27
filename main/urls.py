@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^faq$', 'c2g.views.faq'),
 
                        
+    
     #emailoptout
     url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
     
@@ -39,6 +40,9 @@ urlpatterns = patterns('',
     #shibboleth login
     url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
                        
+    
+    #impersonate
+    url(r'^impersonate/(?P<username>[\w.@+-]+)/?$', 'accounts.views.impersonate', name='impersonate'),
                        
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
