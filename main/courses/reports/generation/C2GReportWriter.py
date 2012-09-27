@@ -14,7 +14,6 @@ class C2GReportWriter:
     save_to_s3 = False
     csv_file = None
     csv_writer = None
-    console = None
     
     def __init__(self, course, save_to_s3_arg, s3_filepath):
         self.save_to_s3 = save_to_s3_arg
@@ -45,4 +44,5 @@ class C2GReportWriter:
                 for i in range(nl): print ""
         
     def close(self):
-        if self.save_to_s3: self.csv_file.close()
+        if self.save_to_s3:
+			self.csv_file.close()

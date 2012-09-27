@@ -1,9 +1,9 @@
 from c2g.models import *
-import csv
 import json
-from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
-from django.core.files.storage import default_storage
-from storages.backends.s3boto import S3BotoStorage
+# import csv
+# from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
+# from django.core.files.storage import default_storage
+# from storages.backends.s3boto import S3BotoStorage
 from courses.reports.generation.C2GReportWriter import *
 
 def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):

@@ -170,7 +170,8 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
     staff_email = 'noreply@class.stanford.edu'
     if course_handle:
         staff_email = re.sub(r'\--', r'-',course_handle) + '-staff@class.stanford.edu'
-    from_addr = course_title + " Staff <%s>" % staff_email
+    course_title_no_quotes = re.sub(r'"', '', course_title) # strip out all quotes
+    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
 
     if err_from_stderr:
         logger.info(err_from_stderr)

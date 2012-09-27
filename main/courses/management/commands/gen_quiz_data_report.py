@@ -34,6 +34,6 @@ class Command(BaseCommand):
             print "Second arg must be either 'video' or 'problemset'"
             return
         
-        save_to_s3 = True if (args[3] == '1') else False
+        save_to_s3 = True if (len(args) > 3 and args[3] == '1') else False
         
         gen_quiz_data_report(ready_course, ready_quiz, save_to_s3)

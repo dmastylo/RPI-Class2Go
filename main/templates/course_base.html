@@ -6,7 +6,8 @@
 <div class="navbar">
     <div class="navbar-inner nav-collapse collapse">
         <div class="container-fluid">
-            <ul class="nav" role="navigation">
+            <h2 id="main-nav-heading" class="hidden-accessible">Course Sections</h2>
+            <ul class="nav" role="navigation" aria-labelledby="main-nav-heading">
                 <li {% block home_link_class %}{% endblock home_link_class %}>
                     <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
                 </li>

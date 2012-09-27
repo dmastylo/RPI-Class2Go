@@ -1,8 +1,4 @@
 from c2g.models import *
-import csv
-from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
-from django.core.files.storage import default_storage
-from storages.backends.s3boto import S3BotoStorage
 from courses.reports.generation.C2GReportWriter import *
 
 def gen_course_quizzes_report(ready_course, save_to_s3=False):
@@ -14,7 +10,7 @@ def gen_course_quizzes_report(ready_course, save_to_s3=False):
     rw = C2GReportWriter(ready_course, save_to_s3, s3_filepath)
     
     # Title
-    rw.write(content = ["Dashboard for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
+    rw.write(content = ["Course Quizzes for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
     
     # Get a list of Quizzes (Problem sets and videos with exercises)
     quizzes = []
@@ -30,6 +26,8 @@ def gen_course_quizzes_report(ready_course, save_to_s3=False):
     
     for q in quizzes:
         WriteQuizDataToReport(q, rw)
+
+    rw.close()
         
 def WriteQuizDataToReport(q, rw):
     mean = lambda k: sum(k)/len(k)

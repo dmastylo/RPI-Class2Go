@@ -2,10 +2,6 @@ from c2g.models import *
 from django.contrib.auth.models import User,Group
 from datetime import datetime, timedelta
 from courses.reports.generation.C2GReportWriter import *
-import csv
-from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
-from django.core.files.storage import default_storage
-from storages.backends.s3boto import S3BotoStorage
 
 
 def gen_course_dashboard_report(ready_course, save_to_s3=False):

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load url from future %}
+{% block title %} Stanford Online | User Profile {% endblock title %} 
+ 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% if user.is_authenticated %}

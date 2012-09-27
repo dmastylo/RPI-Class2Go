@@ -1,0 +1,20 @@
+Pre-requisites for this test
+
+1. db_populate
+2. Login as Professor_0
+3. Create a new problemset, must have a slug of P3, including 9 exercise files, must be in this order:
+
+    MultipleChoiceWithLaTeXAndHint.html
+    NoneOfAboveShowFiveDefinition.html
+    NumericRandomSeed.html
+    NumericWithRange.html
+    RegexpOne.html
+    RegexpTwo.html
+    SimpleMultipleChoice.html
+    SimpleNumeric.html
+    WithTableCSS.html 
+	
+4. Publish and make live this problemset
+5. Run the test in Selenium
+
+Last item in the test fails due to #645
