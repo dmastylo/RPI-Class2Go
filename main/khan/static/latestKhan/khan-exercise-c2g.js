@@ -3463,7 +3463,7 @@ var Khan = (function() {
             // [C2G] Add "View Progress" button to all problem sets
             $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" value="View Problem Set Progress"/></div>');
             $('#view-progress-button').click(function () {
-                location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
+                location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
             });
 
         }
