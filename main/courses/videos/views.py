@@ -73,10 +73,6 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
 
-    if video.mode == 'ready':
-        draft_version = video.image
-        video = draft_version
-
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper

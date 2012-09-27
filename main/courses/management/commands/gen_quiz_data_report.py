@@ -6,7 +6,7 @@ from courses.reports.generation.quiz_data import *
 
 
 class Command(BaseCommand):
-    help = "Get quiz attempts data. Syntax: manage.py gen_quiz_attempts_report <course_handle> <type {'video' | 'problemset'}> <quiz_slug> <order_by={['time'] | 'student'}>\n"
+    help = "Get quiz attempts data. Syntax: manage.py gen_quiz_attempts_report <course_handle> <type {'video' | 'problemset'}> <quiz_slug> [save_to_s3 (1 or 0)]\n"
         
     def handle(self, *args, **options):
         if len(args) < 3:
@@ -34,7 +34,6 @@ class Command(BaseCommand):
             print "Second arg must be either 'video' or 'problemset'"
             return
         
-        order_by = 'time_created'
-        if (len(args) == 4) and (args[3] == 'student'): order_by = 'student'
+        save_to_s3 = True if (len(args) > 3 and args[3] == '1') else False
         
-        print gen_quiz_data_report(ready_course, ready_quiz, order_by)
+        gen_quiz_data_report(ready_course, ready_quiz, save_to_s3)
