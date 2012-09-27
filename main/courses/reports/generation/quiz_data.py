@@ -1,121 +1,105 @@
 from c2g.models import *
-from courses.reports.data_aggregation.quiz_attempts import *
-import csv
-from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
-from django.core.files.storage import default_storage
-from storages.backends.s3boto import S3BotoStorage
+import json
+# import csv
+# from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
+# from django.core.files.storage import default_storage
+# from storages.backends.s3boto import S3BotoStorage
+from courses.reports.generation.C2GReportWriter import *
 
-def gen_quiz_data_report(ready_course, ready_quiz, order_by, save_to_s3=False):
-    ex_att_dl = get_quiz_attempts_report_data(ready_quiz, order_by)
-    ad = aggregate_quiz_attempts_report_data(ready_quiz, ex_att_dl)
+def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
     
-    ### Output ###
+    dt = datetime.now()
+    course_prefix = ready_course.handle.split('--')[0]
+    course_suffix = ready_course.handle.split('--')[1]
+    s3_filepath = "%s/%s/reports/quiz_data/%s/%02d_%02d_%02d__%02d_%02d_%02d-%s-Quiz-Data.csv" % (course_prefix, course_suffix, ready_quiz.slug, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_quiz.slug)
+    
+    rw = C2GReportWriter(ready_course, save_to_s3, s3_filepath)
+    rw.write(["Quiz Attempts for Quiz \"%s\" in %s (%s %d)" % (ready_quiz.title, ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1) 
+    
     is_summative = isinstance(ready_quiz, ProblemSet) and (ready_quiz.assessment_type == 'summative')
-    res_table = ad['res_table']
-    sorted_usernames = sorted(res_table.keys())
     
-    if AWS_STORAGE_BUCKET_NAME == 'local':
-        secure_file_storage = default_storage
-    else:
-        secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
+    data = {}
+    mean = lambda k: sum(k)/len(k)
     
-    txt_string = ""
-    csv_rows = []
+    if isinstance(ready_quiz, Video): rlns = VideoToExercise.objects.get(video=ready_quiz).order_by('video_time')
+    else: rlns = ProblemSetToExercise.objects.filter(problemSet=ready_quiz,).order_by('number')
     
-    # Title
-    txt_string += "Quiz Attempts for Quiz \"%s\" in %s (%s %d)\n" % (ready_quiz.title, ready_course.title, ready_course.term.title(), ready_course.year)
-    txt_string += "-----------------------------------------------------------------------------------------\n\n"
-    
-    csv_rows.append(["Quiz Attempts for Quiz \"%s\" in %s (%s %d)" % (ready_quiz.title, ready_course.title, ready_course.term.title(), ready_course.year)]) 
-    csv_rows.append([])
-    
-    # Txt file has exercise listed under each other
-    for ex in ad['exercises']:
+    ex_ids = []
+    for rln in rlns:
+        ex = rln.exercise
+        ex_ids.append(ex.id)
         
-        txt_string += ex.get_slug()+"\n"
-        txt_string += "----------------\n"
+        if isinstance(ready_quiz, Video): atts = ProblemActivity.objects.filter(video_to_exercise = rln).order_by('student', 'time_created')
+        else: atts = ProblemActivity.objects.filter(problemset_to_exercise = rln).order_by('student', 'time_created')
         
-        txt_string += "Username" + (' ' * 17) + "Name" + (' ' * 26) + "Avg Time/Attempt" + ((' ' * 4) + "Score" if is_summative else '') + (' ' * 5) + "Attempts\n"
-        txt_string += "--------" + (' ' * 17) + "----" + (' ' * 26) + "----------------" + ((' ' * 4) + "-----" if is_summative else '') + (' ' * 5) + "--------\n"
-
-        for stud_username in sorted_usernames:
-            if ex.id in res_table[stud_username]: stud_ex_res = res_table[stud_username][ex.id]
-            else:
-                stud_ex_res = {'attempts': [], 'mean_attempt_time': '', 'score': ''}
-                for e in res_table[stud_username]:
-                    stud_ex_res['student'] = res_table[stud_username][e]['student']
-                    break
-            txt_string += gen_stud_ex_res_string(stud_ex_res['student'], stud_ex_res['mean_attempt_time'], stud_ex_res['score'], stud_ex_res['attempts'], is_summative) + "\n"
+        submitters = atts.values_list('student', flat=True)
+        completes = atts.values_list('complete', flat=True)
+        times_taken = atts.values_list('time_taken', flat=True)
+        attempts_content = atts.values_list('attempt_content', flat=True)
+        
+        
+        for i in range(0, len(atts)):
+            is_student_first_attempt = (i == 0) or (submitters[i] != submitters[i-1])
+            is_student_last_attempt = (i == len(atts)-1) or (submitters[i] != submitters[i+1])
             
-        txt_string += "\n"
-        
-        txt_string += "Total Scores for Quiz:\n"
-        txt_string += "----------------------\n"
-    
-    for stud_username in sorted_usernames:
-            txt_string += content_pad(stud_username, 20) + "%.1f\n" % ad['totals'][stud_username]
-        
-        
-    # CSV file has exercises listed next to each other
-    header_row = ["Username","First name", "Last name"]
-    ex_details_row = ["", "", ""]
-    for ex in ad['exercises']:
-        header_row.extend(["", ex.get_slug(), "", ""])
-        ex_details_row.extend(["", "Score", "Mean time", "Attempts"])
-    header_row.extend(["", "Total score"])
-    
-    csv_rows.append(header_row)
-    csv_rows.append(ex_details_row)
-    
-    for stud_username in sorted_usernames:
-        for e in res_table[stud_username]:
-            student = res_table[stud_username][e]['student']
-            break
-        
-        student_row = [stud_username, student.first_name, student.last_name]
-        for ex in ad['exercises']:
-            if ex.id in res_table[stud_username]:
-                stud_ex_res = res_table[stud_username][ex.id]
+            if is_student_first_attempt:
+                attempt_number = 0
+                stud_username = atts[i].student.username
+                stud_fullname = atts[i].student.first_name + " " + atts[i].student.last_name
+                completed = False
+                attempt_times = []
+                attempts = []
+            
+            attempt_number += 1
+            
+            if not completed:
+                attempt_times.append(times_taken[i])
+                attempts.append(attempts_content[i])
+            
+            if completes[i] == 1: completed = True
+            
+            if is_student_last_attempt:
+                score = 0
+                if is_summative:
+                    if (attempt_number + 1) <= ready_quiz.submissions_permitted:
+                        score = 1 - attempt_number*ready_quiz.resubmission_penalty/100.0
+                    if score < 0: score = 0
                 
-                attempts = ""
-                for i in range(len(stud_ex_res['attempts'])):
-                    if i > 0: attempts += ' | '
-                    attempts += stud_ex_res['attempts'][i]
-                    
-                student_row.extend(["", stud_ex_res['score'], stud_ex_res['mean_attempt_time'], attempts])
-            else:
-                student_row.extend(["", "", "", ""])
+                if not stud_username in data: data[stud_username] = {'username': stud_username, 'name': stud_fullname}
                 
-        student_row.extend(["", ad['totals'][stud_username]])
-        csv_rows.append(student_row)
-        
-    # Write out the files
-    if save_to_s3:
-        dt = datetime.now()
-        csv_file = secure_file_storage.open("%s/%s/reports/quiz_data/csv/%02d_%02d_%02d__%02d_%02d_%02d-%s-Quiz-Data.csv" % (ready_course.handle.split('--')[0], ready_course.handle.split('--')[1], dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_quiz.slug), 'wb')
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerows(csv_rows)
-        csv_file.close()
-        
-        txt_file = secure_file_storage.open("%s/%s/reports/quiz_data/txt/%02d_%02d_%02d__%02d_%02d_%02d-%s-Quiz-Data.txt" % (ready_course.handle.split('--')[0], ready_course.handle.split('--')[1], dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_quiz.slug), 'wb')
-        txt_file.write(txt_string)
-        txt_file.close()
-        
-    return txt_string
+                data[stud_username][ex.id] = {'completed': 'y' if completed else 'n', 'attempts': json.dumps(attempts), 'mean_attempt_time': mean(attempt_times)}
+                if is_summative: data[stud_username][ex.id]['score'] = score
     
-def gen_stud_ex_res_string(student, mean_attempt_time, score, attempts, is_summative):
-    str_ = content_pad(student.username, 25) + content_pad(student.first_name + ' ' + student.last_name, 30) + content_pad(mean_attempt_time, 20)
-    if is_summative: str_ += content_pad(score, 10)
+    # Sort students by username
+    sorted_usernames = sorted(data.keys())
     
-    if len(attempts) > 0:
-        for i in range(len(attempts)):
-            if i > 0: str_ += ' | '
-            str_ += attempts[i]
-    else:
-        str_ += 'No attempts'
+    header1 = ["", ""]
+    header2 = ["", ""]
+    for rln in rlns:
+        header1.extend(["", "", rln.exercise.get_slug(), "", "", ""])
+        header2.extend(["", "", "Completed", "attemps"])
+        if is_summative: header2.append("Score")
+        header2.append("Mean attempt time")
         
-    return str_
-
-def content_pad(content, length):
-    return content + ((' '*(length-len(content))) if len(content) < length else '')
-
+    if is_summative: header1.extend(["", "Total score / %d" % len(rlns)])
+    rw.write(header1)
+    rw.write(header2)
+    
+    for u in sorted_usernames:
+        r = data[u]
+        stud_score = 0
+        content = [u, r['name']]
+        for ex_id in ex_ids:
+            if ex_id in r: ex_res = r[ex_id]
+            else: ex_res = {'completed': '', 'attempts': '', 'score': '', 'mean_attempt_time': ''}
+            
+            content.extend(["", "", ex_res['completed'], ex_res['attempts']])
+            if is_summative:
+                content.append(ex_res['score'])
+                stud_score += (ex_res['score'] if isinstance(ex_res['score'], float) else 0)
+            content.append(ex_res['mean_attempt_time'])
+        if is_summative: content.extend(["", stud_score])    
+        rw.write(content)
+        
+    rw.close()
+     
