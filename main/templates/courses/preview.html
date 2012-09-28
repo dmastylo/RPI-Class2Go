@@ -1,10 +1,12 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+
+{% block title %}Stanford Online | {{ common_page_data.course.title }} | Preview {% if display_login %}(Login){% endif %} {% endblock title %}
 {% block topnav %} {% endblock topnav %}
 {% block navbar %} {% endblock navbar %}
 
 {% block top_scripts %}
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.0.4/css/bootstrap-combined.min.css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
@@ -20,14 +22,16 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
 {% endblock bottom_scripts %}
 
+{% block topbar %}<div id="c2g_layout_topbar" class="preview-page">{% endblock topbar %}
 
 {% block r_column_content %}
-<div class="row-fluid">
     
 
+<div class="course-description">
 {% block course_description %}
 
 {% endblock course_description %}
+</div>
 
 {% block signup_form %}
     
@@ -35,8 +39,7 @@
   {% if common_page_data.is_course_member %}
   <div class="span5">
     <div class="alert alert-success"><em class="icon-heart"></em>You have signed up for {{common_page_data.course.title}}!</div>
-    <p>The course starts on {{common_page_data.course.calendar_start}}.  The course staff will contact you with an email introduction when the date approaches.  Hope to see you online this term!</p>
-      
+    <p>The course starts on {{common_page_data.course.calendar_start}}. The course staff will contact you with an email introduction when the date approaches.  Hope to see you online this term!</p>
     <p><a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Register or log-in someone else</a></p>
   </div>
   {% else %}
@@ -49,7 +52,6 @@
     </div>
     <a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Register or log-in someone else</a>
     </div>
-    
   {% endif %}
 
     
@@ -58,11 +60,11 @@
    <div class="span5">
        {% if login_form.errors %}
        <div class="alert alert-error">
-           <button class="close" data-dismiss="alert">×</button>
-           Uh-oh.  We couldn't find username and password you entered.  Try again?
+         <button class="close" data-dismiss="alert">×</button>
+         Uh-oh.  We couldn't find username and password you entered.  Try again?
        </div>
        {% endif %}
-       <div class="well">
+       <div class="well preview-registration">
        <h3>Confirm your login name</h3>
        <form method="post" action="{% url 'courses.preview.views.preview_login' common_page_data.course_prefix common_page_data.course_suffix %}" class="form-vertical">  
            {% csrf_token %}
@@ -76,43 +78,39 @@
                    <td>{{ login_form.password }}</td>
                </tr>
            </table>
-           
            <input type="submit" value="Login" class="btn" />
            <input type="hidden" name="next" value="{{ next }}" />
        </form>
            <a href="{% url 'auth_password_reset' %}">Forgot My Password</a> &nbsp; &nbsp;
            <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Registration</a>
        </div>
-       
    </div>
-
 
 {% else %}
     <div class="span5">
       {% for error in form.email.errors %}
           {% if "in use" in error %}
           <div class="alert alert-error">
-              <button class="close" data-dismiss="alert">×</button>
-              Someone with the email address you entered already has an account.  Perhaps you'd like to <a class="btn" href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login">Login</a> instead?
+            <button class="close" data-dismiss="alert">×</button>
+            Someone with the email address you entered already has an account.  Perhaps you'd like to <a class="btn" href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login">Login</a> instead?
           </div>
           {% endif %}
       {% endfor %}
-      <div class="registration">
-          <div class="well span12">
-                <h2>Signup</h2>
-                <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post">
-                    {% include "registration/regforminputs.html" %}  
-                    <div class="form-actions">
-                        <p>
-                        {{form.tos.errors}} {{form.tos}} I agree to Stanford Online's <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>, 
-                        <a href="{% url 'c2g.views.tos' %}#honor" target="_blank" >Honor Code</a>, and <a href="{% url 'c2g.views.tos' %}#privacy" target="_blank">Privacy Policy</a>
-                        
-                        </p>
-                        <input type="submit" value="Register" class="btn btn-primary btn-large" /> &nbsp; Already have an account?  <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login"> Login instead</a>
-                        
-                    </div>
-
-                </form>
+      <div class="registration preview-registration">
+          <div class="well">
+            <h2>Stanford Online Signup</h2>
+            <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post" class="form-horizontal">
+              <fieldset>
+              {% include "registration/regforminputs.html" %} 
+              </fieldset>
+              <div class="form-actions">
+                  <p>
+                  {{form.tos}} I agree to Stanford Online's <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>, 
+                  <a href="{% url 'c2g.views.tos' %}#honor" target="_blank" >Honor Code</a>, and <a href="{% url 'c2g.views.tos' %}#privacy" target="_blank">Privacy Policy</a>
+                  </p>
+                  <input type="submit" value="Register" class="btn btn-primary btn-large" /> &nbsp; Already have an account?  <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login"> Login instead</a>
+              </div>
+            </form>
           </div>
        </div>
     </div>
@@ -123,5 +121,4 @@
 {% endblock signup_form %}
 
     
-</div>
 {% endblock r_column_content %}

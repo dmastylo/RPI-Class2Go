@@ -3,10 +3,10 @@ from django import forms
 class PiazzaAuthForm(forms.Form):
     # User Info
     user_id = forms.CharField()
+    lis_person_contact_email_primary = forms.CharField()
     lis_person_name_given = forms.CharField()
     lis_person_name_family = forms.CharField()
     lis_person_name_full = forms.CharField()
-    lis_person_contact_email_primary = forms.CharField()
     roles = forms.CharField()
 
     # Class Info

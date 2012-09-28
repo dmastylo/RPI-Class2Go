@@ -37,12 +37,14 @@ ADMINS = (
 AWS_ACCESS_KEY_ID = 'AAAAAAAAAAAAAAAAAAAA'
 AWS_SECRET_ACCESS_KEY = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 AWS_STORAGE_BUCKET_NAME = 'dev-c2g'
+AWS_SECURE_STORAGE_BUCKET_NAME = 'dev-secure-c2g' # Optional. If not defined here, it will be composed from the AWS_STORAGE_BUCKET_NAME in settings.py
 
 # To use Local Storage.  You still need to define these three all to 'local'
 # and specify where you want those local files written
 # AWS_ACCESS_KEY_ID = 'local'
 # AWS_SECRET_ACCESS_KEY = 'local'
 # AWS_STORAGE_BUCKET_NAME = 'local'
+# AWS_SECURE_STORAGE_BUCKET_NAME = 'local'
 # MEDIA_ROOT = '/opt/class2go/uploads'
 
 # This is if you want to change to a different logging directory than the default,
@@ -57,3 +59,4 @@ PIAZZA_SECRET = "piazza_xxxxxxx"
 # SMTP INFO for SES -- Amazon Simple Email Service $1 per 10K recipients
 SES_SMTP_USER = "USER"
 SES_SMTP_PASSWD = "PWD"
+

@@ -29,7 +29,9 @@ default_attributes \
         "django_secret" => "class2go"
     },
     "util" => {
-        "celery_database" => "/opt/class2go/celery/celerydb.sqlite"
+        "celery_database" => "/opt/class2go/celery/celerydb.sqlite",
+        "celery_timeout" => "7200",
+        "celery_concurrency" => "8"
     },
     "piazza" => {
         "endpoint" => "https://piazza.com/basic_lti",

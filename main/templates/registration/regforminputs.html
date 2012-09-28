@@ -1,58 +1,128 @@
 {% csrf_token %}
 {{form.course_prefix}}{{form.course_suffix}}
 
-{{ form.non_field_errors }}
-<table >
-    <tr>
-        <th><label for="id_username">{{form.username.label}}:</label></th>
-        <td>{{form.username.errors}}{{ form.username }}</td>
+<div class="control-group">
+  <label for="id_username" class="control-label">{{form.username.label}}:</label>
+    <div class="controls">
+    {{ form.username }}
+    <span class="help-block">Your username is your public identity on this site. You won't be able to change it, so choose a "handle" that you are comfortable with.</span>
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_email" class="control-label">{{form.email.label}}:</label>
+  <div class="controls">
+    {{ form.email }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_first_name" class="control-label">{{form.first_name.label}}:</label>
+  <div class="controls">
+    {{ form.first_name }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_last_name" class="control-label">{{form.last_name.label}}:</label>
+  <div class="controls">
+    {{ form.last_name }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_password1" class="control-label">{{form.password1.label}}:</label>
+  <div class="controls">
+    {{ form.password1 }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_password2" class="control-label">{{form.password2.label}}:</label>
+  <div class="controls">
+    {{ form.password2 }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_birth_year" class="control-label">{{form.birth_year.label}}:</label>
+  <div class="controls">
+    {{ form.birth_year }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_gender" class="control-label">{{form.gender.label}}:</label>
+  <div class="controls">
+    {{ form.gender }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_education" class="control-label">{{form.education.label}}:</label>
+  <div class="controls">
+    {{ form.education }}
+  </div>
+</div>
+<div class="control-group">
+  <label for="id_work" class="control-label">{{form.work.label}}:</label>
+  <div class="controls">
+    {{ form.work }}
+  </div>
+</div>
 
-    </tr>
 
-    <tr>
-        <td colspan=2>
-            <p style="font-size:80%">Your username is your public identity on this site.
-	            You won't be able to change it, so choose a
-                "handle" that you are comfortable with.</p>
-        </td>
-    </tr>
-
-    <tr>
-        <th><label for="id_email">{{form.email.label}}:</label></th>
-        <td>{{form.email.errors}}{{ form.email }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_first_name">{{form.first_name.label}}:</label></th>
-        <td>{{form.first_name.errors}}{{ form.first_name }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_last_name">{{form.last_name.label}}:</label></th>
-        <td>{{form.last_name.errors}}{{ form.last_name }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_password1">{{form.password1.label}}:</label></th>
-        <td>{{form.password1.errors}}{{ form.password1 }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_password2">{{form.password2.label}}:</label></th>
-        <td>{{form.password2.errors}}{{ form.password2 }}</td>
-    </tr>
+<script>
     
-    <tr>
-        <th><label for="id_birth_year">{{form.birth_year.label}}:</label></th>
-        <td>{{form.birth_year.errors}}{{ form.birth_year }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_gender">{{form.gender.label}}:</label></th>
-        <td>{{form.gender.errors}}{{ form.gender }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_education">{{form.education.label}}:</label></th>
-        <td>{{form.education.errors}}{{ form.education }}</td>
-    </tr>
-    <tr>
-        <th><label for="id_work">{{form.work.label}}:</label></th>
-        <td>{{form.work.errors}}{{ form.work }}</td>
-    </tr>
-</table>
-    
+        $(function(){
+          
+                 function setupPopover(id,title_in,errorMsg){
+                      var options = {
+                          placement:'left',
+                          trigger:'manual',
+                          title:title_in,
+                          content:errorMsg,
+                          delay:300,
+                       };
+          
+                 $('#'+id).popover(options);
+                 $('#'+id).popover('show');
+          
+                 };
+           
+                 {% for key, value in form.errors.items %}
+                   {% if not key == "__all__" %}
+          
+                     errorMsg_{{key}}="{% for e in value %}<p>{{ e }}</p>{% endfor %}";
+                     setupPopover("id_{{key}}", "{{key}}".charAt(0).toUpperCase()+"{{key}}".slice(1), errorMsg_{{key}});
+                     $('#id_{{key}}').data('popover').$tip.click(function(){$('#id_{{key}}').popover('hide');});
+          
+                     {% if not key == "tos" %}
+                       $('#id_{{key}}').focus(function(){$('#id_{{key}}').popover('hide');});
+                     {% else %}
+                       $('#id_{{key}}').click(function(){$('#id_{{key}}').popover('hide');});
+                     {% endif %}
+          
+                   {% endif %}
+                 {% endfor %}
+           
+                 {% for error in form.non_field_errors %}
+                   {% if 'password' in error %}
+                     if ($('#id_password1').data('popover')) {
+                        $('#id_password1').data('popover').options.content += "<p>{{error}}</p>";
+                        $('#id_password1').popover('show');
+                     }
+                     else {
+                        setupPopover('id_password1','Password','<p>{{error}}</p>');
+                     }
+                     $('#id_password1').data('popover').$tip.click(function(){$('#id_password1').popover('hide');});
+                     $('#id_password1').focus(function(){$('#id_password1').popover('hide');});
+                   {% endif %}
+                 {% endfor %}
+              
+                 $('.arrow').css('border-left-color','red');
+          
+        });
+</script>
+
+<style>
+        .popover {color:red;}
+        .arrow {color:red;border-left-color:red;}
+        .popover-inner {color:red; background-color:red; border-width:1px}
+        .popover-title{padding:5px;margin-bottom:0px}
+        .popover-content{padding:5px}
+</style>
+
+

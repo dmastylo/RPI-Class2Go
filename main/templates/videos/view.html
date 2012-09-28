@@ -1,5 +1,6 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+{% block title %} Stanford Online | {{ common_page_data.course.title }} | {{ video.title }}  {% endblock title %}
 {% block l_column_content %}
 <!-- <div id="c2g_layout_l_column" class="span3">
     <div class="well tight">
@@ -76,7 +77,7 @@
         </div>
         <div id="loadedExercises"></div>
         <input type="hidden" name="exercise_type" value="video" id="exercise_type" />
-        <input type="hidden" name="video_id" value="{{ video.id }}" id="video_id" /> 
+        <input type="hidden" name="video_id" value="{{ video.id }}" id="video_id" />
     {% else %}
         <h2>{{video.title}}</h2>
         <!-- iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe -->
@@ -115,7 +116,7 @@ var c2gConfig = {
 
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
-    var path='http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{{video.id}}/jpegs/';
+    var path="http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
     var thumbManifest = {};
     var psManifest = {};
     var loadThumbManifest = function (data, textStatus, jqXHR) { 
