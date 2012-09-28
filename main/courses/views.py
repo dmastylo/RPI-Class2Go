@@ -69,7 +69,10 @@ def main(request, course_prefix, course_suffix):
     file_list = File.objects.getByCourse(course=common_page_data['course'])
 
     full_index_list = []
+    full_contentsection_list=[]
+    
     for contentsection in contentsection_list:
+    
         index_list = []
         for video in video_list:
             if video.section.id == contentsection.id:
@@ -103,15 +106,19 @@ def main(request, course_prefix, course_suffix):
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
         index_list.sort(key = index)
+        
         full_index_list.append(index_list)
 
+       #don't show empty sections
+        if index_list:
+            full_contentsection_list.append(contentsection)
 
     return render_to_response('courses/view.html',
             {'common_page_data': common_page_data,
              'announcement_list': announcement_list,
              'many_announcements':many_announcements,
              'news_list': news_list,
-             'contentsection_list': contentsection_list,
+             'contentsection_list': full_contentsection_list,
              'video_list': video_list,
              'pset_list': pset_list,
              'full_index_list': full_index_list,
