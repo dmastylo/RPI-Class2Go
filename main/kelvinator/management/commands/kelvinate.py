@@ -5,23 +5,30 @@ import urllib
 from django.db import connection, transaction
 import kelvinator.tasks 
 from django.conf import settings
+from optparse import make_option
 
 bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
+instance=getattr(settings, 'INSTANCE')
 
 class Command(BaseCommand):
-    args="<prefix> <suffix> <video_slug> <key_frames>"
     help="Runs the Kelvinator on a video given its course info (prefix and suffix) and slug.\n" + \
         "All parameters are case sensitive \n" + \
         "\n" + \
-        "Usage: manage.py kelvinate <prefix> <suffix> <video_slug>\n" + \
+        "Usage: manage.py kelvinate [options] <prefix> <suffix> <video_slug>\n" + \
         "    prefix         generally the short name, like \"nlp\"\n" + \
         "    suffix         the term, like \"Fall2012\"\n" + \
-        "    video_slug     slug, like \"regexp\"\n" + \
-        "    key_frames     target number of key frames per minute (default=2)" 
+        "    video_slug     slug, like \"regexp\"\n" 
+
+    option_list = (
+        make_option("-r", "--remote", dest="remote", action="store_true",
+                    help="do kelvination remotely (default is local)"),
+        make_option("-f", "--frames", dest="target_frames", default=2, type="int",
+                    help="Target number of thumbnails per minute (default=2)"),
+    ) + BaseCommand.option_list
         
-    def handle(self, *args, **kwargs):
-        if len(args) < 3 or len(args) > 4:
-            raise CommandError("Wrong number of arguments")
+    def handle(self, *args, **options):
+        if len(args) != 3:
+            raise CommandError("Wrong number of arguments, %d instead of 3" % len(args))
         arg_prefix=args[0]
         arg_suffix=args[1]
         handle=arg_prefix+"--"+arg_suffix
@@ -41,12 +48,16 @@ class Command(BaseCommand):
             return
             
         s3_path="https://s3-us-west-2.amazonaws.com/"+bucket+"/"+urllib.quote_plus(video.file.name,"/")
-        
+
         keyframes_per_minute = 2
-        if len(args) > 3:
-            keyframes_per_minute = args[3]
+        if len(args) > 5:
+            keyframes_per_minute = args[5]
         
-        kelvinator.tasks.kelvinate(s3_path, keyframes_per_minute)
-        
-        print "Kelvination complete"
+        if options['remote']:
+            kelvinator.tasks.kelvinate.delay(s3_path, keyframes_per_minute)
+            print "Kelvination queued (%s): %s" % (instance, s3_path)
+        else:
+            kelvinator.tasks.kelvinate(s3_path, keyframes_per_minute)
+            print "Kelvination complete"
+
 

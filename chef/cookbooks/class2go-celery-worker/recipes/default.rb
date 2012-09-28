@@ -46,5 +46,5 @@ end
 service "celeryd" do
     start_command "/etc/init.d/celeryd start"
     supports :status => true, :restart => true, :reload => true
-    action [ :enable, :start ]
+    action [ :enable, :restart ]
 end

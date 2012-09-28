@@ -1,5 +1,6 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+{% block title %}Stanford Online | {{ common_page_data.course.title }} | {{ pset.title }} {% endblock title %} 
 
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 

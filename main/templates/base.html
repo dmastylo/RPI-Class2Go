@@ -27,15 +27,16 @@
             <h1 class="stanford-logo">
                 <a href="http://www.stanford.edu">Stanford University</a>
             </h1>
+            <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
         </div>
         {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}
-            <p class="hide-text hidden"><a href="#main-content">Jump to content</a></p>
             {% block navbar %}
             {% ifequal user.is_staff True %}
             <div class="navbar">
                 <div class="navbar-inner">
                     <div class="container-fluid">
-                        <ul class="nav" role="navigation">
+                        <h2 id="main-nav-heading" class="hidden-accessible">Course Sections</h2>
+                        <ul class="nav" role="navigation" aria-labelledby="main-nav-heading">
                             <li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
                         </ul>
                         <!--form class="navbar-search hidden-phone" action="">
