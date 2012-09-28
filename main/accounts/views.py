@@ -23,7 +23,7 @@ from registration import signals
 from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.http import HttpResponseBadRequest
-
+from django.contrib.auth.decorators import permission_required
 import random
 import os
 import string
@@ -115,6 +115,19 @@ def register(request, template_name='accounts/register.html'):
         'form': form,
     });
     return HttpResponse(t.render(c))
+
+def impersonate(request,username):
+    if not request.user.is_superuser:
+        return HttpResponse('Permission denied')
+    try:
+        u1 = User.objects.get(username=username)
+        u1.backend = 'django.contrib.auth.backends.ModelBackend'
+    except User.DoesNotExist:
+        return HttpResponse('User not found')
+    auth_logout(request)
+    auth_login(request,u1)
+    return HttpResponse('You are now logged in as ' + username)
+    
 
 @never_cache
 def shib_login(request):
