@@ -105,7 +105,7 @@
               </fieldset>
               <div class="form-actions">
                   <p>
-                  {{form.tos.errors}} {{form.tos}} I agree to Stanford Online's <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>, 
+                  {{form.tos}} I agree to Stanford Online's <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>, 
                   <a href="{% url 'c2g.views.tos' %}#honor" target="_blank" >Honor Code</a>, and <a href="{% url 'c2g.views.tos' %}#privacy" target="_blank">Privacy Policy</a>
                   </p>
                   <input type="submit" value="Register" class="btn btn-primary btn-large" /> &nbsp; Already have an account?  <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login"> Login instead</a>
