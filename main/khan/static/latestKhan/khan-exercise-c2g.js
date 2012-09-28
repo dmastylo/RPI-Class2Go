@@ -2205,7 +2205,7 @@ var Khan = (function() {
         }
 
         function handleSubmit() {
-            var pass = validator();
+            var pass = (exAssessType != "survey") ? validator() : true;
             // Stop if the user didn't enter a response
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
@@ -3463,7 +3463,7 @@ var Khan = (function() {
             // [C2G] Add "View Progress" button to all problem sets
             $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" value="View Problem Set Progress"/></div>');
             $('#view-progress-button').click(function () {
-                location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
+                location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
             });
 
         }
@@ -3609,7 +3609,7 @@ var Khan = (function() {
                 } else {
                     $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                     $('#submit-problemset-button').click(function () {
-                        location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
+                        location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
                     });
                 }
             } else if ($('#submit-problemset-button').length) {
