@@ -741,13 +741,21 @@ var Khan = (function() {
         // Initialize to an empty jQuery set
         exercises = jQuery();
 
-        // [C2G] Is this problem set formative or summative? Default is 
-        // formative, but check problem set div for summative CSS class; 
+        // [C2G] Is this problem set formative, summative, or a survey? 
+        // Check c2gConfig object first, then check className of page elements;
+        // Default is formative, but check problem set div for summative CSS class; 
         // otherwise, check the class name on the article element in the page
-        exAssessType = 'formative';
-        if ($("div.summative").length || $("div.assessive").length ||
-            $("article.summative").length || $("article.summative").length) {
-            exAssessType = 'summative';
+        if (typeof c2gConfig != "undefined" && c2gConfig.problemType) {
+            exAssessType = c2gConfig.problemType;
+        } else {
+            if ($("div.summative").length || $("div.assessive").length ||
+                $("article.summative").length || $("article.assessive").length) {
+                exAssessType = 'summative';
+            } else if ($("div.survey").length || $("article.survey").length) {
+                exAssessType = 'survey';
+            } else {
+                exAssessType = 'formative';
+            }
         }
 
         $(function() {
