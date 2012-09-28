@@ -1,5 +1,9 @@
 (function(document, undefined) {
 
+  $('.nav-list.collapse').on("hidden shown", function(e){
+    $(this).prev().toggleClass("expanded", (e.type === "shown"))
+  });
+
     var $document = $(document);
 
     window.c2g = window.c2g || {};
@@ -136,5 +140,6 @@
     .disableSelection();
 
     $("[data-c2g-tooltip]").tooltip();
+
 
 })(document);
