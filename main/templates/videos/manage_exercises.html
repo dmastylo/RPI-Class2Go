@@ -76,7 +76,7 @@ function confirm_change(){
         </td>
         <td style="width:200px">
             <a href="javascript:DeleteExercise('{{field.name}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">X</a>
-            <a class="pull-right" style="float:right;margin-right:10px" href="{% url 'courses.exercises.views.edit' course_prefix course_suffix field.name %}?return={{request.path}}">Edit Text or HTML</a>
+            <a class="pull-right" style="float:right;margin-right:10px" href="{% url 'courses.exercises.views.edit' course_prefix course_suffix field.name %}?return={{request.path}}">Edit HTML file</a>
         </td>
     </tr>
     {% endfor %}
