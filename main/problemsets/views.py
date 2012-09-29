@@ -37,10 +37,8 @@ def list(request, course_prefix, course_suffix):
 
 @auth_view_wrapper
 def show(request, course_prefix, course_suffix, pset_slug):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
+    
+    common_page_data = request.common_page_data 
     try:
         ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
     except:
