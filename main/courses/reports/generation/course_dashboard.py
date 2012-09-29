@@ -59,27 +59,36 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
     rw.write([""])
     
     rw.write(content = ["Problem sets"], indent = 1)
-    rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
-    for item in problem_set_visits:
-        rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
+    if len(problem_set_visits) > 0:
+        rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
+        for item in problem_set_visits:
+            rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
+    else:
+        rw.write(content = ["No live problem sets yet."], indent = 2)
     rw.write([""])
     
     rw.write(content = ["Videos"], indent = 1)
-    rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
-    for item in video_visits:
-        rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
+    if len(video_visits) > 0:
+        rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
+        for item in video_visits:
+            rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
+    else:
+        rw.write(content = ["No live videos yet."], indent = 2)
     rw.write([""])
     
     rw.write(content = ["Content pages"], indent = 1)
-    rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
-    for item in additional_page_visits:
-        rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
+    if len(additional_page_visits) > 0:
+        rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
+        for item in additional_page_visits:
+            rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
+    else:
+        rw.write(content = ["No live content pages yet."], indent = 2)
     rw.write([""])
     
     rw.close()
 
 def get_visit_information(ready_course, items, page_type):
-    if not items:
+    if items == None:
         visits_ = PageVisitLog.objects.filter(course=ready_course, page_type = page_type)
         visit_counts = analyze_visits(visits_)
         return [dict({'item': None}.items() + visit_counts.items())]
