@@ -329,14 +329,14 @@ small.date {
 }
 
 #left-nav h3.expanded {
-    background:url(/static/graphics/core/arrow-open.png) no-repeat right 7px;
+    background:url(/static/graphics/core/icon-minus.png) no-repeat right 7px;
     cursor:pointer;
     padding-right:20px;
     display:block;
     margin-right:15px;
 }
 #left-nav h3 {
-    background:url(/static/graphics/core/arrow-close.png) no-repeat right 4px;
+    background:url(/static/graphics/core/icon-plus.png) no-repeat right 7px;
     cursor:pointer;
     padding-right:20px;
     display:block;
