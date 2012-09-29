@@ -26,7 +26,9 @@
 </div>
 
 <a id="exercise_submit" class="btn" href="javascript:"> Save to Server </a> <a class="btn" href={{returnURL}}> Close </a>
-
+<br></br>
+<a id="wrap" class="btn" href="javascript:"> Wrap </a> 
+<a id="noWrap" class="btn" href="javascript:"> No wrap</a>
 
 {% endblock m_column_content %}
 {% block addl_scripts %}
@@ -50,13 +52,25 @@ $(function(){
                       },
              });
   
-  };
+  };    
+  
+  var wrap =  function(){
+    editor.getSession().setUseWrapMode(true);
+  }
+  
+  var noWrap = function(){
+    editor.getSession().setUseWrapMode(false);
+  }
+
   
   var editor = ace.edit("editor");
   editor.setValue($('#ace_proxy').val());
   editor.setTheme("ace/theme/eclipse");
   editor.getSession().setMode("ace/mode/html");
+  
   $('#exercise_submit').click(saveExerciseContents);
+  $('#wrap').click(wrap);
+  $('#noWrap').click(noWrap);
 
 });
 </script>
