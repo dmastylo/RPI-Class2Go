@@ -28,6 +28,9 @@
               <span class="help-block">{{ field.help_text }}</span>
               {% endif %}
               {{ field }}
+	      {% if field.name == "slug" %}
+	      <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">Changing this also changes the ready version's slug, and will break external references if it is live.</div>
+	      {% endif %}
 	    {% endif %}
 	    {{ field.errors }}
 	  </div>
@@ -56,5 +59,9 @@ function toggleLiveDate(checked) {
         $("#id_live_datetime").val(null);
     }
 }
+
+$('#id_slug').focus(function() {
+    $('#slug_warning').show();
+});
 </script>
 {% endblock addl_scripts %}

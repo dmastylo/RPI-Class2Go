@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
-from c2g.models import Course, Video, VideoToExercise, Exercise
+from c2g.models import Course, Video, VideoToExercise, Exercise, PageVisitLog
 
 from c2g.models import Course, Video, VideoActivity, ProblemActivity
 from courses.common_page_data import get_common_page_data
@@ -55,6 +55,15 @@ def view(request, course_prefix, course_suffix, slug):
         video = Video.objects.get(course=common_page_data['course'], slug=slug)
     except Video.DoesNotExist:
         raise Http404
+    
+    if not common_page_data['is_course_admin']:
+        visit_log = PageVisitLog(
+            course = common_page_data['ready_course'],
+            user = request.user,
+            page_type= 'video',
+            object_id = str(video.id),
+        )
+        visit_log.save()
 
     video_rec = request.user.videoactivity_set.filter(video=video)
     if video_rec:
@@ -63,10 +72,6 @@ def view(request, course_prefix, course_suffix, slug):
         #note student field to be renamed to user, VideoActivity for all users now
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
-
-    if video.mode == 'ready':
-        draft_version = video.image
-        video = draft_version
 
     return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
 
@@ -235,7 +240,7 @@ def save_exercises(request):
 
 def delete_exercise(request):
     try:
-        toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='draft', is_deleted=False)
+        toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='draft', is_deleted=False, video__slug=request.POST['video_slug'])
         toDelete.delete()
         toDelete.save()
 

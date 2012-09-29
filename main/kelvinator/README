@@ -1,18 +1,9 @@
-Usage: ./kelvinator [input video file] [frames rate] [difference threshold]
+This is an evolution from the tool originally written by Kelvin Do
+for generating a set of thumbnails from a video for navigation.  It
+has evolved from a command line tool to a celery-dispatched service.
 
-- input video file: name of video to extract frames from ex. sample_iTunes.mov
+Requires
+- PIL
+- ffmpeg
 
-  If the input file begins with "s3://" then we will use the s3cmd to sync
-  the file down to a temp directory under /opt/class2go, do the procesing
-  there, and then use s3cmd to sync the manifest and jpegs back up
 
-- frame rate: number of frames to extract per second ex. 1 = 1 frame every
-  second, 5 = 5 frames every second, .1 = 1 frame every 10 seconds
-
-- difference threshold: value to measure how different two frames
-  are. larger value means greater difference. larger value passed means
-  fewer frames will be kept
-
-Requirements for usage:
-	ffmpeg must be installed
-    PIL must be installed

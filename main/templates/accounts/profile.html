@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load url from future %}
+{% block title %} Stanford Online | User Profile {% endblock title %} 
  
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
@@ -18,6 +19,11 @@
 	    <li><strong>Gender:</strong> {{user.get_profile.gender }}</li>
 	    <li><strong>Education:</strong> {{user.get_profile.education }}</li>
 	    <li><strong>Work:</strong> {{user.get_profile.work }}</li>
+        <hr />
+        <li><strong>Piazza handle:</strong> {{user.get_profile.piazza_name }}</li>
+        <li><strong>Piazza email:</strong> {{user.get_profile.piazza_email }}</li>
+            
+        <hr />
 	    <li class="pull-left"><strong>Courses:</strong></li>
 	    {% if courses %}
 	    <ul class="unstyled pull-left">
@@ -27,7 +33,12 @@
 	    </ul>
 	    {% endif %}
         </ul>
-        <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a></p>
+        
+        <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> 
+              {% if show_pwd_change %}
+              <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a>
+              {% endif %}
+        </p>
     {% else %}
         <h4> Please <a data-toggle="modal" href="#login-modal">log in</a> to view your profile </h4>
     {% endif %}

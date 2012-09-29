@@ -503,10 +503,10 @@ $.extend(Khan.answerTypes, {
                 solarea = $(this).empty();
 
             var fallback = sol.data("fallback"),
-                validator = Khan.answerTypes[type](solarea, sol, fallback);
+                vldr = Khan.answerTypes[type](solarea, sol, fallback);
 
-            $(this).data("validator", validator);
-            solutionArray.unshift(validator.solution);
+            $(this).data("validator", vldr);
+            solutionArray.unshift(vldr.solution);
         });
 
         var ret = function() {
@@ -515,8 +515,12 @@ $.extend(Khan.answerTypes, {
                 guess = [];
 
             solutionarea.find(".sol").each(function() {
-                var validator = $(this).data("validator", validator);
-
+                if (validator) {
+                   var validator = $(this).data("validator", validator);
+                }
+                else {
+                   var validator = $(this).data("validator");
+                }
                 if (validator != null) {
                     // Don't short-circuit so we can record all guesses
                     valid = validator() && valid;

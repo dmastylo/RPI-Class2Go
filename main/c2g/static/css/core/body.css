@@ -9,7 +9,22 @@ a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
 .well {border-color:#ddcf99;}
 .well.tight {padding:10px 0;background:#f8f6ea;}
-.well.tight .nav-list li a {padding:5px 15px;}
+.well.tight .nav-list li {clear:left;}
+.well.tight .nav-list li a {
+    padding:5px 15px;
+    overflow:hidden;
+}
+.well.tight .nav-list li a em {
+    float:left;
+    width:20px;
+    padding-top:2px;
+}
+.well.tight .nav-list li a span {
+    width:80%;
+    word-wrap:break-word;
+    float:left;
+    display:block;
+}
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
 
@@ -182,6 +197,9 @@ small.date {
 #new_announcement_div {
     clear:left;
 }
+.course-description iframe {
+    width:100%;
+}
 
 /* Header
 -------------------------------------------------- */
@@ -190,7 +208,13 @@ small.date {
     width:100%;
 }
 .stanford-logo {
-    padding:10px 20px;
+    background:transparent url(/static/graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
+    padding:13px 20px;
+    width:198px;
+    height:11px;
+    text-indent: -999px;
+    display:block;
+    overflow:hidden;
 }
 #c2g_layout_topbar {
     position:relative;
@@ -200,9 +224,19 @@ small.date {
     display:inline-block;
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
 }
-#c2g_layout_topbar h1 {
+#c2g_layout_topbar.preview-page {
+    width:auto;
+}
+#c2g_layout_topbar .page-title {
+    margin:20px 0 0 20px;
+}
+#c2g_layout_topbar .page-title img {
+    margin-bottom:25px;
+    margin-top:10px;
+}
+#c2g_layout_topbar h2 {
   font-weight: 300;
-  margin:20px 0 0 20px;
+  font-size:30px;
 }
 #c2g_layout_topbar .top-nav a {
   color:white;
@@ -247,22 +281,23 @@ small.date {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    background-color: #e0d096;
-    background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
+    /*background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
     background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e0d096), to(#cabb84));
     background-image: -webkit-linear-gradient(top, #e0d096, #cabb84);
     background-image: -o-linear-gradient(top, #e0d096, #cabb84);
     background-image: linear-gradient(top, #e0d096, #cabb84);
     background-repeat: repeat-x;
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);*/
+    background: #e0d096 url('../../graphics/core/bg-nav.png') repeat-x bottom center;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 .toggle-views {
-    width: 246px;
+    width: 250px;
     padding: 7px 7px 0;
+    *padding: 7px;
     color: #333;
     text-align: right;
     background:#ffc;
@@ -289,7 +324,7 @@ small.date {
 /* Body
 -------------------------------------------------- */
 .body-content {
-    padding-top:20px;
+    padding-top:20px !important;
     min-height:450px;
 }
 
@@ -306,11 +341,10 @@ small.date {
 -------------------------------------------------- */
 .registration .well {
     margin:0 auto;
-    width:430px;
     background:#f8f6ea;
     padding:0;
 }
-.registration .well form table {
+.registration .well fieldset {
     margin:20px;
 }
 .registration .well form,.registration .well .form-actions {
@@ -323,6 +357,16 @@ small.date {
 .registration h1 {
     margin-bottom:1em;
     text-align:center;
+}
+.registration .well h2 {
+    margin-top:15px;
+    text-align:center;
+}
+.registration .form-horizontal .form-actions {
+    padding-left:20px;
+}
+.preview-registration {
+    margin-top:-100px;
 }
 
 /* Profile Info
@@ -368,11 +412,38 @@ small.date {
 
 .course-list-item {
     overflow:hidden;
-    padding:10px 20px;
+    padding:5px 0px;
+    border-bottom:1px solid #eee;
 }
 .course-list-item .progress {
     width:400px;
     margin-top:5px;
+}
+.course-list-item .icon-pencil,
+.course-list-item .icon-book,
+.course-list-item .icon-file,
+.course-list-item .icon-facetime-video {
+    font-size:40px; 
+    color:#999;
+    opacity:.3;
+    padding-left:5px;
+    padding-top:5px;
+}
+.course-list-item .pull-left {
+    margin-left:-10px;
+    width:60px;
+}
+.course-list-item .course-list-content {
+    overflow:hidden;
+    margin-right:10px;
+    margin-bottom:5px;
+}
+.course-list-item .course-list-content h4 {
+    margin-top:10px;
+    display:inline;
+}
+.course-list-item .course-list-content label {
+    margin-bottom:10px;
 }
 
 /* Forms
@@ -439,7 +510,24 @@ input[data-datetimepicker] {
     color:#fff;
     clear:left;
 }
-
+.class2go {
+    position:relative;
+    width:100%;
+    padding:40px 0 0;
+}
+.class2go a {
+    font-size:11px;
+    background:#f8f6ea;
+    padding:3px 10px;
+    position:absolute;
+    right:20px;
+    bottom:0;
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+    -khtml-border-radius: 5px 5px 0 0;
+    -o-border-radius: 5px 5px 0 0;
+}
 
 
 ul.exercise-list {

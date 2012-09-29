@@ -1,41 +1,75 @@
-<!--
-This is an example shibboleth2.xml generated for you by TestShib Two.  It's reduced and recommented
-specifically for testing.  You don't need to change anything, but you may want to explore the file
-to learn about how your SP works.  Uncomment attributes in your attribute-map.xml file to test them.
+<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
+    xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"    
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+    clockSkew="180">
 
-If you want to test advanced functionality, start from the distribution shibboleth2.xml and add the
-MetadataProvider, the right entityID, and a properly configured SSO element.  More information:
 
-https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPConfiguration
--->
 
-<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-    clockSkew="1800">
 
-    <!-- The entityID is the name TestShib made for your SP. -->
-    <ApplicationDefaults entityID="<%= @node[:shib][:entity_id] %>"
-        REMOTE_USER="eppn">
+    <!-- READ ME!
+ 
+      This configuration file is based on Shibboleth SP v2.4.3. Stanford
+      runs both a production and development IdP (identity provider)
+      system, each with a pair of load balanced servers. This file is
+      pre-configured against the production IdP. If you ever want to
+      authenticate against dev instead, replace 'idp.stanford.edu' with
+      'idp-dev.stanford.edu' in the two locations below (SSO link and
+      metadata download).
 
-        <!-- You should use secure cookies if at all possible.  See cookieProps in this Wiki article. -->
-        <!-- https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSessions -->
+      More information:
+
+      * https://itservices.stanford.edu/service/shibboleth/sp
+      * http://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPConfiguration
+ -->
+
+
+
+
+
+    <!--
+    By default, in-memory StorageService, ReplayCache, ArtifactMap, and SessionCache
+    are used. See example-shibboleth2.xml for samples of explicitly configuring them.
+    -->
+
+    <!--
+    To customize behavior for specific resources on Apache, and to link vhosts or
+    resources to ApplicationOverride settings below, use web server options/commands.
+    See https://spaces.internet2.edu/display/SHIB2/NativeSPConfigurationElements for help.
+    
+    For examples with the RequestMap XML syntax instead, see the example-shibboleth2.xml
+    file, and the https://spaces.internet2.edu/display/SHIB2/NativeSPRequestMapHowTo topic.
+    -->
+
+    <!-- The ApplicationDefaults element is where most of Shibboleth's SAML bits are defined. -->
+    <ApplicationDefaults entityID="<%= @node[:shib][:entity_id]  %>"
+                         REMOTE_USER="eppn persistent-id targeted-id">
+
+        <!--
+        Controls session lifetimes, address checks, cookie handling, and the protocol handlers.
+        You MUST supply an effectively unique handlerURL value for each of your applications.
+        The value defaults to /Shibboleth.sso, and should be a relative path, with the SP computing
+        a relative value based on the virtual host. Using handlerSSL="true", the default, will force
+        the protocol to be https. You should also add a cookieProps setting of "; path=/; secure"
+        in that case. Note that while we default checkAddress to "false", this has a negative
+        impact on the security of the SP. Stealing cookies/sessions is much easier with this disabled.
+        -->
         <Sessions lifetime="28800" timeout="3600" checkAddress="false" relayState="ss:mem" handlerSSL="false">
 
-            <!-- Triggers a login request directly to the TestShib IdP. -->
-            <!-- https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPServiceSSO -->
-            <SSO entityID="https://idp.testshib.org/idp/shibboleth">
-                SAML2 SAML1
+            <!--
+            Configures SSO for a default IdP. To allow for >1 IdP, remove
+            entityID property and adjust discoveryURL to point to discovery service.
+            (Set discoveryProtocol to "WAYF" for legacy Shibboleth WAYF support.)
+            You can also override entityID on /Login query string, or in RequestMap/htaccess.
+            -->
+            <SSO entityID="https://idp.stanford.edu/">
+              SAML2 SAML1
             </SSO>
 
             <!-- SAML and local-only logout. -->
-            <!-- https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPServiceLogout -->
             <Logout>SAML2 Local</Logout>
-
-            <!--
-                Handlers allow you to interact with the SP and gather more information.  Try them out!
-                Attribute values received by the SP through SAML will be visible at:
-                http://myhost.intestshib.org/Shibboleth.sso/Session
-            -->
-
+            
             <!-- Extension service that generates "approximate" metadata based on SP configuration. -->
             <Handler type="MetadataGenerator" Location="/Metadata" signing="false"/>
 
@@ -43,37 +77,71 @@ https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPConfiguration
             <Handler type="Status" Location="/Status" acl="127.0.0.1"/>
 
             <!-- Session diagnostic service. -->
-            <Handler type="Session" Location="/Session" showAttributeValues="true"/>
+            <Handler type="Session" Location="/Session" showAttributeValues="false"/>
 
             <!-- JSON feed of discovery information. -->
-            <Handler type="DiscoveryFeed" Location="/DiscoFeed"/>
-
+            <Handler type="DiscoveryFeed" Location="/DiscoFeed" cacheToDisk="false" />
         </Sessions>
 
-        <!-- Error pages to display to yourself if something goes horribly wrong. -->
-        <Errors supportContact="root@localhost" logoLocation="/shibboleth-sp/logo.jpg" 
-                styleSheet="/shibboleth-sp/main.css"/>
+        <!--
+        Allows overriding of error template information/filenames. You can
+        also add attributes with values that can be plugged into the templates.
+        -->
+        <Errors supportContact="class2go-bugs@cs.stanford.edu"
+            logoLocation="/shibboleth-sp/logo.jpg"
+            styleSheet="/shibboleth-sp/main.css"/>
+        
+        <!-- Example of remotely supplied batch of signed metadata. -->
+        <!--
+        <MetadataProvider type="XML" uri="http://federation.org/federation-metadata.xml"
+              backingFilePath="federation-metadata.xml" reloadInterval="7200">
+            <MetadataFilter type="RequireValidUntil" maxValidityInterval="2419200"/>
+            <MetadataFilter type="Signature" certificate="fedsigner.pem"/>
+        </MetadataProvider>
+        -->
+            <!-- Automatically download and refresh the IDP's metadata. -->
+            <MetadataProvider type="XML" uri="https://idp.stanford.edu/Stanford-metadata.xml"
+                 backingFilePath="/etc/shibboleth/metadata/Stanford-metadata.xml"
+                 reloadInterval="7200" >
+            </MetadataProvider>
 
-        <!-- Loads and trusts a metadata file that describes only the Testshib IdP and how to communicate with it. -->
-        <MetadataProvider type="XML" uri="http://www.testshib.org/metadata/testshib-providers.xml"
-             backingFilePath="testshib-two-idp-metadata.xml" reloadInterval="180000" />
 
-        <!-- Attribute and trust options you shouldn't need to change. -->
+        <!-- Example of locally maintained metadata. -->
+        <!--
+        <MetadataProvider type="XML" file="partner-metadata.xml"/>
+        -->
+
+        <!-- Map to extract attributes from SAML assertions. -->
         <AttributeExtractor type="XML" validate="true" path="attribute-map.xml"/>
+        
+        <!-- Use a SAML query if no attributes are supplied during SSO. -->
         <AttributeResolver type="Query" subjectMatch="true"/>
+
+        <!-- Default filtering policy for recognized attributes, lets other data pass. -->
         <AttributeFilter type="XML" validate="true" path="attribute-policy.xml"/>
 
-        <!-- Your SP generated these credentials.  They're used to talk to IdP's. -->
+        <!-- Simple file-based resolver for using a single keypair. -->
         <CredentialResolver type="File" key="sp-key.pem" certificate="sp-cert.pem"/>
 
+        <!--
+        The default settings can be overridden by creating ApplicationOverride elements (see
+        the https://spaces.internet2.edu/display/SHIB2/NativeSPApplicationOverride topic).
+        Resource requests are mapped by web server commands, or the RequestMapper, to an
+        applicationId setting.
+        
+        Example of a second application (for a second vhost) that has a different entityID.
+        Resources on the vhost would map to an applicationId of "admin":
+        -->
+        <!--
+        <ApplicationOverride id="admin" entityID="https://admin.example.org/shibboleth"/>
+        -->
     </ApplicationDefaults>
     
-    <!-- Security policies you shouldn't change unless you know what you're doing. -->
+    <!-- Policies that determine how to process and authenticate runtime messages. -->
     <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
 
     <!-- Low-level configuration about protocols and bindings available for use. -->
     <ProtocolProvider type="XML" validate="true" reloadChanges="false" path="protocols.xml"/>
 
 </SPConfig>
-
 

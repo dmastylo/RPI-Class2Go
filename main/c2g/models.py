@@ -18,6 +18,8 @@ from django.db.models.signals import post_save
 from django import forms
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from hashlib import md5
+
 import gdata.youtube
 import gdata.youtube.service
 import os
@@ -50,7 +52,10 @@ class Stageable(models.Model):
     mode = models.TextField(blank=True)
     image = models.ForeignKey('self', null=True, related_name="+")
     live_datetime = models.DateTimeField(editable=True, null=True, blank=True)
-
+    
+    def is_live(self):
+        return self.live_datetime and (self.live_datetime < datetime.now())
+        
     class Meta:
        abstract = True
 
@@ -104,6 +109,8 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     list_publicly = models.IntegerField(null=True, blank=True)
     handle = models.CharField(max_length=255, null=True, db_index=True)
     preview_only_mode = models.BooleanField(default=True)
+    institution_only = models.BooleanField(default=False)
+    
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
     # Just use epoch seconds to make it unique.
@@ -156,6 +163,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             image = self,
             mode = 'ready',
             handle = self.handle,
+            institution_only = self.institution_only,
             piazza_id = int(time.mktime(time.gmtime())),
         )
         ready_instance.save()
@@ -388,7 +396,8 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
     class Meta:
         db_table = u'c2g_additional_pages'
-
+        
+        
 class FileManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
@@ -514,6 +523,10 @@ class UserProfile(TimestampMixin, models.Model):
     birth_year = models.CharField(max_length=64, null=True)
     education = models.CharField(max_length=64, null=True)
     work = models.CharField(max_length=128,null=True)
+    piazza_email = models.CharField(max_length=128,blank=True)
+    piazza_name = models.CharField(max_length=128,blank=True)
+
+    institutions = models.ManyToManyField(Institution) #these are confirmed institutions via shib or other trusted verifier
 
     client_ip = models.CharField(max_length=30, null=True)
     user_agent = models.CharField(max_length=256, null=True)
@@ -756,13 +769,22 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         if errors:
             raise ValidationError(errors)
-
+        
     def __unicode__(self):
         return self.title
 
     class Meta:
         db_table = u'c2g_videos'
-
+        
+class VideoViewTraces(TimestampMixin, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    video = models.ForeignKey(Video, db_index=True)
+    user = models.ForeignKey(User)
+    trace = models.TextField(blank=True)
+    
+    class Meta:
+        db_table = u'c2g_video_view_traces'
+        
 class VideoActivity(models.Model):
      student = models.ForeignKey(User)
      course = models.ForeignKey(Course)
@@ -785,7 +807,7 @@ class ProblemSetManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
-
+        
     def getBySection(self, section):
         if section.mode == 'draft':
             return self.filter(section=section, is_deleted=0).order_by('index')
@@ -1029,7 +1051,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         if errors:
             raise ValidationError(errors)
-
+        
     def get_progress(self, student):
         submissions_permitted = self.submissions_permitted
         if submissions_permitted == 0:
@@ -1048,7 +1070,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                     break
         return questions_completed
 
-    def get_score(self, student):
+    def get_score(self, student, detailed=False):
+        exercise_scores = {}
         resubmission_penalty = self.resubmission_penalty
         submissions_permitted = self.submissions_permitted
         if submissions_permitted == 0:
@@ -1067,11 +1090,14 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                     break
                 else:
                     exercise_percent -= resubmission_penalty
-        return total_score
+            exercise_scores[psetToEx.exercise.id] = exercise_percent/100.0
+            
+        if detailed: return exercise_scores
+        else: return total_score
 
     class Meta:
         db_table = u'c2g_problem_sets'
-
+        
 class Exercise(TimestampMixin, Deletable, models.Model):
     problemSet = models.ManyToManyField(ProblemSet, through='ProblemSetToExercise')
     video = models.ManyToManyField(Video, through='VideoToExercise')
@@ -1080,6 +1106,13 @@ class Exercise(TimestampMixin, Deletable, models.Model):
     handle = models.CharField(max_length=255, null=True, db_index=True)
     def __unicode__(self):
         return self.fileName
+        
+    def get_slug(self):
+        split_parts = self.fileName.split('/')
+        last_part = split_parts[-1]
+        split_parts = last_part.split('.')
+        return split_parts[0]
+    
     class Meta:
         db_table = u'c2g_exercises'
 
@@ -1154,29 +1187,70 @@ class NewsEvent(models.Model):
         return self.event
     class Meta:
         db_table = u'c2g_news_events'
-
+        
 #Should probably slate this EditProfileForm for moving to a different file
 class EditProfileForm(forms.Form):
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
     email = forms.CharField(max_length=30)
 
+class Email(TimestampMixin, models.Model):
+    sender = models.ForeignKey(User)
+    hash = models.CharField(max_length=128, db_index=True)
+    subject = models.CharField(max_length=128, blank=True)
+    html_message = models.TextField(null=True, blank=True)    
+    class Meta:
+        abstract = True
 
-class CourseEmail(TimestampMixin, models.Model):
+class CourseEmail(Email, models.Model):
     TO_OPTIONS =(('myself','myself'),
                  ('staff','staff'),
                  ('students','students'),
                  ('all','all'),
                  )
     course = models.ForeignKey(Course)
-    sender = models.ForeignKey(User)
     to = models.CharField(max_length=64, choices=TO_OPTIONS, default='myself')
-    hash = models.CharField(max_length=128, db_index=True)
-    subject = models.CharField(max_length=128, blank=True)
-    html_message = models.TextField(null=True, blank=True)
 
     
     def __unicode__(self):
         return self.subject
     class Meta:
         db_table = u'c2g_course_emails'
+
+class EmailAddr(models.Model):
+    name = models.CharField(max_length=128, null=True, blank=True)
+    addr = models.EmailField(max_length=128)
+    optout = models.BooleanField(default=False)
+    optout_code = models.CharField(max_length=64, default='optout')
+    def __unicode__(self):
+       return self.addr
+
+def write_optout_code(sender, instance, created, raw, **kwargs):
+    if created and not raw:  #create means that a new DB entry is created, raw is set when fixtures are being loaded
+        instance.optout_code = md5(instance.name+instance.addr+datetime.isoformat(datetime.now())).hexdigest()
+        instance.save()
+
+post_save.connect(write_optout_code, sender=EmailAddr)
+
+
+class MailingList(models.Model):
+    name = models.CharField(max_length=128, blank=True)
+    members = models.ManyToManyField(EmailAddr)
+    def __unicode__(self):
+        return self.name
+
+class ListEmail(Email, models.Model):
+    from_name = models.CharField(max_length=128, blank=True)
+    from_addr = models.CharField(max_length=128, blank=True)
+    to_list = models.ForeignKey(MailingList)
+    def __unicode__(self):
+        return self.subject
+        
+class PageVisitLog(TimestampMixin, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    user = models.ForeignKey(User)
+    page_type = models.CharField(max_length=128, db_index=True)
+    object_id = models.CharField(max_length=128, blank=True)
+    
+    class Meta:
+        db_table = u'c2g_page_visit_log'

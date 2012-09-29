@@ -183,7 +183,8 @@ INSTALLED_APPS = (
                       'storages',
                       'celerytest',
                       'kelvinator',
-                      'db_scripts'
+                      'db_scripts',
+                      'convenience_redirect',
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
@@ -205,6 +206,14 @@ try:
 except NameError:
     # TODO: fail if not defined
     pass
+    
+try:
+    AWS_SECURE_STORAGE_BUCKET_NAME
+except NameError:
+    if AWS_STORAGE_BUCKET_NAME.count('-') == 1:
+        AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME.split('-')[0]+'-secure-'+AWS_STORAGE_BUCKET_NAME.split('-')[1]
+    else:
+        AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME # If bucket name does not follow our S3 conventions, set secure bucket to be same as bucket
 
 # Setting these variables to 'local' is the idiom for using local storage.
 if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
@@ -217,6 +226,9 @@ if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
     except NameError:
         # TODO: fail if not defined
         pass
+
+#Sets the expires parameter in s3 urls to 10 years out.
+AWS_QUERYSTRING_EXPIRE = 3.156e+8
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
@@ -258,7 +270,7 @@ LOGGING = {
             'backupCount': 3,
         },
         'console':{
-            'level':'WARNING',
+            'level':'INFO',
             'class':'logging.StreamHandler',
             'formatter': 'simple'
         },
@@ -306,11 +318,12 @@ except NameError:
    EMAIL_ALWAYS_ACTUALLY_SEND = False
 
 # Email Settings
-SERVER_EMAIL = 'class2go-noreply@cs.stanford.edu'
+
+SERVER_EMAIL = 'noreply@class.stanford.edu'
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
-    DEFAULT_FROM_EMAIL = "class2go-noreply@cs.stanford.edu" #probably change for production
+    DEFAULT_FROM_EMAIL = "noreply@class.stanford.edu" #probably change for production
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
     EMAIL_PORT = 587

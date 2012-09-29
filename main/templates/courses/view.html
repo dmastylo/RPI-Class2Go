@@ -1,12 +1,13 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+{% block title %} Stanford Online | {{ common_page_data.course.title }} | Home {% endblock title %}
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
 {% block course_notification %}
 {% if user.is_authenticated and not common_page_data.is_course_member %}
 <div class="alert alert-info inline">
-    <i class="icon-info-sign"></i>You are not yet enrolled in this course. <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
-        <input type="submit" id="login_button" class="btn" value="Enroll" />
+    <em class="icon-info-sign"></em>You are not yet a member in this course. <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+        <input type="submit" id="login_button" class="btn" value="Join" />
         {% csrf_token %}
     </form>
 </div>
@@ -15,54 +16,49 @@
 
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
-    <div class="well tight">
-        <ul class="nav nav-list">
-        	
-        	{% for content_section in contentsection_list %}
-        	  <li class="nav-header">{{content_section.title}}</li>
-        	  
+    <div class="well tight nav" role="navigation" aria-labelledby="sidebar-nav-heading-0">
+        {% for content_section in contentsection_list %}
+        <h3 id="sidebar-nav-heading-{{ forloop.counter0 }}" class="nav-header" data-toggle="collapse" data-target="#sidebar-nav-{{ forloop.counter0 }}">{{content_section.title}}</h3>
+            <ul class="nav nav-list" id="sidebar-nav-{{ forloop.counter0 }}" >
       		    {% for list_item in full_index_list %}
-      		    
       		        {% for item in list_item %}
-
-				{% ifequal content_section.id item.3 %}
-      		 	            {% ifequal item.0 'video' %} 
-      		 	                {% if is_logged_in %}
-      		 		                <li><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><i class="icon-facetime-video"></i> {{item.5}}</a></li>
+                    {% ifequal content_section.id item.3 %}
+                        {% ifequal item.0 'video' %} 
+                            {% if is_logged_in %}
+                                <li><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Video"><em class="icon-facetime-video"></em> <span>{{item.5}}</span></a></li>
       		 		            {% else %}
-                              <li><i class="icon-facetime-video"></i> {{item.5}}</li>
-      		 		            {% endif %}
-      		 	            {% endifequal %}
-      		 	            {% ifequal item.0 'pset' %}
-      		 	                {% if is_logged_in %}
-                                <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><i class="icon-pencil"></i> {{item.5}}</a></li>
+                                <li><em class="icon-facetime-video"></em> <span>{{item.5}}</span></li>
+                            {% endif %}
+                        {% endifequal %}
+                            {% ifequal item.0 'pset' %}
+                                {% if is_logged_in %}
+                                <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Problem Set"><em class="icon-pencil"></em> <span>{{item.5}}</span></a></li>
       		 	                {% else %}
-      		 	                    <li><i class="icon-pencil"></i> {{item.5}}</li>
+                                <li><em class="icon-pencil"></em> <span>{{item.5}}</span></li>
+      		 	                {% endif %}
+                            {% endifequal %}
+                        {% ifequal item.0 'additional_page' %}
+                            {% if is_logged_in %}
+                                <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Page"><em class="icon-book"></em> <span>{{item.5}}</span></a></li>
+      		 	                {% else %}
+                                <li><em class="icon-book"></em> <span>{{item.5}}</span></li>
       		 	                {% endif %}
       		 	            {% endifequal %}
-				    {% ifequal item.0 'additional_page' %}
-      		 	                {% if is_logged_in %}
-                                <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.4 %}"><i class="icon-book"></i> {{item.5}}</a></li>
-      		 	                {% else %}
-      		 	                    <li><i class="icon-book"></i> {{item.5}}</li>
-      		 	                {% endif %}
-      		 	            {% endifequal %}
-      		 		    {% ifequal item.0 'file' %}
-					{% if is_logged_in %}
-					
-					    <li><a href="{{item.4}}"><i class="icon-{{item.6}}"></i> {{item.5}}</a></li>
-					{% else %}
-					    <li><i class="icon-{{item.6}}"></i> {{item.5}}<li>
-					{% endif %}
-				    {% endifequal %}
-				{% endifequal %}
-        	        {% endfor %}	
-        	    {% endfor %}
-
+                        {% ifequal item.0 'file' %}
+                            {% if is_logged_in %}
+                                <li><a href="{{item.4}}"><em class="icon-{{item.6}}"></em> <span>{{item.5}}</span></a></li>
+                                {% else %}
+                                <li><em class="icon-{{item.6}}"></em> <span>{{item.5}}</span><li>
+                                {% endif %}
+                            {% endifequal %}
+                        {% endifequal %}
+                    {% endfor %}	
+                {% endfor %}
             <li class="divider"></li>
+            </ul>
         	{% endfor %}
-        
-            <li><a href="#">Help/FAQs</a></li>
+        <ul class="nav nav-list">
+            <li><a href="{% url 'c2g.views.faq' %}">Help/FAQs</a></li>
             <li><a href="{% url 'c2g.views.contactus' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Contact</a></li>
         </ul>
     </div>

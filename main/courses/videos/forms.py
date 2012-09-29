@@ -1,5 +1,5 @@
 from django import forms
-from c2g.models import ContentSection, Video, Exercise
+from c2g.models import ContentSection, Video, Exercise, Course
 # import the logging library
 #import logging
 #logger = logging.getLogger('django')
@@ -49,7 +49,8 @@ class ManageExercisesForm(forms.Form):
         file = cleaned_data.get('file')
         course = cleaned_data.get('course')
         if file and course:
-            exercises = Exercise.objects.filter(video__course=course, fileName=file)
+            course_inst = Course.objects.get(id=course)
+            exercises = Exercise.objects.filter(handle=course_inst.handle, fileName=file, is_deleted=0)
             if len(exercises) > 0:
                 self._errors['file'] = self.error_class(['An exercise by this name has already been uploaded'])
         return cleaned_data
