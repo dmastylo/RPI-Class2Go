@@ -67,15 +67,16 @@ function confirm_change(){
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
 
-    <table style="width:35%">
+    <table style="width:50%">
     {% for field in reorder_form %}
     <tr id="video_{{item.video.id}}">
         <td><p style="margin-top:10px;display:inline;">{{field.label}}</p></td>
-        <td width="120">
+        <td style="width:50px">
             {{field.errors}} {{field}}
         </td>
-        <td width="20">
-            <a href="javascript:DeleteExercise('{{field.name}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
+        <td style="width:200px">
+            <a href="javascript:DeleteExercise('{{field.name}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">X</a>
+            <a class="pull-right" style="float:right;margin-right:10px" href="{% url 'courses.exercises.views.edit' course_prefix course_suffix field.name %}?return={{request.path}}">Edit Text or HTML</a>
         </td>
     </tr>
     {% endfor %}
