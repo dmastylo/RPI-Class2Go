@@ -63,8 +63,6 @@ $(function(){
      else {$('#wrap').text('No Wrap');}
      next = !next;
   }
-  
-  var editor = ace.edit("editor");
   editor.setValue($('#ace_proxy').val());
   editor.setTheme("ace/theme/eclipse");
   editor.getSession().setMode("ace/mode/html");
