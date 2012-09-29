@@ -3,6 +3,7 @@
 {% block mode_switcher %}{% endblock mode_switcher %}
 {% block m_column_content %}
 
+
     <style type="text/css" media="screen">
         #editor {
             position: absolute;
@@ -18,17 +19,17 @@
     </style>
     
 <h2>Editing {{filename}}</h2>
-
+<br />
+<a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
+<br />
 <textarea id="ace_proxy" style="display:none">{{file_content}}</textarea>
 <div id="container">
 <div id="editor">
 </div>
 </div>
 
-<a id="exercise_submit" class="btn" href="javascript:"> Save to Server </a> <a class="btn" href={{returnURL}}> Close </a>
+<a id="exercise_submit_and_close" class="btn" href="javascript:"> Save to Server &amp; Close </a> <a id="exercise_submit" class="btn" href="javascript:"> Save to Server </a> <a class="btn" href={{returnURL}}> Close </a>
 <br></br>
-<a id="wrap" class="btn" href="javascript:"> Wrap </a> 
-<a id="noWrap" class="btn" href="javascript:"> No wrap</a>
 
 {% endblock m_column_content %}
 {% block addl_scripts %}
@@ -37,7 +38,7 @@
 $(function(){
 
   
-  var saveExerciseContents = function(){
+  var saveExerciseContents = function(callback){return function(){
       var csrftoken = '{{csrf_token}}';
       var filename = '{{filename}}';
 
@@ -49,29 +50,31 @@ $(function(){
              error: function(jqXHR, status, errorMsg) { alert("An error happened.  Your changes weren't saved to the server");},
              success: function(data,textStatus,jqXHR){
                           alert("Your changes to file "+ jqXHR.responseText + " were saved to the server ");
+                          callback();
                       },
              });
+      };
+  };
+  var next=true;
   
-  };    
-  
-  var wrap =  function(){
-    editor.getSession().setUseWrapMode(true);
+  var toggleWrap = function (){
+     editor.getSession().setUseWrapMode(next);
+     if (next) { $('#wrap').text('Wrap');}
+     else {$('#wrap').text('No Wrap');}
+     next = !next;
   }
-  
-  var noWrap = function(){
-    editor.getSession().setUseWrapMode(false);
-  }
-
   
   var editor = ace.edit("editor");
   editor.setValue($('#ace_proxy').val());
   editor.setTheme("ace/theme/eclipse");
   editor.getSession().setMode("ace/mode/html");
-  
-  $('#exercise_submit').click(saveExerciseContents);
-  $('#wrap').click(wrap);
-  $('#noWrap').click(noWrap);
+  editor.getSession().setUseWrapMode(true);
+  $('#exercise_submit').click(saveExerciseContents(function(){}));
+  $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
 
+  $('#wrap').click(toggleWrap);
+  $('#wrap').click();
+  
 });
 </script>
 {% endblock addl_scripts %}
