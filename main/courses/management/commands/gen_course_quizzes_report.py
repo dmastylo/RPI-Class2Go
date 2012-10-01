@@ -5,7 +5,7 @@ from django.db import connection, transaction
 from courses.reports.generation.course_quizzes import *
 
 class Command(BaseCommand):
-    help = "Get stats of all quizzes in the course\n"
+    help = "Get quiz stats for the course. Syntax: manage.py gen_course_quizzes_report <course_handle> [save_to_s3 (1 or 0)]\n"
         
     def handle(self, *args, **options):
         if len(args) == 0:
@@ -16,5 +16,11 @@ class Command(BaseCommand):
         except:
             print "Failed to find course with given handle"
             return
-            
-        print gen_course_quizzes_report(course)
+        
+        save_to_s3 = False
+        if len(args) > 1: save_to_s3 = True if (args[1] == '1') else False
+        
+        report = gen_course_quizzes_report(course, save_to_s3)
+        if save_to_s3:
+            if report['path']: print "Report successfully written to: %s" % report['path']
+            else: print "Failed to generate report or write it to S3!"

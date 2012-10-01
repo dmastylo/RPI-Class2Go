@@ -177,6 +177,7 @@ INSTALLED_APPS = (
                       'courses.videos',
                       'courses.video_exercises',
                       'courses.email_members',
+                      'courses.reports',
                       'khan',
                       'problemsets',
                       'django.contrib.flatpages',
