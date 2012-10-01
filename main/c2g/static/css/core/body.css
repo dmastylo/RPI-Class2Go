@@ -4,7 +4,7 @@
 h1,h2,h3,h4 {margin:0;}
 
 h3 {margin-bottom:.5em;font-size:20px;}
-h4 {margin-bottom:.5em;}
+h4 {margin-bottom:.5em;font-size:16px;}
 
 a {color:#820000;}
 a:hover {color:#820000;}
@@ -118,9 +118,22 @@ a.thumbnail:hover {
 .page-header {
   margin-top:0;
 }
-
-ul.nav li.dropdown:hover ul.dropdown-menu{
-    display: block;    
+ul.nav li.dropdown ul.dropdown-menu {
+    margin-top:0px;
+    margin-left:-1px;
+      -webkit-border-radius: 0 0 6px 6px;
+     -moz-border-radius: 0 0 6px 6px;
+          border-radius: 0 0 6px 6px;
+}
+ul.nav li.dropdown:hover ul.dropdown-menu,
+.navbar .nav li.dropdown.open ul.dropdown-menu {
+    display: block;
+    border-top:0;
+    background:#f8f6ea;
+}
+ul.nav li.dropdown:hover ul.dropdown-menu a,
+.navbar .nav li.dropdown.open ul.dropdown-menu a {
+    padding: 3px 20px 3px 10px;
 }
 .caret {
     opacity:.4;
@@ -132,9 +145,13 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
     border-top-color: #222;
     border-bottom-color: #222;
 }
-.navbar .nav li.dropdown:hover .dropdown-toggle .caret, .navbar .nav li.dropdown.open .caret {
-    border-top-color: white;
-    border-bottom-color: white;
+.navbar .nav li.dropdown:hover .dropdown-toggle,
+.navbar .nav li.dropdown.open .dropdown-toggle {
+    background:#f8f6ea;
+}
+.navbar .nav li.dropdown:hover .dropdown-toggle .caret, 
+.navbar .nav li.dropdown.open .caret {
+
 }
 .navbar .nav li.dropdown.open a {
     color: white;
@@ -142,10 +159,8 @@ ul.nav li.dropdown:hover ul.dropdown-menu{
 .navbar .nav li.dropdown.open ul.dropdown-menu a {
     color: #333;
 }
-.navbar .dropdown-menu::before,
-.navbar .dropdown-menu::after /* Removes carets! */
-{
-    content: '';
+.navbar .nav li.dropdown.open ul.dropdown-menu a:hover {
+    color: white;
 }
 .progress {
     margin-bottom:8px;
@@ -305,7 +320,7 @@ small.date {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 .toggle-views {
-    width: 250px;
+    width: 265px;
     padding: 7px 7px 0;
     *padding: 7px;
     color: #333;

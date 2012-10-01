@@ -4473,7 +4473,7 @@ input[type="submit"].btn.btn-mini {
   margin-top: 3px;
 }
 
-.navbar .nav > li > .dropdown-menu:before {
+/*.navbar .nav > li > .dropdown-menu:before {
   position: absolute;
   top: -7px;
   left: 9px;
@@ -4494,7 +4494,7 @@ input[type="submit"].btn.btn-mini {
   border-bottom: 6px solid #ffffff;
   border-left: 6px solid transparent;
   content: '';
-}
+}*/
 
 .navbar-fixed-bottom .nav > li > .dropdown-menu:before {
   top: auto;

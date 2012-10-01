@@ -876,7 +876,7 @@ width: auto;
 .navbar .nav .active > a, .navbar .nav .active > a:hover {
     color:#820000;
     background:#eadeb9;
-    background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
+    background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -15px;
 }
 .navbar .nav > li > a {
     padding: 7px 10px 8px;
@@ -903,7 +903,7 @@ width: auto;
   .navbar .nav .active > a, .navbar .nav .active > a:hover {
       color:#820000;
       background:#eadeb9;
-      background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -16px;
+      background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -15px;
   }
   .navbar .nav > li > a {
       padding: 7px 10px 8px;
