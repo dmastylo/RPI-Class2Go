@@ -45,10 +45,10 @@ def WriteQuizDataToReport(q, rw):
     
     # Get exercises
     if isinstance(q, Video):
-        exercise_rlns = VideoToExercise.objects.filter(video=q).order_by('video_time')
+        exercise_rlns = VideoToExercise.objects.filter(video=q, is_deleted=0).order_by('video_time')
         
     else:
-        exercise_rlns = ProblemSetToExercise.objects.filter(problemSet=q).order_by('number')
+        exercise_rlns = ProblemSetToExercise.objects.filter(problemSet=q, is_deleted=0).order_by('number')
         exercises = exercise_rlns.values_list('exercise', flat=True)
         
     if len(exercise_rlns) == 0:
