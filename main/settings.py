@@ -204,10 +204,17 @@ try:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
     AWS_STORAGE_BUCKET_NAME
-    AWS_SECURE_STORAGE_BUCKET_NAME
 except NameError:
     # TODO: fail if not defined
     pass
+    
+try:
+    AWS_SECURE_STORAGE_BUCKET_NAME
+except NameError:
+    if AWS_STORAGE_BUCKET_NAME.count('-') == 1:
+        AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME.split('-')[0]+'-secure-'+AWS_STORAGE_BUCKET_NAME.split('-')[1]
+    else:
+        AWS_SECURE_STORAGE_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME # If bucket name does not follow our S3 conventions, set secure bucket to be same as bucket
 
 # Setting these variables to 'local' is the idiom for using local storage.
 if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
@@ -220,6 +227,9 @@ if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
     except NameError:
         # TODO: fail if not defined
         pass
+
+#Sets the expires parameter in s3 urls to 10 years out.
+AWS_QUERYSTRING_EXPIRE = 3.156e+8
 
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'

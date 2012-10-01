@@ -48,7 +48,6 @@ def preview(request, course_prefix, course_suffix):
     context = RequestContext(request)
     template_name='previews/default.html'
     class_template='previews/'+request.common_page_data['course'].handle+'.html'
-    logger.info(settings.TEMPLATE_DIRS)
     if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
         template_name=class_template
     return render_to_response(template_name,

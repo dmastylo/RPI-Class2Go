@@ -37,10 +37,8 @@ def list(request, course_prefix, course_suffix):
 
 @auth_view_wrapper
 def show(request, course_prefix, course_suffix, pset_slug):
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
+    
+    common_page_data = request.common_page_data 
     try:
         ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
     except:
@@ -61,7 +59,8 @@ def show(request, course_prefix, course_suffix, pset_slug):
     activity_list = []
     for psetToEx in psetToExs:
         #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-time_created')
-        attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-complete', '-attempt_number')
+        #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-complete', '-attempt_number')
+        attempts = problem_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('-complete', '-attempt_number')  
         if len(attempts) > 0:
             activity_list.append(attempts[0])
     return render_to_response('problemsets/problemset.html',
@@ -94,7 +93,7 @@ def attempt(request, problemId):
                                            problemset_to_exercise = problemset_to_exercise,
                                            complete = request.POST['complete'],
                                            attempt_content = request.POST['attempt_content'],
-                                           count_hints = request.POST['count_hints'],
+                                           count_hints = request.POST.get('count_hints', 0),
                                            time_taken = request.POST['time_taken'],
                                            seed = request.POST['seed'],
                                            attempt_number = attempts,
@@ -114,7 +113,7 @@ def attempt(request, problemId):
                                            video_to_exercise = video_to_exercise,
                                            complete = request.POST['complete'],
                                            attempt_content = request.POST['attempt_content'],
-                                           count_hints = request.POST['count_hints'],
+                                           count_hints = request.POST.get('count_hints', 0),
                                            time_taken = request.POST['time_taken'],
                                            seed = request.POST['seed'],
                                            attempt_number = attempts,
