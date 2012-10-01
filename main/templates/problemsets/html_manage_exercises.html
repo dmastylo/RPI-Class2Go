@@ -67,6 +67,7 @@ function confirm_change(){
             {% for psetToEx in psetToExs %}
                 <li id="exercise_{{forloop.counter0}}" class="ui-state-default">
                     {{psetToEx.exercise.fileName}}
+                     <a class="btn" href="{% url 'courses.exercises.views.edit' course_prefix course_suffix psetToEx.exercise.fileName %}?return={{request.path}}">Edit</a>
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
                     <a href="javascript:DeleteExercise('{{psetToEx.id}}', '{{psetToEx.exercise.fileName}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
                 </li>
