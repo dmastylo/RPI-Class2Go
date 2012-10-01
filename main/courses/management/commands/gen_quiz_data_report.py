@@ -17,10 +17,10 @@ class Command(BaseCommand):
         except:
             print "Failed to find course with given handle"
             return
-        
+
         if args[1] == 'video':
             try:
-                ready_quiz = Video.objects.get(course=ready_course, slug=args[1])
+                ready_quiz = Video.objects.get(course=ready_course, slug=args[2])
             except:
                 print "Failed to find video with given slug"
                 return
@@ -36,4 +36,8 @@ class Command(BaseCommand):
         
         save_to_s3 = True if (len(args) > 3 and args[3] == '1') else False
         
-        gen_quiz_data_report(ready_course, ready_quiz, save_to_s3)
+        report = gen_quiz_data_report(ready_course, ready_quiz, save_to_s3)
+        if save_to_s3:
+            if report['path']: print "Report successfully written to: %s" % report['path']
+            else: print "Failed to generate report or write it to S3!"
+        

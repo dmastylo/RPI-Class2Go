@@ -8,9 +8,11 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
     dt = datetime.now()
     course_prefix = ready_course.handle.split('--')[0]
     course_suffix = ready_course.handle.split('--')[1]
-    s3_filepath = "%s/%s/reports/dashboard/%02d_%02d_%02d__%02d_%02d_%02d-%s-Dashboard.csv" % (course_prefix, course_suffix, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix)
     
-    rw = C2GReportWriter(ready_course, save_to_s3, s3_filepath)
+    report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s-Dashboard.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix)
+    s3_filepath = "%s/%s/reports/dashboard/%s" % (course_prefix, course_suffix, report_name)
+    
+    rw = C2GReportWriter(save_to_s3, s3_filepath)
     
     # Title
     rw.write(content = ["Dashboard for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
@@ -85,7 +87,9 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
         rw.write(content = ["No live content pages yet."], indent = 2)
     rw.write([""])
     
-    rw.close()
+    report_content = rw.writeout()
+    return {'name': "%02d_%02d_%02d__%02d_%02d_%02d-%s-Dashboard.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix), 'content': report_content, 'path': s3_filepath}
+    
 
 def get_visit_information(ready_course, items, page_type):
     if items == None:
