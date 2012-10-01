@@ -157,5 +157,5 @@ def median(l):
     if len(l) == 0: return None
     
     l = sorted(l)
-    if (len(l)%2) == 0: return math.round((l[len(l)/2] + l[1 + len(l)/2]) / 2.0)
-    else: return l[(len(l)+1)/2]
+    if (len(l)%2) == 0: return (l[len(l)/2] + l[(len(l)-1)/2]) / 2.0
+    else: return l[(len(l)-1)/2]
