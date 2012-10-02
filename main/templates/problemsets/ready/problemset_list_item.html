@@ -3,7 +3,7 @@
         <em class="icon-pencil"></em>
     </div>
     <div class="course-list-content">
-        <h4><a href="problemsets/{{item.problem_set.slug}}">{{item.problem_set.title}}</a></h4>
+        <h4><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.problem_set.slug %}">{{item.problem_set.title}}</a></h4>
         <p>{{item.problem_set.description}}</p>
         <p><strong>Full Credit Deadline:</strong> {{item.problem_set.due_date}} PST<br>
         <strong>Partial Credit Deadline:</strong> {{item.problem_set.partial_credit_deadline}} PST</p>
