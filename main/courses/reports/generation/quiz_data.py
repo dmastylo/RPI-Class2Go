@@ -21,7 +21,6 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
 
     data = {}
     
-    
     if is_video: rlns = VideoToExercise.objects.filter(video=ready_quiz, is_deleted=0).order_by('video_time')
     else: rlns = ProblemSetToExercise.objects.filter(problemSet=ready_quiz, is_deleted=0).order_by('number')
     
@@ -33,7 +32,7 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
                 stud_fullname = vv.user.first_name + " " + vv.user.last_name
                 data[vv.user.username] = {'username': stud_username, 'name': stud_fullname, 'visits':[]}
             data[vv.user.username]['visits'].append("%s-%s-%s at %s:%s" % (vv.time_created.year, vv.time_created.month, vv.time_created.day, vv.time_created.hour, vv.time_created.minute))
-            
+    
     ex_ids = []
     for rln in rlns:
         ex = rln.exercise
@@ -46,7 +45,6 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         completes = atts.values_list('complete', flat=True)
         times_taken = atts.values_list('time_taken', flat=True)
         attempts_content = atts.values_list('attempt_content', flat=True)
-        
         
         for i in range(0, len(atts)):
             is_student_first_attempt = (i == 0) or (submitters[i] != submitters[i-1])
@@ -79,7 +77,7 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
                 
                 data[stud_username][ex.id] = {'completed': 'y' if completed else 'n', 'attempts': json.dumps(attempts), 'median_attempt_time': median(attempt_times)}
                 if is_summative: data[stud_username][ex.id]['score'] = score
-    
+                
     # Sort students by username
     sorted_usernames = sorted(data.keys())
     
@@ -87,7 +85,7 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
     if len(sorted_usernames) == 0:
         rw.write(content=["No activity yet for this %s" % 'video' if is_video else 'problem set'], indent=1)
         report_content = rw.writeout()
-        return {'path': s3_filepath, 'content': report_content}
+        return {'name': report_name, 'path': s3_filepath, 'content': report_content}
         
     header1 = ["", ""]
     header2 = ["", ""]
