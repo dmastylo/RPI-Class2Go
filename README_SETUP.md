@@ -17,6 +17,7 @@ them and send us a pull request!
 * [Mac OS X](#mac)
 * [Windows](#windows)
 * [Linux](#linux)
+* [Configuring Django](#config)
 * [Generating Test Data](#testdata)
 
 It is a big step to go from a dev instance to a full-on deployed 
@@ -28,10 +29,10 @@ For Mac
 
 General Instructions:
 
-- Set-up Python
-- Set-up Python's virtual env
-- Set-up Django
-- Set-up Mysql
+* Set-up Python
+* Set-up Python's virtual env
+* Set-up Django
+* Set-up Mysql
 
 For MAC OS-X Lion: Instructions mainly taken from 
 http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-and-homebrew/
@@ -339,6 +340,28 @@ When you want to start working on your project, just do the following:
     workon class2go
     cd project (shouldn't be necessary, as workon command will automatically cd to project dir, but use it if you need to)
     python manage.py runserver 8100
+
+
+<a id="config"></a>
+Configuring Django
+------------------
+
+The "main" dir is where the django project lives.  You will spend
+most of your time in there.  All the runtime application source is
+under main, and the manage.py script is the interface to runtime
+command line tools.
+
+We partition our django project settings into two settings files:
+
+* **settings.py** - Most of the project settings are in here.  This
+    shoudl be familiar to any django dev.
+
+* **database.py** - Anything that should *not* be checked in, i.e.
+    secret keys or local configuration, should be in the database.py
+    file.  Upon setting up your project one of the first things you
+    have to do is create your own database.py.  There is an example
+    file to get you started, database_example.py.
+
 
 
 <a id="testdata"></a>
