@@ -96,6 +96,8 @@ def main(request, course_prefix, course_suffix):
                     icon_type="picture"  
                 elif (file_extension in ('mp3', 'aac')):
                     icon_type="music"
+                elif (file_extension in ('gz', 'zip', 'tar', 'bz', 'bz2')):
+                    icon_type="download-alt"
                 else:
                     icon_type="file"
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
