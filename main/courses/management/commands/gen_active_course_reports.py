@@ -15,5 +15,5 @@ class Command(BaseCommand):
         
         for ready_course in active_courses:
             email_title = "[Class2Go] Daily %s Reports" % ready_course.handle.replace('--', '-')
-            email_message = "To generate or download any of Class2Go's report types, please visit your course's reports page from Course Administration->Reports, or click <a href='https://class.stanford.edu/%s/browse_reports'>here</a>." % ready_course.handle.replace('--', '/')
-            generate_and_email_reports('c2g_daily_report_mailer', ready_course.handle, [{'type':'dashboard'}, {'type':'course_quizzes'}], email_title, email_message)
+            email_message = "To generate or download any of Class2Go's report types, please visit your course's reports page from Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % ready_course.handle.replace('--', '/')
+            generate_and_email_reports.delay('c2g_daily_report_mailer', ready_course.handle, [{'type':'dashboard'}, {'type':'course_quizzes'}], email_title, email_message)

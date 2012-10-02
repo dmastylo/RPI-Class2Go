@@ -85,7 +85,7 @@ def generate_report(request):
         email_title = "[Class2Go] Video Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'video', 'slug': slug}]
     
-    email_message = "The report is attached. It is also downloadable now from your course's <a href='https://class.stanford.edu/%s/browse_reports'>reports page</a> under Course Administration->Reports" % course_handle.replace('--', '/')
+    email_message = "The report is attached. You can also download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
     
     generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message)
     
