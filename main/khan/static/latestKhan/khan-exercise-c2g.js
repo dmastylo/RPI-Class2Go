@@ -2213,68 +2213,96 @@ var Khan = (function() {
         }
 
         function handleSubmit() {
-            var pass = (exAssessType != "survey") ? validator() : true;
+            var pass = false;
+            if (exAssessType == "survey") {
+                if ($('#testinput').length) {
+                    // it's a "short-answer"
+                    if ($('#testinput').val() != "") {
+                        // anything non-empty is OK
+                        pass = true;
+                    } else {
+                        // not answered, don't do anything
+                        return false;
+                    }
+                } else if ($('input[name|=solution]').length) {
+                    // it's multiple choice, check to see if one is selected
+                    if ($('input[name|=solution]:checked').length) {
+                        pass = true; 
+                    } else {
+                        return false;
+                    }
+                }
+            } else {
+                pass = validator();
+            }
             // Stop if the user didn't enter a response
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
 
-            // [C2G] Don't check for empty if this is a summative exercise
-            //console.log(exAssessType);
-            if (exAssessType !== "summative" && checkIfAnswerEmpty()) {
-                return false;
-            } else {
-                guessLog.push(validator.guess);
-            }
-            //console.log("still in handleSubmit");
-
-            // Stop if the form is already disabled and we're waiting for a response.
-            if ($("#answercontent input").not("#hint,#next-question-button").is(":disabled")) {
-                return false;
-            }
-
-            $("#answercontent input").not("#check-answer-button, #hint")
-                .attr("disabled", "disabled");
-            $("#check-answer-results p").hide();
-
-            var checkAnswerButton = $("#check-answer-button");
-
-            // If incorrect, warn the user and help them in any way we can
-            if (pass != true) {
-                checkAnswerButton
-                    .effect("shake", {times: 3, distance: 5}, 80)
-                    .val("Try Again");
-
-                // Is this a message to be shown?
-                if (typeof pass === "string") {
-                    $("#check-answer-results .check-answer-message").html(pass).tmpl().show();
+            console.log(guessLog);
+            if (exAssessType != "survey") {
+                // [C2G] Don't check for empty if this is a summative exercise
+                //console.log(exAssessType);
+                if (exAssessType !== "summative" && checkIfAnswerEmpty()) {
+                    return false;
+                } else {
+                    guessLog.push(validator.guess);
                 }
 
-                // Refocus text field so user can type a new answer
-                if (lastFocusedSolutionInput != null) {
-                    setTimeout(function() {
-                        var focusInput = $(lastFocusedSolutionInput);
+                // Stop if the form is already disabled and we're waiting for a response.
+                if ($("#answercontent input").not("#hint,#next-question-button").is(":disabled")) {
+                    return false;
+                }
 
-                        if (!focusInput.is(":disabled")) {
-                            // focus should always work; hopefully select will work for text fields
-                            focusInput.focus();
-                            if (focusInput.is("input:text")) {
-                                focusInput.select();
+                $("#answercontent input").not("#check-answer-button, #hint")
+                    .attr("disabled", "disabled");
+                $("#check-answer-results p").hide();
+
+                var checkAnswerButton = $("#check-answer-button");
+
+                // If incorrect, warn the user and help them in any way we can
+                if (pass != true) {
+                    checkAnswerButton
+                        .effect("shake", {times: 3, distance: 5}, 80)
+                        .val("Try Again");
+
+                    // Is this a message to be shown?
+                    if (typeof pass === "string") {
+                        $("#check-answer-results .check-answer-message").html(pass).tmpl().show();
+                    }
+
+                    // Refocus text field so user can type a new answer
+                    if (lastFocusedSolutionInput != null) {
+                        setTimeout(function() {
+                            var focusInput = $(lastFocusedSolutionInput);
+
+                            if (!focusInput.is(":disabled")) {
+                                // focus should always work; hopefully select will work for text fields
+                                focusInput.focus();
+                                if (focusInput.is("input:text")) {
+                                    focusInput.select();
+                                }
                             }
-                        }
-                    }, 1);
+                        }, 1);
+                    }
                 }
-            }
 
-            if (pass === true) {
-                // Problem has been completed but pending data request being
-                // sent to server.
-                $(Khan).trigger("problemDone");
-            }
+                if (pass === true) {
+                    // Problem has been completed but pending data request being
+                    // sent to server.
+                    $(Khan).trigger("problemDone");
+                }
+
+            } else {
+                $('#next-question-button').val("Next Question");
+            } // END CHECK FOR SURVEY
 
             // Save the problem results to the server
             var curTime = new Date().getTime();
             var data = buildAttemptData(pass, ++attempts, JSON.stringify(validator.guess), curTime);
             request("problems/" + problemNum + "/attempt", data, function() {
+                
+                console.log("In the request call!!!!");
 
                 // TODO: Save locally if offline
                 $(Khan).trigger("attemptSaved");
@@ -2911,6 +2939,8 @@ var Khan = (function() {
             user_selection_val = $('input#testinput').val();
         } else if ($('input:radio[name=solution]').length) {
             user_selection_val = $('input:radio[name=solution]:checked').val();
+        } else {
+            user_selection_val = "";
         }
         user_choices = [];
         $('#solutionarea span.value').each(function () {
@@ -2930,6 +2960,9 @@ var Khan = (function() {
         //if (exAssessType == "summative") {
         //    data['attempt_content'] = $('input:radio[name=solution]:checked').next('span.value').text();
         //}
+        if (typeof data['attempt_content'] == "undefined") {
+            data['attempt_content'] = user_selection_val;
+        } 
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         // store user_selection_val
@@ -2966,10 +2999,18 @@ var Khan = (function() {
 
                 // [C2G] If user got question correct
                 if (data['exercise_status'] == "complete") {
-                    $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                    if (exAssessType == "survey") {
+                        $('.current-question').addClass('survey-answered').append('<i class="icon-ok-sign"></i>');
+                    } else {
+                        $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                    }
                     $('.current-question').data("correct", true);
                     if ($('.current-question').is($('#questions-stack li:last'))) {
-                        $('#next-question-button').val('Correct! View Summary');
+                        if (exAssessType == "survey") {
+                            $('#next-question-button').val('View Survey Summary');
+                        } else {
+                            $('#next-question-button').val('Correct! View Summary');
+                        }
                         $('#next-question-button').unbind('click');
                         $('#next-question-button').click(function () {
                             location.href = c2gConfig.progessUrl;
