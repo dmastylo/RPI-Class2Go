@@ -51,8 +51,8 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
             is_student_last_attempt = (i == len(atts)-1) or (submitters[i] != submitters[i+1])
             
             if is_student_first_attempt:
+                stud_username = atts[i].student.username
                 if not atts[i].student.username in data:
-                    stud_username = atts[i].student.username
                     stud_fullname = atts[i].student.first_name + " " + atts[i].student.last_name
                     data[stud_username] = {'username': stud_username, 'name': stud_fullname, 'visits':[]}
                 attempt_number = 0
@@ -83,7 +83,7 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
     
     # If not activity, do not type anything unneeded.
     if len(sorted_usernames) == 0:
-        rw.write(content=["No activity yet for this %s" % 'video' if is_video else 'problem set'], indent=1)
+        rw.write(content=["No activity yet for this %s" % ('video' if is_video else 'problem set')], indent=1)
         report_content = rw.writeout()
         return {'name': report_name, 'path': s3_filepath, 'content': report_content}
         
