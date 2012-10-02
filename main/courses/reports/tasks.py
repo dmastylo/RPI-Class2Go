@@ -45,7 +45,7 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
                 # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
                 try:
                     quiz = ProblemSet.objects.get(course=ready_course, slug=slug)
-                except:
+                except ProblemSet.DoesNotExist:
                     quiz = ProblemSet.objects.get(course=ready_course.image, slug=slug)
                     
                 report = gen_quiz_data_report(ready_course, quiz, save_to_s3=True)
@@ -64,7 +64,7 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
                 # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
                 try:
                     quiz = Video.objects.get(course=ready_course, slug=slug)
-                except:
+                except Video.DoesNotExist:
                     quiz = Video.objects.get(course=ready_course.image, slug=slug)
                     
                 report = gen_quiz_data_report(ready_course, quiz, save_to_s3=True)

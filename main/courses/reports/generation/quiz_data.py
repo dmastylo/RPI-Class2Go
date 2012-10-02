@@ -87,7 +87,7 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
     if len(sorted_usernames) == 0:
         rw.write(content=["No activity yet for this %s" % 'video' if is_video else 'problem set'], indent=1)
         report_content = rw.writeout()
-        return {'path': s3_filepath, 'content': report_content}
+        return {'name': report_name, 'path': s3_filepath, 'content': report_content}
         
     header1 = ["", ""]
     header2 = ["", ""]
