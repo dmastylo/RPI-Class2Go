@@ -227,6 +227,9 @@ if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
         # TODO: fail if not defined
         pass
 
+#Sets the expires parameter in s3 urls to 10 years out.
+AWS_QUERYSTRING_EXPIRE = 3.156e+8
+
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
 

@@ -21,8 +21,8 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
     data = {}
     mean = lambda k: sum(k)/len(k)
     
-    if isinstance(ready_quiz, Video): rlns = VideoToExercise.objects.get(video=ready_quiz).order_by('video_time')
-    else: rlns = ProblemSetToExercise.objects.filter(problemSet=ready_quiz,).order_by('number')
+    if isinstance(ready_quiz, Video): rlns = VideoToExercise.objects.filter(video=ready_quiz, is_deleted=0).order_by('video_time')
+    else: rlns = ProblemSetToExercise.objects.filter(problemSet=ready_quiz, is_deleted=0).order_by('number')
     
     ex_ids = []
     for rln in rlns:
