@@ -87,8 +87,7 @@ def generate_report(request):
     
     email_message = "The report is attached. You can also download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
     
-    #generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message)
-    generate_and_email_reports(request.user.username, course_handle, req_reports, email_title, email_message)
+    generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message)
     
     return redirect(request.META.get('HTTP_REFERER', None))
 
