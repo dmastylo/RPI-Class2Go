@@ -1,0 +1,80 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block mode_switcher %}{% endblock mode_switcher %}
+{% block m_column_content %}
+
+
+    <style type="text/css" media="screen">
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+        #container{
+            position:relative;
+            height:450px;
+        }
+    </style>
+    
+<h2>Editing {{filename}}</h2>
+<br />
+<a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
+<br />
+<textarea id="ace_proxy" style="display:none">{{file_content}}</textarea>
+<div id="container">
+<div id="editor">
+</div>
+</div>
+
+<a id="exercise_submit_and_close" class="btn" href="javascript:"> Save to Server &amp; Close </a> <a id="exercise_submit" class="btn" href="javascript:"> Save to Server </a> <a class="btn" href={{returnURL}}> Close </a>
+<br></br>
+
+{% endblock m_column_content %}
+{% block addl_scripts %}
+<script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
+<script>
+$(function(){
+
+  
+  var saveExerciseContents = function(callback){return function(){
+      var csrftoken = '{{csrf_token}}';
+      var filename = '{{filename}}';
+
+      $.ajax("{% url 'courses.exercises.views.save' common_page_data.course_prefix common_page_data.course_suffix filename %}",{
+             headers: {'X-CSRFToken': csrftoken},
+             type: 'POST',
+             data: { content:editor.getValue(),
+                    },
+             error: function(jqXHR, status, errorMsg) { alert("An error happened.  Your changes weren't saved to the server");},
+             success: function(data,textStatus,jqXHR){
+                          alert("Your changes to file "+ jqXHR.responseText + " were saved to the server ");
+                          callback();
+                      },
+             });
+      };
+  };
+  var next=true;
+  
+  var toggleWrap = function (){
+     editor.getSession().setUseWrapMode(next);
+     if (next) { $('#wrap').text('Wrap');}
+     else {$('#wrap').text('No Wrap');}
+     next = !next;
+  }
+  
+  var editor = ace.edit("editor");
+  editor.setValue($('#ace_proxy').val());
+  editor.setTheme("ace/theme/eclipse");
+  editor.getSession().setMode("ace/mode/html");
+  editor.getSession().setUseWrapMode(true);
+  $('#exercise_submit').click(saveExerciseContents(function(){}));
+  $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
+
+  $('#wrap').click(toggleWrap);
+  $('#wrap').click();
+  
+});
+</script>
+{% endblock addl_scripts %}
