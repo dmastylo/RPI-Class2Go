@@ -103,6 +103,18 @@ commercial, some open source. But a ton of good stuff.
   [gh]:   http://www.github.com/
 
 
+Contributing
+------------
+
+We welcome others contributing to the project.  Begin by checking out our 
+source from here and using the README_SETUP.md file to get a development
+environment set up.  There are also some docs available on the Project Wiki
+here on GitHub.
+
+Before sending unsolicited pull requests it is often best to discuss your
+intentions with the core dev team. Send us mail: <class2go-contact@cs.stanford.edu>.
+
+
 License
 -------
 
