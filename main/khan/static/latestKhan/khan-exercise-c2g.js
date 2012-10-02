@@ -917,6 +917,8 @@ var Khan = (function() {
         // [C2G] Added text change for Summative exercises
         if (typeof exAssessType != "undefined" && exAssessType == "summative") {
             $("#check-answer-button").val("Submit Answer");
+        } else if (typeof exAssessType != "undefined" && exAssessType == "survey") {
+            $("#check-answer-button").val("Submit Response");
         } else {
             $("#check-answer-button").val("Check Answer");
         }
@@ -1256,7 +1258,7 @@ var Khan = (function() {
         $(".hint-box").show();
 
         // [C2G] Adding check for summative exercises, which shouldn't have hints
-        if (hints.length === 0 || exAssessType == "summative") {
+        if (hints.length === 0 || exAssessType == "summative" || exAssessType == "survey") {
             $(".hint-box").hide();
         }
 
@@ -1438,9 +1440,12 @@ var Khan = (function() {
             typeof KhanC2G.PSActivityLog.problems != "undefined" &&
             KhanC2G.PSActivityLog.problems[exerciseRef] && 
             KhanC2G.PSActivityLog.problems[exerciseRef]['correct']) {
-            $('#solutionarea input').attr('disabled', 'disabled');
             $('#solutionarea').remove('p');
-            $('#check-answer-button').hide();
+            // TODO: clean up all the handling of the solution area based on types
+            if (exAssessType != "survey") {
+                $('#solutionarea input').attr('disabled', 'disabled');
+                $('#check-answer-button').hide();
+            }
             $('.hint-box').hide();
             if (exAssessType == "summative") {
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
@@ -1452,7 +1457,11 @@ var Khan = (function() {
                 $('#attempt-penalty-note').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
             }
-            $("#check-answer-button").val("Submit Answer");
+            if (exAssessType == "survey") {
+                $("#check-answer-button").val("Submit Response");
+            } else {
+                $("#check-answer-button").val("Submit Answer");
+            }
             $("#check-answer-button").show();
         }
 
@@ -1461,6 +1470,15 @@ var Khan = (function() {
                 $('#submit-problemset-button').parent().show();
             } else {
                 $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
+                $('#submit-problemset-button').click(function () {
+                    location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
+                });
+            }
+        } else if (exAssessType == "survey" && $('.current-question').is($('#questions-stack li:last'))) {
+            if ($('#submit-problemset-button').length) {
+                $('#submit-problemset-button').parent().show();
+            } else {
+                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Survey"/></div>');
                 $('#submit-problemset-button').click(function () {
                     location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
                 });
@@ -2239,7 +2257,6 @@ var Khan = (function() {
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
 
-            console.log(guessLog);
             if (exAssessType != "survey") {
                 // [C2G] Don't check for empty if this is a summative exercise
                 //console.log(exAssessType);
@@ -3510,7 +3527,12 @@ var Khan = (function() {
             });
 
             // [C2G] Add "View Progress" button to all problem sets
-            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" value="View Problem Set Progress"/></div>');
+            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" /></div>');
+            if (exAssessType == "survey") {
+                $('#view-progress-button').val("View Survey Progress");
+            } else {
+                $('#view-progress-button').val("View Problem Set Progress");
+            }
             $('#view-progress-button').click(function () {
                 location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
             });

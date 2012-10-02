@@ -22,6 +22,8 @@ article.exercises-content div.exercises-header .section-headline div.topic-exerc
 #questions-stack li.current-question { border-color: #cc6200; position: relative; left: .5em; z-index: 2; }
 #questions-stack li.correctly-answered { background-color: #afdcaf; color: #070; position: relative; }
 #questions-stack li.correctly-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }
+.survey #questions-stack li.correctly-answered { background-color: #ddd; border-color: #777; color: #777; position: relative; }
+.survey #questions-stack li.correctly-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }
 #questions-stack li.survey-answered { background-color: #ddd; border-color: #777; color: #777; position: relative; }
 #questions-stack li.survey-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }
 
