@@ -110,7 +110,6 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     handle = models.CharField(max_length=255, null=True, db_index=True)
     preview_only_mode = models.BooleanField(default=True)
     institution_only = models.BooleanField(default=False)
-    share_to = models.ManyToManyField("self",symmetrical=False,related_name='share_from',null=True, blank=True)
 
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
