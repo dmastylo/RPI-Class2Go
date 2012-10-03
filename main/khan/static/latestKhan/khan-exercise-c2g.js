@@ -2276,11 +2276,8 @@ var Khan = (function() {
                 // here we need to store user answer so we can override
                 // what is submitted to the server
                 if (pass == true) {
-                    //console.log(userVal);
-                    //console.log($('.current-question').data());
                     $('.current-question').data('user_selection_val', userVal);
                     $('.current-question').data('userEntered', userVal);
-                    //console.log($('.current-question').data());
                     var thisProbIdx = $('.current-question').data('problemIndex');
                     KhanC2G.PSActivityLog.problems[thisProbIdx]['user_selection_val'] = userVal;
                     KhanC2G.PSActivityLog.problems[thisProbIdx]['userEntered'] = userVal;
@@ -2986,7 +2983,6 @@ var Khan = (function() {
         // [C2G] pset_id of -1 will cause error, but right now just used for in-video
         // Needs to have a real problem set associated with videos
         pset_id = ($('#pset_id').length) ? $('#pset_id').val() : -1;
-        console.log($('.current-question').data());
         if (exAssessType == "survey" || $('input:checkbox[name=survey-checkbox]').length) {
             user_selection_val = $('.current-question').data('user_selection_val');
         } else if ($('input#testinput').length) {
@@ -3014,11 +3010,9 @@ var Khan = (function() {
         //if (exAssessType == "summative") {
         //    data['attempt_content'] = $('input:radio[name=solution]:checked').next('span.value').text();
         //}
-        //console.log('ATTEMPT CONTENT: ' + data['attempt_content']);
         if (typeof data['attempt_content'] == "undefined") {
             data['attempt_content'] = user_selection_val;
         } 
-        //console.log('ATTEMPT CONTENT: ' + data['attempt_content']);
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         // store user_selection_val
@@ -3656,7 +3650,6 @@ var Khan = (function() {
                 userSelectionVal = $('.current-question').data("userEntered");
             } 
 
-            console.log('userSelectionVal is ' + userSelectionVal);
             // [C2G] If user entered something previously...
             if (userSelectionVal) {
                 if ($('#testinput').length) {
@@ -3670,7 +3663,6 @@ var Khan = (function() {
                         $('#solutionarea input').attr('disabled','disabled');
                     }
                 } else if ($('#solutionarea input:checkbox').length) {
-                    console.log('survey says ' + userSelectionVal);
                     var arrCheck = userSelectionVal.split(',');
                     for (var val = 0; val < arrCheck.length; val += 1) {
                         $('#solutionarea input:checkbox')[val].checked = true;
@@ -3818,7 +3810,6 @@ var Khan = (function() {
             // load previous answers into the solution area
             $.when(checkForInputs()).then(function () {
                 var userPrevSel = thisCard.data("userEntered");
-                console.log('userPRevSel is ' + userPrevSel);
                 var validUserChoices = thisCard.data("userChoices");
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON(thisCard.data("userChoices")).length : 0;
                 // [C2G] Just having something in "user_choices" doesn't mean it's valid, it could be an
