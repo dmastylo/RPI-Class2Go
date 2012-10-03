@@ -139,7 +139,21 @@
     })
     .disableSelection();
 
+    // Tooltip config
     $("[data-c2g-tooltip]").tooltip();
+
+    // Toggler
+    $("[data-toggler-target]").change(function(e){
+      var $this = $(this),
+        isChecked = $this.is(':checked'),
+        $target = $($this.data("toggler-target"));
+
+      if (isChecked) {
+        $target.show("fast");
+      } else {
+        $target.hide("fast");
+      }
+    });
 
 
 })(document);

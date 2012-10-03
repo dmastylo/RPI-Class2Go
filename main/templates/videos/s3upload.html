@@ -16,23 +16,21 @@
 		  {% for field in form %}
 			<div class="fieldWrapper {% if field.errors %}errors{% endif %}">
 			  {% if field.name == "url" %}
-				<label>
-			  <a href="#" rel="tooltip" title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><em class="icon-info-sign"></em>Already on YouTube?  Enter Video ID</a>
+				<label><a data-c2g-tooltip title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><em class="icon-info-sign"></em>Already on YouTube?  Enter Video ID</a>
 			  {% if field.value %}
-				<input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" checked /></label>
+				<input type="checkbox" name="yt_id" value="1" data-toggler-target="#yt_id" checked /></label>
 				<div id="yt_id">{{ field }}</div>
 			  {% else %}
-				<input type="checkbox" name="yt_id" value="1" onchange="showOption('yt_id', this.checked)" /></label>
+				<input type="checkbox" name="yt_id" value="1" data-toggler-target="#yt_id" /></label>
 				<div id="yt_id" style="display:none">{{ field }}</div>
 			  {% endif %}
 			  {% elif field.name == "live_datetime" %}
-				<label>
-			  <a href="#" rel="tooltip" title="If you're ready to set a live date for the video, check here.  If you're not ready to decide on a live date yet, you can leave this box unchecked."><em class="icon-info-sign"></em>Set Live Date</a>
+				<label><a data-c2g-tooltip title="If you're ready to set a live date for the video, check here. If you're not ready to decide on a live date yet, you can leave this box unchecked."><em class="icon-info-sign"></em>Set Live Date</a>
 			  {% if field.value %}
-				<input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" checked /></label>
+				<input type="checkbox" name="set_live_date" value="1" data-toggler-target="#live_date" checked /></label>
 					<div id="live_date">{{ field }}</div>
 			  {% else %}
-				<input type="checkbox" name="set_live_date" value="1" onchange="showOption('live_date', this.checked)" /></label>
+				<input type="checkbox" name="set_live_date" value="1" data-toggler-target="#live_date" /></label>
 					<div id="live_date" style="display:none">{{ field }}</div>
 			  {% endif %}
 			  {% else %}
@@ -82,21 +80,5 @@ $('#videoform').submit(function() {
     return true;
 });
 
-function showOption(div_id, checked) {
-    if (div_id == "yt_id") {
-        field_id = "id_url"
-    }
-    else {
-        field_id = "id_live_datetime"
-    } 
-
-    if (checked) {
-        $('#'+div_id).show('fast');
-    }
-    else {
-        $('#'+field_id).val(null);
-        $('#'+div_id).hide('fast');
-    }
-}
 </script>
 {% endblock addl_scripts %}
