@@ -746,7 +746,11 @@ var Khan = (function() {
         // Default is formative, but check problem set div for summative CSS class; 
         // otherwise, check the class name on the article element in the page
         if (typeof c2gConfig != "undefined" && c2gConfig.problemType) {
-            exAssessType = c2gConfig.problemType;
+            if (c2gConfig.problemType == "assessive") {
+                exAssessType = "summative";
+            } else {
+                exAssessType = c2gConfig.problemType;
+            }
         } else {
             if ($("div.summative").length || $("div.assessive").length ||
                 $("article.summative").length || $("article.assessive").length) {
@@ -3675,6 +3679,7 @@ var Khan = (function() {
                 } else if ($('#solutionarea input:radio:checked').length) {
                     $('#solutionarea input:radio:checked').attr('checked', false);
                 }
+                $('#check-answer-button').removeAttr('disabled');
             }
 
             $('#solutionarea').css('visibility', 'visible');
