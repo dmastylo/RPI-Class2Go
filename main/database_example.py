@@ -47,6 +47,12 @@ AWS_SECURE_STORAGE_BUCKET_NAME = 'dev-secure-c2g' # Optional. If not defined her
 # AWS_SECURE_STORAGE_BUCKET_NAME = 'local'
 # MEDIA_ROOT = '/opt/class2go/uploads'
 
+# Place where Kelvinator should do its work
+# if not specified, then under /tmp, but on Amazon, want to use ephemeral storage
+# which is /mnt for some reason
+# Generally don't need to set this in dev
+# KELVINATOR_WORKING_DIR = '/mnt'
+
 # This is if you want to change to a different logging directory than the default,
 # which is '/var/log/django/'
 # Please keep the trailing '/'

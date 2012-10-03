@@ -31,6 +31,9 @@ AWS_STORAGE_BUCKET_NAME = '<%= @node[:aws][:storage_bucket] %>'
 
 MEDIA_ROOT = ''
 
+# use AWS ephemeral storage
+KELVINATOR_WORKING_DIR = '/mnt'
+
 PIAZZA_ENDPOINT = '<%= @node[:piazza][:endpoint] %>'
 PIAZZA_KEY = '<%= @node[:piazza][:key] %>'
 PIAZZA_SECRET = '<%= @node[:piazza][:secret] %>'
