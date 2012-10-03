@@ -34,7 +34,11 @@
 
 <input type="submit" value="Login" class="btn" />
 &nbsp; <a href="{% url 'auth_password_reset' %}">Forgot my password</a>
+{% if next|stringformat:"s" == '/accounts/password/reset/complete/'  %}
+<input type="hidden" name="next" value='/' />
+{% else %}
 <input type="hidden" name="next" value="{{ next }}" />
+{% endif %}
 </form>
 
 {% endif %}
