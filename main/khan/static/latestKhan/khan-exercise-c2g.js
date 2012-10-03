@@ -2233,7 +2233,25 @@ var Khan = (function() {
         function handleSubmit() {
             var pass = false;
             if (exAssessType == "survey") {
-                if ($('#testinput').length) {
+                if ($('input[name|=survey-checkbox]').length) {
+                    if ($('input[name|=survey-checkbox]:checked').length) {
+                        var arrChecked = $('input[name|=survey-checkbox]:checked');
+                        var checkedLen = arrChecked.length;
+                        var userVal = "";
+                        for (var c = 0; c < checkedLen; c += 1) {
+                            userVal += $(arrChecked[c]).val();
+                            if (c < checkedLen - 1) userVal += ",";
+                        }
+                        // here we need to store user answer so we can override
+                        // what is submitted to the server
+                        $('.current-question').data('user_selection_val', userVal);
+                        var thisProbIdx = $('.current-question').data('problemIndex');
+                        KhanC2G.PSActivityLog.problems[thisProbIdx]['user_selection_val'] = userVal;
+                        pass = true; 
+                    } else {
+                        return false;
+                    }
+                } else if ($('#testinput').length) {
                     // it's a "short-answer"
                     if ($('#testinput').val() != "") {
                         // anything non-empty is OK
@@ -2317,6 +2335,7 @@ var Khan = (function() {
             // Save the problem results to the server
             var curTime = new Date().getTime();
             var data = buildAttemptData(pass, ++attempts, JSON.stringify(validator.guess), curTime);
+
             request("problems/" + problemNum + "/attempt", data, function() {
                 
                 console.log("In the request call!!!!");
@@ -2952,7 +2971,9 @@ var Khan = (function() {
         // [C2G] pset_id of -1 will cause error, but right now just used for in-video
         // Needs to have a real problem set associated with videos
         pset_id = ($('#pset_id').length) ? $('#pset_id').val() : -1;
-        if ($('input#testinput').length) {
+        if (exAssessType == "survey" || $('input:checkbox[name=survey-checkbox]').length) {
+            user_selection_val = $('.current-question').data('user_selection_val');
+        } else if ($('input#testinput').length) {
             user_selection_val = $('input#testinput').val();
         } else if ($('input:radio[name=solution]').length) {
             user_selection_val = $('input:radio[name=solution]:checked').val();
@@ -3768,7 +3789,7 @@ var Khan = (function() {
                             $('input#testinput').val("");   // explicitly clear 
                         }
                         $('input#testinput').removeAttr('disabled');
-                    } else if ($('input:radio').length) {
+                    } else if ($('#solutionarea input:radio').length) {
                         if (userPrevSel) {
                             $('#solutionarea input:radio')[userPrevSel].checked = true; 
                         } else {
