@@ -1,0 +1,118 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block title %} Stanford Online | {{ common_page_data.course.title }} | Reports  {% endblock title %}
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column">
+    <h3 class="section-headline">Course Reports</h3>
+    <div class="container">  
+    <div class="row">  
+        <div class="tabbable span9">  
+            <ul class="nav nav-tabs">  
+                <li class="active"><a href="#dashboard" data-toggle="tab">Course Dashboard</a></li>
+                <li><a href="#quiz_summary" data-toggle="tab">Course Quiz Summary</a></li>
+                <li><a href="#psets" data-toggle="tab">Problem sets</a></li>
+                <li><a href="#videos" data-toggle="tab">Videos</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="dashboard" class="tab-pane active" style="padding-left: 10px;">
+                    <h3>Generate new course dashboard report</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <input type="submit" class='btn' value="Generate new dashboard report" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="dashboard" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available course dashboard reports</h3>
+                    <table class="table table-striped" style="width: 600px;">
+                        {% for rep in dashboard_reports %}
+                            <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'dashboard' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                        {% empty %}
+                            <tr><td style="width: 600px;">No dashboard reports available at the moment.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                
+                <div id="quiz_summary" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new course quizzes summary</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <input type="submit" class='btn' value="Generate new course quizzes summary" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="course_quizzes" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available course quizzes summaries</h3>
+                    <table class="table table-striped" style="width: 600px;">
+                        {% for rep in course_quizzes_reports %}
+                            <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'course_quizzes' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                        {% empty %}
+                            <tr><td style="width: 600px;">No course quizzes reports available at the moment.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                
+                <div id="psets" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new problem set report</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <label for="video" style='display: inline;'>Problem set</label>
+                        <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
+                            {% for ps in problemsets %}<option value="{{ps.slug}}">{{ps.title}}</option>{% endfor%}
+                        </select>
+                        <input type="submit" class='btn' value="Generate new problem set report" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="problemset" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available problem set reports</h3>
+                    {% for ps in ps_quiz_data_reports %}
+                        <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
+                        {% if ps.reports|length > 0 %}
+                            <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+                                {% for rep in ps.reports %}
+                                    <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'problemsets' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                                {% endfor %}
+                            </table>
+                        {% else %}
+                            <label style="margin-left: 40px;">No reports available for this problem set.</label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div id="videos" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new video report</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <label for="video" style='display: inline;'>Video</label>
+                        <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
+                            {% for v in videos %}<option value="{{v.slug}}">{{v.title}}</option>{% endfor%}
+                        </select>
+                        <input type="submit" class='btn' value="Generate new video report" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="video" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available video reports</h3>
+                    {% for vd in vd_quiz_data_reports %}
+                        <h4 style="margin-top: 10px; margin-left: 20px;">{{ vd.title }}</h4>
+                        {% if vd.reports|length > 0 %}
+                            <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+                                {% for rep in vd.reports %}
+                                    <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'videos' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                                {% endfor %}
+                            </table>
+                        {% else %}
+                            <label style="margin-left: 40px;">No reports available for this video.</label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+{% endblock m_column_content %}
