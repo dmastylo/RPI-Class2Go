@@ -132,3 +132,10 @@ def course_materials(request, course_prefix, course_suffix):
     
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
 
+def unenroll(request, course_prefix, course_suffix):
+    
+   course = Course.objects.get(handle=course_prefix+'--'+course_suffix, mode='ready')
+   student_group = Group.objects.get(id=course.student_group_id)
+   student_group.user_set.remove(request.user)
+    
+   return redirect('/')

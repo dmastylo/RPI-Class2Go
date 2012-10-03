@@ -55,7 +55,7 @@ mysql --batch -e "drop database ${DEV_DB_NAME}; create database ${DEV_DB_NAME};"
 ./manage.py syncdb --noinput
 ./manage.py syncdb --noinput --database=celery
 ./manage.py migrate
-./manage.py syncdb --database=celery
+./manage.py migrate --database=celery
 ./manage.py db_populate
 
 echo "Everything worked like a champ!"
