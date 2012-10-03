@@ -7,10 +7,12 @@
 
 <div class="row-fluid">
     <div class="span8">
-        <h2>How to reach Stanford Online</h2>
+        <center><h2>How to reach Stanford Online</h2></center>
         <p></p>
+        <h3>For most issues, we recommend posting on the discussion forum rather than sending email.  </h3><p></p>
+        
         {% if staffmail %}
-        <p>For {{course.title}} course staff email <a href="mailto:{{staffmail}}">{{staffmail}}</a></p>
+        <p>For {{course.title}} course staff email <a href="mailto:{{staffmail}}">{{staffmail}}</a> Course staff may not be able to respond to all queries individually - please consider posting on the discussion forum.</p>
         {% endif %}
         <p>For general information email us at <a href="mailto:class2go-contact@cs.stanford.edu">class2go-contact@cs.stanford.edu</a></p>
         <p>For copyright concerns email us at <a href="mailto:class2go-copyright@cs.stanford.edu">class2go-copyright@cs.stanford.edu</a></p>
