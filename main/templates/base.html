@@ -51,10 +51,12 @@
             {% endifequal %}
             {% endblock navbar %}
             <div class="row-fluid" style="position:relative;">
+            {% block page_title %}
             <div class="pull-left page-title">
                 <img src="{{ STATIC_URL }}graphics/core/top-banner-Stanford.png" alt="Stanford Online">
                 <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
             </div>
+            {% endblock page_title %}
             {% block mode_switcher %}
             {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                 <div class="hidden-phone" style="position:absolute;top:0;right:0;">
