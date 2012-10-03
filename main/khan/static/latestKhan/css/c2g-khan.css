@@ -35,4 +35,5 @@ strong.attempts-so-far { color: #cc6200; }
 .assessive #solutionarea p { margin: 12px 0; }
 
 /* survey exercises styles */
+.survey #examples-show {display: none;}
 #survey-checkbox-list input { float: left; margin-right: 5px; }
