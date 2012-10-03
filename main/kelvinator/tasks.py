@@ -77,7 +77,15 @@ def kelvinate(s3_path_raw, input_frames_per_min='0'):
     course_suffix = s3_path_parts[-4]
     course_prefix = s3_path_parts[-5]
     
-    working_dir=tempfile.mkdtemp(prefix="kelvinator-")
+    # Create working dir.  If this fails, we log something but otherwise let the 
+    # exception go since we want it to fail violently which will leave the job
+    # on the work queue.
+    working_dir_parent = getattr(settings, "KELVINATOR_WORKING_DIR", "/tmp")
+    try:
+        working_dir=tempfile.mkdtemp(prefix="kelvinator-", dir=working_dir_parent)
+    except:
+        logger.error("Kelvinator error when creating temp file in \"%s\"" % working_dir_parent)
+        raise
     logger.info("Working directory: " + working_dir)
 
     jpeg_dir = working_dir + "/jpegs"

@@ -736,7 +736,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     def ret_url(self):
-        return "https://www.youtube.com/analytics#fi=v-" + self.url + ",r=retention"
+        return "https://www.youtube.com/analytics#dt=lt,fi=v-" + self.url + ",r=retention"
 
     def runtime(self):
         if not self.duration:
