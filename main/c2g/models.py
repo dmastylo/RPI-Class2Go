@@ -110,6 +110,8 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     handle = models.CharField(max_length=255, null=True, db_index=True)
     preview_only_mode = models.BooleanField(default=True)
     institution_only = models.BooleanField(default=False)
+    share_to = models.ManyToManyField("self",symmetrical=False,related_name='share_from',null=True, blank=True)
+
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
@@ -444,6 +446,9 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
         return url
 
+    def __unicode__(self):
+
+        return self.title
     class Meta:
         db_table = u'c2g_files'
 
@@ -821,7 +826,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     slug = models.SlugField("URL Identifier")
     title = models.CharField(max_length=255,)
     description = models.TextField(blank=True)
-    path = models.CharField(max_length=255)
+    path = models.CharField(max_length=255) #used as URL path to load problem set contents (Khan Summative file)
     due_date = models.DateTimeField(null=True)
     grace_period = models.DateTimeField()
     partial_credit_deadline = models.DateTimeField()
