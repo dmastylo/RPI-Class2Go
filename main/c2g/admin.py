@@ -11,7 +11,7 @@ admin.site.register(ProblemSet)
 admin.site.register(EmailAddr)
 admin.site.register(MailingList)
 admin.site.register(ListEmail)
-
+admin.site.register(CourseEmail)
 admin.site.register(ContentSection)
 admin.site.register(File)
 admin.site.register(ProblemSetToExercise)
