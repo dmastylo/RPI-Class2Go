@@ -1262,7 +1262,6 @@ var Khan = (function() {
             $(".hint-box").hide();
         }
 
-
         // Evaluate any inline script tags in this exercise's source
         $.each(exercise.data("script") || [], function(i, scriptContents) {
             $.globalEval(scriptContents);
@@ -1380,6 +1379,13 @@ var Khan = (function() {
         // Add the problem into the page
         Khan.scratchpad.resize();
 
+        // [C2G] If survey and checkbox, set up special solutionarea
+        if (exAssessType == "survey" && $('#survey-checkbox-list').length) {
+            $('#examples-show').hide();
+            $('#solutionarea input#testinput').hide();
+            $('#survey-checkbox-list').appendTo('#solutionarea');
+        }
+
         // Enable the all answer input elements except the check answer button.
         $("#answercontent input").not("#check-answer-button")
             .removeAttr("disabled");
@@ -1480,6 +1486,7 @@ var Khan = (function() {
             } else {
                 $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Survey"/></div>');
                 $('#submit-problemset-button').click(function () {
+                    alert('Thanks for taking the survey!');
                     location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
                 });
             }
@@ -2242,11 +2249,6 @@ var Khan = (function() {
                             userVal += $(arrChecked[c]).val();
                             if (c < checkedLen - 1) userVal += ",";
                         }
-                        // here we need to store user answer so we can override
-                        // what is submitted to the server
-                        $('.current-question').data('user_selection_val', userVal);
-                        var thisProbIdx = $('.current-question').data('problemIndex');
-                        KhanC2G.PSActivityLog.problems[thisProbIdx]['user_selection_val'] = userVal;
                         pass = true; 
                     } else {
                         return false;
@@ -2255,6 +2257,7 @@ var Khan = (function() {
                     // it's a "short-answer"
                     if ($('#testinput').val() != "") {
                         // anything non-empty is OK
+                        userVal = $('#testinput').val();
                         pass = true;
                     } else {
                         // not answered, don't do anything
@@ -2263,10 +2266,24 @@ var Khan = (function() {
                 } else if ($('input[name|=solution]').length) {
                     // it's multiple choice, check to see if one is selected
                     if ($('input[name|=solution]:checked').length) {
+                        userVal = $('input[name|=solution]:checked').val();
                         pass = true; 
                     } else {
                         return false;
                     }
+                }
+
+                // here we need to store user answer so we can override
+                // what is submitted to the server
+                if (pass == true) {
+                    //console.log(userVal);
+                    //console.log($('.current-question').data());
+                    $('.current-question').data('user_selection_val', userVal);
+                    $('.current-question').data('userEntered', userVal);
+                    //console.log($('.current-question').data());
+                    var thisProbIdx = $('.current-question').data('problemIndex');
+                    KhanC2G.PSActivityLog.problems[thisProbIdx]['user_selection_val'] = userVal;
+                    KhanC2G.PSActivityLog.problems[thisProbIdx]['userEntered'] = userVal;
                 }
             } else {
                 pass = validator();
@@ -2338,8 +2355,6 @@ var Khan = (function() {
 
             request("problems/" + problemNum + "/attempt", data, function() {
                 
-                console.log("In the request call!!!!");
-
                 // TODO: Save locally if offline
                 $(Khan).trigger("attemptSaved");
 
@@ -2971,6 +2986,7 @@ var Khan = (function() {
         // [C2G] pset_id of -1 will cause error, but right now just used for in-video
         // Needs to have a real problem set associated with videos
         pset_id = ($('#pset_id').length) ? $('#pset_id').val() : -1;
+        console.log($('.current-question').data());
         if (exAssessType == "survey" || $('input:checkbox[name=survey-checkbox]').length) {
             user_selection_val = $('.current-question').data('user_selection_val');
         } else if ($('input#testinput').length) {
@@ -2998,9 +3014,11 @@ var Khan = (function() {
         //if (exAssessType == "summative") {
         //    data['attempt_content'] = $('input:radio[name=solution]:checked').next('span.value').text();
         //}
+        //console.log('ATTEMPT CONTENT: ' + data['attempt_content']);
         if (typeof data['attempt_content'] == "undefined") {
             data['attempt_content'] = user_selection_val;
         } 
+        //console.log('ATTEMPT CONTENT: ' + data['attempt_content']);
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         // store user_selection_val
@@ -3451,6 +3469,7 @@ var Khan = (function() {
     }
 
     function initC2GStacks(exercises) {
+
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
@@ -3528,6 +3547,22 @@ var Khan = (function() {
                 curNumProbs+=probsInExercise;
 
             });
+
+            // Completed survey replaces content with thank you message
+            if (exAssessType == "survey") {
+                var arrProbs = KhanC2G.PSActivityLog.problems;
+                var arrProbsLen = arrProbs.length; 
+                var numCompleted = 0;
+                for (var p = 0; p < arrProbsLen; p += 1) {
+                    if (arrProbs[p].correct) {
+                        numCompleted += 1;
+                    }
+                }
+                if (numCompleted == arrProbsLen) {
+                    $('#container article').fadeOut('slow').remove();
+                    $('#container').append('<h3>You have already completed the survey. Thanks for your submission!</h3>');
+                }
+            }
 
             // [C2G] Add keyboard nav to questions
             $(document).keydown(function (ev) {
@@ -3621,6 +3656,7 @@ var Khan = (function() {
                 userSelectionVal = $('.current-question').data("userEntered");
             } 
 
+            console.log('userSelectionVal is ' + userSelectionVal);
             // [C2G] If user entered something previously...
             if (userSelectionVal) {
                 if ($('#testinput').length) {
@@ -3633,6 +3669,12 @@ var Khan = (function() {
                     if ($('.current-question').data('correct')) {
                         $('#solutionarea input').attr('disabled','disabled');
                     }
+                } else if ($('#solutionarea input:checkbox').length) {
+                    console.log('survey says ' + userSelectionVal);
+                    var arrCheck = userSelectionVal.split(',');
+                    for (var val = 0; val < arrCheck.length; val += 1) {
+                        $('#solutionarea input:checkbox')[val].checked = true;
+                    } 
                 }
             // [C2G] Otherwise, clear value so other problem answers don't bleed over
             } else {
@@ -3765,6 +3807,7 @@ var Khan = (function() {
             // load previous answers into the solution area
             $.when(checkForInputs()).then(function () {
                 var userPrevSel = thisCard.data("userEntered");
+                console.log('userPRevSel is ' + userPrevSel);
                 var validUserChoices = thisCard.data("userChoices");
                 var userChoicesLen = (typeof validUserChoices != "undefined") ? $.parseJSON(thisCard.data("userChoices")).length : 0;
                 // [C2G] Just having something in "user_choices" doesn't mean it's valid, it could be an
@@ -3799,6 +3842,14 @@ var Khan = (function() {
                         $('input:radio').removeAttr('disabled');
                     }
                     $('#check-answer-button').removeAttr('disabled');
+                }
+
+                // Check for previously-selected checkboxes
+                if (exAssessType == "survey" && $('#solutionarea input:checkbox').length) {
+                    var arrUserVals = userPrevSel.split(',');
+                    for (var val = 0; val < arrUserVals.length; val += 1) {
+                        $('#solutionarea input:checkbox')[arrUserVals[val]].checked = true;
+                    } 
                 }
             });
 
