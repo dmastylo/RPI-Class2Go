@@ -1486,7 +1486,7 @@ var Khan = (function() {
             } else {
                 $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Survey"/></div>');
                 $('#submit-problemset-button').click(function () {
-                    alert('Thanks for taking the survey!');
+                    alert('Thank you for completing the survey!');
                     location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
                 });
             }
@@ -3746,6 +3746,17 @@ var Khan = (function() {
                         location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
                     });
                 }
+            } else if ((exAssessType == "survey" || KhanC2G.PSActivityLog.assessType == "survey") && 
+                $('.current-question').is($('#questions-stack li:last'))) {
+                if ($('#submit-problemset-button').length) {
+                    $('#submit-problemset-button').parent().show();
+                } else {
+                    $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Survey"/></div>');
+                    $('#submit-problemset-button').click(function () {
+                        alert('Thank you for completing the survey!');
+                        location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
+                    });
+                }
             } else if ($('#submit-problemset-button').length) {
                 $('#submit-problemset-button').parent().hide();
             }
@@ -3845,7 +3856,7 @@ var Khan = (function() {
                 }
 
                 // Check for previously-selected checkboxes
-                if (exAssessType == "survey" && $('#solutionarea input:checkbox').length) {
+                if (exAssessType == "survey" && $('#solutionarea input:checkbox').length && typeof userPrevSel != "undefined") {
                     var arrUserVals = userPrevSel.split(',');
                     for (var val = 0; val < arrUserVals.length; val += 1) {
                         $('#solutionarea input:checkbox')[arrUserVals[val]].checked = true;
