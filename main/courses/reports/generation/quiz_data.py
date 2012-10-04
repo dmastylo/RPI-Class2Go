@@ -40,7 +40,7 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
                 stud_fullname = vv.user.first_name + " " + vv.user.last_name
                 data[vv.user.username] = {'username': stud_username, 'name': stud_fullname, 'visits':[]}
             data[vv.user.username]['visits'].append("%s-%s-%s at %s:%s" % (vv.time_created.year, vv.time_created.month, vv.time_created.day, vv.time_created.hour, vv.time_created.minute))
-    
+
     ex_ids = []
     for rln in rlns:
         ex = rln.exercise

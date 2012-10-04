@@ -110,6 +110,8 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     handle = models.CharField(max_length=255, null=True, db_index=True)
     preview_only_mode = models.BooleanField(default=True)
     institution_only = models.BooleanField(default=False)
+    share_to = models.ManyToManyField("self",symmetrical=False,related_name='share_from',null=True, blank=True)
+
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
@@ -394,6 +396,9 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
         return True
 
+    def __unicode__(self):
+        return self.title
+    
     class Meta:
         db_table = u'c2g_additional_pages'
         
@@ -443,6 +448,9 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         
         url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
         return url
+
+    def __unicode__(self):
+        return self.title
 
     class Meta:
         db_table = u'c2g_files'
@@ -502,6 +510,9 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
 
         return True
 
+    def __unicode__(self):
+        return self.title
+    
     class Meta:
         db_table = u'c2g_announcements'
 
@@ -736,7 +747,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     def ret_url(self):
-        return "https://www.youtube.com/analytics#fi=v-" + self.url + ",r=retention"
+        return "https://www.youtube.com/analytics#dt=lt,fi=v-" + self.url + ",r=retention"
 
     def runtime(self):
         if not self.duration:
@@ -821,7 +832,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     slug = models.SlugField("URL Identifier")
     title = models.CharField(max_length=255,)
     description = models.TextField(blank=True)
-    path = models.CharField(max_length=255)
+    path = models.CharField(max_length=255) #used as URL path to load problem set contents (Khan Summative file)
     due_date = models.DateTimeField(null=True)
     grace_period = models.DateTimeField()
     partial_credit_deadline = models.DateTimeField()
@@ -1060,7 +1071,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
         questions_completed = 0
         for psetToEx in psetToExs:
-            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('time_created')
+            exercise_activities = pset_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('time_created')
             for exercise_activity in exercise_activities:
                 if exercise_activity.attempt_number == submissions_permitted:
                     questions_completed += 1
@@ -1080,7 +1091,7 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
         total_score = 0.0
         for psetToEx in psetToExs:
-            exercise_activities = pset_activities.filter(problemset_to_exercise=psetToEx).order_by('time_created')
+            exercise_activities = pset_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('time_created')
             exercise_percent = 100
             for exercise_activity in exercise_activities:
                 if exercise_activity.attempt_number > submissions_permitted:
@@ -1095,6 +1106,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if detailed: return exercise_scores
         else: return total_score
 
+    def __unicode__(self):
+        return self.title
+    
     class Meta:
         db_table = u'c2g_problem_sets'
         

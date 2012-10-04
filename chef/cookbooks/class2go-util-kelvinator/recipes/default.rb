@@ -24,7 +24,8 @@ package "ffmpeg" do
     action :install
 end
 
-directory "/opt/class2go/kelvinator" do
+# make /mnt writeable, where Kelvinator working dirs live (see issue #926)
+directory "/mnt" do
     owner "root"
     group "root"
     mode 00777

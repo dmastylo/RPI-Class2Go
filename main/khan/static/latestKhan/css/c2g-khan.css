@@ -22,6 +22,10 @@ article.exercises-content div.exercises-header .section-headline div.topic-exerc
 #questions-stack li.current-question { border-color: #cc6200; position: relative; left: .5em; z-index: 2; }
 #questions-stack li.correctly-answered { background-color: #afdcaf; color: #070; position: relative; }
 #questions-stack li.correctly-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }
+.survey #questions-stack li.correctly-answered { background-color: #ddd; border-color: #777; color: #777; position: relative; }
+.survey #questions-stack li.correctly-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }
+#questions-stack li.survey-answered { background-color: #ddd; border-color: #777; color: #777; position: relative; }
+#questions-stack li.survey-answered .icon-ok-sign { position: absolute; right: -10px; top: -5px; }
 
 .loading {background-color: #ffc; border: 2px solid #b75; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; font-weight: bold; opacity: .5; padding: .3em 1em; -ms-filter: “alpha(opacity=50)”; filter: alpha(opacity=50); -khtml-opacity: .5; -moz-opacity: .5; }
 
@@ -29,3 +33,7 @@ article.exercises-content div.exercises-header .section-headline div.topic-exerc
 #penalty-pct { font-weight: bold; }
 strong.attempts-so-far { color: #cc6200; }
 .assessive #solutionarea p { margin: 12px 0; }
+
+/* survey exercises styles */
+.survey #examples-show {display: none;}
+#survey-checkbox-list input { float: left; margin-right: 5px; }

@@ -741,13 +741,25 @@ var Khan = (function() {
         // Initialize to an empty jQuery set
         exercises = jQuery();
 
-        // [C2G] Is this problem set formative or summative? Default is 
-        // formative, but check problem set div for summative CSS class; 
+        // [C2G] Is this problem set formative, summative, or a survey? 
+        // Check c2gConfig object first, then check className of page elements;
+        // Default is formative, but check problem set div for summative CSS class; 
         // otherwise, check the class name on the article element in the page
-        exAssessType = 'formative';
-        if ($("div.summative").length || $("div.assessive").length ||
-            $("article.summative").length || $("article.summative").length) {
-            exAssessType = 'summative';
+        if (typeof c2gConfig != "undefined" && c2gConfig.problemType) {
+            if (c2gConfig.problemType == "assessive") {
+                exAssessType = "summative";
+            } else {
+                exAssessType = c2gConfig.problemType;
+            }
+        } else {
+            if ($("div.summative").length || $("div.assessive").length ||
+                $("article.summative").length || $("article.assessive").length) {
+                exAssessType = 'summative';
+            } else if ($("div.survey").length || $("article.survey").length) {
+                exAssessType = 'survey';
+            } else {
+                exAssessType = 'formative';
+            }
         }
 
         $(function() {
@@ -909,6 +921,8 @@ var Khan = (function() {
         // [C2G] Added text change for Summative exercises
         if (typeof exAssessType != "undefined" && exAssessType == "summative") {
             $("#check-answer-button").val("Submit Answer");
+        } else if (typeof exAssessType != "undefined" && exAssessType == "survey") {
+            $("#check-answer-button").val("Submit Response");
         } else {
             $("#check-answer-button").val("Check Answer");
         }
@@ -1248,10 +1262,9 @@ var Khan = (function() {
         $(".hint-box").show();
 
         // [C2G] Adding check for summative exercises, which shouldn't have hints
-        if (hints.length === 0 || exAssessType == "summative") {
+        if (hints.length === 0 || exAssessType == "summative" || exAssessType == "survey") {
             $(".hint-box").hide();
         }
-
 
         // Evaluate any inline script tags in this exercise's source
         $.each(exercise.data("script") || [], function(i, scriptContents) {
@@ -1370,6 +1383,13 @@ var Khan = (function() {
         // Add the problem into the page
         Khan.scratchpad.resize();
 
+        // [C2G] If survey and checkbox, set up special solutionarea
+        if (exAssessType == "survey" && $('#survey-checkbox-list').length) {
+            $('#examples-show').hide();
+            $('#solutionarea input#testinput').hide();
+            $('#survey-checkbox-list').appendTo('#solutionarea');
+        }
+
         // Enable the all answer input elements except the check answer button.
         $("#answercontent input").not("#check-answer-button")
             .removeAttr("disabled");
@@ -1430,9 +1450,12 @@ var Khan = (function() {
             typeof KhanC2G.PSActivityLog.problems != "undefined" &&
             KhanC2G.PSActivityLog.problems[exerciseRef] && 
             KhanC2G.PSActivityLog.problems[exerciseRef]['correct']) {
-            $('#solutionarea input').attr('disabled', 'disabled');
             $('#solutionarea').remove('p');
-            $('#check-answer-button').hide();
+            // TODO: clean up all the handling of the solution area based on types
+            if (exAssessType != "survey") {
+                $('#solutionarea input').attr('disabled', 'disabled');
+                $('#check-answer-button').hide();
+            }
             $('.hint-box').hide();
             if (exAssessType == "summative") {
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
@@ -1444,7 +1467,11 @@ var Khan = (function() {
                 $('#attempt-penalty-note').append('<span id="penalty-pct">' + penaltyPct + '</span> penalty per attempt.');
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts so far: <span id="attempt-count">' + alreadyAttempted + '</span></strong> (Maximum credit <span id="max-credit">' + maxCredit + '</span>%)</p>');
             }
-            $("#check-answer-button").val("Submit Answer");
+            if (exAssessType == "survey") {
+                $("#check-answer-button").val("Submit Response");
+            } else {
+                $("#check-answer-button").val("Submit Answer");
+            }
             $("#check-answer-button").show();
         }
 
@@ -1454,6 +1481,16 @@ var Khan = (function() {
             } else {
                 $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                 $('#submit-problemset-button').click(function () {
+                    location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
+                });
+            }
+        } else if (exAssessType == "survey" && $('.current-question').is($('#questions-stack li:last'))) {
+            if ($('#submit-problemset-button').length) {
+                $('#submit-problemset-button').parent().show();
+            } else {
+                $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Survey"/></div>');
+                $('#submit-problemset-button').click(function () {
+                    alert('Thank you for completing the survey!');
                     location.href = (typeof c2gConfig != "undefined") ? c2gConfig.progressUrl : 'problemsets';
                 });
             }
@@ -2205,69 +2242,120 @@ var Khan = (function() {
         }
 
         function handleSubmit() {
-            var pass = validator();
+            var pass = false;
+            if (exAssessType == "survey") {
+                if ($('input[name|=survey-checkbox]').length) {
+                    if ($('input[name|=survey-checkbox]:checked').length) {
+                        var arrChecked = $('input[name|=survey-checkbox]:checked');
+                        var checkedLen = arrChecked.length;
+                        var userVal = "";
+                        for (var c = 0; c < checkedLen; c += 1) {
+                            userVal += $(arrChecked[c]).val();
+                            if (c < checkedLen - 1) userVal += ",";
+                        }
+                        pass = true; 
+                    } else {
+                        return false;
+                    }
+                } else if ($('#testinput').length) {
+                    // it's a "short-answer"
+                    if ($('#testinput').val() != "") {
+                        // anything non-empty is OK
+                        userVal = $('#testinput').val();
+                        pass = true;
+                    } else {
+                        // not answered, don't do anything
+                        return false;
+                    }
+                } else if ($('input[name|=solution]').length) {
+                    // it's multiple choice, check to see if one is selected
+                    if ($('input[name|=solution]:checked').length) {
+                        userVal = $('input[name|=solution]:checked').val();
+                        pass = true; 
+                    } else {
+                        return false;
+                    }
+                }
+
+                // here we need to store user answer so we can override
+                // what is submitted to the server
+                if (pass == true) {
+                    $('.current-question').data('user_selection_val', userVal);
+                    $('.current-question').data('userEntered', userVal);
+                    var thisProbIdx = $('.current-question').data('problemIndex');
+                    KhanC2G.PSActivityLog.problems[thisProbIdx]['user_selection_val'] = userVal;
+                    KhanC2G.PSActivityLog.problems[thisProbIdx]['userEntered'] = userVal;
+                }
+            } else {
+                pass = validator();
+            }
             // Stop if the user didn't enter a response
             // If multiple-answer, join all responses and check if that's empty
             // Remove commas left by joining nested arrays in case multiple-answer is nested
 
-            // [C2G] Don't check for empty if this is a summative exercise
-            //console.log(exAssessType);
-            if (exAssessType !== "summative" && checkIfAnswerEmpty()) {
-                return false;
-            } else {
-                guessLog.push(validator.guess);
-            }
-            //console.log("still in handleSubmit");
-
-            // Stop if the form is already disabled and we're waiting for a response.
-            if ($("#answercontent input").not("#hint,#next-question-button").is(":disabled")) {
-                return false;
-            }
-
-            $("#answercontent input").not("#check-answer-button, #hint")
-                .attr("disabled", "disabled");
-            $("#check-answer-results p").hide();
-
-            var checkAnswerButton = $("#check-answer-button");
-
-            // If incorrect, warn the user and help them in any way we can
-            if (pass != true) {
-                checkAnswerButton
-                    .effect("shake", {times: 3, distance: 5}, 80)
-                    .val("Try Again");
-
-                // Is this a message to be shown?
-                if (typeof pass === "string") {
-                    $("#check-answer-results .check-answer-message").html(pass).tmpl().show();
+            if (exAssessType != "survey") {
+                // [C2G] Don't check for empty if this is a summative exercise
+                //console.log(exAssessType);
+                if (exAssessType !== "summative" && checkIfAnswerEmpty()) {
+                    return false;
+                } else {
+                    guessLog.push(validator.guess);
                 }
 
-                // Refocus text field so user can type a new answer
-                if (lastFocusedSolutionInput != null) {
-                    setTimeout(function() {
-                        var focusInput = $(lastFocusedSolutionInput);
+                // Stop if the form is already disabled and we're waiting for a response.
+                if ($("#answercontent input").not("#hint,#next-question-button").is(":disabled")) {
+                    return false;
+                }
 
-                        if (!focusInput.is(":disabled")) {
-                            // focus should always work; hopefully select will work for text fields
-                            focusInput.focus();
-                            if (focusInput.is("input:text")) {
-                                focusInput.select();
+                $("#answercontent input").not("#check-answer-button, #hint")
+                    .attr("disabled", "disabled");
+                $("#check-answer-results p").hide();
+
+                var checkAnswerButton = $("#check-answer-button");
+
+                // If incorrect, warn the user and help them in any way we can
+                if (pass != true) {
+                    checkAnswerButton
+                        .effect("shake", {times: 3, distance: 5}, 80)
+                        .val("Try Again");
+
+                    // Is this a message to be shown?
+                    if (typeof pass === "string") {
+                        $("#check-answer-results .check-answer-message").html(pass).tmpl().show();
+                    }
+
+                    // Refocus text field so user can type a new answer
+                    if (lastFocusedSolutionInput != null) {
+                        setTimeout(function() {
+                            var focusInput = $(lastFocusedSolutionInput);
+
+                            if (!focusInput.is(":disabled")) {
+                                // focus should always work; hopefully select will work for text fields
+                                focusInput.focus();
+                                if (focusInput.is("input:text")) {
+                                    focusInput.select();
+                                }
                             }
-                        }
-                    }, 1);
+                        }, 1);
+                    }
                 }
-            }
 
-            if (pass === true) {
-                // Problem has been completed but pending data request being
-                // sent to server.
-                $(Khan).trigger("problemDone");
-            }
+                if (pass === true) {
+                    // Problem has been completed but pending data request being
+                    // sent to server.
+                    $(Khan).trigger("problemDone");
+                }
+
+            } else {
+                $('#next-question-button').val("Next Question");
+            } // END CHECK FOR SURVEY
 
             // Save the problem results to the server
             var curTime = new Date().getTime();
             var data = buildAttemptData(pass, ++attempts, JSON.stringify(validator.guess), curTime);
-            request("problems/" + problemNum + "/attempt", data, function() {
 
+            request("problems/" + problemNum + "/attempt", data, function() {
+                
                 // TODO: Save locally if offline
                 $(Khan).trigger("attemptSaved");
 
@@ -2899,10 +2987,14 @@ var Khan = (function() {
         // [C2G] pset_id of -1 will cause error, but right now just used for in-video
         // Needs to have a real problem set associated with videos
         pset_id = ($('#pset_id').length) ? $('#pset_id').val() : -1;
-        if ($('input#testinput').length) {
+        if (exAssessType == "survey" || $('input:checkbox[name=survey-checkbox]').length) {
+            user_selection_val = $('.current-question').data('user_selection_val');
+        } else if ($('input#testinput').length) {
             user_selection_val = $('input#testinput').val();
         } else if ($('input:radio[name=solution]').length) {
             user_selection_val = $('input:radio[name=solution]:checked').val();
+        } else {
+            user_selection_val = "";
         }
         user_choices = [];
         $('#solutionarea span.value').each(function () {
@@ -2922,6 +3014,9 @@ var Khan = (function() {
         //if (exAssessType == "summative") {
         //    data['attempt_content'] = $('input:radio[name=solution]:checked').next('span.value').text();
         //}
+        if (typeof data['attempt_content'] == "undefined") {
+            data['attempt_content'] = user_selection_val;
+        } 
         data = $.extend(data, {"user_choices": escape(JSON.stringify(user_choices))});
 
         // store user_selection_val
@@ -2958,10 +3053,18 @@ var Khan = (function() {
 
                 // [C2G] If user got question correct
                 if (data['exercise_status'] == "complete") {
-                    $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                    if (exAssessType == "survey") {
+                        $('.current-question').addClass('survey-answered').append('<i class="icon-ok-sign"></i>');
+                    } else {
+                        $('.current-question').addClass('correctly-answered').append('<i class="icon-ok-sign"></i>');
+                    }
                     $('.current-question').data("correct", true);
                     if ($('.current-question').is($('#questions-stack li:last'))) {
-                        $('#next-question-button').val('Correct! View Summary');
+                        if (exAssessType == "survey") {
+                            $('#next-question-button').val('View Survey Summary');
+                        } else {
+                            $('#next-question-button').val('Correct! View Summary');
+                        }
                         $('#next-question-button').unbind('click');
                         $('#next-question-button').click(function () {
                             location.href = c2gConfig.progessUrl;
@@ -3364,6 +3467,7 @@ var Khan = (function() {
     }
 
     function initC2GStacks(exercises) {
+
         //Setup 2 stack structures: questions-to-do and questions-done, as children
         //of <div id="problem-and-answer">
         $('#problem-and-answer').css('position', 'relative');
@@ -3442,6 +3546,22 @@ var Khan = (function() {
 
             });
 
+            // Completed survey replaces content with thank you message
+            if (exAssessType == "survey") {
+                var arrProbs = KhanC2G.PSActivityLog.problems;
+                var arrProbsLen = arrProbs.length; 
+                var numCompleted = 0;
+                for (var p = 0; p < arrProbsLen; p += 1) {
+                    if (arrProbs[p].correct) {
+                        numCompleted += 1;
+                    }
+                }
+                if (numCompleted == arrProbsLen) {
+                    $('#container article').fadeOut('slow').remove();
+                    $('#container').append('<h3>You have already completed the survey. Thanks for your submission!</h3>');
+                }
+            }
+
             // [C2G] Add keyboard nav to questions
             $(document).keydown(function (ev) {
                 var allCards = $('#questions-stack li');
@@ -3461,7 +3581,12 @@ var Khan = (function() {
             });
 
             // [C2G] Add "View Progress" button to all problem sets
-            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" value="View Problem Set Progress"/></div>');
+            $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" /></div>');
+            if (exAssessType == "survey") {
+                $('#view-progress-button').val("View Survey Progress");
+            } else {
+                $('#view-progress-button').val("View Problem Set Progress");
+            }
             $('#view-progress-button').click(function () {
                 location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
             });
@@ -3541,6 +3666,11 @@ var Khan = (function() {
                     if ($('.current-question').data('correct')) {
                         $('#solutionarea input').attr('disabled','disabled');
                     }
+                } else if ($('#solutionarea input:checkbox').length) {
+                    var arrCheck = userSelectionVal.split(',');
+                    for (var val = 0; val < arrCheck.length; val += 1) {
+                        $('#solutionarea input:checkbox')[val].checked = true;
+                    } 
                 }
             // [C2G] Otherwise, clear value so other problem answers don't bleed over
             } else {
@@ -3549,6 +3679,7 @@ var Khan = (function() {
                 } else if ($('#solutionarea input:radio:checked').length) {
                     $('#solutionarea input:radio:checked').attr('checked', false);
                 }
+                $('#check-answer-button').removeAttr('disabled');
             }
 
             $('#solutionarea').css('visibility', 'visible');
@@ -3609,7 +3740,18 @@ var Khan = (function() {
                 } else {
                     $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Problem Set"/></div>');
                     $('#submit-problemset-button').click(function () {
-                        location.href = (c2gConfig.PSProgressUrl) ? c2gConfig.PSProgressUrl : 'problemsets';
+                        location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
+                    });
+                }
+            } else if ((exAssessType == "survey" || KhanC2G.PSActivityLog.assessType == "survey") && 
+                $('.current-question').is($('#questions-stack li:last'))) {
+                if ($('#submit-problemset-button').length) {
+                    $('#submit-problemset-button').parent().show();
+                } else {
+                    $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="submit-problemset-button" value="Submit Survey"/></div>');
+                    $('#submit-problemset-button').click(function () {
+                        alert('Thank you for completing the survey!');
+                        location.href = (c2gConfig.progressUrl) ? c2gConfig.progressUrl : 'problemsets';
                     });
                 }
             } else if ($('#submit-problemset-button').length) {
@@ -3697,7 +3839,7 @@ var Khan = (function() {
                             $('input#testinput').val("");   // explicitly clear 
                         }
                         $('input#testinput').removeAttr('disabled');
-                    } else if ($('input:radio').length) {
+                    } else if ($('#solutionarea input:radio').length) {
                         if (userPrevSel) {
                             $('#solutionarea input:radio')[userPrevSel].checked = true; 
                         } else {
@@ -3707,6 +3849,14 @@ var Khan = (function() {
                         $('input:radio').removeAttr('disabled');
                     }
                     $('#check-answer-button').removeAttr('disabled');
+                }
+
+                // Check for previously-selected checkboxes
+                if (exAssessType == "survey" && $('#solutionarea input:checkbox').length && typeof userPrevSel != "undefined") {
+                    var arrUserVals = userPrevSel.split(',');
+                    for (var val = 0; val < arrUserVals.length; val += 1) {
+                        $('#solutionarea input:checkbox')[arrUserVals[val]].checked = true;
+                    } 
                 }
             });
 

@@ -1,4 +1,4 @@
-set terminal png font 14 size 600,400
+set terminal png font 14 size 800,400
 set output "users_by_class.png"
 
 set nokey
