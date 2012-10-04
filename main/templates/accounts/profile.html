@@ -27,9 +27,13 @@
 	    <li class="pull-left"><strong>Courses:</strong></li>
 	    {% if courses %}
 	    <ul class="unstyled pull-left">
+	      <table>
 	      {% for course in courses %}
-	      <li>&nbsp<a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></li>
+	      <tr>
+	      <td><a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></td>
+	      <td><a href="{% url 'courses.views.unenroll' course.prefix course.suffix %}" onclick="return confirm('Do you really want to unenroll?')">Unenroll</a></td>
 	      {% endfor %}
+	      </table>
 	    </ul>
 	    {% endif %}
         </ul>
