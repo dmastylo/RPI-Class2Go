@@ -40,9 +40,12 @@ def WriteQuizDataToReport(q, rw):
     
     if isinstance(q, Video): type = 'Video'
     else:
-        if q.assessment_type == 'summative':
+        if q.assessment_type == 'assessive':
             type = 'Summative problem set'
             assessment_type = 'summative'
+            submissions_permitted = q.submissions_permitted
+            if submissions_permitted == 0: submissions_permitted = 100000
+            resubmission_penalty = q.resubmission_penalty / 100.0
         else: type = 'Formative problem set'
     
     rw.write(["%s (%s)" % (q.title, type)])
@@ -79,14 +82,16 @@ def WriteQuizDataToReport(q, rw):
             'num_correct_third_attempts':"",
         }
         
-        if isinstance(q, Video): atts = ProblemActivity.objects.filter(video_to_exercise = rln).order_by('student', 'time_created')
-        else: atts = ProblemActivity.objects.filter(problemset_to_exercise = rln).order_by('student', 'time_created')
+        if isinstance(q, Video):
+            atts = ProblemActivity.objects.select_related('video', 'exercise').filter(video_to_exercise__exercise__fileName=ex.fileName, video_to_exercise__video=q).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
+        else:
+            atts = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__exercise__fileName=ex.fileName, problemset_to_exercise__problemSet=q).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
         
-        submitters = atts.values_list('student', flat = True)
-        complete_ = atts.values_list('complete', flat = True)
-        complete = [i for i in complete_]
-        attempt_times = atts.values_list('time_taken', flat = True)
-        #import pdb; pdb.set_trace()
+        submitters = [item[0] for item in atts]
+        completes = [item[1] for item in atts]
+        attempt_times = [item[2] for item in atts]
+        attempts_content = [item[3] for item in atts]
+        
         stud_index = -1
         unique_submitters = []
         unique_submitters_num_attempts = []
@@ -109,12 +114,12 @@ def WriteQuizDataToReport(q, rw):
                 unique_submitters_num_attempts[stud_index] += 1
                 attempt_number = i - first_attempt_index
                 
-                if complete[i] == 1:
+                if completes[i] == 1:
                     unique_submitters_correct_attempt_number[stud_index] = attempt_number + 1
                     if assessment_type == 'summative':
-                        if (attempt_number+1) > q.submissions_permitted: unique_submitters_scores[stud_index] = 0
+                        if (attempt_number+1) > submissions_permitted: unique_submitters_scores[stud_index] = 0
                         else:
-                            unique_submitters_scores[stud_index] = 1 - attempt_number * (q.resubmission_penalty/100.0)
+                            unique_submitters_scores[stud_index] = 1 - attempt_number * (resubmission_penalty)
                             if unique_submitters_scores[stud_index] < 0: unique_submitters_scores[stud_index] = 0
                         
                 if is_last_student_attempt and assessment_type == 'summative': # Before leaving to the next student, register the student score if the quiz is a summ. ps.
@@ -127,7 +132,7 @@ def WriteQuizDataToReport(q, rw):
                 'num_attempts': len(submitters),
                 'num_attempting_students':len(unique_submitters),
                 'num_attempts_per_student': 1.0*len(submitters)/len(unique_submitters),
-                'num_correct_attempts':complete.count(1),
+                'num_correct_attempts':completes.count(1),
                 'attempt_times': attempt_times,
                 'num_correct_first_attempts':unique_submitters_correct_attempt_number.count(1),
                 'num_correct_second_attempts':unique_submitters_correct_attempt_number.count(2),
