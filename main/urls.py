@@ -25,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^contactus$', 'c2g.views.contactus'),
     url(r'^faq$', 'c2g.views.faq'),
 
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
                        
     
     #emailoptout
@@ -164,7 +165,10 @@ urlpatterns = patterns('',
     url(r'^upload_file/?', 'courses.files.actions.upload'),
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
                        
-
+    #Content Sharing
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/?$', 'courses.content_sections.views.copy_content_form'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/send/?$', 'courses.content_sections.views.copy_content'),
+                      
 
     # Landing Page
     url(r'^/?$', 'courses.landing.views.landing'),
@@ -178,11 +182,9 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),             
     
     #Reports
-    # url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/reports/?$', 'courses.reports.views.main'),
-    # url(r'^export_csv_dashboard$', 'courses.reports.views.export_csv_dashboard'),
-    # url(r'^export_csv_quiz_report$', 'courses.reports.views.export_csv_quiz_report'),
-    # url(r'^export_html_dashboard$', 'courses.reports.views.export_html_dashboard'),
-    # url(r'^export_html_quiz_report$', 'courses.reports.views.export_html_quiz_report'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/browse_reports/?$', 'courses.reports.views.main'),
+    url(r'^generate_report$', 'courses.reports.views.generate_report'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/reports/(?P<report_type>[a-zA-Z0-9_-]+)/(?P<report_name>.+)$', 'courses.reports.views.download_report'),
     
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),

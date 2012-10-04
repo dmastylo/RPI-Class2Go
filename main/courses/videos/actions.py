@@ -119,7 +119,11 @@ def save_video_progress(request):
     playTime = request.POST['playTime']
     videoRec = VideoActivity.objects.get(id=videoRecId)
     if not videoRec.video.duration:
-        videoRec.video.duration = request.POST['duration']
+        duration = request.POST['duration']
+        video = Video.objects.get(id=videoRec.video_id)
+        if duration: #this is going to be some string that looks like a float
+            video.duration = int(float(duration)) #type conversion first to float then to int
+            video.save()
     if videoRec.start_seconds != long(playTime):
         videoRec.start_seconds = playTime
         videoRec.save()

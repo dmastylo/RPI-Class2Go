@@ -75,19 +75,19 @@ def main(request, course_prefix, course_suffix):
     
         index_list = []
         for video in video_list:
-            if video.section.id == contentsection.id:
+            if video.section == contentsection:
                 index_list.append(('video', video.index, video.id, contentsection.id, video.slug, video.title))
 
         for pset in pset_list:
-            if pset.section.id == contentsection.id:
+            if pset.section == contentsection:
                 index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
                 
         for page in additional_pages:
-            if page.section.id == contentsection.id:
+            if page.section == contentsection:
                 index_list.append(('additional_page', page.index, page.id, contentsection.id, page.slug, page.title))
 
         for file in file_list:
-            if file.section.id == contentsection.id:
+            if file.section == contentsection:
                 file_path=urlparse(file.file.url).path
                 file_parts=re.split('\.',file_path)
                 file_extension=file_parts.pop().lower()
@@ -139,3 +139,10 @@ def course_materials(request, course_prefix, course_suffix):
     
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
 
+def unenroll(request, course_prefix, course_suffix):
+    
+   course = Course.objects.get(handle=course_prefix+'--'+course_suffix, mode='ready')
+   student_group = Group.objects.get(id=course.student_group_id)
+   student_group.user_set.remove(request.user)
+    
+   return redirect('/')

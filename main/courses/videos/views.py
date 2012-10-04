@@ -240,7 +240,8 @@ def save_exercises(request):
 
 def delete_exercise(request):
     try:
-        toDelete = VideoToExercise.objects.get(exercise__fileName=request.POST['exercise_file'], mode='draft', is_deleted=False, video__slug=request.POST['video_slug'])
+        handle = request.POST['course_prefix']+'--'+request.POST['course_suffix']
+        toDelete = VideoToExercise.objects.get(exercise__handle=handle,exercise__fileName=request.POST['exercise_file'], mode='draft', is_deleted=False, video__slug=request.POST['video_slug'])
         toDelete.delete()
         toDelete.save()
 

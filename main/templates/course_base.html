@@ -2,6 +2,12 @@
 {% block title %}Stanford Online | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 
+{% block page_title %}
+<div class="pull-left page-title">
+    <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
+</div>
+{% endblock page_title %}
+
 {% block navbar %}
 <div class="navbar">
     <div class="navbar-inner nav-collapse collapse">
@@ -53,6 +59,10 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Administration<em class="caret"></em></a>
                             <ul class="dropdown-menu">
                               <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">Email Course Members</a></li>
+                              <li><a href="{% url 'courses.reports.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Reports</a></li>
+                                {% if common_page_data.course.share_to.exists %}
+                              <li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">Copy Content To Other Course</a></li>
+                                {% endif %}
                               <!-- <li><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Coming Soon!</a></li> -->
                             </ul>
                         </li>
