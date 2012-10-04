@@ -8,7 +8,7 @@ class CreateProblemSet(forms.ModelForm):
         self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course).order_by('index'), empty_label=None)
         self.fields['live_datetime'].required = False
 
-    assessment_type = forms.TypedChoiceField(choices=(('formative', 'Formative'), ('assessive', 'Summative')), widget=forms.RadioSelect)
+    assessment_type = forms.TypedChoiceField(choices=(('formative', 'Formative'), ('assessive', 'Summative'), ('survey', 'Survey')), widget=forms.RadioSelect)
     submissions_permitted = forms.IntegerField(min_value=0)
     resubmission_penalty = forms.IntegerField(min_value=0, max_value=100)
 
