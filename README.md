@@ -20,7 +20,7 @@ presenting material or grading exercises.  We believe an open source
 platform best facilitates this
 
 If you are interested in reaching the team email us at 
-<class2go-contact@cs.stanford.edu>.
+<c2g-contact@class.stanford.edu>.
 
 
 Philosophy 
@@ -112,7 +112,7 @@ environment set up.  There are also some docs available on the Project Wiki
 here on GitHub.
 
 Before sending unsolicited pull requests it is often best to discuss your
-intentions with the core dev team. Send us mail: <class2go-contact@cs.stanford.edu>.
+intentions with the core dev team. Send us mail: <c2g-contact@class.stanford.edu>.
 
 
 License
