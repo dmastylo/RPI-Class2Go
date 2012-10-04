@@ -68,7 +68,6 @@ function confirm_change(){
                     <input type="hidden" name="exercise_order[{{forloop.counter0}}]" value={{forloop.counter0}}>
                     <a href="#" data-delete-exercise data-exercise='{"id":{{psetToEx.id}},"title":"{{psetToEx.exercise.fileName}}","problemSetTaken":"{{problemset_taken}}"}' style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">X</a>
                     <a class="pull-right" style="float:right;margin-right:10px" href="{% url 'courses.exercises.views.edit' course_prefix course_suffix psetToEx.exercise.fileName %}?return={{request.path}}">Edit HTML file</a>
-
                 </li>
             {% empty%}
                 <p style='margin: 20px;'>There are no exercises yet.</p>
