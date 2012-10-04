@@ -119,7 +119,11 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     piazza_id = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return self.title
+        if self.title:
+            return self.title
+        else:
+            return "No Title"
+
     
     def _get_prefix(self):
         return self.handle.split("--")[0]
@@ -307,7 +311,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             return children[-1].index+1
 
     def __unicode__(self):
-        return self.title
+        if self.title:
+            return self.title
+        else:
+            return "No Title"
 
     class Meta:
         db_table = u'c2g_content_sections'
@@ -397,7 +404,10 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         return True
 
     def __unicode__(self):
-        return self.title
+        if self.title:
+            return self.title
+        else:
+            return "No Title"
     
     class Meta:
         db_table = u'c2g_additional_pages'
@@ -450,7 +460,10 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return url
 
     def __unicode__(self):
-        return self.title
+        if self.title:
+            return self.title
+        else:
+            return "No Title"
 
     class Meta:
         db_table = u'c2g_files'
@@ -511,8 +524,11 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
         return True
 
     def __unicode__(self):
-        return self.title
-    
+        if self.title:
+            return self.title
+        else:
+            return "No Title"
+
     class Meta:
         db_table = u'c2g_announcements'
 
@@ -782,7 +798,10 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             raise ValidationError(errors)
         
     def __unicode__(self):
-        return self.title
+        if self.title:
+            return self.title
+        else:
+            return "No Title"
 
     class Meta:
         db_table = u'c2g_videos'

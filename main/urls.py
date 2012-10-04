@@ -165,7 +165,10 @@ urlpatterns = patterns('',
     url(r'^upload_file/?', 'courses.files.actions.upload'),
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
                        
-
+    #Content Sharing
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/?$', 'courses.content_sections.views.copy_content_form'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/send/?$', 'courses.content_sections.views.copy_content'),
+                      
 
     # Landing Page
     url(r'^/?$', 'courses.landing.views.landing'),
