@@ -22,6 +22,7 @@
         <hr />
         <li><strong>Piazza handle:</strong> {{user.get_profile.piazza_name }}</li>
         <li><strong>Piazza email:</strong> {{user.get_profile.piazza_email }}</li>
+        <li><strong>Receive course emails:</strong> {% if user.get_profile.email_me %} Yes {% else %} No {% endif %} </li>
             
         <hr />
 	    <li class="pull-left"><strong>Courses:</strong></li>
