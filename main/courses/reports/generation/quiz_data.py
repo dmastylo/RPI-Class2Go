@@ -3,12 +3,20 @@ import json
 from courses.reports.generation.C2GReportWriter import *
 
 def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
+    students_ = ready_course.student_group.user_set.all().values_list('id', 'username', 'first_name', 'last_name')
+    students = {}
+    for s in students_: students[s[0]] = {"username": s[1], "name": "%s %s" % (s[2], s[3])}
+    
     mean = lambda k: sum(k)/len(k)
     dt = datetime.now()
     course_prefix = ready_course.handle.split('--')[0]
     course_suffix = ready_course.handle.split('--')[1]
     is_video = isinstance(ready_quiz, Video)
-    is_summative = (not is_video) and (ready_quiz.assessment_type == 'summative')
+    is_summative = (not is_video) and (ready_quiz.assessment_type == 'assessive')
+    if is_summative:
+        submissions_permitted = ready_quiz.submissions_permitted
+        if submissions_permitted == 0: submissions_permitted = 100000
+        resubmission_penalty = ready_quiz.resubmission_penalty/100.0
     
     report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_quiz.slug)
     if is_video:
@@ -38,41 +46,46 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         ex = rln.exercise
         ex_ids.append(ex.id)
         
-        if is_video: atts = ProblemActivity.objects.filter(video_to_exercise = rln).order_by('student', 'time_created')
-        else: atts = ProblemActivity.objects.filter(problemset_to_exercise = rln).order_by('student', 'time_created')
+        if is_video:
+            atts = ProblemActivity.objects.select_related('video', 'exercise').filter(video_to_exercise__exercise__fileName=ex.fileName, video_to_exercise__video=ready_quiz).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
+        else:
+            atts = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__exercise__fileName=ex.fileName, problemset_to_exercise__problemSet=ready_quiz).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
         
-        submitters = atts.values_list('student', flat=True)
-        completes = atts.values_list('complete', flat=True)
-        times_taken = atts.values_list('time_taken', flat=True)
-        attempts_content = atts.values_list('attempt_content', flat=True)
+        submitters = [item[0] for item in atts]
+        completes = [item[1] for item in atts]
+        times_taken = [item[2] for item in atts]
+        attempts_content = [item[3] for item in atts]
         
         for i in range(0, len(atts)):
             is_student_first_attempt = (i == 0) or (submitters[i] != submitters[i-1])
             is_student_last_attempt = (i == len(atts)-1) or (submitters[i] != submitters[i+1])
             
             if is_student_first_attempt:
-                stud_username = atts[i].student.username
-                if not atts[i].student.username in data:
-                    stud_fullname = atts[i].student.first_name + " " + atts[i].student.last_name
+                stud_username = students[submitters[i]]['username']
+                if not stud_username in data:
+                    stud_fullname = students[submitters[i]]['name']
                     data[stud_username] = {'username': stud_username, 'name': stud_fullname, 'visits':[]}
                 attempt_number = 0
                 completed = False
                 attempt_times = []
                 attempts = []
+                num_incorrect_attempts = 0
             
             attempt_number += 1
             
             if not completed:
                 attempt_times.append(times_taken[i])
-                attempts.append(attempts_content[i])
+                attempts.append(attempts_content[i].replace("\r", "").replace("\n", ";"))
             
-            if completes[i] == 1: completed = True
+            if completes[i] == 1:
+                completed = True
+                num_incorrect_attempts = attempt_number - 1
             
             if is_student_last_attempt:
                 score = 0
                 if is_summative:
-                    if (attempt_number + 1) <= ready_quiz.submissions_permitted:
-                        score = 1 - attempt_number*ready_quiz.resubmission_penalty/100.0
+                    if completed and (num_incorrect_attempts+1 <= submissions_permitted):
+                        score = 1 - (num_incorrect_attempts)*resubmission_penalty
                     if score < 0: score = 0
                 
                 data[stud_username][ex.id] = {'completed': 'y' if completed else 'n', 'attempts': json.dumps(attempts), 'median_attempt_time': median(attempt_times)}
@@ -96,7 +109,7 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         
     for rln in rlns:
         header1.extend(["", "", rln.exercise.get_slug(), "", "", ""])
-        header2.extend(["", "", "Completed", "attemps"])
+        header2.extend(["", "", "Completed", "attempts"])
         if is_summative: header2.append("Score")
         header2.append("Median attempt time")
         
