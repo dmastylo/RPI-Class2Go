@@ -62,7 +62,9 @@ class EditProfileForm(forms.ModelForm):
                                                                    ('ManufacturingConstruction','In manufacturing or construction'),
                                                                    ('AnotherIndustry','In another industry'),
                                                                    ('Other','Other'),))
-    
+ 
+    email_me = forms.BooleanField(label=_("Receive emails from courses"), required=False)
+
     piazza_name  = forms.RegexField(regex=r'^[\w -]+$',
                                     required=False,
                                     max_length=50,
@@ -71,7 +73,6 @@ class EditProfileForm(forms.ModelForm):
     piazza_email = forms.EmailField(required=False,
                                     label=_("Piazza email"), max_length=75)
 
-    
     class Meta:
         model = UserProfile
-        fields = ('birth_year', 'gender', 'education', 'work', 'piazza_name', 'piazza_email')
+        fields = ('birth_year', 'gender', 'education', 'work', 'piazza_name', 'piazza_email', 'email_me')

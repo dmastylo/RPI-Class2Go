@@ -13,7 +13,7 @@
         <form name="edit profile form-vertical" action="{% url 'accounts.views.save_edits' %}" method="POST">
             {% csrf_token %}
             {{uform.as_p}}
-	    {{pform.as_p}}
+	        {{pform.as_p}}
             <input type="submit" value="Save Changes" class="btn" />
         </form>
     {% else %}

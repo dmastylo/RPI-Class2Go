@@ -552,7 +552,8 @@ class UserProfile(TimestampMixin, models.Model):
     work = models.CharField(max_length=128,null=True)
     piazza_email = models.CharField(max_length=128,blank=True)
     piazza_name = models.CharField(max_length=128,blank=True)
-
+    email_me = models.BooleanField(default=True) #get emails sent by the teaching staff
+    
     institutions = models.ManyToManyField(Institution) #these are confirmed institutions via shib or other trusted verifier
 
     client_ip = models.CharField(max_length=30, null=True)
