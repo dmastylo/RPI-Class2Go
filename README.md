@@ -19,7 +19,7 @@ to build interesting features to try out new ways of presenting
 material or grading exercises.  We believe an open source platform
 is the best way to do this.
 
-If you are interested in reaching the team, please email us at 
+If you are interested in reaching the team email us at 
 <c2g-contact@class.stanford.edu>.
 
 

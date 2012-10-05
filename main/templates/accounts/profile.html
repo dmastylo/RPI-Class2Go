@@ -15,32 +15,44 @@
             <li><strong>First Name:</strong> {{ user.first_name }}</li>
             <li><strong>Last Name:</strong> {{ user.last_name }}</li>
             <li><strong>E-mail:</strong> {{ user.email }}</li>
-	    <li><strong>Year of Birth:</strong> {{ user.get_profile.birth_year }}</li>
-	    <li><strong>Gender:</strong> {{user.get_profile.gender }}</li>
-	    <li><strong>Education:</strong> {{user.get_profile.education }}</li>
-	    <li><strong>Work:</strong> {{user.get_profile.work }}</li>
-        <hr />
-        <li><strong>Piazza handle:</strong> {{user.get_profile.piazza_name }}</li>
-        <li><strong>Piazza email:</strong> {{user.get_profile.piazza_email }}</li>
+            <li><strong>Year of Birth:</strong> {{ user.get_profile.birth_year }}</li>
+            <li><strong>Gender:</strong> {{user.get_profile.gender }}</li>
+            <li><strong>Education:</strong> {{user.get_profile.education }}</li>
+            <li><strong>Work:</strong> {{user.get_profile.work }}</li>
+            <hr />
+            <li><strong>Piazza handle:</strong> {{user.get_profile.piazza_name }}</li>
+            <li><strong>Piazza email:</strong> {{user.get_profile.piazza_email }}</li>
+            <li><strong>Receive course emails:</strong> {% if user.get_profile.email_me %} Yes {% else %} No {% endif %} </li>
             
-        <hr />
-	    <li class="pull-left"><strong>Courses:</strong></li>
-	    {% if courses %}
-	    <ul class="unstyled pull-left">
-	      {% for course in courses %}
-	      <li>&nbsp<a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></li>
-	      {% endfor %}
-	    </ul>
-	    {% endif %}
+            <hr />
+            <li class="pull-left"><strong>Courses:</strong></li>
+            {% if courses %}
+            <ul class="unstyled pull-left">
+	            {% for course in courses %}
+	                <li>
+                    <a style="display:inline" href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a>&nbsp;
+                    {% if user in course.get_all_students %}
+                       <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
+                           {% csrf_token %}
+                           <input class="btn-mini" type="Submit"  value="Unenroll as Student" onclick="return confirm('Do you really want to unenroll?')" />
+                       </form>
+                    {% else %}
+                        Staff Member
+                    {% endif %}
+                    </li>
+	            {% endfor %}
+	         </ul>
+	         {% endif %}
         </ul>
         
-        <p><a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a> 
+        <p style="text-wrap:none;">
+              <a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a>
               {% if show_pwd_change %}
               <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a>
               {% endif %}
         </p>
     {% else %}
-        <h4> Please <a data-toggle="modal" href="#login-modal">log in</a> to view your profile </h4>
+    <h4> Please <a href="{% url 'auth_login' %}?next={{ request.path }}">log in</a> to view your profile </h4>
     {% endif %}
 
 </div>

@@ -9,11 +9,11 @@
     </div>
 </div>
     {% if user.is_authenticated %}
-        <p>Need help? Contact <a href="mailto:class2go-techsupport@cs.stanford.edu">class2go-techsupport@cs.stanford.edu</a></p>
+        <p>Need help? Contact <a href="mailto:c2g-techsupport@class.stanford.edu">c2g-techsupport@class.stanford.edu</a></p>
         <form name="edit profile form-vertical" action="{% url 'accounts.views.save_edits' %}" method="POST">
             {% csrf_token %}
             {{uform.as_p}}
-	    {{pform.as_p}}
+	        {{pform.as_p}}
             <input type="submit" value="Save Changes" class="btn" />
         </form>
     {% else %}

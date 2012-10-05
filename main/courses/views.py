@@ -9,6 +9,8 @@ import re
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect
 
 from courses.forms import *
 
@@ -139,10 +141,17 @@ def course_materials(request, course_prefix, course_suffix):
     
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
 
+@auth_view_wrapper
+@require_POST
+@csrf_protect
 def unenroll(request, course_prefix, course_suffix):
     
-   course = Course.objects.get(handle=course_prefix+'--'+course_suffix, mode='ready')
-   student_group = Group.objects.get(id=course.student_group_id)
-   student_group.user_set.remove(request.user)
+    try:
+        course = Course.objects.get(handle=course_prefix+'--'+course_suffix, mode='ready')
+    except Course.DoesNotExist:
+        raise Http404
+            
+    student_group = Group.objects.get(id=course.student_group_id)
+    student_group.user_set.remove(request.user)
     
-   return redirect('/')
+    return redirect(request.META['HTTP_REFERER'])
