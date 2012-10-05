@@ -3,7 +3,7 @@
 directory "/mnt" do
     owner "root"
     group "root"
-    mode 00777
+    mode 001777
     action :create
 end
 
