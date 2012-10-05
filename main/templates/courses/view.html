@@ -62,6 +62,9 @@
         <ul class="nav nav-list">
             <li><a href="{% url 'c2g.views.faq' %}">Help/FAQs</a></li>
             <li><a href="{% url 'c2g.views.contactus' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Contact</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="/accounts/profile">My profile</a></li>
+            {% endif %}
         </ul>
     </div>
 </div>
