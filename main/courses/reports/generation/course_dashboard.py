@@ -33,8 +33,8 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
     
     num_all_formative_problem_sets = ProblemSet.objects.getByCourse(course=ready_course.image).filter(assessment_type="formative").count()
     num_live_formative_problem_sets = problem_sets.filter(assessment_type="formative").count()
-    num_all_summative_problem_sets = ProblemSet.objects.getByCourse(course=ready_course.image).filter(assessment_type="summative").count()
-    num_live_summative_problem_sets = problem_sets.filter(assessment_type="summative").count()
+    num_all_summative_problem_sets = ProblemSet.objects.getByCourse(course=ready_course.image).filter(assessment_type="assessive").count()
+    num_live_summative_problem_sets = problem_sets.filter(assessment_type="assessive").count()
     num_all_videos = Video.objects.getByCourse(course=ready_course.image).count()
     num_live_videos = videos.count()
     num_all_pages = AdditionalPage.objects.getSectionPagesByCourse(course=ready_course.image).count()
