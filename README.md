@@ -11,7 +11,7 @@ courses" (MOOC's): [Computer Networking][net] and
   [sol]: http://solar.class.stanford.edu/
 
 Class2Go was built to be an open platform for learning and research.
-Professors x have access to the classes' data to learn how their
+Professors have access to the classes' data to learn how their
 students learn. We will facilitate experiments.  For example, we
 intend this to be the best plaform for running A/B/N tests to measure
 the impact of different teaching methods on student outcomes, or
@@ -20,7 +20,7 @@ material or grading exercises.  We believe an open source platform
 is the best way to do this.
 
 If you are interested in reaching the team, please email us at 
-<class2go-contact@cs.stanford.edu>.
+<c2g-contact@class.stanford.edu>.
 
 
 Philosophy 
@@ -115,7 +115,7 @@ environment set up.  There are also some docs available on the
 Project Wiki here on GitHub.
 
 Before sending unsolicited pull requests it is often best to discuss your
-intentions with the core dev team. Send us mail: <class2go-contact@cs.stanford.edu>.
+intentions with the core dev team. Send us mail: <c2g-contact@class.stanford.edu>.
 
 If you want to get an idea of the kinds of things to do on the project,
 check out our
@@ -139,7 +139,7 @@ is to stand up a development environment on your own laptop and try
 it out.  We have people this demo sized Class2Go up and running
 pretty quickly on their local machine.
 
-Send us mail at <class2go-contact@cs.stanford.edu> and we can give
+Send us mail at <c2g-contact@class.stanford.edu> and we can give
 you an idea what would be involved.
 
 
