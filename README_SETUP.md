@@ -155,7 +155,7 @@ Steps:
 2. Install Egit and configure it to the github repos (https://github.com/Stanford-Online/class2go)
     For this you would need Jason to set you up with access to this repos.
     Note, when configuring the Remote Push Url you'll need to add ".git" on the end:
-    (git clone https://github.com/jbau/class2go.git)
+    (git clone https://github.com/Stanford-Online/class2go.git)
 
 
 **Requirements**
@@ -267,7 +267,7 @@ be installed for Mac (and probably Windows too)
 
 14. Clone class2go repo from github:
 
-    git clone https://github.com/jbau/class2go.git .
+    git clone https://github.com/Stanford-Online/class2go.git .
 
 15. Check out where your mysql is installed, make sure mysql_config exists in the dir:
 
