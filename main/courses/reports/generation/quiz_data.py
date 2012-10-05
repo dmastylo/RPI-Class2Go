@@ -57,6 +57,8 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         attempts_content = [item[3] for item in atts]
         
         for i in range(0, len(atts)):
+            if not (submitters[i] in students): continue # Do not include attempts by non-students in the report
+            
             is_student_first_attempt = (i == 0) or (submitters[i] != submitters[i-1])
             is_student_last_attempt = (i == len(atts)-1) or (submitters[i] != submitters[i+1])
             
