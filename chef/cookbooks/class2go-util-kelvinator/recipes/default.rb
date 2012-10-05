@@ -24,11 +24,3 @@ package "ffmpeg" do
     action :install
 end
 
-# make /mnt writeable, where Kelvinator working dirs live (see issue #926)
-directory "/mnt" do
-    owner "root"
-    group "root"
-    mode 00777
-    action :create
-end
-
