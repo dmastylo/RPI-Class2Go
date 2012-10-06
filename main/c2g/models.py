@@ -1114,11 +1114,19 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             exercise_activities = pset_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('time_created')
             exercise_percent = 100
             for exercise_activity in exercise_activities:
-                if exercise_activity.attempt_number > submissions_permitted:
+                #first, disregard attempts that are beyond the allowed number or
+                #past the partial credit deadline
+                if exercise_activity.attempt_number > submissions_permitted or \
+                   exercise_activity.time_created > self.partial_credit_deadline:
                     break
+                #if submission is valid and correct
                 elif exercise_activity.complete:
+                    # penalize for being late
+                    if exercise_activity.time_created > self.grace_period:
+                        exercise_percent -= self.late_penalty
                     total_score += exercise_percent/100.0
                     break
+                #deduct for submission that was incorrect
                 else:
                     exercise_percent -= resubmission_penalty
             exercise_scores[psetToEx.exercise.id] = exercise_percent/100.0
