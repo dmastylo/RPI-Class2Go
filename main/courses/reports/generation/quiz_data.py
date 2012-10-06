@@ -13,6 +13,8 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
     course_suffix = ready_course.handle.split('--')[1]
     is_video = isinstance(ready_quiz, Video)
     is_summative = (not is_video) and (ready_quiz.assessment_type == 'assessive')
+    is_formative = (is_video) or (ready_quiz.assessment_type == 'formative')
+    
     if is_summative:
         submissions_permitted = ready_quiz.submissions_permitted
         if submissions_permitted == 0: submissions_permitted = 100000
@@ -73,9 +75,8 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
                 attempts = []
                 num_incorrect_attempts = 0
             
-            attempt_number += 1
-            
             if not completed:
+                attempt_number += 1
                 attempt_times.append(times_taken[i])
                 attempts.append(attempts_content[i].replace("\r", "").replace("\n", ";"))
             
@@ -89,9 +90,12 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
                     if completed and (num_incorrect_attempts+1 <= submissions_permitted):
                         score = 1 - (num_incorrect_attempts)*resubmission_penalty
                     if score < 0: score = 0
+                elif is_formative:
+                    if completed: score = 1.0
+                    else: score = 0.0
                 
                 data[stud_username][ex.id] = {'completed': 'y' if completed else 'n', 'attempts': json.dumps(attempts), 'median_attempt_time': median(attempt_times)}
-                if is_summative: data[stud_username][ex.id]['score'] = score
+                if is_summative or is_formative: data[stud_username][ex.id]['score'] = score
                 
     # Sort students by username
     sorted_usernames = sorted(data.keys())
@@ -112,10 +116,10 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
     for rln in rlns:
         header1.extend(["", "", rln.exercise.get_slug(), "", "", ""])
         header2.extend(["", "", "Completed", "attempts"])
-        if is_summative: header2.append("Score")
+        if is_summative or is_formative: header2.append("Score")
         header2.append("Median attempt time")
         
-    if is_summative: header1.extend(["", "Total score / %d" % len(rlns)])
+    if is_summative or is_formative: header1.extend(["", "Total score / %d" % len(rlns)])
     rw.write(header1)
     rw.write(header2)
     
@@ -136,11 +140,11 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
             else: ex_res = {'completed': '', 'attempts': '', 'score': '', 'median_attempt_time': ''}
             
             content.extend(["", "", ex_res['completed'], ex_res['attempts']])
-            if is_summative:
+            if is_summative or is_formative:
                 content.append(ex_res['score'])
                 stud_score += (ex_res['score'] if isinstance(ex_res['score'], float) else 0)
             content.append(ex_res['median_attempt_time'])
-        if is_summative: content.extend(["", stud_score])    
+        if is_summative or is_formative: content.extend(["", stud_score])    
         rw.write(content)
         
     report_content = rw.writeout()

@@ -45,9 +45,10 @@ $(function(){
       $.ajax("{% url 'courses.exercises.views.save' common_page_data.course_prefix common_page_data.course_suffix filename %}",{
              headers: {'X-CSRFToken': csrftoken},
              type: 'POST',
+             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
              data: { content:editor.getValue(),
                     },
-             error: function(jqXHR, status, errorMsg) { alert("An error happened.  Your changes weren't saved to the server");},
+             error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
              success: function(data,textStatus,jqXHR){
                           alert("Your changes to file "+ jqXHR.responseText + " were saved to the server ");
                           callback();
