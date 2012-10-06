@@ -1,6 +1,11 @@
 # Create your views here.
+import sys
+import traceback
+import logging
+logger = logging.getLogger(__name__)
+
 from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
@@ -48,11 +53,15 @@ def save(request, course_prefix, course_suffix, filename):
     try:
        newfile = default_storage.open(exercise.file.name,'rw+')
        newfile.seek(0)
-       newfile.write(request.POST['content'])
+       newfile.write(request.POST['content'].encode('utf-8'))
        newfile.truncate()
        newfile.close()
        exercise.file.save(filename, newfile)
-    except AttributeError:
-        return HttpResponseBadRequest('Something went wrong while saving the file.')
+    except BaseException as e:
+        #yes, we're catching all exceptions, but this is for the purpose of sending back an understandable
+        #ajax error message.  We'll log the exception which causes email to be sent
+        (type, value, tb)=sys.exc_info()
+        logger.exception(str(type)+str(value))
+        return HttpResponseBadRequest(unicode(e))
 
     return HttpResponse(exercise.file.name)
