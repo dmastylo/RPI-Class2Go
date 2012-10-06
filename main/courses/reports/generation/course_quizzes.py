@@ -123,10 +123,8 @@ def WriteQuizDataToReport(q, rw):
                         else:
                             unique_submitters_scores[stud_index] = 1 - attempt_number * (resubmission_penalty)
                             if unique_submitters_scores[stud_index] < 0: unique_submitters_scores[stud_index] = 0
-                    elif assessment_type == 'formative':
-                        unique_submitters_scores[stud_index] = 1.0
                         
-                if is_last_student_attempt and (assessment_type == 'summative' or assessment_type == 'formative'): # Before leaving to the next student, register the student score.
+                if is_last_student_attempt and (assessment_type == 'summative'): # Before leaving to the next student, register the student score.
                     if submitters[i] in q_scores: q_scores[submitters[i]] += unique_submitters_scores[stud_index]
                     else: q_scores[submitters[i]] = 0
         
