@@ -14,6 +14,11 @@
  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
  <![endif]-->
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<style>
+.alert-error{
+  margin-bottom: 60px;
+}
+</style>
 {% endblock top_scripts %}
 
 
@@ -38,9 +43,19 @@
 {% if user.is_authenticated %}
   {% if common_page_data.is_course_member %}
   <div class="span5">
-    <div class="alert alert-success"><em class="icon-heart"></em>You have signed up for {{common_page_data.course.title}}!</div>
-    <p>The course starts on {{common_page_data.course.calendar_start}}. The course staff will contact you with an email introduction when the date approaches.  Hope to see you online this term!</p>
-    <p><a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Register or log-in someone else</a></p>
+    <div class="alert alert-success">
+        <em class="icon-heart"></em>
+        You have signed up for {{common_page_data.course.title}}!
+        <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' common_page_data.course_prefix common_page_data.course_suffix %}">
+            {% csrf_token %}
+            <input class="btn-mini" type="Submit"  value="Unenroll" onclick="return confirm('Do you really want to unenroll?')" />
+        </form>
+    </div>
+    <p>The course starts on {{common_page_data.course.calendar_start}}. The course staff will contact you with an email introduction when the date approaches.
+      Hope to see you online this term!</p>
+    <p><a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">
+        Register or log-in as someone else</a>
+    </p>
   </div>
   {% else %}
     <div class="span5">
@@ -50,7 +65,7 @@
     {% csrf_token %}
     </form>
     </div>
-    <a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Register or log-in someone else</a>
+    <a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Register or log-in as someone else</a>
     </div>
   {% endif %}
 
@@ -117,8 +132,6 @@
     {% endif %}
 {% endif %}
     
-    
 {% endblock signup_form %}
 
-    
 {% endblock r_column_content %}

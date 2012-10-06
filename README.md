@@ -1,43 +1,47 @@
 Class2Go 
 ========
 
-Class2Go is Stanford's internal open-source platform for on-line courses. We
-began building Class2Go in June 2012. A team of eight has worked on
-it through the summer, and it is launching Fall 2012 for a handful
-of internal classes and two public classes (MOOC's): [Computer
-Networking] [net] and [Solar Cells, Fuel Cells, and Batteries] [sol]
+Class2Go is Stanford's internal open-source platform for on-line
+education. A team of eight built the first version over the summer
+2012, and it is still under active development.  Class2Go launched
+in Fall for six on-campus classes and of internal classes and two
+large open two (MOOC's): [Computer Networking][net] 
+and [Solar Cells, Fuel Cells, and Batteries][sol].
   [net]: http://networking.class.stanford.edu/
   [sol]: http://solar.class.stanford.edu/
 
-Class2Go is intended to be an open platform for learning and research.
-Professors will have direct access to the data for their classes
-to learn how their students learn. We will facilitate experiments.
-This could be A/B/N testing of how different things affect student
-learning, or even bespoke code to try out interesting new features.
+Class2Go was built to be an open platform for learning and research.
+Professors will have access to the data for their classes to learn
+how their students learn. We will facilitate experiments.  For
+example, we intend this to be the best plaform for running A/B/N
+tests to measure the impact of different teaching methods on student
+outcomes, or to build interesting features to try out new ways of
+presenting material or grading exercises.  We believe an open source
+platform best facilitates this
 
-If you are interested in discussing with us, the team can be reached 
-at <class2go-contact@cs.stanford.edu>
+If you are interested in reaching the team email us at 
+<c2g-contact@class.stanford.edu>.
 
 
 Philosophy 
 ----------
 
-There are som principles that have guided our project:
+There are some principles that have guided our project:
 
-* *Open*. The platform is open source to make it easier for users
+* **Open**. The platform is open source to make it easier for users
     (faculty members) to give us feedback on what we are doing.
-    We would love to have others use the platform, or
-    to collaborate with similar efforts in other places.
+    We would love to have others use the platform.  We are working
+    with others who are interested in using Class2Go for on-line
+    education: universities, private schools, even NGO's.
 
-* *Portable*. We believe strongly that valuable course content
-    shouldn't be tied to any one platform. Documents are already
-    portable; the videos are outside our system (on YouTube) and
-    the assets themselves can be repurposed as faculty see fit.
-    And our exercises and problem sets, instead of being trapped
-    in a proprietary database, are in the Khan Academy format, so
-    they can be used elsewhere.
+* **Portable**. Valuable course content shouldn't be tied to any
+    one platform. Documents are already portable; the videos are
+    outside our system (on YouTube) and the assets themselves can
+    be repurposed as faculty see fit.  And our exercises and problem
+    sets, instead of being trapped in a proprietary database, are
+    in the Khan Academy format, so they can be used elsewhere.
 
-* *Interoperable*. We don't want to build or maintain more than we
+* **Interoperable**. We don't want to build or maintain more than we
     have to. See the section below for a list of all the shoulders
     we are standing on.
 
@@ -48,10 +52,10 @@ Key Features
 To bring this to life we've built a system. Here are some of its
 important and distinguishing features.
 
-* *Video and Problem Set Management*. Professors (and TA's) can
+* **Video and Problem Set Management**. Professors (and TA's) can
     upload assets to S3; videos are then uploaded to YouTube.
 
-* *Exercises*. We support two kinds of exercises: formative (for
+* **Exercises**. We support two kinds of exercises: formative (for
     learning) and summative (for assessment, like quizzes and tests).
     Students can attempt each problem as many times as they want
     without penalty in formative problem sets, but may be penalized
@@ -59,18 +63,18 @@ important and distinguishing features.
     problem sets, feedback is available immediately so students can
     learn along the way.
 
-* *Content Management*. We have built a simple content management
+* **Content Management**. We have built a simple content management
     system where course information (videos, static pages, problem
     sets) can be created, reviewed, and then published. One important
     ability is an automatic live date, so a professor (or, most
-    likely, a TA) doesn't have to click a button at midnight to
+    likely, their TA) doesn't have to click a button at midnight to
     publish a problem set.
 
-* *Frame Extraction*. We have a tool for extracting frames from
-    a video (using ```ffmpeg```) differencing them to find key
-    frames, and then using thumbnails of these frames as an index
-    to the video. It's called the Kelvinator after its author,
-    Kelvin Do.
+* **Frame Extraction**. We have a simple tool for extracting frames
+    from a video (using ```ffmpeg```) and differencing them to find 
+    key frames.  The thumbnails of these frames are used as an index
+    to the video for navigation. It's called the Kelvinator after
+    its first author, Kelvin Do.
 
 
 Leveraging Others
@@ -97,6 +101,18 @@ commercial, some open source. But a ton of good stuff.
   [a]:    http://aws.amazon.com/
   [oc]:   http://www.opscode.org/
   [gh]:   http://www.github.com/
+
+
+Contributing
+------------
+
+We welcome others contributing to the project.  Begin by checking out our 
+source from here and using the README_SETUP.md file to get a development
+environment set up.  There are also some docs available on the Project Wiki
+here on GitHub.
+
+Before sending unsolicited pull requests it is often best to discuss your
+intentions with the core dev team. Send us mail: <c2g-contact@class.stanford.edu>.
 
 
 License

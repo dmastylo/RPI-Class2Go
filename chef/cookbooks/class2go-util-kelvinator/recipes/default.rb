@@ -24,10 +24,3 @@ package "ffmpeg" do
     action :install
 end
 
-directory "/opt/class2go/kelvinator" do
-    owner "root"
-    group "root"
-    mode 00777
-    action :create
-end
-

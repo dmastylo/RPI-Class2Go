@@ -1,13 +1,16 @@
 from c2g.models import *
 from courses.reports.generation.C2GReportWriter import *
+import math
 
 def gen_course_quizzes_report(ready_course, save_to_s3=False):
     dt = datetime.now()
     course_prefix = ready_course.handle.split('--')[0]
     course_suffix = ready_course.handle.split('--')[1]
-    s3_filepath = "%s/%s/reports/course_quizzes/daily/%02d_%02d_%02d__%02d_%02d_%02d-%s-Course-Quizzes.csv" % (course_prefix, course_suffix, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix)
     
-    rw = C2GReportWriter(ready_course, save_to_s3, s3_filepath)
+    report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s-Course-Quizzes.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix)
+    s3_filepath = "%s/%s/reports/course_quizzes/%s" % (course_prefix, course_suffix, report_name)
+    
+    rw = C2GReportWriter(save_to_s3, s3_filepath)
     
     # Title
     rw.write(content = ["Course Quizzes for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
@@ -27,7 +30,8 @@ def gen_course_quizzes_report(ready_course, save_to_s3=False):
     for q in quizzes:
         WriteQuizDataToReport(q, rw)
 
-    rw.close()
+    report_content = rw.writeout()
+    return {'name': "%02d_%02d_%02d__%02d_%02d_%02d-%s-Quizzes.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix), 'content': report_content, 'path': s3_filepath}
         
 def WriteQuizDataToReport(q, rw):
     mean = lambda k: sum(k)/len(k)
@@ -36,9 +40,12 @@ def WriteQuizDataToReport(q, rw):
     
     if isinstance(q, Video): type = 'Video'
     else:
-        if q.assessment_type == 'summative':
+        if q.assessment_type == 'assessive':
             type = 'Summative problem set'
             assessment_type = 'summative'
+            submissions_permitted = q.submissions_permitted
+            if submissions_permitted == 0: submissions_permitted = 100000
+            resubmission_penalty = q.resubmission_penalty / 100.0
         else: type = 'Formative problem set'
     
     rw.write(["%s (%s)" % (q.title, type)])
@@ -75,14 +82,16 @@ def WriteQuizDataToReport(q, rw):
             'num_correct_third_attempts':"",
         }
         
-        if isinstance(q, Video): atts = ProblemActivity.objects.filter(video_to_exercise = rln).order_by('student', 'time_created')
-        else: atts = ProblemActivity.objects.filter(problemset_to_exercise = rln).order_by('student', 'time_created')
+        if isinstance(q, Video):
+            atts = ProblemActivity.objects.select_related('video', 'exercise').filter(video_to_exercise__exercise__fileName=ex.fileName, video_to_exercise__video=q).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
+        else:
+            atts = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__exercise__fileName=ex.fileName, problemset_to_exercise__problemSet=q).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
         
-        submitters = atts.values_list('student', flat = True)
-        complete_ = atts.values_list('complete', flat = True)
-        complete = [i for i in complete_]
-        attempt_times = atts.values_list('time_taken', flat = True)
-        #import pdb; pdb.set_trace()
+        submitters = [item[0] for item in atts]
+        completes = [item[1] for item in atts]
+        attempt_times = [item[2] for item in atts]
+        attempts_content = [item[3] for item in atts]
+        
         stud_index = -1
         unique_submitters = []
         unique_submitters_num_attempts = []
@@ -105,12 +114,12 @@ def WriteQuizDataToReport(q, rw):
                 unique_submitters_num_attempts[stud_index] += 1
                 attempt_number = i - first_attempt_index
                 
-                if complete[i] == 1:
+                if completes[i] == 1:
                     unique_submitters_correct_attempt_number[stud_index] = attempt_number + 1
                     if assessment_type == 'summative':
-                        if (attempt_number+1) > q.submissions_permitted: unique_submitters_scores[stud_index] = 0
+                        if (attempt_number+1) > submissions_permitted: unique_submitters_scores[stud_index] = 0
                         else:
-                            unique_submitters_scores[stud_index] = 1 - attempt_number * (q.resubmission_penalty/100.0)
+                            unique_submitters_scores[stud_index] = 1 - attempt_number * (resubmission_penalty)
                             if unique_submitters_scores[stud_index] < 0: unique_submitters_scores[stud_index] = 0
                         
                 if is_last_student_attempt and assessment_type == 'summative': # Before leaving to the next student, register the student score if the quiz is a summ. ps.
@@ -123,7 +132,7 @@ def WriteQuizDataToReport(q, rw):
                 'num_attempts': len(submitters),
                 'num_attempting_students':len(unique_submitters),
                 'num_attempts_per_student': 1.0*len(submitters)/len(unique_submitters),
-                'num_correct_attempts':complete.count(1),
+                'num_correct_attempts':completes.count(1),
                 'attempt_times': attempt_times,
                 'num_correct_first_attempts':unique_submitters_correct_attempt_number.count(1),
                 'num_correct_second_attempts':unique_submitters_correct_attempt_number.count(2),
@@ -138,14 +147,20 @@ def WriteQuizDataToReport(q, rw):
     
     content = ["Exercise"]
     if assessment_type == 'summative': content.extend(["Mean score", "Max score"])
-    content.extend(["Total attempts", "Students who have attempted", "Avg. attempts per student", "Correct attempts", "Correct 1st attempts", "Correct 2nd attempts", "Correct 3rd attempts", "Mean attempt time"])
+    content.extend(["Total attempts", "Students who have attempted", "Avg. attempts per student", "Correct attempts", "Correct 1st attempts", "Correct 2nd attempts", "Correct 3rd attempts", "Median attempt time"])
     rw.write(content, indent = 1)
     
     for e_data in e_data_list:
         content = [e_data['exercise'].get_slug()]
         if assessment_type == 'summative': content.extend([mean(e_data['scores']), max(e_data['scores'])])
-        content.extend([e_data['num_attempts'], e_data['num_attempting_students'], e_data['num_attempts_per_student'], e_data['num_correct_attempts'], e_data['num_correct_first_attempts'], e_data['num_correct_second_attempts'], e_data['num_correct_third_attempts'], mean(e_data['attempt_times']) if len(e_data['attempt_times']) > 0 else ""])
+        content.extend([e_data['num_attempts'], e_data['num_attempting_students'], e_data['num_attempts_per_student'], e_data['num_correct_attempts'], e_data['num_correct_first_attempts'], e_data['num_correct_second_attempts'], e_data['num_correct_third_attempts'], median(e_data['attempt_times']) if len(e_data['attempt_times']) > 0 else ""])
         rw.write(content, indent = 1)
         
     rw.write([""])    
+
+def median(l):
+    if len(l) == 0: return None
     
+    l = sorted(l)
+    if (len(l)%2) == 0: return (l[len(l)/2] + l[(len(l)-1)/2]) / 2.0
+    else: return l[(len(l)-1)/2]

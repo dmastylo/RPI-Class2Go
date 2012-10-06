@@ -1,0 +1,10 @@
+{% extends 'courses/preview.html' %}
+{% load url from future %}
+
+{% block course_description %}
+
+<div class = "span7">
+    <h1>Course Info</h1>
+</div>
+
+{% endblock course_description %}

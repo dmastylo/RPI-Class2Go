@@ -88,7 +88,7 @@ $(function() {
                     if(status=="success"){
                         var kScript = document.createElement('script');
                         kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js";
-                        document.head.appendChild(kScript);
+                        document.getElementsByTagName("head")[0].appendChild(kScript);
                     }
                  });
   

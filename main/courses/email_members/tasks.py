@@ -140,6 +140,7 @@ def delegate_emails(hash_for_msg, total_num_emails, course_title, course_handle,
     num_workers=int(math.ceil(float(total_num_emails)/float(EMAILS_PER_WORKER)))
     recipient_qset = User.objects.all() #put recipients in a QuerySet
     recipient_qset.query = query #again, this is supported practice for reconstructing a queryset from a pickle,
+    recipient_qset = recipient_qset.filter(userprofile__email_me=True) #respect student email optout
     recipient_qset.only('email','first_name','last_name')
     recipient_list = map(lambda r: (r.first_name, r.last_name, r.email), list(recipient_qset))
     

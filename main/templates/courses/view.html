@@ -16,10 +16,10 @@
 
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
-    <div class="well tight nav" role="navigation" aria-labelledby="sidebar-nav-heading-0">
+    <div id="left-nav" class="well tight nav" role="navigation" aria-labelledby="sidebar-nav-heading-0">
         {% for content_section in contentsection_list %}
-        <h3 id="sidebar-nav-heading-{{ forloop.counter0 }}" class="nav-header" data-toggle="collapse" data-target="#sidebar-nav-{{ forloop.counter0 }}">{{content_section.title}}</h3>
-            <ul class="nav nav-list" id="sidebar-nav-{{ forloop.counter0 }}" >
+        <h3 id="sidebar-nav-heading-{{ forloop.counter0 }}" class="nav-header expanded" data-toggle="collapse" data-target="#sidebar-nav-{{ forloop.counter0 }}">{{content_section.title}}</h3>
+            <ul class="nav nav-list collapse in" id="sidebar-nav-{{ forloop.counter0 }}">
       		    {% for list_item in full_index_list %}
       		        {% for item in list_item %}
                     {% ifequal content_section.id item.3 %}
@@ -54,12 +54,17 @@
                         {% endifequal %}
                     {% endfor %}	
                 {% endfor %}
-            <li class="divider"></li>
+            </ul>
+            <ul class="nav nav-list">
+                <li class="divider"></li>
             </ul>
         	{% endfor %}
         <ul class="nav nav-list">
             <li><a href="{% url 'c2g.views.faq' %}">Help/FAQs</a></li>
             <li><a href="{% url 'c2g.views.contactus' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Contact</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="/accounts/profile">My profile</a></li>
+            {% endif %}
         </ul>
     </div>
 </div>
