@@ -3067,7 +3067,7 @@ var Khan = (function() {
                         }
                         $('#next-question-button').unbind('click');
                         $('#next-question-button').click(function () {
-                            location.href = c2gConfig.progessUrl;
+                            location.href = c2gConfig.progressUrl;
                         });
                     }
                 } else {
