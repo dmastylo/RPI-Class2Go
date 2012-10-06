@@ -110,11 +110,13 @@ def WriteQuizDataToReport(q, rw):
                     unique_submitters_correct_attempt_number.append(-1)
                     unique_submitters_scores.append(0)
                     first_attempt_index = i
+                    completed = False
                 
                 unique_submitters_num_attempts[stud_index] += 1
                 attempt_number = i - first_attempt_index
                 
-                if completes[i] == 1:
+                if (completes[i] == 1) and (not completed):
+                    completed = True
                     unique_submitters_correct_attempt_number[stud_index] = attempt_number + 1
                     if assessment_type == 'summative':
                         if (attempt_number+1) > submissions_permitted: unique_submitters_scores[stud_index] = 0
@@ -122,7 +124,7 @@ def WriteQuizDataToReport(q, rw):
                             unique_submitters_scores[stud_index] = 1 - attempt_number * (resubmission_penalty)
                             if unique_submitters_scores[stud_index] < 0: unique_submitters_scores[stud_index] = 0
                         
-                if is_last_student_attempt and assessment_type == 'summative': # Before leaving to the next student, register the student score if the quiz is a summ. ps.
+                if is_last_student_attempt and (assessment_type == 'summative'): # Before leaving to the next student, register the student score.
                     if submitters[i] in q_scores: q_scores[submitters[i]] += unique_submitters_scores[stud_index]
                     else: q_scores[submitters[i]] = 0
         

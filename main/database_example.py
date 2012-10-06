@@ -53,6 +53,10 @@ AWS_SECURE_STORAGE_BUCKET_NAME = 'dev-secure-c2g' # Optional. If not defined her
 # Generally don't need to set this in dev
 # KELVINATOR_WORKING_DIR = '/mnt'
 
+# Place where we should spool uploads.  Django defaults to /tmp, which is fine on
+# dev machines, but in AWS we want this to be on ephemeral storage
+# FILE_UPLOAD_TEMP_DIR = '/mnt'
+
 # This is if you want to change to a different logging directory than the default,
 # which is '/var/log/django/'
 # Please keep the trailing '/'
