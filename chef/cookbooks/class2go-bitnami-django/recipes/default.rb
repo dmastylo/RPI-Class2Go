@@ -40,8 +40,8 @@ end
 # I don't know why bitnami stores their log files in a quirky place, but
 # the apache rotation script they ship with still goes to the old place
 # (/var/log/apache2).  
-file "/etc/logrotate.d/apache2" do
-    source "logrotate-apache"
+cookbook_file "/etc/logrotate.d/apache2" do
+    source "logrotate-apache2"
     owner "root"
     group "root"
     mode 00644
