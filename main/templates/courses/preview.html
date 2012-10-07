@@ -96,8 +96,9 @@
            <input type="submit" value="Login" class="btn" />
            <input type="hidden" name="next" value="{{ next }}" />
        </form>
-           <a href="{% url 'auth_password_reset' %}">Forgot My Password</a> &nbsp; &nbsp;
            <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Registration</a>
+           <br>
+           <a href="{% url 'auth_password_reset' %}">Forgot My Password or Username</a> 
        </div>
    </div>
 
