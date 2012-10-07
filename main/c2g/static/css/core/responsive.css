@@ -367,6 +367,18 @@ width: auto;
     -khtml-border-radius: 10px;
     -o-border-radius: 10px;
   }
+  .home .home-primary .span5 {
+    margin-left:0;
+    padding-left:0;
+    border-left:0;
+  }
+  .home .home-unity {
+    padding:20px;
+  }
+  .home .computernetworking,.home .solarcells {
+    background:#fff;
+    padding:20px;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 979px) {

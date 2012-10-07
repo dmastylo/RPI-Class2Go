@@ -258,6 +258,11 @@ body.home {
 .home h3 a {
     font-weight:300;
 }
+.home-primary .span5 {
+    padding-left:20px;
+    border-left:1px solid #fbf7f4;
+    margin-left:20px;
+}
 .social-btn {
     margin-right:20px;
     float:left;
