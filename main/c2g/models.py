@@ -1100,6 +1100,33 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                     questions_completed += 1
                     break
         return questions_completed
+    
+    #This is the old version, from sprint-15, without late penalties
+    def get_score_v1(self, student, detailed=False):
+        exercise_scores = {}
+        resubmission_penalty = self.resubmission_penalty
+        submissions_permitted = self.submissions_permitted
+        if submissions_permitted == 0:
+            submissions_permitted = sys.maxsize
+        pset_activities = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__problemSet=self, student=student)
+        psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        total_score = 0.0
+        for psetToEx in psetToExs:
+            exercise_activities = pset_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('time_created')
+            exercise_percent = 100
+            for exercise_activity in exercise_activities:
+                if exercise_activity.attempt_number > submissions_permitted:
+                    break
+                elif exercise_activity.complete:
+                    total_score += exercise_percent/100.0
+                    break
+                else:
+                    exercise_percent -= resubmission_penalty
+            exercise_scores[psetToEx.exercise.id] = exercise_percent/100.0
+        
+        if detailed: return exercise_scores
+        else: return total_score
+
 
     def get_score(self, student, detailed=False):
         exercise_scores = {}
