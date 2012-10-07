@@ -21,7 +21,7 @@
     <title>{% block title %}Stanford Online{% endblock %}</title>
 </head>
 
-<body>
+{% block bodytag %}<body>{% endblock bodytag %}
     <div id="viewport">
         <div id="global-header">
             <h1 class="stanford-logo">
@@ -29,6 +29,7 @@
             </h1>
             <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
         </div>
+        {% block topcontent %}<div id="top-content"></div>{% endblock topcontent %}
         {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}
             {% block navbar %}
             {% ifequal user.is_staff True %}
