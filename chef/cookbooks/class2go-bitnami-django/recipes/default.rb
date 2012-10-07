@@ -37,3 +37,22 @@ directory "python-egg-dir" do
     action :create
 end
 
+# I don't know why bitnami stores their log files in a quirky place, but
+# the apache rotation script they ship with still goes to the old place
+# (/var/log/apache2).  
+file "/etc/logrotate.d/apache2" do
+    source "logrotate-apache"
+    owner "root"
+    group "root"
+    mode 00644
+    action :create
+end 
+
+cron "logrotate in root cron" do
+    hour   "8"          # GMT (midnight PDT)
+    minute "0"
+    user "root"
+    command "logrotate -s /var/log/logrotate.status /etc/logrotate.d"
+    action :create
+end
+
