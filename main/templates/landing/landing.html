@@ -4,57 +4,123 @@
 {% block navbar %} {% endblock navbar %}
 {% load url from future %}
 
+{% block bodytag %}
+<body class="home">
+{% endblock bodytag %}
+
+
+{% block topcontent %}
+<div class="row-fluid hero-header">
+    <div class="container">
+        <div class="row hero">
+            <h1>Class2Go</h1>
+            <h2>Take Stanford Online Classes. <strong>Anywhere.</strong></h2>
+        </div>
+    </div>
+</div>
+{% endblock topcontent %}
+
 {% block m_column_content %}
-
-<div class="row-fluid">
-    <div class="span8">
-        <h2>
-            <a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">Computer Networking</a>
-        </h2>
-
-    <p>
-        <i>Taught by Nick McKeown and Philip Levis</i>
-    </p>
-
-    <p>
-    This is an introductory course on computer networking, specifically
-    the Internet. It focuses on explaining how the Internet works,
-    ranging from how bits are modulated on wires and in wireless
-    to application-level protocols like BitTorrent and HTTP. It
-    also explains the principles of how to design networks and
-    network protocols. Students gain experience reading and
-    understanding RFCs (Internet protocol specifications) as
-    statements of what a system should do. The course grounds many
-    of the concepts in current practice and recent developments,
-    such as net neutrality and DNS security.
-    </p>
+<div class="home-unit home-primary" style="background:#fff">
+    <div class="container">
+        <div class="row">
+            <div class="span6">
+                <h3>Welcome to Class2Go! We're Stanford Online's internal platform, designed to be an open platform for online learning and research.</h3>
+                <p>This fall, we're offering two free courses to the world: 
+                <ul>
+                    <li><a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">Computer Networking</a> with Nick McKeown &amp; Philip Levis</li> 
+                    <li><a href="{% url 'courses.views.main' 'solar' 'Fall2012' %}">Solar Cells, Fuel Cells, &amp; Batteries</a> with Bruce Clemens</li>
+                </ul>
+                <h4>Here's what you will like about Class2Go:</h4>
+                <p><strong>Videos from Stanford professors</strong> with interactive in-video quizzes give you a chance to learn from Stanford professors and then practice what you've learned.</p>
+                <p><strong>Formative and summative exercises</strong> built on the Khan Academy's exercise framework provide new formats for taking your learning to the next level.</p>
+                <p><strong>Frame extracting</strong> allows you to preview and navigate to specific parts of videos. Scroll through extracted frames underneath a video to quickly find what you're looking for.</p>
+                <p><strong>Love discussion forums?</strong> We've added Piazza forums to get people talking.</p>
+            </div>
+            <div class="span5">
+                <h3>It's <a href="http://github.com/Stanford-Online/class2go/">open</a>.</h3>
+                <p>The platform is open source so that anyone who wants to can collaborate with us. We would love to have others use the platform, or to work together with similar efforts in other places.</p>
+                <h3>It's portable.</h3>
+                <p>The platform is open source so that anyone who wants to can collaborate with us. We would love to have others use the platform, or to work together with similar efforts in other placesWe believe strongly that valuable course content shouldn't be tied to any one platform. Documents are already portable; the videos are outside our system (on YouTube) and the assets themselves can be repurposed as faculty see fit. And our exercises and problem sets, instead of being trapped in a proprietary database, are in the Khan Academy format, so they can be used elsewhere.</p>
+                <h3>It's interoperable.</h3>
+                <p>We don't want to build or maintain more than we have to. We're standing on the shoulders of developments from Khan Academy, Piazza, YouTube, MySQL, Python Django, Amazon AWS, Opscode, and Github.</p>
+            </div>
+        </div>
     </div>
-
+</div>
+<div>
+    <div class="container" style="margin-top:30px;margin-bottom:0;">
+        <div style="width:285px;margin:0 auto;">
+            <div class="social-btn facebook"><div class="fb-like" data-href="http://class2go.standford.edu" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
+            <div class="social-btn twitter"><a href="https://twitter.com/class2go" class="twitter-follow-button" data-show-count="false">Follow @class2go</a></div>
+            <div class="social-btn google"><div class="g-plusone" data-size="medium" data-annotation="none"></div></div>
+        </div>
+    </div>
+</div>
+<div class="home-unit">
+    <div class="container">
+        <div class="row computernetworking">
+            <h3><a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">An Introduction to Computer Networking</a></h3>
+            <p><strong>Class begins October 8, 2012</strong></p>
+            <p>This is an introductory course on computer networking, specifically the Internet. It focuses on explaining how the Internet works, ranging from how bits are modulated on wires and in wireless to application-level protocols like BitTorrent and HTTP. It also explains the principles of how to design networks and network protocols. Students gain experience reading and understanding RFCs (Internet protocol specifications) as statements of what a system should do. The course grounds many of the concepts in current practice and recent developments, such as net neutrality and DNS security.</p>
+        </div>
+    </div>
+</div>
+<div class="home-unit">
+    <div class="container">
+        <div class="row solarcells">
+            <h3><a href="{% url 'courses.views.main' 'solar' 'Fall2012' %}">Solar Cells, Fuel Cells &amp; Batteries</a></h3>
+            <p><strong>Class begins October 8, 2012</strong></p>
+            <p>This is an introductory course on computer networking, specifically the Internet. It focuses on explaining how the Internet works, ranging from how bits are modulated on wires and in wireless to application-level protocols like BitTorrent and HTTP. It also explains the principles of how to design networks and network protocols. Students gain experience reading and understanding RFCs (Internet protocol specifications) as statements of what a system should do. The course grounds many of the concepts in current practice and recent developments, such as net neutrality and DNS security.</p>
+        </div>
+    </div>
+</div>
+<div class="home-unit home-examples">
+    <div class="container">
+        <div class="row">
+            <div class="span4">
+                <img src="{{ STATIC_URL }}graphics/core/home-why-1.jpg" alt="Course page example">
+                <p>Easy access to class videos, announcements, problem sets, and other files</p>
+            </div>
+            <div class="span4">
+                <img src="{{ STATIC_URL }}graphics/core/home-why-2.jpg" alt="Problem set example">
+                <p>Check your understanding with problem sets</p>
+            </div>
+            <div class="span4">
+                <img src="{{ STATIC_URL }}graphics/core/home-why-3.jpg" alt="Image index example">
+                <p>Browse an image index to find specific topics and quizzes within videos</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <div class="container" style="text-align:center; font-size:16px;">
+        <div class="row">
+            <p>Want to work on Class2Go? We're <strong><a href="http://recruit.trovix.com/jobhostmaster/jobhost/ViewJobPostDetails.do?action=viewDetails&accountId=de85ad313f8598db1c42b567a3df24a00497ba22&jobId=49432&displayLogo=true&jobSource=Company+Website" target="_blank">hiring engineers</a></strong>!</p>
+        </div>
+    </div>
 </div>
 
-<div class="row-fluid">
-    <div class="span8">
-        <h2>
-            <a href="{% url 'courses.views.main' 'solar' 'Fall2012' %}">Solar Cells, Fuel Cells, & Batteries</a>
-        </h2>
+<!--facebook-->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=195512500520406";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 
-    <p>
-        <i>Taught by Bruce Clemens</i>
-    </p>
+<!--twitter-->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
-    <p>
-    This course focuses on the operating principles and applications
-    of emerging technological solutions to the energy demands of
-    the world. We will begin with discussing the scale of global
-    energy usage and requirements for possible solutions. Basic
-    physics and chemistry of solar cells, fuel cells, and batteries
-    will be discussed in quantitative detail. We will explore
-    performance issues, including economics, from the ideal device
-    to the installed system. Finally, we will end with the promise
-    of materials research for providing next generation solutions.
-    </p>
 
-    </div>
-
-</div>
+<!--google plus-->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
 {% endblock m_column_content %}
