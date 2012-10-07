@@ -4,20 +4,20 @@ Class2Go
 Class2Go is Stanford's internal open-source platform for on-line
 education. A team of eight built the first version over the summer
 2012, and it is still under active development.  Class2Go launched
-in Fall for six on-campus classes and of internal classes and two
-large open two (MOOC's): [Computer Networking][net] 
-and [Solar Cells, Fuel Cells, and Batteries][sol].
+this Fall for six on-campus classes and two "massive open online 
+courses" (MOOC's): [Computer Networking][net] and 
+[Solar Cells, Fuel Cells, and Batteries][sol].
   [net]: http://networking.class.stanford.edu/
   [sol]: http://solar.class.stanford.edu/
 
 Class2Go was built to be an open platform for learning and research.
-Professors will have access to the data for their classes to learn
-how their students learn. We will facilitate experiments.  For
-example, we intend this to be the best plaform for running A/B/N
-tests to measure the impact of different teaching methods on student
-outcomes, or to build interesting features to try out new ways of
-presenting material or grading exercises.  We believe an open source
-platform best facilitates this
+Professors have access to the classes' data to learn how their
+students learn. We will facilitate experiments.  For example, we
+intend this to be the best plaform for running A/B/N tests to measure
+the impact of different teaching methods on student outcomes, or
+to build interesting features to try out new ways of presenting
+material or grading exercises.  We believe an open source platform
+is the best way to do this.
 
 If you are interested in reaching the team email us at 
 <c2g-contact@class.stanford.edu>.
@@ -55,13 +55,13 @@ important and distinguishing features.
 * **Video and Problem Set Management**. Professors (and TA's) can
     upload assets to S3; videos are then uploaded to YouTube.
 
-* **Exercises**. We support two kinds of exercises: formative (for
-    learning) and summative (for assessment, like quizzes and tests).
-    Students can attempt each problem as many times as they want
-    without penalty in formative problem sets, but may be penalized
-    for multiple submissions in summative sets. In both types of
-    problem sets, feedback is available immediately so students can
-    learn along the way.
+* **Exercises**. We support two kinds of exercises: formative, for
+    learning and encouraging engagement; and summative, for assessment,
+    like quizzes and tests.  Students can attempt each formative
+    problems many times as they want without penalty, but may be
+    penalized for multiple submissions in summative sets. In both
+    types of problem sets, feedback is available immediately so
+    students can learn along the way.
 
 * **Content Management**. We have built a simple content management
     system where course information (videos, static pages, problem
@@ -75,6 +75,9 @@ important and distinguishing features.
     key frames.  The thumbnails of these frames are used as an index
     to the video for navigation. It's called the Kelvinator after
     its first author, Kelvin Do.
+
+* **Reporting**. We have a set of ad-hoc and scheduled reports so
+    teachers can get feedback and adjust.
 
 
 Leveraging Others
@@ -106,13 +109,39 @@ commercial, some open source. But a ton of good stuff.
 Contributing
 ------------
 
-We welcome others contributing to the project.  Begin by checking out our 
-source from here and using the README_SETUP.md file to get a development
-environment set up.  There are also some docs available on the Project Wiki
-here on GitHub.
+We welcome others contributing to Class2Go.  Begin by checking out
+our source from here and using README_SETUP.md to get a development
+environment set up.  There are also some docs available on the
+Project Wiki here on GitHub.
 
 Before sending unsolicited pull requests it is often best to discuss your
 intentions with the core dev team. Send us mail: <c2g-contact@class.stanford.edu>.
+
+If you want to get an idea of the kinds of things to do on the project,
+check out our
+<a href="https://github.com/Stanford-Online/class2go/issues?state=open">issue list right here on GitHub</a>.  
+We keep it here for all to see.  Feel free to comment on bugs and make 
+suggestions.  If you want to fix a bug, go ahead fork, fix, test, and send 
+a pull request.
+
+
+Using Class2Go Yourself
+-----------------------
+
+We intend for other colleges, universities, and even private
+organizations to be able to stand up their own instance of Class2Go
+to host their own courses.  Unfortunately, the tooling and instructions
+for this aren't turnkey just yet.  We also need to do some development
+to make it less Stanford-specific.  Maybe you can help with that?
+
+If you're interested, your the first step, just like contributing,
+is to stand up a development environment on your own laptop and try
+it out.  We have people this demo sized Class2Go up and running
+pretty quickly on their local machine.
+
+Send us mail at <c2g-contact@class.stanford.edu> and we can give
+you an idea what would be involved.
+
 
 
 License

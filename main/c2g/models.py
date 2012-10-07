@@ -1100,8 +1100,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                     questions_completed += 1
                     break
         return questions_completed
-
-    def get_score(self, student, detailed=False):
+    
+    #This is the old version, from sprint-15, without late penalties
+    def get_score_v1(self, student, detailed=False):
         exercise_scores = {}
         resubmission_penalty = self.resubmission_penalty
         submissions_permitted = self.submissions_permitted
@@ -1114,21 +1115,61 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             exercise_activities = pset_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('time_created')
             exercise_percent = 100
             for exercise_activity in exercise_activities:
-                #first, disregard attempts that are beyond the allowed number or
-                #past the partial credit deadline
+                if exercise_activity.attempt_number > submissions_permitted:
+                    break
+                elif exercise_activity.complete:
+                    total_score += exercise_percent/100.0
+                    break
+                else:
+                    exercise_percent -= resubmission_penalty
+            exercise_scores[psetToEx.exercise.id] = exercise_percent/100.0
+        
+        if detailed: return exercise_scores
+        else: return total_score
+
+
+    def get_score(self, student, detailed=False):
+        exercise_scores = {}
+        resubmission_penalty = self.resubmission_penalty
+        submissions_permitted = self.submissions_permitted
+        if submissions_permitted == 0:
+            submissions_permitted = sys.maxsize
+        pset_activities = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__problemSet=self, student=student)
+        psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
+        total_score = 0.0
+        for psetToEx in psetToExs:
+            exercise_activities = pset_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('time_created')
+            #Exercise percent starts at 100 and gets deducted per wrong attempt, and will
+            #be added to the total score if a valid complete_time is found
+            exercise_percent = 100
+            complete_time = None
+            for exercise_activity in exercise_activities:
+                #short-circuit if no correct attempts within the allowed number or
+                #within the partial credit deadline
                 if exercise_activity.attempt_number > submissions_permitted or \
                    exercise_activity.time_created > self.partial_credit_deadline:
                     break
-                #if submission is valid and correct
+                #if submission is valid and correct, mark complete_time, and break
                 elif exercise_activity.complete:
-                    # penalize for being late
-                    if exercise_activity.time_created > self.grace_period:
-                        exercise_percent -= self.late_penalty
-                    total_score += exercise_percent/100.0
+                    complete_time = exercise_activity.time_created
                     break
                 #deduct for submission that was incorrect
                 else:
                     exercise_percent -= resubmission_penalty
+        
+            #give 0 if no correct attempts
+            if not complete_time:
+                exercise_percent=0
+            #penalize if late
+            elif complete_time > self.grace_period:
+                exercise_percent = int(exercise_percent*(100-self.late_penalty)/100.0)
+        
+            #floor exercise percent at 0
+            exercise_percent = max(exercise_percent,0)
+            
+            #add to total_score
+            total_score += exercise_percent/100.0
+                    
             exercise_scores[psetToEx.exercise.id] = exercise_percent/100.0
             
         if detailed: return exercise_scores
