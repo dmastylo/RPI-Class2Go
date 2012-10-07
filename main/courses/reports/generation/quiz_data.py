@@ -19,6 +19,10 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         submissions_permitted = ready_quiz.submissions_permitted
         if submissions_permitted == 0: submissions_permitted = 100000
         resubmission_penalty = ready_quiz.resubmission_penalty/100.0
+        grace_deadline = ready_quiz.grace_period
+        if not grace_deadline: grace_deadline = ready_quiz.due_date
+        partial_credit_deadline = ready_quiz.partial_credit_deadline
+        late_penalty = ready_quiz.late_penalty / 100.0
     
     report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_quiz.slug)
     if is_video:
@@ -49,14 +53,15 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         ex_ids.append(ex.id)
         
         if is_video:
-            atts = ProblemActivity.objects.select_related('video', 'exercise').filter(video_to_exercise__exercise__fileName=ex.fileName, video_to_exercise__video=ready_quiz).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
+            atts = ProblemActivity.objects.select_related('video', 'exercise').filter(video_to_exercise__exercise__fileName=ex.fileName, video_to_exercise__video=ready_quiz).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content', 'time_created')
         else:
-            atts = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__exercise__fileName=ex.fileName, problemset_to_exercise__problemSet=ready_quiz).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content')
+            atts = ProblemActivity.objects.select_related('problemSet', 'exercise').filter(problemset_to_exercise__exercise__fileName=ex.fileName, problemset_to_exercise__problemSet=ready_quiz).order_by('student', 'time_created').values_list('student_id', 'complete', 'time_taken', 'attempt_content', 'time_created')
         
         submitters = [item[0] for item in atts]
         completes = [item[1] for item in atts]
         times_taken = [item[2] for item in atts]
         attempts_content = [item[3] for item in atts]
+        times_created = [item[4] for item in atts]
         
         for i in range(0, len(atts)):
             if not (submitters[i] in students): continue # Do not include attempts by non-students in the report
@@ -83,20 +88,36 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
             if completes[i] == 1:
                 completed = True
                 num_incorrect_attempts = attempt_number - 1
+                first_correct_attempt_time_created = times_created[i]
             
             if is_student_last_attempt:
                 score = 0
+                score_after_late_penalty = 0
                 if is_summative:
                     if completed and (num_incorrect_attempts+1 <= submissions_permitted):
-                        score = 1 - (num_incorrect_attempts)*resubmission_penalty
+                        score = 1.0 - (num_incorrect_attempts)*resubmission_penalty
+                        score_after_late_penalty = score
+                        
+                    # Apply late penalty if necessary
+                    if first_correct_attempt_time_created > partial_credit_deadline:
+                        if partial_credit_deadline: score_after_late_penalty = 0
+                            
+                    elif first_correct_attempt_time_created > grace_deadline:
+                        if grace_deadline: score_after_late_penalty = score * (1-late_penalty)
+                        
                     if score < 0: score = 0
+                    if score_after_late_penalty < 0: score_after_late_penalty = 0
+                    
                 elif is_formative:
                     if completed: score = 1.0
                     else: score = 0.0
                 
-                data[stud_username][ex.id] = {'completed': 'y' if completed else 'n', 'attempts': json.dumps(attempts), 'median_attempt_time': median(attempt_times)}
-                if is_summative or is_formative: data[stud_username][ex.id]['score'] = score
+                data[stud_username][ex.id] = {'completed': 'y' if completed else 'n', 'attempts': json.dumps(attempts), 'median_attempt_time': median(attempt_times), 'score': score}
+                if is_summative: data[stud_username][ex.id]['score_after_late_penalty'] = score_after_late_penalty
+
                 
+    ##### Start Write Out #####
+    
     # Sort students by username
     sorted_usernames = sorted(data.keys())
     
@@ -115,17 +136,22 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         
     for rln in rlns:
         header1.extend(["", "", rln.exercise.get_slug(), "", "", ""])
-        header2.extend(["", "", "Completed", "attempts"])
-        if is_summative or is_formative: header2.append("Score")
-        header2.append("Median attempt time")
+        header2.extend(["", "", "Completed", "Attempts", "Median attempt time", "Score"])
+        if is_summative:
+            header1.append("")
+            header2.append("Score after Late Penalty")
         
-    if is_summative or is_formative: header1.extend(["", "Total score / %d" % len(rlns)])
+    header1.extend(["", "Total score / %d"  % len(rlns)])
+    if is_summative: header1.append("Total score after late penalty")
+    
     rw.write(header1)
     rw.write(header2)
     
     for u in sorted_usernames:
         r = data[u]
         stud_score = 0
+        stud_score_after_late_penalty = 0
+        
         content = [u, r['name']]
         if is_video:
             visit_dt_string = ""
@@ -137,14 +163,17 @@ def gen_quiz_data_report(ready_course, ready_quiz, save_to_s3=False):
         
         for ex_id in ex_ids:
             if ex_id in r: ex_res = r[ex_id]
-            else: ex_res = {'completed': '', 'attempts': '', 'score': '', 'median_attempt_time': ''}
+            else: ex_res = {'completed': '', 'attempts': '', 'median_attempt_time': '', 'score': '', 'score_after_late_penalty': ''}
             
-            content.extend(["", "", ex_res['completed'], ex_res['attempts']])
-            if is_summative or is_formative:
-                content.append(ex_res['score'])
-                stud_score += (ex_res['score'] if isinstance(ex_res['score'], float) else 0)
-            content.append(ex_res['median_attempt_time'])
-        if is_summative or is_formative: content.extend(["", stud_score])    
+            content.extend(["", "", ex_res['completed'], ex_res['attempts'], ex_res['median_attempt_time'], ex_res['score']])
+            if is_summative: content.append(ex_res['score_after_late_penalty'])
+            
+            stud_score += (ex_res['score'] if isinstance(ex_res['score'], float) else 0)
+            if is_summative: stud_score_after_late_penalty += (ex_res['score_after_late_penalty'] if isinstance(ex_res['score_after_late_penalty'], float) else 0)
+
+        content.extend(["", stud_score])
+        if is_summative: content.append(stud_score_after_late_penalty)
+            
         rw.write(content)
         
     report_content = rw.writeout()
