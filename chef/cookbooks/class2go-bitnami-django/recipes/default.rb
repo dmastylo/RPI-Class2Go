@@ -49,7 +49,7 @@ cookbook_file "/etc/logrotate.d/apache2" do
 end 
 
 cron "logrotate in root cron" do
-    hour   "8"          # GMT (midnight PDT)
+    hour   "9"          # GMT
     minute "0"
     user "root"
     command "logrotate -s /var/log/logrotate.status /etc/logrotate.d"
