@@ -65,7 +65,8 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_video_content:
                 for video in videos:
                     #if video.section_id == section.id and (common_page_data['course_mode'] == 'draft' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
-                    if video.image and video.section_id == section.id:
+                    if video.section_id == section.id:
+                
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
 
                         videoToExs = VideoToExercise.objects.getByVideo(video)
