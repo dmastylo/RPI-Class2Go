@@ -327,10 +327,10 @@ class AdditionalPageManager(models.Manager):
     def getSectionPagesByCourse(self, course):
         # Additional pages displayed under sections have a live_datetime effect.
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0,menu_slug=None).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0, menu_slug=None).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,menu_slug=None,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0,menu_slug=None,live_datetime__lt=now).order_by('section','index')
 
     def getBySection(self, section):
         if section.mode == 'draft':
@@ -581,10 +581,10 @@ post_save.connect(create_user_profile, sender=User)
 class VideoManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('section','index')
 
     def getBySection(self, section):
         if section.mode == 'draft':
@@ -834,10 +834,10 @@ class VideoActivity(models.Model):
 class ProblemSetManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
         
     def getBySection(self, section):
         if section.mode == 'draft':
