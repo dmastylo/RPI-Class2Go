@@ -40,7 +40,7 @@ end
 # I don't know why bitnami stores their log files in a quirky place, but
 # the apache rotation script they ship with still goes to the old place
 # (/var/log/apache2).  
-cookbook_file "/etc/logrotate.d/apache2" do
+cookbook_file "/etc/logrotate.d/apache2-bitnami" do
     source "logrotate-apache2"
     owner "root"
     group "root"
@@ -52,7 +52,7 @@ cron "logrotate in root cron" do
     hour   "9"          # GMT
     minute "0"
     user "root"
-    command "logrotate -s /var/log/logrotate.status /etc/logrotate.d"
+    command "logrotate -s /var/log/logrotate.status /etc/logrotate.d/apache2-bitnami"
     action :create
 end
 
