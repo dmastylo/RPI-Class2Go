@@ -24,6 +24,7 @@
         <label for="id_subject">{{ form.subject.label }}: {{form.subject.errors}}</label> 
         {{form.subject}}
         <label for="id_message">{{ form.message.label }}:  {{form.message.errors}}</label>
+        <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please use the link-shaped button below, and <span style='text-decoration: italic; font-weight: bold;'>always use absolute URLs only (http://.....)</span>.</p>
         {{form.message}}
         <input class="btn" type="submit" value="Send">
     </form>
