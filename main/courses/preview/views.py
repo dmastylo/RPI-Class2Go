@@ -38,9 +38,13 @@ def preview(request, course_prefix, course_suffix):
     if request.common_page_data['is_course_admin']:
         return redirect('http://'+request.get_host()+reverse('courses.views.main', args=[course_prefix, course_suffix]))
     
-       
+    if request.common_page_data['is_course_member'] and not request.common_page_data['course'].preview_only_mode and \
+       date.today() >= request.common_page_data['course'].calendar_start :
+        return redirect('http://'+request.get_host()+reverse('courses.views.main', args=[course_prefix, course_suffix]))
+
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
+    
     
    
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
@@ -69,7 +73,8 @@ def preview_login(request, course_prefix, course_suffix):
     login_form = AuthenticationForm(data=request.POST)
     if login_form.is_valid():
         auth_login(request, login_form.get_user())
-        if date.today() > request.common_page_data['course'].calendar_start :
+        if not request.common_page_data['course'].preview_only_mode and \
+           date.today() >= request.common_page_data['course'].calendar_start :
             redirect_to = 'courses.views.main'
         else:
             redirect_to = 'courses.preview.views.preview'
@@ -98,7 +103,8 @@ def preview_reg(request, course_prefix, course_suffix):
         new_user = backend.register(request, **form.cleaned_data)
         course_group = request.common_page_data['course'].student_group
         course_group.user_set.add(new_user)
-        if date.today() > request.common_page_data['course'].calendar_start :
+        if not request.common_page_data['course'].preview_only_mode and \
+           date.today() >= request.common_page_data['course'].calendar_start :
             redirect_to = 'courses.views.main'
         else:
             redirect_to = 'courses.preview.views.preview'
