@@ -25,6 +25,18 @@
   {% if user.is_authenticated %}
 
     {% if video.title %} 
+	<div id="vid-nav-controls">
+	{% if prev_slug %}
+	  <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix prev_slug %}" class="btn">« Previous</a>
+	{% else %}
+	  <button type="button" class="btn" disabled>« Previous</button>
+	{% endif %}
+	{% if next_slug %}
+	  <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix next_slug %}" class="btn pull-right">Next »</a>
+	{% else %}
+	  <button type="button" class="btn pull-right" disabled>Next »</button>
+	{% endif %}
+	</div>
         <h3 class="section-headline">{{video.title}}</h3>
         {% if common_page_data.course_mode == 'draft' and common_page_data.is_course_admin %}
           <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>

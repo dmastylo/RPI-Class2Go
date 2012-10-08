@@ -65,6 +65,22 @@ def view(request, course_prefix, course_suffix, slug):
         )
         visit_log.save()
 
+    videos = Video.objects.getByCourse(course=common_page_data['course'])
+    #Get index of current video
+    for index, item in enumerate(videos):
+        if item == video:
+            cur_index = index
+            break
+    
+    if cur_index > 0:
+        prev_slug = videos[cur_index-1].slug
+    else:
+        prev_slug = None
+    if cur_index < videos.count() - 1:
+        next_slug = videos[cur_index+1].slug
+    else:
+        next_slug = None
+
     video_rec = request.user.videoactivity_set.filter(video=video)
     if video_rec:
         video_rec = video_rec[0]
@@ -73,7 +89,7 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
 
-    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec}, context_instance=RequestContext(request))
+    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug}, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):
