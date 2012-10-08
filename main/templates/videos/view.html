@@ -27,14 +27,14 @@
     {% if video.title %} 
 	<div id="vid-nav-controls">
 	{% if prev_slug %}
-	  <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix prev_slug %}" class="btn">« Previous</a>
+	  <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix prev_slug %}" class="btn">« Previous video</a>
 	{% else %}
-	  <button type="button" class="btn" disabled>« Previous</button>
+	  <button type="button" class="btn" disabled>« Previous video</button>
 	{% endif %}
 	{% if next_slug %}
-	  <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix next_slug %}" class="btn pull-right">Next »</a>
+	  <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix next_slug %}" class="btn pull-right">Next video »</a>
 	{% else %}
-	  <button type="button" class="btn pull-right" disabled>Next »</button>
+	  <button type="button" class="btn pull-right" disabled>Next video »</button>
 	{% endif %}
 	</div>
         <h3 class="section-headline">{{video.title}}</h3>
