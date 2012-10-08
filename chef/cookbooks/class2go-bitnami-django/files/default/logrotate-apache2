@@ -4,7 +4,7 @@
     rotate 100
     compress
     delaycompress
-    create 644 root root
+    create 666 daemon daemon
     sharedscripts
     postrotate
         kill -USR1 `cat /opt/bitnami/apache2/logs/httpd.pid`
