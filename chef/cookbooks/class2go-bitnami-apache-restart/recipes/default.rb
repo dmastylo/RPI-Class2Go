@@ -4,8 +4,17 @@ file "make ctlscript.sh executible" do
     action :create
 end
 
-execute "restart-apache" do
-    command "/opt/bitnami/ctlscript.sh restart apache"
+execute "stop apache" do
+    command "/opt/bitnami/ctlscript.sh stop apache"
+    user "root"
+end
+
+execute "sleep 5 seconds" do
+    command "sleep 5"
+end
+
+execute "start apache" do
+    command "/opt/bitnami/ctlscript.sh start apache"
     user "root"
 end
 
