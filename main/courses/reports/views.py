@@ -35,7 +35,8 @@ def main(request, course_prefix, course_suffix):
     
     for problemset_report in problemset_reports:
         report_slug = get_quiz_slug(problemset_report['s3_name'])
-        ps_quiz_data_reports_dict[report_slug]['reports'].append(problemset_report)
+        if report_slug in ps_quiz_data_reports_dict:
+            ps_quiz_data_reports_dict[report_slug]['reports'].append(problemset_report)
         
     ps_quiz_data_reports_list = []
     for ps in problemsets:
@@ -46,7 +47,8 @@ def main(request, course_prefix, course_suffix):
     
     for video_report in video_reports:
         report_slug = get_quiz_slug(video_report['s3_name'])
-        vd_quiz_data_reports_dict[report_slug]['reports'].append(video_report)
+        if report_slug in vd_quiz_data_reports_dict:
+            vd_quiz_data_reports_dict[report_slug]['reports'].append(video_report)
         
     vd_quiz_data_reports_list = []
     for vd in videos:
