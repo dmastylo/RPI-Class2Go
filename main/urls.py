@@ -48,6 +48,7 @@ urlpatterns = patterns('',
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
     url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),
+    url(r'^problemsets/attempt_protect/(?P<problemId>\d+)/?$', 'problemsets.views.attempt_protect'),
 
     # accounts app for user management
     url(r'^accounts/profile/?$', 'accounts.views.profile', name='accounts_profile'),
