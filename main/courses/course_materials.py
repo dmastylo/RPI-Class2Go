@@ -71,9 +71,11 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     for video in videos:
                         video_list.append(video.id)
                     videoToExs = VideoToExercise.objects.values('video').filter(video__in=video_list, is_deleted=0).annotate(dcount=Count('video'))
+                    
+                    if common_page_data['course_mode'] == 'ready':
+                        video_recs = VideoActivity.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user)
                         
                 for video in videos:
-                    #if video.section_id == section.id and (common_page_data['course_mode'] == 'draft' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
                     if video.section_id == section.id:
                 
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
@@ -101,14 +103,13 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
                             item['visible_status'] = visible_status
                         else:
-                            video_recs = VideoActivity.objects.filter(video=video, student=common_page_data['request'].user)
-                            if len(video_recs)>0:
-                                video_rec = video_recs[0]
-                                item['video_rec'] = video_rec
-                                if video.duration:
-                                    item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
-                                else:
-                                    item['completed_percent'] = 0
+                            for video_rec in video_recs:
+                                if video_rec.video_id == video.id:
+                                    item['video_rec'] = video_rec
+                                    if video.duration:
+                                        item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
+                                    else:
+                                        item['completed_percent'] = 0
 
                         item['numQuestions'] = numQuestions
                         section_dict['items'].append(item)
