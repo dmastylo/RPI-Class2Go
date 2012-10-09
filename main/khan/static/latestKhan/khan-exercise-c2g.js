@@ -2057,7 +2057,8 @@ var Khan = (function() {
 
         // If the textbox is empty disable "Check Answer" button
         // Note: We don't do this for number line etc.
-        if (answerType === "text" || answerType === "number") {
+        if (!($("#survey-checkbox-list").length) /* special case checkboxes otherwise checkanswer is disabled*/
+            && (answerType === "text" || answerType === "number")) {
             var checkAnswerButton = $("#check-answer-button");
             checkAnswerButton.attr("disabled", "disabled").attr(
                 "title", "Type in an answer first.");
@@ -2997,9 +2998,16 @@ var Khan = (function() {
             user_selection_val = "";
         }
         user_choices = [];
-        $('#solutionarea span.value').each(function () {
-            user_choices.push($(this).text());
-        });
+                                          
+        if (exAssessType == "survey" && $('#survey-checkbox-list').length) {
+            $("#solutionarea #survey-checkbox-list label").each(function () {
+                user_choices.push($(this).text());
+            });
+        } else {
+            $('#solutionarea span.value').each(function () {
+                user_choices.push($(this).text());
+            });
+        }
         
         // [C2G] Correct attempt count for when a user reloads the page
         if ($.isNumeric($('#attempt-count').text())) {

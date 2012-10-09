@@ -12,7 +12,11 @@
             <div class="bar" style="width:{{item.progress}}%"></div>
         </div>
         {% if item.numCompleted == item.numQuestions %}
+           {% if not item.problem_set.assessment_type == "survey" %}
             <span class="label">Complete with Score: {{item.score}} of {{item.numQuestions}}</span>
+           {% else %}
+            <span class="label">Complete</span>
+           {% endif %}
         {% else %}
             <span class="label">In Progress: {{item.numCompleted}} of {{item.numQuestions}}</span>
         {% endif %}
