@@ -1077,8 +1077,9 @@ var Khan = (function() {
 
     function makeProblem(id, seed) {
 
-        // Enable scratchpad (unless the exercise explicitly disables it later)
-        Khan.scratchpad.enable();
+        // [C2G] Disable scratchpad 
+        Khan.scratchpad.disable();  // hides link
+        $('#scratchpad-not-available').css('display', 'none');  // hides disabled message 
 
         // [C2G] Build and return a localStorage key
         function getLSSeedKey () {
