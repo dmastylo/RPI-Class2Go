@@ -1,11 +1,12 @@
 from c2g.models import *
 import datetime
+from django.db.models import Count
+
 
 def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
-        videos = Video.objects.getByCourse(course=common_page_data['course'])
         problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
         pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
         files = File.objects.getByCourse(course=common_page_data['course'])
@@ -63,14 +64,26 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_video_content:
+                videos = Video.objects.getByCourse(course=common_page_data['course'])
+                
+                if videos:
+                    video_list = []
+                    for video in videos:
+                        video_list.append(video.id)
+                    videoToExs = VideoToExercise.objects.values('video').filter(video__in=video_list, is_deleted=0).annotate(dcount=Count('video'))
+                        
                 for video in videos:
                     #if video.section_id == section.id and (common_page_data['course_mode'] == 'draft' or (video.live_datetime and video.live_datetime < common_page_data['effective_current_datetime'])):
-                    if video.image and video.section_id == section.id:
+                    if video.section_id == section.id:
+                
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
 
-                        videoToExs = VideoToExercise.objects.getByVideo(video)
-                        numQuestions = len(videoToExs)
-
+                        numQuestions = 0
+                        for videoToEx in videoToExs:
+                            if videoToEx['video'] == video.id:
+                                numQuestions = videoToEx['dcount']
+                                break
+                        
                         if common_page_data['course_mode'] == 'draft':
                             prod_video = video.image
                             if not prod_video.live_datetime:
