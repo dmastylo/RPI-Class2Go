@@ -63,7 +63,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
         #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-time_created')
         #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-complete', '-attempt_number')
         attempts = problem_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('-complete', '-attempt_number')  
-        if len(attempts) > 0:
+        if attempts.exists():
             activity_list.append(attempts[0])
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
@@ -93,7 +93,7 @@ def attempt(request, problemId):
     exercise_type = request.POST['exercise_type']
     if exercise_type == 'problemset':
         problemset_to_exercise = ProblemSetToExercise.objects.distinct().get(problemSet__id=request.POST['pset_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise, student=request.user).exclude(attempt_content='hint'))
+        attempts = ProblemActivity.objects.filter(problemset_to_exercise=problemset_to_exercise, student=request.user).exclude(attempt_content='hint').count()
         # Chokes if user_selection_val isn't provided, so set to blank
         post_selection_val = request.POST.get('user_selection_val', '')
         # Only increment attempts if it's not a hint request
@@ -113,7 +113,7 @@ def attempt(request, problemId):
 
     elif exercise_type == 'video':
         video_to_exercise = VideoToExercise.objects.distinct().get(video__id=request.POST['video_id'], exercise__fileName=request.POST['exercise_filename'], is_deleted=False)
-        attempts = len(ProblemActivity.objects.filter(video_to_exercise=video_to_exercise, student=request.user).exclude(attempt_content='hint'))
+        attempts = ProblemActivity.objects.filter(video_to_exercise=video_to_exercise, student=request.user).exclude(attempt_content='hint').count()
         # Chokes if user_selection_val isn't provided, so set to blank
         post_selection_val = request.POST.get('user_selection_val', '')
         # Only increment attempts if it's not a hint request
@@ -130,12 +130,6 @@ def attempt(request, problemId):
                                            problem_type = request.POST['problem_type'],
                                            user_selection_val = post_selection_val,
                                            user_choices = request.POST['user_choices'])
-
-    #In case no problem id is specified in template
-    try:
-        problem_activity.problem = request.POST['problem_identifier']
-    except:
-        pass
 
     problem_activity.save()
     if request.POST['complete'] == "1":
@@ -258,17 +252,16 @@ def edit_action(request):
 @auth_is_course_admin_view_wrapper
 def manage_exercises(request, course_prefix, course_suffix, pset_slug):
     #Get all necessary information about the problemset
-    try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
-        raise Http404
+    
+    common_page_data = request.common_page_data
+    
     data = {'common_page_data': common_page_data}
     form = ManageExercisesForm(initial={'course':common_page_data['course'].id})
     pset = ProblemSet.objects.getByCourse(common_page_data['course']).get(slug=pset_slug)
     psetToExs = ProblemSetToExercise.objects.getByProblemset(pset).select_related('exercise', 'problemSet')
     used_exercises = []
     problemset_taken = False
-    if len(ProblemActivity.objects.filter(problemset_to_exercise__problemSet=pset.image)) > 0:
+    if ProblemActivity.objects.filter(problemset_to_exercise__problemSet=pset.image).exists():
         problemset_taken = True
     #Get the list of exercises currently in this problem set
     for psetToEx in psetToExs:
@@ -291,7 +284,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
             exercise.file.save(file_name, file_content)
             exercise.save()
 
-            index = len(ProblemSetToExercise.objects.getByProblemset(pset))
+            index = ProblemSetToExercise.objects.getByProblemset(pset).count()
             psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
             psetToEx.save()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
@@ -313,7 +306,7 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=len(ProblemSetToExercise.objects.getByProblemset(pset)), is_deleted=0, mode='draft')
+        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=ProblemSetToExercise.objects.getByProblemset(pset).count(), is_deleted=0, mode='draft')
         psetToEx.save()
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
@@ -350,7 +343,7 @@ def save_exercises(request):
         return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
     else:
         psetToExs = ProblemSetToExercise.objects.getByProblemset(pset)
-        for n in range(0,len(psetToExs)):
+        for n in range(0,psetToExs.count()):
             listName = "exercise_order[" + str(n) + "]"
             psetToExs[n].number = request.POST[listName]
             psetToExs[n].save()

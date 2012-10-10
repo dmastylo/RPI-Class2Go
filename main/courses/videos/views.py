@@ -137,7 +137,7 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
     videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=video_slug).order_by('video_time')
     used_exercises = []
     exercise_attempted = False
-    if len(ProblemActivity.objects.filter(video_to_exercise__video=video.image)) > 0:
+    if ProblemActivity.objects.filter(video_to_exercise__video=video.image).exists():
         exercise_attempted = True
     #Get the list of exercises currently in this problem set
     for videoToEx in videoToExs:
