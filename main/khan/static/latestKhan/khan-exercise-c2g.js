@@ -1077,8 +1077,9 @@ var Khan = (function() {
 
     function makeProblem(id, seed) {
 
-        // Enable scratchpad (unless the exercise explicitly disables it later)
-        Khan.scratchpad.enable();
+        // [C2G] Disable scratchpad 
+        Khan.scratchpad.disable();  // hides link
+        $('#scratchpad-not-available').css('display', 'none');  // hides disabled message 
 
         // [C2G] Build and return a localStorage key
         function getLSSeedKey () {
@@ -3587,24 +3588,6 @@ var Khan = (function() {
                     $('#container').append('<h3>You have already completed the survey. Thanks for your submission!</h3>');
                 }
             }
-
-            // [C2G] Add keyboard nav to questions
-            $(document).keydown(function (ev) {
-                var allCards = $('#questions-stack li');
-                var currentIdx = parseInt(allCards.index($('.current-question')));
-                var moveToCard = function (idx) {
-                    idx = parseInt(idx);
-                    if (idx < 0) idx = allCards.length - 1;
-                    if (idx >= allCards.length) idx = 0;
-                    $(allCards[idx]).trigger("click");
-                };
-
-                if (ev.keyCode == "37" || ev.keyCode == "38") {
-                    moveToCard(currentIdx - 1);
-                } else if (ev.keyCode == "39" || ev.keyCode == "40") {
-                    moveToCard(currentIdx + 1);
-                }
-            });
 
             // [C2G] Add "View Progress" button to all problem sets
             $('#answer_area').append('<div class="info-box"><input type="button" class="simple-button green full-width" id="view-progress-button" /></div>');
