@@ -29,8 +29,8 @@ class user_profiling(object):
                 # by defaut, once per day
                 resolution = getattr(settings, "PROFILE_UPDATE_RESOLUTION", 86400)
                 delta = datetime.now()-profile.last_updated
-		diff = timedelta(seconds=resolution)
-		if delta < diff:		
+                diff = timedelta(seconds=resolution)
+                if delta < diff:
                     return
 
                 try:
