@@ -76,6 +76,14 @@ def show(request, course_prefix, course_suffix, pset_slug):
                               },
                               context_instance=RequestContext(request))
 
+
+
+#CSRF Protected version, wrapped
+@require_POST
+#@auth_view_wrapper
+def attempt_protect(request, problemId):
+    return attempt(request, problemId)
+
 @csrf_exempt
 @require_POST
 #@auth_view_wrapper

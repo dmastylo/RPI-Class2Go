@@ -22,6 +22,7 @@ set -x
 
 knife environment from file environments/prod.rb
 knife environment from file environments/stage.rb
+knife environment from file environments/dev.rb
 
 knife role from file roles/*.rb
 
