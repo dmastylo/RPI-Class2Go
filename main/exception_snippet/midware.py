@@ -13,8 +13,8 @@ class error_ping(object):
         datestring = datetime.datetime.isoformat(datetime.datetime.now())
         (type, value, tb) = sys.exc_info()
         (path, lineno, exc, text) = traceback.extract_tb(tb)[-1]
-        email_subj = "Exception on %s @ %s:%i" % (repr(socket.gethostname()), path, lineno)
-        email_msg = "User: %s\nTime: %s\nException type: %s\nException line: %s\n" % (username, datestring, exc, text)
+        email_subj = "%s on %s" % (repr(exception), repr(socket.gethostname()))
+        email_msg = "User: %s\nTime: %s\nFile path %s:%d\nLine text: %s\n" % (username, datestring, path, lineno,  text)
         send_mail(email_subj, email_msg, from_addr, mailto_list)
         del tb
         return None
