@@ -33,6 +33,10 @@ ADMINS = (
         ('Class2Go Dev', "YOURNAME@stanford.edu"),
         )
 
+# EMAIL ERROR PINGS
+ERROR_SNIPPET_EMAILS = ['YOURNAME@stanford.edu',]
+
+
 # For using S3 Storage, specify these with real settings
 AWS_ACCESS_KEY_ID = 'AAAAAAAAAAAAAAAAAAAA'
 AWS_SECRET_ACCESS_KEY = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'

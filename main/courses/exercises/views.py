@@ -60,7 +60,7 @@ def save(request, course_prefix, course_suffix, filename):
     except BaseException as e:
         #yes, we're catching all exceptions, but this is for the purpose of sending back an understandable
         #ajax error message.  We'll log the exception which causes email to be sent
-        (type, value, tb)=sys.exc_info()
+        type, value = sys.exc_info()[:2] #per http://docs.python.org/library/sys.html#sys.exc_info
         logger.exception(str(type)+str(value))
         return HttpResponseBadRequest(unicode(e))
 
