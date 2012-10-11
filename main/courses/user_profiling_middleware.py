@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from c2g.models import UserProfile
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,7 +29,8 @@ class user_profiling(object):
                 # by defaut, once per day
                 resolution = getattr(settings, "PROFILE_UPDATE_RESOLUTION", 86400)
                 delta = datetime.now()-profile.last_updated
-                if delta.total_seconds() < resolution:
+                diff = timedelta(seconds=resolution)
+                if delta < diff:
                     return
 
                 try:
