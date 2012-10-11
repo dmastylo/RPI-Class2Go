@@ -18,10 +18,13 @@ PRODUCTION = <%= @node[:main][:production] %>
 
 INSTANCE = '<%= @node[:main][:instance] %>'
 
-# Put your name and email address here, so Django serious errors can come to you
+# full stackdumps go to this address
 ADMINS = (
         ('<%= @node[:main][:admin_name] %>', '<%= @node[:main][:admin_email] %>'),
         )
+
+# small stackdumps go to this address
+ERROR_SNIPPET_EMAILS = ['<%= @node[:main][:snippet_email] %>',]
 
 SECRET_KEY = '<%= @node[:main][:django_secret] %>'
 
