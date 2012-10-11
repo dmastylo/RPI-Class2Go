@@ -1,5 +1,6 @@
 import socket, sys, traceback, datetime
 from django.core.mail import send_mail
+from django.shortcuts import Http404
 import settings
 mailto_list = getattr(settings, 'ERROR_SNIPPET_EMAILS', [])
 from_addr = getattr(settings, 'DEFAULT_FROM_EMAIL', "admin@localhost")
@@ -9,6 +10,8 @@ class error_ping(object):
     This is a middleware class that sends short email snippets per uncaught exception
     """
     def process_exception(self, request, exception):
+        if isinstance(exception, Http404):
+            return None
         username = request.user.username if request.user.is_authenticated() else "Anonymous"
         datestring = datetime.datetime.isoformat(datetime.datetime.now())
         (type, value, tb) = sys.exc_info()
