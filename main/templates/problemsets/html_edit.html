@@ -96,9 +96,9 @@
             <input type="submit" value="Save as Draft" onclick="form.action='{% url 'problemsets.views.edit_action' %}';" class="btn">
             <input type="submit" value="Save and Make Ready" onclick="form.action='{% url 'problemsets.views.edit_publish_action' %}';" class="btn">
             <input type="submit" value="Revert" onclick="form.action='{% url 'problemsets.views.revert_problemset' %}';" class="btn">
-            <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
+            <a href="{% url 'problemsets.views.listAll' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
         </div>
     </form>
-</div>​
+</div>
 {% endblock m_column_content %}
 

@@ -12,7 +12,7 @@
 	        <input type="submit" name="action" value="Save and Set as Ready" class="btn btn-primary" />
 	        <input type="submit" name="action" value="Save as Draft" class="btn" />
 	        <input type="submit" name="action" value="Reset to Ready" class="btn" />
-	        <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
+	        <a href="{% url 'problemsets.views.listAll' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
 	    </div>
     </form>
     {% else %}
