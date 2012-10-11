@@ -21,7 +21,7 @@ from django.contrib import messages
 
 
 @auth_view_wrapper
-def list(request, course_prefix, course_suffix):
+def listAll(request, course_prefix, course_suffix):
     common_page_data = request.common_page_data
    
 
@@ -41,10 +41,10 @@ def show(request, course_prefix, course_suffix, pset_slug):
         ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
     except ProblemSet.DoesNotExist:
         messages.add_message(request,messages.ERROR, 'This Problemset is not visible in the student view at this time. Please note that students will not see this message.')
-        return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
+        return HttpResponseRedirect(reverse('problemsets.views.listAll', args=(course_prefix, course_suffix)))
     except ProblemSet.MultipleObjectsReturned:
         messages.add_message(request,messages.ERROR, 'We found multiple problem sets with the same slug.  Please try to delete one.  This most likely happened due to copying content from another course.')
-        return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
+        return HttpResponseRedirect(reverse('problemsets.views.listAll', args=(course_prefix, course_suffix)))
 
 
     if not common_page_data['is_course_admin']:
@@ -243,7 +243,7 @@ def edit_action(request):
                     pset.image.slug = pset.slug
                     pset.image.path = pset.path
                     pset.image.save()
-                return HttpResponseRedirect(reverse('problemsets.views.list', args=(course_prefix, course_suffix)))
+                return HttpResponseRedirect(reverse('problemsets.views.listAll', args=(course_prefix, course_suffix)))
 
     data['form'] = form
     data['pset'] = pset
@@ -342,14 +342,14 @@ def save_exercises(request):
         pset.revert()
         return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
     else:
-        psetToExs = ProblemSetToExercise.objects.getByProblemset(pset)
-        for n in range(0,psetToExs.count()):
+        psetToExs = list(ProblemSetToExercise.objects.getByProblemset(pset))
+        for n in range(0,len(psetToExs)):
             listName = "exercise_order[" + str(n) + "]"
             psetToExs[n].number = request.POST[listName]
             psetToExs[n].save()
         if action == 'Save and Set as Ready':
             pset.commit()
-        return HttpResponseRedirect(reverse('problemsets.views.list', args=(request.POST['course_prefix'], request.POST['course_suffix'])))
+        return HttpResponseRedirect(reverse('problemsets.views.listAll', args=(request.POST['course_prefix'], request.POST['course_suffix'])))
 
 
 @auth_view_wrapper

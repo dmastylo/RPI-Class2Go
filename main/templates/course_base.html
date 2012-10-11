@@ -37,7 +37,7 @@
                     <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
                 </li>
                 <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-                    <a href="{% url 'problemsets.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
+                    <a href="{% url 'problemsets.views.listAll' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
                 </li>
                 <li {% block videos_link_class %}{% endblock videos_link_class %}>
                     <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>

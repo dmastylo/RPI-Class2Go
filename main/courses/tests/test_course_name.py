@@ -46,5 +46,5 @@ class SimpleTest(TestCase):
         self.request_and_search(courses.views.overview)
         self.request_and_search(courses.views.syllabus)
         self.request_and_search(courses.videos.views.list)
-        self.request_and_search(problemsets.views.list)
+        self.request_and_search(problemsets.views.listAll)
 
