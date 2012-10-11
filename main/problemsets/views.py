@@ -326,8 +326,8 @@ def delete_exercise(request):
         index += 1
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
-#@require_POST
-#@auth_is_course_admin_view_wrapper
+@require_POST
+@auth_is_course_admin_view_wrapper
 def save_exercises(request):
     #Function should only be accessed from submitting a form
     if request.method != 'POST':
