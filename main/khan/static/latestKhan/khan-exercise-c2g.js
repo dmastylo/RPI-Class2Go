@@ -3699,6 +3699,12 @@ var Khan = (function() {
 
         $('#next-question-button').click(function () {
 
+            // if part of in-video quiz, make sure we first hide quiz overlay
+            if ($('#playerdiv').length > 0) {
+                KhanC2G.hideVideoQuiz();
+                player.playVideo();
+            }
+
             var currentQCard = $('.current-question');
 
             var userAnswer = readOnlyChoices = null;
@@ -3875,8 +3881,39 @@ var Khan = (function() {
 
     }
 
+    // [C2G] Separate function/method to hide quiz data
+    KhanC2G.hideVideoQuiz = function () {
+
+        $('#questionBG').remove();
+        $('#questionPane').remove();
+        $('#problemarea').css('z-index', 0);
+
+        $('#playerdiv').fadeTo('slow', 1.0);
+        $('.video-overlay-question').hide();
+        $('.video-overlay-hint').hide();
+        $('#answer_area').fadeOut('slow');
+        $("#slideIndex").show();
+
+    };
+
+    // [C2G] Add Skip Question ability
+    KhanC2G.addSkipQuestionButton = function () {
+        // if skip button doesn't exist, add it
+        if ($('#skip-button').length == 0) { 
+            var skipBtn = document.createElement('input');
+            $(skipBtn).attr('id', 'skip-button');
+            $(skipBtn).attr('type', 'button');
+            $(skipBtn).attr('value', 'Skip Question');
+            $(skipBtn).attr('title', 'Skip this question');
+            $(skipBtn).addClass('simple-button').addClass('green').addClass('full-width');
+            $('#check-answer-button').after($(skipBtn));
+            $(skipBtn).click(function () { $('#next-question-button').trigger('click'); })
+        }
+    };
+
     // [C2G] Called for in-video exercises
     KhanC2G.initVideoExercises = function () {
+
         $('.current-card-contents').append($('div.content'));
         $('.current-card-contents').css('min-height', '600px');
         $('div.content').css('position', 'absolute').css('top', '10px').css('left','10px');
@@ -3884,29 +3921,12 @@ var Khan = (function() {
         $('#container').css('padding-top',0);
         $('#examples-show').hide();
 
-        var skipBtn = document.createElement('input');
-        $(skipBtn).attr('id', 'skip-button');
-        $(skipBtn).attr('type', 'button');
-        $(skipBtn).attr('value', 'Skip Question');
-        $(skipBtn).attr('title', 'Skip this question and return to the video');
-        $(skipBtn).addClass('simple-button').addClass('green').addClass('full-width');
-        $('#check-answer-button').after($(skipBtn));
-        $(skipBtn).click(function () { $('#next-question-button').trigger('click'); })
+        KhanC2G.addSkipQuestionButton();
         $('#next-question-button').val("Correct! Resume Video");
 
         $('#next-question-button').unbind('click');
         $('#next-question-button').click(function () {
-
-            $('#questionBG').remove();
-            $('#questionPane').remove();
-            $('#problemarea').css('z-index', 0);
-
-            $('#playerdiv').fadeTo('slow', 1.0);
-            $('.video-overlay-question').hide();
-            $('.video-overlay-hint').hide();
-            $('#answer_area').fadeOut('slow');
-            $("#slideIndex").show();
-
+            KhanC2G.hideVideoQuiz();
             player.playVideo();
         });
     };

@@ -158,6 +158,7 @@ var c2gConfig = {
     var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
 
     $(document).ready(function () {
+        KhanC2G.addSkipQuestionButton();
         window.setTimeout(function () {
             KhanC2G.initVideoExercises();
             $('#playerdiv').show();
