@@ -9,12 +9,21 @@
 # bug list, a change made in my own fork: https://github.com/sefk/ghi
 #
 
+function set_yesterday {
+    case `uname` in
+        "Darwin" )
+            YESTERDAY=`date -v -1d` ;;
+        * )
+            YESTERDAY=`date --date="yesterday"` ;;
+    esac
+}
+
 function buglist-by-dev {
     if [[ $# -eq 1 ]]; then
         sprintparam="-M $1"
     fi
 
-    for a in dcadams halawa jbau jinpa sefk wescott shalinguyen kelvindo kluo ; do
+    for a in jbau wescott jrbl sefk shalinguyen dcadams halawa kluo jinpa ; do
         for p in P0 P1; do
             echo "**** $a ($p) ****"
             ghi list -q -s open -l $p -u $a -q $sprintparam | grep -v '\[3-Done\]'
@@ -30,12 +39,7 @@ function buglist-by-dev {
 
 function buglist-counts {
     NOW=`date -u +"%F %R UTC"`
-    case `uname` in
-        "Darwin" )
-            YESTERDAY=`date -v -1d` ;;
-        * )
-            YESTERDAY=`date --date="yesterday"` ;;
-    esac
+    set_yesterday
 
     for l in P0 P1 P2; do
         # echo -ne "${NOW}\t"
@@ -49,16 +53,15 @@ function buglist-counts {
 }
 
 function buglist-active {
-    case `uname` in
-        "Darwin" )
-            YESTERDAY=`date -v -1d` ;;
-        * )
-            YESTERDAY=`date --date="yesterday"` ;;
-    esac
+    set_yesterday
     echo -ne '# Marked as Not Done, '
     ghi list -s open --since "${YESTERDAY}"  | grep -v '3-Done'
     echo -ne '# Marked as Done, '
     ghi list -s open --since "${YESTERDAY}"  | egrep '^#|3-Done'
+}
+
+function buglist-recently-closed {
+    set_yesterday
     ghi list -s closed --since "${YESTERDAY}"
 }
 
@@ -68,12 +71,7 @@ function buglist-hot {
 
 function buglist-to-triage {
     if [[ $1 == "new" ]]; then
-        case `uname` in
-            "Darwin" )
-                YESTERDAY=`date -v -1d` ;;
-            * )
-                YESTERDAY=`date --date="yesterday"` ;;
-        esac
+        set_yesterday
         sinceparam="--since ${YESTERDAY}"
         sincemsg=" (PRIOR 24 HOURS)"
     else
@@ -93,15 +91,15 @@ function buglist-to-triage {
     ghi list -s open ${sinceparam} | grep -E "^#|NO-ASGN"
 }
 
-function buglist-goalline {
-    echo "-------- COUNTS OF OPEN ISSUES "
+function buglist-full-report {
+    echo "-------- COUNTS OF OPEN ISSUES"
     echo
     buglist-counts
 
     echo; echo
-    echo "-------- OPEN P0's AND P1's BY DEVELOPER"
+    echo "-------- CLOSED IN LAST DAY"
     echo
-    buglist-by-dev
+    buglist-recently-closed
 
     echo; echo
     echo "-------- ALL OPEN P0 ISSUES"
@@ -109,14 +107,20 @@ function buglist-goalline {
     buglist-hot
 
     echo; echo
-    echo "-------- ACTIVE BUGS THAT NEED TRIAGE"
+    echo "-------- ACTIVE (NEW) BUGS THAT NEED TRIAGE"
     echo
     buglist-to-triage new
 
     echo; echo
-    echo "-------- ALL ACTIVE ISSUES"
+    echo "-------- OPEN P0's AND P1's BY DEVELOPER"
     echo
-    buglist-active
+    buglist-by-dev
+
+    # too much!
+    # echo; echo
+    # echo "-------- ALL ACTIVE ISSUES"
+    # echo
+    # buglist-active
 
     echo; echo
     echo "Notes:"
