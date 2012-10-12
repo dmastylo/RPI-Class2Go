@@ -102,6 +102,11 @@ function buglist-full-report {
     buglist-recently-closed
 
     echo; echo
+    echo "-------- ALL OPEN P0 ISSUES"
+    echo
+    buglist-hot
+
+    echo; echo
     echo "-------- ACTIVE (NEW) BUGS THAT NEED TRIAGE"
     echo
     buglist-to-triage new
@@ -110,11 +115,6 @@ function buglist-full-report {
     echo "-------- OPEN P0's AND P1's BY DEVELOPER"
     echo
     buglist-by-dev
-
-    echo; echo
-    echo "-------- ALL OPEN P0 ISSUES"
-    echo
-    buglist-hot
 
     # too much!
     # echo; echo
