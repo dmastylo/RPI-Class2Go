@@ -53,7 +53,7 @@ def email_members(request, course_prefix, course_suffix):
                                 to=form.cleaned_data['to'],
                                 subject=form.cleaned_data['subject'],
                                 html_message=form.cleaned_data['message'],
-                                hash=md5(form.cleaned_data['message']+form.cleaned_data['subject']+datetime.datetime.isoformat(datetime.datetime.now())).hexdigest())
+                                hash=md5((form.cleaned_data['message']+form.cleaned_data['subject']+datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
             email.save()
             
             recipient_qset = User.objects.none() #get recipients in a QuerySet
