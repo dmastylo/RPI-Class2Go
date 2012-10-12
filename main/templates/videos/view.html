@@ -157,53 +157,13 @@ var c2gConfig = {
     var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
     var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
 
-    var initStacks = function () {
-        /*
-        console.log("initStacks being run now");
-        if (typeof KhanC2G != "undefined" && $.isArray(KhanC2G.remoteExercises)) {
-            for (var i = 0; i < KhanC2G.remoteExercises.length; i += 1) {
-                KhanC2G.makeProblem(i); 
-                console.log("Made problem " + i);
-            }
-        }
-        */
-        $('.current-card-contents').append($('div.content'));
-        $('.current-card-contents').css('min-height', '600px');
-        $('div.content').css('position', 'absolute').css('top', '10px').css('left','10px');
-
-        $('#container').css('padding-top',0);
-        $('#examples-show').hide();
-
-        var skipBtn = document.createElement('input');
-        $(skipBtn).attr('id', 'skip-button');
-        $(skipBtn).attr('type', 'button');
-        $(skipBtn).attr('value', 'Skip Question');
-        $(skipBtn).attr('title', 'Skip this question and return to the video');
-        $(skipBtn).addClass('simple-button').addClass('green').addClass('full-width');
-        $('#check-answer-button').after($(skipBtn));
-        $(skipBtn).click(function () { $('#next-question-button').trigger('click'); })
-        $('#next-question-button').val("Correct! Resume Video");
-
-        $('#next-question-button').unbind('click');
-        $('#next-question-button').click(function () {
-
-            $('#questionBG').remove();
-            $('#questionPane').remove();
-            $('#problemarea').css('z-index', 0);
-
-            $('#playerdiv').fadeTo('slow', 1.0);
-            $('.video-overlay-question').hide();
-            $('.video-overlay-hint').hide();
-            $('#answer_area').fadeOut('slow');
-            $("#slideIndex").show();
-
-            player.playVideo();
-        });
-
-    };
     $(document).ready(function () {
-        window.setTimeout(KhanC2G.initVideoExercises, 2000);
+        window.setTimeout(function () {
+            KhanC2G.initVideoExercises();
+            $('#playerdiv').show();
+        }, 2000);
     });
+
     {% if video_rec %}
     window.onbeforeunload = function() {
         vidTime = Math.floor(player.getCurrentTime());
@@ -231,6 +191,7 @@ var c2gConfig = {
         videoId: '{{video.url}}',
         playerVars: { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} },
         });
+        $('#playerdiv').show();
     }
 
     {% if video_rec %}
