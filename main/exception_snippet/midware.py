@@ -17,7 +17,7 @@ class error_ping(object):
         (type, value, tb) = sys.exc_info()
         (path, lineno, exc, text) = traceback.extract_tb(tb)[-1]
         email_subj = "%s on %s" % (repr(exception), repr(socket.gethostname()))
-        email_msg = "User: %s\nTime: %s\nFile path %s:%d\nLine text: %s\n" % (username, datestring, path, lineno,  text)
+        email_msg = "User: %s\nTime: %s\nUser-agent: %s\nFile path %s:%d\nLine text: %s\n" % (username, datestring, request.META['HTTP_USER_AGENT'], path, lineno,  text)
         send_mail(email_subj, email_msg, from_addr, mailto_list)
         del tb
         return None
