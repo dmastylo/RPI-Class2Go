@@ -249,6 +249,7 @@ def copySection(draft, new_draft_course):
         index = ContentSection.objects.filter(is_deleted=False, course=new_draft_course).aggregate(Max('index'))['index__max']+1
         newdraft = ContentSection(course=new_draft_course, title=draft.title)
         newdraft.index = index
+        newdraft.mode="draft"
         newdraft.save()
         newdraft.create_ready_instance()
 
