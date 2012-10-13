@@ -3367,10 +3367,8 @@ var Khan = (function() {
 
             initC2GStacks(exercises);
             
-            if ($('#exercise_type').length && $('#exercise_type').val() === 'video'){
-                KhanC2G.initVideoExercises();
-            }
-                                                                    
+            
+                                                                 
             var problems = exercises.children(".problems").children();
             globalProblems=problems;
             globalExercises=exercises;
@@ -3391,6 +3389,7 @@ var Khan = (function() {
 
             // [C2G] moves to viewed list, as it's currently being viewed
             var first = $('#questions-viewed li:first-child');
+                                                                    
 
             // [C2G] Set up cards so the first one not done is the "current card"
             function configureCards () {
@@ -3451,6 +3450,7 @@ var Khan = (function() {
             if ($('#exercise_type').val() != "video") {
                 configureCards();
             }
+                                                                    
 
         }
 
@@ -3915,9 +3915,10 @@ var Khan = (function() {
         }
     };
 
+    var runInitVideoEx=0;
     // [C2G] Called for in-video exercises
     KhanC2G.initVideoExercises = function () {
-
+      if (!runInitVideoEx){
         $('.current-card-contents').append($('div.content'));
         $('.current-card-contents').css('min-height', '600px');
         $('div.content').css('position', 'absolute').css('top', '10px').css('left','10px');
@@ -3933,6 +3934,8 @@ var Khan = (function() {
             KhanC2G.hideVideoQuiz();
             player.playVideo();
         });
+      };
+      runInitVideoEx=1;
     };
 
     return Khan;

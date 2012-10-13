@@ -4,8 +4,11 @@ var skipSecQ;
 
 
 function onPlayerReady(event) {
+    //
+    //
+    console.log('PlayerReady');
     $('#playerdiv').show();
-
+    //KhanC2G.initVideoExercises();
 }
 
 function onPlayerError(event) {

@@ -101,7 +101,8 @@ Sequence of events (no timeouts)
 var c2gConfig = {
     user: {{user.id}},
     problemType: 'formative',
-    progressUrl: '/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos'
+    progressUrl: '/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos',
+    is_video: 1,
 };
 </script>
 <!-- <script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script> -->
@@ -163,12 +164,14 @@ var c2gConfig = {
                                        kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g-10-12-12.js";
                                        //#3 loads Khan Exercises Framework
                                        $(kScript).load(function() {
+                                            //Setup the video display
+                                            KhanC2G.initVideoExercises();
                                             thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
-                                                       thumbSet.getVidID();
+                                            thumbSet.getVidID();
                                             //#4. Load Video Player and Displays Thumbnails
                                             thumbSet.runQuiz();
+                                            
                                        });
-                                   
                                        document.getElementsByTagName("head")[0].appendChild(kScript);
                                    }
                                 });
