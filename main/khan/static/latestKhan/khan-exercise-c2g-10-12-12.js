@@ -3342,6 +3342,7 @@ var Khan = (function() {
             // for in-video exercises
             //$("#container .exercises-body .current-card-contents").html(htmlExercise);
             $("#container .exercises-body .current-card-contents").prepend(htmlExercise);
+            
 
         }
 
@@ -3362,7 +3363,12 @@ var Khan = (function() {
         function finishSitePrep() {
 
             prepareSite();
-
+            
+            if ((typeof c2gConfig.is_video != "undefined") && c2gConfig.is_video) {
+                KhanC2G.addSkipQuestionButton();
+            }
+                                         
+                                                                    
             initC2GActivityLog();
 
             initC2GStacks(exercises);
@@ -3926,7 +3932,7 @@ var Khan = (function() {
         $('#container').css('padding-top',0);
         $('#examples-show').hide();
 
-        KhanC2G.addSkipQuestionButton();
+        //KhanC2G.addSkipQuestionButton();
         $('#next-question-button').val("Correct! Resume Video");
 
         $('#next-question-button').unbind('click');
