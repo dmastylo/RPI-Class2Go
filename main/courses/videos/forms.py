@@ -12,7 +12,7 @@ class S3UploadForm(forms.ModelForm):
         #logger.warning('test')
         course = kwargs.pop('course')
         super(S3UploadForm, self).__init__(*args, **kwargs)
-        self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course), empty_label=None)
+        self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course, is_deleted=False), empty_label=None)
         instance = getattr(self, 'instance', None)
         if instance and instance.id:
             del self.fields['file']
