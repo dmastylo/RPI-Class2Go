@@ -81,7 +81,7 @@ function confirm_change(){
             <input type="submit" value="Save" onclick="form.action='{% url 'problemsets.views.save_exercises' %}';" class="btn">
             <input type="submit" value="Save and Make Ready" onclick="form.action='{% url 'problemsets.views.save_and_publish_exercises' %}';" class="btn">
             <input type="submit" value="Revert" onclick="form.action='{% url 'problemsets.views.revert_problemset' %}';" class="btn">
-            <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
+            <a href="{% url 'problemsets.views.listAll' course_prefix=course_prefix course_suffix=course_suffix %}" class='btn'>Return to List</a>
         </div>
     </form>
 </div>

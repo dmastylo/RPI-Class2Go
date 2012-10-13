@@ -135,6 +135,8 @@ MIDDLEWARE_CLASSES = (
     'convenience_redirect.redirector.convenience_redirector',
     'courses.common_page_data_middleware.common_data',
     'courses.user_profiling_middleware.user_profiling',
+    'exception_snippet.midware.error_ping',
+
 )
 
 ROOT_URLCONF = 'urls'
@@ -186,6 +188,7 @@ INSTALLED_APPS = (
                       'kelvinator',
                       'db_scripts',
                       'convenience_redirect',
+                      'exception_snippet',
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
@@ -295,7 +298,7 @@ LOGGING = {
         'django.db.backends':{
             'handlers':['logfile'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
     }
 }

@@ -102,9 +102,9 @@
             </div>
         </fieldset>
         <div class="form-actions">
-            <input type="submit" value="Save and Add Exercises" class="btn"> or <a href="{% url 'problemsets.views.list' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
+            <input type="submit" value="Save and Add Exercises" class="btn"> or <a href="{% url 'problemsets.views.listAll' course_prefix=course_prefix course_suffix=course_suffix %} " class="btn"> Cancel</a>
         </div>
     </form>
-</div>​
+</div>
 {% endblock m_column_content %}
 

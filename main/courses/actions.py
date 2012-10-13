@@ -153,7 +153,7 @@ def change_live_datetime(request):
         if list_type == 'course_materials':
             return redirect('courses.views.course_materials', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
         elif list_type == 'problemsets':
-            return redirect('problemsets.views.list', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
+            return redirect('problemsets.views.listAll', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
         else:
             return redirect('courses.videos.views.list', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
         #This won't work anymore because referer could be /change_live_datetime if it's an invalid form post
