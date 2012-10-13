@@ -67,8 +67,8 @@ def view(request, course_prefix, course_suffix, slug):
     #Need both of these checks to tell if it's a student, maybe having an is_course_student field would simplify/clarify
     if not common_page_data['is_course_admin'] and not common_page_data['can_switch_mode']:
         if not 'video_mode' in request.session:
-            # Default to include quizzes in viewing videos
-            request.session['video_mode'] = "yes";
+            #Default to include quizzes in viewing videos
+            request.session['video_mode'] = "yes"
 
     videos = Video.objects.getByCourse(course=common_page_data['course'])
     #Get index of current video
