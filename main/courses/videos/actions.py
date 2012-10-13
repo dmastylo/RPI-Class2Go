@@ -29,6 +29,12 @@ from django.views.decorators.http import require_POST
 ### Videos ###
 
 @require_POST
+def switch_mode(request):
+    common_page_data = request.common_page_data
+    request.session['video_mode'] = request.POST.get('to_mode')
+    return redirect(request.META['HTTP_REFERER'])
+
+@require_POST
 @auth_is_course_admin_view_wrapper
 def add_video(request):
     course_prefix = request.POST.get("course_prefix")

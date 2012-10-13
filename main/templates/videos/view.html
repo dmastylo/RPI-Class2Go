@@ -1,6 +1,25 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% block title %} Stanford Online | {{ common_page_data.course.title }} | {{ video.title }}  {% endblock title %}
+{% block mode_switcher %}
+    {% if not common_page_data.is_course_admin and not common_page_data.can_switch_mode %}
+        <div class="hidden-phone" style="position:absolute;top:0;right:0;">
+	  <form class="toggle-views" name="video_mode_switch_form" action="{%url 'courses.videos.actions.switch_mode' %}" method="POST">
+            <p>View with:</p>
+            <div class="btn-group btn-views-toggle">
+              <button type="submit" name="to_mode" value="no" class="btn btn-mini{% ifequal request.session.video_mode 'no' %} active{% endifequal %}">No quizzes</button>
+              <button type="submit" name="to_mode" value="yes" class="btn btn-mini{% ifequal request.session.video_mode 'yes' %} active{% endifequal %}">Quizzes included</button>
+            </div>
+            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+            {% csrf_token %}
+          </form>
+        </div>
+    {% else %}
+        {{block.super}}
+    {% endif %}
+{% endblock mode_switcher %}
+
 {% block l_column_content %}
 <!-- <div id="c2g_layout_l_column" class="span3">
     <div class="well tight">
@@ -117,6 +136,7 @@ var c2gConfig = {
 <script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script>
 <script src="{{ STATIC_URL }}js/thumbnails.js" /></script>
 <script>
+{% ifequal request.session.video_mode 'yes' %}
     var vidPSUrl = '{{video.id}}/load_video_problem_set';
     $("#loadedExercises").load(vidPSUrl, function(text,status) {
         if(status=="success"){
@@ -125,6 +145,7 @@ var c2gConfig = {
             document.getElementsByTagName("head")[0].appendChild(kScript);
         }
     });
+{% endifequal %}
 
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
@@ -152,7 +173,9 @@ var c2gConfig = {
         });
     };
     $.getJSON(path + "manifest.txt", "", loadThumbManifest);
+    {% ifequal request.session.video_mode 'yes' %}
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
+    {% endifequal %}
 
     var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
     var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
