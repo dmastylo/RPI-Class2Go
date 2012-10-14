@@ -4,11 +4,7 @@ var skipSecQ;
 
 
 function onPlayerReady(event) {
-    //
-    //
-    console.log('PlayerReady');
     $('#playerdiv').show();
-    //KhanC2G.initVideoExercises();
 }
 
 function onPlayerError(event) {
@@ -43,10 +39,6 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
 
         getVidID: function() {
             vidName = c2gVidId;
-
-            // setTimeout necessary here for everything to be ready at the right time
-            // (hacky, but it does the job)
-            //setTimeout(function () { thumbSet.runQuiz(); }, 1000);
         },
 
         runQuiz: function() {
@@ -248,7 +240,7 @@ var initThumbnails = function (c2gVidId, c2gSlideIndicesObj, c2gQuizIndicesObj) 
                     }
                     if (questions.hasOwnProperty(sorted[i])) {
                         var tmpDiv=thumbSet.addQuizSlide(sorted[i]);
-                        slideIndices[sorted[i]]={displayDiv: tmpDiv};
+                        slideIndices[sorted[i]]={displayDiv: tmpDiv}; //Quiz takes precedence and overwrites if both quiz and thumb are at the same time
                     }
                 }
                 lastTime=sorted[i];

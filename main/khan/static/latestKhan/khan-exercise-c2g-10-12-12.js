@@ -3289,7 +3289,7 @@ var Khan = (function() {
             }
 
         // [C2G] setTimeout below is to allow enough time for last exercise to be properly loaded
-        }).done(setTimeout(function () { dfd.resolve(); }, 1500));
+        }).done(setTimeout(function () { dfd.resolve(); }, 1000));
 
         return dfd.promise();
     }

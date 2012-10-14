@@ -113,6 +113,8 @@ var c2gConfig = {
     var path="http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
     var thumbManifest = {};
     var psManifest = {};
+    var thumbsFetched=false; //We'll use these fetched variables to gate the loading of the YouTube API.
+    var psFetched=false;     //to eliminate race conditions.
     var loadThumbManifest = function (data, textStatus, jqXHR) {
         $.each(data, function (key, val) {
                $.each(val, function (k, v) {
@@ -133,8 +135,10 @@ var c2gConfig = {
                psManifest[parseInt(key)] = val;
                });
     };
-    $.getJSON(path + "manifest.txt", "", loadThumbManifest);
-    $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
+    $.getJSON(path + "manifest.txt", "", loadThumbManifest)
+    .always(function(){thumbsFetched=true;});  //The request may fail if there are no thumbs, but we know we tried.
+    $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest)
+    .always(function(){psFetched=true;});  //The request may fail if there are no exercises, but we know we tried.
     
     
     
@@ -142,7 +146,16 @@ var c2gConfig = {
     var tag = document.createElement('script');
     tag.src = "//www.youtube.com/player_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
-    setTimeout(function(){firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);}, 200); // #1 loads YouTube API--200ms to give manifests a small head start
+    
+    function gatedYouTubeAPILoad() {
+        if (thumbsFetched && psFetched) {
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        } else {
+            setTimeout(gatedYouTubeAPILoad, 200);
+        }
+    }
+    
+    gatedYouTubeAPILoad() // #1 loads YouTube API
     
     //Global settings for video player height and width
     var vidPlayerHeight = 430;
