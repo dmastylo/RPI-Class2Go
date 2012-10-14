@@ -32,17 +32,11 @@ def computeDiff(file1, file2):
     rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, h1, h2))/len(h1))
     return rms
     
-def dir_create(path):
-    if not os.path.isdir(path):
-        os.mkdir(path)
-        if not os.path.isdir(path):
-            raise KelvinatorError("Unable to create dir: " % path)
-
 def dir_remove(path):
     if os.path.isdir(path):
         shutil.rmtree(path, ignore_errors=True)
         if os.path.isdir(path):
-            raise KelvinatorError("Unable to remove dir (recursively): " % path)
+            raise KelvinatorError("Unable to remove dir: %s" % path)
 
 class KelvinatorError(Exception):
      def __init__(self, value):
@@ -82,14 +76,17 @@ def kelvinate(s3_path_raw, input_frames_per_min='0'):
     # on the work queue.
     working_dir_parent = getattr(settings, "KELVINATOR_WORKING_DIR", "/tmp")
     try:
-        working_dir=tempfile.mkdtemp(prefix="kelvinator-", dir=working_dir_parent)
+        working_dir=tempfile.mkdtemp(prefix="kelvinator-", dir=working_dir_parent,
+                suffix=os.getpid())
     except:
         logger.error("Kelvinator error when creating temp file in \"%s\"" % working_dir_parent)
         raise
     logger.info("Working directory: " + working_dir)
 
     jpeg_dir = working_dir + "/jpegs"
-    dir_create(jpeg_dir)
+    os.mkdir(path)
+    if not os.path.isdir(path):
+        raise KelvinatorError("Unable to create dir: " % path)
     
     logger.info("Reading from S3: " + s3_path)
     dl_handle = urllib2.urlopen(s3_path)
@@ -181,6 +178,7 @@ def kelvinate(s3_path_raw, input_frames_per_min='0'):
     os.remove(jpeg_dir+'/'+image_list[len(image_list)-1])
     
     # Write out manifest
+
     outfile = jpeg_dir + "/manifest.txt"
     FILE = open(outfile, "w")
     index = 0
@@ -198,15 +196,21 @@ def kelvinate(s3_path_raw, input_frames_per_min='0'):
         index += 1
     FILE.write("}")
     FILE.close()
-    
+
     # Upload manifest and jpegs to S3
+    
+    # first clear out prior thumbnails if there
+    # not doing write to tmp and then mv because django's file storage API 
+    # doesn't support rename/mv
+    s3_path = course_prefix + "/" + course_suffix + "/videos/" + str(video_id) + "/jpegs"
+    if default_storage.exists(s3_path):
+        default_storage.delete(s3_path)
     
     image_list = os.listdir(jpeg_dir)
     image_list.sort()
-    
-    for file in image_list:
-        local_file = open(jpeg_dir + '/' + file, 'rb')
-        s3_file = default_storage.open(course_prefix + '/' + course_suffix + '/videos/' + str(video_id) + '/jpegs/' + file, 'wb')
+    for fname in image_list:
+        local_file = open(jpeg_dir + "/" + fname, 'rb')
+        s3_file = default_storage.open(s3_path + "/" + fname, 'wb')
         file_data = local_file.read();
         s3_file.write(file_data)
         local_file.close()
