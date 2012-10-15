@@ -6,6 +6,9 @@
 article { border-top: 0; }
 article.exercises-content div.exercises-header .section-headline div.topic-exercise-badge {display:none;}
 
+/* playerdiv's display will be set to block in JS */
+#playerdiv { display: none; }
+
 #questions-stack {/*display: none;*/ position:absolute; font-size: 150%; top: 30px; left: -60px; z-index:5}
 #questions-stack ol { list-style: none; margin: 0; }
 #questions-stack li { background-color: #fff; border: 2px solid #ccc; border-radius: 3px; color: #999; cursor: pointer; margin-top: -.3em; padding: 3px .5em; } 

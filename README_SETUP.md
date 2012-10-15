@@ -42,24 +42,24 @@ for all these commands that modify the environment (brew, easy_install,
 pip).  For all of those you should plan on running your own sudo
 prefix for these.
 
-1. Install XCode from the Apple App Store
+1. Install XCode from the Apple App Store Version 4.5 or later
 
-2. Within XCode, add the command line tools: Preferences -> Download Item -> "Command Line Tools" Install button
+2. Within XCode, add the command line tools: Preferences -> Download -> "Command Line Tools" -> Install button
 
 3. Install Homebrew:
 
-    /usr/bin/ruby -e "$(/usr/bin/curl -fksSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)"
-    
+    /usr/bin/ruby -e "$(curl -fsSkL http://raw.github.com/mxcl/homebrew/go)"
+
 4. Install Python (we are expecting 2.7.x):
 
-    brew install readline sqlite gdbm 
-    brew install python --universal --framework 
+    brew install readline sqlite gdbm  
+    brew install python --universal --framework  
 
 5. Install mysql
 
-    brew install mysql
-    (Optional but useful for looking at the database)
-    Install phpmyadmin (?!) following the directions here:
+    brew install mysql  
+    (Optional but useful for looking at the database)  
+    Install phpmyadmin (?!) following the directions here:  
     http://www.djangoapp.com/blog/2011/07/24/installing-phpmyadmin-on-mac-os-x-lion/
 
 6. Install pip, a python package manager
@@ -120,15 +120,51 @@ prefix for these.
 
     pip install django-celery django-celery-email pytz
 
-18. Setup initial db.
+18. Setup the acocunt and database in MySql
 
-    ./manage.py syncdb
-    ./manage.py migrate
-    ./manage.py syncdb --database=celery
-    ./manage.py migrate --database=celery
+    create database class2go;  
+    grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';  
+    grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';  
 
-At this point you should be able to look at the django database in
-your local mysql and see a bunch of c2g_* tables.  Yay.
+19. Set up some folders for logs and the celery database. The sqlite3 folder can be anywhere that is writable.
+
+    mkdir /var/log/django/  
+    chmod 777 /var/log/django/  
+    mkdir /Users/account/sqlite3/  
+
+20. In the main folder, make a copy of database_example.py to database.py 
+and edit the DATABASES strings as follows substituting proper values for your system.
+
+    DATABASES = {  
+        'default': {  
+            'ENGINE': 'django.db.backends.mysql',  
+            'NAME': 'class2go',  
+            'USER': 'class2go',  
+            'PASSWORD': 'class2gopw',  
+            'HOST': '',  
+            'PORT': '',  
+        },  
+        'celery': {  
+            'ENGINE': 'django.db.backends.sqlite3',  
+            'NAME': '/Users/account/sqlite3/celerydb.sqlite',  
+        },  
+    }  
+
+21. Setup initial db from the main folder
+
+    ./manage.py syncdb  
+    ./manage.py migrate  
+    ./manage.py syncdb --database=celery  
+    ./manage.py migrate --database=celery  
+
+    At this point you should be able to look at the django database in
+    your local mysql and see a bunch of c2g_* tables.  Yay.
+
+22. From the main folder, run server on whatever port you want:
+
+    python manage.py runserver 8100
+
+23. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
 
 
 
