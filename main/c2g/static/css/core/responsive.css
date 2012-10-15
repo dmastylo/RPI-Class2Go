@@ -939,10 +939,6 @@ width: auto;
       padding: 7px 10px 8px;
       border-right:1px solid #999;
   }
-  .nav-collapse.collapse {
-    height: auto;
-    overflow: visible;
-  }
 }
 
 
@@ -955,5 +951,9 @@ width: auto;
   }
   .preview-registration {
     margin-top:-52px;
+  }
+  .nav-collapse.collapse {
+    height: auto;
+    overflow: visible;
   }
 }
