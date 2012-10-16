@@ -33,7 +33,7 @@
 </table>
 
 <input type="submit" value="Login" class="btn" />
-&nbsp; <a href="{% url 'auth_password_reset' %}">Forgot my password</a>
+&nbsp; <a href="{% url 'auth_password_reset' %}">Forgot my username or password</a>
 {% if next|stringformat:"s" == '/accounts/password/reset/complete/'  %}
 <input type="hidden" name="next" value='/' />
 {% else %}
