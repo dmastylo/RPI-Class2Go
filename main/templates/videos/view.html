@@ -102,7 +102,7 @@ var c2gConfig = {
     user: {{user.id}},
     problemType: 'formative',
     progressUrl: '/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos',
-    is_video: 1,
+    is_video: true,
 };
 </script>
 <!-- <script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script> -->
@@ -110,11 +110,11 @@ var c2gConfig = {
 <script>
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
-    var path="http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
+    var path = "http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
     var thumbManifest = {};
     var psManifest = {};
-    var thumbsFetched=false; //We'll use these fetched variables to gate the loading of the YouTube API.
-    var psFetched=false;     //to eliminate race conditions.
+    var thumbsChecked = false; //We'll use these fetched variables to gate the loading of the YouTube API.
+    var psChecked = false;     //to eliminate race conditions.
     var loadThumbManifest = function (data, textStatus, jqXHR) {
         $.each(data, function (key, val) {
                $.each(val, function (k, v) {
@@ -136,9 +136,9 @@ var c2gConfig = {
                });
     };
     $.getJSON(path + "manifest.txt", "", loadThumbManifest)
-    .always(function(){thumbsFetched=true;});  //The request may fail if there are no thumbs, but we know we tried.
+    .always(function(){thumbsChecked=true;});  //The request may fail if there are no thumbs, but we know we tried.
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest)
-    .always(function(){psFetched=true;});  //The request may fail if there are no exercises, but we know we tried.
+    .always(function(){psChecked=true;});  //The request may fail if there are no exercises, but we know we tried.
     
     
     
@@ -148,7 +148,7 @@ var c2gConfig = {
     var firstScriptTag = document.getElementsByTagName('script')[0];
     
     function gatedYouTubeAPILoad() {
-        if (thumbsFetched && psFetched) {
+        if (thumbsChecked && psChecked) {
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         } else {
             setTimeout(gatedYouTubeAPILoad, 200);
