@@ -64,9 +64,9 @@ def view(request, course_prefix, course_suffix, slug):
         )
         visit_log.save()
 
-    if not 'video_mode' in request.session:
+    if not 'video_quiz_mode' in request.session:
         #Default to include quizzes in viewing videos
-        request.session['video_mode'] = "include quizzes"
+        request.session['video_quiz_mode'] = "quizzes included"
 
     videos = Video.objects.getByCourse(course=common_page_data['course'])
     #Get index of current video

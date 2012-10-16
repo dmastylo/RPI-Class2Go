@@ -29,9 +29,9 @@ from django.views.decorators.http import require_POST
 ### Videos ###
 
 @require_POST
-def switch_mode(request):
+def switch_quiz_mode(request):
     common_page_data = request.common_page_data
-    request.session['video_mode'] = request.POST.get('to_mode')
+    request.session['video_quiz_mode'] = request.POST.get('to_mode')
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST

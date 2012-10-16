@@ -4,11 +4,11 @@
 {% block mode_switcher %}
     {% if not common_page_data.is_course_admin and not common_page_data.can_switch_mode %}
         <div class="hidden-phone" style="position:absolute;top:0;right:0;">
-	  <form class="toggle-views" name="video_mode_switch_form" action="{%url 'courses.videos.actions.switch_mode' %}" method="POST">
+	  <form class="toggle-views" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
             <p>View with:</p>
             <div class="btn-group btn-views-toggle">
-              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
-              <button type="submit" name="to_mode" value="include quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'include quizzes' %} active{% endifequal %}">Quizzes included</button>
+              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
+              <button type="submit" name="to_mode" value="quizzes included" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'quizzes included' %} active{% endifequal %}">Quizzes included</button>
             </div>
             <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
@@ -27,11 +27,11 @@
             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
             {% csrf_token %}
           </form>
-	  <form class="toggle-views pull-right" name="video_mode_switch_form" action="{%url 'courses.videos.actions.switch_mode' %}" method="POST">
+	  <form class="toggle-views pull-right" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
             <p>View with:</p>
             <div class="btn-group btn-views-toggle">
-              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
-              <button type="submit" name="to_mode" value="include quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'include quizzes' %} active{% endifequal %}">Quizzes included</button>
+              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
+              <button type="submit" name="to_mode" value="quizzes included" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'quizzes included' %} active{% endifequal %}">Quizzes included</button>
             </div>
             <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
@@ -157,7 +157,7 @@ var c2gConfig = {
 <script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script>
 <script src="{{ STATIC_URL }}js/thumbnails.js" /></script>
 <script>
-{% ifequal request.session.video_mode 'include quizzes' %}
+{% ifequal request.session.video_quiz_mode 'quizzes included' %}
     var vidPSUrl = '{{video.id}}/load_video_problem_set';
     $("#loadedExercises").load(vidPSUrl, function(text,status) {
         if(status=="success"){
@@ -194,7 +194,7 @@ var c2gConfig = {
         });
     };
     $.getJSON(path + "manifest.txt", "", loadThumbManifest);
-    {% ifequal request.session.video_mode 'include quizzes' %}
+    {% ifequal request.session.video_quiz_mode 'quizzes included' %}
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
     {% endifequal %}
 
