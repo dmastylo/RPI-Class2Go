@@ -7,8 +7,8 @@
 	  <form class="toggle-views" name="video_mode_switch_form" action="{%url 'courses.videos.actions.switch_mode' %}" method="POST">
             <p>View with:</p>
             <div class="btn-group btn-views-toggle">
-              <button type="submit" name="to_mode" value="no" class="btn btn-mini{% ifequal request.session.video_mode 'no' %} active{% endifequal %}">No quizzes</button>
-              <button type="submit" name="to_mode" value="yes" class="btn btn-mini{% ifequal request.session.video_mode 'yes' %} active{% endifequal %}">Quizzes included</button>
+              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
+              <button type="submit" name="to_mode" value="include quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'include quizzes' %} active{% endifequal %}">Quizzes included</button>
             </div>
             <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
@@ -16,7 +16,28 @@
           </form>
         </div>
     {% else %}
-        {{block.super}}
+	<div class="hidden-phone" style="position:absolute;top:0;right:0;">
+          <form data-c2g-tooltip class="toggle-views pull-right" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST" data-placement="left" title="Choosing EDIT mode lets you edit the course site. Choosing LIVE mode lets you view the site as students will.">
+            <p>You are currently viewing:</p>
+            <div class="btn-group btn-views-toggle">
+              <button type="submit" name="to_mode" value="draft" class="btn btn-mini{% ifequal common_page_data.course_mode 'draft' %} active{% endifequal %}">Edit</button>
+              <button type="submit" name="to_mode" value="ready" class="btn btn-mini{% ifequal common_page_data.course_mode 'ready' %} active{% endifequal %}">Live</button>
+            </div>
+            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+            {% csrf_token %}
+          </form>
+	  <form class="toggle-views pull-right" name="video_mode_switch_form" action="{%url 'courses.videos.actions.switch_mode' %}" method="POST">
+            <p>View with:</p>
+            <div class="btn-group btn-views-toggle">
+              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
+              <button type="submit" name="to_mode" value="include quizzes" class="btn btn-mini{% ifequal request.session.video_mode 'include quizzes' %} active{% endifequal %}">Quizzes included</button>
+            </div>
+            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+            {% csrf_token %}
+          </form>
+	</div>
     {% endif %}
 {% endblock mode_switcher %}
 
@@ -136,7 +157,7 @@ var c2gConfig = {
 <script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script>
 <script src="{{ STATIC_URL }}js/thumbnails.js" /></script>
 <script>
-{% ifequal request.session.video_mode 'yes' %}
+{% ifequal request.session.video_mode 'include quizzes' %}
     var vidPSUrl = '{{video.id}}/load_video_problem_set';
     $("#loadedExercises").load(vidPSUrl, function(text,status) {
         if(status=="success"){
@@ -173,7 +194,7 @@ var c2gConfig = {
         });
     };
     $.getJSON(path + "manifest.txt", "", loadThumbManifest);
-    {% ifequal request.session.video_mode 'yes' %}
+    {% ifequal request.session.video_mode 'include quizzes' %}
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
     {% endifequal %}
 
