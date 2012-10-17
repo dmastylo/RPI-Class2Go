@@ -18,11 +18,12 @@ import kelvinator.tasks
 from c2g.models import Video
 
 class Command(BaseCommand):
-    help = """    Audit videos to see what commands need to be run to fix them out.  Looks out for
-    missing thumbnails or smaller video files.  Does this by comparing contents of database
-    to what is in S3.  Note that this doesn't do any *semantic* validation, just checks for 
-    presence of files.  For example, doesn't tell if they are good thumbnails, or even the 
-    right thumbnails, just that there are thumbnails.
+    help = """    Audit videos to see what commands need to be run to fix them out.
+    Looks out for missing thumbnails or smaller video files.  Does this
+    by comparing contents of database to what is in S3.  Note that this
+    doesn't do any *semantic* validation, just checks for presence of
+    files.  For example, doesn't tell if they are good thumbnails, or
+    even the right thumbnails, just that there are thumbnails.
 
     Output is a set of commands to be run to fix it up.
     """
