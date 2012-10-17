@@ -14,14 +14,14 @@ class Command(BaseCommand):
     help="Runs the Kelvinator on a video given its course info (prefix and suffix) and slug.\n" + \
         "All parameters are case sensitive \n" + \
         "\n" + \
-        "Usage: manage.py kelvinate [options] <prefix> <suffix> <video_slug>\n" + \
+        "Usage: manage.py thumbnails [options] <prefix> <suffix> <video_slug>\n" + \
         "    prefix         generally the short name, like \"nlp\"\n" + \
         "    suffix         the term, like \"Fall2012\"\n" + \
         "    video_slug     slug, like \"regexp\"\n" 
 
     option_list = (
-        make_option("-r", "--remote", dest="remote", action="store_true",
-                    help="do kelvination remotely (default is local)"),
+        make_option("-l", "--local", dest="local", action="store_true",
+                    help="do kelvination remotely (default is remote)"),
         make_option("-f", "--frames", dest="target_frames", default=2, type="int",
                     help="Target number of thumbnails per minute (default=2)"),
     ) + BaseCommand.option_list
@@ -53,11 +53,11 @@ class Command(BaseCommand):
         if len(args) > 5:
             keyframes_per_minute = args[5]
         
-        if options['remote']:
-            kelvinator.tasks.kelvinate.delay(s3_path, keyframes_per_minute)
-            print "Kelvination queued (%s): %s" % (instance, s3_path)
-        else:
+        if options['local']:
             kelvinator.tasks.kelvinate(s3_path, keyframes_per_minute)
             print "Kelvination complete"
+        else:
+            kelvinator.tasks.kelvinate.delay(s3_path, keyframes_per_minute)
+            print "Kelvination queued (%s): %s" % (instance, s3_path)
 
 
