@@ -34,7 +34,7 @@ class user_profiling(object):
                     return
 
                 try:
-                    profile.client_ip = request.META['X-FORWARDED-FOR']
+                    profile.client_ip = request.META['HTTP_X_FORWARDED_FOR']
                 except KeyError:
                     try:
                         profile.client_ip = request.META['REMOTE_ADDR']
@@ -42,7 +42,7 @@ class user_profiling(object):
                         pass
 
                 try:
-                    profile.referrer = request.META['HTTP_REFERRER']
+                    profile.referrer = request.META['HTTP_REFERER']
                 except KeyError:
                     pass
 
