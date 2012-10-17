@@ -1,8 +1,9 @@
 import logging
 from celery import task
-from courses.reports.generation.course_dashboard import *
-from courses.reports.generation.course_quizzes import *
-from courses.reports.generation.quiz_data import *
+from courses.reports.generation.gen_course_dashboard_report import *
+from courses.reports.generation.gen_quiz_summary_report import *
+from courses.reports.generation.gen_quiz_full_report import *
+from courses.reports.generation.gen_class_roster import *
 from settings import SERVER_EMAIL
 
 from django.core.mail import EmailMessage
@@ -13,13 +14,14 @@ logger = logging.getLogger(__name__)
 def generate_and_email_reports(username, course_handle, requested_reports, email_title, email_message):
     # Generates the list of reports in requested_reports, and sends it to the staff of the given course.
     ready_course = Course.objects.get(handle=course_handle, mode='ready')
-    logger.info(requested_reports[0]['type'])
+    
     # Generate requested reports
     reports = []
     for rr in requested_reports:
         if rr['type'] == 'dashboard':
             logger.info("User %s requested to generate dashboard report for course %s." % (username, course_handle))
             report = gen_course_dashboard_report(ready_course, save_to_s3=True)
+            report['type'] = rr['type']
             if report:
                 reports.append(report)
                 logger.info("Dashboard report for course %s generated successfully for user %s." % (course_handle, username))
@@ -29,18 +31,19 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
         elif rr['type'] == 'course_quizzes':
             logger.info("User %s requested to generate course quizzes report for course %s." % (username, course_handle))
             report = gen_course_quizzes_report(ready_course, save_to_s3=True)
+            report['type'] = rr['type']
             if report:
                 reports.append(report)
                 logger.info("Course quizzes report for course %s generated successfully for user %s." % (course_handle, username))
             else:
                 logger.info("Failed to generate course quizzes report for course %s for user %s." % (course_handle, username))
                 
-        elif rr['type'] == 'problemset':
+        elif rr['type'] == 'problemset_full':
             if (not 'slug' in rr) or (not rr['slug']):
-                logger.info("Missing slug -- Failed to generate problem set report")
+                logger.info("Missing slug -- Failed to generate problem set full report")
             else:
                 slug = rr['slug']
-                logger.info("User %s requested to generate problemset report for course %s problemset slug %s." % (username, course_handle, slug))
+                logger.info("User %s requested to generate problemset full report for course %s problemset slug %s." % (username, course_handle, slug))
                 
                 # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
                 try:
@@ -48,31 +51,85 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
                 except ProblemSet.DoesNotExist:
                     quiz = ProblemSet.objects.get(course=ready_course.image, slug=slug)
                     
-                report = gen_quiz_data_report(ready_course, quiz, save_to_s3=True)
+                report = gen_quiz_full_report(ready_course, quiz, save_to_s3=True)
+                report['type'] = rr['type']
                 if report:
                     reports.append(report)
-                    logger.info("Problemset report for course %s problemset %s generated successfully for user %s." % (course_handle, slug, username))
+                    logger.info("Problemset full report for course %s problemset %s generated successfully for user %s." % (course_handle, slug, username))
                 else:
-                    logger.info("Failed to generate problemset report for course %s problemset %s for user %s." % (course_handle, slug, username))
-            
-        elif rr['type'] == 'video':
+                    logger.info("Failed to generate problemset full report for course %s problemset %s for user %s." % (course_handle, slug, username))
+                    
+        elif rr['type'] == 'problemset_summary':
             if (not 'slug' in rr) or (not rr['slug']):
-                logger.info("Missing slug -- Failed to generate video report")
+                logger.info("Missing slug -- Failed to generate problem set summary report")
             else:
                 slug = rr['slug']
-                logger.info("User %s requested to generate video report for course %s video slug %s." % (username, course_handle, slug))
+                logger.info("User %s requested to generate problemset summary report for course %s problemset slug %s." % (username, course_handle, slug))
+                
+                # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
+                try:
+                    quiz = ProblemSet.objects.get(course=ready_course, slug=slug)
+                except ProblemSet.DoesNotExist:
+                    quiz = ProblemSet.objects.get(course=ready_course.image, slug=slug)
+                    
+                report = gen_quiz_summary_report(ready_course, quiz, save_to_s3=True)
+                report['type'] = rr['type']
+                if report:
+                    reports.append(report)
+                    logger.info("Problemset summary report for course %s problemset %s generated successfully for user %s." % (course_handle, slug, username))
+                else:
+                    logger.info("Failed to generate problemset summary report for course %s problemset %s for user %s." % (course_handle, slug, username))
+            
+        elif rr['type'] == 'video_full':
+            if (not 'slug' in rr) or (not rr['slug']):
+                logger.info("Missing slug -- Failed to generate video full report")
+            else:
+                slug = rr['slug']
+                logger.info("User %s requested to generate video full report for course %s video slug %s." % (username, course_handle, slug))
                 # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
                 try:
                     quiz = Video.objects.get(course=ready_course, slug=slug)
                 except Video.DoesNotExist:
                     quiz = Video.objects.get(course=ready_course.image, slug=slug)
                     
-                report = gen_quiz_data_report(ready_course, quiz, save_to_s3=True)
+                report = gen_quiz_full_report(ready_course, quiz, save_to_s3=True)
+                report['type'] = rr['type']
                 if report:
                     reports.append(report)
-                    logger.info("Video report for course %s video %s generated successfully for user %s." % (course_handle, slug, username))
+                    logger.info("Video full report for course %s video %s generated successfully for user %s." % (course_handle, slug, username))
                 else:
-                    logger.info("Failed to generate video report for course %s video %s for user %s." % (course_handle, slug, username))
+                    logger.info("Failed to generate video full report for course %s video %s for user %s." % (course_handle, slug, username))
+                    
+        elif rr['type'] == 'video_summary':
+            if (not 'slug' in rr) or (not rr['slug']):
+                logger.info("Missing slug -- Failed to generate video report")
+            else:
+                slug = rr['slug']
+                logger.info("User %s requested to generate video summary report for course %s video slug %s." % (username, course_handle, slug))
+                # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
+                try:
+                    quiz = Video.objects.get(course=ready_course, slug=slug)
+                except Video.DoesNotExist:
+                    quiz = Video.objects.get(course=ready_course.image, slug=slug)
+                    
+                report = gen_quiz_summary_report(ready_course, quiz, save_to_s3=True)
+                report['type'] = rr['type']
+                if report:
+                    reports.append(report)
+                    logger.info("Video summary report for course %s video %s generated successfully for user %s." % (course_handle, slug, username))
+                else:
+                    logger.info("Failed to generate video summary report for course %s video %s for user %s." % (course_handle, slug, username))
+                    
+        elif rr['type'] == 'class_roster':
+            logger.info("User %s requested to generate class roster for course %s." % (username, course_handle))
+            report = gen_class_roster(ready_course, save_to_s3=True)
+            report['type'] = rr['type']
+            if report:
+                reports.append(report)
+                logger.info("Class roster for course %s generated successfully for user %s." % (course_handle, username))
+            else:
+                logger.info("Failed to generate class roster for course %s for user %s." % (course_handle, username))
+                    
             
     # Email Generated Reports
     staff_email = ready_course.contact
@@ -80,7 +137,7 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
         logger.info("Failed to email reports for course %s -- Missing course contact email" % (course_handle))
     else:
         if len(reports) == 0:
-            logger.info("Giving up send reports email to %s, because no reports were generated." % staff_email)
+            logger.info("Not sending reports email to %s, because no reports were generated." % staff_email)
             return
             
         email = EmailMessage(
@@ -90,7 +147,12 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
             [staff_email, 'c2g-dev@cs.stanford.edu'], # To
         )
         for report in reports:
-            email.attach(report['name'], report['content'], 'text/csv')
+            if report['type'] in ['problemset_summary', 'video_summary']:
+                report_name = report['name'][:-4] + '_summary.csv'
+            else:
+                report_name = report['name']
+                
+            email.attach(report_name, report['content'], 'text/csv')
             
         email.send()
         

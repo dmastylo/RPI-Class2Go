@@ -1,10 +1,12 @@
 import csv
+import re
 from cStringIO import StringIO
 from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
 from storages.backends.s3boto import S3BotoStorage
 from django.core.files.storage import default_storage
 from datetime import datetime, timedelta
 
+    
 class C2GReportWriter:
     def __init__(self, save_to_s3_arg, s3_filepath = ''):
         self.save_to_s3 = save_to_s3_arg
@@ -24,7 +26,10 @@ class C2GReportWriter:
             elif isinstance(item, float): padded_content.append("%.2f" % item)
             else: padded_content.append(item)
         
-        self.csv_writer.writerow(padded_content)
+        try:
+            self.csv_writer.writerow(padded_content)
+        except UnicodeEncodeError:
+            print padded_content
         for i in range(nl): self.csv_writer.writerow([""])
         
     def writeout(self):

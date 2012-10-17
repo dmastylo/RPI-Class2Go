@@ -7,12 +7,15 @@
     <h3 class="section-headline">Course Reports</h3>
     <div class="container">  
     <div class="row">  
-        <div class="tabbable span9">  
-            <ul class="nav nav-tabs">  
+        <div class="tabbable span12">  
+            <ul class="nav nav-tabs" style='font-size: 10pt;'>  
                 <li class="active"><a href="#dashboard" data-toggle="tab">Course Dashboard</a></li>
-                <li><a href="#quiz_summary" data-toggle="tab">Course Quiz Summary</a></li>
-                <li><a href="#psets" data-toggle="tab">Problem sets</a></li>
-                <li><a href="#videos" data-toggle="tab">Videos</a></li>
+                <li><a href="#all_quiz_summary" data-toggle="tab">Combined Summary of all Quizzes</a></li>
+                <li><a href="#psets_full" data-toggle="tab">Problem set Student Data</a></li>
+                <li><a href="#psets_summary" data-toggle="tab">Problem set Summary</a></li>
+                <li><a href="#videos_full" data-toggle="tab">Video Student Data</a></li>
+                <li><a href="#videos_summary" data-toggle="tab">Video Summary</a></li>
+                <li><a href="#class_roster" data-toggle="tab">Class Roster</a></li>
             </ul>
             <div class="tab-content">
                 <div id="dashboard" class="tab-pane active" style="padding-left: 10px;">
@@ -34,7 +37,7 @@
                     </table>
                 </div>
                 
-                <div id="quiz_summary" class="tab-pane" style="padding-left: 10px;">
+                <div id="all_quiz_summary" class="tab-pane" style="padding-left: 10px;">
                     <h3>Generate new course quizzes summary</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
@@ -53,21 +56,21 @@
                     </table>
                 </div>
                 
-                <div id="psets" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new problem set report</h3>
+                <div id="psets_full" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new problem set full report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
                         <label for="video" style='display: inline;'>Problem set</label>
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
                             {% for ps in problemsets %}<option value="{{ps.slug}}">{{ps.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new problem set report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new problem set full report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
-                        <input type="hidden" name="type" value="problemset" />
+                        <input type="hidden" name="type" value="problemset_full" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available problem set reports</h3>
-                    {% for ps in ps_quiz_data_reports %}
+                    <h3>Available problem set full reports</h3>
+                    {% for ps in ps_quiz_full_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
                         {% if ps.reports|length > 0 %}
                             <table class="table table-striped" style="margin-left: 40px;width: 600px;">
@@ -76,26 +79,54 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No reports available for this problem set.</label>
+                            <label style="margin-left: 40px;">No full reports available for this problem set.</label>
                         {% endif %}
                     {% endfor %}
                 </div>
                 
-                <div id="videos" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new video report</h3>
+                <div id="psets_summary" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new problem set summary report</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <label for="video" style='display: inline;'>Problem set</label>
+                        <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
+                            {% for ps in problemsets %}<option value="{{ps.slug}}">{{ps.title}}</option>{% endfor%}
+                        </select>
+                        <input type="submit" class='btn' value="Generate new problem set summary report" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="problemset_summary" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available problem set summary reports</h3>
+                    {% for ps in ps_quiz_summ_reports %}
+                        <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
+                        {% if ps.reports|length > 0 %}
+                            <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+                                {% for rep in ps.reports %}
+                                    <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'problemsets_summary' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                                {% endfor %}
+                            </table>
+                        {% else %}
+                            <label style="margin-left: 40px;">No summary reports available for this problem set.</label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div id="videos_full" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new video full report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
                         <label for="video" style='display: inline;'>Video</label>
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
                             {% for v in videos %}<option value="{{v.slug}}">{{v.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new video report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new video full report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
-                        <input type="hidden" name="type" value="video" />
+                        <input type="hidden" name="type" value="video_full" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available video reports</h3>
-                    {% for vd in vd_quiz_data_reports %}
+                    <h3>Available video full reports</h3>
+                    {% for vd in vd_quiz_full_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ vd.title }}</h4>
                         {% if vd.reports|length > 0 %}
                             <table class="table table-striped" style="margin-left: 40px;width: 600px;">
@@ -104,10 +135,60 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No reports available for this video.</label>
+                            <label style="margin-left: 40px;">No full reports available for this video.</label>
                         {% endif %}
                     {% endfor %}
                 </div>
+                
+                <div id="videos_summary" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new video summary report</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <label for="video" style='display: inline;'>Video</label>
+                        <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
+                            {% for v in videos %}<option value="{{v.slug}}">{{v.title}}</option>{% endfor%}
+                        </select>
+                        <input type="submit" class='btn' value="Generate new video summary report" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="video_summary" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available video summary reports</h3>
+                    {% for vd in vd_quiz_summ_reports %}
+                        <h4 style="margin-top: 10px; margin-left: 20px;">{{ vd.title }}</h4>
+                        {% if vd.reports|length > 0 %}
+                            <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+                                {% for rep in vd.reports %}
+                                    <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'videos_summary' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                                {% endfor %}
+                            </table>
+                        {% else %}
+                            <label style="margin-left: 40px;">No summary reports available for this video.</label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div id="class_roster" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new class roster</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <input type="submit" class='btn' value="Generate new class roster" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="class_roster" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Download Class Roster</h3>
+                    {% if class_rosters|length > 0 %}
+                        <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+                            {% for rep in class_rosters %}
+                                <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'class_roster' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <label style="margin-left: 40px;">No class roster has been generated yet for this course.</label>
+                    {% endif %}
+                </div>
+                
             </div>
         </div>
     </div>

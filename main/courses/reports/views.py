@@ -20,49 +20,57 @@ def main(request, course_prefix, course_suffix):
     course_prefix = course.handle.split('--')[0]
     course_suffix = course.handle.split('--')[1]
     
-    # List all problem sets and videos, since instructors may let something fo non-live then try to get its report. If instructors try to generate a report for something that doesn't have a live instance, we will write that in the report
+    
+    # 1- List all problem sets and videos, since instructors may let something fo non-live then try to get its report. If instructors try to generate a report for something that doesn't have a live instance, we will write that in the report
     problemsets = ProblemSet.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     videos = Video.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     
-    # Read a list of all reports for that course that are on the server
+    
+    # 2- Read a list of all reports for that course that are on the server
     dashboard_reports = list_reports_in_dir("%s/%s/reports/dashboard/" % (course_prefix, course_suffix))
     course_quizzes_reports = list_reports_in_dir("%s/%s/reports/course_quizzes/" % (course_prefix, course_suffix))
-    problemset_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
-    video_reports = list_reports_in_dir("%s/%s/reports/videos/" % (course_prefix, course_suffix))
+    problemset_full_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
+    problemset_summ_reports = list_reports_in_dir("%s/%s/reports/problemsets_summary/" % (course_prefix, course_suffix))
+    video_full_reports = list_reports_in_dir("%s/%s/reports/videos/" % (course_prefix, course_suffix))
+    video_summ_reports = list_reports_in_dir("%s/%s/reports/videos_summary/" % (course_prefix, course_suffix))
+    class_rosters = list_reports_in_dir("%s/%s/reports/class_roster/" % (course_prefix, course_suffix))
     
-    ps_quiz_data_reports_dict = {}
-    for ps in problemsets: ps_quiz_data_reports_dict[ps.slug] = {'title': ps.title, 'reports': []}
+    # 3- Divide ps and video reports into lists of dicts ready for grouped display by object
+    ps_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(problemsets, problemset_full_reports)
+    ps_quiz_summ_reports_list_of_dicts = ClassifyReportsBySlug(problemsets, problemset_summ_reports)
+    vd_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_full_reports)
+    vd_quiz_summ_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_summ_reports)
     
-    for problemset_report in problemset_reports:
-        report_slug = get_quiz_slug(problemset_report['s3_name'])
-        if report_slug in ps_quiz_data_reports_dict:
-            ps_quiz_data_reports_dict[report_slug]['reports'].append(problemset_report)
-        
-    ps_quiz_data_reports_list = []
-    for ps in problemsets:
-        ps_quiz_data_reports_list.append(ps_quiz_data_reports_dict[ps.slug])
-        
-    vd_quiz_data_reports_dict = {}
-    for vd in videos: vd_quiz_data_reports_dict[vd.slug] = {'title': vd.title, 'reports': []}
-    
-    for video_report in video_reports:
-        report_slug = get_quiz_slug(video_report['s3_name'])
-        if report_slug in vd_quiz_data_reports_dict:
-            vd_quiz_data_reports_dict[report_slug]['reports'].append(video_report)
-        
-    vd_quiz_data_reports_list = []
-    for vd in videos:
-        vd_quiz_data_reports_list.append(vd_quiz_data_reports_dict[vd.slug])
-        
+    # 4- Render to response
     return render_to_response('reports/main.html', {
         'common_page_data':request.common_page_data,
         'dashboard_reports': dashboard_reports,
         'course_quizzes_reports': course_quizzes_reports,
-        'vd_quiz_data_reports': vd_quiz_data_reports_list,
-        'ps_quiz_data_reports': ps_quiz_data_reports_list,
+        'class_rosters': class_rosters,
+        'ps_quiz_full_reports': ps_quiz_full_reports_list_of_dicts,
+        'ps_quiz_summ_reports': ps_quiz_summ_reports_list_of_dicts,
+        'vd_quiz_full_reports': vd_quiz_full_reports_list_of_dicts,
+        'vd_quiz_summ_reports': vd_quiz_summ_reports_list_of_dicts,
         'videos': videos.order_by('title'),
         'problemsets': problemsets.order_by('title'),
     }, context_instance=RequestContext(request))
+    
+    
+def ClassifyReportsBySlug(objs, reports):
+    reports_dict = {}
+    for obj in objs: reports_dict[obj.slug] = {'title': obj.title, 'reports': []}
+    
+    for report in reports:
+        slug = get_slug_from_report_name(report['s3_name'])
+        if slug in reports_dict:
+            reports_dict[slug]['reports'].append(report)
+        
+    reports_list_of_dicts = []
+    for obj in objs:
+        reports_list_of_dicts.append(reports_dict[obj.slug])
+        
+    return reports_list_of_dicts
+        
 
 #@auth_is_course_admin_view_wrapper
 def generate_report(request):
@@ -77,15 +85,29 @@ def generate_report(request):
         email_title = "[Class2Go] Course Quizzes Report for %s" % course_handle_pretty
         req_reports = [{'type': 'course_quizzes'}]
         
-    elif report_type == 'problemset':
+    elif report_type == 'problemset_full':
         slug = request.POST["slug"]
-        email_title = "[Class2Go] Problemset Report for %s %s" % (course_handle_pretty, slug)
-        req_reports = [{'type': 'problemset', 'slug': slug}]
+        email_title = "[Class2Go] Problemset Full Report for %s %s" % (course_handle_pretty, slug)
+        req_reports = [{'type': 'problemset_full', 'slug': slug}]
         
-    elif report_type == 'video':
+    elif report_type == 'problemset_summary':
         slug = request.POST["slug"]
-        email_title = "[Class2Go] Video Report for %s %s" % (course_handle_pretty, slug)
-        req_reports = [{'type': 'video', 'slug': slug}]
+        email_title = "[Class2Go] Problemset Summary Report for %s %s" % (course_handle_pretty, slug)
+        req_reports = [{'type': 'problemset_summary', 'slug': slug}]
+        
+    elif report_type == 'video_full':
+        slug = request.POST["slug"]
+        email_title = "[Class2Go] Video Full Report for %s %s" % (course_handle_pretty, slug)
+        req_reports = [{'type': 'video_full', 'slug': slug}]
+        
+    elif report_type == 'video_summary':
+        slug = request.POST["slug"]
+        email_title = "[Class2Go] Video Summary Report for %s %s" % (course_handle_pretty, slug)
+        req_reports = [{'type': 'video_summary', 'slug': slug}]
+        
+    elif report_type == 'class_roster':
+        email_title = "[Class2Go] Class Roster for %s" % (course_handle_pretty)
+        req_reports = [{'type': 'class_roster'}]
     
     email_message = "The report is attached. You can also download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
     
@@ -95,9 +117,9 @@ def generate_report(request):
 
 
 @auth_is_course_admin_view_wrapper  
-def download_report(request, course_prefix, course_suffix, report_type, report_name):
+def download_report(request, course_prefix, course_suffix, report_subfolder, report_name):
     #secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
-    report_path = "%s/%s/reports/%s/%s" % (course_prefix, course_suffix, report_type, report_name)
+    report_path = "%s/%s/reports/%s/%s" % (course_prefix, course_suffix, report_subfolder, report_name)
     
     try:
         report_file= secure_file_storage.open(report_path, 'rb')
@@ -106,7 +128,9 @@ def download_report(request, course_prefix, course_suffix, report_type, report_n
     
     report_content = report_file.read()
     
-    #mimetype_guess = mimetypes.guess_type(report_name)
+    if report_subfolder in ['problemsets_summary', 'videos_summary']:
+        report_name = report_name[:-4] + '_summary.csv'
+    
     response = HttpResponse(report_content, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=' + report_name
     response['Content-Length'] = str(len(report_content))
@@ -132,5 +156,5 @@ def get_report_date(rep_name):
     return {'year': rep_name[0:4], 'month': rep_name[6:8], 'day': rep_name[9:11], 'hour': rep_name[13:15], 'minute': rep_name[16:18], 'second': rep_name[19:21]}
 
     
-def get_quiz_slug(rep_name):
+def get_slug_from_report_name(rep_name):
     return rep_name[21:-4]

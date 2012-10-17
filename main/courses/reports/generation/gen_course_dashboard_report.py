@@ -27,9 +27,9 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
     rw.write(content = ["Students", num_stud, "Professors", num_prof, "TAs", num_tas, "Readonly TAs", num_rota], indent = 1, nl = 1)
     
     # Content
-    problem_sets = ProblemSet.objects.getByCourse(course=ready_course).order_by('-live_datetime')
-    videos = Video.objects.getByCourse(course=ready_course).order_by('-live_datetime')
-    additional_pages = AdditionalPage.objects.getSectionPagesByCourse(course=ready_course).order_by('-live_datetime')
+    problem_sets = ProblemSet.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
+    videos = Video.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
+    additional_pages = AdditionalPage.objects.getSectionPagesByCourse(course=ready_course).order_by('section__index', 'index')
     
     num_all_formative_problem_sets = ProblemSet.objects.getByCourse(course=ready_course.image).filter(assessment_type="formative").count()
     num_live_formative_problem_sets = problem_sets.filter(assessment_type="formative").count()

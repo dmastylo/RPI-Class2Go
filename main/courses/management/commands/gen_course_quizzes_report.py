@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from c2g.models import *
 from django.contrib.auth.models import User,Group
 from django.db import connection, transaction
-from courses.reports.generation.course_quizzes import *
+from courses.reports.generation.gen_quiz_summary_report import *
 
 class Command(BaseCommand):
     help = "Get quiz stats for the course. Syntax: manage.py gen_course_quizzes_report <course_handle> [save_to_s3 (1 or 0)]\n"
@@ -13,7 +13,7 @@ class Command(BaseCommand):
             
         try:
             course = Course.objects.get(handle= args[0], mode='ready')
-        except:
+        except Course.DoesNotExist:
             print "Failed to find course with given handle"
             return
         
