@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from c2g.models import *
 from django.contrib.auth.models import User,Group
 from django.db import connection, transaction
-from courses.reports.generation.course_dashboard import *
+from courses.reports.generation.gen_course_dashboard_report import *
 
 class Command(BaseCommand):
     help = "Get course dashboard stats.\nUsage: manage.py gen_course_dashboard_report course_handle [save_to_s3]\nIf save_to_s3 is 1, the file will be saved to s3. Otherwise, it will be output to console.\n"
@@ -13,7 +13,7 @@ class Command(BaseCommand):
             
         try:
             course = Course.objects.get(handle= args[0], mode='ready')
-        except:
+        except Course.DoesNotExist:
             print "Failed to find course with given handle"
             return
         
