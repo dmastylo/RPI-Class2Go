@@ -182,3 +182,7 @@ class Command(BaseCommand):
                 print "./manage.py resize small " + p.fixup_params()
             if p in missingLargeSet:
                 print "./manage.py resize large " + p.fixup_params()
+
+        for m in missingVideoSet:
+            print "# missing video file \"%s\" for %s " % (m.file, m.fixup_params())
+
