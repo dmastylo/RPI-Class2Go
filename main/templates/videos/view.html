@@ -1,23 +1,6 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% block title %} Stanford Online | {{ common_page_data.course.title }} | {{ video.title }}  {% endblock title %}
-{% block l_column_content %}
-<!-- <div id="c2g_layout_l_column" class="span3">
-    <div class="well tight">
-        <ul class="nav nav-list">
-            <li class="nav-header">Videos</li>
-            <li class="active"><a href="#">1.1 Course Intro</a></li>
-            <li><a href="#">1.2 History of Field</a></li>
-            <li><a href="#">1.3 Big Issues</a></li>
-            <li><a href="#">1.4 Another nav item</a></li>
-            <li><a href="#">1.5 Another nav item</a></li>
-            <li class="divider"></li>
-            <li><a href="#"><em class="icon-flag"></em>Help</a></li>
-            <li><a href="#"><em class="icon-envelope-alt"></em>Contact</a></li>
-        </ul>
-    </div>
-</div> -->
-{% endblock %}
 
 {% block m_column_content %}
 <link rel="stylesheet" href="{{STATIC_URL}}latestKhan/demo/css/quiz_iframe.css" />
@@ -104,66 +87,110 @@
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
-
+{% comment %}
+Sequence of events (no timeouts)
+0. Load thumbnail manifest and PS manifest, triggers
+1. Load YouTube Player API, triggers
+2. Load Problem Set definition, triggers
+3. Load Khan Exercises Framework, triggers
+4. Load YouTube Player and Sets up thumbnails,
+{% endcomment %}
 
 {% if video.title %} 
 <script>
 var c2gConfig = {
     user: {{user.id}},
     problemType: 'formative',
-    progressUrl: '/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos'
+    progressUrl: '/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos',
+    is_video: true,
 };
 </script>
-<script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script>
-<script src="{{ STATIC_URL }}js/thumbnails.js" /></script>
+<!-- <script src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js" /></script> -->
+<script src="{{ STATIC_URL }}js/thumbnails-10-12-12.js" /></script>
 <script>
-    var vidPSUrl = '{{video.id}}/load_video_problem_set';
-    $("#loadedExercises").load(vidPSUrl, function(text,status) {
-        if(status=="success"){
-            var kScript = document.createElement('script');
-            kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g.js";
-            document.getElementsByTagName("head")[0].appendChild(kScript);
-        }
-    });
-
     // [@wescott] Want to get valid thumbnails for other videos, since they might not have been
     // Kelvinated
-    var path="http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
+    var path = "http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
     var thumbManifest = {};
     var psManifest = {};
-    var loadThumbManifest = function (data, textStatus, jqXHR) { 
+    var thumbsChecked = false; //We'll use these fetched variables to gate the loading of the YouTube API.
+    var psChecked = false;     //to eliminate race conditions.
+    var loadThumbManifest = function (data, textStatus, jqXHR) {
         $.each(data, function (key, val) {
-            $.each(val, function (k, v) {
-                if (k == "imgsrc") {
-                    val[k] = path + v;
-                }
-            })
-            thumbManifest[parseInt(key)] = val; 
-        });
+               $.each(val, function (k, v) {
+                      if (k == "imgsrc") {
+                      val[k] = path + v;
+                      }
+                      })
+               thumbManifest[parseInt(key)] = val;
+               });
     };
-    var loadPSManifest = function (data, textStatus, jqXHR) { 
+    var loadPSManifest = function (data, textStatus, jqXHR) {
         $.each(data, function (key, val) {
-            $.each(val, function (k, v) {
-                if (k == "imgsrc") {
-                    val[k] = path + v;
-                }
-            })
-            psManifest[parseInt(key)] = val; 
-        });
+               $.each(val, function (k, v) {
+                      if (k == "imgsrc") {
+                      val[k] = path + v;
+                      }
+                      })
+               psManifest[parseInt(key)] = val;
+               });
     };
-    $.getJSON(path + "manifest.txt", "", loadThumbManifest);
-    $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest);
+    $.getJSON(path + "manifest.txt", "", loadThumbManifest)
+    .always(function(){thumbsChecked=true;});  //The request may fail if there are no thumbs, but we know we tried.
+    $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest)
+    .always(function(){psChecked=true;});  //The request may fail if there are no exercises, but we know we tried.
+    
+    
+    
+    // Fetch YouTube Player API as script node
+    var tag = document.createElement('script');
+    tag.src = "//www.youtube.com/player_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    
+    function gatedYouTubeAPILoad() {
+        if (thumbsChecked && psChecked) {
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        } else {
+            setTimeout(gatedYouTubeAPILoad, 200);
+        }
+    }
+    
+    gatedYouTubeAPILoad() // #1 loads YouTube API
+    
+    //Global settings for video player height and width
+    var vidPlayerHeight = 430;
+    var videoHeight = vidPlayerHeight - 30;
+    var vidPlayerWidth = 710;
+    var videoWidth = vidPlayerWidth;
+    var hRatio=1; //ratios for the screen size on which the overlay was made to that on which it will be displayed
+    var wRatio=1; //defaults to 1, calculated when the questions json object is loaded
 
+    var vidPSUrl = '{{video.id}}/load_video_problem_set';
     var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
-    var thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
-
-    $(document).ready(function () {
-        window.setTimeout(function () {
-            KhanC2G.initVideoExercises();
-            $('#playerdiv').show();
-        }, 2000);
-    });
-
+    var thumbSet;
+    
+    function onYouTubePlayerAPIReady() {
+        //#2 loads pset definition
+        $("#loadedExercises").load(vidPSUrl, function(text,status) {
+                                   if(status=="success"){
+                                       var kScript = document.createElement('script');
+                                       kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g-10-12-12.js";
+                                       //#3 loads Khan Exercises Framework
+                                       $(kScript).load(function() {
+                                            //Setup the video display
+                                            KhanC2G.initVideoExercises();
+                                            thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
+                                            thumbSet.getVidID();
+                                            //#4. Load Video Player and Displays Thumbnails
+                                            thumbSet.runQuiz();
+                                            $('#playerdiv').hide(); /* for Firefox */
+                                            $('#playerdiv').show();
+                                       });
+                                       document.getElementsByTagName("head")[0].appendChild(kScript);
+                                   }
+                                });
+    };
+    
     {% if video_rec %}
     window.onbeforeunload = function() {
         vidTime = Math.floor(player.getCurrentTime());
