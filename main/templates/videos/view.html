@@ -183,7 +183,8 @@ var c2gConfig = {
                                             thumbSet.getVidID();
                                             //#4. Load Video Player and Displays Thumbnails
                                             thumbSet.runQuiz();
-                                            
+                                            $('#playerdiv').hide(); /* for Firefox */
+                                            $('#playerdiv').show();
                                        });
                                        document.getElementsByTagName("head")[0].appendChild(kScript);
                                    }
