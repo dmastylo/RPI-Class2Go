@@ -50,25 +50,25 @@ class Command(BaseCommand):
             def __init__(self, prefix, suffix, video_id, slug=None, file=None):
                 self.prefix = prefix
                 self.suffix = suffix
-                self.video_id = video_id
+                self.video_id = str(video_id)
                 self.slug = slug
                 self.file = file
 
             def __eq__(self, other):
                 return self.prefix == other.prefix \
                     and self.suffix == other.suffix \
-                    and str(self.video_id) == str(other.video_id)
+                    and self.video_id == other.video_id
 
             def __lt__(self, other):
                 return self.prefix < other.prefix \
                     and self.suffix < other.suffix \
-                    and str(self.video_id) < str(self.video_id)
+                    and self.video_id < self.video_id
 
             def __hash__(self):
-                return hash((self.prefix, self.suffix, str(self.video_id)))
+                return hash((self.prefix, self.suffix, self.video_id))
 
             def __str__(self):
-                return "%s %s %s %s %s" % (self.prefix, self.suffix, str(self.video_id), self.slug, self.file)
+                return "%s %s %s %s %s" % (self.prefix, self.suffix, self.video_id, self.slug, self.file)
 
             def fixup_params(self):
                 return "%s %s %s" % (self.prefix, self.suffix, self.slug)
