@@ -4,12 +4,9 @@
 {% block mode_switcher %}
     {% if not common_page_data.is_course_admin and not common_page_data.can_switch_mode %}
         <div class="hidden-phone" style="position:absolute;top:0;right:0;">
-	  <form class="toggle-views" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
-            <p>View with:</p>
-            <div class="btn-group btn-views-toggle">
-              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
-              <button type="submit" name="to_mode" value="quizzes included" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'quizzes included' %} active{% endifequal %}">Quizzes included</button>
-            </div>
+	  <form style="width:auto" class="toggle-views" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
+            <p>View with quizzes included</p>
+	    <input type="checkbox" name="to_mode" value="quizzes included" onchange="this.form.submit();"{% ifequal request.session.video_quiz_mode 'quizzes included' %}checked{% endifequal %} />
             <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
             {% csrf_token %}
@@ -27,12 +24,9 @@
             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
             {% csrf_token %}
           </form>
-	  <form class="toggle-views pull-right" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
-            <p>View with:</p>
-            <div class="btn-group btn-views-toggle">
-              <button type="submit" name="to_mode" value="no quizzes" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'no quizzes' %} active{% endifequal %}">No quizzes</button>
-              <button type="submit" name="to_mode" value="quizzes included" class="btn btn-mini{% ifequal request.session.video_quiz_mode 'quizzes included' %} active{% endifequal %}">Quizzes included</button>
-            </div>
+	  <form style="width:auto" class="toggle-views pull-right" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
+            <p>View with quizzes included</p>
+	    <input type="checkbox" name="to_mode" value="quizzes included" onchange="this.form.submit();"{% ifequal request.session.video_quiz_mode 'quizzes included' %}checked{% endifequal %} />	    
             <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
             <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
             {% csrf_token %}
