@@ -177,7 +177,7 @@ class Command(BaseCommand):
         problems = sorted(missingThumbSet.union(missingSmallSet).union(missingLargeSet))
         for p in problems:
             if p in missingThumbSet:
-                print "./manage.py thumbnails " + p.fixup_params()
+                print "./manage.py kelvinate " + p.fixup_params()
             if p in missingSmallSet:
                 print "./manage.py resize small " + p.fixup_params()
             if p in missingLargeSet:
