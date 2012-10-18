@@ -50,7 +50,7 @@
                     <a href="{% url 'auth_logout' %}">Logout</a>
                 </li>
                 {% else %}
-                    <li class="visible-phone"><a id="login_button" data-toggle="modal" href="#login-modal">Login</a></li>
+                    <li class="visible-phone"><a id="login_button" data-toggle="modal" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Login</a></li>
                     <li class="visible-phone"><a href="{% url 'registration_register' %}">Register</a></li>
                 {% endif %}
                 {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
