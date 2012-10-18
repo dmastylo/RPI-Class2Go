@@ -97,8 +97,19 @@ def view(request, course_prefix, course_suffix, slug):
         #note student field to be renamed to user, VideoActivity for all users now
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
+        
+    videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=videos[cur_index].slug).order_by('video_time')
+    
+    num_ex = 0
+    for item in videoToExs:
+        num_ex = num_ex + 1
+    
+    if (num_ex > 0):
+        no_ex = 0
+    else:
+        no_ex = 1
 
-    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug}, context_instance=RequestContext(request))
+    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug, 'no_ex':no_ex}, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):

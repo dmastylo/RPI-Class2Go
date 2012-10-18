@@ -201,7 +201,7 @@ var c2gConfig = {
     var wRatio=1; //defaults to 1, calculated when the questions json object is loaded
 
     var vidPSUrl = '{{video.id}}/load_video_problem_set';
-    var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
+    var playerVars = { 'rel': 0, 'fs':{{ no_ex }}, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
     var thumbSet;
 
     {% ifequal request.session.video_quiz_mode 'quizzes included' %}
@@ -229,6 +229,7 @@ var c2gConfig = {
     {% else %}
     function onYouTubePlayerAPIReady() {
         var kScript = document.createElement('script');
+        playerVars['fs']=1;
         kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g-10-12-12.js";
         //#3 loads Khan Exercises Framework
         $(kScript).load(function() {
@@ -271,7 +272,7 @@ var c2gConfig = {
         height: '430',
         width: '710',
         videoId: '{{video.url}}',
-        playerVars: { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} },
+        playerVars: { 'rel': 0, 'fs':1 , 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %}},
         });
         $('#playerdiv').show();
     }
