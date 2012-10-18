@@ -98,13 +98,9 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
         
-    videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=videos[cur_index].slug).order_by('video_time')
+    videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video=video).order_by('video_time')
     
-    num_ex = 0
-    for item in videoToExs:
-        num_ex = num_ex + 1
-    
-    if (num_ex > 0):
+    if (len(videoToExs) > 0):
         no_ex = 0
     else:
         no_ex = 1
