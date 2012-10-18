@@ -201,7 +201,10 @@ var c2gConfig = {
     var wRatio=1; //defaults to 1, calculated when the questions json object is loaded
 
     var vidPSUrl = '{{video.id}}/load_video_problem_set';
-    var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
+    var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} , 
+    'fs': {% ifequal request.session.video_quiz_mode 'quizzes included' %}
+        {% if num_exercises != '0' %}0{% else %}1{% endif %}
+        {% else %}1{% endifequal %} };
     var thumbSet;
 
     {% ifequal request.session.video_quiz_mode 'quizzes included' %}
