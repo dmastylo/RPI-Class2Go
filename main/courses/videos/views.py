@@ -98,7 +98,6 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
         
-
     has_ex = VideoToExercise.objects.filter(is_deleted=False, video=video).exists()
 
     no_ex = 1 if (not has_ex) or request.session['video_quiz_mode'] != "quizzes included" else 0
