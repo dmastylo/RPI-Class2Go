@@ -5,7 +5,7 @@ class FileUploadForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         course = kwargs.pop('course')
         super(FileUploadForm, self).__init__(*args, **kwargs)
-        self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course), empty_label=None)
+        self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course, is_deleted=False), empty_label=None)
 
     class Meta:
         model = File

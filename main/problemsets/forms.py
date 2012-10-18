@@ -5,7 +5,7 @@ class CreateProblemSet(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         course = kwargs.pop('course')
         super(CreateProblemSet, self).__init__(*args, **kwargs)
-        self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course).order_by('index'), empty_label=None)
+        self.fields['section'] = forms.ModelChoiceField(ContentSection.objects.filter(course=course, is_deleted=False).order_by('index'), empty_label=None)
         self.fields['live_datetime'].required = False
 
     assessment_type = forms.TypedChoiceField(choices=(('formative', 'Formative'), ('assessive', 'Summative'), ('survey', 'Survey')), widget=forms.RadioSelect)

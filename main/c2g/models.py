@@ -1194,7 +1194,12 @@ class Exercise(TimestampMixin, Deletable, models.Model):
         split_parts = self.fileName.split('/')
         last_part = split_parts[-1]
         split_parts = last_part.split('.')
-        return split_parts[0]
+        if len(split_parts) == 0:
+            return "Untitled exercise"
+        elif len(split_parts) == 1:
+            return split_parts[0]
+        else:
+            return ".".join(split_parts[0:-1])
     
     class Meta:
         db_table = u'c2g_exercises'
