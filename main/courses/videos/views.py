@@ -79,7 +79,6 @@ def view(request, course_prefix, course_suffix, slug):
     #code safety
     next_slug = None
     prev_slug = None
-    num_exercises = 0
 
     if cur_index is not None:
         if cur_index > 0:
@@ -99,7 +98,7 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
 
-    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug,  'num_exercises': num_exercises}, context_instance=RequestContext(request))
+    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug}, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):
@@ -145,7 +144,6 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
         raise Http404
 
     videoToExs = VideoToExercise.objects.filter(video__course=common_page_data['course'], is_deleted=False, video__slug=video_slug).order_by('video_time')
- 
     used_exercises = []
     exercise_attempted = False
     if ProblemActivity.objects.filter(video_to_exercise__video=video.image).exists():
@@ -232,7 +230,6 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        num_exercises = num_exercises + 1
         video_time = 0
         videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=False, video_time=video_time, mode="draft")
         videoToEx.save()
