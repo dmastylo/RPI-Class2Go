@@ -1,6 +1,6 @@
 from c2g.models import *
 import datetime
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Q, F
 
 
 def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False):
@@ -22,6 +22,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     video_recs = VideoActivity.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user)
 
         if get_pset_content:
+            
             problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
             if problem_sets:
                 problem_set_list = []
@@ -31,6 +32,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
                 if common_page_data['course_mode'] == 'ready':
                     pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=common_page_data['request'].user).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
+                    pset_score_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__problemSet__resubmission_penalty', 'problemset_to_exercise__problemSet__partial_credit_deadline', 'problemset_to_exercise__problemSet__grace_period', 'problemset_to_exercise__problemSet__late_penalty', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter( Q(problemset_to_exercise__problemSet_id__in=problem_set_list), Q(student=common_page_data['request'].user), (Q(problemset_to_exercise__problemSet__submissions_permitted=0) & Q(problemset_to_exercise__problemSet__partial_credit_deadline__gt=F('time_created'))) | (Q(problemset_to_exercise__problemSet__submissions_permitted__gt=0) & Q(problemset_to_exercise__problemSet__submissions_permitted__gte=F('attempt_number')) & Q(problemset_to_exercise__problemSet__partial_credit_deadline__gt=F('time_created')))).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'), last_valid_attempt_time=Max('time_created'))
 
         index = 0
         for section in sections:
@@ -163,9 +165,26 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     elif pset_activity['problemset_to_exercise__problemSet__submissions_permitted'] != 0 and pset_activity['num_attempts'] >= pset_activity['problemset_to_exercise__problemSet__submissions_permitted']:
                                         numCompleted +=1
                                         
+                            
+                            score = 0.0
+                            for pset_score_activity in pset_score_activities:
+                                if pset_score_activity['problemset_to_exercise__problemSet_id'] == problem_set.id:
+                                    exercise_percent = 100                                
+                                    if pset_score_activity['correct'] == 0:
+                                        exercise_percent = 0
+                                    else:
+                                        exercise_percent -= pset_score_activity['problemset_to_exercise__problemSet__resubmission_penalty']*(pset_score_activity['num_attempts'] -1)
 
-               #             numCompleted = problem_set.get_progress(common_page_data['request'].user)
-                            score = problem_set.get_score(common_page_data['request'].user)
+                                        if pset_score_activity['last_valid_attempt_time'] > pset_score_activity['problemset_to_exercise__problemSet__grace_period']:
+                                            exercise_percent = int(exercise_percent*(100 - pset_score_activity['problemset_to_exercise__problemSet__late_penalty'])/100.0)
+                            
+                                    #floor exercise percent at 0
+                                    exercise_percent = max(exercise_percent,0)
+            
+                                    #add to total_score
+                                    score += exercise_percent/100.0
+                            
+                            old_score = problem_set.get_score(common_page_data['request'].user)
 
                             #Divide by zero safety check
                             if numQuestions == 0:
@@ -188,12 +207,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
     return section_structures
 
 #Test purposes only - not to be run in production
-def test_for_pset_progress():
+def test_for_pset_progress_and_score():
     
-    logfile = open('xxxx.log', 'w')
+    logfile = open('yyyy.log', 'w')
     
     #Get all courses
-    courses = Course.objects.filter(mode='ready')
+    courses = Course.objects.filter(mode='ready', id__gt=4)
     
     #Get all users
     users = User.objects.all()
@@ -219,6 +238,8 @@ def test_for_pset_progress():
                             if g.id == course.student_group_id:
                                 
                                 pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=user).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
+                                pset_score_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__problemSet__resubmission_penalty', 'problemset_to_exercise__problemSet__partial_credit_deadline', 'problemset_to_exercise__problemSet__grace_period', 'problemset_to_exercise__problemSet__late_penalty', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter( Q(problemset_to_exercise__problemSet_id__in=problem_set_list), Q(student=user), (Q(problemset_to_exercise__problemSet__submissions_permitted=0) & Q(problemset_to_exercise__problemSet__partial_credit_deadline__gt=F('time_created'))) | (Q(problemset_to_exercise__problemSet__submissions_permitted__gt=0) & Q(problemset_to_exercise__problemSet__submissions_permitted__gte=F('attempt_number')) & Q(problemset_to_exercise__problemSet__partial_credit_deadline__gt=F('time_created')))).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'), last_valid_attempt_time=Max('time_created'))
+                                
                             
                                 for section in sections:
                                     for problem_set in problem_sets:
@@ -241,8 +262,35 @@ def test_for_pset_progress():
                                             old_numCompleted = problem_set.get_progress(user)
                             
                                             if old_numCompleted != numCompleted:
-                                                logfile.write("****F : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_numCompleted) + " new : " + str(numCompleted) + "\n")
+                                                logfile.write("****FC : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_numCompleted) + " new : " + str(numCompleted) + "\n")
                                             else:
-                                                logfile.write("**P : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_numCompleted) + " new : " + str(numCompleted) + "\n")
+                                                logfile.write("**PC : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_numCompleted) + " new : " + str(numCompleted) + "\n")
+                                                
+                                            score = 0.0
+                                            for pset_score_activity in pset_score_activities:
+                                                
+                                                if pset_score_activity['problemset_to_exercise__problemSet_id'] == problem_set.id:
+                                                    exercise_percent = 100                        
+                                                    if pset_score_activity['correct'] == 0:
+                                                        exercise_percent = 0
+                                                    else:
+                                                        exercise_percent -= pset_score_activity['problemset_to_exercise__problemSet__resubmission_penalty']*(pset_score_activity['num_attempts'] - 1)
+                                                        if pset_score_activity['last_valid_attempt_time'] > pset_score_activity['problemset_to_exercise__problemSet__grace_period']:
+                                                            exercise_percent = int(exercise_percent*(100 - pset_score_activity['problemset_to_exercise__problemSet__late_penalty'])/100.0)
+                            
+                                                    #floor exercise percent at 0
+                                                    exercise_percent = max(exercise_percent,0)
+            
+                                                    #add to total_score
+                                                    score += exercise_percent/100.0
+                            
+                                            old_score = problem_set.get_score(user)
+                                                
+                                            if old_score != score:
+                                                logfile.write("****FS : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_score) + " new : " + str(score) + "\n")
+                                            else:
+                                                logfile.write("**PS : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_score) + " new : " + str(score) + "\n")
+                                                                                                
+                                                
                                             
     logfile.close()    
