@@ -44,35 +44,49 @@ prefix for these.
 
 1. Install XCode from the Apple App Store Version 4.5 or later
 
-2. Within XCode, add the command line tools: Preferences -> Download -> "Command Line Tools" -> Install button
+2. Within XCode, add the command line tools: Preferences -> Download -> 
+"Command Line Tools" -> Install button
 
 3. Install Homebrew:
 
+    ```
     /usr/bin/ruby -e "$(curl -fsSkL http://raw.github.com/mxcl/homebrew/go)"
+    ```
 
 4. Install Python (we are expecting 2.7.x):
 
+    ```
     brew install readline sqlite gdbm  
     brew install python --universal --framework  
+    ```
 
 5. Install mysql
 
+    ```
     brew install mysql  
+    ```
+
     (Optional but useful for looking at the database)  
     Install phpmyadmin (?!) following the directions here:  
     http://www.djangoapp.com/blog/2011/07/24/installing-phpmyadmin-on-mac-os-x-lion/
 
 6. Install pip, a python package manager
 
+    ```
     easy_install pip
+    ```
 
 7. Install python's virtual env
 
+    ```
     pip install virtualenv 
+    ```
 
 8. Create the sophi virtual env (if you want) 
 
+    ```
     virtualenv sophi-venv --no-site-packages    
+    ```
 
     This should create the sophi-venv directory under the
     directory where this README is found.  All our django stuff
@@ -88,29 +102,42 @@ prefix for these.
 
 10. Install django itself (this will be inside the virtualenv)
 
+    ```
     pip install django
+    ```
 
 11. Install MySQL-python (this will be inside the virtualenv)
 
+    ```
     pip install MySQL-python
+    ```
+
     (8/31 note - needed apt-get install python-mysqldb on ubuntu)
 
 12. Install python image library (this will be inside the virtualenv)
 
+    ```
     pip install PIL
+    ```
 
 13. Install South, the database schema migration tool: (this will be inside the virtualenv)
 
+    ```
     pip install South
+    ```
 
 14. Install modules for Amazon S3
 
+    ```
     pip install django_storages
     pip install boto
+    ```
  
 15. Install GData (2.0.17)
 
+    ```
     pip install gdata
+    ```
 
 16. Patch GData and storages
 
@@ -118,23 +145,30 @@ prefix for these.
 
 17. Install Celery ecosystem
 
+    ```
     pip install django-celery django-celery-email pytz
+    ```
 
 18. Setup the acocunt and database in MySql
 
+    ```
     create database class2go;  
     grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';  
     grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';  
+    ```
 
 19. Set up some folders for logs and the celery database. The sqlite3 folder can be anywhere that is writable.
 
+    ```
     mkdir /var/log/django/  
     chmod 777 /var/log/django/  
     mkdir /Users/account/sqlite3/  
+    ```
 
 20. In the main folder, make a copy of database_example.py to database.py 
 and edit the DATABASES strings as follows substituting proper values for your system.
 
+    ```
     DATABASES = {  
         'default': {  
             'ENGINE': 'django.db.backends.mysql',  
@@ -149,20 +183,25 @@ and edit the DATABASES strings as follows substituting proper values for your sy
             'NAME': '/Users/account/sqlite3/celerydb.sqlite',  
         },  
     }  
+    ```
 
 21. Setup initial db from the main folder
 
+    ```
     ./manage.py syncdb  
     ./manage.py migrate  
     ./manage.py syncdb --database=celery  
     ./manage.py migrate --database=celery  
+    ```
 
     At this point you should be able to look at the django database in
     your local mysql and see a bunch of c2g_* tables.  Yay.
 
 22. From the main folder, run server on whatever port you want:
 
+    ```
     python manage.py runserver 8100
+    ```
 
 23. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
 
