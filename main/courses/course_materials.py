@@ -1,36 +1,15 @@
 from c2g.models import *
 import datetime
-from django.db.models import Count, Max
+from django.db.models import Count
 
 
 def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
+        problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
         pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
         files = File.objects.getByCourse(course=common_page_data['course'])
-
-        if get_video_content:
-            videos = Video.objects.getByCourse(course=common_page_data['course'])
-            if videos:
-                video_list = []
-                for video in videos:
-                    video_list.append(video.id)
-                videoToExs = VideoToExercise.objects.values('video').filter(video__in=video_list, is_deleted=0).annotate(dcount=Count('video'))
-                    
-                if common_page_data['course_mode'] == 'ready':
-                    video_recs = VideoActivity.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user)
-
-        if get_pset_content:
-            problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
-            if problem_sets:
-                problem_set_list = []
-                for problem_set in problem_sets:
-                    problem_set_list.append(problem_set.id)
-                psetToExs = ProblemSetToExercise.objects.values('problemSet').filter(problemSet__in=problem_set_list, is_deleted=0).annotate(dcount=Count('problemSet'))
-
-                if common_page_data['course_mode'] == 'ready':
-                    pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=common_page_data['request'].user).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
 
         index = 0
         for section in sections:
@@ -85,6 +64,16 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_video_content:
+                videos = Video.objects.getByCourse(course=common_page_data['course'])
+                
+                if videos:
+                    video_list = []
+                    for video in videos:
+                        video_list.append(video.id)
+                    videoToExs = VideoToExercise.objects.values('video').filter(video__in=video_list, is_deleted=0).annotate(dcount=Count('video'))
+                    
+                    if common_page_data['course_mode'] == 'ready':
+                        video_recs = VideoActivity.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user)
                         
                 for video in videos:
                     if video.section_id == section.id:
@@ -126,16 +115,13 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_pset_content:
-
                 for problem_set in problem_sets:
+                    #if problem_set.section_id == section.id and (common_page_data['course_mode'] == 'draft' or (problem_set.live_datetime and problem_set.live_datetime < common_page_data['effective_current_datetime'])):
                     if problem_set.section_id == section.id:
                         item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
 
-                        numQuestions = 0
-                        for psetToEx in psetToExs:
-                            if psetToEx['problemSet'] == problem_set.id:
-                                numQuestions = psetToEx['dcount']
-                                break
+                        psetToExs = ProblemSetToExercise.objects.getByProblemset(problem_set)
+                        numQuestions = len(psetToExs)
                             
                         if common_page_data['course_mode'] == 'draft':
                             prod_problem_set = problem_set.image
@@ -155,16 +141,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             item['visible_status'] = visible_status
                         else:
 
-                            numCompleted = 0
-                            for pset_activity in pset_activities:
-                                if pset_activity['problemset_to_exercise__problemSet_id'] == problem_set.id:
-                                    if pset_activity['correct'] == 1:
-                                        numCompleted += 1
-                                    elif pset_activity['problemset_to_exercise__problemSet__submissions_permitted'] != 0 and pset_activity['num_attempts'] >= pset_activity['problemset_to_exercise__problemSet__submissions_permitted']:
-                                        numCompleted +=1
-                                        
-
-               #             numCompleted = problem_set.get_progress(common_page_data['request'].user)
+                            numCompleted = problem_set.get_progress(common_page_data['request'].user)
                             score = problem_set.get_score(common_page_data['request'].user)
 
                             #Divide by zero safety check
@@ -186,63 +163,3 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                 index += 1
 
     return section_structures
-
-#Test purposes only - not to be run in production
-def test_for_pset_progress():
-    
-    logfile = open('xxxx.log', 'w')
-    
-    #Get all courses
-    courses = Course.objects.filter(mode='ready')
-    
-    #Get all users
-    users = User.objects.all()
-    
-    for course in courses:
-        logfile.write("course_id : " + str(course.id) + "\n")
-        
-        #Get all problemsets
-        problem_sets = ProblemSet.objects.getByCourse(course=course)
-        
-        #Get all sections
-        sections = ContentSection.objects.getByCourse(course=course)
-
-        if problem_sets:
-                    problem_set_list = []
-                    for problem_set in problem_sets:
-                        problem_set_list.append(problem_set.id)                        
-                        psetToExs = ProblemSetToExercise.objects.values('problemSet').filter(problemSet__in=problem_set_list, is_deleted=0).annotate(dcount=Count('problemSet'))
-
-                    for user in users:
-                        user_groups = user.groups.all()
-                        for g in user_groups:
-                            if g.id == course.student_group_id:
-                                
-                                pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=user).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
-                            
-                                for section in sections:
-                                    for problem_set in problem_sets:
-                                        if problem_set.section_id == section.id:
-                                        
-                                            numQuestions = 0
-                                            for psetToEx in psetToExs:
-                                                if psetToEx['problemSet'] == problem_set.id:
-                                                    numQuestions = psetToEx['dcount']
-                                                    break
-                            
-                                            numCompleted = 0
-                                            for pset_activity in pset_activities:
-                                                if pset_activity['problemset_to_exercise__problemSet_id'] == problem_set.id:
-                                                    if pset_activity['correct'] == 1:
-                                                        numCompleted += 1
-                                                    elif pset_activity['problemset_to_exercise__problemSet__submissions_permitted'] != 0 and pset_activity['num_attempts'] >= pset_activity['problemset_to_exercise__problemSet__submissions_permitted']:
-                                                        numCompleted +=1
-                            
-                                            old_numCompleted = problem_set.get_progress(user)
-                            
-                                            if old_numCompleted != numCompleted:
-                                                logfile.write("****F : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_numCompleted) + " new : " + str(numCompleted) + "\n")
-                                            else:
-                                                logfile.write("**P : course_id : " + str(course.id) + " pset_id : " + str(problem_set.id) + " user_id : " + str(user.id) + " old : " + str(old_numCompleted) + " new : " + str(numCompleted) + "\n")
-                                            
-    logfile.close()    
