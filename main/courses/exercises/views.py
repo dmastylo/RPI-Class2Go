@@ -18,6 +18,13 @@ from django.core.urlresolvers import reverse
 
 from django.views.decorators.csrf import csrf_protect
 
+def show_new_ui(request):
+    return render_to_response('exercises/new-ui.html', RequestContext(request))
+
+def show_exam(request, course_prefix, course_suffix):
+    course = request.common_page_data['course']
+    return render_to_response('exercises/form.html', {'common_page_data':request.common_page_data}, RequestContext(request))
+
 def edit(request, course_prefix, course_suffix, filename):
     course = request.common_page_data['course']
     handle = course_prefix+'--'+course_suffix
