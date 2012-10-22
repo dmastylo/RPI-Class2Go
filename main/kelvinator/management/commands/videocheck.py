@@ -18,12 +18,13 @@ import kelvinator.tasks
 from c2g.models import Video
 
 class Command(BaseCommand):
-    help = """    Audit videos to see what commands need to be run to fix them out.
-    Looks out for missing thumbnails or smaller video files.  Does this
-    by comparing contents of database to what is in S3.  Note that this
-    doesn't do any *semantic* validation, just checks for presence of
-    files.  For example, doesn't tell if they are good thumbnails, or
-    even the right thumbnails, just that there are thumbnails.
+    help = """    Audit videos to see what commands need to be run to fix them
+    out.  Looks out for missing thumbnails or smaller video files.
+    Does this by comparing contents of database to what is in S3.
+    Note that this doesn't do any *semantic* validation, just checks
+    for presence of files.  For example, doesn't tell if they are
+    good thumbnails, or even the right thumbnails, just that there
+    are thumbnails.
 
     Output is a set of commands to be run to fix it up.
     """
@@ -48,11 +49,12 @@ class Command(BaseCommand):
             """
 
             def __init__(self, prefix, suffix, video_id, slug=None, file=None):
-                self.prefix = prefix
-                self.suffix = suffix
+                self.prefix = str(prefix)
+                self.suffix = str(suffix)
                 self.video_id = str(video_id)
-                self.slug = slug
-                self.file = file
+                self.slug = str(slug)
+                if file != None:
+                    self.file = str(file)
 
             def __eq__(self, other):
                 return self.prefix == other.prefix \
@@ -111,9 +113,20 @@ class Command(BaseCommand):
                nlp/Fall2012/videos/39/large/intro.m4v
                nlp/Fall2012/videos/39/jpegs/manifest.txt
             """
-            conn=boto.connect_s3(awsKey, awsSecret)
-            bucketConnnection=conn.get_bucket(awsBucket)
-            bucketContents=bucketConnnection.list(limitHandle)
+            store_contents=[]
+            if awsKey == "local" or awsSecret == "local":
+                media_root = getattr(settings, 'MEDIA_ROOT')
+                for (path, dirs, files) in os.walk(media_root):
+                    for f in files:
+                        p=os.path.join(path, f)
+                        if p.startswith(media_root + "/"):
+                            p = p[len(media_root)+1:]
+                        store_contents.append(p)
+            else:
+                conn=boto.connect_s3(awsKey, awsSecret)
+                bucket_conn=conn.get_bucket(awsBucket)
+                store_contents_s3=bucket_conn.list(limitHandle)
+                store_contents=map(lambda x: x.name, store_contents_s3)
 
             def filterStoragePaths(paths, regexp):
                 """
@@ -121,10 +134,9 @@ class Command(BaseCommand):
                 match sections: prefix, suffix, video_id, filename
                 """
                 foundSet=set([])
-                pathRegexp=re.compile(regexp)
-                for bucketPath in bucketContents:
-                    path = bucketPath.name
-                    match = pathRegexp.match(path)
+                path_regexp=re.compile(regexp)
+                for store_entry in store_contents:
+                    match = path_regexp.match(store_entry)
                     if match:
                         fv = FoundVideo(prefix=match.group(1), suffix=match.group(2),
                                 video_id=match.group(3), file=match.group(4))
@@ -132,13 +144,13 @@ class Command(BaseCommand):
                 return foundSet
 
             # remember that video regexp'es need to handle spaces in file names
-            foundVideos = filterStoragePaths(bucketContents, 
+            foundVideos = filterStoragePaths(store_contents, 
                     r"(\w*)/(\w*)/videos/(\w*)/([^/]+)$")
-            foundManifests = filterStoragePaths(bucketContents, 
+            foundManifests = filterStoragePaths(store_contents, 
                     r"(\w*)/(\w*)/videos/(\w*)/jpegs/(manifest.txt)$")   # dummy filename
-            foundSmalls = filterStoragePaths(bucketContents, 
+            foundSmalls = filterStoragePaths(store_contents, 
                     r"(\w*)/(\w*)/videos/(\w*)/small/([^/]+)$")
-            foundLarges = filterStoragePaths(bucketContents, 
+            foundLarges = filterStoragePaths(store_contents, 
                     r"(\w*)/(\w*)/videos/(\w*)/large/([^/]+)$")
 
             return (foundVideos, foundManifests, foundSmalls, foundLarges)

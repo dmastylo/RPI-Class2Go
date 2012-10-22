@@ -11,24 +11,34 @@ bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
 instance=getattr(settings, 'INSTANCE')
 
 class Command(BaseCommand):
-    help="Runs the Kelvinator on a video given its course info (prefix and suffix) and slug.\n" + \
-        "All parameters are case sensitive \n" + \
-        "\n" + \
-        "Usage: manage.py thumbnails [options] <prefix> <suffix> <video_slug>\n" + \
-        "    prefix         generally the short name, like \"nlp\"\n" + \
-        "    suffix         the term, like \"Fall2012\"\n" + \
-        "    video_slug     slug, like \"regexp\"\n" 
+    args="<prefix> <suffix> <slug>"
+    help="""    Extract thumbnail images for a video given its course info (prefix
+    and suffix) and slug.  All parameters are case sensitive.  Will
+    decide to run local or remote (queued) based on your AWS settings
+    in your database.py file, unless you override.
+
+    Arguments:
+        prefix     course short name, like "nlp"
+        suffix     the term, like "Fall2012"
+        slug       URL parameter for the video, like "lecture1"
+    """
 
     option_list = (
-        make_option("-l", "--local", dest="local", action="store_true",
-                    help="do kelvination remotely (default is remote)"),
+        make_option("-l", "--local", dest="force_local", action="store_true", default=False,
+                    help="Force run locally"),
+        make_option("-r", "--remote", dest="force_remote", action="store_true", default=False,
+                    help="Force run remote (queued)"),
         make_option("-f", "--frames", dest="target_frames", default=2, type="int",
                     help="Target number of thumbnails per minute (default=2)"),
+        make_option("-n", "--notify", dest="notify_addr",  
+                    help="Send mail to address when done"),
     ) + BaseCommand.option_list
         
     def handle(self, *args, **options):
         if len(args) != 3:
             raise CommandError("Wrong number of arguments, %d instead of 3" % len(args))
+        if options['force_local'] and options['force_remote']:
+            raise CommandError("Can't run both local and remote")
         arg_prefix=args[0]
         arg_suffix=args[1]
         handle=arg_prefix+"--"+arg_suffix
@@ -47,17 +57,19 @@ class Command(BaseCommand):
             print "Video slug \"%s\" doesn't have a file listed in S3 (name=\"default\")" % slug
             return
             
-        s3_path="https://s3-us-west-2.amazonaws.com/"+bucket+"/"+urllib.quote_plus(video.file.name,"/")
-
-        keyframes_per_minute = 2
-        if len(args) > 5:
-            keyframes_per_minute = args[5]
-        
-        if options['local']:
-            kelvinator.tasks.kelvinate(s3_path, keyframes_per_minute)
+        where = getattr(settings, 'AWS_ACCESS_KEY_ID', 'local')
+        if options['force_local']: 
+            where='local'
+        if options['force_remote']:
+            where='remote'
+        if where == 'local':
+            media_root = getattr(settings, 'MEDIA_ROOT')
+            local_path = media_root + "/" + video.file.name
+            kelvinator.tasks.kelvinate(local_path, options['target_frames'], options['notify_addr'])
             print "Kelvination complete"
         else:
-            kelvinator.tasks.kelvinate.delay(s3_path, keyframes_per_minute)
-            print "Kelvination queued (%s): %s" % (instance, s3_path)
+            store_path = bucket + "/" + urllib.quote_plus(video.file.name, "/")
+            kelvinator.tasks.kelvinate.delay(store_path, options['target_frames'], options['notify_addr'])
+            print "Kelvination queued (%s): %s" % (instance, store_path)
 
 

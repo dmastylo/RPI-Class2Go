@@ -1,4 +1,4 @@
-# Kelvinator
+#= Kelvinator
 #
 # Simple method of extracting key frames for a video.  
 #
@@ -8,11 +8,12 @@
 #
 
 import sys
-import os
+import os, socket
 import shutil
 import imp
 from django.core.files.storage import default_storage
 from django.conf import settings
+from django.core.mail import send_mail
 import urllib, urllib2, urlparse
 import subprocess
 import math
@@ -25,14 +26,23 @@ from celery import task
 
 logger = logging.getLogger(__name__)
     
-# from http://mail.python.org/pipermail/image-sig/1997-March/000223.html
-def computeDiff(file1, file2):
-    h1 = Image.open(file1).histogram()
-    h2 = Image.open(file2).histogram()
-    rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, h1, h2))/len(h1))
-    return rms
-    
-def dir_remove(path):
+
+##
+## HELPER FUNCTIONS
+##
+
+# relying on buf being a list (mutable) so it is passed by reference
+
+def infoLog(buf, l):
+    buf.append(l)
+    logger.info(l)
+
+def errorLog(buf, l):
+    buf.append("ERROR: %s" % l)
+    logger.error(l)
+
+
+def dirRemove(path):
     if os.path.isdir(path):
         shutil.rmtree(path, ignore_errors=True)
         if os.path.isdir(path):
@@ -44,105 +54,112 @@ class KelvinatorError(Exception):
      def __str__(self):
          return repr(self.value)
 
-@task()
-def kelvinate(s3_path_raw, input_frames_per_min='0'):
-    """
-    Given a path to a video in a readable S3 bucket, extract the frames and 
-    upload back to S3.
+##
+## MAIN FUNCTIONS
+##
 
-    s3_path must be the path to the video file, not just to its parent folder
+def create_working_dir(notify_buf):
     """
-    
-    extractionFrameRate = 1   # seconds
-    startOffset = 3           # seconds
-    
-    input_frames_per_min = float(input_frames_per_min)
+    Create local temp director where we will do our work.  If this fails, we log 
+    something but otherwise let the exception go since we want it to fail violently 
+    which will leave the job on the work queue.
+    """
 
-    # normalizes url by lowercasing path, dropping query parameters and fragments
-    o=urlparse.urlsplit(s3_path_raw)
-    s3_path=o.geturl()
-    
-    # Verify that all working folders on local storage are creatable _and_ created,
-    # that the video is the draft instance, and that the current video is not 
-    # already kelvinating
-    s3_path_parts = s3_path.split('/')
-    video_filename = s3_path_parts[-1]
-    video_id = s3_path_parts[-2]
-    course_suffix = s3_path_parts[-4]
-    course_prefix = s3_path_parts[-5]
-    
-    # Create working dir.  If this fails, we log something but otherwise let the 
-    # exception go since we want it to fail violently which will leave the job
-    # on the work queue.
     working_dir_parent = getattr(settings, "KELVINATOR_WORKING_DIR", "/tmp")
     try:
         working_dir=tempfile.mkdtemp(prefix="kelvinator-", dir=working_dir_parent,
-                suffix=os.getpid())
+                suffix="-" + str(os.getpid()))
     except:
-        logger.error("Kelvinator error when creating temp file in \"%s\"" % working_dir_parent)
+        errorLog(notify_buf, "Kelvinator error when creating temp file in \"%s\"" % working_dir_parent)
         raise
-    logger.info("Working directory: " + working_dir)
+    infoLog(notify_buf, "Working directory: " + working_dir)
 
     jpeg_dir = working_dir + "/jpegs"
-    os.mkdir(path)
-    if not os.path.isdir(path):
-        raise KelvinatorError("Unable to create dir: " % path)
-    
-    logger.info("Reading from S3: " + s3_path)
-    dl_handle = urllib2.urlopen(s3_path)
+    try:
+        os.mkdir(jpeg_dir)
+    except OSError:
+        raise KelvinatorError("cannot create \"%s\", potential collision" % jpeg_dir)
+    if not os.path.isdir(jpeg_dir):
+        raise KelvinatorError("Unable to create dir: " + jpeg_dir)
+
+    return (working_dir, jpeg_dir)
+
+
+def get_video(notify_buf, working_dir, video_filename, source_path):
+    infoLog(notify_buf, "Source file: " + source_path)
+    source_file = default_storage.open(source_path)
 
     video_file = working_dir + "/" + video_filename
-    logger.info("Writing to working (local) file: " + video_file)
-    videoFile = open(video_file, 'wb')
-    videoFile.write(dl_handle.read())
-    videoFile.close()
+    infoLog(notify_buf, "Writing to working (local) file: " + video_file)
+    working_file = open(video_file, 'wb')
+    working_file.write(source_file.read())
+    working_file.close()
+    source_file.close()
     
     # TODO: consider some retry logic here
     try:
         filesize = os.path.getsize(video_file)
-    except os.error as e:
-        logger.error("Unable to download video file from S3")
-        raise e
+    except os.error:
+        errorLog(notify_buf, "Unable to download video file")
+        cleanup_working_dir(notify_buf, working_dir)
+        raise 
 
     if filesize == 0:
+        cleanup_working_dir(notify_buf, working_dir)
         raise KelvinatorError("file size zero, video file did not download properly")
-    
-    logger.info("Kicking off ffmpeg, hold onto your hats")
+
+
+def extract(notify_buf, working_dir, jpeg_dir, video_file, start_offset, extraction_frame_rate):
+    infoLog(notify_buf, "Kicking off ffmpeg, hold onto your hats")
     returncode = subprocess.call(['ffmpeg', 
-        '-i', video_file,                   # input
-        '-ss', str(startOffset),            # start a few seconds late
-        '-r', str(extractionFrameRate),     # thumbs per second to extract
-        '-f', 'image2',                     # thumb format
-        jpeg_dir + '/img%5d.jpeg',          # thumb filename template
+        '-i', working_dir + "/" + video_file,  # input
+        '-ss', str(start_offset),              # start a few seconds late
+        '-r', str(extraction_frame_rate),      # thumbs per second to extract
+        '-f', 'image2',                        # thumb format
+        jpeg_dir + '/img%5d.jpeg',             # thumb filename template
         ])
 
-    logger.info("ffmpeg completed, returncode %d" % returncode)
-    if returncode != 0:
-        raise KelvinatorError
+    if returncode == 0:
+        infoLog(notify_buf, "ffmpeg completed, returncode %d" % returncode)
+    else:
+        errorLog(notify_buf, "ffmpeg completed, returncode %d" % returncode)
+        cleanup_working_dir(notify_buf, working_dir)
+        raise KelvinatorError("ffmpeg error %d" % returncode)
+
+
+def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_per_minute_target):
+    """
+    Sherif's method for figuring out what frames to keep from the candidate
+    set to reach the targeted number of slides.
+    """
+
+    # from http://mail.python.org/pipermail/image-sig/1997-March/000223.html
+    def computeDiff(file1, file2):
+        h1 = Image.open(file1).histogram()
+        h2 = Image.open(file2).histogram()
+        rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, h1, h2))/len(h1))
+        return rms
     
     image_list = os.listdir(jpeg_dir)
     if len(image_list) == 0:
+        cleanup_working_dir(notify_buf, working_dir)
         raise KelvinatorError("Failed to extract keyframes from video file")
         
     image_list.sort()
-    logger.info("Extraction frame rate: %d fps" % extractionFrameRate)
-    duration = len(image_list)/extractionFrameRate    # in seconds
-    logger.info("Video duration: %d seconds" % duration)
-    logger.info("Initial keyframes: %d" % len(image_list))
-    if input_frames_per_min <= 0:
-        logger.info("Target keyframes per minute = 2 (default)")
-        input_frames_per_min = 2
-    else:
-        logger.info("Target keyframes per minute = %d" % input_frames_per_min)
+    infoLog(notify_buf, "Extraction frame rate: %d fps" % extraction_frame_rate)
+    duration = len(image_list)/extraction_frame_rate    # in seconds
+    infoLog(notify_buf, "Video duration: %d seconds" % duration)
+    infoLog(notify_buf, "Initial keyframes: %d" % len(image_list))
+    infoLog(notify_buf, "Target keyframes per minute: %d" % frames_per_minute_target)
     
-    max_keyframes = int(math.ceil(input_frames_per_min * duration/60.0))
-    logger.info("Upper bound on number of keyframes kelvinator will output: %d" % max_keyframes)
-    logger.info("Internal differencing threshold: 1000")
+    max_keyframes = int(math.ceil(frames_per_minute_target * duration/60.0))
+    infoLog(notify_buf, "Upper bound on number of keyframes kelvinator will output: %d" % max_keyframes)
+    infoLog(notify_buf, "Internal differencing threshold: 1000")
 
     differences = [1000000000]
     differences_sorted = [1000000000]
     for i in range(len(image_list)-1):
-        diff = computeDiff(jpeg_dir+'/'+image_list[i], jpeg_dir+'/'+image_list[i+1])
+        diff = computeDiff(jpeg_dir+"/"+image_list[i], jpeg_dir+"/"+image_list[i+1])
         differences.append(diff)
         differences_sorted.append(diff)
     
@@ -161,65 +178,136 @@ def kelvinate(s3_path_raw, input_frames_per_min='0'):
         threshold = 1000
         term_reason = "Capped by internal threshold"
     
-    keepList = []
-    keepIndicies = []
-    deleteList = []
+    keep_frames = []
+    keep_times = []
     
     for i in range(len(image_list)-1):
         if differences[i] >= threshold:
-            keepList.append(image_list[i])
-            keepIndicies.append(i)
+            keep_frames.append(image_list[i])
+            keep_times.append(i)
         else:
-            os.remove(jpeg_dir+'/'+image_list[i])
+            os.remove(jpeg_dir+"/"+image_list[i])
 
-    logger.info("Keyframes selected: %d" % len(keepList))
-    logger.info("Termination reason: %s" % term_reason)
+    infoLog(notify_buf, "Keyframes selected: %d" % len(keep_frames))
+    infoLog(notify_buf, "Termination reason: %s" % term_reason)
     
-    os.remove(jpeg_dir+'/'+image_list[len(image_list)-1])
-    
-    # Write out manifest
+    os.remove(jpeg_dir+"/"+image_list[len(image_list)-1])
 
-    outfile = jpeg_dir + "/manifest.txt"
-    FILE = open(outfile, "w")
+    return (keep_frames, keep_times)
+
+
+def write_manifest(notify_buf, jpeg_dir, keep_frames, keep_times):
+    outfile_name = jpeg_dir + "/manifest.txt"
+    outfile = open(outfile_name, 'w')
     index = 0
-    FILE.write("{")
+    outfile.write("{")
 
-    while(index < len(keepList)):
-        FILE.write("\"")
-        toWrite = str(keepIndicies[index])
-        FILE.write(toWrite)
-        FILE.write("\":{\"imgsrc\":\"")
-        FILE.write(keepList[index])
-        FILE.write("\"}")
-        if index < len(keepList)-1:
-            FILE.write(",")
+    while(index < len(keep_frames)):
+        outfile.write("\"")
+        toWrite = str(keep_times[index])
+        outfile.write(toWrite)
+        outfile.write("\":{\"imgsrc\":\"")
+        outfile.write(keep_frames[index])
+        outfile.write("\"}")
+        if index < len(keep_frames)-1:
+            outfile.write(",")
         index += 1
-    FILE.write("}")
-    FILE.close()
+    outfile.write("}")
+    outfile.close()
 
-    # Upload manifest and jpegs to S3
-    
-    # first clear out prior thumbnails if there
-    # not doing write to tmp and then mv because django's file storage API 
-    # doesn't support rename/mv
-    s3_path = course_prefix + "/" + course_suffix + "/videos/" + str(video_id) + "/jpegs"
-    if default_storage.exists(s3_path):
-        default_storage.delete(s3_path)
-    
+
+def put_thumbs(notify_buf, jpeg_dir, prefix, suffix, video_id, store_path, store_loc):
+    # I wish Filesystem API worked the same for local and remote, but it don't
+    if store_loc == 'local':
+        root = getattr(settings, 'MEDIA_ROOT')
+        store_path = root + "/" + prefix + "/" + suffix + "/videos/" + str(video_id) + "/jpegs"
+        if default_storage.exists(store_path):
+                dirRemove(store_path) 
+        os.mkdir(store_path)
+    else:
+        store_path = prefix + "/" + suffix + "/videos/" + str(video_id) + "/jpegs"
+        default_storage.delete(store_path)
+
+    # not doing write to tmp and then mv because the file storage API limitation
     image_list = os.listdir(jpeg_dir)
     image_list.sort()
     for fname in image_list:
         local_file = open(jpeg_dir + "/" + fname, 'rb')
-        s3_file = default_storage.open(s3_path + "/" + fname, 'wb')
+        store_file = default_storage.open(store_path + "/" + fname, 'wb')
         file_data = local_file.read();
-        s3_file.write(file_data)
+        store_file.write(file_data)
         local_file.close()
-        s3_file.close()
+        store_file.close()
+
+
+def cleanup_working_dir(notify_buf, working_dir):
+    infoLog(notify_buf, "Cleaning up working dir: " + working_dir)
+    dirRemove(working_dir)
+
+
+def notify(notify_buf, notify_addr, prefix, suffix, filename, store_path):
+    if notify_addr is None: return
+
+    subject = "Kelvinator result: %s %s %s" % (prefix, suffix, filename)
+
+    body =  "course: %s %s\n" % (prefix, suffix)
+    body += "video file: %s\n" % store_path
+    body += "machine: %s\n" % socket.gethostname()
+    body += "\n"
+    body += "-------- LOG --------\n"
+    body += "\n"
+    body += "\n".join(notify_buf)
+
+    send_mail(subject, body, "noreply@class.stanford.edu", [ notify_addr, ])
+
+
+
+##
+## CELERY TASK
+##
+
+@task()
+def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
+    """
+    Given a path to a video in a readable S3 bucket, extract the frames and 
+    upload back to S3.
+
+    store_path must be the full path to the video file, not just to its parent folder.
+    """
+
+    notify_buf = []
+
+    extraction_frame_rate = 1   # seconds
+    start_offset = 3            # seconds
     
-    # Cleanup
+    frames_per_minute_target = float(frames_per_minute_target)
 
-    logger.info("Cleaning up working dir: " + working_dir)
-    dir_remove(working_dir)
+    # normalizes url by lowercasing path, dropping query parameters and fragments
+    store_path = urlparse.urlsplit(store_path_raw).geturl()
+    
+    store_path_parts = store_path.split("/")
+    course_prefix = store_path_parts[-5]
+    course_suffix = store_path_parts[-4]
+    video_id = store_path_parts[-2]
+    video_filename = store_path_parts[-1]
 
-    return
+    storage = "remote"
+    if getattr(settings, 'AWS_ACCESS_KEY_ID') == "local":
+        storage = "local"
+
+    work_dir = None
+    try:
+        (work_dir, jpegs) = create_working_dir(notify_buf)
+        get_video(notify_buf, work_dir, video_filename, store_path)
+        extract(notify_buf, work_dir, jpegs, video_filename, start_offset, extraction_frame_rate)
+        (thumbs, times) = difference(notify_buf, work_dir, jpegs, extraction_frame_rate, frames_per_minute_target)
+        write_manifest(notify_buf, jpegs, thumbs, times)
+        put_thumbs(notify_buf, jpegs, course_prefix, course_suffix, video_id, store_path, storage)
+    except:
+        if work_dir: cleanup_working_dir(notify_buf, work_dir)
+        notify(notify_buf, notify_addr, course_prefix, course_suffix, video_filename, store_path)
+        raise
+
+    cleanup_working_dir(notify_buf, work_dir)
+    notify(notify_buf, notify_addr, course_prefix, course_suffix, video_filename, store_path)
 
