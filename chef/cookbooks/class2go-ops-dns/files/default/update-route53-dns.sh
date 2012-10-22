@@ -13,9 +13,11 @@ fi
 export AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY
 
-# Use command line scripts to get instance ID and public hostname
-INSTANCE_ID=$(ec2metadata | grep 'instance-id:' | cut -d ' ' -f 2)
-PUBLIC_HOSTNAME=`hostname`
+# Use command line scripts to get hostname and public hostname
+HOSTNAME_FULL=`hostname`
+HOSTNAME_PART=${HOSTNAME_FULL%%.$ZONE}
+PUBLIC_HOSTNAME=$(ec2metadata | grep 'public-hostname:' | cut -d ' ' -f 2)
 
 # Create a new CNAME record on Route 53, replacing the old entry if nessesary
-cli53 rrcreate "$ZONE" "$INSTANCE_ID" CNAME "$PUBLIC_HOSTNAME" --replace --ttl "$TTL"
+cli53 rrcreate "$ZONE" "$HOSTNAME_PART" CNAME "$PUBLIC_HOSTNAME" --replace --ttl "$TTL"
+

@@ -9,6 +9,7 @@ easy_install_package "dnspython" do
 end
 
 easy_install_package "cli53" do
+    source "https://github.com/barnybug/cli53/tarball/master" 
     action :install
 end
 
