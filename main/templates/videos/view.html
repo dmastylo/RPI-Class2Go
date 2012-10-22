@@ -1,6 +1,39 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% block title %} Stanford Online | {{ common_page_data.course.title }} | {{ video.title }}  {% endblock title %}
+{% block mode_switcher %}
+    {% if not common_page_data.is_course_admin and not common_page_data.can_switch_mode %}
+        <div class="hidden-phone" style="position:absolute;top:0;right:0;">
+	  <form style="width:auto" class="toggle-views" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
+            <p>View with quizzes included</p>
+	    <input type="checkbox" name="to_mode" value="quizzes included" onchange="this.form.submit();"{% ifequal request.session.video_quiz_mode 'quizzes included' %}checked{% endifequal %} />
+            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+            {% csrf_token %}
+          </form>
+        </div>
+    {% else %}
+	<div class="hidden-phone" style="position:absolute;top:0;right:0;">
+          <form data-c2g-tooltip class="toggle-views pull-right" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST" data-placement="left" title="Choosing EDIT mode lets you edit the course site. Choosing LIVE mode lets you view the site as students will.">
+            <p>You are currently viewing:</p>
+            <div class="btn-group btn-views-toggle">
+              <button type="submit" name="to_mode" value="draft" class="btn btn-mini{% ifequal common_page_data.course_mode 'draft' %} active{% endifequal %}">Edit</button>
+              <button type="submit" name="to_mode" value="ready" class="btn btn-mini{% ifequal common_page_data.course_mode 'ready' %} active{% endifequal %}">Live</button>
+            </div>
+            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+            {% csrf_token %}
+          </form>
+	  <form style="width:auto" class="toggle-views pull-right" name="video_quiz_mode_switch_form" action="{%url 'courses.videos.actions.switch_quiz_mode' %}" method="POST">
+            <p>View with quizzes included</p>
+	    <input type="checkbox" name="to_mode" value="quizzes included" onchange="this.form.submit();"{% ifequal request.session.video_quiz_mode 'quizzes included' %}checked{% endifequal %} />	    
+            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+            {% csrf_token %}
+          </form>
+	</div>
+    {% endif %}
+{% endblock mode_switcher %}
 
 {% block m_column_content %}
 <link rel="stylesheet" href="{{STATIC_URL}}latestKhan/demo/css/quiz_iframe.css" />
@@ -137,10 +170,12 @@ var c2gConfig = {
     };
     $.getJSON(path + "manifest.txt", "", loadThumbManifest)
     .always(function(){thumbsChecked=true;});  //The request may fail if there are no thumbs, but we know we tried.
+    {% ifequal request.session.video_quiz_mode 'quizzes included' %}
     $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest)
     .always(function(){psChecked=true;});  //The request may fail if there are no exercises, but we know we tried.
-    
-    
+    {% else %}
+    psChecked = true;
+    {% endifequal %}    
     
     // Fetch YouTube Player API as script node
     var tag = document.createElement('script');
@@ -166,9 +201,10 @@ var c2gConfig = {
     var wRatio=1; //defaults to 1, calculated when the questions json object is loaded
 
     var vidPSUrl = '{{video.id}}/load_video_problem_set';
-    var playerVars = { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
+    var playerVars = { 'rel': 0, 'fs':{{ no_ex }}, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} };
     var thumbSet;
-    
+
+    {% ifequal request.session.video_quiz_mode 'quizzes included' %}
     function onYouTubePlayerAPIReady() {
         //#2 loads pset definition
         $("#loadedExercises").load(vidPSUrl, function(text,status) {
@@ -190,7 +226,26 @@ var c2gConfig = {
                                    }
                                 });
     };
-    
+    {% else %}
+    function onYouTubePlayerAPIReady() {
+        var kScript = document.createElement('script');
+        kScript.src="{{ STATIC_URL }}latestKhan/khan-exercise-c2g-10-12-12.js";
+        //#3 loads Khan Exercises Framework
+        $(kScript).load(function() {
+            //Setup the video display
+            KhanC2G.initVideoExercises();
+            thumbSet = initThumbnails('{{ video.url }}', thumbManifest, psManifest, playerVars);
+            thumbSet.getVidID();
+            //#4. Load Video Player and Displays Thumbnails
+            thumbSet.runQuiz();
+            $('#playerdiv').hide(); /* for Firefox */
+            $('#playerdiv').show();
+        });
+        document.getElementsByTagName("head")[0].appendChild(kScript);
+    };
+    {% endifequal %}
+
+
     {% if video_rec %}
     window.onbeforeunload = function() {
         vidTime = Math.floor(player.getCurrentTime());
@@ -216,7 +271,7 @@ var c2gConfig = {
         height: '430',
         width: '710',
         videoId: '{{video.url}}',
-        playerVars: { 'rel': 0, 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %} },
+        playerVars: { 'rel': 0, 'fs':1 , 'start': {% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %}},
         });
         $('#playerdiv').show();
     }

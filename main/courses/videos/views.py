@@ -64,6 +64,10 @@ def view(request, course_prefix, course_suffix, slug):
         )
         visit_log.save()
 
+    if not 'video_quiz_mode' in request.session:
+        #Default to include quizzes in viewing videos
+        request.session['video_quiz_mode'] = "quizzes included"
+
     videos = Video.objects.getByCourse(course=common_page_data['course'])
     #Get index of current video
     cur_index = None #just code safety
@@ -93,8 +97,11 @@ def view(request, course_prefix, course_suffix, slug):
         #note student field to be renamed to user, VideoActivity for all users now
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
+        
+    has_ex = VideoToExercise.objects.filter(is_deleted=False, video=video).exists()
 
-    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug}, context_instance=RequestContext(request))
+    no_ex = 1 if (not has_ex) or request.session['video_quiz_mode'] != "quizzes included" else 0
+    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug, 'no_ex':no_ex}, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):
