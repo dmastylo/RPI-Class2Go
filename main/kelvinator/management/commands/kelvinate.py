@@ -69,5 +69,6 @@ class Command(BaseCommand):
             print "Kelvination complete"
         else:
             kelvinator.tasks.kelvinate.delay(video.file.name, options['target_frames'], options['notify_addr'])
-            print "Kelvination queued (%s): %s" % (instance, store_path)
+            print "Kelvination queued (%s): %s" % (instance, video.file.name)
+
 
