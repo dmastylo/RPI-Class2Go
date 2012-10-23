@@ -8,9 +8,11 @@ easy_install_package "dnspython" do
     action :install
 end
 
-easy_install_package "cli53" do
-    source "https://github.com/barnybug/cli53/tarball/master" 
-    action :install
+execute "cli53" do
+    user "root"
+    creates "/opt/bitnami/python/bin/cli53"
+    command "easy_install https://github.com/barnybug/cli53/tarball/master" 
+    action :run
 end
 
 directory "/etc/route53" do
@@ -39,5 +41,10 @@ cookbook_file "/etc/init/update-route53-dns.conf" do
     group "root"
     mode 00644
     action :create
+end
+
+execute "start update-route53-dns" do
+    user "root"
+    action :run
 end
 
