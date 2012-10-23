@@ -50,7 +50,7 @@ class TimestampMixin(models.Model):
 
 class Stageable(models.Model):
     mode = models.TextField(blank=True)
-    image = models.ForeignKey('self', null=True, related_name="+")
+    image = models.ForeignKey('self', null=True, blank=True, related_name="+")  #Adding blank = True to allow these to be created in admin interface
     live_datetime = models.DateTimeField(editable=True, null=True, blank=True)
     
     def is_live(self):
@@ -1342,3 +1342,11 @@ class PageVisitLog(TimestampMixin, models.Model):
     
     class Meta:
         db_table = u'c2g_page_visit_log'
+
+class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    html_content = models.TextField(blank=True)
+    slug = models.SlugField("URL Identifier", max_length=255, null=True)
+    def __unicode__(self):
+        return self.title

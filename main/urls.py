@@ -29,7 +29,7 @@ urlpatterns = patterns('',
                        
     # testing new exercise ui
     url(r'^new-ui$', 'courses.exercises.views.show_new_ui'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exam$', 'courses.exercises.views.show_exam'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exam/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exercises.views.show_exam'),
     
     #emailoptout
     url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),

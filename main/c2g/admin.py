@@ -17,6 +17,7 @@ admin.site.register(File)
 admin.site.register(ProblemSetToExercise)
 admin.site.register(Exercise)
 admin.site.register(VideoToExercise)
+admin.site.register(Exam)
 
 
 class ProfileAdmin(admin.ModelAdmin):
