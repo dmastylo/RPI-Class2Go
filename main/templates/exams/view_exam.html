@@ -14,6 +14,9 @@
 
 {% else %}
 
+    <noscript>
+    <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
+    </noscript>
     {{ exam.html_content }}
 
 {% endif %}
