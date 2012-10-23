@@ -219,10 +219,8 @@ def upload(request):
             new_video.create_ready_instance()
             #print new_video.file.url
 
-            # TODO: don't hardcode the AWS location 
-            s3_path="https://s3-us-west-2.amazonaws.com/"+common_page_data['aws_storage_bucket_name']+"/"+urllib.quote_plus(new_video.file.name,"/")
-            
-            kelvinator.tasks.kelvinate.delay(s3_path, 2)
+            # kick off remote jobs
+            kelvinator.tasks.kelvinate.delay(new_video.file.name)
 
             if new_video.url:
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)

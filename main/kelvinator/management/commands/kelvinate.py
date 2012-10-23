@@ -68,8 +68,6 @@ class Command(BaseCommand):
             kelvinator.tasks.kelvinate(local_path, options['target_frames'], options['notify_addr'])
             print "Kelvination complete"
         else:
-            store_path = bucket + "/" + urllib.quote_plus(video.file.name, "/")
-            kelvinator.tasks.kelvinate.delay(store_path, options['target_frames'], options['notify_addr'])
+            kelvinator.tasks.kelvinate.delay(video.file.name, options['target_frames'], options['notify_addr'])
             print "Kelvination queued (%s): %s" % (instance, store_path)
-
 
