@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Script adapted from useful HOWTO posted up here:
 # http://cantina.co/2012/01/25/automated-dns-for-aws-instances-using-route-53/
