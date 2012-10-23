@@ -520,7 +520,7 @@ def test_for_pset_progress_and_score():
                                                         score += exercise_percent/100.0
                             
                                                     else:
-                                                        print logfile.write("Bad data\n")
+                                                        logfile.write("Bad data\n")
                                                         score = problem_set.get_score(user)
                                                         break
                             
