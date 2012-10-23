@@ -254,7 +254,7 @@ Steps:
 
 5. In database.py, append ‘mysql’ to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user ‘root’ and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
 
-6. Make sure you’re in the src/class2go/django-project directory (wherever that is for you)
+6. Make sure you’re in the src/class2go/main directory (wherever that is for you)
 
 7. ‘python manage.py syncdb’ followed by ‘python manage.py migrate’ to create the required database tables and make sure the schema is up to date.
 You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
@@ -375,9 +375,9 @@ be installed for Mac (and probably Windows too)
     pip install django_storages
     pip install boto
 
-22. Go to django-project dir and copy over database settings file:
+22. Go to "main" dir and copy over database settings file:
 
-    cd django-project/
+    cd main
     cp database_example.py database.py
 
 23. Edit file and add db name, username and password:
