@@ -31,6 +31,19 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam}, RequestContext(request))
 
+def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
+    course = request.common_page_data['course']
+    
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    my_subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user).order_by('time_created'))
+
+    return render_to_response('exams/view_my_submissions.html', {'common_page_data':request.common_page_data, 'exam':exam, 'my_subs':my_subs},
+                              RequestContext(request) )
+
 @require_POST
 @auth_view_wrapper
 def collect_data(request, course_prefix, course_suffix, exam_slug):
