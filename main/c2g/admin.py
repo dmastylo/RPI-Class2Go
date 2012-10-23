@@ -19,7 +19,6 @@ admin.site.register(Exercise)
 admin.site.register(VideoToExercise)
 admin.site.register(Exam)
 
-
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'gender', 'birth_year', 'education', 'work', 'client_ip_first', 'user_agent_first', 'referrer_first', 'accept_language_first')
 
@@ -27,6 +26,12 @@ class GroupProxy(Group):
     class Meta:
         proxy = True
 
+class ExamRecordAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__','time_created','mode')
+    fields=['json_data']
+    
+    def mode(self, obj):
+        return obj.course.mode
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'count')
@@ -35,3 +40,4 @@ class GroupAdmin(admin.ModelAdmin):
 
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(GroupProxy, GroupAdmin)
+admin.site.register(ExamRecord, ExamRecordAdmin)

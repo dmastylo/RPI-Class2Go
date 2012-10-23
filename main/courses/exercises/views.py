@@ -4,7 +4,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam
+from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response
 from django.template import Context, loader
@@ -21,15 +21,8 @@ from django.views.decorators.csrf import csrf_protect
 def show_new_ui(request):
     return render_to_response('exercises/new-ui.html', RequestContext(request))
 
-def show_exam(request, course_prefix, course_suffix, exam_slug):
-    course = request.common_page_data['course']
-
-    try:
-        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
-    except Exam.DoesNotExist:
-        raise Http404
     
-    return render_to_response('exercises/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam}, RequestContext(request))
+
 
 def edit(request, course_prefix, course_suffix, filename):
     course = request.common_page_data['course']

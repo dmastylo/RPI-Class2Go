@@ -1,10 +1,27 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+
 {% block m_column_content %}
 {% autoescape off %}
-{{ exam.html_content }}
+
+{% if common_page_data.course.mode == "ready" and not exam.is_live %}
+
+    This exam will go live on {{ exam.live_datetime }} PDT.
+
+{% elif common_page_data.course.mode == "ready" and exam.past_due %}
+
+    This exam was closed on {{ exam.due_date }} PDT.
+
+{% else %}
+
+    {{ exam.html_content }}
+
+{% endif %}
+
 {% endautoescape %}
 {% endblock m_column_content %}
+
+
 {% block addl_scripts %}
 <script>
     $(document).ready(function () {
@@ -43,6 +60,11 @@
                                                                     }
                                                                     });
                                                     console.log(JSON.stringify(userSelections));
+                                                    $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
+                                                           {csrfmiddlewaretoken: "{{ csrf_token }}",
+                                                           json_data:JSON.stringify(userSelections)
+                                                           }
+                                                           )
                                                     });
                       
                       });

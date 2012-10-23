@@ -1348,5 +1348,24 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     html_content = models.TextField(blank=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    grace_period = models.DateTimeField(null=True, blank=True)
+    
+    def past_due(self):
+        if self.due_date and (datetime.now() > self.due_date):
+            return True
+        return False
+    
     def __unicode__(self):
         return self.title
+
+
+class ExamRecord(TimestampMixin, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    json_data = models.TextField(null=True, blank=True)
+    score = models.IntegerField(null=True, blank=True)
+
+    def __unicode__(self):
+        return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
