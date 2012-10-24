@@ -7,17 +7,25 @@ import subprocess
 from celery import task
 from utility import *
 
+# video sizes we support: key is size name (used for target subdirectory) and value
+# are the parameters (as a list) that we'll pass to ffmpeg.
+sizes = { "large":  [ "-crf", "23", "-s", "1280x720" ],   # original size, compressed
+          "medium": [ "-crf", "27", "-s", "wvga" ],       # wvga = 852x480 at 16:9
+          "small":  [ "-crf", "30", "-s", "320x180" ],    # 320p at 16:9
+          "tiny":   [ "-crf", "40", "-s", "320x180" ],
+        }
 
-def scaledown(notify_buf, working_dir, target_dir, video_file, options):
+common_ffmpeg_options = [ "-c:v", "libx264",             # video codec
+                          "-profile:v", "baseline",      # most compatible
+                          "-c:a", "libfaac",             # audio codec
+                        ]
+
+def scaledown(notify_buf, working_dir, target_dir, video_file, target_size):
     infoLog(notify_buf, "Kicking off ffmpeg, hold onto your hats")
-    cmdline = [ "ffmpeg", 
-                "-i", working_dir + "/" + video_file,  # input
-                "-c:v", "libx264",
-                "-profile:v", "baseline" \
-              ] \
-                + options + \
-              [ "-c:a", "libfaac", 
-                target_dir + "/" + video_file ]
+    cmdline = [ "ffmpeg", "-i", working_dir + "/" + video_file, ] \
+                + common_ffmpeg_options  \
+                + sizes[target_size] \
+                + [ target_dir + "/" + video_file ]
     returncode = subprocess.call(cmdline);
 
     if returncode == 0:
@@ -59,8 +67,8 @@ def resize(store_path_raw, target_raw, notify_addr=None):
     notify_buf = []
 
     target = target_raw.lower()
-    if target != "small" and target != "large":
-        VideoError("Target size must either be \"large\" or \"small\", got \"%s\"" % target)
+    if target not in sizes.keys():
+        VideoError("Target size \"%s\" not supported" % target)
 
     (store_path, course_prefix, course_suffix, video_id, video_file) = splitpath(store_path_raw)
 
@@ -72,11 +80,7 @@ def resize(store_path_raw, target_raw, notify_addr=None):
     try:
         (work_dir, smaller_dir) = create_working_dirs("resize", notify_buf, target)
         get_video(notify_buf, work_dir, video_file, store_path)
-        if target == "large":
-            options = [ "-crf", "23" ]
-        else:
-            options = [ "-b:v", "50k", "-s", "cga" ]    # cga = 320x200
-        scaledown(notify_buf, work_dir, smaller_dir, video_file, options)
+        scaledown(notify_buf, work_dir, smaller_dir, video_file, target)
         upload(notify_buf, smaller_dir, target, course_prefix, course_suffix, video_id, video_file, store_loc)
 
     except:
