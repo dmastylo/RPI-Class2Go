@@ -1,10 +1,12 @@
-# For more info, see: http://ffmpeg.org/trac/ffmpeg/wiki/x264EncodingGuide
+# For more info, see: 
+# - http://ffmpeg.org/trac/ffmpeg/wiki/x264EncodingGuide
+# size abbreviations: 
+# - http://linuxers.org/tutorial/how-extract-images-video-using-ffmpeg
 
 import subprocess
 from celery import task
 from utility import *
 
-# ffmpeg -i INPUTFILENAME -c:v libx264 -profile:v baseline -crf 23 -c:a libfaac OUTPUTFILENAME
 
 def scaledown(notify_buf, working_dir, target_dir, video_file, options):
     infoLog(notify_buf, "Kicking off ffmpeg, hold onto your hats")
@@ -71,9 +73,9 @@ def resize(store_path_raw, target_raw, notify_addr=None):
         (work_dir, smaller_dir) = create_working_dirs("resize", notify_buf, target)
         get_video(notify_buf, work_dir, video_file, store_path)
         if target == "large":
-            options = [ "-b:v", "100k" ]
+            options = [ "-crf", "23" ]
         else:
-            options = [ "-b:v", "100k", "-s", "wvga" ]
+            options = [ "-b:v", "50k", "-s", "cga" ]    # cga = 320x200
         scaledown(notify_buf, work_dir, smaller_dir, video_file, options)
         upload(notify_buf, smaller_dir, target, course_prefix, course_suffix, video_id, video_file, store_loc)
 
