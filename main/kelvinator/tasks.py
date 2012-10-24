@@ -30,13 +30,15 @@ from utility import *
 
 def extract(notify_buf, working_dir, jpeg_dir, video_file, start_offset, extraction_frame_rate):
     infoLog(notify_buf, "Kicking off ffmpeg, hold onto your hats")
-    returncode = subprocess.call(['ffmpeg', 
+    cmdline= [ 'ffmpeg', 
         '-i', working_dir + "/" + video_file,  # input
         '-ss', str(start_offset),              # start a few seconds late
         '-r', str(extraction_frame_rate),      # thumbs per second to extract
         '-f', 'image2',                        # thumb format
         jpeg_dir + '/img%5d.jpeg',             # thumb filename template
         ])
+    infoLog(notify_buf, " ".join(cmdline))
+    returncode = subprocess.call(cmdline)
 
     if returncode == 0:
         infoLog(notify_buf, "ffmpeg completed, returncode %d" % returncode)
@@ -172,6 +174,8 @@ def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
 
     notify_buf = []
 
+    infoLog(notify_buf, "Kelvinate: extracting %s" % store_path_raw)
+
     extraction_frame_rate = 1   # seconds
     start_offset = 3            # seconds
     
@@ -226,7 +230,8 @@ def scaledown(notify_buf, working_dir, target_dir, video_file, target_size):
                 + common_ffmpeg_options  \
                 + sizes[target_size] \
                 + [ target_dir + "/" + video_file ]
-    returncode = subprocess.call(cmdline);
+    infoLog(notify_buf, " ".join(cmdline))
+    returncode = subprocess.call(cmdline)
 
     if returncode == 0:
         infoLog(notify_buf, "ffmpeg completed, returncode %d" % returncode)
@@ -267,6 +272,7 @@ def resize(store_path_raw, target_raw, notify_addr=None):
     """
 
     notify_buf = []
+    infoLog(notify_buf, "Resize: converting %s version of %s" % (target_raw, store_path_raw))
 
     target = target_raw.lower()
     if target not in sizes.keys():
@@ -277,6 +283,7 @@ def resize(store_path_raw, target_raw, notify_addr=None):
     store_loc = 'remote'
     if getattr(settings, 'AWS_ACCESS_KEY_ID') == 'local':
         store_loc = 'local'
+
 
     work_dir = None
     try:
