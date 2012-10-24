@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
