@@ -2,6 +2,11 @@ file "/etc/hostname" do
   content node.name+".c2gops.com"
 end
 
+execute "start hostname" do
+    user "root"
+    action :run
+end
+
 template "/home/ubuntu/.bash_aliases" do
     source "bash_aliases.erb"
     owner "ubuntu"

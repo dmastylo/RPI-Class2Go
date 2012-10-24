@@ -34,6 +34,12 @@ default_attributes \
         "celery_timeout" => "7200",
         "celery_concurrency" => "8"
     },
+    "dns_editor" => {
+        "access_key" => "xxxxxxxxxxxxxxxxxxxx",
+        "access_secret" => "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+        "zone" => "c2gops.com",
+        "ttl" => 300
+    },
     "piazza" => {
         "endpoint" => "https://piazza.com/basic_lti",
         "key" => "hhhhhhhhhhhh",

@@ -50,7 +50,7 @@ class TimestampMixin(models.Model):
 
 class Stageable(models.Model):
     mode = models.TextField(blank=True)
-    image = models.ForeignKey('self', null=True, related_name="+")
+    image = models.ForeignKey('self', null=True, blank=True, related_name="+")  #Adding blank = True to allow these to be created in admin interface
     live_datetime = models.DateTimeField(editable=True, null=True, blank=True)
     
     def is_live(self):
@@ -1342,3 +1342,31 @@ class PageVisitLog(TimestampMixin, models.Model):
     
     class Meta:
         db_table = u'c2g_page_visit_log'
+
+class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    html_content = models.TextField(blank=True)
+    slug = models.SlugField("URL Identifier", max_length=255, null=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    grace_period = models.DateTimeField(null=True, blank=True)
+    
+    def past_due(self):
+        if self.due_date and (datetime.now() > self.due_date):
+            return True
+        return False
+    
+    def __unicode__(self):
+        return self.title
+
+
+class ExamRecord(TimestampMixin, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    json_data = models.TextField(null=True, blank=True)
+    score = models.IntegerField(null=True, blank=True)
+
+    def __unicode__(self):
+        return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
