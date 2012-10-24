@@ -11,7 +11,7 @@ end
 # cli53 -- command line util to manage settings, just a wrapper around boto.
 # instead of being dependendent on this guy's repo, just copy and distribute
 # the utility straight from here. see: https://github.com/barnybug/cli53
-cookbook_file "/usr/locao/bin/cli53" do
+cookbook_file "/usr/local/bin/cli53" do
     owner "root"
     group "root"
     mode 00755
