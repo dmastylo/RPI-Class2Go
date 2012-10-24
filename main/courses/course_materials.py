@@ -36,6 +36,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=common_page_data['request'].user).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
                     
                     cursor = connection.cursor()
+                    #The following 2 sqls are the same except the first is for a list of 2 or more and the second is for
+                    # a single item. I was not able to construct the argument for a single value without it putting quotes 
+                    # around the strings.
                     if len(problem_set_list) > 1:
                         cursor.execute("select e.fileName, p2e.problemSet_id, \
                                         count(case when p2e.is_deleted = 0 then 1 else null end) as `num_active` \
@@ -68,6 +71,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     #This was close but not quite; couldn't include the case statement for resiliance to bad activity data.
                     #pset_score_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__problemSet__resubmission_penalty', 'problemset_to_exercise__problemSet__partial_credit_deadline', 'problemset_to_exercise__problemSet__grace_period', 'problemset_to_exercise__problemSet__late_penalty', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter( Q(problemset_to_exercise__problemSet_id__in=problem_set_list), Q(student=common_page_data['request'].user), (Q(problemset_to_exercise__problemSet__submissions_permitted=0) & Q(problemset_to_exercise__problemSet__partial_credit_deadline__gt=F('time_created'))) | (Q(problemset_to_exercise__problemSet__submissions_permitted__gt=0) & Q(problemset_to_exercise__problemSet__submissions_permitted__gte=F('attempt_number')) & Q(problemset_to_exercise__problemSet__partial_credit_deadline__gt=F('time_created')))).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'), last_valid_attempt_time=Max('time_created'))
                     
+                    #The following 2 sqls are the same except the first is for a list of 2 or more and the second is for
+                    # a single item. I was not able to construct the argument for a single value without it putting quotes 
+                    # around the strings.                    
                     if len(problem_set_list) > 1:
                         cursor.execute("SELECT `c2g_problemset_to_exercise`.`problemSet_id`, `c2g_problem_sets`.`submissions_permitted`, `c2g_problem_sets`.`resubmission_penalty`, `c2g_problem_sets`.`partial_credit_deadline`,  \
                                         `c2g_problem_sets`.`grace_period`, `c2g_problem_sets`.`late_penalty`, `c2g_exercises`.`fileName`, \
