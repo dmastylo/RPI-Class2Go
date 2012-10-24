@@ -36,7 +36,7 @@ def extract(notify_buf, working_dir, jpeg_dir, video_file, start_offset, extract
         '-r', str(extraction_frame_rate),      # thumbs per second to extract
         '-f', 'image2',                        # thumb format
         jpeg_dir + '/img%5d.jpeg',             # thumb filename template
-        ])
+        ]
     infoLog(notify_buf, " ".join(cmdline))
     returncode = subprocess.call(cmdline)
 
