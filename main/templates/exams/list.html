@@ -8,6 +8,7 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% if user.is_authenticated %}
+    <ul>
     {% for exam in exams %}
     
     <li class="course-list-item">
@@ -17,6 +18,7 @@
         <div class="course-list-content">
             <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
             <p>{{exam.description}}</p>
+            <a href="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">My Submissions</a>
             <p><strong>Deadline:</strong> {{exam.due_date}} PST<br>
         </div>
     </li>
@@ -27,6 +29,7 @@
     {% empty %}
     <p style='margin: 20px;'>No content to display.</p>
     {% endfor %}
+    </ul>
     {% else %}
     <h4>Please <a data-toggle="modal" href="{% url 'auth_login' %}">log in</a> to see course materials.</h4>
     {% endif %}
