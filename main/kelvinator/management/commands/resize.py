@@ -4,7 +4,7 @@ from c2g.models import Video
 from django.db import connection, transaction
 from django.conf import settings
 from optparse import make_option
-import kelvinator.resize 
+import kelvinator.tasks 
 
 bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
 instance=getattr(settings, 'INSTANCE')
@@ -62,10 +62,10 @@ class Command(BaseCommand):
         if where == 'local':
             media_root = getattr(settings, 'MEDIA_ROOT')
             local_path = media_root + "/" + video.file.name
-            kelvinator.resize.resize(local_path, target, options['notify_addr'])
+            kelvinator.tasks.resize(local_path, target, options['notify_addr'])
             print "Resize complete: %s" % video.file.name
         else:
-            kelvinator.resize.resize.delay(video.file.name, target, options['notify_addr'])
+            kelvinator.tasks.resize.delay(video.file.name, target, options['notify_addr'])
             print "Resize queued (%s): %s" % (instance, video.file.name)
 
 

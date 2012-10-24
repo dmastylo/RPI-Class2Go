@@ -21,7 +21,6 @@ import re
 import settings
 
 import kelvinator.tasks
-import kelvinator.resize
 
 from datetime import datetime
 from courses.actions import auth_is_course_admin_view_wrapper
@@ -222,8 +221,8 @@ def upload(request):
 
             # kick off remote jobs
             kelvinator.tasks.kelvinate.delay(new_video.file.name)
-            kelvinator.resize.resize.delay(new_video.file.name, 'small')
-            kelvinator.resize.resize.delay(new_video.file.name, 'large')
+            kelvinator.tasks.resize.delay(new_video.file.name, "large")
+            kelvinator.tasks.resize.delay(new_video.file.name, "small")
 
             if new_video.url:
                 return redirect('courses.videos.views.list', course_prefix, course_suffix)
