@@ -18,8 +18,8 @@
 <div id="c2g_layout_l_column" class="span3">
     <div id="left-nav" class="well tight nav" role="navigation" aria-labelledby="sidebar-nav-heading-0">
         {% for content_section in contentsection_list %}
-        <h3 id="sidebar-nav-heading-{{ forloop.counter0 }}" class="nav-header expanded" data-toggle="collapse" data-target="#sidebar-nav-{{ forloop.counter0 }}">{{content_section.title}}</h3>
-            <ul class="nav nav-list collapse in" id="sidebar-nav-{{ forloop.counter0 }}">
+        <h3 id="sidebar-nav-heading-{{ forloop.counter0 }}" class="nav-header collapsed" data-toggle="collapse" data-target="#sidebar-nav-{{ forloop.counter0 }}">{{content_section.title}}</h3>
+            <ul class="nav nav-list collapse" id="sidebar-nav-{{ forloop.counter0 }}">
       		    {% for list_item in full_index_list %}
       		        {% for item in list_item %}
                     {% ifequal content_section.id item.3 %}
