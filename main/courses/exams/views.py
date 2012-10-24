@@ -57,7 +57,7 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user).order_by('time_created'))
+    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).order_by('-time_created'))
 
     my_subs = map(lambda s: {'time_created':s.time_created, 'json_obj':json.loads(s.json_data)}, subs)
 

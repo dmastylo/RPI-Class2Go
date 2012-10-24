@@ -5,6 +5,12 @@
 
 {% block m_column_content %}
 {% for sub in my_subs %}
+{% if forloop.first %}
+<div class="well well-small">
+<h3>Graded submission:</h3>
+{% else %}
+<div class="muted">
+{% endif %}
 <p>
 <h4>{{sub.time_created}} :</h4>
     {% for prob, data in sub.json_obj.iteritems %}
@@ -19,6 +25,8 @@ On question {{prob}}, you answered:
     <br />
     {% endfor %}
 </p>
+</div>
+
 {% endfor %}
 
 <a class="btn" href="{% url 'courses.exams.views.listAll' common_page_data.course.prefix common_page_data.course.suffix %}">Back to exams</a>
