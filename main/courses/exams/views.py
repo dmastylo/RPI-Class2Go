@@ -1,6 +1,7 @@
 # Create your views here.
 import sys
 import traceback
+import json
 import logging
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,23 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_protect
 
 
+@auth_view_wrapper
+def listAll(request, course_prefix, course_suffix):
+    
+    course = request.common_page_data['course']
+    exams = list(Exam.objects.filter(course=course, is_deleted=0))
+
+    if course.mode=="live":
+        exams = filter(lambda item: item.is_live(), exams)
+
+    return render_to_response('exams/list.html',
+                              {'common_page_data':request.common_page_data,
+                               'course':course,
+                              'exams':exams},
+                              RequestContext(request))
 
 # Create your views here.
+@auth_view_wrapper
 def show_exam(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
     
@@ -31,6 +47,8 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam}, RequestContext(request))
 
+
+@auth_view_wrapper
 def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
     
@@ -39,10 +57,13 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    my_subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user).order_by('time_created'))
+    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user).order_by('time_created'))
+
+    my_subs = map(lambda s: {'time_created':s.time_created, 'json_obj':json.loads(s.json_data)}, subs)
 
     return render_to_response('exams/view_my_submissions.html', {'common_page_data':request.common_page_data, 'exam':exam, 'my_subs':my_subs},
                               RequestContext(request) )
+
 
 @require_POST
 @auth_view_wrapper

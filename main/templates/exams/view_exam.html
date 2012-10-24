@@ -2,6 +2,9 @@
 {% load url from future %}
 
 {% block m_column_content %}
+<div class="alert alert-error" id="nojswarn">
+You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
+</div>
 {% autoescape off %}
 
 {% if common_page_data.course.mode == "ready" and not exam.is_live %}
@@ -25,6 +28,8 @@
 {% block addl_scripts %}
 <script>
     $(document).ready(function () {
+                      
+                      $('#nojswarn').remove();
                       
                       var allFieldsets = $('fieldset');
                       
