@@ -11,7 +11,7 @@ from utility import *
 # are the parameters (as a list) that we'll pass to ffmpeg.
 sizes = { "large":  [ "-crf", "23", "-s", "1280x720" ],   # original size, compressed
           "medium": [ "-crf", "27", "-s", "wvga" ],       # wvga = 852x480 at 16:9
-          "small":  [ "-crf", "30", "-s", "320x180" ],    # 320p at 16:9
+          "small":  [ "-crf", "30", "-s", "640x360" ],    
           "tiny":   [ "-crf", "40", "-s", "320x180" ],
         }
 
