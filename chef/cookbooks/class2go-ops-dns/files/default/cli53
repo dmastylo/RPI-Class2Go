@@ -2,6 +2,12 @@
 
 # cli53
 # Command line script to administer the Amazon Route 53 dns service
+#
+# This script written by Barnaby Gray.  Included here wholesale just to make it
+# a bit easier for us to install.  But all credit/blame for this should go to 
+# him (https://github.com/barnybug).
+#
+# Project Repo: https://github.com/barnybug/cli53
 
 import os, sys
 import re
