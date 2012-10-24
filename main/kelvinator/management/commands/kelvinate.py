@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError % video.file.name
+from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import MultipleObjectsReturned
 from c2g.models import Video
 from django.db import connection, transaction
