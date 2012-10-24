@@ -63,33 +63,35 @@
             }
         });
 
-        //console.log(JSON.stringify(userSelections));
-
         var examXHR = $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                {csrfmiddlewaretoken: "{{ csrf_token }}",
                    json_data:JSON.stringify(userSelections)
                }
         );
 
-        examXHR.success(function (evt, xhr, settings) {
-            switch (settings.status) {
-                case 200:
-                    alert("Awesome");
-                    break;
-                case 500:
-                    alert("Not so awesome");
-                    break;
-                default:
-                    break;
+        function getDialog() {
+            var dialogDiv = $('#dialog-message');
+            if (dialogDiv.length == 0) {
+                dialogDiv = document.createElement('div');
+                $(dialogDiv).attr('id', 'dialog-message');
+                $(dialogDiv).append('<p></p>');
+                $(document).append($(dialogDiv));
             }
+            return dialogDiv;
+        }
 
+        examXHR.success(function (evt, xhr, settings) {
+            var dialogDiv = getDialog();
+            $(dialogDiv).find('p').text(settings.responseText)
+            $(dialogDiv).dialog({modal: true});
         });
 
         examXHR.error(function(xhr, status, msg) {
-            if (status == 'error') {
-                alert(msg);
-            }
+            var dialogDiv = getDialog();
+            $(dialogDiv).find('p').text(msg);
+            $(dialogDiv).dialog({modal: true});
         });
+
     });
                       
     });
