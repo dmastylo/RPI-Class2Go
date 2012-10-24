@@ -25,8 +25,6 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
         if get_pset_content:
             
-            test_for_pset_progress_and_score()
-            
             problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
             if problem_sets:
                 problem_set_list = []
