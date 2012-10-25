@@ -2,6 +2,7 @@
 import sys
 import traceback
 import json
+import operator
 import logging
 logger = logging.getLogger(__name__)
 
@@ -59,10 +60,11 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
 
     subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).order_by('-time_created'))
 
-    my_subs = map(lambda s: {'time_created':s.time_created, 'json_obj':json.loads(s.json_data)}, subs)
+    my_subs = map(lambda s: {'time_created':s.time_created, 'json_obj':sorted(json.loads(s.json_data).iteritems(), key=operator.itemgetter(0))}, subs)
 
     return render_to_response('exams/view_my_submissions.html', {'common_page_data':request.common_page_data, 'exam':exam, 'my_subs':my_subs},
                               RequestContext(request) )
+
 
 
 @require_POST
