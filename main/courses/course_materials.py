@@ -320,7 +320,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             item['score'] = score
                             item['progress'] = progress
 
-                            item['numQuestions'] = numQuestions
+                        item['numQuestions'] = numQuestions
                         section_dict['items'].append(item)
 
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
