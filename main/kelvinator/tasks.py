@@ -225,10 +225,10 @@ sizes['darwin'] = \
         }
 
 sizes['linux2'] = \
-        { "large":  [ "--crf", "23", "--vf", "1280,720" ],
-          "medium": [ "--crf", "27", "--vf", "852,480" ],
-          "small":  [ "--crf", "30", "--vf", "640,360" ],    
-          "tiny":   [ "--crf", "40", "--vf", "320,180" ],
+        { "large":  [ "--crf", "23", "--vf", "resize:1280,720" ],
+          "medium": [ "--crf", "27", "--vf", "resize:852,480" ],
+          "small":  [ "--crf", "30", "--vf", "resize:640,360" ],    
+          "tiny":   [ "--crf", "40", "--vf", "resize:320,180" ],
         }
 
 
@@ -247,9 +247,9 @@ def change_muxer(notify_buf, working_dir, target_dir, video_file, target_size):
 
     elif platform == "linux2":
         cmdline += [ "ffmpeg" ]
-        cmdline += [ "-i", working_dir + "/" + video_file ]  # infile
+        cmdline += [ "-i", working_dir+"/"+video_file ]  # infile
         cmdline += [ "-vcodec", "copy", "-acodec", "copy" ]
-        cmdlien += [ working_dir, "/", new_video_file ]      # outfile
+        cmdline += [ working_dir+"/"+new_video_file ]      # outfile
     else:
         VideoError("Platform not supported, got \"%s\" expected darwin or linux2")
 
