@@ -39,6 +39,63 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     var allFieldsets = $('fieldset');
                       
+    /*
+    var testDataObj = {};
+    testDataObj.q12c = [];
+    testDataObj.q12c[0] = {'value':'b'};
+    testDataObj.q15d = [];
+    testDataObj.q15d[0] = {'value':'c'};
+    testDataObj.q15d[1] = {'value':'d'};
+    testDataObj.q15e = 'goodbye';
+    window.testData = JSON.stringify(testDataObj);
+    */
+
+    window.repopulateForm = function (jsonStr) {
+        // first wipe all inputs
+        $('input[type|="text"]').val('');
+        //$('textarea').text('');
+        $('input[type|="checkbox"]').removeAttr('checked');
+        $('input[type|="radio"]').removeAttr('checked');
+
+        // just wiped all data 
+        if (!jsonStr) {
+            return;
+        }
+
+        // all keys will be form input names as strings
+        var dataObj = JSON.parse(jsonStr);
+
+        // iterate through named form inputs
+        for (member in dataObj) {
+            
+            if (typeof dataObj[member] == "string") {
+                // it's a text input/textarea
+                $('input[name|=' + member + ']').val(dataObj[member]);
+            } else {
+                // it's multiple choice, therefore an array
+                $('input[name|=' + member + ']').removeAttr('checked');
+
+                // loop through each choice listed for this input
+                for (var i = 0; i < dataObj[member].length; i += 1) {
+                    var obj = dataObj[member][i];
+
+                    for (key in obj) {
+
+                        if (key == 'value') {
+                            console.log(key + ' is what we want');
+                        } else {
+                            console.log(key + ' is not a real value');
+                        }
+
+                        $('#' + member + '_' + obj[key]).attr('checked', 'checked');
+                    }
+
+                }
+            } 
+
+        }
+    };
+
     allFieldsets.each(function() {
         if (!$(this).attr('no-shuffle')) {
             var tmpChoices = $(this).find('label');
@@ -71,12 +128,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
         });
 
+        window.myData = JSON.stringify(userSelections);
+
         var examXHR = $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                {csrfmiddlewaretoken: "{{ csrf_token }}",
                    json_data:JSON.stringify(userSelections)
                }
         );
-
         function getDialog() {
             var dialogDiv = $('#dialog-message');
             if (dialogDiv.length == 0) {
