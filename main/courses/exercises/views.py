@@ -4,8 +4,8 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise
-from django.http import HttpResponse, HttpResponseBadRequest
+from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
@@ -17,6 +17,12 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 
 from django.views.decorators.csrf import csrf_protect
+
+def show_new_ui(request):
+    return render_to_response('exercises/new-ui.html', RequestContext(request))
+
+    
+
 
 def edit(request, course_prefix, course_suffix, filename):
     course = request.common_page_data['course']

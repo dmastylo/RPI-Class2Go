@@ -24,3 +24,7 @@ package "ffmpeg" do
     action :install
 end
 
+package "x264" do
+    action :install
+end
+
