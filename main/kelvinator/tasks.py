@@ -239,8 +239,8 @@ def change_muxer(notify_buf, working_dir, target_dir, video_file, target_size):
     platform = sys.platform
     cmdline = []
 
-    video_stem = video_file.split(".")[0:-1]
-    new_video_file = video_stem + ".mp4"
+    video_stem_list = video_file.split(".")[0:-1]
+    new_video_file = "".join(video_stem_list) + ".mp4"
 
     if platform == "darwin":
         return video_file
