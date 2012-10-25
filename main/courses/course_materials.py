@@ -249,6 +249,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                 break                            
                             
                         if common_page_data['course_mode'] == 'draft':
+                            print "in draft mode"
                             prod_problem_set = problem_set.image
                             if not prod_problem_set.live_datetime:
                                 visible_status = "<span style='color:#A00000;'>Not Live</span>"
@@ -262,7 +263,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
                                 else:
                                     visible_status = "<span style='color:green;'>Live</span>"
-
+                            print "visible status : " + str(visible_status)
                             item['visible_status'] = visible_status
                         else:
                                         
@@ -322,7 +323,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             item['progress'] = progress
 
                             item['numQuestions'] = numQuestions
-                            section_dict['items'].append(item)
+                        section_dict['items'].append(item)
 
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
                 section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index'])
