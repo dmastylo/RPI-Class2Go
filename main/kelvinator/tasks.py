@@ -1,12 +1,15 @@
-#= Kelvinator
+# Video handling utilities.
 #
-# Simple method of extracting key frames for a video.  
+# Two things in this file
+# 1. Kelvinator - simple method of extracting key frames for a video.  
+# 2. Resize - simple transcoder to create smaller versions of videos.
 #
-# Requirements
-# 1. ffmpeg (and in system path)
-# 2. Pything Imaging: PIL, or Image
+# Requirements:
+# 1. ffmpeg 
+# 2. x264 for transcoding
+# 3. Python Imaging: PIL, or Image
 #
-# For more info, see: 
+# For more info on transcoding, see: 
 # - http://ffmpeg.org/trac/ffmpeg/wiki/x264EncodingGuide
 # size abbreviations: 
 # - http://linuxers.org/tutorial/how-extract-images-video-using-ffmpeg
@@ -37,7 +40,7 @@ def extract(notify_buf, working_dir, jpeg_dir, video_file, start_offset, extract
         '-f', 'image2',                        # thumb format
         jpeg_dir + '/img%5d.jpeg',             # thumb filename template
         ]
-    infoLog(notify_buf, " ".join(cmdline))
+    infoLog(notify_buf, "EXTRACT: " + " ".join(cmdline))
     returncode = subprocess.call(cmdline)
 
     if returncode == 0:
@@ -213,32 +216,88 @@ def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
 
 # video sizes we support: key is size name (used for target subdirectory) and value
 # are the parameters (as a list) that we'll pass to ffmpeg.
-sizes = { "large":  [ "-crf", "23", "-s", "1280x720" ],   # original size, compressed
+sizes = {}
+sizes['darwin'] = \
+        { "large":  [ "-crf", "23", "-s", "1280x720" ],   # original size, compressed
           "medium": [ "-crf", "27", "-s", "wvga" ],       # wvga = 852x480 at 16:9
           "small":  [ "-crf", "30", "-s", "640x360" ],    
           "tiny":   [ "-crf", "40", "-s", "320x180" ],
         }
 
-common_ffmpeg_options = [ "-c:v", "libx264",             # video codec
-                          "-profile:v", "baseline",      # most compatible
-                          "-c:a", "libfaac",             # audio codec
-                        ]
+sizes['linux2'] = \
+        { "large":  [ "--crf", "23", "--vf", "resize:1280,720" ],
+          "medium": [ "--crf", "27", "--vf", "resize:852,480" ],
+          "small":  [ "--crf", "30", "--vf", "resize:640,360" ],    
+          "tiny":   [ "--crf", "40", "--vf", "resize:320,180" ],
+        }
 
-def scaledown(notify_buf, working_dir, target_dir, video_file, target_size):
-    infoLog(notify_buf, "Kicking off ffmpeg, hold onto your hats")
-    cmdline = [ "ffmpeg", "-i", working_dir + "/" + video_file, ] \
-                + common_ffmpeg_options  \
-                + sizes[target_size] \
-                + [ target_dir + "/" + video_file ]
-    infoLog(notify_buf, " ".join(cmdline))
+
+# Hack: since we're using the x264 command line utility that doesn't understand the MOV
+# conatiner format, we use ffmpeg to just change the container to mp4 before actually
+# doing the transcoding.  Bleh.
+def change_muxer(notify_buf, working_dir, target_dir, video_file, target_size):
+    platform = sys.platform
+    cmdline = []
+
+    video_stem_list = video_file.split(".")[0:-1]
+    new_video_file = "".join(video_stem_list) + ".mp4"
+
+    if platform == "darwin":
+        return video_file
+
+    elif platform == "linux2":
+        cmdline += [ "ffmpeg" ]
+        cmdline += [ "-i", working_dir+"/"+video_file ]  # infile
+        cmdline += [ "-vcodec", "copy", "-acodec", "copy" ]
+        cmdline += [ working_dir+"/"+new_video_file ]      # outfile
+    else:
+        VideoError("Platform not supported, got \"%s\" expected darwin or linux2")
+
+    infoLog(notify_buf, "CHANGE_MUXER: " + " ".join(cmdline))
     returncode = subprocess.call(cmdline)
 
     if returncode == 0:
-        infoLog(notify_buf, "ffmpeg completed, returncode %d" % returncode)
+        infoLog(notify_buf, "completed with returncode %d" % returncode)
     else:
-        errorLog(notify_buf, "ffmpeg completed, returncode %d" % returncode)
+        errorLog(notify_buf, "completed with returncode %d" % returncode)
         cleanup_working_dir(notify_buf, working_dir)
-        raise VideoError("ffmpeg error %d" % returncode)
+        raise VideoError("change_muxer error %d" % returncode)
+
+    return new_video_file
+
+
+# Actually transcode the video down.
+def scaledown(notify_buf, working_dir, target_dir, video_file, target_size):
+    platform = sys.platform
+    cmdline = []
+
+    if platform == "darwin":                   
+        cmdline += [ "ffmpeg" ]
+        cmdline += [ "-i", working_dir + "/" + video_file,  # infile
+                     "-c:v", "libx264",          # video codec
+                     "-profile:v", "baseline",   # most compatible
+                     "-c:a", "libfaac" ]         # audio codec
+        cmdline += sizes[platform][target_size]
+        cmdline += [ target_dir + "/" + video_file ]  # outfile
+
+    elif platform == "linux2":
+        cmdline += [ "x264" ]
+        cmdline += [ "--profile", "baseline" ]
+        cmdline += sizes[platform][target_size]
+        cmdline += [ "-o", target_dir + "/" + video_file,  # outfile
+                working_dir + "/" + video_file ]           # infile
+    else:
+        VideoError("Platform not supported, got \"%s\" expected darwin or linux2")
+
+    infoLog(notify_buf, "SCALEDOWN: " + " ".join(cmdline))
+    returncode = subprocess.call(cmdline)
+
+    if returncode == 0:
+        infoLog(notify_buf, "completed with returncode %d" % returncode)
+    else:
+        errorLog(notify_buf, "completed with returncode %d" % returncode)
+        cleanup_working_dir(notify_buf, working_dir)
+        raise VideoError("scaledown error %d" % returncode)
 
 
 def upload(notify_buf, target_dir, target_part, prefix, suffix, video_id, video_file, store_loc):
@@ -274,8 +333,12 @@ def resize(store_path_raw, target_raw, notify_addr=None):
     notify_buf = []
     infoLog(notify_buf, "Resize: converting %s version of %s" % (target_raw, store_path_raw))
 
+    platform = sys.platform
+    if platform not in sizes.keys():
+        VideoError("Platform not supported, got \"%s\" expected darwin or linux")
+
     target = target_raw.lower()
-    if target not in sizes.keys():
+    if target not in sizes[platform].keys():
         VideoError("Target size \"%s\" not supported" % target)
 
     (store_path, course_prefix, course_suffix, video_id, video_file) = splitpath(store_path_raw)
@@ -289,6 +352,8 @@ def resize(store_path_raw, target_raw, notify_addr=None):
     try:
         (work_dir, smaller_dir) = create_working_dirs("resize", notify_buf, target)
         get_video(notify_buf, work_dir, video_file, store_path)
+        if video_file.split(".")[-1].lower() == "mov":
+            video_file = change_muxer(notify_buf, work_dir, smaller_dir, video_file, target)
         scaledown(notify_buf, work_dir, smaller_dir, video_file, target)
         upload(notify_buf, smaller_dir, target, course_prefix, course_suffix, video_id, video_file, store_loc)
 
