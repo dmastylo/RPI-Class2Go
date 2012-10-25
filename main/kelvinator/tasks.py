@@ -232,6 +232,41 @@ sizes['linux2'] = \
         }
 
 
+# Hack: since we're using the x264 command line utility that doesn't understand the MOV
+# conatiner format, we use ffmpeg to just change the container to mp4 before actually
+# doing the transcoding.  Bleh.
+def change_muxer(notify_buf, working_dir, target_dir, video_file, target_size):
+    platform = sys.platform
+    cmdline = []
+
+    video_stem = video_file.split(".")[0:-1]
+    new_video_file = video_stem + ".mp4"
+
+    if platform == "darwin":
+        return video_file
+
+    elif platform == "linux2":
+        cmdline += [ "ffmpeg" ]
+        cmdline += [ "-i", working_dir + "/" + video_file ]  # infile
+        cmdline += [ "-vcodec", "copy", "-acodec", "copy" ]
+        cmdlien += [ working_dir, "/", new_video_file ]      # outfile
+    else:
+        VideoError("Platform not supported, got \"%s\" expected darwin or linux2")
+
+    infoLog(notify_buf, "CHANGE_MUXER: " + " ".join(cmdline))
+    returncode = subprocess.call(cmdline)
+
+    if returncode == 0:
+        infoLog(notify_buf, "completed with returncode %d" % returncode)
+    else:
+        errorLog(notify_buf, "completed with returncode %d" % returncode)
+        cleanup_working_dir(notify_buf, working_dir)
+        raise VideoError("change_muxer error %d" % returncode)
+
+    return new_video_file
+
+
+# Actually transcode the video down.
 def scaledown(notify_buf, working_dir, target_dir, video_file, target_size):
     platform = sys.platform
     cmdline = []
@@ -262,7 +297,7 @@ def scaledown(notify_buf, working_dir, target_dir, video_file, target_size):
     else:
         errorLog(notify_buf, "completed with returncode %d" % returncode)
         cleanup_working_dir(notify_buf, working_dir)
-        raise VideoError("Extraction error %d" % returncode)
+        raise VideoError("scaledown error %d" % returncode)
 
 
 def upload(notify_buf, target_dir, target_part, prefix, suffix, video_id, video_file, store_loc):
@@ -317,6 +352,8 @@ def resize(store_path_raw, target_raw, notify_addr=None):
     try:
         (work_dir, smaller_dir) = create_working_dirs("resize", notify_buf, target)
         get_video(notify_buf, work_dir, video_file, store_path)
+        if video_file.split(".")[-1].lower() == "mov":
+            video_file = change_muxer(notify_buf, work_dir, smaller_dir, video_file, target)
         scaledown(notify_buf, work_dir, smaller_dir, video_file, target)
         upload(notify_buf, smaller_dir, target, course_prefix, course_suffix, video_id, video_file, store_loc)
 
