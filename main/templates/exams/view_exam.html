@@ -90,7 +90,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         examXHR.success(function (evt, xhr, settings) {
             var dialogDiv = getDialog();
-            $(dialogDiv).find('p').text(settings.responseText);
+            var dueDateMessage = "\n Please check back after {{exam.due_date|date:'D M d Y'}} for your score."
+            $(dialogDiv).find('p').text(settings.responseText + dueDateMessage);
             $(dialogDiv).dialog({ modal: true,
                                   buttons: {
                                     'See My Submissions': function() {

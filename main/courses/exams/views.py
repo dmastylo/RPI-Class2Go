@@ -80,4 +80,4 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     record = ExamRecord(course=course, exam=exam, student=request.user, json_data=request.POST['json_data'])
     record.save()
     
-    return HttpResponse("Entry has been saved")
+    return HttpResponse("Submission has been saved.")
