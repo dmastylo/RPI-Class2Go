@@ -10,13 +10,12 @@ bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
 instance=getattr(settings, 'INSTANCE')
 
 class Command(BaseCommand):
-    args="<prefix> <suffix> <slug>"
-    help="""    Extract thumbnail images for a video given its course info (prefix
-    and suffix) and slug.  All parameters are case sensitive.  Will
-    decide to run local or remote (queued) based on your AWS settings
-    in your database.py file, unless you override.
+    args="<size> <prefix> <suffix> <slug>"
+    help="""    Convert the video to a smaller size and store result in a directory right alongside
+    the video.
 
     Arguments:
+        size       'large' or 'small'
         prefix     course short name, like "nlp"
         suffix     the term, like "Fall2012"
         slug       URL parameter for the video, like "lecture1"
@@ -27,21 +26,20 @@ class Command(BaseCommand):
                     help="Force run locally"),
         make_option("-r", "--remote", dest="force_remote", action="store_true", default=False,
                     help="Force run remote (queued)"),
-        make_option("-f", "--frames", dest="target_frames", default=2, type="int",
-                    help="Target number of thumbnails per minute (default=2)"),
         make_option("-n", "--notify", dest="notify_addr",  
                     help="Send mail to address when done"),
     ) + BaseCommand.option_list
         
     def handle(self, *args, **options):
-        if len(args) != 3:
-            raise CommandError("Wrong number of arguments, %d instead of 3" % len(args))
+        if len(args) != 4:
+            raise CommandError("Wrong number of arguments, %d instead of 4" % len(args))
         if options['force_local'] and options['force_remote']:
             raise CommandError("Can't run both local and remote")
-        arg_prefix=args[0]
-        arg_suffix=args[1]
+        target=args[0]
+        arg_prefix=args[1]
+        arg_suffix=args[2]
         handle=arg_prefix+"--"+arg_suffix
-        slug=args[2]
+        slug=args[3]
 
         try:
             video = Video.objects.get(course__handle=handle, slug=slug, mode='draft')
@@ -64,10 +62,11 @@ class Command(BaseCommand):
         if where == 'local':
             media_root = getattr(settings, 'MEDIA_ROOT')
             local_path = media_root + "/" + video.file.name
-            kelvinator.tasks.kelvinate(local_path, options['target_frames'], options['notify_addr'])
-            print "Kelvination complete: %s" % video.file.name
+            kelvinator.tasks.resize(local_path, target, options['notify_addr'])
+            print "Resize complete: %s" % video.file.name
         else:
-            kelvinator.tasks.kelvinate.delay(video.file.name, options['target_frames'], options['notify_addr'])
-            print "Kelvination queued (%s): %s" % (instance, video.file.name)
+            kelvinator.tasks.resize.delay(video.file.name, target, options['notify_addr'])
+            print "Resize queued (%s): %s" % (instance, video.file.name)
+
 
 
