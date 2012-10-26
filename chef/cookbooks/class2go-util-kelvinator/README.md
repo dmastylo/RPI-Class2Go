@@ -1,5 +1,5 @@
 We distribute ffmpeg ourselves since we need a version linked with the libx264 codec.
-Compiled on a linux 12.4 LTE machine, rough instructions like this:
+Compiled on Ubuntu 12.4 LTS machine, rough instructions like this:
 
 
 git clone git://git.videolan.org/x264.git
@@ -14,3 +14,5 @@ cd ffmpeg
 make 
 
 
+
+To install on a mac, use "brew install ffmpeg"
