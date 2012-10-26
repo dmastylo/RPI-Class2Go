@@ -149,7 +149,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
         """
         Returns a QUERY_SET of all course members
         """
-        return (self.get_all_students() | self.get_all_course_admins())
+        return (self.get_all_course_admins() | self.get_all_students())
 
     def create_ready_instance(self):
         ready_instance = Course(institution = self.institution,
