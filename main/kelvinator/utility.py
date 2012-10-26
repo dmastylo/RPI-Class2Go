@@ -1,4 +1,4 @@
-import os, socket, shutil
+import sys, os, socket, shutil
 import tempfile
 import logging
 import urllib, urllib2, urlparse
@@ -19,6 +19,16 @@ def splitpath(raw):
     video_id = sp[-2]
     video_filename = sp[-1]
     return (store_path, course_prefix, course_suffix, video_id, video_filename) 
+
+
+def ffmpeg_cmd():
+    if sys.platform == "darwin":
+        cmd = "ffmpeg"
+    elif sys.platform == "linux2":
+        cmd = "/usr/local/bin/ffmpeg"   # hardcoded location since we need a special one
+    else:
+        VideoError("Platform not supported, got \"%s\" expected darwin or linux2" % sys.platform)
+    return cmd
 
 
 def create_working_dirs(job, notify_buf, subdir_name):
@@ -80,6 +90,7 @@ class VideoError(Exception):
 def get_video(notify_buf, working_dir, video_filename, source_path):
     infoLog(notify_buf, "Source file: " + source_path)
     source_file = default_storage.open(source_path)
+    infoLog(notify_buf, "Original file size: %s" % str(default_storage.size(source_path)))
 
     video_file = working_dir + "/" + video_filename
     infoLog(notify_buf, "Writing to working (local) file: " + video_file)
