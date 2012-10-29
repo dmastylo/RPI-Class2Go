@@ -533,22 +533,26 @@ small.date {
     border-bottom:1px solid #eee;
 }
 .course-list-item .progress {
-    width:400px;
+    height:14px;
+    width:100px;
     margin-top:5px;
 }
 .course-list-item .icon-pencil,
 .course-list-item .icon-book,
 .course-list-item .icon-file,
 .course-list-item .icon-facetime-video {
-    font-size:40px; 
+    font-size:24px; 
     color:#999;
     opacity:.3;
     padding-left:5px;
-    padding-top:5px;
+    padding-top:3px;
+}
+.course-list-item .icon-download-alt {
+    margin-right: 0;
 }
 .course-list-item .pull-left {
     margin-left:-10px;
-    width:60px;
+    width:40px;
 }
 .course-list-item .course-list-content {
     overflow:hidden;
@@ -556,11 +560,22 @@ small.date {
     margin-bottom:5px;
 }
 .course-list-item .course-list-content h4 {
-    margin-top:10px;
+    margin-top:3px;
+    margin-right:1em;
     display:inline;
+    float: left;
 }
 .course-list-item .course-list-content label {
     margin-bottom:10px;
+}
+.course-list-item .course-list-content span.label {
+    float: left;
+    margin-top: .3em;
+    margin-right: .3em;
+}
+.course-list-item .course-list-content .deadlines {
+    clear: both;
+    font-size: 90%;
 }
 
 /* Forms
