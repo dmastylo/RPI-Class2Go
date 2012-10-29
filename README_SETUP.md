@@ -375,6 +375,18 @@ be installed for Mac (and probably Windows too)
     pip install django_storages
     pip install boto
 
+21. Install GData (2.0.17)
+
+    ```
+    pip install gdata
+    ```
+
+21. Install Celery ecosystem
+
+    ```
+    pip install django-celery django-celery-email pytz
+    ```
+
 22. Go to "main" dir and copy over database settings file:
 
     cd main
