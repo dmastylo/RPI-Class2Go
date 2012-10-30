@@ -280,205 +280,142 @@ be installed for Mac (and probably Windows too)
 
 1. Install pip:
 
-    ```
-    sudo apt-get install python-pip
-    ```
+        sudo apt-get install python-pip
 
 2. Install virtualenv:
 
-    ```
-    sudo pip install virtualenv
-    ```
+        sudo pip install virtualenv
 
 3. Install virtualenvwrapper:
 
-    ```
-    sudo pip install virtualenvwrapper
-    ```
+        sudo pip install virtualenvwrapper
 
 4. Verify installation location of virtualenv and virtualenvwrapper:
 
-    ```
-    ls /usr/local/bin/
-    ```
+        ls /usr/local/bin/
 
 5. Edit login script:
 
-    ```
-    vim .bashrc
-    ```
+        vim .bashrc
 
 6. ...and add the following (without the backslashes at the start):
 
-    ```
-    \# virtualenv setup -- use Distribute by default
-    export VIRTUALENV_DISTRIBUTE=true
+        # virtualenv setup -- use Distribute by default
+        export VIRTUALENV_DISTRIBUTE=true
 
-    \# virtualenvwrapper setup
-    export WORKON_HOME=~/DevEnvs 
-    export PROJECT_HOME=~/DevProjects
-    export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-    export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
-    source /usr/local/bin/virtualenvwrapper.sh
-    ```
+        # virtualenvwrapper setup
+        export WORKON_HOME=~/DevEnvs 
+        export PROJECT_HOME=~/DevProjects
+        export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+        export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+        source /usr/local/bin/virtualenvwrapper.sh
 
 7. Source login script so env vars take effect:
 
-    ```
-    source ~/.bashrc
+        source ~/.bashrc
     (Sourcing should auto-create your virtual environment base dir)
-    ```
 
 8. Check out new virtual base directory:
 
-    ```
-    ls -l DevEnvs/
-    ```
+        ls -l DevEnvs/
 
 9. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
 
-    ```
-    echo $PATH
-    (If not, add "export PATH=/usr/local/bin:$PATH" to your .bashrc)
-    ```
+        echo $PATH
+    (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
 
 10. Make sure PROJECT_HOME is defined 
 
-    ```
-    echo $PROJECT_HOME
-    ```
+        echo $PROJECT_HOME
 
 11. Make new project directory:
 
-    ```
-    mkdir -p $PROJECT_HOME 
-    ```
+        mkdir -p $PROJECT_HOME 
 
 12. Issue command to set up new project subdirectory and link it to virtual env:
 
-    ```
-    mkproject class2go
-    ```
+        mkproject class2go
 
 13. Once inside virtual env/project directory, install django:
 
-    ```
-    pip install django
-    ```
+        pip install django
 
 14. Clone class2go repo from github:
 
-    ```
-    git clone https://github.com/Stanford-Online/class2go.git .
-    ```
+        git clone https://github.com/Stanford-Online/class2go.git .
 
 15. Check out where your mysql is installed, make sure mysql_config exists in the dir:
 
-    ```
-    which mysql
-    ls /usr/local/mysql (or whichever directory "which mysql" gives you)
-    ```
+        ls `which mysql`
 
 16. Need to install mysql_config if it's not there:
 
-    ```
-    sudo apt-get install libmysqlclient-dev
+        sudo apt-get install libmysqlclient-dev
     (For Macs, brew install mysql should give you the equivalent of this)
-    ```
 
 17. Might need some extra python developer stuff:
 
-    ```
-    sudo apt-get install python-dev
-    ```
+        sudo apt-get install python-dev
 
 18. Install python hooks for MySQL:
 
-    ```
-    pip install MySQL-python
-    ```
+        pip install MySQL-python
 
 19. Install Python Imaging Lib:
 
-    ```
-    pip install PIL
-    ```
+        pip install PIL
 
 20. Install South db stuff:
 
-    ```
-    pip install South
-    ```
+        pip install South
 
 21. Install modules for Amazon S3
 
-    ```
-    pip install django_storages
-    pip install boto
-    ```
+        pip install django_storages
+        pip install boto
 
 21. Install GData (2.0.17)
 
-    ```
-    pip install gdata
-    ```
+        pip install gdata
 
 21. Install Celery ecosystem
 
-    ```
-    pip install django-celery django-celery-email pytz
-    ```
+        pip install django-celery django-celery-email pytz
 
 22. Go to "main" dir and copy over database settings file:
 
-    ```
-    cd main
-    cp database_example.py database.py
-    ```
+        cd main
+        cp database_example.py database.py
 
 23. Edit file and add db name, username and password:
 
-    ```
-    vim database.py 
-    ```
+        vim database.py 
 
 24. Run syncdb to create database tables 
 
-    ```
-    ./manage.py syncdb
+        ./manage.py syncdb
     Might need to issue "syncdb" command a couple times if there are errors. The 
     first time, it will ask you for username and password for the database 
-    ```
 
 25. Migrate user stuff over: 
 
-    ```
-    ./manage.py migrate
-    ```
+        ./manage.py migrate
 
 26. Update settings file and add "static/" for STATIC_ROOT_DIR:
 
-    ```
-    vim settings.py
-    ```
+        vim settings.py
 
 27. Make sure directory exists, or create it:
 
-    ```
-    mkdir static
-    ```
+        mkdir static
 
 28. Run collectstatic to copy stuff into your dir:
 
-    ```
-    ./manage.py collectstatic
-    ```
+        ./manage.py collectstatic
 
 29. Run server on whatever port you want:
 
-    ```
-    python manage.py runserver 8100
-    ```
+        python manage.py runserver 8100
 
 
 When you want to start working on your project, just do the following:
