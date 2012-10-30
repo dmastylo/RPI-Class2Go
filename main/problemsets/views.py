@@ -306,8 +306,21 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=ProblemSetToExercise.objects.getByProblemset(pset).count(), is_deleted=0, mode='draft')
-        psetToEx.save()
+        #if this exercise has been deleted previously then just un-delete it
+        psetToExs = ProblemSetToExercise.objects.filter(problemSet=pset, exercise_id=exercise.id, mode = 'draft', is_deleted=1).order_by('-id')
+        if psetToExs.exists():
+            print "psetToExs exists"
+            psetToEx = psetToExs[0]
+            psetToEx.is_deleted = 0
+            psetToEx.number = ProblemSetToExercise.objects.getByProblemset(pset).count()
+            psetToEx.save()
+        #else create a new one
+        else:
+            print "creating psetToEx"
+            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=ProblemSetToExercise.objects.getByProblemset(pset).count(), is_deleted=0, mode='draft')
+            psetToEx.save()
+            
+            
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 @require_POST

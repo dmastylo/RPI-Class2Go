@@ -945,15 +945,36 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         #Create brand new copies of draft relationships
             for draft_psetToEx in draft_psetToExs:
-                ready_psetToEx = ProblemSetToExercise(problemSet = ready_instance,
-                                                    exercise = draft_psetToEx.exercise,
-                                                    number = draft_psetToEx.number,
-                                                    is_deleted = 0,
-                                                    mode = 'ready',
-                                                    image = draft_psetToEx)
-                ready_psetToEx.save()
-                draft_psetToEx.image = ready_psetToEx
-                draft_psetToEx.save()
+     #           not_deleted_ready_psetToEx = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=0)
+                deleted_ready_psetToExs = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=1).order_by('-id')
+                        
+      #          if not_deleted_ready_psetToEx.exists():
+      #              
+      #              ready_psetToEx = not_deleted_ready_psetToEx[0]
+      #              ready_psetToEx.number = draft_psetToEx.number
+      #              ready_psetToEx.is_deleted = draft_psetToEx.is_deleted
+      #              ready_psetToEx.save()
+                    
+                if deleted_ready_psetToExs.exists():
+                    ready_psetToEx = deleted_ready_psetToExs[0]
+                    ready_psetToEx.is_deleted = 0
+                    ready_psetToEx.number = draft_psetToEx.number
+                    ready_psetToEx.save()
+                    
+                else:
+                    ready_psetToEx = ProblemSetToExercise(problemSet = ready_instance,
+                                                          exercise = draft_psetToEx.exercise,
+                                                          number = draft_psetToEx.number,
+                                                          is_deleted = 0,
+                                                          mode = 'ready',
+                                                          image = draft_psetToEx)
+                    ready_psetToEx.save()
+                    draft_psetToEx.image = ready_psetToEx 
+                    draft_psetToEx.save()
+
+            
+
+
 
         else:
             draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
