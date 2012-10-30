@@ -374,46 +374,46 @@ be installed for Mac (and probably Windows too)
         pip install django_storages
         pip install boto
 
-21. Install GData (2.0.17)
+22. Install GData (2.0.17)
 
         pip install gdata
 
-21. Install Celery ecosystem
+23. Install Celery ecosystem
 
         pip install django-celery django-celery-email pytz
 
-22. Go to "main" dir and copy over database settings file:
+24. Go to "main" dir and copy over database settings file:
 
         cd main
         cp database_example.py database.py
 
-23. Edit file and add db name, username and password:
+25. Edit file and add db name, username and password:
 
         vim database.py 
 
-24. Run syncdb to create database tables 
+26. Run syncdb to create database tables 
 
         ./manage.py syncdb
     Might need to issue "syncdb" command a couple times if there are errors. The 
     first time, it will ask you for username and password for the database 
 
-25. Migrate user stuff over: 
+27. Migrate user stuff over: 
 
         ./manage.py migrate
 
-26. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
+28. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
 
         vim settings.py
 
-27. Make sure directory exists, or create it:
+29. Make sure directory exists, or create it:
 
         mkdir static
 
-28. Run collectstatic to copy stuff into your dir:
+30. Run collectstatic to copy stuff into your dir:
 
         ./manage.py collectstatic
 
-29. Run server on whatever port you want:
+31. Run server on whatever port you want:
 
         python manage.py runserver 8100
 
