@@ -529,8 +529,8 @@ small.date {
 
 .course-list-item {
     overflow:hidden;
-    padding:5px 0px;
-    border-bottom:1px solid #eee;
+    padding:5px 0 0;
+    border-bottom: 0;
 }
 .course-list-item .progress {
     height:14px;
@@ -557,7 +557,7 @@ small.date {
 .course-list-item .course-list-content {
     overflow:hidden;
     margin-right:10px;
-    margin-bottom:5px;
+    margin-bottom: 0;
 }
 .course-list-item .course-list-content h4 {
     margin-top:3px;

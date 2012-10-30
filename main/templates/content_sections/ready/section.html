@@ -1,4 +1,5 @@
 <h3>{{section_structure.section.title}}</h3>
+<div class="well">
 {% for item in section_structure.items %}
     <ul class="unstyled">
     {% ifequal item.type 'additional_page' %}
@@ -17,3 +18,4 @@
 {% empty %}
     <p style='margin: 20px;'>No items have been added to this section</p>
 {% endfor %}
+</div>
