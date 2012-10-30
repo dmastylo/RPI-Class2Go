@@ -133,6 +133,9 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
         return self.handle.split("--")[1]
     suffix = property(_get_suffix)
 
+    def has_exams(self):
+        return Exam.objects.filter(course=self, is_deleted=0).exists()
+
     def get_all_students(self):
         """
         Returns a QUERY_SET of all students
