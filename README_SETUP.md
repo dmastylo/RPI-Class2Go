@@ -401,7 +401,7 @@ be installed for Mac (and probably Windows too)
 
         ./manage.py migrate
 
-26. Update settings file and add "static/" for STATIC_ROOT_DIR:
+26. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
 
         vim settings.py
 
@@ -453,14 +453,14 @@ Generating Test Data
 1. Some schema mods were made so run: manage.py migrate
 
 2. Take a look in c2g/views.py as there are some parameters that
-    affect which data gets created. Note, if you choose the delete_current_data
+    affect which data gets created. Note, if you choose the delete\_current\_data
     option it will delete your current django users so you'll have to
     recreate those users if you want.
 
 3. To run the script that populates the data do "manage.py help db_populate" first. 
     This will tell you where to setup the params for the test data. 
 
-A helper script for this exists at main/repave_dev_database.sh.  It
+A helper script for this exists at main/repave\_dev\_database.sh.  It
 drops/recreates your dev database and then does the syncdb / migrate
 / db_populate steps so you end up with a clean database.  It requires
 a ~/.my.cnf file to know what database to talk to.
