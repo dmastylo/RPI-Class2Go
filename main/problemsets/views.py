@@ -62,7 +62,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
     for psetToEx in psetToExs:
         #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-time_created')
         #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-complete', '-attempt_number')
-        attempts = problem_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('-complete', '-attempt_number')  
+        attempts = problem_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('-complete', 'time_created')  
         if attempts.exists():
             activity_list.append((attempts[0], psetToEx.number))
     return render_to_response('problemsets/problemset.html',
