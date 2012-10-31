@@ -18,8 +18,14 @@
         <div class="course-list-content">
             <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
             <p>{{exam.description}}</p>
+            <p>
             <a href="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">My Submissions</a>
-            <p><strong>Deadline:</strong> {{exam.due_date}} PST<br>
+            {% if common_page_data.course_mode == "draft" %}
+             <a class="btn btn-small" href="{% url 'courses.exams.views.view_submissions_to_grade' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Download Student Submission CSV</a>
+            </p>
+            {% endif %}
+            <p><strong>Deadline:</strong> {{exam.due_date}} PST<br />
+            
         </div>
     </li>
 
