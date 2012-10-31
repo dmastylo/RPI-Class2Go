@@ -8,11 +8,13 @@ from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
-from django.db.models import Q
+from django.db.models import Q, Count, Max
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
 from courses.forms import *
 from django.contrib import messages
+from django.db import connection
+from courses.course_materials import filename_in_deleted_list
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -56,15 +58,71 @@ def show(request, course_prefix, course_suffix, pset_slug):
         )
         visit_log.save()
         
-    problem_activities = ProblemActivity.objects.select_related('problemset_to_exercise').filter(student=request.user, problemset_to_exercise__problemSet=ps)
-    psetToExs = ProblemSetToExercise.objects.getByProblemset(ps)
     activity_list = []
-    for psetToEx in psetToExs:
-        #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-time_created')
-        #attempts = problem_activities.filter(problemset_to_exercise=psetToEx).order_by('-complete', '-attempt_number')
-        attempts = problem_activities.filter(problemset_to_exercise__exercise__fileName=psetToEx.exercise.fileName).order_by('-complete', 'time_created')  
-        if attempts.exists():
-            activity_list.append((attempts[0], psetToEx.number))
+    
+    cursor = connection.cursor()
+    cursor.execute("SELECT `c2g_problemset_to_exercise`.`problemSet_id`, `c2g_exercises`.`fileName`, c2g_problemset_to_exercise.number, \
+                    min(case when c2g_problem_activity.complete = 1 then c2g_problem_activity.id else null end) as `first_correct_answer`, \
+                    max(c2g_problem_activity.id) as `max_activity_id` \
+                    FROM `c2g_problem_activity` \
+                    LEFT OUTER JOIN `c2g_problemset_to_exercise` ON (`c2g_problem_activity`.`problemset_to_exercise_id` = `c2g_problemset_to_exercise`.`id`) \
+                    INNER JOIN `c2g_problem_sets` ON (`c2g_problemset_to_exercise`.`problemSet_id` = `c2g_problem_sets`.`id`) \
+                    INNER JOIN `c2g_exercises` ON (`c2g_problemset_to_exercise`.`exercise_id` = `c2g_exercises`.`id`) \
+                    WHERE (`c2g_problemset_to_exercise`.`problemSet_id` = %s \
+                    AND `c2g_problem_activity`.`student_id` = %s ) \
+                    GROUP BY `c2g_problemset_to_exercise`.`problemSet_id`, `c2g_exercises`.`fileName`, c2g_problemset_to_exercise.number \
+                    ORDER BY c2g_problemset_to_exercise.number", [ps.id, request.user.id])
+    
+    raw_activity_list = []
+    for row in cursor.fetchall():
+        problemset_id = row[0]
+        filename = row[1]
+        number = row[2]
+        first_correct_answer = row[3]
+        max_activity_id = row[4]                                
+                                
+        raw_activity_item = {'problemset_id' : problemset_id,
+                             'filename' : filename,
+                             'number' : number,
+                             'first_correct_answer' : first_correct_answer,
+                             'max_activity_id' : max_activity_id
+                            }
+        raw_activity_list.append(raw_activity_item)
+            
+    cursor.execute("select e.fileName, p2e.problemSet_id, \
+                                        count(case when p2e.is_deleted = 0 then 1 else null end) as `num_active` \
+                                        from c2g_problemset_to_exercise p2e, c2g_exercises e \
+                                        where p2e.exercise_id = e.id \
+                                        and p2e.problemSet_id = %s \
+                                        and p2e.mode = 'ready' \
+                                        group by e.filename, p2e.problemSet_id \
+                                        having num_active = 0", [ps.id])
+
+    deleted_exercise_list = []
+    for row in cursor.fetchall():
+        filename = row[0]
+        problemset_id = row[1]
+        
+        filename_item = {'filename' : filename,
+                         'problemset_id' : problemset_id
+                        }
+        deleted_exercise_list.append(filename_item)                        
+    
+    for raw_activity_item in raw_activity_list:
+        problemset_id = raw_activity_item['problemset_id']
+        filename = raw_activity_item['filename']
+        number = raw_activity_item['number']
+        first_correct_answer = raw_activity_item['first_correct_answer']
+        max_activity_id = raw_activity_item['max_activity_id']        
+        
+        if not filename_in_deleted_list(  filename, problemset_id, deleted_exercise_list):
+            if first_correct_answer == None or first_correct_answer == max_activity_id:
+                activity_item = ProblemActivity.objects.get(id=max_activity_id)
+            else:
+                activity_item = ProblemActivity.objects.get(id=first_correct_answer)
+                
+            activity_list.append((activity_item, number))
+
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
                                'pset': ps,
@@ -75,7 +133,6 @@ def show(request, course_prefix, course_suffix, pset_slug):
                                'activity_list': activity_list,
                               },
                               context_instance=RequestContext(request))
-
 
 
 #CSRF Protected version, wrapped
@@ -309,14 +366,12 @@ def add_existing_exercises(request):
         #if this exercise has been deleted previously then just un-delete it
         psetToExs = ProblemSetToExercise.objects.filter(problemSet=pset, exercise_id=exercise.id, mode = 'draft', is_deleted=1).order_by('-id')
         if psetToExs.exists():
-            print "psetToExs exists"
             psetToEx = psetToExs[0]
             psetToEx.is_deleted = 0
             psetToEx.number = ProblemSetToExercise.objects.getByProblemset(pset).count()
             psetToEx.save()
         #else create a new one
         else:
-            print "creating psetToEx"
             psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=ProblemSetToExercise.objects.getByProblemset(pset).count(), is_deleted=0, mode='draft')
             psetToEx.save()
             
@@ -381,9 +436,8 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     #
     # TODO: put exception handling around this, figure out how to handle S3 errors
     # (file not there...)
+    
     return HttpResponse(exercise.file.file)
-
-
 @auth_view_wrapper
 def load_problem_set(request, course_prefix, course_suffix, pset_slug):
     try:
