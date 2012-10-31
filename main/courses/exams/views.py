@@ -92,10 +92,8 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
 
     for s in submitters: #yes, there is sql in a loop here.  We'll optimize later
         latest_sub = ExamRecord.objects.values('student__username', 'time_created', 'json_data').filter(exam=exam, time_created__lt=exam.grace_period, student=s['student']).latest('time_created')
-        print(latest_sub)
         for k,v in json.loads(latest_sub['json_data']).iteritems():
             str = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, parse_val(v))
-            print(str)
             outfile.write(str)
 
     outfile.write("\n")
@@ -107,7 +105,6 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
     s3file.write(outfile.read())
     s3file.close()
     outfile.close()
-#    return HttpResponse('ok')
     return HttpResponseRedirect(secure_file_storage.url("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname), response_headers={'response-content-disposition': 'attachment'}))
 
 def parse_val(v):
