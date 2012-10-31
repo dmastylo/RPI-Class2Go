@@ -941,24 +941,24 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
-            #Delete all previous relationships
+                
+            #If filename in ready but not in draft list then delete it.
             for ready_psetToEx in ready_psetToExs:
-                ready_psetToEx.delete()
-                ready_psetToEx.save()
+                if not self.in_list(ready_psetToEx, draft_psetToExs):
+                    ready_psetToEx.is_deleted = 1
+                    ready_psetToEx.save()
 
-        #Create brand new copies of draft relationships
+            #Find ready instance, if it exists, and set it.
             for draft_psetToEx in draft_psetToExs:
-     #           not_deleted_ready_psetToEx = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=0)
+                not_deleted_ready_psetToEx = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=0)
                 deleted_ready_psetToExs = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=1).order_by('-id')
                         
-      #          if not_deleted_ready_psetToEx.exists():
-      #              
-      #              ready_psetToEx = not_deleted_ready_psetToEx[0]
-      #              ready_psetToEx.number = draft_psetToEx.number
-      #              ready_psetToEx.is_deleted = draft_psetToEx.is_deleted
-      #              ready_psetToEx.save()
+                if not_deleted_ready_psetToEx.exists():
+                    ready_psetToEx = not_deleted_ready_psetToEx[0]
+                    ready_psetToEx.number = draft_psetToEx.number
+                    ready_psetToEx.save() 
                     
-                if deleted_ready_psetToExs.exists():
+                elif deleted_ready_psetToExs.exists():
                     ready_psetToEx = deleted_ready_psetToExs[0]
                     ready_psetToEx.is_deleted = 0
                     ready_psetToEx.number = draft_psetToEx.number
@@ -974,10 +974,6 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                     ready_psetToEx.save()
                     draft_psetToEx.image = ready_psetToEx 
                     draft_psetToEx.save()
-
-            
-
-
 
         else:
             draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
@@ -1023,22 +1019,28 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
-            #Delete all previous relationships
-            for draft_psetToEx in draft_psetToExs:
-                draft_psetToEx.delete()
-                draft_psetToEx.save()
 
-        #Create brand new copies of draft relationships
+            #If filename in draft but not in ready list then delete it.
+            for draft_psetToEx in draft_psetToExs:
+                if not self.in_list(draft_psetToEx, ready_psetToExs):
+                    draft_psetToEx.is_deleted = 1
+                    draft_psetToEx.save()
+
+            #Find draft instance and set it.
             for ready_psetToEx in ready_psetToExs:
-                draft_psetToEx = ProblemSetToExercise(problemSet = self,
-                                                    exercise = ready_psetToEx.exercise,
-                                                    number = ready_psetToEx.number,
-                                                    is_deleted = 0,
-                                                    mode = 'draft',
-                                                    image = ready_psetToEx)
-                draft_psetToEx.save()
-                ready_psetToEx.image = draft_psetToEx
-                ready_psetToEx.save()
+                not_deleted_draft_psetToEx = ProblemSetToExercise.objects.filter(problemSet=self, exercise=ready_psetToEx.exercise, is_deleted=0)
+                deleted_draft_psetToExs = ProblemSetToExercise.objects.filter(problemSet=self, exercise=ready_psetToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_draft_psetToEx.exists():
+                    draft_psetToEx = not_deleted_draft_psetToEx[0]
+                    draft_psetToEx.number = ready_psetToEx.number
+                    draft_psetToEx.save() 
+                    
+                elif deleted_draft_psetToExs.exists():
+                    draft_psetToEx = deleted_draft_psetToExs[0]
+                    draft_psetToEx.is_deleted = 0
+                    draft_psetToEx.number = ready_psetToEx.number
+                    draft_psetToEx.save()
 
         else:
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
@@ -1198,6 +1200,12 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             
         if detailed: return exercise_scores
         else: return total_score
+
+    def in_list(self, ready_psetToEx, draft_psetToExs):
+        for draft_psetToEx in draft_psetToExs:
+            if ready_psetToEx.exercise.fileName == draft_psetToEx.exercise.fileName:
+                return True
+        return False
 
     def __unicode__(self):
         return self.title
