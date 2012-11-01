@@ -24,6 +24,7 @@ default_attributes \
     "main" => {
         "production" => "False",
         "instance" => "stage",
+        "git_branch" => "origin/master",
         "admin_name" => "Class2Go Example",
         "admin_email" => "crash@class.stanford.edu",
         "snippet_email" => "c2g-dev@cs.stanford.edu",
