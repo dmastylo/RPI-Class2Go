@@ -61,6 +61,8 @@ def show(request, course_prefix, course_suffix, pset_slug):
     activity_list = []
     
     cursor = connection.cursor()
+    
+    #Used to test for valid data
     cursor.execute("SELECT `c2g_problemset_to_exercise`.`problemSet_id`, `c2g_exercises`.`fileName`, c2g_problemset_to_exercise.number, \
                     min(case when c2g_problem_activity.complete = 1 then c2g_problem_activity.id else null end) as `first_correct_answer`, \
                     max(c2g_problem_activity.id) as `max_activity_id` \
@@ -89,6 +91,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
                             }
         raw_activity_list.append(raw_activity_item)
             
+    #Find deleted files
     cursor.execute("select e.fileName, p2e.problemSet_id, \
                                         count(case when p2e.is_deleted = 0 then 1 else null end) as `num_active` \
                                         from c2g_problemset_to_exercise p2e, c2g_exercises e \
@@ -438,6 +441,8 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     # (file not there...)
     
     return HttpResponse(exercise.file.file)
+
+
 @auth_view_wrapper
 def load_problem_set(request, course_prefix, course_suffix, pset_slug):
     try:
