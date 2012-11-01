@@ -50,4 +50,7 @@ default_attributes \
         "yt_service_developer_key" => "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "google_client_id" => "nnnnnnnnnnnn.apps.googleusercontent.com",
         "google_client_secret" => "sssssssssssssssssssss"
+    },
+    "apache" => {
+        "servername" => "https://example.class.university.edu"
     }
