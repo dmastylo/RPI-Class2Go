@@ -572,6 +572,66 @@ class UserProfile(TimestampMixin, models.Model):
     def __unicode__(self):
         return self.user.username
 
+    def is_student_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_student_list = []
+        for course in courses:
+            for group in group_list:
+                if course.student_group_id == group.id:
+                    is_student_list.append(course)
+                    break
+        return is_student_list
+
+    def is_instructor_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_instructor_list = []
+        for course in courses:
+            for group in group_list:
+                if course.instructor_group_id == group.id:
+                    is_instructor_list.append(course)
+                    break
+        return is_instructor_list
+
+    def is_tas_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_tas_list = []
+        for course in courses:
+            for group in group_list:
+                if course.tas_group_id == group.id:
+                    is_tas_list.append(course)
+                    break
+        return is_tas_list
+
+    def is_readonly_tas_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_readonly_tas_list = []
+        for course in courses:
+            for group in group_list:
+                if course.readonly_tas_group_id == group.id:
+                    is_readonly_tas_list.append(course)
+                    break
+        return is_readonly_tas_list
+
     class Meta:
         db_table = u'c2g_user_profiles'
 

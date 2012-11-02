@@ -36,20 +36,12 @@ def index(request):
 
 def profile(request):
     
-    group_list = []
-    groups = request.user.groups.all()
-    for group in groups:
-        group_list.append(group.id)
-    
+    group_list = request.user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
-    
-    is_student_list = []
-    for course in courses:
-        for group in group_list:
-            if course.student_group_id == group:
-                is_student_list.append(course)
-                break
       
+    user_profile = request.user.get_profile()
+    is_student_list = user_profile.is_student_list(group_list, courses)
+            
     allow_password_change  = True
     if (not request.user.is_authenticated()) or (request.user.get_profile().institutions.filter(title='Stanford').exists()):
         allow_password_change = False
