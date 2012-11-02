@@ -5,6 +5,7 @@
 
 {% block m_column_content %}
 {% for sub in my_subs %}
+<form method="post" action="snapshot" name="sub_{{sub.id}}">
 {% if forloop.first %}
 <div class="well well-small">
 <h3>Graded submission:</h3>
@@ -25,9 +26,14 @@ On question {{prob}}, you answered:
     <br />
     {% endfor %}
 </p>
+<input type="hidden" name="json-pre-pop" value="{{sub.plain_json_obj}}" />
+{% if forloop.first %}
+    <input type="hidden" name="latest" value="True" />
+{% endif %}
+<input type="submit" name="pre-pop-submit" id="pre-pop-submit" value="See form with this data" />
+{% csrf_token %}
 </div>
-
+</form>
 {% endfor %}
-
 <a class="btn" href="{% url 'courses.exams.views.listAll' common_page_data.course.prefix common_page_data.course.suffix %}">Back to exams</a>
 {% endblock m_column_content %}

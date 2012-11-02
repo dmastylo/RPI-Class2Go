@@ -94,6 +94,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             } 
 
         }
+
+        var enabled = ('{{editable}}' == 'True') ? true : false;
+        if (!enabled) {
+            $('input').attr('disabled','disabled');
+        }
     };
 
     allFieldsets.each(function() {
@@ -165,6 +170,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     });
                       
+    var prePopData = '{% autoescape off %}{{json_pre_pop}}{% endautoescape %}';
+    if (prePopData != '') {
+        window.repopulateForm(prePopData);
+    }
+
     });
 </script>
 {% endblock addl_scripts %}

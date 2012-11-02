@@ -6,6 +6,7 @@ import operator
 import logging
 import settings
 import datetime
+import HTMLParser
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
@@ -57,6 +58,20 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam}, RequestContext(request))
 
+@require_POST
+@auth_view_wrapper
+def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
+    course = request.common_page_data['course']
+    parser = HTMLParser.HTMLParser()
+    json_pre_pop = parser.unescape(request.POST['json-pre-pop'])
+    editable = request.POST.get('latest', False)
+ 
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'editable':editable}, RequestContext(request))
 
 @auth_view_wrapper
 def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
@@ -69,7 +84,8 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
 
     subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).order_by('-time_created'))
 
-    my_subs = map(lambda s: {'time_created':s.time_created, 'json_obj':sorted(json.loads(s.json_data).iteritems(), key=operator.itemgetter(0))}, subs)
+    #my_subs = map(lambda s: {'time_created':s.time_created, 'json_obj':sorted(json.loads(s.json_data).iteritems(), key=operator.itemgetter(0)), 'plain_json_obj':json.JSONEncoder().encode(json.loads(s.json_data)),'id':s.id}, subs)
+    my_subs = map(lambda s: {'time_created':s.time_created, 'json_obj':sorted(json.loads(s.json_data).iteritems(), key=operator.itemgetter(0)), 'plain_json_obj':json.dumps(json.loads(s.json_data)),'id':s.id}, subs)
 
     return render_to_response('exams/view_my_submissions.html', {'common_page_data':request.common_page_data, 'exam':exam, 'my_subs':my_subs},
                               RequestContext(request) )
