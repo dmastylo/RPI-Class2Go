@@ -1457,7 +1457,7 @@ var Khan = (function() {
                 $('#solutionarea input').attr('disabled', 'disabled');
                 $('#check-answer-button').hide();
             }
-            $('.hint-box').hide();
+            //$('.hint-box').hide();
             if (exAssessType == "summative") {
                 $('#solutionarea').append('<p><strong class="attempts-so-far">Attempts: <span id="attempt-count">' + alreadyAttempted + '</span></strong></p> <p>You received <span id="max-credit">' + maxCredit + '</span>% credit</p>');
             }
@@ -3289,7 +3289,7 @@ var Khan = (function() {
             }
 
         // [C2G] setTimeout below is to allow enough time for last exercise to be properly loaded
-        }).done(setTimeout(function () { dfd.resolve(); }, 1000));
+        }).done(setTimeout(function () { dfd.resolve(); }, 1500));
 
         return dfd.promise();
     }

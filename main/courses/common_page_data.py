@@ -14,6 +14,9 @@ def get_common_page_data(request, prefix, suffix):
     course_mode = 'ready'
     course = ready_course
     
+    prefix = course.prefix
+    suffix = course.suffix
+    
     can_switch_mode = False
     is_course_admin = False
     is_course_member = False

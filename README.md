@@ -19,6 +19,9 @@ to build interesting features to try out new ways of presenting
 material or grading exercises.  We believe an open source platform
 is the best way to do this.
 
+For community support of c2g users, we have a Google group at
+https://groups.google.com/forum/#!forum/class2go-users.
+
 If you are interested in reaching the team email us at 
 <c2g-contact@class.stanford.edu>.
 

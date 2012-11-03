@@ -50,7 +50,7 @@ class TimestampMixin(models.Model):
 
 class Stageable(models.Model):
     mode = models.TextField(blank=True)
-    image = models.ForeignKey('self', null=True, related_name="+")
+    image = models.ForeignKey('self', null=True, blank=True, related_name="+")  #Adding blank = True to allow these to be created in admin interface
     live_datetime = models.DateTimeField(editable=True, null=True, blank=True)
     
     def is_live(self):
@@ -133,6 +133,9 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
         return self.handle.split("--")[1]
     suffix = property(_get_suffix)
 
+    def has_exams(self):
+        return Exam.objects.filter(course=self, is_deleted=0).exists()
+
     def get_all_students(self):
         """
         Returns a QUERY_SET of all students
@@ -149,7 +152,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
         """
         Returns a QUERY_SET of all course members
         """
-        return (self.get_all_students() | self.get_all_course_admins())
+        return (self.get_all_course_admins() | self.get_all_students())
 
     def create_ready_instance(self):
         ready_instance = Course(institution = self.institution,
@@ -938,22 +941,39 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
-            #Delete all previous relationships
+                
+            #If filename in ready but not in draft list then delete it.
             for ready_psetToEx in ready_psetToExs:
-                ready_psetToEx.delete()
-                ready_psetToEx.save()
+                if not self.in_list(ready_psetToEx, draft_psetToExs):
+                    ready_psetToEx.is_deleted = 1
+                    ready_psetToEx.save()
 
-        #Create brand new copies of draft relationships
+            #Find ready instance, if it exists, and set it.
             for draft_psetToEx in draft_psetToExs:
-                ready_psetToEx = ProblemSetToExercise(problemSet = ready_instance,
-                                                    exercise = draft_psetToEx.exercise,
-                                                    number = draft_psetToEx.number,
-                                                    is_deleted = 0,
-                                                    mode = 'ready',
-                                                    image = draft_psetToEx)
-                ready_psetToEx.save()
-                draft_psetToEx.image = ready_psetToEx
-                draft_psetToEx.save()
+                not_deleted_ready_psetToEx = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=0)
+                deleted_ready_psetToExs = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_ready_psetToEx.exists():
+                    ready_psetToEx = not_deleted_ready_psetToEx[0]
+                    ready_psetToEx.number = draft_psetToEx.number
+                    ready_psetToEx.save() 
+                    
+                elif deleted_ready_psetToExs.exists():
+                    ready_psetToEx = deleted_ready_psetToExs[0]
+                    ready_psetToEx.is_deleted = 0
+                    ready_psetToEx.number = draft_psetToEx.number
+                    ready_psetToEx.save()
+                    
+                else:
+                    ready_psetToEx = ProblemSetToExercise(problemSet = ready_instance,
+                                                          exercise = draft_psetToEx.exercise,
+                                                          number = draft_psetToEx.number,
+                                                          is_deleted = 0,
+                                                          mode = 'ready',
+                                                          image = draft_psetToEx)
+                    ready_psetToEx.save()
+                    draft_psetToEx.image = ready_psetToEx 
+                    draft_psetToEx.save()
 
         else:
             draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
@@ -999,22 +1019,28 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
-            #Delete all previous relationships
-            for draft_psetToEx in draft_psetToExs:
-                draft_psetToEx.delete()
-                draft_psetToEx.save()
 
-        #Create brand new copies of draft relationships
+            #If filename in draft but not in ready list then delete it.
+            for draft_psetToEx in draft_psetToExs:
+                if not self.in_list(draft_psetToEx, ready_psetToExs):
+                    draft_psetToEx.is_deleted = 1
+                    draft_psetToEx.save()
+
+            #Find draft instance and set it.
             for ready_psetToEx in ready_psetToExs:
-                draft_psetToEx = ProblemSetToExercise(problemSet = self,
-                                                    exercise = ready_psetToEx.exercise,
-                                                    number = ready_psetToEx.number,
-                                                    is_deleted = 0,
-                                                    mode = 'draft',
-                                                    image = ready_psetToEx)
-                draft_psetToEx.save()
-                ready_psetToEx.image = draft_psetToEx
-                ready_psetToEx.save()
+                not_deleted_draft_psetToEx = ProblemSetToExercise.objects.filter(problemSet=self, exercise=ready_psetToEx.exercise, is_deleted=0)
+                deleted_draft_psetToExs = ProblemSetToExercise.objects.filter(problemSet=self, exercise=ready_psetToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_draft_psetToEx.exists():
+                    draft_psetToEx = not_deleted_draft_psetToEx[0]
+                    draft_psetToEx.number = ready_psetToEx.number
+                    draft_psetToEx.save() 
+                    
+                elif deleted_draft_psetToExs.exists():
+                    draft_psetToEx = deleted_draft_psetToExs[0]
+                    draft_psetToEx.is_deleted = 0
+                    draft_psetToEx.number = ready_psetToEx.number
+                    draft_psetToEx.save()
 
         else:
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
@@ -1174,6 +1200,12 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             
         if detailed: return exercise_scores
         else: return total_score
+
+    def in_list(self, ready_psetToEx, draft_psetToExs):
+        for draft_psetToEx in draft_psetToExs:
+            if ready_psetToEx.exercise.fileName == draft_psetToEx.exercise.fileName:
+                return True
+        return False
 
     def __unicode__(self):
         return self.title
@@ -1342,3 +1374,31 @@ class PageVisitLog(TimestampMixin, models.Model):
     
     class Meta:
         db_table = u'c2g_page_visit_log'
+
+class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    html_content = models.TextField(blank=True)
+    slug = models.SlugField("URL Identifier", max_length=255, null=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+    grace_period = models.DateTimeField(null=True, blank=True)
+    
+    def past_due(self):
+        if self.due_date and (datetime.now() > self.due_date):
+            return True
+        return False
+    
+    def __unicode__(self):
+        return self.title
+
+
+class ExamRecord(TimestampMixin, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    json_data = models.TextField(null=True, blank=True)
+    score = models.IntegerField(null=True, blank=True)
+
+    def __unicode__(self):
+        return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
