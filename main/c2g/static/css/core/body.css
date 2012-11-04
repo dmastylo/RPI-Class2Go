@@ -3,7 +3,7 @@
 
 h1,h2,h3,h4 {margin:0;}
 
-h3 {margin-bottom:.5em;font-size:20px;}
+h3 {margin-bottom:.5em;font-size:20px; line-height:1.2em;}
 h4 {margin-bottom:.5em;font-size:16px;}
 
 a {color:#820000;}
@@ -527,10 +527,15 @@ small.date {
   background-color: #820000;
 }
 
+ul.unstyled.course-list {
+  border-bottom:1px solid #eee;
+  margin:0;
+}
+
 .course-list-item {
-    overflow:hidden;
-    padding:5px 0 0;
-    border-bottom: 0;
+  overflow:hidden;
+  padding:8px 0 4px;
+  border-bottom: 0;
 }
 .course-list-item .progress {
     height:14px;
@@ -550,7 +555,7 @@ small.date {
 .course-list-item .icon-download-alt {
     margin-right: 0;
 }
-.course-list-item .pull-left {
+.course-list-item .pull-left.icon {
     margin-left:-10px;
     width:40px;
 }
