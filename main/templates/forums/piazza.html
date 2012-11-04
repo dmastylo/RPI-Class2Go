@@ -5,6 +5,8 @@
 
 {% block forums_link_class %}class="dropdown active"{% endblock forums_link_class %}
 
+{% block course_page_title %}Forum (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
+
 {% block m_column_content %}
 
 <script type="text/javascript">
