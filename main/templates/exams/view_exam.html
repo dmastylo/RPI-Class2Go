@@ -34,6 +34,25 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% block addl_scripts %}
 <script>
     $(document).ready(function () {
+
+    var SUBMISSION_LIST_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+
+    // Add button that just takes you back to submission list without submitting form again
+    var returnToListBtn = document.createElement('input');
+    $(returnToListBtn).attr('type', 'button');
+    $(returnToListBtn).attr('id', 'returnToListBtn');
+    $(returnToListBtn).attr('title', 'Click to return to the submissions list without re-submitting form');
+    $(returnToListBtn).val('Return Without Submitting');
+    $(returnToListBtn).addClass('btn btn-spaced');
+    $(returnToListBtn).click(function (ev) {
+        document.location = SUBMISSION_LIST_URL;
+    });
+    
+    var submitBtn = $('input[type|="submit"]').not('#login_button');
+    submitBtn.after($(returnToListBtn));
+    if (!submitBtn.hasClass('btn')) {
+        submitBtn.addClass('btn btn-spaced');
+    }
                       
     $('#nojswarn').remove();
                       
@@ -98,10 +117,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('input').attr('disabled','disabled');
+            $('input').not('#returnToListBtn').attr('disabled','disabled');
 
             // hide submit button
-            var submitBtn = $('input[type|="submit"]');
+            var submitBtn = $('input[type|="submit"]').not('#login_button');
+            submitBtn.addClass('btn btn-spaced');
             submitBtn.hide();
 
             // Add a "re-enable inputs" button
@@ -109,6 +129,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(reEnableBtn).attr('id', 'reEnableForm');
             $(reEnableBtn).attr('type', 'button');
             $(reEnableBtn).attr('title', 'Click to re-enable answers for re-submission of this exam');
+            $(reEnableBtn).addClass('btn btn-spaced');
             $(reEnableBtn).val('Click to Re-Enable Answers');
             submitBtn.before($(reEnableBtn));
             $(reEnableBtn).click(function (ev) {
@@ -175,7 +196,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(dialogDiv).dialog({ modal: true,
                                   buttons: {
                                     'See My Submissions': function() {
-                                     document.location="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}"
+                                     //document.location="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}"
+                                     document.location = SUBMISSION_LIST_URL;
                                 }}});
         });
 
@@ -187,7 +209,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     });
                       
-    var prePopData = '{% autoescape off %}{{json_pre_pop}}{% endautoescape %}';
+    // Make sure pre-pop is in a properly-escaped string 
+    var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
