@@ -174,6 +174,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             handle = self.handle,
             institution_only = self.institution_only,
             piazza_id = int(time.mktime(time.gmtime())),
+            preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
         self.image = ready_instance
