@@ -97,7 +97,24 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
+            // disable all inputs
             $('input').attr('disabled','disabled');
+
+            // hide submit button
+            var submitBtn = $('input[type|="submit"]');
+            submitBtn.hide();
+
+            // Add a "re-enable inputs" button
+            var reEnableBtn = document.createElement('input');
+            $(reEnableBtn).attr('id', 'reEnableForm');
+            $(reEnableBtn).attr('type', 'button');
+            $(reEnableBtn).attr('title', 'Click to re-enable answers for re-submission of this exam');
+            $(reEnableBtn).val('Click to Re-Enable Answers');
+            submitBtn.before($(reEnableBtn));
+            $(reEnableBtn).click(function (ev) {
+                $('input').removeAttr('disabled');
+                submitBtn.show();
+            });
         }
     };
 
