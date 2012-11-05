@@ -6,9 +6,7 @@ override_attributes \
         "admin_user" => "ubuntu",
         "admin_group" => "ubuntu",
         "admin_home" => "/home/ubuntu"
-    }
-
-override_attributes \
+    },
     "main" => {
         "maint" => "True"
     }
@@ -21,5 +19,5 @@ run_list(
     "recipe[class2go-deploy]",
     "recipe[class2go-logging]",
     "recipe[class2go-ops-dns]",
-    "recipe[class2go-database-config]",
+    "recipe[class2go-database-config]"
 )
