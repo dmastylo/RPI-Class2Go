@@ -591,6 +591,37 @@ ul.unstyled.course-list {
     font-size: 90%;
 }
 
+/* FAQs
+-------------------------------------------------- */
+.faq h4 {
+    cursor: pointer;
+}
+.faq ol {
+    margin-left:0;
+}
+.faq ol li {
+    list-style-type:none;
+    padding:10px 10px 0;
+    border:1px solid #eee;
+    margin-bottom:10px;
+    background:#f8f6ea;
+    border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+}
+.faq ol li:hover {
+    background:#eee;
+}
+.faq ol li ul li {
+    background:none;
+    margin-bottom:0;
+    border:0;
+    list-style-type:lower-alpha;
+}
+.faq ol li ul {
+    margin-bottom:20px;
+}
+
 /* Forms
 -------------------------------------------------- */
 .errorlist {
