@@ -20,4 +20,4 @@
 
     WSGIDaemonProcess class2go threads=15 maximum-requests=10000 python-path=/home/ubuntu/class2go/main
     WSGIProcessGroup class2go
-<VirtualHost *:80>
+</VirtualHost>
