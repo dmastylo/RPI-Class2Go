@@ -1,0 +1,23 @@
+Alias /robots.txt /home/ubuntu/class2go/main/static/robots.txt
+Alias /favicon.ico /home/ubuntu/class2go/main/static/favicon.ico
+
+AliasMatch ^/([^/]*\.css) /home/ubuntu/class2go/main/static/styles/$1
+
+Alias /static/ /opt/class2go/static/
+
+<Directory /opt/class2go/static>
+    Order deny,allow
+    Allow from all
+</Directory>
+
+WSGIScriptAlias / /home/ubuntu/class2go/main/wsgi.py
+
+<Directory /home/ubuntu/class2go/main>
+<Files wsgi.py>
+    Order deny,allow
+    Allow from all
+</Files>
+</Directory>
+
+WSGIDaemonProcess class2go threads=15 maximum-requests=10000 python-path=/home/ubuntu/class2go/main
+WSGIProcessGroup class2go
