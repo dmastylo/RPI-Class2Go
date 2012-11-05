@@ -1,7 +1,5 @@
-Alias /robots.txt /home/ubuntu/class2go/main/static/robots.txt
-Alias /favicon.ico /home/ubuntu/class2go/main/static/favicon.ico
-
-AliasMatch ^/([^/]*\.css) /home/ubuntu/class2go/main/static/styles/$1
+Alias /robots.txt /opt/class2go/static/robots.txt
+Alias /favicon.ico /opt/class2go/static/graphics/core/favicon.ico
 
 Alias /static/ /opt/class2go/static/
 
