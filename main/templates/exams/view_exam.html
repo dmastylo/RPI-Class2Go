@@ -153,7 +153,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
     });
                       
-    $('input[type=submit]').click(function () {
+    $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
         $('input').each(function () {
             if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
