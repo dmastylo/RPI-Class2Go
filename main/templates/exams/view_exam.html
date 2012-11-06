@@ -58,17 +58,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     var allFieldsets = $('fieldset');
                       
-    /*
-    var testDataObj = {};
-    testDataObj.q12c = [];
-    testDataObj.q12c[0] = {'value':'b'};
-    testDataObj.q15d = [];
-    testDataObj.q15d[0] = {'value':'c'};
-    testDataObj.q15d[1] = {'value':'d'};
-    testDataObj.q15e = 'goodbye';
-    window.testData = JSON.stringify(testDataObj);
-    */
-
     window.repopulateForm = function (jsonStr) {
         // first wipe all inputs
         $('input[type|="text"]').val('');
@@ -196,7 +185,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(dialogDiv).dialog({ modal: true,
                                   buttons: {
                                     'See My Submissions': function() {
-                                     //document.location="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}"
                                      document.location = SUBMISSION_LIST_URL;
                                 }}});
         });
