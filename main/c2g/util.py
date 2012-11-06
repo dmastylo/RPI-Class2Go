@@ -1,9 +1,21 @@
-from c2g.models import Course
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import redirect
 import settings
 import urlparse
+
+from django.contrib.sites.models import Site
+from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.utils.functional import wraps
+
+
+def get_site_domain():
+    """Return a bare domain name for the current site"""
+    return Site.objects.get_current().domain
+
+def get_site_url():
+    """Return a fully qualified URL for the current site"""
+    site = Site.objects.get_current()
+    url = 'http://%s/' % (site.domain)
+    return url
 
 
 def redirects_use_http(response, request):
@@ -13,7 +25,6 @@ def redirects_use_http(response, request):
     if isinstance(response, HttpResponseRedirect):
         return HttpResponseRedirect(urlparse.urljoin('http://'+request.get_host()+'/',response['Location']))
     return response
-
 
 
 def upgrade_to_https_and_downgrade_upon_redirect(view):

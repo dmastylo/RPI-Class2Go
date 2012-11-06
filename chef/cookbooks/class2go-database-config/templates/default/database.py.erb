@@ -15,6 +15,7 @@ DATABASES = {
 
 # When PRODUCTION=True we don't show stackdumps on errors.  Careful, no quotes.
 PRODUCTION = <%= @node[:main][:production] %>
+MAINTENANCE_LANDING_PAGE = <%= @node[:main][:maint] %>
 
 INSTANCE = '<%= @node[:main][:instance] %>'
 

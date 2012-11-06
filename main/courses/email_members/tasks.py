@@ -81,8 +81,8 @@ def email_list(msg_hash, addr_list, throttle=False):
                              'optout_code':code,
                              'domain':site.domain
                             })
-                p = Popen(['lynx','-stdin','-dump'], stdin=PIPE, stdout=PIPE)
-                (plaintext, err_from_stderr) = p.communicate(input=html_msg) #use lynx to get plaintext
+                p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
+                (plaintext, err_from_stderr) = p.communicate(input=html_msg.encode('utf-8')) #use lynx to get plaintext
                 if err_from_stderr:
                     logger.info(err_from_stderr)
         
@@ -166,8 +166,8 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
     """
     msg = CourseEmail.objects.get(hash=hash_for_msg)
     
-    p = Popen(['lynx','-stdin','-dump'], stdin=PIPE, stdout=PIPE)
-    (plaintext, err_from_stderr) = p.communicate(input=msg.html_message) #use lynx to get plaintext
+    p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
+    (plaintext, err_from_stderr) = p.communicate(input=msg.html_message.encode('utf-8')) #use lynx to get plaintext
     staff_email = 'noreply@class.stanford.edu'
     if course_handle:
         staff_email = re.sub(r'\--', r'-',course_handle) + '-staff@class.stanford.edu'
@@ -204,9 +204,8 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
                                             'last_name':last_name,
                                             'email':email,
                                             })
-            
-            email_msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer, from_addr, [email], connection=connection)
-            email_msg.attach_alternative(msg.html_message+html_footer,'text/html')
+            email_msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer.encode('utf-8'), from_addr, [email], connection=connection)
+            email_msg.attach_alternative(msg.html_message+html_footer.encode('utf-8'),'text/html')
             
             if throttle or current.request.retries > 0: #throttle if we tried a few times and got the rate limiter
                 time.sleep(0.2)
@@ -258,8 +257,8 @@ def email_with_celery(subject,html_msg,sender,recipient_email_list,course_title=
     plain text and html.  Send using celery task
     """
 
-    p = Popen(['lynx','-stdin','-dump'], stdin=PIPE, stdout=PIPE)
-    (plaintext, err_from_stderr) = p.communicate(input=html_msg) #use lynx to get plaintext
+    p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
+    (plaintext, err_from_stderr) = p.communicate(input=html_msg.encode('utf-8')) #use lynx to get plaintext
     
     connection = get_connection() #get connection from settings
     connection.open()
@@ -283,8 +282,8 @@ def email_with_celery(subject,html_msg,sender,recipient_email_list,course_title=
                                         'email':user.email,
                                         })
         
-            msg = EmailMultiAlternatives(subject, plaintext+plain_footer, sender, [user.email], connection=connection)
-            msg.attach_alternative(html_msg+html_footer,'text/html')
+            msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer.encode('utf-8'), from_addr, [email], connection=connection)
+            msg.attach_alternative(html_msg+html_footer.encode('utf-8'),'text/html')
             connection.send_messages([msg])
             num_sent += 1
     connection.close()
