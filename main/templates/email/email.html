@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% block title %}Email Course Members | {{ common_page_data.course.title }}{% endblock title %}
 {% load url from future %}
 {% block mode_switcher %}{% endblock mode_switcher %}
 {% block m_column_content %}
@@ -15,7 +16,7 @@
 
 <div class="row-fluid">
 <div class="span8">
-<h2>Send email to course members</h2>
+<h3>Send email to course members</h3>
 <div class="well">
     <form action="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
         {% csrf_token %}
