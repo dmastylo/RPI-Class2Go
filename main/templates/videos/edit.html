@@ -44,7 +44,7 @@
 	</div>
       </form>
   {% else %}
-    <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to edit videos.</h4>
+    <h4>Please <a data-toggle="modal" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">log in</a> to edit videos.</h4>
   {% endif %}
 
 {% endblock m_column_content %}

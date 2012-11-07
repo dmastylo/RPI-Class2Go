@@ -1,8 +1,8 @@
 <li class="course-list-item">
-    <div class="pull-left">
+    <div class="pull-left icon">
         <em class="icon-book"></em>
     </div>
     <div class="course-list-content">
-        <h4><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4>
+        <h4 class="pull-left"><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4>
     </div>
 </li>

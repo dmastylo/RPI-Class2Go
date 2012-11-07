@@ -356,3 +356,16 @@ BROKER_TRANSPORT_OPTIONS = {
     'visibility_timeout' : 7200,
 }
 
+CELERY_DEFAULT_QUEUE = 'default'
+CELERY_DEFAULT_EXCHANGE = 'default'
+CELERY_DEFAULT_ROUTING_KEY = 'default'
+
+CELERY_QUEUES = {
+    'default': {'exchange': 'default', 'routing_key': 'default'},
+    'long':    {'exchange': 'long',    'routing_key': 'long'},
+}
+
+CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': 'long', 'routing_key': 'long'},
+                 'kelvinator.tasks.resize':    {'queue': 'long', 'routing_key': 'long'},
+                 'celerytest.tasks.echo_long': {'queue': 'long', 'routing_key': 'long'},
+                }

@@ -233,9 +233,18 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        video_time = 0
-        videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=False, video_time=video_time, mode="draft")
-        videoToEx.save()
+        #if this exercise has been deleted previously then just un-delete it
+        videoToExs = VideoToExercise.objects.filter(video=video, exercise_id=exercise.id, mode = 'draft', is_deleted=1).order_by('-id')
+        if videoToExs.exists():
+            videoToEx = videoToExs[0]
+            videoToEx.is_deleted = 0
+            videoToEx.video_time = 0
+            videoToEx.save()
+        #else create a new one
+        else:
+            videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=0, video_time=0, mode='draft')
+            videoToEx.save()       
+        
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 
