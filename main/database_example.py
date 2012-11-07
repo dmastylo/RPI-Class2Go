@@ -18,6 +18,8 @@ SECRET_KEY = ''
 
 # Set PRODUCTION to True so we don't show stackdumps on errors
 PRODUCTION = False
+# Set this this to true if you want to show our maint page as root
+MAINTENANCE_LANDING_PAGE = False
 
 # The instance is the group of servers correspond to a C2G stack.  Some good 
 # values for this are:

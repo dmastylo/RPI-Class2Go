@@ -31,7 +31,7 @@
 	            {% for course in courses %}
 	                <li>
                     <a style="display:inline" href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a>&nbsp;
-                    {% if user in course.get_all_students %}
+                    {% if course in is_student_list %}
                        <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
                            {% csrf_token %}
                            <input class="btn-mini" type="Submit"  value="Unenroll as Student" onclick="return confirm('Do you really want to unenroll?')" />

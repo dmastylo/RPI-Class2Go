@@ -12,22 +12,22 @@
 # any table indexes that use multiple columns are placed in a south migration at
 # <location to be inserted>
 
-from django.db import models
-from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save
-from django import forms
 from datetime import datetime
-from django.core.exceptions import ValidationError
-from hashlib import md5
-
 import gdata.youtube
 import gdata.youtube.service
+from hashlib import md5
 import os
-import time
 import sys
+import time
 
-# For file system upload
-from django.core.files.storage import FileSystemStorage
+from django import forms
+from django.core.exceptions import ValidationError
+from django.core.files.storage import DefaultStorage
+from django.db import models
+from django.db.models.signals import post_save
+from django.contrib.auth.models import User, Group
+
+import c2g.util
 
 def get_file_path(instance, filename):
     parts = str(instance.handle).split("--")
@@ -174,6 +174,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             handle = self.handle,
             institution_only = self.institution_only,
             piazza_id = int(time.mktime(time.gmtime())),
+            preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
         self.image = ready_instance
@@ -456,11 +457,14 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.save()
 
     def dl_link(self):
+        """Return a fully-qualified download link URL for this asset, or empty"""
         if not self.file.storage.exists(self.file.name):
-            return ""
+            return ''
         
-        url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
-        return url
+        if isinstance(self.file.storage, DefaultStorage):
+            # Construct a fully-qualified URL using Site database entry
+            return c2g.util.get_site_url() + self.file.storage.url(self.file.name)
+        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     def __unicode__(self):
         if self.title:
@@ -571,6 +575,66 @@ class UserProfile(TimestampMixin, models.Model):
     
     def __unicode__(self):
         return self.user.username
+
+    def is_student_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_student_list = []
+        for course in courses:
+            for group in group_list:
+                if course.student_group_id == group.id:
+                    is_student_list.append(course)
+                    break
+        return is_student_list
+
+    def is_instructor_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_instructor_list = []
+        for course in courses:
+            for group in group_list:
+                if course.instructor_group_id == group.id:
+                    is_instructor_list.append(course)
+                    break
+        return is_instructor_list
+
+    def is_tas_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_tas_list = []
+        for course in courses:
+            for group in group_list:
+                if course.tas_group_id == group.id:
+                    is_tas_list.append(course)
+                    break
+        return is_tas_list
+
+    def is_readonly_tas_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_readonly_tas_list = []
+        for course in courses:
+            for group in group_list:
+                if course.readonly_tas_group_id == group.id:
+                    is_readonly_tas_list.append(course)
+                    break
+        return is_readonly_tas_list
 
     class Meta:
         db_table = u'c2g_user_profiles'
@@ -762,8 +826,12 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return True
 
     def dl_link(self):
+        """Return a fully-qualified download link URL for this asset, or empty"""
         if not self.file.storage.exists(self.file.name):
-            return ""
+            return ''
+        if isinstance(self.file.storage, DefaultStorage):
+            # Construct a fully-qualified URL using Site database entry
+            return c2g.util.get_site_url() + self.file.storage.url(self.file.name)
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
 
     def ret_url(self):

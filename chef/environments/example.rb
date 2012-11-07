@@ -24,6 +24,8 @@ default_attributes \
     "main" => {
         "production" => "False",
         "instance" => "stage",
+        "maint" => "False",
+        "git_branch" => "origin/master",
         "admin_name" => "Class2Go Example",
         "admin_email" => "crash@class.stanford.edu",
         "snippet_email" => "c2g-dev@cs.stanford.edu",
@@ -49,4 +51,7 @@ default_attributes \
         "yt_service_developer_key" => "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "google_client_id" => "nnnnnnnnnnnn.apps.googleusercontent.com",
         "google_client_secret" => "sssssssssssssssssssss"
+    },
+    "apache" => {
+        "servername" => "https://example.class.university.edu"
     }
