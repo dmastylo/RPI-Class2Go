@@ -1,6 +1,6 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block title %} Stanford Online | {{ common_page_data.course.title }} | {{ video.title }}  {% endblock title %}
+{% block title %}{{ video.title }} | {{ common_page_data.course.title }}{% endblock title %}
 {% block mode_switcher %}
     {% if not common_page_data.is_course_admin and not common_page_data.can_switch_mode %}
         <div class="hidden-phone" style="position:absolute;top:0;right:0;">
