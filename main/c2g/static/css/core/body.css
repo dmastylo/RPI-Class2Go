@@ -535,6 +535,10 @@ small.date {
   background-color: #820000;
 }
 
+.course-section {
+    margin-bottom:30px;
+}
+
 ul.unstyled.course-list {
   border-bottom:1px solid #eee;
   margin:0;
@@ -549,6 +553,7 @@ ul.unstyled.course-list {
     height:14px;
     width:100px;
     margin-top:5px;
+    float:left;
 }
 .course-list-item .icon-pencil,
 .course-list-item .icon-book,
