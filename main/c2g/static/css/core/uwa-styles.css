@@ -1,0 +1,119 @@
+a {color:#1F5EB7;}
+a:hover {color:#1F5EB7;}
+
+
+#global-header {border-top: 3px solid #7AC4D9;
+	background: #000000;
+	padding-bottom:10px;
+	box-shadow: 1px 1px 5px 1px #666666;
+	overflow:hidden}
+
+.stanford-logo {
+    background-image: url(../../graphics/core/uwa-logo.gif);
+    background-repeat: no-repeat;
+    background-size: auto auto;
+    display: block;
+    height: 40px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-bottom: 13px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 13px;
+    text-indent: -999px;
+    width: 198px;
+    float: left;}
+
+.tagline {
+    float: right;
+    margin-top: 37px;
+    padding-right: 20px;
+}
+
+.top-nav {
+    
+    top: -52px;
+}
+
+.top-nav li .btn {background-color: #666;
+font-weight:normal;
+box-shadow:none;
+text-shadow: none;}
+
+
+.top-nav li .btn:hover {
+  opacity: 0.9;
+  background: #666;}
+
+.home .hero-header {
+       background-image: url(../../graphics/core/Winthrop-Hall-Yellow-for-Lightbox.png);
+    }
+    
+    body.home {
+       background-color: #EFEFEF;
+   }
+   
+   
+   
+   .class2go a {
+        background-color: #E2E2E2;}
+        
+        /*******
+        MENU
+        ********/
+        
+        
+#c2g_layout_topbar .navbar .navbar-inner {
+        background-image: url("../../graphics/core/bg-nav.png") !important;
+   }
+
+
+
+.navbar .nav .active > a, .navbar .nav .active > a:hover  {
+        background-image: url("../../graphics/core/bg-nav-selected.png") !important;
+        color: #000;
+   }
+
+
+.navbar .nav > li > a {text-shadow: none;
+color: #000;}        
+
+ul.nav li.dropdown:hover ul.dropdown-menu,
+  .navbar .nav li.dropdown.open ul.dropdown-menu,
+  .navbar .nav li.dropdown:hover .dropdown-toggle,
+  .navbar .nav li.dropdown.open .dropdown-toggle {
+    background:#efefef;
+    
+  }
+
+
+/*********
+ACCORDION
+*********/
+
+
+.well.tight {
+    background-color: #E8F4F9;}
+    
+    .well {border-color: #89CBE5;}
+    
+    .nav-list .divider {
+    background-color: #89CBE5;
+    border-bottom: none;
+}
+
+   
+/**********
+FOOTER
+***********/   
+   
+   #global-footer {
+    background:url(../../graphics/core/footer-hp-bgrepeat.jpg) repeat-x;}
+    
+    .footer ul a {color: #666;}
+    
+    .footer .vcard {
+    clear: left;
+    color: #666;
+    font-size: 11px;
+}

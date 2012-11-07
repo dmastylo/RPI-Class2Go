@@ -28,7 +28,7 @@ bash "git clone" do
     cwd node['system']['admin_home']
     code <<-EOH
     if [[ ! -d class2go ]]; then
-        git clone https://github.com/Stanford-Online/class2go.git
+        git clone https://github.com/dglance/class2go.git
     fi
     EOH
 end
