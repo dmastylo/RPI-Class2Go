@@ -3,8 +3,7 @@
         <em class="icon-facetime-video"></em>
     </div>
     <div class="course-list-content">
-        <h4><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a> ({{item.video.runtime}}){% if item.video.dl_link %}<a href="{{item.video.dl_link}}" class="btn btn-mini" title="download"><em class="icon-download-alt"></em> Download</a>{% endif %}</h4>
-	<div>{{item.video.description}}</div>
+        <h4><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}" title="{{item.video.description}}">{{item.video.title}}</a> ({{item.video.runtime}}){% if item.video.dl_link %}<a href="{{item.video.dl_link}}" class="btn btn-mini" title="Download"><em class="icon-download-alt"></em></a>{% endif %}</h4>
         {% if item.completed_percent > 90 %}
         <div class="progress progress-success progress-striped">
         {% else %}

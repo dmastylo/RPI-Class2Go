@@ -280,135 +280,142 @@ be installed for Mac (and probably Windows too)
 
 1. Install pip:
 
-    sudo apt-get install python-pip
+        sudo apt-get install python-pip
 
 2. Install virtualenv:
 
-    sudo pip install virtualenv
+        sudo pip install virtualenv
 
 3. Install virtualenvwrapper:
 
-    sudo pip install virtualenvwrapper
+        sudo pip install virtualenvwrapper
 
 4. Verify installation location of virtualenv and virtualenvwrapper:
 
-    ls /usr/local/bin/
+        ls /usr/local/bin/
 
 5. Edit login script:
 
-    vim .bashrc
+        vim .bashrc
 
 6. ...and add the following (without the backslashes at the start):
 
-    \# virtualenv setup -- use Distribute by default
-    export VIRTUALENV_DISTRIBUTE=true
+        # virtualenv setup -- use Distribute by default
+        export VIRTUALENV_DISTRIBUTE=true
 
-    \# virtualenvwrapper setup
-    export WORKON_HOME=~/DevEnvs 
-    export PROJECT_HOME=~/DevProjects
-    export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-    export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
-    source /usr/local/bin/virtualenvwrapper.sh
+        # virtualenvwrapper setup
+        export WORKON_HOME=~/DevEnvs 
+        export PROJECT_HOME=~/DevProjects
+        export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+        export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+        source /usr/local/bin/virtualenvwrapper.sh
 
 7. Source login script so env vars take effect:
 
-    source ~/.bashrc
+        source ~/.bashrc
     (Sourcing should auto-create your virtual environment base dir)
 
 8. Check out new virtual base directory:
 
-    ls -l DevEnvs/
+        ls -l DevEnvs/
 
 9. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
 
-    echo $PATH
-    (If not, add "export PATH=/usr/local/bin:$PATH" to your .bashrc)
+        echo $PATH
+    (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
 
 10. Make sure PROJECT_HOME is defined 
 
-    echo $PROJECT_HOME
+        echo $PROJECT_HOME
 
 11. Make new project directory:
 
-    mkdir -p $PROJECT_HOME 
+        mkdir -p $PROJECT_HOME 
 
 12. Issue command to set up new project subdirectory and link it to virtual env:
 
-    mkproject class2go
+        mkproject class2go
 
 13. Once inside virtual env/project directory, install django:
 
-    pip install django
+        pip install django
 
 14. Clone class2go repo from github:
 
-    git clone https://github.com/Stanford-Online/class2go.git .
+        git clone https://github.com/Stanford-Online/class2go.git .
 
 15. Check out where your mysql is installed, make sure mysql_config exists in the dir:
 
-    which mysql
-    ls /usr/local/mysql (or whichever directory "which mysql" gives you)
+        ls `which mysql`
 
 16. Need to install mysql_config if it's not there:
 
-    sudo apt-get install libmysqlclient-dev
+        sudo apt-get install libmysqlclient-dev
     (For Macs, brew install mysql should give you the equivalent of this)
 
 17. Might need some extra python developer stuff:
 
-    sudo apt-get install python-dev
+        sudo apt-get install python-dev
 
 18. Install python hooks for MySQL:
 
-    pip install MySQL-python
+        pip install MySQL-python
 
 19. Install Python Imaging Lib:
 
-    pip install PIL
+        pip install PIL
 
 20. Install South db stuff:
 
-    pip install South
+        pip install South
 
 21. Install modules for Amazon S3
 
-    pip install django_storages
-    pip install boto
+        pip install django_storages
+        pip install boto
 
-22. Go to "main" dir and copy over database settings file:
+22. Install GData (2.0.17)
 
-    cd main
-    cp database_example.py database.py
+        pip install gdata
 
-23. Edit file and add db name, username and password:
+23. Install Celery ecosystem
 
-    vim database.py 
+        pip install django-celery django-celery-email pytz
 
-24. Run syncdb to create database tables 
+24. Go to "main" dir and copy over database settings file:
 
-    ./manage.py syncdb
+        cd main
+        cp database_example.py database.py
+
+25. Edit file and add db name, username and password:
+
+        vim database.py 
+
+26. Run syncdb to create database tables 
+
+        ./manage.py syncdb
     Might need to issue "syncdb" command a couple times if there are errors. The 
     first time, it will ask you for username and password for the database 
 
-25. Migrate user stuff over: 
+27. Migrate user stuff over: 
 
-    ./manage.py migrate
+        ./manage.py migrate
 
-26. Update settings file and add "static/" for STATIC_ROOT_DIR:
+28. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
 
-    vim settings.py
+        vim settings.py
 
-27. Make sure directory exists, or create it:
+29. Make sure directory exists, or create it:
 
-    mkdir static
+        mkdir static
 
-28. Run collectstatic to copy stuff into your dir:
+30. Run collectstatic to copy stuff into your dir:
 
-    ./manage.py collectstatic
+        ./manage.py collectstatic
 
-29. Run server on whatever port you want:
+31. Run server on whatever port you want:
 
-    python manage.py runserver 8100
+        python manage.py runserver 8100
 
 
 When you want to start working on your project, just do the following:
@@ -446,14 +453,14 @@ Generating Test Data
 1. Some schema mods were made so run: manage.py migrate
 
 2. Take a look in c2g/views.py as there are some parameters that
-    affect which data gets created. Note, if you choose the delete_current_data
+    affect which data gets created. Note, if you choose the delete\_current\_data
     option it will delete your current django users so you'll have to
     recreate those users if you want.
 
 3. To run the script that populates the data do "manage.py help db_populate" first. 
     This will tell you where to setup the params for the test data. 
 
-A helper script for this exists at main/repave_dev_database.sh.  It
+A helper script for this exists at main/repave\_dev\_database.sh.  It
 drops/recreates your dev database and then does the syncdb / migrate
 / db_populate steps so you end up with a clean database.  It requires
 a ~/.my.cnf file to know what database to talk to.

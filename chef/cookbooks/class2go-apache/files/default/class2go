@@ -1,0 +1,23 @@
+<VirtualHost *:80>
+    Alias /robots.txt /opt/class2go/static/robots.txt
+    Alias /favicon.ico /opt/class2go/static/graphics/core/favicon.ico
+
+    Alias /static/ /opt/class2go/static/
+
+    <Directory /opt/class2go/static>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    WSGIScriptAlias / /home/ubuntu/class2go/main/wsgi.py
+
+    <Directory /home/ubuntu/class2go/main>
+    <Files wsgi.py>
+        Order deny,allow
+        Allow from all
+    </Files>
+    </Directory>
+
+    WSGIDaemonProcess class2go threads=15 maximum-requests=10000 python-path=/home/ubuntu/class2go/main
+    WSGIProcessGroup class2go
+<VirtualHost *:80>

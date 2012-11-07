@@ -13,7 +13,7 @@
 {% endif %}
 <p>
 <h4>{{sub.time_created}} :</h4>
-    {% for prob, data in sub.json_obj.iteritems %}
+    {% for prob, data in sub.json_obj %}
 On question {{prob}}, you answered:
          {% if data|islist %}{# Custom template tag to test if object is a list #}
              {% for i in data %}

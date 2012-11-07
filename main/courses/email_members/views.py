@@ -53,7 +53,7 @@ def email_members(request, course_prefix, course_suffix):
                                 to=form.cleaned_data['to'],
                                 subject=form.cleaned_data['subject'],
                                 html_message=form.cleaned_data['message'],
-                                hash=md5(form.cleaned_data['message']+form.cleaned_data['subject']+datetime.datetime.isoformat(datetime.datetime.now())).hexdigest())
+                                hash=md5((form.cleaned_data['message']+form.cleaned_data['subject']+datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
             email.save()
             
             recipient_qset = User.objects.none() #get recipients in a QuerySet
@@ -72,7 +72,7 @@ def email_members(request, course_prefix, course_suffix):
                                                               request.build_absolute_uri(reverse('courses.views.main', args=[course_prefix, course_suffix])),
                                                               recipient_qset.query
                                                              )
-            success_msg = "Your email was successfully queued for sending"
+            success_msg = "Your email was successfully queued for sending.  Please note that for large public classes (~10k), it may take 1-2 hours to send all emails."
             
         else:
             error_msg = "Please fix the errors below:"

@@ -33,6 +33,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/submit/?$', 'courses.exams.views.collect_data'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/all_submissions_to_grade/?$', 'courses.exams.views.view_submissions_to_grade'),
 
     #emailoptout
     url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
