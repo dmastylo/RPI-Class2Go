@@ -731,22 +731,39 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_videoToExs =  VideoToExercise.objects.getByVideo(self)
             ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
-            #Delete all previous relationships
-            for ready_videoToEx in ready_videoToExs:
-                ready_videoToEx.delete()
-                ready_videoToEx.save()
 
-        #Create brand new copies of draft relationships
+            #If filename in ready but not in draft list then delete it.
+            for ready_videoToEx in ready_videoToExs:
+                if not self.in_list(ready_videoToEx, draft_videoToExs):
+                    ready_videoToEx.is_deleted = 1
+                    ready_videoToEx.save()
+
+            #Find ready instance, if it exists, and set it.
             for draft_videoToEx in draft_videoToExs:
-                ready_videoToEx = VideoToExercise(video = ready_instance,
-                                                    exercise = draft_videoToEx.exercise,
-                                                    video_time = draft_videoToEx.video_time,
-                                                    is_deleted = 0,
-                                                    mode = 'ready',
-                                                    image = draft_videoToEx)
-                ready_videoToEx.save()
-                draft_videoToEx.image = ready_videoToEx
-                draft_videoToEx.save()
+                not_deleted_ready_videoToEx = VideoToExercise.objects.filter(video=ready_instance, exercise=draft_videoToEx.exercise, is_deleted=0)
+                deleted_ready_videoToExs = VideoToExercise.objects.filter(video=ready_instance, exercise=draft_videoToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_ready_videoToEx.exists():
+                    ready_videoToEx = not_deleted_ready_videoToEx[0]
+                    ready_videoToEx.video_time = draft_videoToEx.video_time
+                    ready_videoToEx.save() 
+                    
+                elif deleted_ready_videoToExs.exists():
+                    ready_videoToEx = deleted_ready_videoToExs[0]
+                    ready_videoToEx.is_deleted = 0
+                    ready_videoToEx.video_time = draft_videoToEx.video_time
+                    ready_videoToEx.save()
+                    
+                else:
+                    ready_videoToEx = VideoToExercise(video = ready_instance,
+                                                          exercise = draft_videoToEx.exercise,
+                                                          video_time = draft_videoToEx.video_time,
+                                                          is_deleted = 0,
+                                                          mode = 'ready',
+                                                          image = draft_videoToEx)
+                    ready_videoToEx.save()
+                    draft_videoToEx.image = ready_videoToEx 
+                    draft_videoToEx.save()
 
         else:
             draft_videoToExs = VideoToExercise.objects.getByVideo(self)
@@ -778,22 +795,28 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_videoToExs = VideoToExercise.objects.getByVideo(self)
             ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
-            #Delete all previous relationships
-            for draft_videoToEx in draft_videoToExs:
-                draft_videoToEx.delete()
-                draft_videoToEx.save()
 
-        #Create brand new copies of draft relationships
+            #If filename in draft but not in ready list then delete it.
+            for draft_videoToEx in draft_videoToExs:
+                if not self.in_list(draft_videoToEx, ready_videoToExs):
+                    draft_videoToEx.is_deleted = 1
+                    draft_videoToEx.save()
+
+            #Find draft instance and set it.
             for ready_videoToEx in ready_videoToExs:
-                draft_videoToEx = VideoToExercise(video = self,
-                                                    exercise = ready_videoToEx.exercise,
-                                                    video_time = ready_videoToEx.video_time,
-                                                    is_deleted = 0,
-                                                    mode = 'draft',
-                                                    image = ready_videoToEx)
-                draft_videoToEx.save()
-                ready_videoToEx.image = draft_videoToEx
-                ready_videoToEx.save()
+                not_deleted_draft_videoToEx = VideoToExercise.objects.filter(video=self, exercise=ready_videoToEx.exercise, is_deleted=0)
+                deleted_draft_videoToExs = VideoToExercise.objects.filter(video=self, exercise=ready_videoToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_draft_videoToEx.exists():
+                    draft_videoToEx = not_deleted_draft_videoToEx[0]
+                    draft_videoToEx.video_time = ready_videoToEx.video_time
+                    draft_videoToEx.save() 
+                    
+                elif deleted_draft_videoToExs.exists():
+                    draft_videoToEx = deleted_draft_videoToExs[0]
+                    draft_videoToEx.is_deleted = 0
+                    draft_videoToEx.video_time = ready_videoToEx.video_time
+                    draft_videoToEx.save()
 
         else:
             ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
@@ -868,6 +891,12 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         if errors:
             raise ValidationError(errors)
+
+    def in_list(self, needle, haystack):
+        for hay in haystack:
+            if needle.exercise.fileName == hay.exercise.fileName:
+                return True
+        return False
         
     def __unicode__(self):
         if self.title:
@@ -1269,9 +1298,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if detailed: return exercise_scores
         else: return total_score
 
-    def in_list(self, ready_psetToEx, draft_psetToExs):
-        for draft_psetToEx in draft_psetToExs:
-            if ready_psetToEx.exercise.fileName == draft_psetToEx.exercise.fileName:
+    def in_list(self, needle, haystack):
+        for hay in haystack:
+            if needle.exercise.fileName == hay.exercise.fileName:
                 return True
         return False
 
