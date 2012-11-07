@@ -41,18 +41,29 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     var returnToListBtn = document.createElement('input');
     $(returnToListBtn).attr('type', 'button');
     $(returnToListBtn).attr('id', 'returnToListBtn');
-    $(returnToListBtn).attr('title', 'Click to return to the submissions list without re-submitting form');
-    $(returnToListBtn).val('Return Without Submitting');
+    $(returnToListBtn).attr('title', 'Click to return to the submissions list without submitting this form');
+    $(returnToListBtn).val('View Previous Submissions (Without Submitting Form)');
     $(returnToListBtn).addClass('btn btn-spaced');
     $(returnToListBtn).click(function (ev) {
         document.location = SUBMISSION_LIST_URL;
     });
-    
+    $(returnToListBtn).mouseover(function (ev) {
+        $(userNote).show();
+    }).mouseout(function (ev) {
+        $(userNote).hide();
+    });
+
     var submitBtn = $('input[type|="submit"]').not('#login_button');
     submitBtn.after($(returnToListBtn));
     if (!submitBtn.hasClass('btn')) {
         submitBtn.addClass('btn btn-spaced');
     }
+
+    var userNote = document.createElement('em');
+    $(userNote).addClass('userNote');
+    $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
+    $(returnToListBtn).after($(userNote));
+    $(userNote).hide();
                       
     $('#nojswarn').remove();
                       

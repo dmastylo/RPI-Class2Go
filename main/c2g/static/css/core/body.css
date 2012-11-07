@@ -30,6 +30,7 @@ a:hover {color:#820000;}
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
 .btn-spaced {margin-right:5px;}
+.userNote {color:#900; font-size:90%;}
 
 .modal-header {border-bottom:1px solid #ddcf99;}
 .modal-body {border-top:1px solid white;}
