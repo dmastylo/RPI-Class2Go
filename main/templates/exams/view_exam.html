@@ -37,24 +37,24 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     var SUBMISSION_LIST_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
 
-    // Add button that just takes you back to submission list without submitting form again
-    var returnToListBtn = document.createElement('input');
-    $(returnToListBtn).attr('type', 'button');
-    $(returnToListBtn).attr('id', 'returnToListBtn');
-    $(returnToListBtn).attr('title', 'Click to return to the submissions list without submitting this form');
-    $(returnToListBtn).val('View Previous Submissions (Without Submitting Form)');
-    $(returnToListBtn).addClass('btn btn-spaced');
-    $(returnToListBtn).click(function (ev) {
-        document.location = SUBMISSION_LIST_URL;
-    });
-    $(returnToListBtn).mouseover(function (ev) {
+    // Add link that just takes you back to submission list without submitting form again
+    var returnToListCont = document.createElement('p');
+    $(returnToListCont).addClass('useful-info');
+
+    var returnToListLink = document.createElement('a');
+    $(returnToListLink).attr('id', 'returnToListLink');
+    $(returnToListLink).attr('href', SUBMISSION_LIST_URL);
+    $(returnToListLink).attr('title', 'Click to return to the submissions list without submitting this form');
+    $(returnToListLink).text('View Previous Submissions (Without Submitting Form)');
+    $(returnToListLink).mouseover(function (ev) {
         $(userNote).show();
     }).mouseout(function (ev) {
         $(userNote).hide();
     });
 
     var submitBtn = $('input[type|="submit"]').not('#login_button');
-    submitBtn.after($(returnToListBtn));
+    submitBtn.after($(returnToListCont));
+    $(returnToListCont).append($(returnToListLink));
     if (!submitBtn.hasClass('btn')) {
         submitBtn.addClass('btn btn-spaced');
     }
@@ -62,7 +62,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     var userNote = document.createElement('em');
     $(userNote).addClass('userNote');
     $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
-    $(returnToListBtn).after($(userNote));
+    $(returnToListLink).after($(userNote));
     $(userNote).hide();
                       
     $('#nojswarn').remove();
@@ -117,7 +117,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('input').not('#returnToListBtn').attr('disabled','disabled');
+            $('input').attr('disabled','disabled');
 
             // hide submit button
             var submitBtn = $('input[type|="submit"]').not('#login_button');
