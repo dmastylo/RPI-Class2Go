@@ -34,22 +34,41 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% block addl_scripts %}
 <script>
     $(document).ready(function () {
+
+    var SUBMISSION_LIST_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+
+    // Add link that just takes you back to submission list without submitting form again
+    var returnToListCont = document.createElement('p');
+    $(returnToListCont).addClass('useful-info');
+
+    var returnToListLink = document.createElement('a');
+    $(returnToListLink).attr('id', 'returnToListLink');
+    $(returnToListLink).attr('href', SUBMISSION_LIST_URL);
+    $(returnToListLink).attr('title', 'Click to return to the submissions list without submitting this form');
+    $(returnToListLink).text('View Previous Submissions (Without Submitting Form)');
+    $(returnToListLink).mouseover(function (ev) {
+        $(userNote).show();
+    }).mouseout(function (ev) {
+        $(userNote).hide();
+    });
+
+    var submitBtn = $('input[type|="submit"]').not('#login_button');
+    submitBtn.after($(returnToListCont));
+    $(returnToListCont).append($(returnToListLink));
+    if (!submitBtn.hasClass('btn')) {
+        submitBtn.addClass('btn btn-spaced');
+    }
+
+    var userNote = document.createElement('em');
+    $(userNote).addClass('userNote');
+    $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
+    $(returnToListLink).after($(userNote));
+    $(userNote).hide();
                       
     $('#nojswarn').remove();
                       
     var allFieldsets = $('fieldset');
                       
-    /*
-    var testDataObj = {};
-    testDataObj.q12c = [];
-    testDataObj.q12c[0] = {'value':'b'};
-    testDataObj.q15d = [];
-    testDataObj.q15d[0] = {'value':'c'};
-    testDataObj.q15d[1] = {'value':'d'};
-    testDataObj.q15e = 'goodbye';
-    window.testData = JSON.stringify(testDataObj);
-    */
-
     window.repopulateForm = function (jsonStr) {
         // first wipe all inputs
         $('input[type|="text"]').val('');
@@ -94,6 +113,30 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             } 
 
         }
+
+        var enabled = ('{{editable}}' == 'True') ? true : false;
+        if (!enabled) {
+            // disable all inputs
+            $('input').attr('disabled','disabled');
+
+            // hide submit button
+            var submitBtn = $('input[type|="submit"]').not('#login_button');
+            submitBtn.addClass('btn btn-spaced');
+            submitBtn.hide();
+
+            // Add a "re-enable inputs" button
+            var reEnableBtn = document.createElement('input');
+            $(reEnableBtn).attr('id', 'reEnableForm');
+            $(reEnableBtn).attr('type', 'button');
+            $(reEnableBtn).attr('title', 'Click to re-enable answers for re-submission of this exam');
+            $(reEnableBtn).addClass('btn btn-spaced');
+            $(reEnableBtn).val('Click to Re-Enable Answers');
+            submitBtn.before($(reEnableBtn));
+            $(reEnableBtn).click(function (ev) {
+                $('input').removeAttr('disabled');
+                submitBtn.show();
+            });
+        }
     };
 
     allFieldsets.each(function() {
@@ -110,7 +153,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
     });
                       
-    $('input[type=submit]').click(function () {
+    $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
         $('input').each(function () {
             if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
@@ -153,18 +196,24 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(dialogDiv).dialog({ modal: true,
                                   buttons: {
                                     'See My Submissions': function() {
-                                     document.location="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}"
+                                     document.location = SUBMISSION_LIST_URL;
                                 }}});
         });
 
         examXHR.error(function(xhr, status, msg) {
             var dialogDiv = getDialog();
-            $(dialogDiv).find('p').text(msg);
+            $(dialogDiv).find('p').text(msg+": "+xhr.responseText.substr(0,99));
             $(dialogDiv).dialog({modal: true});
         });
 
     });
                       
+    // Make sure pre-pop is in a properly-escaped string 
+    var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
+    if (prePopData != '') {
+        window.repopulateForm(prePopData);
+    }
+
     });
 </script>
 {% endblock addl_scripts %}

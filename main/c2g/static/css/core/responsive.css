@@ -193,6 +193,9 @@ width: auto;
   .carousel-caption {
     position: static;
   }
+  .course-list-item .course-list-content .pull-right {
+    float:left;
+  }
   body .container-fluid {
     padding-right: 20px;
     padding-left: 20px;
