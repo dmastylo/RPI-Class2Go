@@ -25,7 +25,7 @@ if [[ $HOSTNAME =~ ${INVALID_HOSTNAME} ]]; then
 fi
 
 echo "This script nukes your dev database and recreates with default contents."
-read -p "Are you you want to do this? (y/n) " confirm
+read -p "Are you sure you want to do this? (y/n) " confirm
 if [[ ! $confirm =~ ^[Yy]$ ]]; then
     exit 0
 fi
@@ -51,7 +51,7 @@ fi
     
 set -x
 
-mysql --batch -e "drop database ${DEV_DB_NAME}; create database ${DEV_DB_NAME};"
+mysql --batch -e "drop database ${DEV_DB_NAME}; create database ${DEV_DB_NAME} default character set 'utf8' default collate 'utf8_unicode_ci';"
 ./manage.py syncdb --noinput
 ./manage.py syncdb --noinput --database=celery
 ./manage.py migrate
