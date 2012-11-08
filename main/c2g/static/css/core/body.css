@@ -3,7 +3,7 @@
 
 h1,h2,h3,h4 {margin:0;}
 
-h3 {margin-bottom:.5em;font-size:20px;}
+h3 {margin-bottom:.5em;font-size:20px; line-height:1.2em;}
 h4 {margin-bottom:.5em;font-size:16px;}
 
 a {color:#820000;}
@@ -29,6 +29,10 @@ a:hover {color:#820000;}
 }
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
+.btn-spaced {margin-right:5px;}
+.userNote {background-color: #ffd; font-size:90%; padding: 0 .2em; }
+.useful-info {margin: .2em; padding: .3em; position: relative;}
+.useful-info a, .useful-info em {float: left; margin-right: .5em;}
 
 .modal-header {border-bottom:1px solid #ddcf99;}
 .modal-body {border-top:1px solid white;}
@@ -162,6 +166,14 @@ a.thumbnail:hover {
 }
 label.control-label {
     font-weight:bold;
+}
+
+.accordion-group {
+  margin:0;
+  border:0;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
 }
 
 
@@ -527,15 +539,25 @@ small.date {
   background-color: #820000;
 }
 
+.course-section {
+    margin-bottom:30px;
+}
+
+ul.unstyled.course-list {
+  border-bottom:1px solid #eee;
+  margin:0;
+}
+
 .course-list-item {
-    overflow:hidden;
-    padding:5px 0 0;
-    border-bottom: 0;
+  overflow:hidden;
+  padding:8px 0 4px;
+  border-bottom: 0;
 }
 .course-list-item .progress {
     height:14px;
     width:100px;
     margin-top:5px;
+    float:left;
 }
 .course-list-item .icon-pencil,
 .course-list-item .icon-book,
@@ -550,7 +572,7 @@ small.date {
 .course-list-item .icon-download-alt {
     margin-right: 0;
 }
-.course-list-item .pull-left {
+.course-list-item .pull-left.icon {
     margin-left:-10px;
     width:40px;
 }
@@ -576,6 +598,37 @@ small.date {
 .course-list-item .course-list-content .deadlines {
     clear: both;
     font-size: 90%;
+}
+
+/* FAQs
+-------------------------------------------------- */
+.faq h4 {
+    cursor: pointer;
+}
+.faq ol {
+    margin-left:0;
+}
+.faq ol li {
+    list-style-type:none;
+    padding:10px 10px 0;
+    border:1px solid #eee;
+    margin-bottom:10px;
+    background:#f8f6ea;
+    border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+}
+.faq ol li:hover {
+    background:#eee;
+}
+.faq ol li ul li {
+    background:none;
+    margin-bottom:0;
+    border:0;
+    list-style-type:lower-alpha;
+}
+.faq ol li ul {
+    margin-bottom:20px;
 }
 
 /* Forms

@@ -5,6 +5,7 @@
 
 {% block m_column_content %}
 {% for sub in my_subs %}
+<form method="post" action="snapshot" name="sub_{{sub.id}}">
 {% if forloop.first %}
 <div class="well well-small">
 <h3>Graded submission:</h3>
@@ -13,6 +14,9 @@
 {% endif %}
 <p>
 <h4>{{sub.time_created}} :</h4>
+  {% if sub.json_obj == "__ERROR__" and sub.plain_json_obj == "__ERROR__" %}
+    <div class="alert alert-error">We're sorry, there was an error decoding this submission. If this is the graded submission you'll need to retake the exam or restore from a previous submission. </div>
+  {% else %}
     {% for prob, data in sub.json_obj %}
 On question {{prob}}, you answered:
          {% if data|islist %}{# Custom template tag to test if object is a list #}
@@ -24,10 +28,18 @@ On question {{prob}}, you answered:
          {% endif %}
     <br />
     {% endfor %}
+  {% endif %}
 </p>
+<input type="hidden" name="json-pre-pop" value="{{sub.plain_json_obj}}" />
+{% if forloop.first %}
+    <input type="hidden" name="latest" value="True" />
+{% endif %}
+  {% if sub.json_obj != "__ERROR__" or sub.plain_json_obj != "__ERROR__" %}
+     <input type="submit" name="pre-pop-submit" id="pre-pop-submit" value="See form with this data" />
+  {% endif %}
+{% csrf_token %}
 </div>
-
+</form>
 {% endfor %}
-
 <a class="btn" href="{% url 'courses.exams.views.listAll' common_page_data.course.prefix common_page_data.course.suffix %}">Back to exams</a>
 {% endblock m_column_content %}

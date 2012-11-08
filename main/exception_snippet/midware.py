@@ -1,4 +1,4 @@
-import socket, sys, traceback, datetime
+import socket, sys, traceback, datetime, re
 from django.core.mail import send_mail
 from django.shortcuts import Http404
 import settings
@@ -18,6 +18,7 @@ class error_ping(object):
         (type, value, tb) = sys.exc_info()
         (path, lineno, exc, text) = traceback.extract_tb(tb)[-1]
         email_subj = "%s on %s" % (repr(exception), repr(socket.gethostname()))
+        email_subj = re.sub(r'\n','',email_subj)
         email_msg = "User: %s\nTime: %s\nUser-agent: %s\nFile path %s:%d\nLine text: %s\n" % (username, datestring, user_agent, path, lineno,  text)
         send_mail(email_subj, email_msg, from_addr, mailto_list)
         del tb

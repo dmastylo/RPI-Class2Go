@@ -1,9 +1,11 @@
 #!/bin/bash -e
 
+envs="prod stage dev"
+
 echo "This script prepares for an install by making sure that three shared resources are"
 echo "uploaded from this repo and the central Chef Server."
 echo 
-echo "1. updates the stage and prod environments from shared files"
+echo "1. updates environments from shared files: ${envs}"
 echo "2. uploads roles"
 echo "3. uploads cookbooks"
 echo 
@@ -18,11 +20,16 @@ if [[ ! $confirm =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
-set -x
 
-knife environment from file environments/prod.rb
-knife environment from file environments/stage.rb
-knife environment from file environments/dev.rb
+for e in $envs; do
+    if [ -e environments/$e.rb ]; then
+        set -x
+        knife environment from file environments/$e.rb
+        set +x
+    fi
+done
+
+set -x
 
 knife role from file roles/*.rb
 
