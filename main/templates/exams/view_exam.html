@@ -202,7 +202,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         examXHR.error(function(xhr, status, msg) {
             var dialogDiv = getDialog();
-            $(dialogDiv).find('p').text(msg);
+            $(dialogDiv).find('p').text(msg+": "+xhr.responseText.substr(0,99));
             $(dialogDiv).dialog({modal: true});
         });
 
