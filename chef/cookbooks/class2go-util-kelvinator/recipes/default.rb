@@ -20,6 +20,10 @@ execute "pip pil" do
     action :run
 end
 
+package "libx264-dev" do
+    action :install
+end
+
 cookbook_file "/usr/local/bin/ffmpeg" do
     owner "root"
     mode 00777
