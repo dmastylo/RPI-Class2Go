@@ -6,14 +6,15 @@
         h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
         #input-pane, #preview-pane {float: left; margin-right: 1em; width: 48%;}
         #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; padding: 1em;}
-        textarea, #staging-area {height: 300px; width: 100%;}
+        textarea, #staging-area {height: 300px; overflow: auto; width: 100%;}
         #preview-pane label {clear: both; display: block;}
         #preview-pane label input {float: left; margin-right: 1em;}
+        #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 1em;}
     </style>
 </head>
 <body>
 <div id="input-pane">
-    <h2>Enter Your Shit</h2>
+    <h2>Enter Problem XML</h2>
     <textarea>
     <problem>
     <p>
@@ -42,11 +43,11 @@
     </problem>
 
     </textarea>
-    <input type="button" id="preview-btn" value="Preview My Shit" />
+    <input type="button" id="preview-btn" value="Preview My Problem" />
 </div>
 
 <div id="preview-pane">
-    <h2>Preview Your Shit</h2>
+    <h2>Preview Problem HTML</h2>
     <div id="staging-area">
     </div>
 </div>
@@ -63,25 +64,45 @@ $(document).ready(function () {
 
         // Set up XML DOM
         var sourceXML = $('textarea').val();
-        var myDOM = $.parseXML(sourceXML);
-        var paragraphs = $(myDOM).find('p');
-        var choices = $(myDOM).find('choice'); 
-        
-        $(choices).each(function (idx, el) {
-            var tmpInput = document.createElement('input');
-            var tmpLabel = document.createElement('label');
-            $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
+        try {
+            var myDOM = $.parseXML(sourceXML);
+        } catch (e) {
+            alert('Your XML is invalid');
+            console.log(e.message);
+            return;
+        }
+        var root = $(myDOM).find('problem');
+        var allChildren = $(root).children();
 
-            $(tmpInput).attr('type', 'radio');
-            $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
-            $(tmpInput).attr('name', 'q' + questionIdx);
-            $(tmpInput).attr('value', $(this).attr('name'));
+        $(allChildren).each(function () {
+            if ($(this)[0].nodeName == 'p') {
+                $(this).clone().appendTo($('#staging-area'));
+            } else if ($(this)[0].nodeName == 'multiplechoiceresponse') {
+                var choices = $($(this)).find('choice'); 
+                
+                $(choices).each(function (idx, el) {
+                    var tmpInput = document.createElement('input');
+                    var tmpLabel = document.createElement('label');
+                    $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
 
-            $(tmpLabel).text($(this).text());
+                    $(tmpInput).attr('type', 'radio');
+                    $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
+                    $(tmpInput).attr('name', 'q' + questionIdx);
+                    $(tmpInput).attr('value', $(this).attr('name'));
 
-            $('#staging-area').append($(tmpLabel));
-            $(tmpLabel).append($(tmpInput));
+                    $(tmpLabel).text($(this).text());
+
+                    $('#staging-area').append($(tmpLabel));
+                    $(tmpLabel).append($(tmpInput));
+                });
+            }
         });
+       
+        var dataToTransmit = {};
+        dataToTransmit.xmlContent = $('textarea').val();
+        dataToTransmit.htmlContent = $('#staging-area').html(); 
+        console.log(JSON.stringify(dataToTransmit));
+
     }
 
     $('#preview-btn').click(renderPreview);
