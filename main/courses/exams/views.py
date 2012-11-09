@@ -146,3 +146,6 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     record.save()
     
     return HttpResponse("Submission has been saved.")
+
+def show_test_xml(request):
+    return render_to_response('exams/test_xml.html', {'message':'what up G?'}, RequestContext(request))
