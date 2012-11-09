@@ -35,6 +35,10 @@
     {% endif %}
 {% endblock mode_switcher %}
 
+{% block l_column_content %}
+    {% include "left_nav.html" %}
+{% endblock l_column_content %}
+
 {% block m_column_content %}
 <link rel="stylesheet" href="{{STATIC_URL}}latestKhan/demo/css/quiz_iframe.css" />
 <div id="c2g_layout_m_column" class="khan-template">
@@ -58,7 +62,7 @@
           <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" class="btn edit-video">Edit Video</a>
         {% endif %}
             <!-- Hardcoding select content of khan-site.html -->
-            <div id="page-container">
+            <div id="page-container  max-width: 1100px">
                 <div id="page-container-inner">
                     <div id="fb-root"></div>
                     <header></header>

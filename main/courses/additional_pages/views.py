@@ -5,8 +5,8 @@ from django.template import RequestContext
 from c2g.models import *
 from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
-import re
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
+from courses.views import get_full_contentsection_list
 
 @auth_is_course_admin_view_wrapper
 def manage_nav_menu(request, course_prefix, course_suffix):
@@ -55,4 +55,24 @@ def main(request, course_prefix, course_suffix, slug):
     else:
         template = 'additional_pages/view.html'
         
-    return render_to_response(template,{'common_page_data': common_page_data, 'page':page},context_instance=RequestContext(request))
+    course = common_page_data['course']
+    contentsection_list = ContentSection.objects.getByCourse(course=course)
+    video_list = Video.objects.getByCourse(course=course)
+    pset_list =  ProblemSet.objects.getByCourse(course=course)
+    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
+    file_list = File.objects.getByCourse(course=course)
+
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+
+    if request.user.is_authenticated():
+        is_logged_in = 1
+    else:
+        is_logged_in = 0
+
+    return render_to_response(template,
+                              {'common_page_data': common_page_data,
+                               'page': page,
+                               'contentsection_list': full_contentsection_list, 
+                               'full_index_list': full_index_list,
+                               'is_logged_in': is_logged_in},
+                               context_instance=RequestContext(request))

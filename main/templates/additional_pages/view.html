@@ -7,6 +7,10 @@
 
 {% block course_page_title %}{{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
+{% block l_column_content %}
+    {% include "left_nav.html" %}
+{% endblock l_column_content %}
+
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
     {% ifnotequal page.description '' %}
