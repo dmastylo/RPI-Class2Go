@@ -36,9 +36,9 @@ a:hover {color:#1F5EB7;}
 }
 
 .top-nav li .btn {background-color: #666;
-font-weight:normal;
-box-shadow:none;
-text-shadow: none;}
+	font-weight:normal;
+	box-shadow:none;
+	text-shadow: none;}
 
 
 .top-nav li .btn:hover {
@@ -46,21 +46,28 @@ text-shadow: none;}
   background: #666;}
 
 .home .hero-header {
-       background-image: url(../../graphics/core/Winthrop-Hall-Yellow-for-Lightbox.png);
-    }
+    background-image: url("../../graphics/core/Winthrop-Hall-Yellow-for-Lightbox.png");
+    padding-bottom: 40px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0;    }
     
-    body.home {
-       background-color: #EFEFEF;
+body.home {
+   background-color: #fff;
    }
    
    
+.home-unit {
+	padding-top: 0px;}
    
-   .class2go a {
-        background-color: #E2E2E2;}
+   
+   
+.class2go a {
+	background-color: #E2E2E2;}
         
-        /*******
-        MENU
-        ********/
+ /*******
+MENU
+********/
         
         
 #c2g_layout_topbar .navbar .navbar-inner {
@@ -101,6 +108,29 @@ ACCORDION
     background-color: #89CBE5;
     border-bottom: none;
 }
+
+
+/********
+UNITS _MOVED TO BODY.CSS
+*********/
+
+
+/* ============================= */
+/* ! Layout for mobile version   */
+/* ============================= */
+
+@media handheld, only screen and (max-width: 900px) {
+
+	body {
+		
+	}
+	
+.home-unit a p {font-size: 14px;
+line-height: 16px;}
+
+}
+
+
 
    
 /**********

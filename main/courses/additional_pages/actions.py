@@ -117,6 +117,29 @@ def save(request):
         if request.POST.get("commit") == '1':
             page.commit()
             
+        if request.POST.get("title") == 'Overview':
+            
+            ready_course = common_page_data['ready_course']
+            draft_course = common_page_data['draft_course']
+
+            print(request.POST.get("description"))
+
+            draft_course.outcomes = request.POST.get("outcomes")
+            draft_course.faq = request.POST.get("faq")
+            draft_course.prerequisites = request.POST.get("prerequisites")
+            draft_course.accompanying_materials = request.POST.get("accompanying_materials")
+            draft_course.description = request.POST.get("description")
+            draft_course.save()
+                
+            if request.POST.get("commit") == '1': 
+                ready_course.outcomes = request.POST.get("outcomes")
+                ready_course.faq = request.POST.get("faq")
+                ready_course.prerequisites = request.POST.get("prerequisites")
+                ready_course.accompanying_materials = request.POST.get("accompanying_materials")
+                ready_course.description = request.POST.get("description")
+                ready_course.save()
+    
+                   
     return redirect('courses.additional_pages.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'], page.slug)
 
 @require_POST

@@ -55,4 +55,18 @@ def main(request, course_prefix, course_suffix, slug):
     else:
         template = 'additional_pages/view.html'
         
-    return render_to_response(template,{'common_page_data': common_page_data, 'page':page},context_instance=RequestContext(request))
+        
+    if slug == 'overview':
+        video = Video.objects.getByCourse(course=common_page_data['course']).get(slug='intro')
+        instructors = Instructor.objects.filter(courseinstructor=common_page_data['course'])
+        photo =  instructors[0].photo.storage.url(instructors[0].photo.name)
+        return render_to_response(template,{'common_page_data': common_page_data, 
+                                            'video':video,
+                                            'photo':photo,
+                                            'instructors':instructors,
+                                            'course': common_page_data['course'],
+                                            'page':page},context_instance=RequestContext(request))
+    else:
+        return render_to_response(template,{'common_page_data': common_page_data, 'page':page},context_instance=RequestContext(request))
+        
+        

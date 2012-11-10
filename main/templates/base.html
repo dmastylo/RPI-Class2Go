@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/uwa-styles.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/{{ SITE_NAME_SHORT }}-styles.css" />
     <!--[if IE 7]>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
     <![endif]-->
@@ -55,7 +55,9 @@
             <div class="row-fluid" style="position:relative;">
             {% block page_title %}
             <div class="pull-left page-title">
+                {% if SITE_NAME_SHORT = 'Stanford' %}
                 <img src="{{ STATIC_URL }}graphics/core/top-banner-Stanford.png" alt="Stanford Online">
+                {% endif %}
                 <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
             </div>
             {% endblock page_title %}

@@ -19,6 +19,7 @@ from django.contrib.auth import login as auth_login
 from django.conf import settings
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.views.decorators.debug import sensitive_post_parameters
+from c2g.models import Video, Instructor, CourseInstructor
 
 import json
 import settings
@@ -29,6 +30,7 @@ logger=logging.getLogger("foo")
 
 backend = get_backend('registration.backends.simple.SimpleBackend')
 form_class = RegistrationFormUniqueEmail
+
 
 @upgrade_to_https_and_downgrade_upon_redirect
 def preview(request, course_prefix, course_suffix):
@@ -45,19 +47,29 @@ def preview(request, course_prefix, course_suffix):
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     
+    video = Video.objects.getByCourse(course=request.common_page_data['course']).get(slug='intro')
     
+    instructors = Instructor.objects.filter(courseinstructor=request.common_page_data['course'])
+    
+    photo =  instructors[0].photo.storage.url(instructors[0].photo.name)
    
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)
     template_name='previews/default.html'
-    class_template='previews/'+request.common_page_data['course'].handle+'.html'
+# class_template='previews/'+request.common_page_data['course'].handle+'.html'
+    class_template='previews/default.html'
+ 
     if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
         template_name=class_template
     return render_to_response(template_name,
                               {'form': form,
                                'login_form': login_form,
+                               'video':video,
+                               'photo':photo,
+                               'instructors':instructors,
                               'common_page_data': request.common_page_data,
+                              'course': request.common_page_data['course'],
                               'display_login': request.GET.__contains__('login')},
                               context_instance=context)
 

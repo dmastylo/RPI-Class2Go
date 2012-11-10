@@ -39,6 +39,45 @@
             <input type='hidden' name='title' value='Overview' />
         {% endifnotequal %}
         <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
+       
+        {% ifequal page.slug 'overview' %}
+        <div class="control-group">
+            <div class="controls">
+                
+                <h3>Description</h3>
+                
+                <textarea name="description" class="tinymce">
+                    {% autoescape off %}{{course.description}}{% endautoescape %}
+                </textarea>
+                
+                <h3>Prerequisites</h3>
+                
+                <textarea name="prerequisites" class="tinymce">
+                    {% autoescape off %}{{course.prerequisites}}{% endautoescape %}
+                </textarea>
+                
+                <h3>FAQ</h3>
+                
+                <textarea name="faq" class="tinymce">
+                    {% autoescape off %}{{course.faq}}{% endautoescape %}
+                </textarea>
+                
+                 <h3>Accompanying Materials</h3>
+                
+                <textarea name="accompanying_materials" class="tinymce">
+                    {% autoescape off %}{{course.accompanying_materials}}{% endautoescape %}
+                </textarea>
+                
+                 <h3>Outcomes</h3>
+                
+                <textarea name="outcomes" class="tinymce">
+                    {% autoescape off %}{{course.outcomes}}{% endautoescape %}
+                </textarea>
+                
+            </div>
+        </div>
+        
+        {% else %}
         <div class="control-group">
             <div class="controls">
                 <textarea name="description" class="tinymce">
@@ -46,6 +85,7 @@
                 </textarea>
             </div>
         </div>
+        {% endifequal %}
         
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
