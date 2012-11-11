@@ -132,7 +132,9 @@
         {% endblock content %}
         </div>
     </div>
-    {% include "footer.html" %}
+    {% with "sites/"|add:SITE_NAME_SHORT|add:"/footer.html" as footer_include %}
+    {% include  footer_include  %}
+    {% endwith %}
     {% if reenable_modal %}
     <!-- Commenting out the modal login per #447 for now
     <div id="login-modal" class="modal fade">

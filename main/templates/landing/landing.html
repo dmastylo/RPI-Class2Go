@@ -29,10 +29,10 @@
          	{% for course in course_list %}
 			<div class="home-unit">
    			    <div class="container">
-    				<a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">
+    				<a href="{% url 'courses.views.main' course.prefix course.suffix %}">
     	 			<div class="home-unit-box"> 
         				<div class="row">
-	        				<img src="/static/graphics/core/solarcells.jpg">
+	        				<img src="{{ course.logo_dl_link }}">
             				<h3>{{ course.title }}</h3>
             				<p><strong>Course starts {{ course.term }} {{ course.year }} </strong></p>
             				<p>{% autoescape off %}{{course.short_description}}{% endautoescape %}</p>

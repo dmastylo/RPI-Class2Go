@@ -117,13 +117,20 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     outcomes = models.TextField(blank=True)
     faq = models.TextField(blank=True)
     logo = models.FileField(upload_to=get_file_path,null=True)
-    logo_handle = models.CharField(max_length=255, null=True, db_index=True)
  
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
     # Just use epoch seconds to make it unique.
     piazza_id = models.IntegerField(null=True, blank=True)
+
+    def logo_dl_link(self):
+        if not self.logo.storage.exists(self.logo.name):
+            return ""
+        
+        url = self.logo.storage.url(self.logo.name)
+        return url
+
 
     def __unicode__(self):
         if self.title:
@@ -1421,7 +1428,14 @@ class Instructor(TimestampMixin, models.Model):
     email = models.TextField(blank=True)
     biography = models.TextField(blank=True)
     photo = models.FileField(upload_to=get_file_path, blank=True)
-    photo_handle = models.CharField(max_length=255, null=True, db_index=True)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+    
+    def photo_dl_link(self):
+        if not self.photo.storage.exists(self.photo.name):
+            return ""
+        
+        url = self.photo.storage.url(self.photo.name)
+        return url
     
     def __unicode__(self):
         return self.name

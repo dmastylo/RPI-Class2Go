@@ -47,31 +47,31 @@ def preview(request, course_prefix, course_suffix):
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     
-    video = Video.objects.getByCourse(course=request.common_page_data['course']).get(slug='intro')
-    
+    try:
+        video = Video.objects.getByCourse(course=request.common_page_data['course']).get(slug='intro')
+    except Video.DoesNotExist:
+        video = None
+        
     instructors = Instructor.objects.filter(courseinstructor=request.common_page_data['course'])
-    
-    photo =  instructors[0].photo.storage.url(instructors[0].photo.name)
-   
+       
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)
     template_name='previews/default.html'
-# class_template='previews/'+request.common_page_data['course'].handle+'.html'
-    class_template='previews/default.html'
+    # class_template='previews/'+request.common_page_data['course'].handle+'.html'
+
  
-    if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
-        template_name=class_template
+    #if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
+    #    template_name=class_template
     return render_to_response(template_name,
                               {'form': form,
                                'login_form': login_form,
                                'video':video,
-                               'photo':photo,
                                'instructors':instructors,
-                              'common_page_data': request.common_page_data,
-                              'course': request.common_page_data['course'],
-                              'display_login': request.GET.__contains__('login')},
-                              context_instance=context)
+                               'common_page_data': request.common_page_data,
+                               'course': request.common_page_data['course'],
+                               'display_login': request.GET.__contains__('login')},
+                               context_instance=context)
 
 @sensitive_post_parameters()
 @never_cache
@@ -94,12 +94,13 @@ def preview_login(request, course_prefix, course_suffix):
     else:
         form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
         context = RequestContext(request)                
-        return render_to_response('previews/'+request.common_page_data['course'].handle+'.html',
-                          {'form': form,
-                          'login_form': login_form,
-                          'common_page_data': request.common_page_data,
-                          'display_login': True},
-                          context_instance=context)
+        return render_to_response(#'previews/'+request.common_page_data['course'].handle+'.html',
+                                  'previews/default.html',
+                                  {'form': form,
+                                   'login_form': login_form,
+                                   'common_page_data': request.common_page_data,
+                                   'display_login': True},
+                                  context_instance=context)
 
 @sensitive_post_parameters()
 @require_POST
@@ -124,7 +125,8 @@ def preview_reg(request, course_prefix, course_suffix):
     else:
         login_form = AuthenticationForm(data=request.POST)
         context = RequestContext(request)                
-        return render_to_response('previews/'+request.common_page_data['course'].handle+'.html',
+        return render_to_response(#'previews/'+request.common_page_data['course'].handle+'.html',
+                                  'previews/default.html',
                                       {'form': form,
                                       'login_form': login_form,
                                       'common_page_data': request.common_page_data,

@@ -13,7 +13,7 @@
 	
 	<div class = "span11">
     <h3>Course Info</h3>
-     {% ifnotequal video.url '' %}
+     {% ifnotequal video None %}
     <iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
 	<br/>
 	 {% endifnotequal %}
@@ -48,7 +48,7 @@
    			    <div class="container">
     				<div class="home-unit-box"> 
         				<div class="row" >
-							<img style="width:200px;height:220px;" src="/{{photo}}">
+							<img style="width:200px;height:220px;" src="{{instructor.photo_dl_link}}">
             				<p>{{instructor.biography}}</p>
         				</div>
         			</div>
