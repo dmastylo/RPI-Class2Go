@@ -353,7 +353,7 @@ BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
 BROKER_TRANSPORT_OPTIONS = {
     'region': 'us-west-2', 
     'queue_name_prefix' : INSTANCE+'-',
-    'visibility_timeout' : 7200,
+    'visibility_timeout' : 3600*6,
 }
 
 CELERY_DEFAULT_QUEUE = 'default'
