@@ -50,15 +50,14 @@ class SimpleTestBase(TestCase):
                                 follow=True)
         self.assertEqual(resp.status_code, 200)
 
-
-class ProblemSetTest(SimpleTestBase):
+class BasicDraftModeTest(SimpleTestBase):
     fixtures = ['pset_testdata.json']
     username = 'professor_0'
     password = 'class2go'
     coursePrefix = 'networking'
     courseSuffix = 'Fall2012'
 
-    def test_fixure_loading(self):
+    def test_fixture_loading(self):
         """
         Tests the fixture loaded correctly
         """
@@ -76,9 +75,28 @@ class ProblemSetTest(SimpleTestBase):
         self.assertTrue('pset_url' in resp.context)
         self.assertEqual(resp.context['pset_url'], '/networking/Fall2012/problemsets/P2/load_problem_set')
 
+    def test_pset_load(self):
+        """
+        Test that we can load the actual problem set (?)
+        """
         # load a page with just the problem set
         resp = self.client.get('/networking/Fall2012/problemsets/P2/load_problem_set' )
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('file_names' in resp.context)
         self.assertEqual(resp.context['file_names'][0], 'xx_P2_Lexical1')
+
+    def test_load_all_psets(self):
+        """
+        Test the view all problemset page
+        """
+        resp = self.client.get('/networking/Fall2012/problemsets/' )
+        self.assertEqual(resp.status_code, 200)
+
+    def test_load_manage_exercises(self):
+        """
+        Test the loading of the manage problemset exercises page
+        """
+        resp = self.client.get('/networking/Fall2012/problemsets/P2/manage_exercise' )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.context['exercises']), 2)
 
