@@ -277,6 +277,7 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
                 valid, output = validate_row(row)
                 if not valid:
                     bad_rows.append(str(row_count) + ":" + str(row) + " => " + output)
+                    logger.error(str(row_count) + ":" + str(row) + " => " + output)
                 else:
                     (username, field_name, score) = output
                     
@@ -311,7 +312,7 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
             total_1 = sum(map(lambda r:r['score'], record['fields']))
             if total_1 != record['total']:
                 bad_rows.append(username + ": total does not match sum of subscores.  Sum:" + str(total_1) + " Total:" + str(record['total']))
-
+                logger.error(username + ": total does not match sum of subscores.  Sum:" + str(total_1) + " Total:" + str(record['total']))
             user_score.score = max(record['total'],0) #0 is the floor score
             user_score.save()
             db_hits += 1
@@ -323,6 +324,9 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
         
         except User.DoesNotExist:
             bad_rows.append(username + " not found in students list!")
+            logger.error(username + " not found in students list!")
+
+    logger.info("Good count: %d  Student count: %d  DB Hits: %d  Bad rows:%s" % (good_count, student_count, db_hits, str(bad_rows)))
 
     return render_to_response('exams/csv_upload_confirm.html',
                               {'common_page_data':request.common_page_data,
