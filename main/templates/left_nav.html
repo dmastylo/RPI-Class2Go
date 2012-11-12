@@ -48,7 +48,7 @@
                         {% endifequal %}
                         {% ifequal item.0 'pset' %}
                             {% if is_logged_in %}
-                                {% ifequal item.5 pset.slug %}
+                                {% ifequal item.5 pset.title %}
                                     <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Problem Set"><em class="icon-pencil" style="color:#3926F0"></em> <span style="color:#3926F0">{{item.5}}</span></a></li>
                                 {% else %}
                                     <li><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Problem Set"><em class="icon-pencil"></em> <span>{{item.5}}</span></a></li>    
