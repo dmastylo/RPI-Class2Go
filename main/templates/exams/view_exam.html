@@ -230,8 +230,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     }
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
+                      
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
     $("#reEnableForm").attr('disabled','disabled');
+    $('#main-content input').attr('disabled','disabled');
+                  
+                      
     {% endif %}
                       
     });
