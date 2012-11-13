@@ -1473,6 +1473,7 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
+    total_score = models.IntegerField(null=True, blank=True)
     
     def past_due(self):
         if self.due_date and (datetime.now() > self.due_date):
@@ -1488,7 +1489,29 @@ class ExamRecord(TimestampMixin, models.Model):
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)
-    score = models.IntegerField(null=True, blank=True)
+    score = models.IntegerField(null=True, blank=True) #currently unused.
 
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
+
+
+class ExamScore(TimestampMixin, models.Model):
+    """
+    This class is meant to be the top level score of each problem set
+    """
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    score = models.IntegerField(null=True, blank=True) #this is the parent score
+    #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
+
+    def __unicode__(self):
+        return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.total_score))
+
+
+class ExamScoreField(TimestampMixin, models.Model):
+    parent = models.ForeignKey(ExamScore, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    subscore = models.IntegerField(default=0)
+
+
