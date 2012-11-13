@@ -10,13 +10,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 {% if common_page_data.course.mode == "ready" and not exam.is_live %}
 
-    This exam will go live on {{ exam.live_datetime }} PDT.
+    This exam will go live on {{ exam.live_datetime }} PST.
 
-{% elif common_page_data.course.mode == "ready" and exam.past_due %}
-
-    This exam was closed on {{ exam.due_date }} PDT.
 
 {% else %}
+
+    {% if common_page_data.course.mode == "ready" and exam.past_due %}
+
+       <h3>This exam was closed on {{ exam.due_date }} PST.  Submissions are disabled. </h3>
+
+    {% if score %}
+    <h4><b style="color:red">Your grade: {{score}}/{{exam.total_score}}</b></h4>
+    {% endif %}
+
+    {% endif %}
 
     <noscript>
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
@@ -90,23 +97,34 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             if (typeof dataObj[member] == "string") {
                 // it's a text input/textarea
                 $('input[name|=' + member + ']').val(dataObj[member]);
+                if (scores.hasOwnProperty(member)) {
+                      //Label the input with the score
+                      $('input[name|=' + member + ']').before("<b style='color:red'>" + scores[member]+" </b> ");
+                };
+                
             } else {
+                if (scores.hasOwnProperty(member)) {
+                      //Label the closet div enclosing the choices with the score (probably want fieldset instead)
+                      $('input[name|=' + member + ']').first().closest('div').children(':first').before("<b style='color:red'>" + scores[member]+" </b> ");
+                }
                 // it's multiple choice, therefore an array
                 $('input[name|=' + member + ']').removeAttr('checked');
-
                 // loop through each choice listed for this input
                 for (var i = 0; i < dataObj[member].length; i += 1) {
+    
                     var obj = dataObj[member][i];
 
                     for (key in obj) {
 
                         if (key == 'value') {
-                            console.log(key + ' is what we want');
+                      //console.log(key + ' is what we want');
+                            $('#' + member + '_' + obj[key]).attr('checked', 'checked');
+
                         } else {
-                            console.log(key + ' is not a real value');
+                      //console.log(key + ' is not a real value');
                         }
 
-                        $('#' + member + '_' + obj[key]).attr('checked', 'checked');
+                        
                     }
 
                 }
@@ -210,10 +228,25 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     // Make sure pre-pop is in a properly-escaped string 
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
+    var scores = JSON.parse('{{scores|escapejs}}');
+                      
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
 
+    {% if common_page_data.course.mode == "ready" and exam.past_due %}
+                      
+    $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
+    $("#reEnableForm").attr('disabled','disabled');
+    $('#main-content input').attr('disabled','disabled');
+                  
+                      
+    {% endif %}
+                      
     });
+ 
+ 
+
+    
 </script>
 {% endblock addl_scripts %}
