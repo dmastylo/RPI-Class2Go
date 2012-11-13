@@ -1506,7 +1506,7 @@ class ExamScore(TimestampMixin, models.Model):
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
 
     def __unicode__(self):
-        return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.total_score))
+        return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.score))
 
 
 class ExamScoreField(TimestampMixin, models.Model):
