@@ -68,7 +68,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
         raise Http404
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
-                              'scores':"{}",
+                              'scores':"{}",'editable':True,
                               'exam':exam}, RequestContext(request))
 
 @require_POST
