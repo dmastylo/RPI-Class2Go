@@ -9,22 +9,66 @@
 <div id="c2g_layout_m_column" class="span12">
     {% if user.is_authenticated %}
     <ul>
-    {% for exam in exams %}
+    {% for exam,score in exams_and_scores %}
     
     <li class="course-list-item">
         <div class="pull-left">
             <em class="icon-pencil"></em>
         </div>
         <div class="course-list-content">
-            <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
-            <p>{{exam.description}}</p>
-            <p>
-            <a href="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">My Submissions</a>
-            {% if common_page_data.course_mode == "draft" %}
-             <a class="btn btn-small" href="{% url 'courses.exams.views.view_submissions_to_grade' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Download Student Submission CSV</a>
-            </p>
+            {% if common_page_data.course.mode == "ready" and exam.past_due %}
+                <h4>{{exam.title}}</h4>
+            {% else %}
+                <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
             {% endif %}
-            <p><strong>Deadline:</strong> {{exam.due_date}} PST<br />
+            <p>{{exam.description}}</p>
+            
+            {% if common_page_data.course_mode == "draft" %}
+            <div class="btn-toolbar">
+                <div class="btn-group">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                        Download CSV
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'courses.exams.views.view_submissions_to_grade' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Student Submissions</a></li>
+                        <li><a href="{% url 'courses.exams.views.view_csv_grades' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Student Grades</a></li>
+                    </ul>
+                </div>
+                
+                <a href="#myModal{{exam.slug}}" role="button" class="btn" data-toggle="modal">Upload CSV</a>
+            </div>
+            
+            <div id="myModal{{exam.slug}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel{{exam.slug}}" aria-hidden="true">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 id="ModalLabel{{exam.slug}}">Select a CSV File with Student Grades</h3>
+                </div>
+                <div class="modal-body">
+                    <form id="csv_upload" enctype="multipart/form-data" method="POST" action="{% url 'courses.exams.views.post_csv_grades' common_page_data.course.prefix common_page_data.course.suffix exam.slug%}">
+                        {% csrf_token %}
+                        <input style="line-height:0px" id="fileinput" type="file" name="file" />
+                    </form>
+                    <b>Note:</b>  for a file with a lot of records (~50k), this import will take up to 10 minutes, so please don't navigate away after you clicked import.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                    <input class="btn btn-primary" type="submit" value="Import Grade CSV" onclick="$('#csv_upload').submit()" />
+                </div>
+            </div>
+
+            {% endif %}
+            {% if score %}
+            <b><a href="{% url 'courses.exams.views.show_graded_exam' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Score: {{score}}/{{exam.total_score}} </a></b>
+            {% endif %}
+            &nbsp; 
+            <a href="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">
+            View Submissions</a>
+            
+            
+            
+
+            <p><strong>Deadline:</strong> {{exam.due_date}} PST<br /><br /></p>
             
         </div>
     </li>
@@ -37,9 +81,10 @@
     {% endfor %}
     </ul>
     {% else %}
-    <h4>Please <a data-toggle="modal" href="{% url 'auth_login' %}">log in</a> to see course materials.</h4>
+    <h4>Please <a href="{% url 'auth_login' %}">log in</a> to see course materials.</h4>
     {% endif %}
 </div>
+
 {% endblock m_column_content %}
 
 

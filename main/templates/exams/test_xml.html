@@ -9,7 +9,7 @@
         textarea, #staging-area {height: 300px; overflow: auto; width: 100%;}
         #preview-pane label {clear: both; display: block;}
         #preview-pane label input {float: left; margin-right: 1em;}
-        #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 1em;}
+        #preview-pane #staging-area p {clear: both; display: block; margin: 0; padding: 0 0 1em;}
     </style>
 </head>
 <body>
@@ -74,27 +74,70 @@ $(document).ready(function () {
         var root = $(myDOM).find('problem');
         var allChildren = $(root).children();
 
-        $(allChildren).each(function () {
-            if ($(this)[0].nodeName == 'p') {
-                $(this).clone().appendTo($('#staging-area'));
-            } else if ($(this)[0].nodeName == 'multiplechoiceresponse') {
-                var choices = $($(this)).find('choice'); 
-                
-                $(choices).each(function (idx, el) {
+        var renderResponseNode = function (node) {
+
+            var nodeName = $(node)[0].nodeName;
+            var nodeParent = arguments[1] || $('#staging-area'); 
+
+            switch (nodeName) {
+                case 'multiplechoiceresponse':
+                    var choices = $($(node)).find('choice'); 
+                    
+                    $(choices).each(function (idx, el) {
+                        var tmpInput = document.createElement('input');
+                        var tmpLabel = document.createElement('label');
+                        $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
+
+                        $(tmpInput).attr('type', 'radio');
+                        $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
+                        $(tmpInput).attr('name', 'q' + questionIdx);
+                        $(tmpInput).attr('value', $(this).attr('name'));
+
+                        $(tmpLabel).text($(this).text());
+
+                        $(nodeParent).append($(tmpLabel));
+                        $(tmpLabel).append($(tmpInput));
+                    });
+                    break;
+                case 'stringresponse':
+                case 'numericalresponse':
+                    var textBoxData = $(node).children();   // only goes down one-level
+                    
                     var tmpInput = document.createElement('input');
-                    var tmpLabel = document.createElement('label');
-                    $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
-
-                    $(tmpInput).attr('type', 'radio');
-                    $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
+                    $(tmpInput).attr('type', 'text');
+                    $(tmpInput).attr('id', 'q' + questionIdx);
                     $(tmpInput).attr('name', 'q' + questionIdx);
-                    $(tmpInput).attr('value', $(this).attr('name'));
 
-                    $(tmpLabel).text($(this).text());
+                    var textInputSize = (false) ? '' : 20;
+                    $(tmpInput).attr('size', textInputSize);
 
-                    $('#staging-area').append($(tmpLabel));
-                    $(tmpLabel).append($(tmpInput));
-                });
+                    $(nodeParent).append($(tmpInput));
+                    break;
+                default:
+                    break;
+            }
+
+            if ($(nodeParent)[0] != $('#staging-area')[0]) {
+                $('#staging-area').append($(nodeParent));
+            }
+        };
+
+        $(allChildren).each(function () {
+            var nodeName = $(this)[0].nodeName;
+
+            if (nodeName == 'p') {
+                var previewP = document.createElement('p');
+                $(previewP).text($(this).text());
+                $(previewP).appendTo($('#staging-area'));
+                
+                var responseNodes = $(this).children();
+                if (responseNodes.length > 0) {
+                    responseNodes.each(function () {
+                        renderResponseNode($(this), previewP);
+                    });
+                }
+            } else {
+                renderResponseNode($(this));
             }
         });
        
