@@ -11,9 +11,11 @@
                {% else %}
                 <span class="label">Complete</span>
                {% endif %}
-            {% else %}
+            {% elif item.numCompleted > 0 %}
                 <span class="label">In Progress: {{item.numCompleted}} of {{item.numQuestions}}</span>
             {% endif %}
+            
+            
             <div class="progress {% if item.numCompleted == item.numQuestions %}progress-success{% else %}progress-warning{% endif %} progress-striped">
                 <div class="bar" style="width:{{item.progress}}%"></div>
             </div>
