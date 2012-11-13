@@ -16,7 +16,11 @@
             <em class="icon-pencil"></em>
         </div>
         <div class="course-list-content">
-            <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
+            {% if common_page_data.course.mode == "ready" and exam.past_due %}
+                <h4>{{exam.title}}</h4>
+            {% else %}
+                <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
+            {% endif %}
             <p>{{exam.description}}</p>
             
             {% if common_page_data.course_mode == "draft" %}
@@ -54,14 +58,15 @@
             </div>
 
             {% endif %}
-            
+            {% if score %}
+            <b><a href="{% url 'courses.exams.views.show_graded_exam' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Score: {{score}}/{{exam.total_score}} </a></b>
+            {% endif %}
+            &nbsp; 
             <a href="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">
-                {% if score %}
-                <b>Score: {{score}}/{{exam.total_score}}  --  </b>
-                {% endif %}
-                View Submissions</a>
+            View Submissions</a>
             
-                        
+            
+            
 
             <p><strong>Deadline:</strong> {{exam.due_date}} PST<br /><br /></p>
             

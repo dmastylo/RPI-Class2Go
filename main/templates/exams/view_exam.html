@@ -19,6 +19,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
        <h3>This exam was closed on {{ exam.due_date }} PST.  Submissions are disabled. </h3>
 
+    {% if score %}
+    <h4><b style="color:red">Your grade: {{score}}/{{exam.total_score}}</b></h4>
+    {% endif %}
+
     {% endif %}
 
     <noscript>
@@ -113,12 +117,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     for (key in obj) {
 
                         if (key == 'value') {
-                            console.log(key + ' is what we want');
+                      //console.log(key + ' is what we want');
+                            $('#' + member + '_' + obj[key]).attr('checked', 'checked');
+
                         } else {
-                            console.log(key + ' is not a real value');
+                      //console.log(key + ' is not a real value');
                         }
 
-                        $('#' + member + '_' + obj[key]).attr('checked', 'checked');
                         
                     }
 

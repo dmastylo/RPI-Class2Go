@@ -67,7 +67,9 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
     
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
+                              'scores':"{}",
+                              'exam':exam}, RequestContext(request))
 
 @require_POST
 @auth_view_wrapper
@@ -75,7 +77,7 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
     parser = HTMLParser.HTMLParser()
     json_pre_pop = parser.unescape(request.POST['json-pre-pop'])
-    scores = request.POST.get('scores',"")
+    scores = request.POST.get('scores',"{}")
     editable = request.POST.get('latest', False)
  
     try:
@@ -84,6 +86,39 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
         raise Http404
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores, 'editable':editable}, RequestContext(request))
+
+
+@auth_view_wrapper
+def show_graded_exam(request, course_prefix, course_suffix, exam_slug):
+    course = request.common_page_data['course']
+    
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    try:
+        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).latest('time_created')
+        json_pre_pop = record.json_data
+    except ExamRecord.DoesNotExist:
+        record = None
+        json_pre_pop = "{}"
+
+    try:
+        score_obj = ExamScore.objects.get(course=course, exam=exam, student=request.user)
+        score = score_obj.score
+        score_fields = {}
+        for s in list(ExamScoreField.objects.filter(parent=score_obj)):
+            score_fields[s.field_name] = s.subscore
+        scores_json = json.dumps(score_fields)
+    except ExamScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
+        score = None
+        score_fields = {}
+        scores_json = "{}"
+
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'editable':False, 'score':score}, RequestContext(request))
+
+
 
 @auth_view_wrapper
 def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
