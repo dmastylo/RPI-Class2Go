@@ -30,21 +30,40 @@
     div.problem, div.problem {float:left; width:95%;}
     .control-group {clear:both; padding:1em; zoom:1;}
     .control-group .atomic-unit {float:left; margin-right: 1em;}
+    div#summative {display:none}
 </style>
 
 <div class="well create-exam-form">
     <h2>Create a new exam</h2>
 
     <div class="control-group">
-        <div class="atomic-unit"><label for="exam_title" class="control-label">Exam Title:</label><input id="exam_title" type="text"></div>
-        <div class="atomic-unit"><label for="exam_slug" class="control-label">Exam URL Identifier:</label><input id="exam_slug" type="text"></div>
+        <div class="atomic-unit"><label for="exam_title" class="control-label">Exam Title:*</label><input id="exam_title" type="text" /></div>
+        <div class="atomic-unit"><label for="exam_slug" class="control-label">Exam URL Identifier:*</label><input id="exam_slug" type="text" /></div>
         <div class="atomic-unit">
-            <label class="control-label" for="due_date">Due Date*</label>
+            <label class="control-label" for="due_date">Due Date:*</label>
             <input id="due_date" class="picker"  type="text" name="due_date" value="{{current_datetime}}" data-datetimepicker>
         </div>
         <div class="atomic-unit">
-            <label class="control-label" for="due_date">Grace Period End*</label>
+            <label class="control-label" for="due_date">Grace Period End:*</label>
             <input id="grace_period" class="picker"  type="text" name="grace_period" value="" data-datetimepicker>
+        </div>
+        <div class="atomic-unit">
+            <label class="control-label" for="assess_type">Select Assessment Type:</label>
+            <select name="assessment_type">
+                <option value="formative">Formative Problem Set</option>
+                <option value="summative">Summative Problem Set/Exam</option>
+                <option value="exam">Survey</option>
+            </select>
+        </div>
+        <div id="penalties" class="atomic-unit">
+            <label class="control-label" for="late_penalty">Late Penalty:</label>
+            <input id="late_penalty" type="text" />
+            <div id="summative">
+            <label class="control-label" for="no_subs_permitted">Number of Submissions Allowed:</label>
+            <input id="no_subs_permitted" type="text" />
+            <label class="control-label" for="resubmission_penalty">Penalty per incorrect submission:</label>
+            <input id="resubmission_penalty" type="text" />
+            </div>
         </div>
     </div>
 
