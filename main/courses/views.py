@@ -64,11 +64,58 @@ def main(request, course_prefix, course_suffix):
         is_logged_in = 0
         news_list = []
 
-    contentsection_list = ContentSection.objects.getByCourse(course=common_page_data['course'])
-    video_list = Video.objects.getByCourse(course=common_page_data['course'])
-    pset_list =  ProblemSet.objects.getByCourse(course=common_page_data['course'])
-    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
-    file_list = File.objects.getByCourse(course=common_page_data['course'])
+    course = common_page_data['course']
+    contentsection_list = ContentSection.objects.getByCourse(course=course)
+    video_list = Video.objects.getByCourse(course=course)
+    pset_list =  ProblemSet.objects.getByCourse(course=course)
+    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
+    file_list = File.objects.getByCourse(course=course)
+
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+
+    return render_to_response('courses/view.html',
+            {'common_page_data': common_page_data,
+             'announcement_list': announcement_list,
+             'many_announcements':many_announcements,
+             'news_list': news_list,
+             'contentsection_list': full_contentsection_list,
+             'video_list': video_list,
+             'pset_list': pset_list,
+             'full_index_list': full_index_list,
+             'is_logged_in': is_logged_in
+             },
+
+            context_instance=RequestContext(request))
+
+@auth_view_wrapper
+def course_materials(request, course_prefix, course_suffix):
+
+
+    section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
+
+    form = None
+    if request.common_page_data['course_mode'] == "draft":
+        form = LiveDateForm()
+    
+    return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
+
+@auth_view_wrapper
+@require_POST
+@csrf_protect
+def unenroll(request, course_prefix, course_suffix):
+    
+    try:
+        course = Course.objects.get(handle=course_prefix+'--'+course_suffix, mode='ready')
+    except Course.DoesNotExist:
+        raise Http404
+            
+    student_group = Group.objects.get(id=course.student_group_id)
+    student_group.user_set.remove(request.user)
+    
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list):
 
     full_index_list = []
     full_contentsection_list=[]
@@ -116,44 +163,5 @@ def main(request, course_prefix, course_suffix):
        #don't show empty sections
         if index_list:
             full_contentsection_list.append(contentsection)
-
-    return render_to_response('courses/view.html',
-            {'common_page_data': common_page_data,
-             'announcement_list': announcement_list,
-             'many_announcements':many_announcements,
-             'news_list': news_list,
-             'contentsection_list': full_contentsection_list,
-             'video_list': video_list,
-             'pset_list': pset_list,
-             'full_index_list': full_index_list,
-             'is_logged_in': is_logged_in
-             },
-
-            context_instance=RequestContext(request))
-
-@auth_view_wrapper
-def course_materials(request, course_prefix, course_suffix):
-
-
-    section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
-
-    form = None
-    if request.common_page_data['course_mode'] == "draft":
-        form = LiveDateForm()
-    
-    return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
-
-@auth_view_wrapper
-@require_POST
-@csrf_protect
-def unenroll(request, course_prefix, course_suffix):
-    
-    try:
-        course = Course.objects.get(handle=course_prefix+'--'+course_suffix, mode='ready')
-    except Course.DoesNotExist:
-        raise Http404
-            
-    student_group = Group.objects.get(id=course.student_group_id)
-    student_group.user_set.remove(request.user)
-    
-    return redirect(request.META['HTTP_REFERER'])
+        
+    return full_contentsection_list, full_index_list

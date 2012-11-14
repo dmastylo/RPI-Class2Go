@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog, Video, AdditionalPage, File
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, render
 from django.template import RequestContext
@@ -15,6 +15,7 @@ from courses.forms import *
 from django.contrib import messages
 from django.db import connection
 from courses.course_materials import filename_in_deleted_list
+from courses.views import get_full_contentsection_list
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -126,6 +127,21 @@ def show(request, course_prefix, course_suffix, pset_slug):
                 
             activity_list.append((activity_item, number))
 
+
+    course = common_page_data['course']
+    contentsection_list = ContentSection.objects.getByCourse(course=course)
+    video_list = Video.objects.getByCourse(course=course)
+    pset_list =  ProblemSet.objects.getByCourse(course=course)
+    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
+    file_list = File.objects.getByCourse(course=course)
+
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+
+    if request.user.is_authenticated():
+        is_logged_in = 1
+    else:
+        is_logged_in = 0
+
     return render_to_response('problemsets/problemset.html',
                               {'common_page_data':common_page_data,
                                'pset': ps,
@@ -134,6 +150,9 @@ def show(request, course_prefix, course_suffix, pset_slug):
                                'pset_penalty':ps.resubmission_penalty,
                                'pset_attempts_allowed':ps.submissions_permitted,
                                'activity_list': activity_list,
+                               'contentsection_list': full_contentsection_list, 
+                               'full_index_list': full_index_list,
+                               'is_logged_in': is_logged_in
                               },
                               context_instance=RequestContext(request))
 

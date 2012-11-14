@@ -38,13 +38,18 @@ def profile(request):
     
     group_list = request.user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
-      
-    user_profile = request.user.get_profile()
-    is_student_list = user_profile.is_student_list(group_list, courses)
-            
+    
+    if request.user.is_authenticated():
+        user_profile = request.user.get_profile()
+        is_student_list = user_profile.is_student_list(group_list, courses)
+    else:
+        user_profile = None
+        is_student_list = []
+
     allow_password_change  = True
     if (not request.user.is_authenticated()) or (request.user.get_profile().institutions.filter(title='Stanford').exists()):
         allow_password_change = False
+
     return render_to_response('accounts/profile.html',
                               {'request': request,
                               'courses': courses,
