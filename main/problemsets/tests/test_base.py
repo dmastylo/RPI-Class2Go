@@ -1,8 +1,9 @@
 from django.test import TestCase
+from django_nose import FastFixtureTestCase
 
 __all__ = ['SimpleTestBase']
 
-class SimpleTestBase(TestCase):
+class SimpleTestBase(FastFixtureTestCase):
     """
     A base class for test classes that need to log in to the system and
     switch to edit mode to ensure access to the correct data.
@@ -23,7 +24,7 @@ class SimpleTestBase(TestCase):
 
     # XXXredfive - Make the inheritance work
     # tried using __init__ to set these but there is something wonky with
-    # the inheritance; letting the subclass override them
+    # the inheritance; letting the subclass override them for now
     username = 'set-me-in-subclass'
     password = 'set-me-in-subclass'
     coursePrefix = 'set-me-in-subclass'
