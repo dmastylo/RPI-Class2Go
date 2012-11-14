@@ -9,7 +9,8 @@
         textarea, #staging-area {height: 300px; overflow: auto; width: 100%;}
         #preview-pane label {clear: both; display: block;}
         #preview-pane label input {float: left; margin-right: 1em;}
-        #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 1em;}
+        #preview-pane #staging-area p {clear: both; display: block; margin: 0; padding: 0 0 1em;}
+        .problem {border:1px solid #999; border-radius: 5px; margin: 1em 0; padding: 1em;}
     </style>
 </head>
 <body>
@@ -71,32 +72,90 @@ $(document).ready(function () {
             console.log(e.message);
             return;
         }
-        var root = $(myDOM).find('problem');
-        var allChildren = $(root).children();
+        var problemNodes = $(myDOM).find('problem');
 
-        $(allChildren).each(function () {
-            if ($(this)[0].nodeName == 'p') {
-                $(this).clone().appendTo($('#staging-area'));
-            } else if ($(this)[0].nodeName == 'multiplechoiceresponse') {
-                var choices = $($(this)).find('choice'); 
-                
-                $(choices).each(function (idx, el) {
-                    var tmpInput = document.createElement('input');
-                    var tmpLabel = document.createElement('label');
-                    $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
+        problemNodes.each(function () {
+            var tmpProbDiv = document.createElement('div');
+            $(tmpProbDiv).addClass('problem');
 
-                    $(tmpInput).attr('type', 'radio');
-                    $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
-                    $(tmpInput).attr('name', 'q' + questionIdx);
-                    $(tmpInput).attr('value', $(this).attr('name'));
+            $('#staging-area').append($(tmpProbDiv));
 
-                    $(tmpLabel).text($(this).text());
+            var allChildren = $(this).children();
 
-                    $('#staging-area').append($(tmpLabel));
-                    $(tmpLabel).append($(tmpInput));
-                });
-            }
-        });
+            var renderResponseNode = function (node) {
+
+                var nodeName = $(node)[0].nodeName;
+                var nodeParent = arguments[1] || $(tmpProbDiv); 
+
+                switch (nodeName) {
+                    case 'multiplechoiceresponse':
+                        var choices = $($(node)).find('choice'); 
+                        
+                        $(choices).each(function (idx, el) {
+                            var tmpInput = document.createElement('input');
+                            var tmpLabel = document.createElement('label');
+                            $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
+
+                            $(tmpInput).attr('type', 'radio');
+                            $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
+                            $(tmpInput).attr('name', 'q' + questionIdx);
+                            $(tmpInput).attr('value', $(this).attr('name'));
+
+                            $(tmpLabel).text($(this).text());
+
+                            $(nodeParent).append($(tmpLabel));
+                            $(tmpLabel).append($(tmpInput));
+                        });
+                        break;
+                    case 'stringresponse':
+                    case 'numericalresponse':
+                        var textBoxData = $(node).children();   // only goes down one-level
+                        
+                        var tmpInput = document.createElement('input');
+                        $(tmpInput).attr('type', 'text');
+                        $(tmpInput).attr('id', 'q' + questionIdx);
+                        $(tmpInput).attr('name', 'q' + questionIdx);
+
+                        var textInputSize = (false) ? '' : 20;
+                        $(tmpInput).attr('size', textInputSize);
+
+                        $(nodeParent).append($(tmpInput));
+                        break;
+                    case 'optionresponse':
+                        var optionData = $(node).find('optioninput');
+                        var optionItemStr = $(optionData).attr('options');
+                        break;
+                    default:
+                        break;
+                }
+
+                if ($(nodeParent)[0] != $(tmpProbDiv)[0]) {
+                    $(tmpProbDiv).append($(nodeParent));
+                }
+            };
+
+            $(allChildren).each(function () {
+
+                var nodeName = $(this)[0].nodeName;
+
+                if (nodeName == 'p') {
+                    var previewP = document.createElement('p');
+                    $(previewP).text($(this).text());
+                    $(previewP).appendTo($(tmpProbDiv));
+                    
+                    var responseNodes = $(this).children();
+                    if (responseNodes.length > 0) {
+                        responseNodes.each(function () {
+                            renderResponseNode($(this), previewP);
+                        });
+                    }
+                } else {
+                    renderResponseNode($(this), $(tmpProbDiv));
+                }
+
+            });
+
+        }); // end each problem
        
         var dataToTransmit = {};
         dataToTransmit.xmlContent = $('textarea').val();

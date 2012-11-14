@@ -283,7 +283,6 @@ def create_exam(request, course_prefix, course_suffix):
 def show_test_xml(request):
     return render_to_response('exams/test_xml.html', {'message':'what up G?'}, RequestContext(request))
 
-
 @auth_is_course_admin_view_wrapper
 def view_csv_grades(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
