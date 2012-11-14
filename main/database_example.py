@@ -1,3 +1,4 @@
+# Don't forget to actually create the database named NAME
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
@@ -50,6 +51,9 @@ AWS_SECURE_STORAGE_BUCKET_NAME = 'dev-secure-c2g' # Optional. If not defined her
 # AWS_ACCESS_KEY_ID = 'local'
 # AWS_SECRET_ACCESS_KEY = 'local'
 # AWS_STORAGE_BUCKET_NAME = 'local'
+# Celery must run for file uploads to work properly and video resizing to take place, etc.
+# If you have the above values set to 'local', then set this value to True:
+# CELERY_ALWAYS_EAGER = False
 # AWS_SECURE_STORAGE_BUCKET_NAME = 'local'
 # MEDIA_ROOT = '/opt/class2go/uploads'
 
