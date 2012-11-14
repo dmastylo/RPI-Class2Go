@@ -58,6 +58,7 @@ urlpatterns = patterns('',
                        
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
+    url(r'^videos/record_download/', 'courses.videos.actions.record_download'),
     url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),
     url(r'^problemsets/attempt_protect/(?P<problemId>\d+)/?$', 'problemsets.views.attempt_protect'),
 
@@ -141,6 +142,7 @@ urlpatterns = patterns('',
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
     url(r'^delete_video_exercise/?$', 'courses.videos.views.delete_exercise'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set?$', 'courses.videos.views.load_video_problem_set'),
+    
 
 
     # Video Exercises
