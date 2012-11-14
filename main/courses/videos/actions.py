@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 import subprocess
 from celery import task
 
-from c2g.models import Course, Video, VideoActivity
+from c2g.models import Course, Video, VideoActivity, VideoDownload
 from courses.common_page_data import get_common_page_data
 
 from courses.videos.forms import *
@@ -132,8 +132,22 @@ def save_video_progress(request):
             video.save()
     if videoRec.start_seconds != long(playTime):
         videoRec.start_seconds = playTime
+        if long(playTime) > videoRec.max_end_seconds:
+            videoRec.max_end_seconds = playTime
         videoRec.save()
     return HttpResponse("saved")
+
+@require_POST
+def record_download(request):
+
+    video_id = request.POST['video_id']
+    user_id = request.POST['user_id']
+    course_id = request.POST['course_id']
+    
+    video_download = VideoDownload(student_id = user_id, video_id = video_id, course_id = course_id)
+    video_download.save()
+    
+    return HttpResponse("")
 
 def oauth(request):
     if 'code' in request.GET:

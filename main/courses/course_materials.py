@@ -22,6 +22,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     
                 if common_page_data['course_mode'] == 'ready':
                     video_recs = VideoActivity.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user)
+                    video_downloads = VideoDownload.objects.values('video').filter(course=common_page_data['course'], student=common_page_data['request'].user).annotate(dcount=Count('video'))
 
         if get_pset_content:
             
@@ -225,11 +226,19 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
                             item['visible_status'] = visible_status
                         else:
+                            download_count = 0
+                            for video_download in video_downloads:
+                                if video_download['video'] == video.id:
+                                    download_count = video_download['dcount']
+                                    break                                
+                            
                             for video_rec in video_recs:
                                 if video_rec.video_id == video.id:
                                     item['video_rec'] = video_rec
-                                    if video.duration:
-                                        item['completed_percent'] = 100.0 * video_rec.start_seconds / video.duration
+                                    if download_count > 0:
+                                        item['completed_percent'] = 100.0
+                                    elif video.duration:
+                                        item['completed_percent'] = 100.0 * max(video_rec.start_seconds, video_rec.max_end_seconds)/ video.duration
                                     else:
                                         item['completed_percent'] = 0
 
