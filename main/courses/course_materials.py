@@ -232,15 +232,16 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                     download_count = video_download['dcount']
                                     break                                
                             
-                            for video_rec in video_recs:
-                                if video_rec.video_id == video.id:
-                                    item['video_rec'] = video_rec
-                                    if download_count > 0:
-                                        item['completed_percent'] = 100.0
-                                    elif video.duration:
-                                        item['completed_percent'] = 100.0 * max(video_rec.start_seconds, video_rec.max_end_seconds)/ video.duration
-                                    else:
-                                        item['completed_percent'] = 0
+                            if download_count > 0:
+                                item['completed_percent'] = 100.0
+                            else:
+                                for video_rec in video_recs:
+                                    if video_rec.video_id == video.id:
+                                        item['video_rec'] = video_rec
+                                        if video.duration:
+                                            item['completed_percent'] = 100.0 * max(video_rec.start_seconds, video_rec.max_end_seconds)/ video.duration
+                                        else:
+                                            item['completed_percent'] = 0
 
                         item['numQuestions'] = numQuestions
                         section_dict['items'].append(item)
