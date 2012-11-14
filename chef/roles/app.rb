@@ -3,9 +3,9 @@ description "class2go app server"
 
 override_attributes \
     "system" => {
-        "admin_user" =>  "bitnami",
-        "admin_group" => "bitnami",
-        "admin_home" =>  "/home/bitnami"
+        "admin_user" =>  "ubuntu",
+        "admin_group" => "ubuntu",
+        "admin_home" =>  "/home/ubuntu"
     }
 
 run_list(
@@ -14,7 +14,7 @@ run_list(
     "recipe[class2go-base-ubuntu]",
     "recipe[class2go-apache]",
     "recipe[class2go-python]",
-#    "recipe[bitnami-shib]",
+    "recipe[shib]",
     "recipe[class2go-deploy]",
     "recipe[class2go-logging]",
     "recipe[class2go-ops-dns]",
