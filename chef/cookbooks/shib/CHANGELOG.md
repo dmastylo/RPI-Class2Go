@@ -1,10 +1,10 @@
-# CHANGELOG for bitnami-shib
+# CHANGELOG for shib
 
-This file is used to list changes made in each version of bitnami-shib.
+This file is used to list changes made in each version of shib.
 
 ## 0.1.0:
 
-* Initial release of bitnami-shib
+* Initial release of shib
 
 - - - 
 Check the [Markdown Syntax Guide](http://daringfireball.net/projects/markdown/syntax) for help with Markdown.
