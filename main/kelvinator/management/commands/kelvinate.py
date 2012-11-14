@@ -1,13 +1,17 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.core.exceptions import MultipleObjectsReturned
-from c2g.models import Video
-from django.db import connection, transaction
-from django.conf import settings
 from optparse import make_option
+
+from django.conf import settings
+from django.core.exceptions import MultipleObjectsReturned
+from django.core.management.base import BaseCommand, CommandError
+
+from c2g.models import Video
+from c2g.util import is_storage_local
 import kelvinator.tasks 
+
 
 bucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
 instance=getattr(settings, 'INSTANCE')
+
 
 class Command(BaseCommand):
     args="<prefix> <suffix> <slug>"
@@ -56,12 +60,14 @@ class Command(BaseCommand):
             print "Video slug \"%s\" doesn't have a file listed in S3 (name=\"default\")" % slug
             return
             
-        where = getattr(settings, 'AWS_ACCESS_KEY_ID', 'local')
-        if options['force_local']: 
-            where='local'
-        if options['force_remote']:
-            where='remote'
-        if where == 'local':
+        # FIXME: after confirming this works, clean these lines up.
+        #where = getattr(settings, 'AWS_ACCESS_KEY_ID', 'local')
+        #if options['force_local']: 
+        #    where='local'
+        #if options['force_remote']:
+        #    where='remote'
+        #if where == 'local':
+        if (is_storage_local() or options['force_local']) and not options['force_remote']:
             media_root = getattr(settings, 'MEDIA_ROOT')
             local_path = media_root + "/" + video.file.name
             kelvinator.tasks.kelvinate(local_path, options['target_frames'], options['notify_addr'])
