@@ -98,6 +98,15 @@ a:hover [class^="icon-"] {
     cursor: pointer;
 }
 
+.nav-list > .current > a,
+.nav-list > .current > a:hover {
+  color: red;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  background-color: #C0C0C0;
+}
+
+
+
 a.thumbnail:hover {
     border-color:#8F2718;
 }
