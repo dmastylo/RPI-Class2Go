@@ -141,10 +141,7 @@ prefix for these.
 
 16. Patch GData and storages
 
-    Take a look at the [gdata patch README][1] and the [django-storages patch README][2]. 
-    Instructions for applying the patches are in these documents.
-    [1]: https://github.com/Stanford-Online/class2go/blob/master/chef/cookbooks/gdata/files/default/README.md
-    [2]: https://github.com/Stanford-Online/class2go/tree/master/chef/cookbooks/class2go-python/files/default/README.md
+    Take a look at the [gdata patch README](https://github.com/Stanford-Online/class2go/blob/master/chef/cookbooks/gdata/files/default/README.md) and the [django-storages patch README](https://github.com/Stanford-Online/class2go/tree/master/chef/cookbooks/class2go-python/files/default/README.md). Instructions for applying the patches are in these documents.
 
 17. Install Celery ecosystem
 
