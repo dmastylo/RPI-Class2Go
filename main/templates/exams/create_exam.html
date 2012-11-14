@@ -1,0 +1,370 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block course_page_title %}Exam Creation Form{% endblock course_page_title %}
+
+{% block m_column_content %}
+
+<style type="text/css" media="screen">
+    #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    #container{
+        position:relative;
+        height:450px;
+    }
+    h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
+    #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
+    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; padding: 1em;}
+    textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
+    #preview-pane label {clear: both; display: block;}
+    #preview-pane label input {float: left; margin-right: 1em;}
+    #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 1em;}
+    .problem {border:1px solid #999; border-radius: 5px; margin: 1em 0; padding: 1em;}
+    .picker {position:relative; z-index:10;}
+    h3 {clear:both;}
+    div.question, div.subquestion {float:left; width:95%;}
+    div.problem, div.problem {float:left; width:95%;}
+
+</style>
+
+<div class="well">
+<h2>Create a new exam</h2>
+<label for id="exam_title">Exam Title:<br /><input id="exam_title" type="text"></label>
+<label for id="exam_slug">Exam URL Identifier:<br /><input id="exam_slug" type="text"></label>
+    
+    <div class="control-group">
+        <label class="control-label">Due Date*</label>
+        <div class="controls">
+            <input id="due_date" class="picker"  type="text" name="due_date" value="{{current_datetime}}" data-datetimepicker>
+                </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Grace Period End*</label>
+        <div class="controls">
+            <input id="grace_period" class="picker"  type="text" name="grace_period" value="" data-datetimepicker>
+                </div>
+    </div>
+
+<br />
+<textarea id="ace_proxy" style="display:none">
+    <problemset>
+        <problem>
+            <p>
+            A multiple choice problem presents radio buttons for student
+            input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+            <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
+            </p>
+            
+            <p>What Apple device competed with the portable CD player?</p>
+            <multiplechoiceresponse>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false" name="ipad">The iPad</choice>
+                    <choice correct="false" name="beatles">Napster</choice>
+                    <choice correct="true" name="ipod">The iPod</choice>
+                    <choice correct="false" name="peeler">The vegetable peeler</choice>
+                    <choice correct="false" name="android">Android</choice>
+                    <choice correct="false" name="beatles">The Beatles</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+            <solution>
+                <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and enery-intensive spinning disks. </p>
+                </div>
+            </solution>
+        </problem>
+        <problem>
+            <p>
+            A numerical response problem accepts a line of text input from the
+            student, and evaluates the input for correctness based on its
+            numerical value.
+            </p>
+            
+            <p>
+            The answer is correct if it is within a specified numerical tolerance
+            of the expected answer.
+            </p>
+            <script type="loncapa/python">
+                computed_response = 502*9
+                </script>
+            
+            <p>Enter the numerical value of Pi:
+            <numericalresponse answer="3.14159">
+                <responseparam type="tolerance" default=".02" />
+                <textline />
+            </numericalresponse>
+            </p>
+            <p>Enter the approximate value of 502*9:
+            <numericalresponse answer="$computed_response">
+                <responseparam type="tolerance" default="15%"/>
+                <textline />
+            </numericalresponse>
+            </p>
+            
+            <p>Enter the number of fingers on a human hand:
+            <numericalresponse answer="5">
+                <textline />
+            </numericalresponse>
+            </p>
+            <solution>
+                <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                    <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                    <p>If you look at your hand, you can count that you have five fingers.</p>
+                </div>
+            </solution>
+        </problem>
+        <problem>
+            <p>
+            A numerical response problem accepts a line of text input from the
+            student, and evaluates the input for correctness based on its
+            numerical value.
+            </p>
+            
+            <p>
+            The answer is correct if it is within a specified numerical tolerance
+            of the expected answer.
+            </p>
+            <script type="loncapa/python">
+                computed_response = 502*9
+                </script>
+            
+            <p>Enter the numerical value of Pi:
+            <numericalresponse answer="3.14159">
+                <responseparam type="tolerance" default=".02" />
+                <textline />
+            </numericalresponse>
+            </p>
+            <p>Enter the approximate value of 502*9:
+            <numericalresponse answer="$computed_response">
+                <responseparam type="tolerance" default="15%"/>
+                <textline />
+            </numericalresponse>
+            </p>
+            
+            <p>Enter the number of fingers on a human hand:
+            <numericalresponse answer="5">
+                <textline />
+            </numericalresponse>
+            </p>
+            <solution>
+                <div class="detailed-solution">
+                    <p>Explanation</p>
+                    <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                    <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                    <p>If you look at your hand, you can count that you have five fingers.</p>
+                </div>
+            </solution>
+        </problem>
+    </problemset>
+    
+</textarea>
+<div class="row-fluid">
+<div class="span6">
+    <h4>Enter Exam XML below:</h4>
+
+
+    <div id="container">
+        <div id="editor">
+        </div>
+    </div>
+</div>
+<div class="span6">
+<div id="preview-pane">
+        <h4>Preview Problem HTML</h4>
+        <div id="staging-area">
+        </div>
+
+    </div>
+</div>
+</div>
+
+<a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
+
+<input class="btn" type="button" id="preview-btn" value="Preview My Problem" />
+
+<a id="exercise_submit_and_close" class="btn" href="javascript:"> Save to Server &amp; Close </a> <a id="exercise_submit" class="btn" href="javascript:"> Save to Server </a> <a class="btn" href={{returnURL}}> Close </a>
+<br /><br />
+</div>
+
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
+<script>
+    $(function(){
+        var saveExerciseContents = function(callback){return function(){
+            var csrftoken = '{{csrf_token}}';
+            var filename = '{{filename}}';
+            renderPreview();
+      
+            $.ajax("{% url 'courses.exams.views.save_exam_ajax' course.prefix course.suffix %}",{
+               headers: {'X-CSRFToken': csrftoken},
+               type: 'POST',
+               contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+               data: { title:$('input#exam_title').val(),
+                       slug:$('input#exam_slug').val(),
+                       due_date:$('input#due_date').val(),
+                       grace_period:$('input#grace_period').val(),
+                       xmlContent:editor.getValue(),
+                       htmlContent:$('#staging-area').html()
+               },
+               error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
+               success: function(data,textStatus,jqXHR) {
+                   alert(jqXHR.responseText );
+                   callback();
+               },
+            });
+           };
+         };
+      
+      var next=true;
+      
+      var toggleWrap = function () {
+         editor.getSession().setUseWrapMode(next);
+         if (next) { $('#wrap').text('Wrap');}
+         else {$('#wrap').text('No Wrap');}
+         next = !next;
+      }
+      
+      var editor = ace.edit("editor");
+      editor.setValue($('#ace_proxy').val());
+      editor.setTheme("ace/theme/eclipse");
+      editor.getSession().setMode("ace/mode/html");
+      editor.getSession().setUseWrapMode(true);
+      $('#exercise_submit').click(saveExerciseContents(function(){}));
+      $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
+      
+      $('#wrap').click(toggleWrap);
+      $('#wrap').click();
+      
+      var questionIdx = 0;
+      
+      function renderPreview() {
+      
+        $('#staging-area').empty();
+      
+        // Set up XML DOM
+        var sourceXML = editor.getValue();
+        try {
+            var myDOM = $.parseXML(sourceXML);
+        } catch (e) {
+            alert('Your XML is invalid');
+            console.log(e.message);
+            return;
+        }
+        var problemNodes = $(myDOM).find('problem');
+      
+        problemNodes.each(function () {
+            questionIdx += 1;
+            var tmpProbDiv = document.createElement('div');
+            $(tmpProbDiv).addClass('question');
+            
+            $('#staging-area').append($(tmpProbDiv));
+            
+            var allChildren = $(this).children();
+            
+            var renderResponseNode = function (node, arg2, idx_suffix) {
+            
+              var nodeName = $(node)[0].nodeName;
+              var nodeParent = arguments[1] || $(tmpProbDiv);
+            
+              switch (nodeName) {
+                case 'multiplechoiceresponse':
+                    var choices = $($(node)).find('choice');
+            
+                    $(choices).each(function (idx, el) {
+                            var tmpInput = document.createElement('input');
+                            var tmpLabel = document.createElement('label');
+                            $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
+                            
+                            $(tmpInput).attr('type', 'radio');
+                            $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
+                            $(tmpInput).attr('name', 'q' + questionIdx);
+                            $(tmpInput).attr('value', $(this).attr('name'));
+                            
+                            $(tmpLabel).text($(this).text());
+                            
+                            $(nodeParent).append($(tmpLabel));
+                            $(tmpLabel).append($(tmpInput));
+                    });
+                    break;
+                case 'stringresponse':
+                case 'numericalresponse':
+                    
+                    var textBoxData = $(node).children();   // only goes down one-level
+            
+                    var tmpInput = document.createElement('input');
+                    $(tmpInput).attr('type', 'text');
+                    $(tmpInput).attr('id', 'q' + questionIdx + idx_suffix);
+                    $(tmpInput).attr('name', 'q' + questionIdx + idx_suffix);
+            
+                    var textInputSize = (false) ? '' : 20;
+                    $(tmpInput).attr('size', textInputSize);
+            
+                    $(nodeParent).append($(tmpInput));
+                    break;
+                case 'optionresponse':
+                    var optionData = $(node).find('optioninput');
+                    var optionItemStr = $(optionData).attr('options');
+                    break;
+                default:
+                    break;
+              }
+            
+              if ($(nodeParent)[0] != $(tmpProbDiv)[0]) {
+                    $(tmpProbDiv).append($(nodeParent));
+              }
+            };
+            suffix_idx = 64
+            $(allChildren).each(function () {
+                suffix_idx += 1;
+                var nodeName = $(this)[0].nodeName;
+                                
+                if (nodeName == 'p') {
+                    var previewP = document.createElement('p');
+                    $(previewP).text($(this).text());
+                    $(previewP).appendTo($(tmpProbDiv));
+                        
+                    var responseNodes = $(this).children();
+                    if (responseNodes.length > 0) {
+                        responseNodes.each(function () {
+                            renderResponseNode($(this), previewP, String.fromCharCode(suffix_idx));
+                        });
+                    }
+                } else {
+                    renderResponseNode($(this), $(tmpProbDiv), String.fromCharCode(suffix_idx));
+                }
+            });
+                        
+      }); // end each problem
+      
+      var dataToTransmit = {};
+      dataToTransmit.xmlContent = $('textarea').val();
+      dataToTransmit.htmlContent = $('#staging-area').html(); 
+      console.log(JSON.stringify(dataToTransmit));
+      
+      }
+      
+      $('#preview-btn').click(renderPreview);
+      
+      
+      });
+    </script>
+
+<script>
+    
+    $(document).ready(function () {
+                      
+
+                      
+            });
+    
+    </script>
+
+{% endblock addl_scripts %}
