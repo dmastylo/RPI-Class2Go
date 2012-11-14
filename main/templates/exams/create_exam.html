@@ -184,7 +184,6 @@
 
         <input class="btn" type="button" id="preview-btn" value="Preview My Exam" />
 
-        <!--<a id="exercise_submit_and_close" class="btn" href="javascript:"> Save to Server &amp; Close </a>--> 
         <input type="button" id="exercise_submit_and_close" class="btn" value="Save to Server &amp; Close" /> 
         <input type="button" id="exercise_submit" class="btn" value="Save to Server"/> 
         <a class="btn" href={{returnURL}}> Close </a>
@@ -198,7 +197,7 @@
 {% block addl_scripts %}
 <script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
 <script>
-    $(function(){
+    $(function() {
         var saveExerciseContents = function(callback){return function(){
             var csrftoken = '{{csrf_token}}';
             var filename = '{{filename}}';
@@ -221,32 +220,32 @@
                    callback();
                },
             });
-           };
-         };
+        };
+    };
       
-      var next=true;
+    var next=true;
       
-      var toggleWrap = function () {
-         editor.getSession().setUseWrapMode(next);
-         if (next) { $('#wrap').text('Wrap');}
-         else {$('#wrap').text('No Wrap');}
-         next = !next;
-      }
+    var toggleWrap = function () {
+        editor.getSession().setUseWrapMode(next);
+        if (next) { $('#wrap').text('Wrap');}
+        else {$('#wrap').text('No Wrap');}
+        next = !next;
+    }
       
-      var editor = ace.edit("editor");
-      editor.setValue($('#ace_proxy').val());
-      editor.setTheme("ace/theme/eclipse");
-      editor.getSession().setMode("ace/mode/html");
-      editor.getSession().setUseWrapMode(true);
-      $('#exercise_submit').click(saveExerciseContents(function(){}));
-      $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
+    var editor = ace.edit("editor");
+    editor.setValue($('#ace_proxy').val());
+    editor.setTheme("ace/theme/eclipse");
+    editor.getSession().setMode("ace/mode/html");
+    editor.getSession().setUseWrapMode(true);
+    $('#exercise_submit').click(saveExerciseContents(function(){}));
+    $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
       
-      $('#wrap').click(toggleWrap);
-      $('#wrap').click();
+    $('#wrap').click(toggleWrap);
+    $('#wrap').click();
       
-      var questionIdx = 0;
+    var questionIdx = 0;
       
-      function renderPreview() {
+    function renderPreview() {
       
         $('#staging-area').empty();
       
@@ -343,29 +342,17 @@
                 }
             });
                         
-      }); // end each problem
+        }); // end each problem
       
-      var dataToTransmit = {};
-      dataToTransmit.xmlContent = $('textarea').val();
-      dataToTransmit.htmlContent = $('#staging-area').html(); 
-      console.log(JSON.stringify(dataToTransmit));
+        var dataToTransmit = {};
+            dataToTransmit.xmlContent = $('textarea').val();
+            dataToTransmit.htmlContent = $('#staging-area').html(); 
+            console.log(JSON.stringify(dataToTransmit));
+        }
       
-      }
-      
-      $('#preview-btn').click(renderPreview);
-      
+        $('#preview-btn').click(renderPreview);
       
       });
-    </script>
-
-<script>
-    
-    $(document).ready(function () {
-                      
-
-                      
-            });
-    
     </script>
 
 {% endblock addl_scripts %}
