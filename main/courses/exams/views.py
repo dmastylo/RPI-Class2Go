@@ -232,6 +232,54 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     
     return HttpResponse("Submission has been saved.")
 
+
+@require_POST
+@auth_is_course_admin_view_wrapper
+def save_exam_ajax(request, course_prefix, course_suffix):
+    course = request.common_page_data['course']
+
+    slug = request.POST.get('slug','')
+    title = request.POST.get('title', '')
+    xmlContent = request.POST.get('xmlContent', '')
+    htmlContent = request.POST.get('htmlContent', '')
+    due_date = request.POST.get('due_date', '')
+    grace_period = request.POST.get('grace_period', '')
+    
+    #Validation
+    if not slug:
+        return HttpResponseBadRequest("No slug value provided")
+    if Exam.objects.filter(course=course, slug=slug).exists():
+        return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
+    if not title:
+        return HttpResponseBadRequest("No URL identifier value provided")
+    if not xmlContent:
+        return HttpResponseBadRequest("No xmlContent provided")
+    if not htmlContent:
+        return HttpResponseBadRequest("No htmlContent provided")
+    if not due_date:
+        return HttpResponseBadRequest("No due date provided")
+    if not grace_period:
+        return HttpResponseBadRequest("No grace period provided")
+
+    dd = datetime.datetime.strptime(due_date, "%m/%d/%Y %H:%M")
+    gp = datetime.datetime.strptime(grace_period, "%m/%d/%Y %H:%M")
+
+    #create Exam
+    exam_obj = Exam(course=course, slug=slug, title=title, html_content=htmlContent, due_date=dd, grace_period=gp)
+    exam_obj.save()
+
+    return HttpResponse("Exam " + title + " created")
+
+
+@auth_is_course_admin_view_wrapper
+def create_exam(request, course_prefix, course_suffix):
+    
+    course = request.common_page_data['course']
+    
+    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'course':course},
+                              RequestContext(request))
+
+
 def show_test_xml(request):
     return render_to_response('exams/test_xml.html', {'message':'what up G?'}, RequestContext(request))
 

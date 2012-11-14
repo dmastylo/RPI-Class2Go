@@ -14,6 +14,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 
 {% else %}
+<style>
+#exam-pane label {clear: both; display: block;}
+#exam-pane label input {float: left; margin-right: 1em;}
+#exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
+</style>
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
 
@@ -28,7 +33,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <noscript>
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
     </noscript>
+    <div id="exam-pane">
+        <form>
     {{ exam.html_content }}
+        </form>
+    <input class="btn" type="submit" value="Submit Problem Set" />
+    </div>
 
 {% endif %}
 
