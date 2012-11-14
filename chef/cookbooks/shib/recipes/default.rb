@@ -24,11 +24,11 @@ package "opensaml2-tools" do
 end
 
 template "shib.conf" do
-    path "/home/bitnami/apps/django/conf/shib.conf"
+    path "/etc/apache2/conf.d/shib.conf"
     source "shib.conf.erb"
-    owner "bitnami"
-    group "bitnami"
-    mode "0644"
+    owner "root"
+    group "root"
+    mode 00644
 end
 
 template "shibboleth2.xml" do
@@ -36,7 +36,7 @@ template "shibboleth2.xml" do
     source "shibboleth2.xml.erb"
     owner "root"
     group "root"
-    mode "0644"
+    mode 00644
 end
 
 template "attribute-map.xml" do
@@ -44,7 +44,7 @@ template "attribute-map.xml" do
     source "attribute-map.xml.erb"
     owner "root"
     group "root"
-    mode "0644"
+    mode 00644
 end
 
 template "sp-key.pem" do
@@ -52,7 +52,7 @@ template "sp-key.pem" do
     source "sp-key.pem.erb"
     owner "_shibd"
     group "_shibd"
-    mode "0600"
+    mode 00600
 end
 
 template "sp-cert.pem" do
@@ -60,5 +60,5 @@ template "sp-cert.pem" do
     source "sp-cert.pem.erb"
     owner "_shibd"
     group "_shibd"
-    mode "0644"
+    mode 00644
 end
