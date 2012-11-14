@@ -18,7 +18,7 @@
     }
     h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
     #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
-    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; padding: 1em;}
+    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 420px; padding: 1em;}
     textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
     #preview-pane label {clear: both; display: block;}
     #preview-pane label input {float: left; margin-right: 1em;}
@@ -28,168 +28,169 @@
     h3 {clear:both;}
     div.question, div.subquestion {float:left; width:95%;}
     div.problem, div.problem {float:left; width:95%;}
-
+    .control-group {clear:both; padding:1em; zoom:1;}
+    .control-group .atomic-unit {float:left; margin-right: 1em;}
 </style>
 
-<div class="well">
-<h2>Create a new exam</h2>
-<label for id="exam_title">Exam Title:<br /><input id="exam_title" type="text"></label>
-<label for id="exam_slug">Exam URL Identifier:<br /><input id="exam_slug" type="text"></label>
-    
+<div class="well create-exam-form">
+    <h2>Create a new exam</h2>
+
     <div class="control-group">
-        <label class="control-label">Due Date*</label>
-        <div class="controls">
+        <div class="atomic-unit"><label for="exam_title" class="control-label">Exam Title:</label><input id="exam_title" type="text"></div>
+        <div class="atomic-unit"><label for="exam_slug" class="control-label">Exam URL Identifier:</label><input id="exam_slug" type="text"></div>
+        <div class="atomic-unit">
+            <label class="control-label" for="due_date">Due Date*</label>
             <input id="due_date" class="picker"  type="text" name="due_date" value="{{current_datetime}}" data-datetimepicker>
-                </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">Grace Period End*</label>
-        <div class="controls">
+        </div>
+        <div class="atomic-unit">
+            <label class="control-label" for="due_date">Grace Period End*</label>
             <input id="grace_period" class="picker"  type="text" name="grace_period" value="" data-datetimepicker>
-                </div>
-    </div>
-
-<br />
-<textarea id="ace_proxy" style="display:none">
-    <problemset>
-        <problem>
-            <p>
-            A multiple choice problem presents radio buttons for student
-            input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
-            <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
-            </p>
-            
-            <p>What Apple device competed with the portable CD player?</p>
-            <multiplechoiceresponse>
-                <choicegroup type="MultipleChoice">
-                    <choice correct="false" name="ipad">The iPad</choice>
-                    <choice correct="false" name="beatles">Napster</choice>
-                    <choice correct="true" name="ipod">The iPod</choice>
-                    <choice correct="false" name="peeler">The vegetable peeler</choice>
-                    <choice correct="false" name="android">Android</choice>
-                    <choice correct="false" name="beatles">The Beatles</choice>
-                </choicegroup>
-            </multiplechoiceresponse>
-            <solution>
-                <div class="detailed-solution">
-                    <p>Explanation</p>
-                    <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and enery-intensive spinning disks. </p>
-                </div>
-            </solution>
-        </problem>
-        <problem>
-            <p>
-            A numerical response problem accepts a line of text input from the
-            student, and evaluates the input for correctness based on its
-            numerical value.
-            </p>
-            
-            <p>
-            The answer is correct if it is within a specified numerical tolerance
-            of the expected answer.
-            </p>
-            <script type="loncapa/python">
-                computed_response = 502*9
-                </script>
-            
-            <p>Enter the numerical value of Pi:
-            <numericalresponse answer="3.14159">
-                <responseparam type="tolerance" default=".02" />
-                <textline />
-            </numericalresponse>
-            </p>
-            <p>Enter the approximate value of 502*9:
-            <numericalresponse answer="$computed_response">
-                <responseparam type="tolerance" default="15%"/>
-                <textline />
-            </numericalresponse>
-            </p>
-            
-            <p>Enter the number of fingers on a human hand:
-            <numericalresponse answer="5">
-                <textline />
-            </numericalresponse>
-            </p>
-            <solution>
-                <div class="detailed-solution">
-                    <p>Explanation</p>
-                    <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
-                    <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
-                    <p>If you look at your hand, you can count that you have five fingers.</p>
-                </div>
-            </solution>
-        </problem>
-        <problem>
-            <p>
-            A numerical response problem accepts a line of text input from the
-            student, and evaluates the input for correctness based on its
-            numerical value.
-            </p>
-            
-            <p>
-            The answer is correct if it is within a specified numerical tolerance
-            of the expected answer.
-            </p>
-            <script type="loncapa/python">
-                computed_response = 502*9
-                </script>
-            
-            <p>Enter the numerical value of Pi:
-            <numericalresponse answer="3.14159">
-                <responseparam type="tolerance" default=".02" />
-                <textline />
-            </numericalresponse>
-            </p>
-            <p>Enter the approximate value of 502*9:
-            <numericalresponse answer="$computed_response">
-                <responseparam type="tolerance" default="15%"/>
-                <textline />
-            </numericalresponse>
-            </p>
-            
-            <p>Enter the number of fingers on a human hand:
-            <numericalresponse answer="5">
-                <textline />
-            </numericalresponse>
-            </p>
-            <solution>
-                <div class="detailed-solution">
-                    <p>Explanation</p>
-                    <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
-                    <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
-                    <p>If you look at your hand, you can count that you have five fingers.</p>
-                </div>
-            </solution>
-        </problem>
-    </problemset>
-    
-</textarea>
-<div class="row-fluid">
-<div class="span6">
-    <h4>Enter Exam XML below:</h4>
-
-
-    <div id="container">
-        <div id="editor">
         </div>
     </div>
-</div>
-<div class="span6">
-<div id="preview-pane">
-        <h4>Preview Problem HTML</h4>
-        <div id="staging-area">
+
+    <div class="control-group">
+        <textarea id="ace_proxy" style="display:none">
+        <problemset>
+            <problem>
+                <p>
+                A multiple choice problem presents radio buttons for student
+                input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+                <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
+                </p>
+                
+                <p>What Apple device competed with the portable CD player?</p>
+                <multiplechoiceresponse>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="false" name="ipad">The iPad</choice>
+                        <choice correct="false" name="beatles">Napster</choice>
+                        <choice correct="true" name="ipod">The iPod</choice>
+                        <choice correct="false" name="peeler">The vegetable peeler</choice>
+                        <choice correct="false" name="android">Android</choice>
+                        <choice correct="false" name="beatles">The Beatles</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and enery-intensive spinning disks. </p>
+                    </div>
+                </solution>
+            </problem>
+            <problem>
+                <p>
+                A numerical response problem accepts a line of text input from the
+                student, and evaluates the input for correctness based on its
+                numerical value.
+                </p>
+                
+                <p>
+                The answer is correct if it is within a specified numerical tolerance
+                of the expected answer.
+                </p>
+                <script type="loncapa/python">
+                    computed_response = 502*9
+                    </script>
+                
+                <p>Enter the numerical value of Pi:
+                <numericalresponse answer="3.14159">
+                    <responseparam type="tolerance" default=".02" />
+                    <textline />
+                </numericalresponse>
+                </p>
+                <p>Enter the approximate value of 502*9:
+                <numericalresponse answer="$computed_response">
+                    <responseparam type="tolerance" default="15%"/>
+                    <textline />
+                </numericalresponse>
+                </p>
+                
+                <p>Enter the number of fingers on a human hand:
+                <numericalresponse answer="5">
+                    <textline />
+                </numericalresponse>
+                </p>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                        <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                        <p>If you look at your hand, you can count that you have five fingers.</p>
+                    </div>
+                </solution>
+            </problem>
+            <problem>
+                <p>
+                A numerical response problem accepts a line of text input from the
+                student, and evaluates the input for correctness based on its
+                numerical value.
+                </p>
+                
+                <p>
+                The answer is correct if it is within a specified numerical tolerance
+                of the expected answer.
+                </p>
+                <script type="loncapa/python">
+                    computed_response = 502*9
+                    </script>
+                
+                <p>Enter the numerical value of Pi:
+                <numericalresponse answer="3.14159">
+                    <responseparam type="tolerance" default=".02" />
+                    <textline />
+                </numericalresponse>
+                </p>
+                <p>Enter the approximate value of 502*9:
+                <numericalresponse answer="$computed_response">
+                    <responseparam type="tolerance" default="15%"/>
+                    <textline />
+                </numericalresponse>
+                </p>
+                
+                <p>Enter the number of fingers on a human hand:
+                <numericalresponse answer="5">
+                    <textline />
+                </numericalresponse>
+                </p>
+                <solution>
+                    <div class="detailed-solution">
+                        <p>Explanation</p>
+                        <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                        <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                        <p>If you look at your hand, you can count that you have five fingers.</p>
+                    </div>
+                </solution>
+            </problem>
+        </problemset>
+        </textarea>
+        <div class="row-fluid">
+            <div class="span6">
+                <h4>Enter Exam XML below:</h4>
+                <div id="container">
+                    <div id="editor"></div>
+                </div>
+            </div>
+            <div class="span6">
+                <div id="preview-pane">
+                    <h4>Preview Exam HTML</h4>
+                    <div id="staging-area"></div>
+                </div>
+            </div>
         </div>
 
+    </div> <!-- end of "control-group" -->
+
+    <div class="control-group">
+        <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
+
+        <input class="btn" type="button" id="preview-btn" value="Preview My Exam" />
+
+        <!--<a id="exercise_submit_and_close" class="btn" href="javascript:"> Save to Server &amp; Close </a>--> 
+        <input type="button" id="exercise_submit_and_close" class="btn" value="Save to Server &amp; Close" /> 
+        <input type="button" id="exercise_submit" class="btn" value="Save to Server"/> 
+        <a class="btn" href={{returnURL}}> Close </a>
+
     </div>
-</div>
-</div>
 
-<a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
-
-<input class="btn" type="button" id="preview-btn" value="Preview My Problem" />
-
-<a id="exercise_submit_and_close" class="btn" href="javascript:"> Save to Server &amp; Close </a> <a id="exercise_submit" class="btn" href="javascript:"> Save to Server </a> <a class="btn" href={{returnURL}}> Close </a>
-<br /><br />
 </div>
 
 {% endblock m_column_content %}
