@@ -197,11 +197,21 @@
 {% block addl_scripts %}
 <script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
 <script>
+    var editor = ace.edit("editor");
+    editor.setValue($('#ace_proxy').val());
+    editor.setTheme("ace/theme/eclipse");
+    editor.getSession().setMode("ace/mode/html");
+    editor.getSession().setUseWrapMode(true);
+
+    var questionIdx = 0;
+      
+    {% include "exams/renderPreview.js" %}
+
     $(function() {
         var saveExerciseContents = function(callback){return function(){
             var csrftoken = '{{csrf_token}}';
             var filename = '{{filename}}';
-            renderPreview();
+            c2gXMLParse.renderPreview();
       
             $.ajax("{% url 'courses.exams.views.save_exam_ajax' course.prefix course.suffix %}",{
                headers: {'X-CSRFToken': csrftoken},
@@ -232,21 +242,12 @@
         next = !next;
     }
       
-    var editor = ace.edit("editor");
-    editor.setValue($('#ace_proxy').val());
-    editor.setTheme("ace/theme/eclipse");
-    editor.getSession().setMode("ace/mode/html");
-    editor.getSession().setUseWrapMode(true);
     $('#exercise_submit').click(saveExerciseContents(function(){}));
     $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
       
     $('#wrap').click(toggleWrap);
     $('#wrap').click();
       
-    var questionIdx = 0;
-      
-    {% include "exams/renderPreview.js" %}
-
       
     $('#preview-btn').click(c2gXMLParse.renderPreview);
       
