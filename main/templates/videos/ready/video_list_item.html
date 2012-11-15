@@ -5,7 +5,7 @@
     <div class="course-list-content">
         <h4 class="pull-left"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}" title="{{item.video.description}}">{{item.video.title}}</a> ({{item.video.runtime}})</h4>
         {% if item.video.dl_link %}
-        <a href="{{item.video.dl_link}}" class="btn btn-mini" title="download" onclick="record_download({{item.video.id}}, {{common_page_data.request.user.id}}, {{item.video.course_id}} );"><em class="icon-download-alt"></em></a>
+        <a href="{{item.video.dl_link}}" class="btn btn-mini" title="download" onclick="record_download({{item.video.id}}, {{common_page_data.request.user.id}}, {{item.video.course_id}}, 'original' );"><em class="icon-download-alt"></em></a>
         {% endif %}
         <div class="pull-right">
             {% if item.completed_percent > 90 %}
@@ -20,7 +20,7 @@
 </li>
 
 <script type="text/javascript">
-        function record_download(video_id, user_id, course_id) {
-        	$.ajax({type:"POST", url: "/videos/record_download/", async:false, data: {video_id: video_id, user_id: user_id, course_id: course_id, csrfmiddlewaretoken: '{{ csrf_token }}'}});
+        function record_download(video_id, user_id, course_id, format) {
+        	$.ajax({type:"POST", url: "/videos/record_download/", async:false, data: {video_id: video_id, user_id: user_id, course_id: course_id, format: format, csrfmiddlewaretoken: '{{ csrf_token }}'}});
         }
 </script>
