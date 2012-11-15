@@ -100,7 +100,7 @@ a:hover [class^="icon-"] {
 
 .nav-list > .current > a,
 .nav-list > .current > a:hover {
-  color: red;
+  color: #820000;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
   background-color: #C0C0C0;
 }

@@ -914,6 +914,7 @@ class VideoActivity(models.Model):
      course = models.ForeignKey(Course)
      video = models.ForeignKey(Video)
      start_seconds = models.IntegerField(default=0, blank=True)
+     max_end_seconds = models.IntegerField(default=0, blank=True)
      #last_watched = models.DateTimeField(auto_now=True, auto_now_add=False)
 
      def percent_done(self):
@@ -923,6 +924,16 @@ class VideoActivity(models.Model):
             return self.student.username
      class Meta:
         db_table = u'c2g_video_activity'
+        
+class VideoDownload(models.Model):
+    student = models.ForeignKey(User)
+    course = models.ForeignKey(Course)
+    video = models.ForeignKey(Video)
+    download_date = models.DateTimeField(auto_now=False, auto_now_add=True)
+    format = models.CharField(max_length=35, null=True, blank=True)
+    
+    class Meta:
+        db_table = u'c2g_video_download'
 
 class ProblemSetManager(models.Manager):
     def getByCourse(self, course):
