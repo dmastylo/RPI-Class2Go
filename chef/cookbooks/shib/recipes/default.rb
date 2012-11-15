@@ -19,7 +19,8 @@ package "libapache2-mod-shib2" do
     action :install
 end
 
-bash "a2enmod shib" do
+execute "a2enmod shib2" do
+    user "root"
     action :run
 end
 

@@ -2,11 +2,6 @@ package "libapache2-mod-wsgi" do
     action :install
 end
 
-cookbook_file "/etc/apache2/sites-available/class2go" do
-    mode 00644
-    action :create
-end
-
 template "/etc/apache2/sites-available/class2go" do
     source "class2go-site.erb"
     owner "root"
@@ -14,11 +9,13 @@ template "/etc/apache2/sites-available/class2go" do
     mode 00644
 end
 
-bash "a2ensite class2go" do
+execute "a2ensite class2go" do
+    user "root"
     action :run
 end
 
-bash "a2dissite default" do
+execute "a2dissite default" do
+    user "root"
     action :run
 end
 
