@@ -1,7 +1,5 @@
-# Import all the tests in the directory
-#from problemsets.tests.tests import *
-#from problemsets.tests.test_advanced import *
-#from problemsets.tests.test_base import *
-#
-#__all__ = ['tests', 'test_base', 'test_advanced']
+# Need to import because the filenames don't match nosetest loader
+# (i.e. contain [Tt]est on a word boundary)
+from problemsets.tests.views_advanced import *
+from problemsets.tests.views_simple import *
 
