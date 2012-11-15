@@ -4,7 +4,7 @@
     </div>
     <div class="course-list-content">
         <h4 class="pull-left"><a href="{{item.file.file.url}}">{{item.file.title}}</a></h4>
-        {% if item.file.dl_link %}<a href="{{item.file.dl_link}}" class="btn btn-mini" title="download"><em class="icon-download-alt"></em></a>
+        {% if item.file.has_storage %}<a href="{{item.file.dl_link}}" class="btn btn-mini" title="download"><em class="icon-download-alt"></em></a>
         {% endif %}
         
     </div>
