@@ -19,6 +19,10 @@ package "libapache2-mod-shib2" do
     action :install
 end
 
+bash "a2enmod shib" do
+    action :run
+end
+
 package "opensaml2-tools" do
     action :install
 end
@@ -62,3 +66,4 @@ template "sp-cert.pem" do
     group "_shibd"
     mode 00644
 end
+

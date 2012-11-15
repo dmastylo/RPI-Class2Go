@@ -7,17 +7,19 @@ cookbook_file "/etc/apache2/sites-available/class2go" do
     action :create
 end
 
-link "/etc/apache2/sites-enabled/000-default" do
-    to "/etc/apache2/sites-available/class2go"
-    link_type :symbolic
-    action :create
-end
-
-template "/etc/apache2/conf.d/class2go.conf" do
-    source "class2go-global.conf.erb"
+template "/etc/apache2/sites-available/class2go" do
+    source "class2go-site.erb"
     owner "root"
     group "root"
     mode 00644
+end
+
+bash "a2ensite class2go" do
+    action :run
+end
+
+bash "a2dissite default" do
+    action :run
 end
 
 cookbook_file "/etc/logrotate.d/apache2" do
