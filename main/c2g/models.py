@@ -12,22 +12,28 @@
 # any table indexes that use multiple columns are placed in a south migration at
 # <location to be inserted>
 
-from django.db import models
-from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save
-from django import forms
 from datetime import datetime
-from django.core.exceptions import ValidationError
-from hashlib import md5
-
 import gdata.youtube
 import gdata.youtube.service
+from hashlib import md5
 import os
-import time
+import re
 import sys
+import time
 
-# For file system upload
-from django.core.files.storage import FileSystemStorage
+from django import forms
+from django.contrib.auth.models import Group, User
+from django.core.exceptions import ValidationError
+from django.core.files.storage import DefaultStorage, get_storage_class, FileSystemStorage
+from django.db.models.signals import post_save
+from django.db import models
+
+from c2g.util import is_storage_local, get_site_url
+from kelvinator.tasks import sizes as video_resize_options 
+
+
+RE_S3_PATH_FILENAME_SPLIT = re.compile('(?P<path>.+)\/(?P<filename>.*)$')
+
 
 def get_file_path(instance, filename):
     parts = str(instance.handle).split("--")
@@ -456,7 +462,12 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.image = ready_instance
         self.save()
 
+    def has_storage(self):
+        """Return True if we have a copy of this file on our storage."""
+        return self.file.storage.exists(self.file.name)
+
     def dl_link(self):
+        # File
         if not self.file.storage.exists(self.file.name):
             return ""
         
@@ -668,7 +679,6 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     file = models.FileField(upload_to=get_file_path)
     handle = models.CharField(max_length=255, null=True, db_index=True)
-#    kelvinator = models.IntegerField("K-Threshold", default=15)
     objects = VideoManager()
 
     def create_ready_instance(self):
@@ -845,10 +855,38 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 return False
         return True
 
+    def has_storage(self):
+        """Return True if we have a copy of this video on our storage."""
+        return self.file.storage.exists(self.file.name)
+
     def dl_link(self):
+        # Video
         if not self.file.storage.exists(self.file.name):
             return ""
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+
+    def dl_links_all(self):
+        """Return list of fully-qualified download URLs for video variants."""
+        # Video
+        if is_storage_local():
+            # FIXME: doesn't work on local sites yet
+            print "DEBUG: I don't work on local sites yet, sorry." 
+            return []
+        else:
+            # XXX: very S3 specific
+            myname  = self.file.name
+            mystore = self.file.storage
+            urlof   = mystore.url
+            basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
+            names = []
+            for size in sorted(video_resize_options):
+                checkfor = basepath+'/'+size+'/'+filename
+                gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
+                if gotback:
+                    names.append((size, urlof(checkfor, response_headers={'response-content-disposition': 'attachment'}), gotback[0].size, video_resize_options[size][3]))
+            if not names:
+                names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
+            return names
 
     def ret_url(self):
         return "https://www.youtube.com/analytics#dt=lt,fi=v-" + self.url + ",r=retention"

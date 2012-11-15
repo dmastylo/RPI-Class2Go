@@ -53,6 +53,10 @@ AWS_SECURE_STORAGE_BUCKET_NAME = 'dev-secure-c2g' # Optional. If not defined her
 # AWS_SECURE_STORAGE_BUCKET_NAME = 'local'
 # MEDIA_ROOT = '/opt/class2go/uploads'
 
+# Celery must run for file uploads to work properly and video resizing to take place, etc.
+# If you have the above values set to 'local', then set this value to True:
+# CELERY_ALWAYS_EAGER = False
+
 # Place where Kelvinator should do its work
 # if not specified, then under /tmp, but on Amazon, want to use ephemeral storage
 # which is /mnt for some reason
@@ -76,3 +80,8 @@ PIAZZA_SECRET = "piazza_xxxxxxx"
 SES_SMTP_USER = "USER"
 SES_SMTP_PASSWD = "PWD"
 
+# class2go relies on Youtube pretty heavily. You need to have an API key 
+# with youtube application integration enabled
+YT_SERVICE_DEVELOPER_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+GOOGLE_CLIENT_ID = "NNNNNNNNNNNN.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "YYYYYYYYYYYYYYYYYYYYYYYY"
