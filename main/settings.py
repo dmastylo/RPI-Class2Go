@@ -196,9 +196,7 @@ if INSTANCE != "prod":
                         'django_nose',
                        )
 
-# XXXredfive - trying out the django_nose stuff
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
