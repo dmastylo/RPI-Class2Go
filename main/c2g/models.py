@@ -930,6 +930,7 @@ class VideoDownload(models.Model):
     course = models.ForeignKey(Course)
     video = models.ForeignKey(Video)
     download_date = models.DateTimeField(auto_now=False, auto_now_add=True)
+    format = models.CharField(max_length=35, null=True, blank=True)
     
     class Meta:
         db_table = u'c2g_video_download'
