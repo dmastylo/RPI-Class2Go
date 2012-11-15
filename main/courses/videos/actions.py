@@ -143,8 +143,9 @@ def record_download(request):
     video_id = request.POST['video_id']
     user_id = request.POST['user_id']
     course_id = request.POST['course_id']
+    format = request.POST['format']
     
-    video_download = VideoDownload(student_id = user_id, video_id = video_id, course_id = course_id)
+    video_download = VideoDownload(student_id = user_id, video_id = video_id, course_id = course_id, format = format)
     video_download.save()
     
     return HttpResponse("")
