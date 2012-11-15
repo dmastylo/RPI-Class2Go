@@ -111,6 +111,7 @@ div.problem, div.problem {float:left; width:95%;}
             if (typeof dataObj[member] == "string") {
                 // it's a text input/textarea
                 $('input[name|=' + member + ']').val(dataObj[member]);
+                $('textarea[name|=' + member + ']').val(dataObj[member]);
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
                       $('input[name|=' + member + ']').before("<b style='color:red'>" + scores[member]+" </b> ");
@@ -150,6 +151,7 @@ div.problem, div.problem {float:left; width:95%;}
         if (!enabled) {
             // disable all inputs
             $('input').attr('disabled','disabled');
+            $('textarea').attr('disabled','disabled');
 
             // hide submit button
             var submitBtn = $('input[type|="submit"]').not('#login_button');
@@ -166,6 +168,7 @@ div.problem, div.problem {float:left; width:95%;}
             submitBtn.before($(reEnableBtn));
             $(reEnableBtn).click(function (ev) {
                 $('input').removeAttr('disabled');
+                $('textarea').removeAttr('disabled');
                 submitBtn.show();
             });
         }
@@ -199,6 +202,11 @@ div.problem, div.problem {float:left; width:95%;}
 
                 userSelections[$(this).attr('name')].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
+                userSelections[$(this).attr('name')] = $(this).val();
+            }
+        });
+        $('textarea').each(function () {
+            if ($(this).val() != "") {
                 userSelections[$(this).attr('name')] = $(this).val();
             }
         });
