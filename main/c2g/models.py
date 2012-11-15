@@ -126,9 +126,9 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
 
     def __unicode__(self):
         if self.title:
-            return self.title
+            return self.title + " | Mode: " + self.mode
         else:
-            return "No Title"
+            return "No Title" + " | Mode: " + self.mode
 
     
     def _get_prefix(self):
@@ -140,8 +140,11 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     suffix = property(_get_suffix)
 
     def has_exams(self):
-        return Exam.objects.filter(course=self, is_deleted=0).exists()
+        return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam").exists()
 
+    def has_surveys(self):
+        return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey").exists()
+    
     def get_all_students(self):
         """
         Returns a QUERY_SET of all students
@@ -1515,6 +1518,12 @@ class PageVisitLog(TimestampMixin, models.Model):
         db_table = u'c2g_page_visit_log'
 
 class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+    
+    EXAM_TYPE_CHOICES = (
+                         ('exam', 'exam'),
+                         ('survey', 'survey'),
+                         )
+    
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -1523,6 +1532,8 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
     total_score = models.IntegerField(null=True, blank=True)
+    exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    
     
     def past_due(self):
         if self.due_date and (datetime.now() > self.due_date):
@@ -1530,7 +1541,7 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
         return False
     
     def __unicode__(self):
-        return self.title
+        return self.title + " | Mode: " + self.mode
 
 
 class ExamRecord(TimestampMixin, models.Model):

@@ -47,7 +47,7 @@
 </div>
 </form>
 {% endfor %}
-<a class="btn" href="{% url 'courses.exams.views.listAll' common_page_data.course.prefix common_page_data.course.suffix %}">Back to exams</a>
+<a class="btn" href="{% url 'exam_list' common_page_data.course.prefix common_page_data.course.suffix %}">Back to exams</a>
 {% endblock m_column_content %}
 
 {% block addl_scripts %}

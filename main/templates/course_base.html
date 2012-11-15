@@ -44,7 +44,12 @@
                 </li>
                 {% if common_page_data.course.has_exams %}
                 <li {% block exam_link_class %}{% endblock exam_link_class %}>
-                    <a href="{% url 'courses.exams.views.listAll' common_page_data.course_prefix common_page_data.course_suffix %}">Exams</a>
+                    <a href="{% url 'exam_list' common_page_data.course_prefix common_page_data.course_suffix %}">Exams</a>
+                </li>
+                {% endif %}
+                {% if common_page_data.course.has_surveys %}
+                <li {% block survey_link_class %}{% endblock survey_link_class %}>
+                    <a href="{% url 'survey_list' common_page_data.course_prefix common_page_data.course_suffix %}">Surveys</a>
                 </li>
                 {% endif %}
                 {% if user.is_authenticated %}
