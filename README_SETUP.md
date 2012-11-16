@@ -44,166 +44,133 @@ prefix for these.
 
 1. Install XCode from the Apple App Store Version 4.5 or later
 
-2. Within XCode, add the command line tools: Preferences -> Download -> 
+1. Within XCode, add the command line tools: Preferences -> Download -> 
 "Command Line Tools" -> Install button
 
-3. Install Homebrew:
+1. Install Homebrew:
 
-    ```
-    /usr/bin/ruby -e "$(curl -fsSkL http://raw.github.com/mxcl/homebrew/go)"
-    ```
+        /usr/bin/ruby -e "$(curl -fsSkL http://raw.github.com/mxcl/homebrew/go)"
 
-4. Install Python (we are expecting 2.7.x):
+1. Install Python (we are expecting 2.7.x):
 
-    ```
-    brew install readline sqlite gdbm  
-    brew install python --universal --framework  
-    ```
+        brew install readline sqlite gdbm  
+        brew install python --universal --framework  
 
-5. Install mysql
+1. Install mysql
 
-    ```
-    brew install mysql  
-    ```
+        brew install mysql  
 
     (Optional but useful for looking at the database)  
     Install phpmyadmin (?!) following the directions here:  
     http://www.djangoapp.com/blog/2011/07/24/installing-phpmyadmin-on-mac-os-x-lion/
 
-6. Install pip, a python package manager
+1. Install pip, a python package manager
 
-    ```
-    easy_install pip
-    ```
+        easy_install pip
 
-7. Install python's virtual env
+1. Install python's virtual env
 
-    ```
-    pip install virtualenv 
-    ```
+        pip install virtualenv 
 
-8. Create the sophi virtual env (if you want) 
+1. Create the sophi virtual env (if you want) 
 
-    ```
-    virtualenv sophi-venv --no-site-packages    
-    ```
+        virtualenv sophi-venv --no-site-packages    
 
     This should create the sophi-venv directory under the
     directory where this README is found.  All our django stuff
     will happen in there now.
 
-9. Start using the virtual environment that we just created.  
+1. Start using the virtual environment that we just created.  
 
-    . ./sophi-venv/bin/activate
+        . ./sophi-venv/bin/activate
 
     WARNING:  you need to do this from whatever shell you're using.
     You can tell this because is puts an environment indicator at
     the beginning of your prompt
 
-10. Install django itself (this will be inside the virtualenv)
+1. Install django itself (this will be inside the virtualenv)
 
-    ```
-    pip install django
-    ```
+        pip install django
 
-11. Install MySQL-python (this will be inside the virtualenv)
+1. Install MySQL-python (this will be inside the virtualenv)
 
-    ```
-    pip install MySQL-python
-    ```
+        pip install MySQL-python
 
-    (8/31 note - needed apt-get install python-mysqldb on ubuntu)
+1. Install python image library (this will be inside the virtualenv)
 
-12. Install python image library (this will be inside the virtualenv)
-
-    ```
-    pip install PIL
-    ```
+        pip install PIL
 
 13. Install South, the database schema migration tool: (this will be inside the virtualenv)
 
-    ```
-    pip install South
-    ```
+        pip install South
 
-14. Install modules for Amazon S3
+1. Install modules for Amazon S3
 
-    ```
-    pip install django-storages
-    pip install boto
-    ```
+        pip install django-storages
+        pip install boto
  
-15. Install GData (2.0.17)
+1. Install GData (2.0.17)
 
-    ```
-    pip install gdata
-    ```
+        pip install gdata
 
-16. Patch GData and storages
+1. Patch GData and storages
 
     Take a look at the [gdata patch README](https://github.com/Stanford-Online/class2go/blob/master/chef/cookbooks/gdata/files/default/README.md) and the [django-storages patch README](https://github.com/Stanford-Online/class2go/tree/master/chef/cookbooks/class2go-python/files/default/README.md). Instructions for applying the patches are in these documents.
 
-17. Install Celery ecosystem
+1. Install Celery ecosystem
 
-    ```
-    pip install django-celery django-celery-email pytz
-    ```
+        pip install django-celery django-celery-email pytz
 
-18. Setup the acocunt and database in MySql
+1. Install test environment dependencies:
 
-    ```
-    create database class2go;  
-    grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';  
-    grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';  
-    ```
+        pip install mock nose django_nose
 
-19. Set up some folders for logs and the celery database. The sqlite3 folder can be anywhere that is writable.
+1. Setup the account and database in MySql
 
-    ```
-    mkdir /var/log/django/  
-    chmod 777 /var/log/django/  
-    mkdir /Users/account/sqlite3/  
-    ```
+        create database class2go;  
+        grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';  
+        grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';  
 
-20. In the main folder, make a copy of database_example.py to database.py 
+1. Set up some folders for logs and the celery database.
+
+    Put them somewhere writable. Make sure the django settings.py entry for LOGGING_DIR and the database.py entry for DATABASES.celery.NAME match these locations.
+
+        mkdir /home/account/django-logs/
+        mkdir /home/account/sqlite3/  
+
+1. In the main folder, make a copy of database_example.py to database.py 
 and edit the DATABASES strings as follows substituting proper values for your system.
 
-    ```
-    DATABASES = {  
-        'default': {  
-            'ENGINE': 'django.db.backends.mysql',  
-            'NAME': 'class2go',  
-            'USER': 'class2go',  
-            'PASSWORD': 'class2gopw',  
-            'HOST': '',  
-            'PORT': '',  
-        },  
-        'celery': {  
-            'ENGINE': 'django.db.backends.sqlite3',  
-            'NAME': '/Users/account/sqlite3/celerydb.sqlite',  
-        },  
-    }  
-    ```
+        DATABASES = {  
+            'default': {  
+                'ENGINE': 'django.db.backends.mysql',  
+                'NAME': 'class2go',  
+                'USER': 'class2go',  
+                'PASSWORD': 'class2gopw',  
+                'HOST': '',  
+                'PORT': '',  
+            },  
+            'celery': {  
+                'ENGINE': 'django.db.backends.sqlite3',  
+                'NAME': '/Users/account/sqlite3/celerydb.sqlite',  
+            },  
+        }  
 
-21. Setup initial db from the main folder
+1. Setup initial db from the main folder
 
-    ```
-    ./manage.py syncdb  
-    ./manage.py migrate  
-    ./manage.py syncdb --database=celery  
-    ./manage.py migrate --database=celery  
-    ```
+        ./manage.py syncdb  
+        ./manage.py migrate  
+        ./manage.py syncdb --database=celery  
+        ./manage.py migrate --database=celery  
 
     At this point you should be able to look at the django database in
     your local mysql and see a bunch of c2g_* tables.  Yay.
 
-22. From the main folder, run server on whatever port you want:
+1. From the main folder, run server on whatever port you want:
 
-    ```
-    python manage.py runserver 8100
-    ```
+        python manage.py runserver 8100
 
-23. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
+1. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
 
 
 
@@ -225,7 +192,7 @@ The following versions seem to be compatible:
 
 Steps:
 
-1. Install Eclipse
+2. Install Eclipse
 
 2. Install Egit and configure it to the github repos (https://github.com/Stanford-Online/class2go)
     For this you would need Jason to set you up with access to this repos.
@@ -235,7 +202,7 @@ Steps:
 
 **Requirements**
 
-1. Prereqs: 
+2. Prereqs: 
 	If you do not have the following, install them:
 		python 2.7
 		django
@@ -248,22 +215,22 @@ Steps:
 2. Install South, the database schema migration tool: (this will be inside the virtualenv)
     easy_install South
 
-3. Create a database called c2g (for example).
+2. Create a database called c2g (for example).
 
-4. Copy database.example.py to database.py.
+2. Copy database.example.py to database.py.
 
-5. In database.py, append ‘mysql’ to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user ‘root’ and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
+2. In database.py, append ‘mysql’ to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user ‘root’ and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
 
-6. Make sure you’re in the src/class2go/main directory (wherever that is for you)
+2. Make sure you’re in the src/class2go/main directory (wherever that is for you)
 
-7. ‘python manage.py syncdb’ followed by ‘python manage.py migrate’ to create the required database tables and make sure the schema is up to date.
+2. ‘python manage.py syncdb’ followed by ‘python manage.py migrate’ to create the required database tables and make sure the schema is up to date.
 You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
 
-8. XX -- ‘python manage.py collectstatic    ’ to copy all static files to the directory specified in settings.py.
+2. XX -- ‘python manage.py collectstatic    ’ to copy all static files to the directory specified in settings.py.
 
-9. ‘python manage.py runserver xxxx’ to run a dev server on port number xxxx. Example: xxxx = 8000
+2. ‘python manage.py runserver xxxx’ to run a dev server on port number xxxx. Example: xxxx = 8000
 
-10. Visit localhost:xxxx in your web browser and confirm that you get a C2G page.
+2. Visit localhost:xxxx in your web browser and confirm that you get a C2G page.
 
 
 
@@ -278,11 +245,11 @@ These instructions also include info for virtualenvwrapper, which
 contains useful tools for virtualenv. virtualenvwrapper can also
 be installed for Mac (and probably Windows too)
 
-1. Install pip:
+3. Install pip:
 
         sudo apt-get install python-pip
 
-2. Install virtualenv:
+3. Install virtualenv:
 
         sudo pip install virtualenv
 
@@ -290,15 +257,15 @@ be installed for Mac (and probably Windows too)
 
         sudo pip install virtualenvwrapper
 
-4. Verify installation location of virtualenv and virtualenvwrapper:
+3. Verify installation location of virtualenv and virtualenvwrapper:
 
         ls /usr/local/bin/
 
-5. Edit login script:
+3. Edit login script:
 
         vim .bashrc
 
-6. ...and add the following (without the backslashes at the start):
+3. ...and add the following:
 
         # virtualenv setup -- use Distribute by default
         export VIRTUALENV_DISTRIBUTE=true
@@ -310,118 +277,122 @@ be installed for Mac (and probably Windows too)
         export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
         source /usr/local/bin/virtualenvwrapper.sh
 
-7. Source login script so env vars take effect:
+3. Source login script so env vars take effect:
 
         source ~/.bashrc
     (Sourcing should auto-create your virtual environment base dir)
 
-8. Check out new virtual base directory:
+3. Check out new virtual base directory:
 
         ls -l DevEnvs/
 
-9. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
+3. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
 
         echo $PATH
     (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
 
-10. Make sure PROJECT_HOME is defined 
+3. Make sure PROJECT_HOME is defined 
 
         echo $PROJECT_HOME
 
-11. Make new project directory:
+3. Make new project directory:
 
         mkdir -p $PROJECT_HOME 
 
-12. Issue command to set up new project subdirectory and link it to virtual env:
+3. Issue command to set up new project subdirectory and link it to virtual env:
 
         mkproject class2go
 
-13. Once inside virtual env/project directory, install django:
+3. Once inside virtual env/project directory, install django:
 
         pip install django
 
-14. Clone class2go repo from github:
+3. Clone class2go repo from github:
 
         git clone https://github.com/Stanford-Online/class2go.git .
 
-15. Check out where your mysql is installed, make sure mysql_config exists in the dir:
+3. Check out where your mysql is installed, make sure mysql_config exists in the dir:
 
         ls `which mysql`
 
-16. Need to install mysql_config if it's not there:
+3. Need to install mysql_config if it's not there:
 
         sudo apt-get install libmysqlclient-dev
-    (For Macs, brew install mysql should give you the equivalent of this)
 
-17. Might need some extra python developer stuff:
+3. Might need some extra python developer stuff:
 
         sudo apt-get install python-dev
 
-18. Install python hooks for MySQL:
+3. Install python hooks for MySQL:
 
         pip install MySQL-python
 
-19. Install Python Imaging Lib:
+3. Install Python Imaging Lib:
 
         pip install PIL
 
-20. Install South db stuff:
+3. Install South db stuff:
 
         pip install South
 
-21. Install modules for Amazon S3
+3. Install modules for Amazon S3
 
         pip install django_storages
         pip install boto
 
-22. Install GData (2.0.17)
+3. Install GData (2.0.17)
 
         pip install gdata
 
-23. Install Celery ecosystem
+3. Install Celery ecosystem
 
         pip install django-celery django-celery-email pytz
 
-24. Go to "main" dir and copy over database settings file:
+3. Install test environment dependencies:
+
+        pip install mock nose django_nose
+
+3. Go to "main" dir and copy over database settings file:
 
         cd main
         cp database_example.py database.py
 
-25. Edit file and add db name, username and password:
+3. Edit file and add db name, username and password (see mac instructions)
 
         vim database.py 
 
-26. Run syncdb to create database tables 
+3. Run syncdb to create database tables 
 
         ./manage.py syncdb
     Might need to issue "syncdb" command a couple times if there are errors. The 
     first time, it will ask you for username and password for the database 
 
-27. Migrate user stuff over: 
+3. Migrate user stuff over: 
 
         ./manage.py migrate
 
-28. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
+3. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
 
         vim settings.py
 
-29. Make sure directory exists, or create it:
+3. Make sure directory exists, or create it:
 
         mkdir static
 
-30. Run collectstatic to copy stuff into your dir:
+3. Run collectstatic to copy stuff into your dir:
 
         ./manage.py collectstatic
 
-31. Run server on whatever port you want:
+3. Run server on whatever port you want:
 
         python manage.py runserver 8100
 
 
 When you want to start working on your project, just do the following:
-    workon class2go
-    cd project (shouldn't be necessary, as workon command will automatically cd to project dir, but use it if you need to)
-    python manage.py runserver 8100
+
+        # this should change to the correct virtualenv and cd you to project dir
+        workon class2go
+        python ./manage.py runserver 8100
 
 
 <a id="config"></a>
