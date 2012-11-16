@@ -31,7 +31,9 @@ urlpatterns = patterns('',
     #This and the exams list use the same view, so any reversing should be done using the name, i.e. 'survey_list', otherwise it
     #will be always return /exams/
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/?$', 'courses.exams.views.listAll', {'show_types':['survey',]}, name='survey_list'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam', name='survey_show'),
 
+                       
     # testing new exercise ui
     url(r'^new-ui$', 'courses.exercises.views.show_new_ui'),
     #This and the surveys list use the same view, so any reversing should be done using the name, i.e. 'exam_list', otherwise it
