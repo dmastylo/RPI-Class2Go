@@ -18,10 +18,10 @@ class InstructorDraftModeTestAdv(SimpleTestBase):
             'problemsets.views.create_action'),
         """
         # Get the number of problemsets
-        numProblemSets = len(ProblemSet.objects.all())
-        self.assertEqual(numProblemSets,4)
-        self.assertEqual( len(ProblemSet.objects.filter(mode='ready')), numProblemSets/2 )
-        self.assertEqual( len(ProblemSet.objects.filter(mode='draft')), numProblemSets/2 )
+        num_problem_sets = len(ProblemSet.objects.all())
+        self.assertEqual(num_problem_sets, 4)
+        self.assertEqual( len(ProblemSet.objects.filter(mode='ready')), num_problem_sets/2 )
+        self.assertEqual( len(ProblemSet.objects.filter(mode='draft')), num_problem_sets/2 )
     
         # Create a new problemset
         resp = self.client.post('/createproblemsetaction/',
@@ -45,7 +45,7 @@ class InstructorDraftModeTestAdv(SimpleTestBase):
         self.assertEqual(resp['location'], 'http://testserver/networking/Fall2012/problemsets/testPS/manage_exercise')
 
         # assert that there are 2 more problemsets, one each for ready & draft
-        self.assertEqual( len(ProblemSet.objects.all()), numProblemSets+2 )
-        self.assertEqual( len(ProblemSet.objects.filter(mode='ready')), (numProblemSets/2)+1 )
-        self.assertEqual( len(ProblemSet.objects.filter(mode='draft')), (numProblemSets/2)+1 )
+        self.assertEqual( len(ProblemSet.objects.all()), num_problem_sets+2 )
+        self.assertEqual( len(ProblemSet.objects.filter(mode='ready')), (num_problem_sets/2)+1 )
+        self.assertEqual( len(ProblemSet.objects.filter(mode='draft')), (num_problem_sets/2)+1 )
 

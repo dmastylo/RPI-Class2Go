@@ -3,10 +3,10 @@ from problemsets.tests.test_base import SimpleTestBase
 __all__ = ['test_standalone', 'InstructorDraftModeTest']
 
 def test_standalone():
-  """
-  Tests standalone function inclusion
-  """
-  pass
+    """
+    Tests standalone function inclusion
+    """
+    pass
 
 class InstructorDraftModeTest(SimpleTestBase):
     fixtures = ['pset_testdata.json']
@@ -15,7 +15,7 @@ class InstructorDraftModeTest(SimpleTestBase):
     coursePrefix = 'networking'
     courseSuffix = 'Fall2012'
 
-    def test_basic_pageAccess(self):
+    def test_basic_page_access(self):
         """
         Tests that we can access the basic test problem set pages
         url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/
