@@ -16,7 +16,6 @@ from courses.forms import *
 
 from courses.actions import auth_view_wrapper
 
-from urlparse import urlparse
 import settings
 
 def index(item): # define a index function for list items
@@ -137,23 +136,7 @@ def get_full_contentsection_list(course, contentsection_list, video_list, pset_l
 
         for file in file_list:
             if file.section == contentsection:
-                file_path=urlparse(file.file.url).path
-                file_parts=re.split('\.',file_path)
-                file_extension=file_parts.pop().lower()
-                if file_extension in ("html", "htm"):
-                    icon_type="globe"
-                elif (file_extension in ("ppt", "pptx")):
-                    icon_type="list-alt"
-                elif (file_extension in ('jpg', 'png', 'gif', 'jpeg')):
-                    icon_type="picture"  
-                elif (file_extension in ('mp3', 'aac')):
-                    icon_type="music"
-                elif (file_extension in ('gz', 'zip', 'tar', 'bz', 'bz2')):
-                    icon_type="download-alt"
-                elif (file_extension in ('csv', 'xls')):
-                    icon_type="table"
-                else:
-                    icon_type="file"
+                icon_type = file.file_icon()
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
         index_list.sort(key = index)
