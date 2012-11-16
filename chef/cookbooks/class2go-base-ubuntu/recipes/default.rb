@@ -37,9 +37,11 @@ package "python-mysqldb" do
 end
 
 easy_install_package "django" do
+    version "1.4.1"
     action :install
 end
 
+# For now let this version float.  We use 0.7.6 now.
 easy_install_package "South" do
     action :install
 end

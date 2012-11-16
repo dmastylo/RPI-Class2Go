@@ -193,8 +193,10 @@ INSTALLED_APPS = (
 if INSTANCE != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
+                        'django_nose',
                        )
 
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 

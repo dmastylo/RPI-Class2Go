@@ -35,10 +35,10 @@ from storages.backends.s3boto import S3BotoStorage
 
 
 @auth_view_wrapper
-def listAll(request, course_prefix, course_suffix):
+def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
     
     course = request.common_page_data['course']
-    exams = list(Exam.objects.filter(course=course, is_deleted=0))
+    exams = list(Exam.objects.filter(course=course, is_deleted=0, exam_type__in=show_types))
 
     if course.mode=="live":
         exams = filter(lambda item: item.is_live(), exams)
