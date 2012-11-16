@@ -1,4 +1,7 @@
 <VirtualHost *:80>
+    ServerName <%= @node[:apache][:servername] %>
+    UseCanonicalName On
+
     Alias /robots.txt /opt/class2go/static/robots.txt
     Alias /favicon.ico /opt/class2go/static/graphics/core/favicon.ico
 
