@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
-from c2g.models import Course, Video, VideoToExercise, Exercise, PageVisitLog
+from c2g.models import Course, Video, VideoToExercise, Exercise, PageVisitLog, ProblemSet, AdditionalPage, File
 
 from c2g.models import Course, Video, VideoActivity, ProblemActivity
 from courses.common_page_data import get_common_page_data
@@ -16,6 +16,7 @@ from django.db.models import Q
 
 from django.template import RequestContext
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
+from courses.views import get_full_contentsection_list
 
 @auth_view_wrapper
 def list(request, course_prefix, course_suffix):
@@ -101,7 +102,32 @@ def view(request, course_prefix, course_suffix, slug):
     has_ex = VideoToExercise.objects.filter(is_deleted=False, video=video).exists()
 
     no_ex = 1 if (not has_ex) or request.session['video_quiz_mode'] != "quizzes included" else 0
-    return render_to_response('videos/view.html', {'common_page_data': common_page_data, 'video': video, 'video_rec':video_rec, 'prev_slug': prev_slug, 'next_slug': next_slug, 'no_ex':no_ex}, context_instance=RequestContext(request))
+    
+    course = common_page_data['course']
+    contentsection_list = ContentSection.objects.getByCourse(course=course)
+    video_list = videos #Video.objects.getByCourse(course=course)
+    pset_list =  ProblemSet.objects.getByCourse(course=course)
+    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
+    file_list = File.objects.getByCourse(course=course)
+
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+
+    if request.user.is_authenticated():
+        is_logged_in = 1
+    else:
+        is_logged_in = 0    
+    
+    return render_to_response('videos/view.html', 
+                              {'common_page_data': common_page_data, 
+                               'video': video, 
+                               'video_rec':video_rec, 
+                               'prev_slug': prev_slug, 
+                               'next_slug': next_slug, 
+                               'no_ex': no_ex,
+                               'contentsection_list': full_contentsection_list, 
+                               'full_index_list': full_index_list,
+                               'is_logged_in': is_logged_in}, 
+                              context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):
@@ -233,9 +259,18 @@ def add_existing_exercises(request):
     exercise_ids = request.POST.getlist('exercise')
     exercises = Exercise.objects.filter(id__in=exercise_ids)
     for exercise in exercises:
-        video_time = 0
-        videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=False, video_time=video_time, mode="draft")
-        videoToEx.save()
+        #if this exercise has been deleted previously then just un-delete it
+        videoToExs = VideoToExercise.objects.filter(video=video, exercise_id=exercise.id, mode = 'draft', is_deleted=1).order_by('-id')
+        if videoToExs.exists():
+            videoToEx = videoToExs[0]
+            videoToEx.is_deleted = 0
+            videoToEx.video_time = 0
+            videoToEx.save()
+        #else create a new one
+        else:
+            videoToEx = VideoToExercise(video=video, exercise=exercise, is_deleted=0, video_time=0, mode='draft')
+            videoToEx.save()       
+        
     return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
 

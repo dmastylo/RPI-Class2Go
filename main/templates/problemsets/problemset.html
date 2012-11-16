@@ -1,6 +1,6 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block title %}Stanford Online | {{ common_page_data.course.title }} | {{ pset.title }} {% endblock title %} 
+{% block title %}{{ pset.title }} | {{ common_page_data.course.title }}{% endblock title %} 
 
 {% block problemsets_link_class %}class="active"{% endblock problemsets_link_class %}
 
@@ -10,8 +10,13 @@
 <div class="container-fluid body-content">
     <div class="row-fluid">
         <div class="span12">
+        <div class="row-fluid">
+        {% block l_column_content %}
+            {% include "left_nav.html" %}
+        {% endblock l_column_content %}
+        
             <!-- Hardcoding select content of khan-site.html -->
-            <div id="page-container">
+            <div class="span9" id="page-container" style="min-width:500px">
                 <div id="page-container-inner">
                     <div id="fb-root"></div>
                     <header></header>
@@ -45,6 +50,7 @@
                     <div id="badge-notification-container" class="badge-award-container" style="display:none;"></div>
                 </div>
             </div>
+        </div>
         </div>
         <!-- End Hardcoding select content of khan-site.html -->
         

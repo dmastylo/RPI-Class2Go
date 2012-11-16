@@ -357,6 +357,19 @@ BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
 BROKER_TRANSPORT_OPTIONS = {
     'region': 'us-west-2', 
     'queue_name_prefix' : INSTANCE+'-',
-    'visibility_timeout' : 7200,
+    'visibility_timeout' : 3600*6,
 }
 
+CELERY_DEFAULT_QUEUE = 'default'
+CELERY_DEFAULT_EXCHANGE = 'default'
+CELERY_DEFAULT_ROUTING_KEY = 'default'
+
+CELERY_QUEUES = {
+    'default': {'exchange': 'default', 'routing_key': 'default'},
+    'long':    {'exchange': 'long',    'routing_key': 'long'},
+}
+
+CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': 'long', 'routing_key': 'long'},
+                 'kelvinator.tasks.resize':    {'queue': 'long', 'routing_key': 'long'},
+                 'celerytest.tasks.echo_long': {'queue': 'long', 'routing_key': 'long'},
+                }

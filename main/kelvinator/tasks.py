@@ -221,7 +221,7 @@ def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
 # video sizes we support: key is size name (used for target subdirectory) and value
 # are the parameters (as a list) that we'll pass to ffmpeg.
 sizes = { "large":  [ "-crf", "23", "-s", "1280x720" ],   # original size, compressed
-          "medium": [ "-crf", "27", "-s", "wvga" ],       # wvga = 852x480 at 16:9
+          "medium": [ "-crf", "27", "-s", "852x480" ],    # wvga at 16:9
           "small":  [ "-crf", "30", "-s", "640x360" ],    
           "tiny":   [ "-crf", "40", "-s", "320x180" ],
         }

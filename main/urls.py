@@ -26,13 +26,25 @@ urlpatterns = patterns('',
     url(r'^faq$', 'c2g.views.faq'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
-                       
+
+    #survey menu item
+    #This and the exams list use the same view, so any reversing should be done using the name, i.e. 'survey_list', otherwise it
+    #will be always return /exams/
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/?$', 'courses.exams.views.listAll', {'show_types':['survey',]}, name='survey_list'),
+
     # testing new exercise ui
     url(r'^new-ui$', 'courses.exercises.views.show_new_ui'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/?$', 'courses.exams.views.listAll'),
+    #This and the surveys list use the same view, so any reversing should be done using the name, i.e. 'exam_list', otherwise it
+    #will be always return /exams/
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/?$', 'courses.exams.views.listAll', name='exam_list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/snapshot/?$', 'courses.exams.views.show_populated_exam'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/submit/?$', 'courses.exams.views.collect_data'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/all_submissions_to_grade/?$', 'courses.exams.views.view_submissions_to_grade'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/post_csv_grades/?$', 'courses.exams.views.post_csv_grades'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/get_csv_grades/?$', 'courses.exams.views.view_csv_grades'),
 
     #emailoptout
     url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
@@ -53,6 +65,7 @@ urlpatterns = patterns('',
                        
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
+    url(r'^videos/record_download/', 'courses.videos.actions.record_download'),
     url(r'^problemsets/attempt/(?P<problemId>\d+)/?$', 'problemsets.views.attempt'),
     url(r'^problemsets/attempt_protect/(?P<problemId>\d+)/?$', 'problemsets.views.attempt_protect'),
 
@@ -136,6 +149,7 @@ urlpatterns = patterns('',
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
     url(r'^delete_video_exercise/?$', 'courses.videos.views.delete_exercise'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set?$', 'courses.videos.views.load_video_problem_set'),
+    
 
 
     # Video Exercises

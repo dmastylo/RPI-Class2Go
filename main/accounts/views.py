@@ -24,6 +24,7 @@ from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import permission_required
+from django.db.models import Q
 import random
 import os
 import string
@@ -34,22 +35,25 @@ def index(request):
 
 
 def profile(request):
-    course_list = Course.objects.all()
-    groups = request.user.groups.all()
-    courses = []
-    for g in groups:
-        for c in course_list:
-            if g.id == c.student_group_id or g.id == c.instructor_group_id or g.id == c.tas_group_id or g.id == c.readonly_tas_group_id:
-                courses.append(c)
-                break
     
+    group_list = request.user.groups.all()
+    courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
     
+    if request.user.is_authenticated():
+        user_profile = request.user.get_profile()
+        is_student_list = user_profile.is_student_list(group_list, courses)
+    else:
+        user_profile = None
+        is_student_list = []
+
     allow_password_change  = True
     if (not request.user.is_authenticated()) or (request.user.get_profile().institutions.filter(title='Stanford').exists()):
         allow_password_change = False
+
     return render_to_response('accounts/profile.html',
                               {'request': request,
                               'courses': courses,
+                              'is_student_list': is_student_list,
                               'show_pwd_change': allow_password_change,},
                               context_instance=RequestContext(request))
 

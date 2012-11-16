@@ -1,5 +1,5 @@
 {% extends "course_base.html" %}
-{% block title %}Stanford Online | {{common_page_data.course.title}} | Videos{% endblock %}
+{% block title %}Videos | {{common_page_data.course.title}}{% endblock %}
 {% block videos_link_class %}class="active"{% endblock videos_link_class %}
 
 {% block course_page_title %}Videos (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
