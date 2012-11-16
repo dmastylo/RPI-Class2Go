@@ -26,7 +26,7 @@
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
 
-    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %O %D \"%{Referer}i\" \"%{User-Agent}i\"" class2go
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %D" class2go
     CustomLog ${APACHE_LOG_DIR}/access.log class2go
 
 </VirtualHost>
