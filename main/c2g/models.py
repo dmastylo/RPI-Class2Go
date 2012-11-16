@@ -12,22 +12,28 @@
 # any table indexes that use multiple columns are placed in a south migration at
 # <location to be inserted>
 
-from django.db import models
-from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save
-from django import forms
 from datetime import datetime
-from django.core.exceptions import ValidationError
-from hashlib import md5
-
 import gdata.youtube
 import gdata.youtube.service
+from hashlib import md5
 import os
-import time
+import re
 import sys
+import time
 
-# For file system upload
-from django.core.files.storage import FileSystemStorage
+from django import forms
+from django.contrib.auth.models import Group, User
+from django.core.exceptions import ValidationError
+from django.core.files.storage import DefaultStorage, get_storage_class, FileSystemStorage
+from django.db.models.signals import post_save
+from django.db import models
+
+from c2g.util import is_storage_local, get_site_url
+from kelvinator.tasks import sizes as video_resize_options 
+
+
+RE_S3_PATH_FILENAME_SPLIT = re.compile('(?P<path>.+)\/(?P<filename>.*)$')
+
 
 def get_file_path(instance, filename):
     parts = str(instance.handle).split("--")
@@ -134,9 +140,9 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
 
     def __unicode__(self):
         if self.title:
-            return self.title
+            return self.title + " | Mode: " + self.mode
         else:
-            return "No Title"
+            return "No Title" + " | Mode: " + self.mode
 
     
     def _get_prefix(self):
@@ -148,8 +154,11 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     suffix = property(_get_suffix)
 
     def has_exams(self):
-        return Exam.objects.filter(course=self, is_deleted=0).exists()
+        return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam").exists()
 
+    def has_surveys(self):
+        return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey").exists()
+    
     def get_all_students(self):
         """
         Returns a QUERY_SET of all students
@@ -195,6 +204,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             faq = self.faq,
             logo = self.logo,
             logo_handle = self.logo_handle
+            preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
         self.image = ready_instance
@@ -504,7 +514,12 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.image = ready_instance
         self.save()
 
+    def has_storage(self):
+        """Return True if we have a copy of this file on our storage."""
+        return self.file.storage.exists(self.file.name)
+
     def dl_link(self):
+        # File
         if not self.file.storage.exists(self.file.name):
             return ""
         
@@ -621,6 +636,66 @@ class UserProfile(TimestampMixin, models.Model):
     def __unicode__(self):
         return self.user.username
 
+    def is_student_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_student_list = []
+        for course in courses:
+            for group in group_list:
+                if course.student_group_id == group.id:
+                    is_student_list.append(course)
+                    break
+        return is_student_list
+
+    def is_instructor_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_instructor_list = []
+        for course in courses:
+            for group in group_list:
+                if course.instructor_group_id == group.id:
+                    is_instructor_list.append(course)
+                    break
+        return is_instructor_list
+
+    def is_tas_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+        
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_tas_list = []
+        for course in courses:
+            for group in group_list:
+                if course.tas_group_id == group.id:
+                    is_tas_list.append(course)
+                    break
+        return is_tas_list
+
+    def is_readonly_tas_list(self, group_list=None, courses=None):
+        if group_list == None:
+            group_list = self.user.groups.all()
+
+        if courses == None:
+            courses = Course.objects.filter(mode='ready')
+    
+        is_readonly_tas_list = []
+        for course in courses:
+            for group in group_list:
+                if course.readonly_tas_group_id == group.id:
+                    is_readonly_tas_list.append(course)
+                    break
+        return is_readonly_tas_list
+
     class Meta:
         db_table = u'c2g_user_profiles'
 
@@ -656,7 +731,6 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     file = models.FileField(upload_to=get_file_path)
     handle = models.CharField(max_length=255, null=True, db_index=True)
-#    kelvinator = models.IntegerField("K-Threshold", default=15)
     objects = VideoManager()
 
     def create_ready_instance(self):
@@ -716,22 +790,39 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_videoToExs =  VideoToExercise.objects.getByVideo(self)
             ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
-            #Delete all previous relationships
-            for ready_videoToEx in ready_videoToExs:
-                ready_videoToEx.delete()
-                ready_videoToEx.save()
 
-        #Create brand new copies of draft relationships
+            #If filename in ready but not in draft list then delete it.
+            for ready_videoToEx in ready_videoToExs:
+                if not self.in_list(ready_videoToEx, draft_videoToExs):
+                    ready_videoToEx.is_deleted = 1
+                    ready_videoToEx.save()
+
+            #Find ready instance, if it exists, and set it.
             for draft_videoToEx in draft_videoToExs:
-                ready_videoToEx = VideoToExercise(video = ready_instance,
-                                                    exercise = draft_videoToEx.exercise,
-                                                    video_time = draft_videoToEx.video_time,
-                                                    is_deleted = 0,
-                                                    mode = 'ready',
-                                                    image = draft_videoToEx)
-                ready_videoToEx.save()
-                draft_videoToEx.image = ready_videoToEx
-                draft_videoToEx.save()
+                not_deleted_ready_videoToEx = VideoToExercise.objects.filter(video=ready_instance, exercise=draft_videoToEx.exercise, is_deleted=0)
+                deleted_ready_videoToExs = VideoToExercise.objects.filter(video=ready_instance, exercise=draft_videoToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_ready_videoToEx.exists():
+                    ready_videoToEx = not_deleted_ready_videoToEx[0]
+                    ready_videoToEx.video_time = draft_videoToEx.video_time
+                    ready_videoToEx.save() 
+                    
+                elif deleted_ready_videoToExs.exists():
+                    ready_videoToEx = deleted_ready_videoToExs[0]
+                    ready_videoToEx.is_deleted = 0
+                    ready_videoToEx.video_time = draft_videoToEx.video_time
+                    ready_videoToEx.save()
+                    
+                else:
+                    ready_videoToEx = VideoToExercise(video = ready_instance,
+                                                          exercise = draft_videoToEx.exercise,
+                                                          video_time = draft_videoToEx.video_time,
+                                                          is_deleted = 0,
+                                                          mode = 'ready',
+                                                          image = draft_videoToEx)
+                    ready_videoToEx.save()
+                    draft_videoToEx.image = ready_videoToEx 
+                    draft_videoToEx.save()
 
         else:
             draft_videoToExs = VideoToExercise.objects.getByVideo(self)
@@ -763,22 +854,28 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_videoToExs = VideoToExercise.objects.getByVideo(self)
             ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
-            #Delete all previous relationships
-            for draft_videoToEx in draft_videoToExs:
-                draft_videoToEx.delete()
-                draft_videoToEx.save()
 
-        #Create brand new copies of draft relationships
+            #If filename in draft but not in ready list then delete it.
+            for draft_videoToEx in draft_videoToExs:
+                if not self.in_list(draft_videoToEx, ready_videoToExs):
+                    draft_videoToEx.is_deleted = 1
+                    draft_videoToEx.save()
+
+            #Find draft instance and set it.
             for ready_videoToEx in ready_videoToExs:
-                draft_videoToEx = VideoToExercise(video = self,
-                                                    exercise = ready_videoToEx.exercise,
-                                                    video_time = ready_videoToEx.video_time,
-                                                    is_deleted = 0,
-                                                    mode = 'draft',
-                                                    image = ready_videoToEx)
-                draft_videoToEx.save()
-                ready_videoToEx.image = draft_videoToEx
-                ready_videoToEx.save()
+                not_deleted_draft_videoToEx = VideoToExercise.objects.filter(video=self, exercise=ready_videoToEx.exercise, is_deleted=0)
+                deleted_draft_videoToExs = VideoToExercise.objects.filter(video=self, exercise=ready_videoToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_draft_videoToEx.exists():
+                    draft_videoToEx = not_deleted_draft_videoToEx[0]
+                    draft_videoToEx.video_time = ready_videoToEx.video_time
+                    draft_videoToEx.save() 
+                    
+                elif deleted_draft_videoToExs.exists():
+                    draft_videoToEx = deleted_draft_videoToExs[0]
+                    draft_videoToEx.is_deleted = 0
+                    draft_videoToEx.video_time = ready_videoToEx.video_time
+                    draft_videoToEx.save()
 
         else:
             ready_videoToExs = VideoToExercise.objects.getByVideo(ready_instance)
@@ -810,10 +907,38 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 return False
         return True
 
+    def has_storage(self):
+        """Return True if we have a copy of this video on our storage."""
+        return self.file.storage.exists(self.file.name)
+
     def dl_link(self):
+        # Video
         if not self.file.storage.exists(self.file.name):
             return ""
         return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+
+    def dl_links_all(self):
+        """Return list of fully-qualified download URLs for video variants."""
+        # Video
+        if is_storage_local():
+            # FIXME: doesn't work on local sites yet
+            print "DEBUG: I don't work on local sites yet, sorry." 
+            return []
+        else:
+            # XXX: very S3 specific
+            myname  = self.file.name
+            mystore = self.file.storage
+            urlof   = mystore.url
+            basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
+            names = []
+            for size in sorted(video_resize_options):
+                checkfor = basepath+'/'+size+'/'+filename
+                gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
+                if gotback:
+                    names.append((size, urlof(checkfor, response_headers={'response-content-disposition': 'attachment'}), gotback[0].size, video_resize_options[size][3]))
+            if not names:
+                names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
+            return names
 
     def ret_url(self):
         return "https://www.youtube.com/analytics#dt=lt,fi=v-" + self.url + ",r=retention"
@@ -849,6 +974,12 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
         if errors:
             raise ValidationError(errors)
+
+    def in_list(self, needle, haystack):
+        for hay in haystack:
+            if needle.exercise.fileName == hay.exercise.fileName:
+                return True
+        return False
         
     def __unicode__(self):
         if self.title:
@@ -869,6 +1000,7 @@ class VideoViewTraces(TimestampMixin, models.Model):
         db_table = u'c2g_video_view_traces'
         
 class VideoActivity(models.Model):
+<<<<<<< HEAD
     student = models.ForeignKey(User)
     course = models.ForeignKey(Course)
     video = models.ForeignKey(Video)
@@ -881,7 +1013,32 @@ class VideoActivity(models.Model):
     def __unicode__(self):
         return self.student.username
     class Meta:
+=======
+     student = models.ForeignKey(User)
+     course = models.ForeignKey(Course)
+     video = models.ForeignKey(Video)
+     start_seconds = models.IntegerField(default=0, blank=True)
+     max_end_seconds = models.IntegerField(default=0, blank=True)
+     #last_watched = models.DateTimeField(auto_now=True, auto_now_add=False)
+
+     def percent_done(self):
+         return float(self.start_seconds)*100/self.video.duration
+
+     def __unicode__(self):
+            return self.student.username
+     class Meta:
+>>>>>>> 50c5f8635f920bd2c3e07130b4014e78fd5a10c6
         db_table = u'c2g_video_activity'
+        
+class VideoDownload(models.Model):
+    student = models.ForeignKey(User)
+    course = models.ForeignKey(Course)
+    video = models.ForeignKey(Video)
+    download_date = models.DateTimeField(auto_now=False, auto_now_add=True)
+    format = models.CharField(max_length=35, null=True, blank=True)
+    
+    class Meta:
+        db_table = u'c2g_video_download'
 
 class ProblemSetManager(models.Manager):
     def getByCourse(self, course):
@@ -990,22 +1147,39 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_psetToExs =  ProblemSetToExercise.objects.getByProblemset(self)
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
-            #Delete all previous relationships
+                
+            #If filename in ready but not in draft list then delete it.
             for ready_psetToEx in ready_psetToExs:
-                ready_psetToEx.delete()
-                ready_psetToEx.save()
+                if not self.in_list(ready_psetToEx, draft_psetToExs):
+                    ready_psetToEx.is_deleted = 1
+                    ready_psetToEx.save()
 
-        #Create brand new copies of draft relationships
+            #Find ready instance, if it exists, and set it.
             for draft_psetToEx in draft_psetToExs:
-                ready_psetToEx = ProblemSetToExercise(problemSet = ready_instance,
-                                                    exercise = draft_psetToEx.exercise,
-                                                    number = draft_psetToEx.number,
-                                                    is_deleted = 0,
-                                                    mode = 'ready',
-                                                    image = draft_psetToEx)
-                ready_psetToEx.save()
-                draft_psetToEx.image = ready_psetToEx
-                draft_psetToEx.save()
+                not_deleted_ready_psetToEx = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=0)
+                deleted_ready_psetToExs = ProblemSetToExercise.objects.filter(problemSet=ready_instance, exercise=draft_psetToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_ready_psetToEx.exists():
+                    ready_psetToEx = not_deleted_ready_psetToEx[0]
+                    ready_psetToEx.number = draft_psetToEx.number
+                    ready_psetToEx.save() 
+                    
+                elif deleted_ready_psetToExs.exists():
+                    ready_psetToEx = deleted_ready_psetToExs[0]
+                    ready_psetToEx.is_deleted = 0
+                    ready_psetToEx.number = draft_psetToEx.number
+                    ready_psetToEx.save()
+                    
+                else:
+                    ready_psetToEx = ProblemSetToExercise(problemSet = ready_instance,
+                                                          exercise = draft_psetToEx.exercise,
+                                                          number = draft_psetToEx.number,
+                                                          is_deleted = 0,
+                                                          mode = 'ready',
+                                                          image = draft_psetToEx)
+                    ready_psetToEx.save()
+                    draft_psetToEx.image = ready_psetToEx 
+                    draft_psetToEx.save()
 
         else:
             draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
@@ -1051,22 +1225,28 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.exercises_changed() == True:
             draft_psetToExs = ProblemSetToExercise.objects.getByProblemset(self)
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
-            #Delete all previous relationships
-            for draft_psetToEx in draft_psetToExs:
-                draft_psetToEx.delete()
-                draft_psetToEx.save()
 
-        #Create brand new copies of draft relationships
+            #If filename in draft but not in ready list then delete it.
+            for draft_psetToEx in draft_psetToExs:
+                if not self.in_list(draft_psetToEx, ready_psetToExs):
+                    draft_psetToEx.is_deleted = 1
+                    draft_psetToEx.save()
+
+            #Find draft instance and set it.
             for ready_psetToEx in ready_psetToExs:
-                draft_psetToEx = ProblemSetToExercise(problemSet = self,
-                                                    exercise = ready_psetToEx.exercise,
-                                                    number = ready_psetToEx.number,
-                                                    is_deleted = 0,
-                                                    mode = 'draft',
-                                                    image = ready_psetToEx)
-                draft_psetToEx.save()
-                ready_psetToEx.image = draft_psetToEx
-                ready_psetToEx.save()
+                not_deleted_draft_psetToEx = ProblemSetToExercise.objects.filter(problemSet=self, exercise=ready_psetToEx.exercise, is_deleted=0)
+                deleted_draft_psetToExs = ProblemSetToExercise.objects.filter(problemSet=self, exercise=ready_psetToEx.exercise, is_deleted=1).order_by('-id')
+                        
+                if not_deleted_draft_psetToEx.exists():
+                    draft_psetToEx = not_deleted_draft_psetToEx[0]
+                    draft_psetToEx.number = ready_psetToEx.number
+                    draft_psetToEx.save() 
+                    
+                elif deleted_draft_psetToExs.exists():
+                    draft_psetToEx = deleted_draft_psetToExs[0]
+                    draft_psetToEx.is_deleted = 0
+                    draft_psetToEx.number = ready_psetToEx.number
+                    draft_psetToEx.save()
 
         else:
             ready_psetToExs = ProblemSetToExercise.objects.getByProblemset(ready_instance)
@@ -1226,6 +1406,12 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             
         if detailed: return exercise_scores
         else: return total_score
+
+    def in_list(self, needle, haystack):
+        for hay in haystack:
+            if needle.exercise.fileName == hay.exercise.fileName:
+                return True
+        return False
 
     def __unicode__(self):
         return self.title
@@ -1396,6 +1582,12 @@ class PageVisitLog(TimestampMixin, models.Model):
         db_table = u'c2g_page_visit_log'
 
 class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+    
+    EXAM_TYPE_CHOICES = (
+                         ('exam', 'exam'),
+                         ('survey', 'survey'),
+                         )
+    
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -1403,6 +1595,9 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
+    total_score = models.IntegerField(null=True, blank=True)
+    exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    
     
     def past_due(self):
         if self.due_date and (datetime.now() > self.due_date):
@@ -1410,7 +1605,7 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
         return False
     
     def __unicode__(self):
-        return self.title
+        return self.title + " | Mode: " + self.mode
 
 
 class ExamRecord(TimestampMixin, models.Model):
@@ -1418,7 +1613,7 @@ class ExamRecord(TimestampMixin, models.Model):
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)
-    score = models.IntegerField(null=True, blank=True)
+    score = models.IntegerField(null=True, blank=True) #currently unused.
 
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
@@ -1459,3 +1654,24 @@ class CourseInstructor(TimestampMixin,  models.Model):
     class Meta:
         db_table = u'c2g_course_instructor'
                 
+
+class ExamScore(TimestampMixin, models.Model):
+    """
+    This class is meant to be the top level score of each problem set
+    """
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    score = models.IntegerField(null=True, blank=True) #this is the parent score
+    #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
+
+    def __unicode__(self):
+        return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.score))
+
+
+class ExamScoreField(TimestampMixin, models.Model):
+    parent = models.ForeignKey(ExamScore, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    subscore = models.IntegerField(default=0)
+
+
