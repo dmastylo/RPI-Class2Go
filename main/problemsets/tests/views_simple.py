@@ -1,4 +1,3 @@
-from c2g.models import ProblemSet
 from problemsets.tests.test_base import SimpleTestBase
 
 __all__ = ['test_standalone', 'InstructorDraftModeTest']

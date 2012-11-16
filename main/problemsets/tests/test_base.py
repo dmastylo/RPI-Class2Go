@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django_nose import FastFixtureTestCase
 
 __all__ = ['SimpleTestBase']
