@@ -26,10 +26,17 @@ urlpatterns = patterns('',
     url(r'^faq$', 'c2g.views.faq'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
-                       
+
+    #survey menu item
+    #This and the exams list use the same view, so any reversing should be done using the name, i.e. 'survey_list', otherwise it
+    #will be always return /exams/
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/?$', 'courses.exams.views.listAll', {'show_types':['survey',]}, name='survey_list'),
+
     # testing new exercise ui
     url(r'^new-ui$', 'courses.exercises.views.show_new_ui'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/?$', 'courses.exams.views.listAll'),
+    #This and the surveys list use the same view, so any reversing should be done using the name, i.e. 'exam_list', otherwise it
+    #will be always return /exams/
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/?$', 'courses.exams.views.listAll', name='exam_list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/snapshot/?$', 'courses.exams.views.show_populated_exam'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam'),
