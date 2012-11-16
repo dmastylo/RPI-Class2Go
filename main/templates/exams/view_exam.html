@@ -40,38 +40,48 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 {% block addl_scripts %}
 <script>
+    var __exam_type = "exam";
+    {% if exam.exam_type != "exam" %}
+    __exam_type = "{{exam.exam_type}}";
+    {% endif %}
+    
     $(document).ready(function () {
 
-    var SUBMISSION_LIST_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-
-    // Add link that just takes you back to submission list without submitting form again
-    var returnToListCont = document.createElement('p');
-    $(returnToListCont).addClass('useful-info');
-
-    var returnToListLink = document.createElement('a');
-    $(returnToListLink).attr('id', 'returnToListLink');
-    $(returnToListLink).attr('href', SUBMISSION_LIST_URL);
-    $(returnToListLink).attr('title', 'Click to return to the submissions list without submitting this form');
-    $(returnToListLink).text('View Previous Submissions (Without Submitting Form)');
-    $(returnToListLink).mouseover(function (ev) {
-        $(userNote).show();
-    }).mouseout(function (ev) {
-        $(userNote).hide();
-    });
-
-    var submitBtn = $('input[type|="submit"]').not('#login_button');
-    submitBtn.after($(returnToListCont));
-    $(returnToListCont).append($(returnToListLink));
-    if (!submitBtn.hasClass('btn')) {
-        submitBtn.addClass('btn btn-spaced');
+    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    
+    if (__exam_type=="survey") {
+            SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
     }
 
-    var userNote = document.createElement('em');
-    $(userNote).addClass('userNote');
-    $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
-    $(returnToListLink).after($(userNote));
-    $(userNote).hide();
-                      
+    // Add link that just takes you back to submission list without submitting form again
+    if (__exam_type != "survey") {
+        var returnToListCont = document.createElement('p');
+        $(returnToListCont).addClass('useful-info');
+
+        var returnToListLink = document.createElement('a');
+        $(returnToListLink).attr('id', 'returnToListLink');
+        $(returnToListLink).attr('href', SUBMISSION_RETURN_URL);
+        $(returnToListLink).attr('title', 'Click to return to the submissions list without submitting this form');
+        $(returnToListLink).text('View Previous Submissions (Without Submitting Form)');
+        $(returnToListLink).mouseover(function (ev) {
+            $(userNote).show();
+        }).mouseout(function (ev) {
+            $(userNote).hide();
+        });
+
+        var submitBtn = $('input[type|="submit"]').not('#login_button');
+        submitBtn.after($(returnToListCont));
+        $(returnToListCont).append($(returnToListLink));
+        if (!submitBtn.hasClass('btn')) {
+            submitBtn.addClass('btn btn-spaced');
+        }
+
+        var userNote = document.createElement('em');
+        $(userNote).addClass('userNote');
+        $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
+        $(returnToListLink).after($(userNote));
+        $(userNote).hide();
+    }
     $('#nojswarn').remove();
                       
     var allFieldsets = $('fieldset');
@@ -97,6 +107,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             if (typeof dataObj[member] == "string") {
                 // it's a text input/textarea
                 $('input[name|=' + member + ']').val(dataObj[member]);
+                $('textarea[name|=' + member + ']').val(dataObj[member]);
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
                       $('input[name|=' + member + ']').before("<b style='color:red'>" + scores[member]+" </b> ");
@@ -136,6 +147,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         if (!enabled) {
             // disable all inputs
             $('input').attr('disabled','disabled');
+            $('textarea').attr('disabled','disabled');
 
             // hide submit button
             var submitBtn = $('input[type|="submit"]').not('#login_button');
@@ -152,6 +164,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             submitBtn.before($(reEnableBtn));
             $(reEnableBtn).click(function (ev) {
                 $('input').removeAttr('disabled');
+                $('textarea').removeAttr('disabled');
                 submitBtn.show();
             });
         }
@@ -188,6 +201,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 userSelections[$(this).attr('name')] = $(this).val();
             }
         });
+        $('textarea').each(function () {
+            if ($(this).val() != "") {
+                userSelections[$(this).attr('name')] = $(this).val();
+            }
+        });
 
         window.myData = JSON.stringify(userSelections);
 
@@ -209,13 +227,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         examXHR.success(function (evt, xhr, settings) {
             var dialogDiv = getDialog();
-            var dueDateMessage = "\n Please check back after {{exam.due_date|date:'D M d Y'}} for your score."
+            var dueDateMessage = "";
+            var confirmText = "OK";
+            if (__exam_type == "exam") 
+                { dueDateMessage = "\n Please check back after {{exam.due_date|date:'D M d Y'}} for your score.";
+                  confirmText = "See My Submissions"; }
+            else if (__exam_type == "survey")
+                { dueDateMessage = "\n Thanks!"; }
+                        
             $(dialogDiv).find('p').text(settings.responseText + dueDateMessage);
+            var buttonObj = {};
+            buttonObj[confirmText]=function() {
+                        document.location = SUBMISSION_RETURN_URL;};
+
             $(dialogDiv).dialog({ modal: true,
-                                  buttons: {
-                                    'See My Submissions': function() {
-                                     document.location = SUBMISSION_LIST_URL;
-                                }}});
+                                buttons: buttonObj});
         });
 
         examXHR.error(function(xhr, status, msg) {
