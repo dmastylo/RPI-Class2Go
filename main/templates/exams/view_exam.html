@@ -47,10 +47,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     
     $(document).ready(function () {
 
-    var SUBMISSION_RETURN_URL = "{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
+    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     
-    if (__exam_type=="exam") {
-            SUBMISSION_RETURN_URL="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    if (__exam_type=="survey") {
+            SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
     }
 
     // Add link that just takes you back to submission list without submitting form again
