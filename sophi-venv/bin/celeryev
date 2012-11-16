@@ -1,0 +1,9 @@
+#!/Users/gregbruhns/dev_c2g/sophi-venv/bin/python
+# EASY-INSTALL-ENTRY-SCRIPT: 'celery==3.0.12','console_scripts','celeryev'
+__requires__ = 'celery==3.0.12'
+import sys
+from pkg_resources import load_entry_point
+
+sys.exit(
+   load_entry_point('celery==3.0.12', 'console_scripts', 'celeryev')()
+)
