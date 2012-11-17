@@ -37,13 +37,20 @@ var c2gXMLParse = (function() {
             switch (nodeName) {
                 case 'multiplechoiceresponse':
                     var choices = $($(node)).find('choice');
-            
+                    var correctchoices = $(choices).filter(function() {
+                                                              if (!$(this).attr('correct'))
+                                                                 return false;
+                                                              return $(this).attr('correct').toLowerCase()==='true';
+                                                           });
+                    console.log(correctchoices.length + " correct choice");
+                    var inputtype = (correctchoices.length == 1)?'radio':'checkbox';
+                    
                     $(choices).each(function (idx, el) {
                         var tmpInput = document.createElement('input');
                         var tmpLabel = document.createElement('label');
                         $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
                             
-                        $(tmpInput).attr('type', 'radio');
+                        $(tmpInput).attr('type', inputtype);
                         $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
                         $(tmpInput).attr('name', 'q' + questionIdx);
                         $(tmpInput).attr('value', $(this).attr('name'));
