@@ -31,7 +31,11 @@
             {% if common_page_data.course.mode == "ready" and exam.past_due %}
                 <h4>{{exam.title}}</h4>
             {% else %}
-                <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
+               {% if "surveys" in request.path %}
+                  <h4><a href="{% url 'survey_show' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
+               {% else %}
+                   <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
+               {% endif %}
             {% endif %}
             <p>{{exam.description}}</p>
             

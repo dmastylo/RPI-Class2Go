@@ -28,6 +28,8 @@ from django.core.files.storage import DefaultStorage, get_storage_class, FileSys
 from django.db.models.signals import post_save
 from django.db import models
 
+from urlparse import urlparse
+
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
 
@@ -476,6 +478,36 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         
         url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
         return url
+        
+    def file_ext(self):
+        """ Return the extension of a file - eg pdf - or just 'file' if it doesn't have one """
+        if not self.file.storage.exists(self.file.name):
+            return ""
+        file_path=urlparse(self.file.url).path
+        file_parts=re.split('\.',file_path)
+        if len(file_parts) > 1:
+            return (file_parts.pop().lower())
+        else:
+            return "file"
+            
+    def file_icon(self):
+        """ return an appropriate icon for a file, based on its extension """
+        file_extension = self.file_ext()
+        if file_extension in ("html", "htm"):
+            return "globe"
+        elif (file_extension in ("ppt", "pptx")):
+            return "list-alt"
+        elif (file_extension in ('jpg', 'png', 'gif', 'jpeg')):
+            return "picture"  
+        elif (file_extension in ('mp3', 'aac')):
+            return "music"
+        elif (file_extension in ('gz', 'zip', 'tar', 'bz', 'bz2')):
+            return "download-alt"
+        elif (file_extension in ('csv', 'xls')):
+            return "table"
+        else:
+            return "file"
+        
 
     def __unicode__(self):
         if self.title:
