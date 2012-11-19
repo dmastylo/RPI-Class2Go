@@ -18,6 +18,18 @@ var c2gXMLParse = (function() {
 
         var problemNodes = $(myDOM).find('problem');
 
+        //Helper function
+        var isChoiceCorrect = function(choiceElem) {
+            if (!$(choiceElem).attr('correct'))
+                   return false;
+            return $(choiceElem).attr('correct').toLowerCase()==='true';
+        }
+          
+        var questionIdx = 0;
+                   
+        //Build up a DOM object corresponding to the answer key
+        var answerkeyObj = document.createElement('answerkey');
+
         problemNodes.each(function () {
 
             questionIdx += 1;
@@ -31,83 +43,107 @@ var c2gXMLParse = (function() {
             
             var renderResponseNode = function (node, arg2, idx_suffix) {
             
-            var nodeName = $(node)[0].nodeName;
-            var nodeParent = arguments[1] || $(tmpProbDiv);
-            
-            switch (nodeName) {
-                case 'multiplechoiceresponse':
-                    var choices = $($(node)).find('choice');
-                    var correctchoices = $(choices).filter(function() {
-                                                              if (!$(this).attr('correct'))
-                                                                 return false;
-                                                              return $(this).attr('correct').toLowerCase()==='true';
-                                                           });
-                    console.log(correctchoices.length + " correct choice");
-                    var inputtype = (correctchoices.length == 1)?'radio':'checkbox';
-                    
-                    $(choices).each(function (idx, el) {
-                        var tmpInput = document.createElement('input');
-                        var tmpLabel = document.createElement('label');
-                        $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
-                            
-                        $(tmpInput).attr('type', inputtype);
-                        $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
-                        $(tmpInput).attr('name', 'q' + questionIdx);
-                        $(tmpInput).attr('value', $(this).attr('name'));
-                            
-                        $(tmpLabel).text($(this).text());
+                var nodeName = $(node)[0].nodeName;
+                var nodeParent = arguments[1] || $(tmpProbDiv);
+                                              
+                switch (nodeName) {
+                    case 'multiplechoiceresponse':
                         
-                        $(nodeParent).append($(tmpLabel));
-                        $(tmpLabel).append($(tmpInput));
-                    });
+                        var choices = $($(node)).find('choice');
+                        var correctchoices = $(choices).filter(function() {
+                                                                 return isChoiceCorrect(this)
+                                                               });
+                        console.log(correctchoices.length + " correct choice");
+                        var inputtype = (correctchoices.length == 1)?'radio':'checkbox';
+                        var probName = 'q' + questionIdx;
+                         
+                        //make answer object
+                        var answerObj = document.createElement('answer');
+                        $(answerObj).attr('name', probName)
+                        $(answerkeyObj).append($(answerObj));
 
-                    break;
+                        $(choices).each(function (idx, el) {
+                            
+                            var choiceID = 'q' + questionIdx + '_' + idx;
+                            
+                            //Add to Answer object
+                            if (isChoiceCorrect(this)) {
+                                var correctObj=document.createElement('correct');
+                                $(correctObj).text(choiceID);
+                                $(answerObj).append($(correctObj));
+                            }
+                                    
+                            //Add to preview.
+                            var tmpInput = document.createElement('input');
+                            var tmpLabel = document.createElement('label');
+                            $(tmpLabel).attr('for', choiceID);
+                                
+                            $(tmpInput).attr('type', inputtype);
+                            $(tmpInput).attr('id', choiceID);
 
-                case 'stringresponse':
-                case 'numericalresponse':
-                    
-                    var textBoxData = $(node).children();   // only goes down one-level
-            
-                    var tmpInput = document.createElement('input');
-                    $(tmpInput).attr('type', 'text');
-                    $(tmpInput).attr('id', 'q' + questionIdx + idx_suffix);
-                    $(tmpInput).attr('name', 'q' + questionIdx + idx_suffix);
-            
-                    var textInputSize = (false) ? '' : 20;
-                    $(tmpInput).attr('size', textInputSize);
-            
-                    $(nodeParent).append($(tmpInput));
+                            $(tmpInput).attr('name', probName);
+                            $(tmpInput).attr('value', $(this).attr('name'));
+                                
+                            $(tmpLabel).text($(this).text());
+                            
+                            $(nodeParent).append($(tmpLabel));
+                            $(tmpLabel).append($(tmpInput));
+                        });
 
-                    break;
+                        break;
 
-                case 'optionresponse':
+                    case 'stringresponse':
+                    case 'numericalresponse':
+                          
+                        var probName =  'q' + questionIdx + idx_suffix;
+                        if ($(node).attr('answer')) {
+                            var answerObj = document.createElement('answer');
+                            $(answerObj).text($(node).attr('answer'));
+                            $(answerkeyObj).append($(answerObj));
+                        }
+                        
+                        var textBoxData = $(node).children();   // only goes down one-level
+                
+                        var tmpInput = document.createElement('input');
+                        $(tmpInput).attr('type', 'text');
+                        $(tmpInput).attr('id', probName);
+                        $(tmpInput).attr('name', probName);
+                
+                        var textInputSize = (false) ? '' : 20;
+                        $(tmpInput).attr('size', textInputSize);
+                
+                        $(nodeParent).append($(tmpInput));
 
-                    var optionData = $(node).find('optioninput');
-                    var optionItemStr = $(optionData).attr('options');
-                    var optionItemArr = optionItemStr.split(',');
+                        break;
 
-                    var tmpSelect = document.createElement('select');
-                    for (var i = 0; i < optionItemArr.length; i += 1) {
-                        var tmpOptionItem = document.createElement('option');
-                        $(tmpOptionItem).text(optionItemArr[i]);
-                        $(tmpSelect).append($(tmpOptionItem));
-                    }
+                    case 'optionresponse':
 
-                    $(nodeParent).append($(tmpSelect));
+                        var optionData = $(node).find('optioninput');
+                        var optionItemStr = $(optionData).attr('options');
+                        var optionItemArr = optionItemStr.split(',');
 
-                    break;
+                        var tmpSelect = document.createElement('select');
+                        for (var i = 0; i < optionItemArr.length; i += 1) {
+                            var tmpOptionItem = document.createElement('option');
+                            $(tmpOptionItem).text(optionItemArr[i]);
+                            $(tmpSelect).append($(tmpOptionItem));
+                        }
 
-                default:
+                        $(nodeParent).append($(tmpSelect));
 
-                    break;
+                        break;
 
-              }
-            
-              if ($(nodeParent)[0] != $(tmpProbDiv)[0]) {
+                    default:
+
+                        break;
+
+                } // End Switch
+                
+                if ($(nodeParent)[0] != $(tmpProbDiv)[0]) {
                     $(tmpProbDiv).append($(nodeParent));
-              }
+                }
 
-            };
+                };  //End renderResponseNode
 
             suffix_idx = 64
 
@@ -130,13 +166,17 @@ var c2gXMLParse = (function() {
                     renderResponseNode($(this), $(tmpProbDiv), String.fromCharCode(suffix_idx));
                 }
             });
-                        
+           
+                                    
+        
         }); // end each problem
       
         var dataToTransmit = {};
         dataToTransmit.xmlContent = $('textarea').val();
         dataToTransmit.htmlContent = $('#staging-area').html();
         console.log(JSON.stringify(dataToTransmit));
+                   console.log(questionIdx);
+        console.log(answerkeyObj);
       } // end renderpreview()
     } // end c2gXMLParse object
 
