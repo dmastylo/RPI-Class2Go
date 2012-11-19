@@ -31,6 +31,7 @@
     .control-group {clear:both; padding:1em; zoom:1;}
     .control-group .atomic-unit {float:left; margin-right: 1em;}
     div#summative {display:none}
+    div.ui-dialog div.ui-widget-header (background: #900;)
 </style>
 
 <div class="well create-exam-form">
@@ -65,6 +66,10 @@
             <input id="resubmission_penalty" type="text" />
             </div>
         </div>
+    </div>
+
+    <div class="control-group">
+        <input type="button" id="xml-entry-btn" class="btn" value="Enter XML" title="Click to expose text input" />
     </div>
 
     <div class="control-group">
@@ -183,7 +188,7 @@
         </textarea>
         <div class="row-fluid">
             <div class="span6">
-                <h4>Enter Exam XML below:</h4>
+                <h4>Edit Exam HTML below:</h4>
                 <div id="container">
                     <div id="editor"></div>
                 </div>
@@ -211,11 +216,53 @@
 
 </div>
 
+<div id="dialog-form" title="Paste Your XML">
+    <form>
+    <fieldset>
+        <label for="name">XML</label>
+        <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"></textarea>
+    </fieldset>
+    </form>
+</div>
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
 <script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
 <script>
+    $( "#dialog-form" ).dialog({
+        autoOpen: false,
+        height: 500,
+        width: "90%",
+        modal: true,
+        buttons: {
+            "Add XML": function() {
+                var bValid = true;
+
+                try {
+                    var myDOM = $.parseXML($('#xml-entry').val());
+                    console.log($(myDOM));
+                    editor.setValue($(myDOM));
+                } catch (e) {
+                    alert('Your XML is invalid');
+                    console.log(e.message);
+                    return;
+                }
+                if ( bValid ) {
+                    $( this ).dialog( "close" );
+                }
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        },
+        close: function() {
+            //allFields.val( "" ).removeClass( "ui-state-error" );
+        }
+    });
+    $('#xml-entry-btn').click(function() {
+        $( "#dialog-form" ).dialog( "open" );
+    });
+
     var editor = ace.edit("editor");
     editor.setValue($('#ace_proxy').val());
     editor.setTheme("ace/theme/eclipse");
