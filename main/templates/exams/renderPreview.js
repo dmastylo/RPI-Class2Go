@@ -59,7 +59,8 @@ var c2gXMLParse = (function() {
                          
                         //make answer object
                         var answerObj = document.createElement('answer');
-                        $(answerObj).attr('name', probName)
+                        $(answerObj).attr('name', probName);
+                        $(answerObj).attr('answertype',nodeName);
                         $(answerkeyObj).append($(answerObj));
 
                         $(choices).each(function (idx, el) {
@@ -96,10 +97,13 @@ var c2gXMLParse = (function() {
                     case 'numericalresponse':
                           
                         var probName =  'q' + questionIdx + idx_suffix;
+                          
                         if ($(node).attr('answer')) {
-                            var answerObj = document.createElement('answer');
-                            $(answerObj).text($(node).attr('answer'));
-                            $(answerkeyObj).append($(answerObj));
+                          var answerObj = document.createElement('answer');
+                          $(answerObj).attr('name', probName);
+                          $(answerObj).attr('ansewrtype', nodeName);
+                          $(answerObj).text($(node).attr('answer'));
+                          $(answerkeyObj).append($(answerObj));
                         }
                         
                         var textBoxData = $(node).children();   // only goes down one-level
@@ -143,7 +147,7 @@ var c2gXMLParse = (function() {
                     $(tmpProbDiv).append($(nodeParent));
                 }
 
-                };  //End renderResponseNode
+            };  //End renderResponseNode
 
             suffix_idx = 64
 
@@ -165,9 +169,7 @@ var c2gXMLParse = (function() {
                 } else {
                     renderResponseNode($(this), $(tmpProbDiv), String.fromCharCode(suffix_idx));
                 }
-            });
-           
-                                    
+            });  //end $(allChildren)
         
         }); // end each problem
       
@@ -175,7 +177,7 @@ var c2gXMLParse = (function() {
         dataToTransmit.xmlContent = $('textarea').val();
         dataToTransmit.htmlContent = $('#staging-area').html();
         console.log(JSON.stringify(dataToTransmit));
-                   console.log(questionIdx);
+        console.log(questionIdx);
         console.log(answerkeyObj);
       } // end renderpreview()
     } // end c2gXMLParse object
