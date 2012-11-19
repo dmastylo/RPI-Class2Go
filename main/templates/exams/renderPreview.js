@@ -43,6 +43,18 @@ var c2gXMLParse = (function() {
 
         var problemNodes = $(myDOM).find('problem');
 
+        //Helper function
+        var isChoiceCorrect = function(choiceElem) {
+            if (!$(choiceElem).attr('correct'))
+                   return false;
+            return $(choiceElem).attr('correct').toLowerCase()==='true';
+        }
+          
+        var questionIdx = 0;
+                   
+        //Build up a DOM object corresponding to the answer key
+        var answerkeyObj = document.createElement('answerkey');
+
         problemNodes.each(function () {
 
             questionIdx += 1;
@@ -58,7 +70,6 @@ var c2gXMLParse = (function() {
             
                 var nodeName = $(node)[0].nodeName;
                 var nodeParent = arguments[1] || $(tmpProbDiv);
-                
                 switch (nodeName) {
                     case 'multiplechoiceresponse':
 
@@ -133,7 +144,7 @@ var c2gXMLParse = (function() {
                     $(tmpProbDiv).append($(nodeParent));
                 }
 
-            };
+            };  //End renderResponseNode
 
             suffix_idx = 64
 
@@ -155,14 +166,16 @@ var c2gXMLParse = (function() {
                 } else {
                     renderResponseNode($(this), $(tmpProbDiv), String.fromCharCode(suffix_idx));
                 }
-            });
-                        
+            });  //end $(allChildren)
+        
         }); // end each problem
       
         var dataToTransmit = {};
         dataToTransmit.xmlContent = $('textarea').val();
         dataToTransmit.htmlContent = $('#staging-area').html();
         console.log(JSON.stringify(dataToTransmit));
+        console.log(questionIdx);
+        console.log(answerkeyObj);
       } // end renderpreview()
     } // end c2gXMLParse object
 
