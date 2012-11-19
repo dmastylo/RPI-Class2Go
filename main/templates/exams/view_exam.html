@@ -44,6 +44,13 @@ div.problem, div.problem {float:left; width:95%;}
     <input class="btn" type="submit" value="Submit Problem Set" />
     </div>
 
+    {% if single_question %}
+    <div id="problemset-nav">
+        <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
+        <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
+    </div>
+    {% endif %}
+
 {% endif %}
 
 {% endautoescape %}
@@ -60,6 +67,41 @@ div.problem, div.problem {float:left; width:95%;}
     {% endif %}
     
     $(document).ready(function () {
+
+    {% if single_question %}
+        $('.question').not(':first').hide();
+        var localQuestionIdx = 0;
+
+        var adjustQuestionIdx = function (newIdx) {
+            // right now, just accept neg number as moving back 1,
+            // pos number moving forward 1
+            if (newIdx > 0) {
+                localQuestionIdx += 1;
+            } else if (newIdx < 0) {
+                localQuestionIdx -= 1;
+            }
+
+            if (localQuestionIdx > ($('.question').length - 1)) {
+                localQuestionIdx = 0;
+            } else if (localQuestionIdx < 0) {
+                localQuestionIdx = $('.question').length - 1;
+            }
+
+            return localQuestionIdx;
+        }
+
+        $('.question-nav').click(function () {
+            var newQIdx = localQuestionIdx;
+            if ($(this).attr('id') == "next-question") {
+                var newQIdx = adjustQuestionIdx(1);
+            } else if ($(this).attr('id') == "prev-question") {
+                var newQIdx = adjustQuestionIdx(-1);
+            }
+            $('.question').hide();
+            $('.question').eq(newQIdx).show();
+        });
+        
+    {% endif %}
 
     var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     
