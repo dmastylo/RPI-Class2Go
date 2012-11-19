@@ -3,7 +3,7 @@
 # This is meant to run as -e so failures are real
 #
 
-JENKINS_DB_NAME=${C2G_JENKINS_DB_NAME:-"c2g-jenkins"}
+JENKINS_DB_NAME=${C2G_JENKINS_DB_NAME:-"c2g_jenkins"}
 HOSTNAME=`hostname`
 INVALID_HOSTNAME="prod"
 PROD_DB_NAME="class2go"
