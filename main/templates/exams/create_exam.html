@@ -238,15 +238,8 @@
             "Add XML": function() {
                 var bValid = true;
 
-                try {
-                    var myDOM = $.parseXML($('#xml-entry').val());
-                    console.log($(myDOM));
-                    editor.setValue($(myDOM));
-                } catch (e) {
-                    alert('Your XML is invalid');
-                    console.log(e.message);
-                    return;
-                }
+                c2gXMLParse.renderMarkup($('#xml-entry'), "");
+
                 if ( bValid ) {
                     $( this ).dialog( "close" );
                 }
