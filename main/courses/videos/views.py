@@ -1,17 +1,13 @@
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
-from django.template import Context, loader
 from c2g.models import Course, Video, VideoToExercise, Exercise, PageVisitLog, ProblemSet, AdditionalPage, File
 
 from c2g.models import Course, Video, VideoActivity, ProblemActivity
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
-import datetime
 from courses.videos.forms import *
 from courses.forms import *
-import gdata.youtube
-import gdata.youtube.service
 from django.db.models import Q
 
 from django.template import RequestContext

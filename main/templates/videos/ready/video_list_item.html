@@ -1,3 +1,4 @@
+<!-- video_list_item -->
 <li class="course-list-item">
     <div class="pull-left icon">
         <em class="icon-facetime-video"></em>
@@ -15,20 +16,14 @@
                     </a>
                 </div>
                 {% endfor %}
-        {% endif %}
-            {% if item.completed_percent > 90 %}
-            <div class="progress progress-success progress-striped" style="margin-left:3px;">
-            {% else %}
-            <div class="progress progress-info progress-striped" style="margin-left:3px;">
             {% endif %}
-                <div class="bar" style="width:{{item.completed_percent}}%"></div>
+            {% if item.completed_percent > 90 %}
+                <div class="progress progress-success progress-striped" style="margin-left:3px;">
+            {% else %}
+                <div class="progress progress-info progress-striped" style="margin-left:3px;">
+            {% endif %}
+            <div class="bar" style="width:{{item.completed_percent}}%"></div>
             </div>
         </div>
     </div>
 </li>
-
-<script type="text/javascript">
-        function record_download(video_id, user_id, course_id, format) {
-        	$.ajax({type:"POST", url: "/videos/record_download/", async:false, data: {video_id: video_id, user_id: user_id, course_id: course_id, format: format, csrfmiddlewaretoken: '{{ csrf_token }}'}});
-        }
-</script>

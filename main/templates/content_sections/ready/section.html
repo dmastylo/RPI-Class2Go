@@ -1,3 +1,18 @@
+<!-- section -->
+<script type="text/javascript">
+    function record_download(video_id, user_id, course_id, format) {
+        $.ajax({type:"POST", 
+                url: "/videos/record_download/", 
+                async:false, 
+                data: {video_id: video_id, 
+                       user_id: user_id, 
+                       course_id: course_id, 
+                       format: format, 
+                       csrfmiddlewaretoken: '{{ csrf_token }}'
+                       }
+               });
+    }
+</script>
 <h3>{{section_structure.section.title}}</h3>
 <div class="course-section">
 <ul class="unstyled course-list">
@@ -15,7 +30,9 @@
             {% include "files/ready/file_list_item.html" %}
     {% endifequal %}
 {% empty %}
-    </ul>
-    <p style='margin: 20px;'>No items have been added to this section</p>
+    <li class="course-list-item">
+        <p style='margin: 20px;'>No items have been added to this section</p>
+    </li>
 {% endfor %}
+</ul>
 </div>
