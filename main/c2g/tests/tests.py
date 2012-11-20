@@ -1,7 +1,36 @@
+import os
+import tempfile
+
+#from django.contrib.auth.models import Group
+from django.core.files import File as FieldFile
 from django.test import TestCase
-from c2g.models import Institution, Course
-from django.contrib.auth.models import Group 
+
+from c2g.models import Course
+from c2g.models import File as FileModel
+#from c2g.models import Institution
 from db_test_data.management.commands.db_populate import Command 
+
+class FileUnitTests(TestCase):
+    """Idempotent unit tests of the File model methods: nothing gets saved"""
+
+    def setUp(self):
+        """Create a *very* fake models.File object"""
+        # XXX: we should use a real mocking library probably
+        self.myFile = FileModel()
+        fh, fpath = tempfile.mkstemp(suffix='.jpeg')
+        self.myFile.file = FieldFile(open(fpath, 'w'))
+        self.myFile.file.write('\n')
+
+    def tearDown(self):
+        """Clean up cruft from the test object"""
+        self.myFile.file.close()
+        os.remove(self.myFile.file.name)
+
+    def test_icon_methods(self):
+        """Check methods related to file icon assignment"""
+        self.assertEqual(self.myFile.get_ext(), 'jpeg')
+        self.assertEqual(self.myFile.get_icon_type(), 'picture')
+
 
 class C2GUnitTests(TestCase):
     
@@ -11,7 +40,6 @@ class C2GUnitTests(TestCase):
     def setUp(self):
         self.pop_command.handle()
 
-    
     def tearDown(self):
         pass
     
@@ -29,7 +57,6 @@ class C2GUnitTests(TestCase):
 #        numGroupsAfter=len(Group.objects.all())
 #        self.assertEqual(numGroupsB4+4, numGroupsAfter)
 
-
 #    def test_course_create(self):
 #        """
 #        Tests that course creation creates groups
@@ -41,7 +68,6 @@ class C2GUnitTests(TestCase):
 #        course1.save()
 #        numGroupsAfter=len(Group.objects.all())
 #        self.assertEqual(numGroupsB4+4, numGroupsAfter)
-        
 
     def test_fixture_install(self):
         """
