@@ -431,10 +431,10 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 class FileManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('section','index')
             
     def getBySection(self, section):
         if section.mode == 'draft':

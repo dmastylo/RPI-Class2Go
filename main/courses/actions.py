@@ -13,6 +13,7 @@ from courses.forms import *
 from c2g.models import *
 from random import randrange
 from datetime import datetime
+from os.path import basename
 
 from django.utils.functional import wraps
 
@@ -172,6 +173,20 @@ def change_live_datetime(request):
                   {'common_page_data': request.common_page_data,
                    'section_structures': section_structures,
                    'form': form})
+
+@require_POST
+@auth_is_course_admin_view_wrapper
+def check_filename(request, course_prefix, course_suffix, file_type):
+    filename = request.POST.get('filename')
+    
+    if file_type == "files":
+        #Validate that file doesn't already exist for course
+        files = File.objects.getByCourse(course=request.common_page_data['course'])
+        for file in files:
+            if basename(file.file.name) == filename:
+                return HttpResponse("File name already exists!")
+    
+    return HttpResponse("File name is available")            
 
 def is_member_of_course(course, user):
     student_group_id = course.student_group.id

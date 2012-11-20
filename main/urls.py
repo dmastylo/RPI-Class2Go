@@ -107,6 +107,8 @@ urlpatterns = patterns('',
     url(r'^revert/?$', 'courses.actions.revert'),
     url(r'^change_live_datetime/?', 'courses.actions.change_live_datetime'),
 
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/(?P<file_type>files)/check_filename/?', 'courses.actions.check_filename'),
+
     # Additional Pages
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/pages/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.additional_pages.views.main'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/manage_nav_menu/?$', 'courses.additional_pages.views.manage_nav_menu'),
