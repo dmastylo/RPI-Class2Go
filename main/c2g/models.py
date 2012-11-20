@@ -20,6 +20,8 @@ import os
 import re
 import sys
 import time
+from urlparse import urlparse
+
 
 from django import forms
 from django.contrib.auth.models import Group, User
@@ -27,8 +29,6 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import DefaultStorage, get_storage_class, FileSystemStorage
 from django.db.models.signals import post_save
 from django.db import models
-
-from urlparse import urlparse
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
@@ -473,10 +473,13 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def dl_link(self):
         # File
-        if not self.file.storage.exists(self.file.name):
+        filename = self.file.name
+        if not self.file.storage.exists(filename):
             return ""
-        
-        url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+        if is_storage_local():
+            url = get_site_url() + self.file.storage.url(filename)
+        else:
+            url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
         return url
         
     def file_ext(self):
@@ -895,23 +898,29 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return self.file.storage.exists(self.file.name)
 
     def dl_link(self):
+        """Return fully-qualified download URL for this video, or empty string."""
         # Video
-        if not self.file.storage.exists(self.file.name):
+        videoname = self.file.name
+        if not self.file.storage.exists(videoname):
             return ""
-        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+        if is_storage_local():
+            # FileSystemStorage returns a path, not a url
+            return get_site_url() + self.file.storage.url(videoname)
+        else:
+            return self.file.storage.url_monkeypatched(videoname, response_headers={'response-content-disposition': 'attachment'})
 
     def dl_links_all(self):
         """Return list of fully-qualified download URLs for video variants."""
         # Video
+        myname  = self.file.name
+        mystore = self.file.storage
         if is_storage_local():
             # FIXME: doesn't work on local sites yet
-            print "DEBUG: I don't work on local sites yet, sorry." 
-            return []
+            print "DEBUG: Multiple download links don't work on local sites yet, sorry." 
+            return [('large', get_site_url() + mystore.url(myname), self.file.size, '')]
         else:
             # XXX: very S3 specific
-            myname  = self.file.name
-            mystore = self.file.storage
-            urlof   = mystore.url
+            urlof   = mystore.url_monkeypatched
             basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
             names = []
             for size in sorted(video_resize_options):

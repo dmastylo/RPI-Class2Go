@@ -1,15 +1,18 @@
 # Django settings for Class2Go project.
+from os import path
+
+import django.template
+import djcelery
 
 from database import *
-from os import path
-from os import path
-#ADDED FOR url tag future
-import django.template
-django.template.add_to_builtins('django.templatetags.future')
+import monkeypatch
 
+
+#ADDED FOR url tag future
+django.template.add_to_builtins('django.templatetags.future')
 #Added for celery
-import djcelery
 djcelery.setup_loader()
+
 
 # the INSTANCE should be "prod" or "stage" or something like that
 # if it hasn't been set then get the user name
