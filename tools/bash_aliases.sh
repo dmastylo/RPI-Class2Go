@@ -26,15 +26,13 @@ function multitail-prod {
     multitail -s 2  \
         --config /usr/local/etc/multitail.conf \
         -CS apache \
-        -l 'ssh bitnami@app10.prod.c2gops.com "tail -f stack/apache2/logs/access_log"' \
-        -l 'ssh bitnami@app11.prod.c2gops.com "tail -f stack/apache2/logs/access_log"' \
-        -l 'ssh bitnami@app12.prod.c2gops.com "tail -f stack/apache2/logs/access_log"' \
+        -l 'ssh bitnami@app1.prod.c2gops.com "tail -f stack/apache2/logs/access_log"' \
+        -l 'ssh bitnami@app2.prod.c2gops.com "tail -f stack/apache2/logs/access_log"' \
         -c- \
         -l 'ssh ubuntu@util1.prod.c2gops.com "tail -f /var/log/celery/*.log"' \
         -CS apache_error \
-        -l 'ssh bitnami@app10.prod.c2gops.com "tail -f stack/apache2/logs/error_log"' \
-        -l 'ssh bitnami@app11.prod.c2gops.com "tail -f stack/apache2/logs/error_log"' \
-        -l 'ssh bitnami@app12.prod.c2gops.com "tail -f stack/apache2/logs/error_log"' \
+        -l 'ssh bitnami@app1.prod.c2gops.com "tail -f stack/apache2/logs/error_log"' \
+        -l 'ssh bitnami@app2.prod.c2gops.com "tail -f stack/apache2/logs/error_log"' \
         -c- \
         -l 'ssh ubuntu@util2.prod.c2gops.com "tail -f /var/log/celery/*.log"' \
         -c- 
