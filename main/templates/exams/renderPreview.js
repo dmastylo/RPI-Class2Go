@@ -98,15 +98,16 @@ var c2gXMLParse = (function() {
 
                                 $(tmpInput).attr('name', probName);
                                 $(tmpInput).attr('value', $(this).attr('name'));
-                                    
-                                $(tmpLabel).text($(this).text());
                                 
-                                $(nodeParent).append($(tmpLabel));
                                 $(tmpLabel).append($(tmpInput));
+                                $(tmpLabel).append($(this).text());
+
+                                $(nodeParent).append($(tmpLabel));
                             });
 
                             break;
 
+                        case 'regexresponse':
                         case 'stringresponse':
                         case 'numericalresponse':
                               
@@ -197,6 +198,7 @@ var c2gXMLParse = (function() {
             console.log(JSON.stringify(dataToTransmit));
             console.log(questionIdx);
             console.log(answerkeyObj);
+            console.log($(answerkeyObj).html())
 
         } // end renderMarkup()
 
