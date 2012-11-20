@@ -21,7 +21,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 h3 {clear:both;}
 div.question, div.subquestion {float:left; width:95%;}
 div.problem, div.problem {float:left; width:95%;}
-
+#problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
+#next-question {float: right;}
+#prev-question {float: left;}
 </style>
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
@@ -41,15 +43,16 @@ div.problem, div.problem {float:left; width:95%;}
         <form>
     {{ exam.html_content }}
         </form>
-    <input class="btn" type="submit" value="Submit Problem Set" />
-    </div>
 
     {% if single_question %}
     <div id="problemset-nav">
-        <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
         <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
+        <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
     </div>
     {% endif %}
+
+    <input class="btn" type="submit" value="Submit Problem Set" />
+    </div>
 
 {% endif %}
 
@@ -326,9 +329,6 @@ div.problem, div.problem {float:left; width:95%;}
     {% endif %}
                       
     });
- 
- 
-
     
 </script>
 {% endblock addl_scripts %}
