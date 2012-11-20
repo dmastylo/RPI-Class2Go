@@ -10,6 +10,7 @@ import csv
 import HTMLParser
 from django.db.models import Sum
 
+
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
 AWS_SECRET_ACCESS_KEY = getattr(settings, 'AWS_SECRET_ACCESS_KEY', '')
@@ -202,7 +203,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
     s3file.write(outfile.read())
     s3file.close()
     outfile.close()
-    return HttpResponseRedirect(secure_file_storage.url("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname), response_headers={'response-content-disposition': 'attachment'}))
+    return HttpResponseRedirect(secure_file_storage.url_monkeypatched("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname), response_headers={'response-content-disposition': 'attachment'}))
 
 def parse_val(v):
     """Helper function to parse AJAX submissions"""
