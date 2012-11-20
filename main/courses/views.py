@@ -123,19 +123,19 @@ def get_full_contentsection_list(course, contentsection_list, video_list, pset_l
     
         index_list = []
         for video in video_list:
-            if video.section == contentsection:
+            if video.section_id == contentsection.id:
                 index_list.append(('video', video.index, video.id, contentsection.id, video.slug, video.title))
 
         for pset in pset_list:
-            if pset.section == contentsection:
+            if pset.section_id == contentsection.id:
                 index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
                 
         for page in additional_pages:
-            if page.section == contentsection:
+            if page.section_id == contentsection.id:
                 index_list.append(('additional_page', page.index, page.id, contentsection.id, page.slug, page.title))
 
         for file in file_list:
-            if file.section == contentsection:
+            if file.section_id == contentsection.id:
                 icon_type = file.get_icon_type()
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
