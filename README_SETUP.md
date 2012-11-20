@@ -72,17 +72,17 @@ prefix for these.
 
         pip install virtualenv 
 
-1. Create the sophi virtual env (if you want) 
+1. Create the class2go virtual env (if you want) 
 
-        virtualenv sophi-venv --no-site-packages    
+        virtualenv class2go-venv --no-site-packages    
 
-    This should create the sophi-venv directory under the
+    This should create the class2go-venv directory under the
     directory where this README is found.  All our django stuff
     will happen in there now.
 
 1. Start using the virtual environment that we just created.  
 
-        . ./sophi-venv/bin/activate
+        . ./class2go-venv/bin/activate
 
     WARNING:  you need to do this from whatever shell you're using.
     You can tell this because is puts an environment indicator at
@@ -112,10 +112,6 @@ prefix for these.
 1. Install GData (2.0.17)
 
         pip install gdata
-
-1. Patch GData and storages
-
-    Take a look at the [gdata patch README](https://github.com/Stanford-Online/class2go/blob/master/chef/cookbooks/gdata/files/default/README.md) and the [django-storages patch README](https://github.com/Stanford-Online/class2go/tree/master/chef/cookbooks/class2go-python/files/default/README.md). Instructions for applying the patches are in these documents.
 
 1. Install Celery ecosystem
 
@@ -171,7 +167,6 @@ and edit the DATABASES strings as follows substituting proper values for your sy
         python manage.py runserver 8100
 
 1. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
-
 
 
 <a id="windows"></a>
