@@ -64,3 +64,13 @@ bash "install wtop" do
     EOH
     action :run
 end
+
+# do last so it clobbers whatever default the bundle came with
+
+template "/etc/wtop.cfg" do
+    source "wtop.cfg.erb"
+    owner "root"
+    group "root"
+    mode 00644
+end
+

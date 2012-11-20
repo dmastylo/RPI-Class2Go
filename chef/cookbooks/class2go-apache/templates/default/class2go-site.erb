@@ -24,9 +24,9 @@
     WSGIDaemonProcess class2go threads=15 maximum-requests=10000 python-path=/home/ubuntu/class2go/main
     WSGIProcessGroup class2go
 
-    ErrorLog ${APACHE_LOG_DIR}/error_log
+    ErrorLog ${APACHE_LOG_DIR}/error.log
 
     LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %D" class2go
-    CustomLog ${APACHE_LOG_DIR}/access_log class2go
+    CustomLog ${APACHE_LOG_DIR}/access.log class2go
 
 </VirtualHost>
