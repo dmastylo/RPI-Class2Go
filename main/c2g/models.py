@@ -1889,6 +1889,8 @@ class ContentGroupGroupFactory(object):
                         entry.save()
                     return entry.id
             # We have a reference to it, but it's not in content_group
+            # TODO: Decide: If cgref was previously a parent and we reassign
+            #       it, what happnes to its (old) children?
             if content_group and cgref:
                 cgref.group_id = group_id
                 cgref.level = 2

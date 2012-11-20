@@ -32,8 +32,8 @@ def upload(request):
 
             if parent_type:
                 parent_ref = ContentGroupGroupFactory.groupable_types[parent_type].objects.get(id=long(parent_id)).image
-                print "DEBUG: creating parent/child relationship between", parent_type, parent_ref.id, "and file", new_file.image.id
-                content_group_groupid = ContentGroupGroupFactory.add_parent(common_page_data['course'], parent_type, parent_ref)
+                print "DEBUG: creating parent/child relationship between", parent_type, parent_ref.image.id, "and file", new_file.image.id
+                content_group_groupid = ContentGroupGroupFactory.add_parent(new_file.image.course, parent_type, parent_ref.image)
                 ContentGroupGroupFactory.add_child(content_group_groupid, 'file', new_file.image)
 
             return redirect('courses.views.course_materials', course_prefix, course_suffix)

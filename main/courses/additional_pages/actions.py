@@ -69,7 +69,7 @@ def add(request):
         parent_ref = AdditionalPage.objects.get(id=parent_id).image
         print "DEBUG: creating parent/child relationship between", parent_ref.id, "and", draft_page.image.id
         # XXX: We assume that the parent is an AdditionalPage regardless of parent_type; this is by the spec, but against my nature
-        content_group_groupid = ContentGroupGroupFactory.add_parent(common_page_data['draft_course'], parent_type, parent_ref)
+        content_group_groupid = ContentGroupGroupFactory.add_parent(parent_ref.course, parent_type, parent_ref)
         ContentGroupGroupFactory.add_child(content_group_groupid, 'additional_page', draft_page.image)
     
     if request.POST.get("menu_slug") == "":
