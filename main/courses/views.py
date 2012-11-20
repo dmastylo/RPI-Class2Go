@@ -136,14 +136,14 @@ def get_full_contentsection_list(course, contentsection_list, video_list, pset_l
 
         for file in file_list:
             if file.section == contentsection:
-                icon_type = file.file_icon()
+                icon_type = file.get_icon_type()
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
         index_list.sort(key = index)
         
         full_index_list.append(index_list)
 
-       #don't show empty sections
+        # don't show empty sections
         if index_list:
             full_contentsection_list.append(contentsection)
         

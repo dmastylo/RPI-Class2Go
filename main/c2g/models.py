@@ -13,20 +13,15 @@
 # <location to be inserted>
 
 from datetime import datetime
-import gdata.youtube
-import gdata.youtube.service
 from hashlib import md5
 import os
 import re
 import sys
 import time
-from urlparse import urlparse
-
 
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
-from django.core.files.storage import DefaultStorage, get_storage_class, FileSystemStorage
 from django.db.models.signals import post_save
 from django.db import models
 
@@ -444,11 +439,11 @@ class FileManager(models.Manager):
             return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
-    course = models.ForeignKey(Course, db_index=True)
+    course  = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    file = models.FileField(upload_to=get_file_path)
-    handle = models.CharField(max_length=255, null=True, db_index=True)
+    title   = models.CharField(max_length=255, null=True, blank=True)
+    file    = models.FileField(upload_to=get_file_path)
+    handle  = models.CharField(max_length=255, null=True, db_index=True)
     objects = FileManager()
 
     def create_ready_instance(self):
@@ -482,35 +477,38 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
         return url
         
-    def file_ext(self):
-        """ Return the extension of a file - eg pdf - or just 'file' if it doesn't have one """
-        if not self.file.storage.exists(self.file.name):
-            return ""
-        file_path=urlparse(self.file.url).path
-        file_parts=re.split('\.',file_path)
+    def get_ext(self):
+        """ Return the extension of a file - eg pdf - or just '' if it doesn't have one """
+        # TODO: use filemagic or python-magic for this instead
+        file_parts = self.file.name.split('.')
         if len(file_parts) > 1:
             return (file_parts.pop().lower())
-        else:
-            return "file"
+        return ''
             
-    def file_icon(self):
+    def get_icon_type(self):
         """ return an appropriate icon for a file, based on its extension """
-        file_extension = self.file_ext()
-        if file_extension in ("html", "htm"):
-            return "globe"
-        elif (file_extension in ("ppt", "pptx")):
-            return "list-alt"
-        elif (file_extension in ('jpg', 'png', 'gif', 'jpeg')):
-            return "picture"  
-        elif (file_extension in ('mp3', 'aac')):
-            return "music"
-        elif (file_extension in ('gz', 'zip', 'tar', 'bz', 'bz2')):
-            return "download-alt"
-        elif (file_extension in ('csv', 'xls')):
-            return "table"
-        else:
-            return "file"
-        
+        extensions = {
+          # extension : icon name
+                'html': 'globe',
+                'htm':  'globe',
+                'ppt':  'list-alt',
+                'pptx': 'list-alt',
+                'jpg':  'picture',
+                'png':  'picture',
+                'gif':  'picture',
+                'jpeg': 'picture',
+                'mp3':  'music',
+                'aac':  'music',
+                'gz':   'download-alt',
+                'zip':  'download-alt',
+                'tar':  'download-alt',
+                'bz':   'download-alt',
+                'bz2':  'download-alt',
+                'csv':  'table',
+                'xls':  'table'
+        }
+        file_extension = self.get_ext()
+        return extensions.get(file_extension, 'file')
 
     def __unicode__(self):
         if self.title:
