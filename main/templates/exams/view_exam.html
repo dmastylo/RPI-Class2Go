@@ -24,6 +24,8 @@ div.problem, div.problem {float:left; width:95%;}
 #problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
 #next-question {float: right;}
 #prev-question {float: left;}
+label pre {margin-left:30px;}
+
 </style>
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
@@ -179,7 +181,19 @@ div.problem, div.problem {float:left; width:95%;}
                 }
                 // it's multiple choice, therefore an array
                 $('input[name|=' + member + ']').removeAttr('checked');
+                      
+                var selectedValues = $.map(dataObj[member], function(val, idex) {
+                                           return 'input[value="' + val.value + '"]';
+                                           });
+                      
+                      //check all inputs
+                var selector =  selectedValues.join(",");
+                      
+                      console.log('input[name|=' + member + ']');
+                      console.log(selector);
+                $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
                 // loop through each choice listed for this input
+                /*
                 for (var i = 0; i < dataObj[member].length; i += 1) {
     
                     var obj = dataObj[member][i];
@@ -190,14 +204,13 @@ div.problem, div.problem {float:left; width:95%;}
                       //console.log(key + ' is what we want');
                             $('#' + member + '_' + obj[key]).attr('checked', 'checked');
 
-                        } else {
-                      //console.log(key + ' is not a real value');
-                        }
-
+                        } 
+	
                         
                     }
 
                 }
+                 */
             } 
 
         }
@@ -254,6 +267,7 @@ div.problem, div.problem {float:left; width:95%;}
                 var tmpObj = {};
                 tmpObj.value = $(this).attr('value');
                 tmpObj.associatedText = $(this).parent().text();
+                tmpObj.tag4humans = $(this).attr('tag4humans');
 
                 userSelections[$(this).attr('name')].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {

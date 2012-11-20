@@ -1569,10 +1569,13 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     html_content = models.TextField(blank=True)
+    xml_metadata = models.TextField(null=True, blank=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
     total_score = models.IntegerField(null=True, blank=True)
+    autograde = models.BooleanField(default=False)
+    display_single = models.BooleanField(default=False)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
     
     
@@ -1590,29 +1593,62 @@ class ExamRecord(TimestampMixin, models.Model):
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)
-    score = models.IntegerField(null=True, blank=True) #currently unused.
-
+    json_score_data = models.TextField(null=True, blank=True)  #denormalized stuff
+    #score was subsumed by ExamRecordScore
+    
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
 
 
 class ExamScore(TimestampMixin, models.Model):
     """
-    This class is meant to be the top level score of each problem set
+    This class is meant to be the top level score of each exam.  
+    It should have a one-to-one relationship with the (exam, student) pair
     """
-    course = models.ForeignKey(Course, db_index=True)
+    course = models.ForeignKey(Course, db_index=True) #mainly for convenience
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    score = models.IntegerField(null=True, blank=True) #this is the parent score
+    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
-
+    
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.score))
 
+    class Meta:
+        unique_together = ("exam", "student")
 
 class ExamScoreField(TimestampMixin, models.Model):
+    """Should be kept basically identical to ExamRecordScoreField"""
     parent = models.ForeignKey(ExamScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     subscore = models.IntegerField(default=0)
+    comments = models.TextField(null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
+	
+
+class ExamRecordScore(TimestampMixin, models.Model):
+    """
+    Making a separate DB table to keep scores associated with each record.
+    Currently for CSV-graded exams this does not get created since there are too many DB operations
+    One of these can be "promoted" -- i.e. copied into ExamScore to be the official score
+       **TODO: Write Promote as a function in the model**
+    """
+    record = models.OneToOneField(ExamRecord, db_index=True)
+    score = models.IntegerField(null=True, blank=True) # this is the score of the entire record
+    #subscores are in ExamRecordScoreField
+    
+    def __unicode__(self):
+        return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.score))
+
+
+class ExamRecordScoreField(TimestampMixin, models.Model):
+    """Should be kept basically identical to ExamScoreField"""
+    parent = models.ForeignKey(ExamRecordScore, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    subscore = models.IntegerField(default=0)
+    comments = models.TextField(null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
 
 
