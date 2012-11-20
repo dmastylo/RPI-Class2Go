@@ -21,7 +21,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 h3 {clear:both;}
 div.question, div.subquestion {float:left; width:95%;}
 div.problem, div.problem {float:left; width:95%;}
-
+#problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
+#next-question {float: right;}
+#prev-question {float: left;}
 </style>
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
@@ -41,6 +43,14 @@ div.problem, div.problem {float:left; width:95%;}
         <form>
     {{ exam.html_content }}
         </form>
+
+    {% if single_question %}
+    <div id="problemset-nav">
+        <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
+        <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
+    </div>
+    {% endif %}
+
     <input class="btn" type="submit" value="Submit Problem Set" />
     </div>
 
@@ -60,6 +70,41 @@ div.problem, div.problem {float:left; width:95%;}
     {% endif %}
     
     $(document).ready(function () {
+
+    {% if single_question %}
+        $('.question').not(':first').hide();
+        var localQuestionIdx = 0;
+
+        var adjustQuestionIdx = function (newIdx) {
+            // right now, just accept neg number as moving back 1,
+            // pos number moving forward 1
+            if (newIdx > 0) {
+                localQuestionIdx += 1;
+            } else if (newIdx < 0) {
+                localQuestionIdx -= 1;
+            }
+
+            if (localQuestionIdx > ($('.question').length - 1)) {
+                localQuestionIdx = 0;
+            } else if (localQuestionIdx < 0) {
+                localQuestionIdx = $('.question').length - 1;
+            }
+
+            return localQuestionIdx;
+        }
+
+        $('.question-nav').click(function () {
+            var newQIdx = localQuestionIdx;
+            if ($(this).attr('id') == "next-question") {
+                var newQIdx = adjustQuestionIdx(1);
+            } else if ($(this).attr('id') == "prev-question") {
+                var newQIdx = adjustQuestionIdx(-1);
+            }
+            $('.question').hide();
+            $('.question').eq(newQIdx).show();
+        });
+        
+    {% endif %}
 
     var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     
@@ -284,9 +329,6 @@ div.problem, div.problem {float:left; width:95%;}
     {% endif %}
                       
     });
- 
- 
-
     
 </script>
 {% endblock addl_scripts %}
