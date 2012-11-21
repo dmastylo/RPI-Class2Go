@@ -64,7 +64,9 @@ var c2gXMLParse = (function() {
                 questionIdx += 1;
                 var questionMeta=document.createElement('question_metadata');
                 $(questionMeta).attr('id', 'problem_'+questionIdx);
+                $(questionMeta).attr('tag4humans', $(this).attr('tag4humans'));
                 $(metadataObj).append($(questionMeta));
+                
                               
                             
                 //Grab question level solutions
@@ -79,6 +81,7 @@ var c2gXMLParse = (function() {
                 var tmpProbDiv = document.createElement('div');
                 $(tmpProbDiv).addClass('question');
                 $(tmpProbDiv).attr('id', 'problem_'+questionIdx);
+                $(tmpProbDiv).attr('tag4humans', $(this).attr('tag4humans'));
                               
                 //$('#staging-area').append($(tmpProbDiv));
                 $(targetEl).append($(tmpProbDiv));
@@ -106,7 +109,13 @@ var c2gXMLParse = (function() {
                             var questionObj = document.createElement('response');
                             $(questionObj).attr('name', probName);
                             $(questionObj).attr('answertype',nodeName);
+                            $(questionObj).attr('tag4humans',$(node).attr('tag4humans'));
                             $(questionMeta).append($(questionObj));
+                              
+                            var fieldsetObj = document.createElement('fieldset');
+                            $(fieldsetObj).attr('tag4humans',$(node).attr('tag4humans'));
+
+                            $(nodeParent).append($(fieldsetObj));
                               
                             $(choices).each(function (idx, el) {
                                            
@@ -143,7 +152,7 @@ var c2gXMLParse = (function() {
                                 $(tmpLabel).append($(this).find('text').text());
 
 
-                                $(nodeParent).append($(tmpLabel));
+                                $(fieldsetObj).append($(tmpLabel));
                             });
 
                             break;

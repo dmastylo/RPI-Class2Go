@@ -268,6 +268,7 @@ label pre {margin-left:30px;}
                 tmpObj.value = $(this).attr('value');
                 tmpObj.associatedText = $(this).parent().text();
                 tmpObj.tag4humans = $(this).attr('tag4humans');
+                tmpObj.questionTag4humans = $(this).closest('fieldset').attr('tag4humans');
 
                 userSelections[$(this).attr('name')].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
