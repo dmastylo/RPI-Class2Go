@@ -62,21 +62,20 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
 
     # from http://mail.python.org/pipermail/image-sig/1997-March/000223.html
     def computeDiff(file1, file2):
-      	h1 = Image.open(file1).histogram()
+        h1 = Image.open(file1).histogram()
         h2 = Image.open(file2).histogram()
         rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, h1, h2))/len(h1))
         return rms
 
     # get local maximum values from an array, which are also larger the threshold. 
     # local maximum is extracted by comparing current with three neighbors in both directions. 
-    def localMaximum(scores, index, threshold):
-        cut_scores = []
-        cut_frame_index = []
-        for i in range(3, len(scores)-4):
-            if scores[i] > threshold and scores[i] > scores[i-1] and scores[i] > scores[i-2] and scores[i] > scores[i-3] and scores[i] > scores[i+1] and scores[i] > scores[i+2] and scores[i] > scores[i+3] :
-                cut_scores.append(scores[i])
-                cut_frame_index.append(index[i])
-        return (cut_scores, cut_frame_index)
+    def localMaximum(candidates, threshold):
+        cuts = [];
+        for i in range(3, len(candidates)-4):
+            cur_score = candidates[i][0]
+            if cur_score > threshold and cur_score > candidates[i-1][0] and cur_score > candidates[i-2][0] and cur_score > candidates[i-3][0] and cur_score > candidates[i+1][0] and cur_score > candidates[i+2][0] and cur_score > candidates[i+3][0] :
+                cuts.append(candidates[i])
+        return cuts
 
     image_list = os.listdir(jpeg_dir)
     if len(image_list) == 0:
@@ -97,7 +96,7 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
     # window size, all the frames in the window centered at 
     # current frame are used to determine shot boundary. 
     # this value doesn't need to be changed for different videos.
-    k = 5 
+    k = 5
 
     # calculate difference matrix
     difference_matrix = np.zeros((image_num,image_num))
@@ -106,38 +105,32 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
             difference_matrix[i, j] = computeDiff(jpeg_dir+"/"+image_list[i], jpeg_dir+"/"+image_list[j])
     difference_matrix = difference_matrix + difference_matrix.transpose()
     
-    # calculate shot boundary scores for each frames, score = cut(A,B)/associate(A) + cut(A,B)/associate(B) 
-    candidate_scores = [] 
-    candidate_index = [] 
+    # callate shot boundary scores for each frames, score = cut(A,B)/associate(A) + cut(A,B)/associate(B) 
+    candidates = []
     for i in range(k, image_num-1-k):
         cutAB = np.sum(difference_matrix[i-k:i, i:i+k])
         assocA = np.sum(difference_matrix[i-k:i, i-k:i])
         assocB = np.sum(difference_matrix[i:i+k, i:i+k])
         if (assocA!=0) and (assocB!=0):
-	    score = cutAB/assocA + cutAB/assocB
+            score = cutAB/assocA + cutAB/assocB
         else:
-	    score = 0
-        candidate_scores.append(score)
-        candidate_index.append(i)
+            score = 0
+        candidates.append((score, i))
 
     # extract local maximum as the shot boundaries.
     # the threshold is assigned to be the mean of all the scores. 
+    # [important] we may want to change the threshold to control the number of key frames. 
     # higher threshold generates fewer shot boundaries.
-    # [note] we can change this threshold to control key frames number.
-    # But a more good way is to change the input frames_per_minute_target to control key frames number.
-    threshold = np.mean(candidate_scores)
-    (cut_scores, cut_index) = localMaximum(candidate_scores, candidate_index, threshold)
+    threshold = np.mean([pair[0] for pair in candidates]);
+    cuts = localMaximum(candidates, threshold)
 
     # limit shot boundary number fewer than max_keyframes
-    if len(cut_scores) >= max_keyframes :
+    if len(cuts) >= max_keyframes :
         # sort key frames by score 
-        scoreAndIndex = zip(cut_scores, cut_index)
-        scoreAndIndex.sort(reverse=True)
-        score_sorted, index_sorted = zip(*scoreAndIndex)
-        cut_scores = score_sorted[:max_keyframes]
-        cut_index = index_sorted[:max_keyframes]
+        cuts.sort(reverse=True)
+        cuts = cuts[:max_keyframes];
 
-    # select the 3rd frame after each shot boundary as the key frame.
+    # select the 3nd frame after each shot boundary as the key frame.
     # alternatively, we can also select middle frame between two shot boundaries as the key frame.
     cut_offset = 2
 
@@ -150,13 +143,12 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
         pass
     else:
         os.mkdir(jpeg_dir_result)
-    # sort key frames by index     
-    scoreAndIndex = zip(cut_index, cut_scores)
-    scoreAndIndex.sort()
-    cut_index, cut_scores = zip(*scoreAndIndex)
+    # sort key frames by index
+    sorted(cuts, key=lambda x: x[1])     
+
     # move key frames into a tmp folder, then move back.
-    for i in range(len(cut_scores)):
-        index = min(cut_index[i] + cut_offset, len(image_list) - 1)
+    for i in range(len(cuts)):
+        index = min(cuts[i][1] + cut_offset, len(image_list) - 1)
         shutil.move(jpeg_dir+"/"+image_list[index], jpeg_dir_result)
         keep_frames.append(image_list[index])
         keep_times.append(index)
@@ -165,7 +157,7 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
     os.rename(jpeg_dir_result, jpeg_dir)  
 
     return (keep_frames, keep_times)
-
+    
 
 def write_manifest(notify_buf, jpeg_dir, keep_frames, keep_times):
     outfile_name = jpeg_dir + "/manifest.txt"
