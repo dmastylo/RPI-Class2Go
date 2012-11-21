@@ -230,7 +230,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     
     record = ExamRecord(course=course, exam=exam, student=request.user, json_data=request.POST['json_data'])
     record.save()
-    
+
     return HttpResponse("Submission has been saved.")
 
 
@@ -241,7 +241,7 @@ def save_exam_ajax(request, course_prefix, course_suffix):
 
     slug = request.POST.get('slug','')
     title = request.POST.get('title', '')
-    xmlContent = request.POST.get('xmlContent', '')
+    metaXMLContent = request.POST.get('metaXMLContent', '')
     htmlContent = request.POST.get('htmlContent', '')
     due_date = request.POST.get('due_date', '')
     grace_period = request.POST.get('grace_period', '')
@@ -253,8 +253,8 @@ def save_exam_ajax(request, course_prefix, course_suffix):
         return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
     if not title:
         return HttpResponseBadRequest("No URL identifier value provided")
-    if not xmlContent:
-        return HttpResponseBadRequest("No xmlContent provided")
+    if not metaXMLContent:
+        return HttpResponseBadRequest("No metaXMLContent provided")
     if not htmlContent:
         return HttpResponseBadRequest("No htmlContent provided")
     if not due_date:
@@ -266,7 +266,7 @@ def save_exam_ajax(request, course_prefix, course_suffix):
     gp = datetime.datetime.strptime(grace_period, "%m/%d/%Y %H:%M")
 
     #create Exam
-    exam_obj = Exam(course=course, slug=slug, title=title, html_content=htmlContent, due_date=dd, grace_period=gp)
+    exam_obj = Exam(course=course, slug=slug, title=title, html_content=htmlContent, xml_metadata=metaXMLContent, due_date=dd, grace_period=gp)
     exam_obj.save()
 
     return HttpResponse("Exam " + title + " created")

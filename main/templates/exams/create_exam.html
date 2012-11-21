@@ -12,13 +12,20 @@
         bottom: 0;
         left: 0;
     }
+    #metadata_editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
     #container{
         position:relative;
         height:450px;
     }
     h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
     #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
-    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 420px; padding: 1em;}
+    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 600px; padding: 1em;}
     textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
     #preview-pane label {clear: both; display: block;}
     #preview-pane label input {float: left; margin-right: 1em;}
@@ -31,7 +38,8 @@
     .control-group {clear:both; padding:1em; zoom:1;}
     .control-group .atomic-unit {float:left; margin-right: 1em;}
     div#summative {display:none}
-    div.ui-dialog div.ui-widget-header (background: #900;)
+    div.ui-dialog div.ui-widget-header {background: #900;}
+    label pre {margin-left:30px;}
 </style>
 
 <div class="well create-exam-form">
@@ -42,7 +50,7 @@
         <div class="atomic-unit"><label for="exam_slug" class="control-label">Exam URL Identifier:*</label><input id="exam_slug" type="text" /></div>
         <div class="atomic-unit">
             <label class="control-label" for="due_date">Due Date:*</label>
-            <input id="due_date" class="picker"  type="text" name="due_date" value="{{current_datetime}}" data-datetimepicker>
+            <input id="due_date" class="picker" type="text" name="due_date" value="{{current_datetime}}" data-datetimepicker>
         </div>
         <div class="atomic-unit">
             <label class="control-label" for="due_date">Grace Period End:*</label>
@@ -69,18 +77,58 @@
     </div>
 
     <div class="control-group">
-        <input type="button" id="xml-entry-btn" class="btn" value="Enter XML" title="Click to expose text input" />
+        <input type="button" id="xml-entry-btn" class="btn" value="Import XML" title="Click to expose text input" />
     </div>
 
+    
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a id="enter-tab" href="#enter-content">Edit</a></li>
+        <li><a id="preview-tab" href="#preview-content">Preview</a></li>
+
+    </ul>
+    
     <div class="control-group">
-        <textarea id="ace_proxy" style="display:none">
-        </textarea>
-        <div class="row-fluid">
-            <div class="span6">
+        <div class="tab-content">
+            <div class="tab-pane active" id="enter-content">
                 <h4>Edit Exam HTML below:</h4>
+                <textarea id="ace_proxy" style="display:none"></textarea>
                 <div id="container">
                     <div id="editor"></div>
                 </div>
+                <br />
+                <h4>Edit Exam MetaData below:</h4>
+                <textarea id="ace_metadata_proxy" style="display:none"></textarea>
+                <div id="container">
+                    <div id="metadata_editor"></div>
+                </div>
+                
+            </div>
+            <div class="tab-pane" id="preview-content">
+                <div id="preview-pane">
+                    <h4>Preview Exam HTML</h4>
+                    <div id="staging-area"></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+<!--  Non-tabbed version
+    <div class="control-group">
+        <div class="row-fluid">
+            <div class="span6">
+                <h4>Edit Exam HTML below:</h4>
+                <textarea id="ace_proxy" style="display:none"></textarea>
+                <div id="container">
+                    <div id="editor"></div>
+                </div>
+                <br />
+                <h4>Edit Exam MetaData below:</h4>
+                <textarea id="ace_metadata_proxy" style="display:none"></textarea>
+                <div id="container">
+                    <div id="metadata_editor"></div>
+                </div>
+                
             </div>
             <div class="span6">
                 <div id="preview-pane">
@@ -90,7 +138,7 @@
             </div>
         </div>
 
-    </div> <!-- end of "control-group" -->
+    </div>  --> <!-- end of "control-group" -->
 
     <div class="control-group">
         <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
@@ -113,26 +161,64 @@
             <problemset>
                 <problem>
                     <p>
-                    A multiple choice problem presents radio buttons for student
-                    input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+                    A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
+                        Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
                     <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
                     </p>
                     
                     <p>What Apple device competed with the portable CD player?</p>
                     <multiplechoiceresponse>
                         <choicegroup type="MultipleChoice">
-                            <choice correct="false" name="ipad">The iPad</choice>
-                            <choice correct="false" name="beatles">Napster</choice>
-                            <choice correct="true" name="ipod">The iPod</choice>
-                            <choice correct="false" name="peeler">The vegetable peeler</choice>
-                            <choice correct="false" name="android">Android</choice>
-                            <choice correct="false" name="beatles">The Beatles</choice>
+                            <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" tag4humans="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" tag4humans="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" tag4humans="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" tag4humans="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
                         </choicegroup>
                     </multiplechoiceresponse>
                     <solution>
                         <div class="detailed-solution">
                             <p>Explanation</p>
                             <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and enery-intensive spinning disks. </p>
+                        </div>
+                    </solution>
+                </problem>
+                <problem>
+                    <p>
+                     Which of the following is NOT a valid JSON object?
+                    </p>
+                    <multiplechoiceresponse>
+                        <choicegroup type="MultipleChoice">
+                            <choice correct="true" name="a" tag4humans="Missing comma">
+                                <text><![CDATA[
+<pre>
+{ "name": "Smiley",
+"age": 20,
+"phone": "888-123-4567"
+"email": "smiley@xyz.com",
+"happy": true }</pre>
+                        ]]></text>
+                                <explanation>check commas</explanation>
+                            </choice>
+                            <choice correct="false" name="b" tag4humans="OK choice1">
+                                <text><![CDATA[
+<pre>
+{ "name": "Smiley",
+"age": 20,
+"phone": "888-123-4567",
+"email": "smiley@xyz.com",
+"happy": true }
+</pre>
+                                ]]></text>
+                                <explanation>correctly formatted</explanation>
+                            </choice>
+                       </choicegroup>
+                    </multiplechoiceresponse>
+                    <solution>
+                        <div class="detailed-solution">
+                            <p>Explanation</p>
+                            <p>In JSON objects, all labels (property names) must be quoted, and all label-value pairs must be separated by commas. Values in label-value pairs can be numbers, quoted strings, true, false, null, objects, or arrays. Objects and arrays may be empty. </p>
                         </div>
                     </solution>
                 </problem>
@@ -152,20 +238,20 @@
                         </script>
                     
                     <p>Enter the numerical value of Pi:
-                    <numericalresponse answer="3.14159">
+                    <numericalresponse answer="3.14159" tag4humans="Value of Pi">
                         <responseparam type="tolerance" default=".02" />
                         <textline />
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse answer="$computed_response">
+                    <numericalresponse answer="$computed_response" tag4humans="502*9">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>Enter the number of fingers on a human hand:
-                    <numericalresponse answer="5">
+                    <numericalresponse answer="5" tag4humans="number of fingers on a hand">
                         <textline />
                     </numericalresponse>
                     </p>
@@ -194,20 +280,20 @@
                         </script>
                     
                     <p>Enter the numerical value of Pi:
-                    <numericalresponse answer="3.14159">
+                    <numericalresponse tag4humans="Value of Pi" answer="3.14159">
                         <responseparam type="tolerance" default=".02" />
                         <textline />
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse answer="$computed_response">
+                    <numericalresponse tag4humans="value of 502*9" answer="$computed_response">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>Enter the number of fingers on a human hand:
-                    <numericalresponse answer="5">
+                    <numericalresponse tag4humans="number of finers on a hand" answer="5">
                         <textline />
                     </numericalresponse>
                     </p>
@@ -232,6 +318,12 @@
 <script src="{{STATIC_URL}}js/core/beautify-html.js"></script>
 
 <script>
+    $('#myTab a').click(function (e) {
+                        e.preventDefault();
+                        $(this).tab('show');
+                        })
+    
+    
     $( "#dialog-form" ).dialog({
         autoOpen: false,
         height: 500,
@@ -244,7 +336,9 @@
                 c2gXMLParse.renderMarkup($('#xml-entry'), "");
 
                 if ( bValid ) {
-                    editor.setValue(style_html(editor.getValue(), {'max_char':60}));
+                    editor.setValue(style_html(editor.getValue(), {'max_char':80}));
+                    metadata_editor.setValue(style_html(metadata_editor.getValue(), {'max_char':80}));
+
                     $( this ).dialog( "close" );
                 }
                                
@@ -266,7 +360,13 @@
     editor.setTheme("ace/theme/eclipse");
     editor.getSession().setMode("ace/mode/html");
     editor.getSession().setUseWrapMode(true);
-
+    
+    var metadata_editor = ace.edit("metadata_editor");
+    metadata_editor.setValue($('#ace_metadata_proxy').val());
+    metadata_editor.setTheme("ace/theme/eclipse");
+    metadata_editor.getSession().setMode("ace/mode/xml");
+    metadata_editor.getSession().setUseWrapMode(true);
+    
     var questionIdx = 0;
       
     {% include "exams/renderPreview.js" %}
@@ -285,7 +385,7 @@
                        slug:$('input#exam_slug').val(),
                        due_date:$('input#due_date').val(),
                        grace_period:$('input#grace_period').val(),
-                       xmlContent:editor.getValue(),
+                       metaXMLContent:metadata_editor.getValue(),
                        htmlContent:$('#staging-area').html()
                },
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
@@ -301,6 +401,7 @@
       
     var toggleWrap = function () {
         editor.getSession().setUseWrapMode(next);
+        metadata_editor.getSession().setUseWrapMode(next);
         if (next) { $('#wrap').text('Wrap');}
         else {$('#wrap').text('No Wrap');}
         next = !next;
@@ -314,6 +415,8 @@
       
       
     $('#preview-btn').click(c2gXMLParse.renderPreview);
+    $('#preview-tab').click(c2gXMLParse.renderPreview);
+
       
       });
     </script>
