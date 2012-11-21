@@ -16,18 +16,40 @@ class SimpleTestBase(FastFixtureTestCase):
           Also provide configuration for the u/p (to allow student logins)
           Perhaps even take the path and parse it for the pre/suf
     """
-    mode = 'draft'
     loginPath = '/%s/%s/preview_login/'
     userAgent = 'Mozilla/5.0'
     referer = 'http://testserver/%s/%s/preview/'
+    fixtures = ['pset_testdata.json']
 
-    # XXXredfive - Make the inheritance work
-    # tried using __init__ to set these but there is something wonky with
-    # the inheritance; letting the subclass override them for now
-    username = 'set-me-in-subclass'
-    password = 'set-me-in-subclass'
-    coursePrefix = 'set-me-in-subclass'
-    courseSuffix = 'set-me-in-subclass'
+    # the following are specific to each TestCase subclass and should be
+    # passed in to __init__
+    username = None
+    password = None
+    coursePrefix = None
+    courseSuffix = None
+    mode = None
+
+    def __init__(self, *args, **kwargs):
+        """
+        Expects to receive the following args passed in through kwargs:
+          course_prefix
+          course_suffix
+          username
+          password
+          mode
+        """
+        assert 'course_prefix' in kwargs
+        assert 'course_suffix' in kwargs
+        assert 'username' in kwargs
+        assert 'password' in kwargs
+        assert 'mode' in kwargs
+
+        self.coursePrefix = kwargs.pop('course_prefix', None)
+        self.courseSuffix = kwargs.pop('course_suffix', None)
+        self.username = kwargs.pop('username', None)
+        self.password = kwargs.pop('password', None)
+        self.mode = kwargs.pop('mode', None)
+        super(SimpleTestBase,self).__init__(*args, **kwargs)
 
     def setUp(self):
         # login

@@ -5,11 +5,19 @@ from problemsets.tests.test_base import SimpleTestBase
 __all__ = ['InstructorDraftModeTestAdv']
 
 class InstructorDraftModeTestAdv(SimpleTestBase):
-    fixtures = ['pset_testdata.json']
-    username = 'professor_0'
-    password = 'class2go'
-    coursePrefix = 'networking'
-    courseSuffix = 'Fall2012'
+    #fixtures = ['pset_testdata.json']
+
+    def __init__(self, *arrgs, **kwargs):
+        config = { 'username' : 'professor_0',
+                   'password' : 'class2go',
+                   'course_prefix' :'networking',
+                   'course_suffix' :'Fall2012',
+                   'mode' : 'draft' }
+        if kwargs != None:
+            kwargs.update(config)
+        else:
+            kwargs = config
+        super(InstructorDraftModeTestAdv, self).__init__(*arrgs, **kwargs)
 
     def test_create_problemset_action(self):
         """
