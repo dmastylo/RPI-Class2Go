@@ -62,7 +62,7 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
 
     # from http://mail.python.org/pipermail/image-sig/1997-March/000223.html
     def computeDiff(file1, file2):
-        h1 = Image.open(file1).histogram()
+      	h1 = Image.open(file1).histogram()
         h2 = Image.open(file2).histogram()
         rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, h1, h2))/len(h1))
         return rms
@@ -113,9 +113,9 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
         cutAB = np.sum(difference_matrix[i-k:i, i:i+k])
         assocA = np.sum(difference_matrix[i-k:i, i-k:i])
         assocB = np.sum(difference_matrix[i:i+k, i:i+k])
-    	if (assocA!=0) and (assocB!=0):
+        if (assocA!=0) and (assocB!=0):
 	    score = cutAB/assocA + cutAB/assocB
-    	else:
+        else:
 	    score = 0
         candidate_scores.append(score)
         candidate_index.append(i)
@@ -137,7 +137,7 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
         cut_scores = score_sorted[:max_keyframes]
         cut_index = index_sorted[:max_keyframes]
 
-    # select the 2nd frame after each shot boundary as the key frame.
+    # select the 3rd frame after each shot boundary as the key frame.
     # alternatively, we can also select middle frame between two shot boundaries as the key frame.
     cut_offset = 2
 
