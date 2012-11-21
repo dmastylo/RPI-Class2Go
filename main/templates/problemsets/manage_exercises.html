@@ -8,11 +8,7 @@ function confirm_change(){
         return true;
     }   
     var r=confirm("WARNING: Students have already begun taking this problem set. Adding exercises can ruin the integrity of the results. Are you sure you wish to make this change?")
-    if (r==true){
-       return true;
-    } else {
-        return false;
-    }
+    return r;
 }
 </script>
 
@@ -22,7 +18,7 @@ function confirm_change(){
     <h3>Add or Remove Exercises</h3>
 
     <h4>Upload Exercises to {{pset.title}}</h4>
-    <form action= {% url 'problemsets.views.manage_exercises' course_prefix course_suffix pset.slug %} method="POST" class="form-vertical" enctype="multipart/form-data">
+    <form action= {% url 'problemsets.views.manage_exercises' course_prefix course_suffix pset.slug %} method="POST" onsubmit="return validate();" class="form-vertical" enctype="multipart/form-data">
         <fieldset class="well">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
@@ -30,14 +26,14 @@ function confirm_change(){
         <input type="hidden" name="course_suffix" value={{course_suffix}}>
         <div class="fieldWrapper">
             {{ form.file.errors }}
-            {{ form.file }} <input type="submit" value="Add Exercise" onclick="return confirm_change()" class="btn">
+            {{ form.file }} <input type="submit" value="Add Exercise" class="btn">
             {{ form.course }}
             <span class="help-block">{{ field.help_text }}</span>
         </div>
     </form>
 
     <h4><a data-toggle="collapse" data-target="#choose-existing" class='btn'>Choose From Existing Exercises</a></h4>
-    <form action= {% url 'problemsets.views.add_existing_exercises' %} method="POST" class="form-vertical">
+    <form action= {% url 'problemsets.views.add_existing_exercises' %} method="POST" onsubmit="return confirm_change();" class="form-vertical">
         {% csrf_token %}
         <input type="hidden" name="pset_id" value={{pset.id}}>
         <input type="hidden" name="course_prefix" value={{course_prefix}}>
@@ -52,7 +48,7 @@ function confirm_change(){
                     {% endfor %}
                 </div>
             </div>
-            <input type="submit" value="Add Exercises" onclick="return confirm_change()" class="btn">
+            <input type="submit" value="Add Exercises" class="btn">
         </div>
     </form>
 
@@ -84,3 +80,31 @@ function confirm_change(){
     </form>
 </div>
 {% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script>
+function validate() {
+    var filename = document.getElementById('id_file').files[0].name;
+    var r = true;
+    $.ajax({
+        type:"POST",
+        url: "{% url 'courses.actions.check_filename' course_prefix course_suffix 'problemsets' %}",
+        async:false,
+        data: {filename:filename, csrfmiddlewaretoken:'{{ csrf_token }}'},
+        success: function(data) {
+            if (data == "File name already exists!") {
+                r=confirm("WARNING!\n\nYou are uploading an exercise file with a name that has already been uploaded for this course, that may be used in a problem set or video. Nobody has taken this exercise yet though. If you intend to upload a new copy of this file to overwrite the existing one, go ahead.");
+            }
+            else if (data == "File name already exists! Exercise taken") {
+                r=confirm("Important warning - think carefully before choosing!\n\nYou are uploading an exercise file with a name that has already been uploaded for this course.\n\nStudents have already completed this exercise in a problem set or video! If you are changing the exercise in any non-trivial way (eg number of questions, answers to questions) then you may be losing data. Be careful!");
+            }
+            else {
+                //File name is available, check confirm_change
+                r=confirm_change();
+            }
+        }
+    });
+    return r;
+}
+</script>
+{% endblock addl_scripts %}

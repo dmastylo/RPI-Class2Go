@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.shortcuts import render, render_to_response, redirect
 from django.template import Context, loader
 from django.template import RequestContext
@@ -185,7 +186,16 @@ def check_filename(request, course_prefix, course_suffix, file_type):
         for file in files:
             if basename(file.file.name) == filename:
                 return HttpResponse("File name already exists!")
-    
+    else:
+        exercises = Exercise.objects.filter(handle=course_prefix+"--"+course_suffix,is_deleted=0)
+        for exercise in exercises:
+            if exercise.fileName == filename:
+                #File name already exists, check if it has been taken yet
+                if ProblemActivity.objects.filter(Q(video_to_exercise__exercise=exercise) | Q(problemset_to_exercise__exercise=exercise)).exists():
+                    return HttpResponse("File name already exists! Exercise taken")
+                else:
+                    return HttpResponse("File name already exists!")
+
     return HttpResponse("File name is available")            
 
 def is_member_of_course(course, user):
