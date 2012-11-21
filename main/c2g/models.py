@@ -1614,3 +1614,24 @@ class ExamScoreField(TimestampMixin, models.Model):
     subscore = models.IntegerField(default=0)
 
 
+class GroupItemManager(models.Manager):
+    def getByCourse(self, course):
+        return self.filter(course=course).order_by('group_id','level')
+
+class GroupItem(models.Model):
+    group_id = models.IntegerField(db_index=True, null=True, blank=True)
+    level = models.IntegerField(db_index=True)
+    video = models.ForeignKey(Video, null=True, blank=True)
+    problemSet = models.ForeignKey(ProblemSet, null=True, blank=True)
+    additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
+    file = models.ForeignKey(File, null=True, blank=True)
+    exam = models.ForeignKey(Exam, null=True, blank=True)
+    course = models.ForeignKey(Course)
+    objects = GroupItemManager()
+    
+    def __unicode__(self):
+        return (self.group_id)
+    
+    class Meta:
+        db_table = u'c2g_group_items'
+        
