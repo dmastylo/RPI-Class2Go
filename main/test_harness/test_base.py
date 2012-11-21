@@ -28,6 +28,7 @@ class AuthenticatedTestBase(SimpleTestBase):
     loginPath = '/%s/%s/preview_login/'
     userAgent = 'Mozilla/5.0'
     referer = 'http://testserver/%s/%s/preview/'
+    fixtures = ['pset_testdata.json']
 
     # the following are specific to each TestCase subclass and should be
     # passed in to __init__
