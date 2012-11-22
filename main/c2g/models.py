@@ -203,7 +203,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             outcomes = self.outcomes,
             faq = self.faq,
             logo = self.logo,
-            logo_handle = self.logo_handle
+            logo_handle = self.logo_handle,
             preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
@@ -1000,20 +1000,6 @@ class VideoViewTraces(TimestampMixin, models.Model):
         db_table = u'c2g_video_view_traces'
         
 class VideoActivity(models.Model):
-<<<<<<< HEAD
-    student = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
-    video = models.ForeignKey(Video)
-    start_seconds = models.IntegerField(default=0, blank=True)
-    #last_watched = models.DateTimeField(auto_now=True, auto_now_add=False)
-
-    def percent_done(self):
-        return float(self.start_seconds)*100/self.video.duration
-
-    def __unicode__(self):
-        return self.student.username
-    class Meta:
-=======
      student = models.ForeignKey(User)
      course = models.ForeignKey(Course)
      video = models.ForeignKey(Video)
@@ -1027,7 +1013,6 @@ class VideoActivity(models.Model):
      def __unicode__(self):
             return self.student.username
      class Meta:
->>>>>>> 50c5f8635f920bd2c3e07130b4014e78fd5a10c6
         db_table = u'c2g_video_activity'
         
 class VideoDownload(models.Model):

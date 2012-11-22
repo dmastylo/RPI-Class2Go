@@ -1,10 +1,7 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-<<<<<<< HEAD
 {% block title %} {{SITE_TITLE}} | {{ common_page_data.course.title }} | {{ page.title }} {% endblock title %}
-=======
-{% block title %}{{ page.title }} | {{ common_page_data.course.title }}{% endblock title %}
->>>>>>> 50c5f8635f920bd2c3e07130b4014e78fd5a10c6
+
 
 {% block course_info_link_class %}{% if page.menu_slug %} active{% endif %}{% endblock course_info_link_class %}
 {% block course_materials_link_class %}{% if not page.menu_slug %}class="active"{% endif %}{% endblock course_materials_link_class %}
@@ -21,36 +18,36 @@
 	
 	<div class = "span11">
     <h3>Course Info</h3>
-     {% ifnotequal video None %}
-    <iframe width="710" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+     {% ifnotequal intro_video None %}
+    <iframe width="710" height="430" src="https://www.youtube.com/embed/{{intro_video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
 	<br/>
 	 {% endifnotequal %}
-	<h3>Course starts {{ course.term }} {{ course.year }}</h3>
+	<h3>Course starts {{ common_page_data.course.term }} {{ common_page_data.course.year }}</h3>
 	<p>{% autoescape off %}{{course.description}}{% endautoescape %}</p>
-    {% ifnotequal course.prerequisites '' %}
+    {% ifnotequal common_page_data.course.prerequisites '' %}
 	<h3>Prerequisites</h3>	
-	<p>{% autoescape off %}{{course.prerequisites}}{% endautoescape %}</p>
+	<p>{% autoescape off %}{{common_page_data.course.prerequisites}}{% endautoescape %}</p>
     {% endifnotequal %}
 
-    {% ifnotequal course.faq '' %}
+    {% ifnotequal common_page_data.course.faq '' %}
 	<h3>FAQ</h3>	
-	<p>{% autoescape off %}{{course.faq}}{% endautoescape %}</p>
+	<p>{% autoescape off %}{{common_page_data.course.faq}}{% endautoescape %}</p>
     {% endifnotequal %}
 
-    {% ifnotequal course.outcomes '' %}
+    {% ifnotequal common_page_data.course.outcomes '' %}
 	<h3>Outcomes</h3>	
-	<p>{% autoescape off %}{{course.outcomes}}{% endautoescape %}</p>
+	<p>{% autoescape off %}{{common_page_data.course.outcomes}}{% endautoescape %}</p>
     {% endifnotequal %}
 
-    {% ifnotequal course.accompanying_materials '' %}
+    {% ifnotequal common_page_data.course.accompanying_materials '' %}
 	<h3>Accompanying Material</h3>	
-	<p>{% autoescape off %}{{course.accompanying_materials}}{% endautoescape %}</p>
+	<p>{% autoescape off %}{{common_page_data.course.accompanying_materials}}{% endautoescape %}</p>
     {% endifnotequal %}
 
 
 	<h3>Biographies</h3>
 
-	{% for instructor in instructors %}
+	{% for instructor in full_index_list.instructor_list %}
             <h3>{{ instructor.name }}</h3>
 			<div class="home-unit">
    			    <div class="container">

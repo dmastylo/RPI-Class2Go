@@ -81,8 +81,16 @@ def main(request, course_prefix, course_suffix, slug):
     pset_list =  ProblemSet.objects.getByCourse(course=course)
     additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
     file_list = File.objects.getByCourse(course=course)
-
+    instructor_list = Instructor.objects.filter(courseinstructor=common_page_data['course'])
+ 
     full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+    
+    full_index_list.append(instructor_list)
+    
+    try:
+        video = Video.objects.getByCourse(course=common_page_data['course']).get(slug='intro')
+    except Video.DoesNotExist:
+        video = None
 
     if request.user.is_authenticated():
         is_logged_in = 1
@@ -94,6 +102,6 @@ def main(request, course_prefix, course_suffix, slug):
                                'page': page,
                                'contentsection_list': full_contentsection_list, 
                                'full_index_list': full_index_list,
-                               'is_logged_in': is_logged_in},
+                               'is_logged_in': is_logged_in, 'intro_video': video},
                                context_instance=RequestContext(request))
 

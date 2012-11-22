@@ -1,6 +1,8 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.simple import redirect_to
 from django.conf import settings
+from rest import views
+
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -16,6 +18,24 @@ urlpatterns = patterns('',
     url(r'^_throw500$', 'c2g.views.throw500'),
     url(r'^_throw404$', 'c2g.views.throw404'),
 
+    # REST Class2Go API
+    url(r'^rest/login', 'rest.views.rest_login'),
+    url(r'^rest/problemactivities', views.ProblemActivities.as_view()),
+    url(r'^rest/courses', views.CourseList.as_view()),
+    url(r'^rest/announcements', views.AnnouncementList.as_view()),                                              
+    url(r'^rest/psets', views.ProblemSetList.as_view()),                                              
+    url(r'^rest/psettoexercise', views.ProblemSetToExerciseList.as_view()),  
+    url(r'^rest/exercise', views.ExerciseList.as_view()),  
+    url(r'^rest/contentsection', views.ContentSectionList.as_view()),  
+    url(r'^rest/videotoexercise', views.VideoToExerciseList.as_view()),  
+    url(r'^rest/videoactivities', views.VideoActivities.as_view()),
+    url(r'^rest/files', views.FilesList.as_view()),                         
+    url(r'^rest/video', views.VideoList.as_view()),  
+    url(r'^rest/exams', views.ExamList.as_view()),
+    url(r'^rest/examrecords', views.ExamRecordList.as_view()),
+    url(r'^rest/examscores', views.ExamScoreList.as_view()),
+    url(r'^rest/examscorefields', views.ExamScoreFieldList.as_view()),
+                    
     #Testing messages
     url(r'^_test_messages$', 'c2g.views.test_messages'),
 

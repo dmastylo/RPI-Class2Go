@@ -1,10 +1,13 @@
-from djangorestframework.permissions import IsAuthenticated
-from djangorestframework.views import ListOrCreateModelView
-from djangorestframework.compat import View
-from djangorestframework.response import Response
-from djangorestframework import status
-from djangorestframework.mixins import ResponseMixin
-from djangorestframework.renderers import JSONRenderer
+from rest_framework import permissions
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+from rest_framework import generics
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest.serializers import *
+
 from django.http import HttpResponse, Http404
 from registration.backends import get_backend
 from django.template import RequestContext
@@ -20,7 +23,6 @@ from django.conf import settings
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.utils import simplejson
-from courses.common_page_data import get_common_page_data
 from c2g.models import *
 from django.contrib import auth
 
@@ -30,6 +32,16 @@ import os.path
 
 import logging
 logger=logging.getLogger("foo")
+
+
+class JSONResponse(HttpResponse):
+    """
+    An HttpResponse that renders it's content into JSON.
+    """
+    def __init__(self, data, **kwargs):
+        content = JSONRenderer().render(data)
+        kwargs['content_type'] = 'application/json'
+        super(JSONResponse, self).__init__(content, **kwargs)
 
 
 @sensitive_post_parameters()
@@ -55,9 +67,6 @@ def rest_login(request):
                     courses.append({'course_id':c.id})
                     break
         
-     
-        #print request.user.email
-
         
         to_json = {'userid': request.user.username, 'email': request.user.email, 'last_name':request.user.last_name,
                    'first_name':request.user.first_name,'date_joined':request.user.date_joined.strftime('%Y-%m-%dT%H:%M:%S'),
@@ -74,31 +83,33 @@ def rest_login(request):
 Gets Problemset Activities for student
 """
 
-class ProblemsetActivities(ResponseMixin, View):
+class ProblemActivities(APIView):
 
-    renderers = (JSONRenderer,)
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+        
     def get(self, request):
 
         problem_activities = ProblemActivity.objects.filter(student=request.user)
                 
         index_list = []
         for prob in problem_activities:
-            index_list.append({'id': prob.id, 'video_to_exercise_id': prob.video_to_exercise_id, 
-                               'problemset_to_exercise_id': prob.problemset_to_exercise_id,
+            index_list.append({'id': prob.id, 'video_to_exercise': prob.video_to_exercise_id, 
+                               'problemset_to_exercise': prob.problemset_to_exercise_id,
                                'problem_identifier': prob.problem_identifier, 'complete': prob.complete, 'attempt_content': prob.attempt_content,
                                'count_hints':prob.count_hints, 'time_taken':prob.time_taken,'attempt_number': prob.attempt_number,
                                'sha1':prob.sha1, 'seed': prob.seed,'problem_type':prob.problem_type,'review_mode':prob.review_mode,
                                'topic_mode':prob.topic_mode,'casing':prob.casing,'card':prob.card,'cards_done':prob.cards_done,
                                'cards_left':prob.cards_left,'user_selection_val':prob.user_selection_val,'user_choices':prob.user_choices})
 
-        response = Response(200, index_list)
         
-        return self.render(response)
+        return Response(index_list)
 
         
-class VideoActivities(ResponseMixin, View):
+class VideoActivities(APIView):
 
-    renderers = (JSONRenderer,)
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)   
     
     def get(self, request):
 
@@ -106,36 +117,168 @@ class VideoActivities(ResponseMixin, View):
                 
         index_list = []
         for vid_activity in video_activities:
-            index_list.append({'id': vid_activity.id, 'course_id': vid_activity.course_id, 
-                               'video_id': vid_activity.video_id,
+            index_list.append({'id': vid_activity.id, 'course': vid_activity.course_id, 
+                               'video': vid_activity.video_id,
                                'start_seconds': vid_activity.start_seconds})
 
-        response = Response(200, index_list)
         
-        return self.render(response)
+        
+        return Response(index_list)
 
-class Files(ResponseMixin, View):
+class FilesList(APIView):
 
-    renderers = (JSONRenderer,)
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)    
+    def get(self, request):
+        files = File.objects.all()
+        serializer = FileSerializer(files)
+    
+        return Response(serializer.data)
+
+class CourseList(APIView):
+    
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
     
     def get(self, request):
+        courses= Course.objects.all()
+        serializer = CourseSerializer(courses)
+    
+        return Response(serializer.data)
 
-        course = request.common_page_data['course']
-        files = Files.objects.filter(course=course,is_deleted=0)
-                
-        index_list = []
-        for aFile in files:
-            index_list.append({'id': file.id, 'course_id': file.course_id, 
-                               'is_deleted': file.is_deleted,
-                               'index': file.index, 'section_id':file.section_id,'title':file.title,'file':file.file,
-                               'mode':file.mode,'handle':file.handle})
+	
+class AnnouncementList(APIView):
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        announcements= Announcement.objects.all()
+        serializer = AnnouncementSerializer(announcements)
+    
+        return Response(serializer.data)
+    
 
-        response = Response(200, index_list)
+class ProblemSetList(APIView):
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        psets = ProblemSet.objects.all()
+        serializer = PSetSerializer(psets)
+    
+        return Response(serializer.data)
+    
+    
+class ProblemSetToExerciseList(APIView):
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        psetexes = ProblemSetToExercise.objects.all()
+        serializer = PSetExerciseSerializer(psetexes)
+    
+        return Response(serializer.data)
+    
+
+class ExerciseList(APIView):
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        exercises= Exercise.objects.all()
+        serializer = ExerciseSerializer(exercises)
+    
+        return Response(serializer.data)
         
-        return self.render(response)
+
+    
+
+class ContentSectionList(APIView):
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        content_sections = ContentSection.objects.all()
+        serializer = ContentSectionSerializer(content_sections)
+    
+        return Response(serializer.data)
+    
 
 
-class AuthenticatedListOrCreateModelView(ListOrCreateModelView):
-	permissions = (IsAuthenticated, )
+class VideoList(APIView):
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        videos = Video.objects.all()
+        serializer = VideoSerializer(videos)
+    
+        return Response(serializer.data)
+    
+    
+class VideoToExerciseList(APIView):
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        vidtoexes = VideoToExercise.objects.all()
+        serializer = VideoToExerciseSerializer(vidtoexes)
+    
+        return Response(serializer.data)
 
+"""
+Gets ExamScores for student
+"""
 
+class ExamRecordList(APIView):
+
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+        
+    def get(self, request):
+
+        exam_records = ExamRecord.objects.filter(student=request.user)
+                
+        serializer = ExamRecordSerializer(exam_records)
+    
+        return Response(serializer.data)
+
+class ExamScoreList(APIView):
+
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+        
+    def get(self, request):
+
+        exam_scores = ExamScore.objects.filter(student=request.user)
+                
+        serializer = ExamScoreSerializer(exam_scores)
+    
+        return Response(serializer.data)
+
+class ExamScoreFieldList(APIView):
+
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+        
+    def get(self, request):
+
+        exam_score_fields = ExamScoreField.objects.filter(student=request.user)
+                
+        serializer = ExamScoreFieldSerializer(exam_score_fields)
+    
+        return Response(serializer.data)
+
+class ExamList(APIView):
+
+    renderer_classes = (JSONRenderer,)
+    permission_classes = (permissions.IsAuthenticated,)
+        
+    def get(self, request):
+
+        course_id = request.GET.get('course')
+        exams = Exam.objects.filter(course=course_id)
+                
+        serializer = ExamSerializer(exams)
+    
+        return Response(serializer.data)
