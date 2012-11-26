@@ -1590,13 +1590,12 @@ class ExamRecord(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    json_data = models.TextField(null=True, blank=True)
-    json_score_data = models.TextField(null=True, blank=True)  #denormalized stuff
+    json_data = models.TextField(null=True, blank=True)   #blob
+    json_score_data = models.TextField(null=True, blank=True)  #blob
     #score was subsumed by ExamRecordScore
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
-
 
 class ExamScore(TimestampMixin, models.Model):
     """

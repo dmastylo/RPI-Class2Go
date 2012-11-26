@@ -143,7 +143,7 @@
     <div class="control-group">
         <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
 
-        <input class="btn" type="button" id="preview-btn" value="Preview My Exam" />
+        <!-- <input class="btn" type="button" id="preview-btn" value="Preview My Exam" /> -->
 
         <input type="button" id="exercise_submit_and_close" class="btn" value="Save to Server &amp; Close" /> 
         <input type="button" id="exercise_submit" class="btn" value="Save to Server"/> 
@@ -157,9 +157,9 @@
     <form>
     <fieldset>
         <label for="name">XML</label>
-        <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all">
-            <problemset>
-                <problem>
+        <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> <!-- Begin Example Template -->
+            <problemset tag4humans="EXAMPLE">
+                <problem tag4humans="Apple Competitor Question">
                     <p>
                     A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
                         Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
@@ -167,10 +167,10 @@
                     </p>
                     
                     <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse>
+                    <multiplechoiceresponse tag4humans="Apple Competitors">
                         <choicegroup type="MultipleChoice">
                             <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="beatles" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="napster" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
                             <choice correct="true" name="ipod" tag4humans="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
                             <choice correct="false" name="peeler" tag4humans="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
                             <choice correct="false" name="android" tag4humans="Android"><text>Android</text><explanation>Try again</explanation></choice>
@@ -180,15 +180,15 @@
                     <solution>
                         <div class="detailed-solution">
                             <p>Explanation</p>
-                            <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and enery-intensive spinning disks. </p>
+                            <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks. </p>
                         </div>
                     </solution>
                 </problem>
-                <problem>
+                <problem tag4humans="JSON-Multiple-Choice">
                     <p>
                      Which of the following is NOT a valid JSON object?
                     </p>
-                    <multiplechoiceresponse>
+                    <multiplechoiceresponse tag4humans="Valid/Invalid JSON objects">
                         <choicegroup type="MultipleChoice">
                             <choice correct="true" name="a" tag4humans="Missing comma">
                                 <text><![CDATA[
@@ -201,7 +201,18 @@
                         ]]></text>
                                 <explanation>check commas</explanation>
                             </choice>
-                            <choice correct="false" name="b" tag4humans="OK choice1">
+                            <choice correct="true" name="b" tag4humans="Missing quotes">
+                                <text><![CDATA[
+<pre>
+{ "name": "Smiley",
+  age: 20,
+"phone": "888-123-4567"
+"email": "smiley@xyz.com",
+"happy": true }</pre>
+                                    ]]></text>
+                                <explanation>check commas</explanation>
+                            </choice>
+                            <choice correct="false" name="c" tag4humans="OK choice1">
                                 <text><![CDATA[
 <pre>
 { "name": "Smiley",
@@ -222,7 +233,7 @@
                         </div>
                     </solution>
                 </problem>
-                <problem>
+                <problem tag4humans="Short-answer1">
                     <p>
                     A numerical response problem accepts a line of text input from the
                     student, and evaluates the input for correctness based on its
@@ -255,6 +266,19 @@
                         <textline />
                     </numericalresponse>
                     </p>
+                    
+                    <p>What Apple device competed with the portable CD player?</p>
+                    <multiplechoiceresponse tag4humans="Apple Competitors">
+                        <choicegroup type="MultipleChoice">
+                            <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" tag4humans="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" tag4humans="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" tag4humans="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" tag4humans="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+                        </choicegroup>
+                    </multiplechoiceresponse>
+                    
                     <solution>
                         <div class="detailed-solution">
                             <p>Explanation</p>
@@ -264,7 +288,7 @@
                         </div>
                     </solution>
                 </problem>
-                <problem>
+                <problem tag4humans="Short-answer2">
                     <p>
                     A numerical response problem accepts a line of text input from the
                     student, and evaluates the input for correctness based on its
@@ -307,7 +331,7 @@
                     </solution>
                 </problem>
             </problemset>
-        </textarea>
+        </textarea> <!-- End Example Template -->
     </fieldset>
     </form>
 </div>
@@ -414,7 +438,7 @@
     $('#wrap').click();
       
       
-    $('#preview-btn').click(c2gXMLParse.renderPreview);
+      //$('#preview-btn').click(c2gXMLParse.renderPreview);
     $('#preview-tab').click(c2gXMLParse.renderPreview);
 
       
