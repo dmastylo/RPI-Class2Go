@@ -1,11 +1,10 @@
 from c2g.models import ProblemSet
 from datetime import datetime, timedelta
-from problemsets.tests.test_base import SimpleTestBase
+from tests.test_base import SimpleTestBase
 
 __all__ = ['InstructorDraftModeTestAdv']
 
 class InstructorDraftModeTestAdv(SimpleTestBase):
-    #fixtures = ['pset_testdata.json']
 
     def __init__(self, *arrgs, **kwargs):
         config = { 'username' : 'professor_0',

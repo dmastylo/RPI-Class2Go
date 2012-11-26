@@ -1,4 +1,4 @@
-from problemsets.tests.test_base import SimpleTestBase
+from tests.test_base import SimpleTestBase
 
 __all__ = ['test_standalone', 'InstructorDraftModeTest']
 
@@ -9,7 +9,6 @@ def test_standalone():
     pass
 
 class InstructorDraftModeTest(SimpleTestBase):
-    #fixtures = ['pset_testdata.json']
 
     def __init__(self, *arrgs, **kwargs):
         config = { 'username' : 'professor_0',
