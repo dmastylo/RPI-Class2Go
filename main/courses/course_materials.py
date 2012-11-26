@@ -152,12 +152,21 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_additional_page_content:
                 for page in pages:
+                    
                     if page.section_id == section.id and not level2_items.has_key('page' + ':' + str(page.id)):
-                        item = {'type':'additional_page', 'additional_page':page, 'index':page.index}
                         
+                        children = []
                         if level1_items.has_key('page' + ':' + str(page.id)):
                             group_id = level1_items['page' + ':' + str(page.id)]
-                            children = [k for k, v in level2_items.items() if str(group_id) in v]
+                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
+                            for child in child_items:
+                                child_item = {}
+                                type, url = get_child_data(child)
+                                child_item['type'] = type
+                                child_item['url'] = url
+                                children.append(child_item)
+                        
+                        item = {'type':'additional_page', 'additional_page':page, 'index':page.index, 'children': children}
 
                         if common_page_data['course_mode'] == 'draft':
                             prod_page = page.image
@@ -181,11 +190,19 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_file_content:
                 for file in files:
                     if file.section_id == section.id and not level2_items.has_key('file' + ':' + str(file.id)):
-                        item = {'type':'file', 'file':file, 'index':file.index}
-
+                        
+                        children = []
                         if level1_items.has_key('file' + ':' + str(file.id)):
                             group_id = level1_items['file' + ':' + str(file.id)]
-                            children = [k for k, v in level2_items.items() if str(group_id) in v]
+                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
+                            for child in child_items:
+                                child_item = {}
+                                type, url = get_child_data(child)
+                                child_item['type'] = type
+                                child_item['url'] = url
+                                children.append(child_item)
+                        
+                        item = {'type':'file', 'file':file, 'index':file.index, 'children': children}
 
                         if common_page_data['course_mode'] == 'draft':
                             prod_file = file.image
@@ -271,11 +288,19 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
                 for problem_set in problem_sets:
                     if problem_set.section_id == section.id and not level2_items.has_key('pset' + ':' + str(problem_set.id)):
-                        item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
-
+                        
+                        children = []
                         if level1_items.has_key('pset' + ':' + str(problem_set.id)):
                             group_id = level1_items['pset' + ':' + str(problem_set.id)]
-                            children = [k for k, v in level2_items.items() if str(group_id) in v]
+                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
+                            for child in child_items:
+                                child_item = {}
+                                type, url = get_child_data(child)
+                                child_item['type'] = type
+                                child_item['url'] = url
+                                children.append(child_item)
+                        
+                        item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index, 'children': children}
 
                         numQuestions = 0
                         for psetToEx in psetToExs:

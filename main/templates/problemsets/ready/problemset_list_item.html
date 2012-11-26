@@ -5,6 +5,17 @@
     <div class="course-list-content">
         <h4 class="pull-left"><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.problem_set.slug %}" title="{{item.problem_set.description}}">{{item.problem_set.title}}</a></h4>
         <div class="pull-right">
+        
+            {% if item.children %}
+                {% for child in item.children %}
+                     <div class="btn-group" style="float: left">
+                         <a href="{{child.url}}">
+                             <button class="btn btn-mini" title={{child.type}}>{{child.type}}</button>
+                         </a>
+                     </div>
+                {% endfor %}
+            {% endif %}
+        
             {% if item.numCompleted == item.numQuestions %}
                {% if not item.problem_set.assessment_type == "survey" %}
                 <span class="label">Complete with Score: {{item.score}} of {{item.numQuestions}}</span>
