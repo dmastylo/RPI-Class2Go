@@ -1,10 +1,10 @@
 from c2g.models import ProblemSet
 from datetime import datetime, timedelta
-from tests.test_base import SimpleTestBase
+from tests.test_base import AuthenticatedTestBase
 
 __all__ = ['InstructorDraftModeTestAdv']
 
-class InstructorDraftModeTestAdv(SimpleTestBase):
+class InstructorDraftModeTestAdv(AuthenticatedTestBase):
 
     def __init__(self, *arrgs, **kwargs):
         config = { 'username' : 'professor_0',

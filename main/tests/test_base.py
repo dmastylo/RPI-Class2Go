@@ -3,6 +3,15 @@ from django_nose import FastFixtureTestCase
 __all__ = ['SimpleTestBase']
 
 class SimpleTestBase(FastFixtureTestCase):
+    fixtures = ['db_snapshot.json']
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+class AuthenticatedTestBase(SimpleTestBase):
     """
     A base class for test classes that need to log in to the system and
     switch to edit mode to ensure access to the correct data.
@@ -19,7 +28,6 @@ class SimpleTestBase(FastFixtureTestCase):
     loginPath = '/%s/%s/preview_login/'
     userAgent = 'Mozilla/5.0'
     referer = 'http://testserver/%s/%s/preview/'
-    fixtures = ['db_snapshot.json']
 
     # the following are specific to each TestCase subclass and should be
     # passed in to __init__

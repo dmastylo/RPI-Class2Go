@@ -1,4 +1,4 @@
-from tests.test_base import SimpleTestBase
+from tests.test_base import AuthenticatedTestBase
 
 __all__ = ['test_standalone', 'InstructorDraftModeTest']
 
@@ -8,7 +8,7 @@ def test_standalone():
     """
     pass
 
-class InstructorDraftModeTest(SimpleTestBase):
+class InstructorDraftModeTest(AuthenticatedTestBase):
 
     def __init__(self, *arrgs, **kwargs):
         config = { 'username' : 'professor_0',
