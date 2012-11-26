@@ -210,12 +210,19 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         
                 for video in videos:
                     if video.section_id == section.id and not level2_items.has_key('video' + ':' + str(video.id)):
-                
+
+                        children = []
                         if level1_items.has_key('video' + ':' + str(video.id)):
                             group_id = level1_items['video' + ':' + str(video.id)]
-                            children = [k for k, v in level2_items.items() if str(group_id) in v]
-                
-                        item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
+                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
+                            for child in child_items:
+                                child_item = {}
+                                type, url = get_child_data(child)
+                                child_item['type'] = type
+                                child_item['url'] = url
+                                children.append(child_item)
+                                
+                        item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index, 'children': children}
 
                         numQuestions = 0
                         for videoToEx in videoToExs:
@@ -616,5 +623,24 @@ def get_group_item_data(group):
 
     return level, type, id
     
-                
-        
+def get_child_data(child):
+    parts = str(child).split(":")
+    type = parts[0]
+    id = parts[1]
+    
+    if type == 'video':
+        video = Video.objects.get(id=id)
+        url = 'videos/' + video.slug
+    elif type == 'pset':
+        pset = ProblemSet.objects.get(id=id)
+        url = 'problemsets/' + pset.slug
+    elif type == 'page':
+        page = AdditionalPage.objects.get(id=id)
+        url = 'pages/' + page.slug
+    elif type == 'file':
+        file = File.objects.get(id=id)
+        url = file.file.url
+    else:
+        url = ''
+    
+    return type, url

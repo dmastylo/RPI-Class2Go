@@ -15,7 +15,21 @@
                     </a>
                 </div>
                 {% endfor %}
-        {% endif %}
+            {% endif %}
+            
+            
+            {% if item.children %}
+                {% for child in item.children %}
+                     <div class="btn-group" style="float: left">
+                         <a href="{{child.url}}">
+                             <button class="btn btn-mini" title={{child.type}}></button>
+                         </a>
+                     </div>
+                {% endfor %}
+            {% endif %}
+                     
+                         
+                         
             {% if item.completed_percent > 90 %}
             <div class="progress progress-success progress-striped" style="margin-left:3px;">
             {% else %}
