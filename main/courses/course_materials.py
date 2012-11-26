@@ -13,20 +13,6 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
         files = File.objects.getByCourse(course=common_page_data['course'])
         groups = GroupItem.objects.getByCourse(course=common_page_data['course'])
         level1_items, level2_items = group_data(groups)
- #       print all_group_items
-
-#        for group_item in all_group_items:
-#            print "new group"
-#            for item in group_item:
-#                print item['type']
-#                print item['id']
-#                print item['level']
-                
-        print "**********"
-        print level2_items
-        print "**********"
-        print level1_items
-                
 
         if get_video_content:
             videos = Video.objects.getByCourse(course=common_page_data['course'])
@@ -167,8 +153,11 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_additional_page_content:
                 for page in pages:
                     if page.section_id == section.id and not level2_items.has_key('page' + ':' + str(page.id)):
-                        print "Found a non-level2 page: " + str(page.id)
                         item = {'type':'additional_page', 'additional_page':page, 'index':page.index}
+                        
+                        if level1_items.has_key('page' + ':' + str(page.id)):
+                            group_id = level1_items['page' + ':' + str(page.id)]
+                            children = [k for k, v in level2_items.items() if str(group_id) in v]
 
                         if common_page_data['course_mode'] == 'draft':
                             prod_page = page.image
@@ -191,8 +180,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_file_content:
                 for file in files:
-                    if file.section_id == section.id:
+                    if file.section_id == section.id and not level2_items.has_key('file' + ':' + str(file.id)):
                         item = {'type':'file', 'file':file, 'index':file.index}
+
+                        if level1_items.has_key('file' + ':' + str(file.id)):
+                            group_id = level1_items['file' + ':' + str(file.id)]
+                            children = [k for k, v in level2_items.items() if str(group_id) in v]
 
                         if common_page_data['course_mode'] == 'draft':
                             prod_file = file.image
@@ -217,18 +210,10 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         
                 for video in videos:
                     if video.section_id == section.id and not level2_items.has_key('video' + ':' + str(video.id)):
-                        print "Found a non-level2 video: " + str(video.id)
                 
                         if level1_items.has_key('video' + ':' + str(video.id)):
-                            print "Found a level1 video : " + str(video.id)
                             group_id = level1_items['video' + ':' + str(video.id)]
-                            print "group_id : " + str(group_id)
                             children = [k for k, v in level2_items.items() if str(group_id) in v]
-                            print "+++++++++++++++"
-                            print children
-                            #for child in children:
-                                
-                            
                 
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
 
@@ -278,8 +263,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_pset_content:
 
                 for problem_set in problem_sets:
-                    if problem_set.section_id == section.id:
+                    if problem_set.section_id == section.id and not level2_items.has_key('pset' + ':' + str(problem_set.id)):
                         item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
+
+                        if level1_items.has_key('pset' + ':' + str(problem_set.id)):
+                            group_id = level1_items['pset' + ':' + str(problem_set.id)]
+                            children = [k for k, v in level2_items.items() if str(group_id) in v]
 
                         numQuestions = 0
                         for psetToEx in psetToExs:
@@ -586,10 +575,6 @@ def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
 
 def group_data(groups):
     
-#    all_group_items = []
-#    group_item = []
-#    item = {}
-    
     level1_items = {}
     level2_items = {}
     
@@ -597,20 +582,14 @@ def group_data(groups):
     for group in groups:
         if group.group_id == group_id:
             level, type, id = get_group_item_data(group)
-#            item = {'level': level, 'type': type, 'id': id}
-#            group_item.append(item)
-            level2_items[type + ':' + str(id)] = str(group_id)
+            if level == 2:
+                level2_items[type + ':' + str(id)] = str(group_id)
         else:
-#            if group_id != None:
-#                all_group_items.append(group_item) 
             group_id = group.group_id
-#            group_item = []
             level, type, id = get_group_item_data(group)
-#            item = {'level': level, 'type': type, 'id': id}
-#            group_item.append(item)
-            level1_items[type + ':' + str(id)] = group_id
+            if level == 1:
+                level1_items[type + ':' + str(id)] = group_id
             
- #   all_group_items.append(group_item)
     return level1_items, level2_items
                 
 def get_group_item_data(group):
