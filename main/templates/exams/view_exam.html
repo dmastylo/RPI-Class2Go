@@ -26,6 +26,9 @@ div.problem, div.problem {float:left; width:95%;}
 #prev-question {float: left;}
 label pre {margin-left:30px;}
 
+/* BEGIN CSS hack up for today's demo */
+.quick-check {clear: both; display: block;}
+/* BEGIN CSS hack up for today's demo */
 </style>
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
@@ -106,6 +109,29 @@ label pre {margin-left:30px;}
             $('.question').eq(newQIdx).show();
         });
         
+        /* BEGIN JS hack up for today's demo */
+        var quickCheck = function () {
+            //alert($(this).attr('id'));
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    var csrftoken = '{{ csrf_token }}';
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            });
+            $.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, function(data) {var myXML = $.parseXML(data); alert($(myXML).find('solution'));});
+        };
+
+        $('.question').each(function (idx, el) {
+            var tmpBtn = document.createElement('input');
+            $(tmpBtn).attr('type','button');
+            $(tmpBtn).attr('id','quickCheck_' + idx);
+            $(tmpBtn).addClass('btn').addClass('quick-check');
+            $(tmpBtn).attr('value', 'Check Answer');
+            $(this).append($(tmpBtn));
+        });
+
+        $('.quick-check').click(quickCheck);
+        /* END JS hack up for today's demo */
     {% endif %}
 
     var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";

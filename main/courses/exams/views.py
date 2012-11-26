@@ -88,6 +88,21 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores, 'editable':editable}, RequestContext(request))
 
+# BEGIN Hack function for today's demo
+@require_POST
+@auth_view_wrapper
+def show_quick_check(request, course_prefix, course_suffix, exam_slug):
+    course = request.common_page_data['course']
+    parser = HTMLParser.HTMLParser()
+    question_data = parser.unescape(request.POST['question-data'])
+ 
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    return render_to_response('exams/quickcheck.html', {'common_page_data':request.common_page_data, 'exam':exam, 'question-data':question_data, }, RequestContext(request))
+# END Hack function for today's demo
 
 @auth_view_wrapper
 def show_graded_exam(request, course_prefix, course_suffix, exam_slug):
