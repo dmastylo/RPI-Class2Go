@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 from c2g.models import *
-from courses.course_materials import get_course_materials
+from courses.course_materials import get_course_materials, group_data
 from courses.common_page_data import get_common_page_data
 import re
 from django.contrib import messages
@@ -69,8 +69,10 @@ def main(request, course_prefix, course_suffix):
     pset_list =  ProblemSet.objects.getByCourse(course=course)
     additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
     file_list = File.objects.getByCourse(course=course)
+    groups = GroupItem.objects.getByCourse(course=course)
+    level1_items, level2_items = group_data(groups)
 
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, level2_items)
 
     return render_to_response('courses/view.html',
             {'common_page_data': common_page_data,
@@ -114,7 +116,7 @@ def unenroll(request, course_prefix, course_suffix):
     return redirect(request.META['HTTP_REFERER'])
 
 
-def get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list):
+def get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, level2_items):
 
     full_index_list = []
     full_contentsection_list=[]
@@ -123,19 +125,19 @@ def get_full_contentsection_list(course, contentsection_list, video_list, pset_l
     
         index_list = []
         for video in video_list:
-            if video.section_id == contentsection.id:
+            if video.section_id == contentsection.id and not level2_items.has_key('video' + ':' + str(video.id)):
                 index_list.append(('video', video.index, video.id, contentsection.id, video.slug, video.title))
 
         for pset in pset_list:
-            if pset.section_id == contentsection.id:
+            if pset.section_id == contentsection.id and not level2_items.has_key('pset' + ':' + str(pset.id)):
                 index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
                 
         for page in additional_pages:
-            if page.section_id == contentsection.id:
+            if page.section_id == contentsection.id and not level2_items.has_key('page' + ':' + str(page.id)):
                 index_list.append(('additional_page', page.index, page.id, contentsection.id, page.slug, page.title))
 
         for file in file_list:
-            if file.section_id == contentsection.id:
+            if file.section_id == contentsection.id and not level2_items.has_key('file' + ':' + str(file.id)):
                 icon_type = file.get_icon_type()
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
