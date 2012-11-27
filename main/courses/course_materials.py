@@ -153,18 +153,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_additional_page_content:
                 for page in pages:
                     
-                    if page.section_id == section.id and not level2_items.has_key('page' + ':' + str(page.id)):
-                        
-                        children = []
-                        if level1_items.has_key('page' + ':' + str(page.id)):
-                            group_id = level1_items['page' + ':' + str(page.id)]
-                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
-                            for child in child_items:
-                                child_item = {}
-                                type, url = get_child_data(child)
-                                child_item['type'] = type
-                                child_item['url'] = url
-                                children.append(child_item)
+                    key = 'page:' + str(page.id)
+                    if page.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
                         
                         item = {'type':'additional_page', 'additional_page':page, 'index':page.index, 'children': children}
 
@@ -189,18 +180,10 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_file_content:
                 for file in files:
-                    if file.section_id == section.id and not level2_items.has_key('file' + ':' + str(file.id)):
-                        
-                        children = []
-                        if level1_items.has_key('file' + ':' + str(file.id)):
-                            group_id = level1_items['file' + ':' + str(file.id)]
-                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
-                            for child in child_items:
-                                child_item = {}
-                                type, url = get_child_data(child)
-                                child_item['type'] = type
-                                child_item['url'] = url
-                                children.append(child_item)
+                    
+                    key = 'file:' + str(file.id)
+                    if file.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
                         
                         item = {'type':'file', 'file':file, 'index':file.index, 'children': children}
 
@@ -226,18 +209,10 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_video_content:
                         
                 for video in videos:
-                    if video.section_id == section.id and not level2_items.has_key('video' + ':' + str(video.id)):
-
-                        children = []
-                        if level1_items.has_key('video' + ':' + str(video.id)):
-                            group_id = level1_items['video' + ':' + str(video.id)]
-                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
-                            for child in child_items:
-                                child_item = {}
-                                type, url = get_child_data(child)
-                                child_item['type'] = type
-                                child_item['url'] = url
-                                children.append(child_item)
+                    
+                    key = 'video:' + str(video.id)
+                    if video.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
                                 
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index, 'children': children}
 
@@ -287,18 +262,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_pset_content:
 
                 for problem_set in problem_sets:
-                    if problem_set.section_id == section.id and not level2_items.has_key('pset' + ':' + str(problem_set.id)):
-                        
-                        children = []
-                        if level1_items.has_key('pset' + ':' + str(problem_set.id)):
-                            group_id = level1_items['pset' + ':' + str(problem_set.id)]
-                            child_items = [k for k, v in level2_items.items() if str(group_id) in v]
-                            for child in child_items:
-                                child_item = {}
-                                type, url = get_child_data(child)
-                                child_item['type'] = type
-                                child_item['url'] = url
-                                children.append(child_item)
+                    key = 'pset:' + str(problem_set.id)
+                    if problem_set.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
                         
                         item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index, 'children': children}
 
@@ -647,6 +613,19 @@ def get_group_item_data(group):
         id = group.exam_id
 
     return level, type, id
+
+def get_children(key, level1_items, level2_items):
+    children = []
+    if level1_items.has_key(key):
+        group_id = level1_items[key]
+        child_items = [k for k, v in level2_items.items() if str(group_id) in v]
+        for child in child_items:
+            child_item = {}
+            type, url = get_child_data(child)
+            child_item['type'] = type
+            child_item['url'] = url
+            children.append(child_item)
+    return children
     
 def get_child_data(child):
     parts = str(child).split(":")
