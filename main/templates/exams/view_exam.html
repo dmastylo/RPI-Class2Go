@@ -28,6 +28,10 @@ label pre {margin-left:30px;}
 
 /* BEGIN CSS hack up for today's demo */
 .quick-check {clear: both; display: block;}
+.explanation {background: #fff; border-radius: 3px; padding: 1em;}
+#exam-pane .explanation p {margin: 0; padding: 0;}
+#exam-pane fieldset label {position: relative;}
+#exam-pane .inline-explanation {position: absolute; right: -10em;}
 /* BEGIN CSS hack up for today's demo */
 </style>
 
@@ -111,14 +115,62 @@ label pre {margin-left:30px;}
         
         /* BEGIN JS hack up for today's demo */
         var quickCheck = function () {
-            //alert($(this).attr('id'));
+
+            var checkBtnID = $(this).attr('id');
+            var assocQ = $(this).closest('.question');
+            var assocQID = $(assocQ).attr('id');
+
+            if ($(this).attr('value') == "Hide Answer") {
+                $('#' + assocQID + '-expl').empty().remove();
+                $(this).attr('value', 'Check Answer');
+                return;
+            }
+
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     var csrftoken = '{{ csrf_token }}';
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 }
             });
-            $.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, function(data) {var myXML = $.parseXML(data); alert($(myXML).find('solution'));});
+
+            var displayMetaData = function (data) {
+                console.log('displayMetaData called');
+                console.log(data);
+                var myXML = $.parseXML(data);
+                var examMD = $(myXML).find('exam_metadata');
+                var questionMD = $(examMD).find('question_metadata#' + assocQID);
+                var mySolution = $(questionMD).find('solution');
+                var myResponse = $(questionMD).find('response');
+
+                var responseType = $(myResponse).attr('answertype');
+                if (responseType == "multiplechoiceresponse") {
+                    var choices = $(myResponse).find('choice');
+                    choices.each(function () {
+                        var tmpInlineExpl = document.createElement('span');
+                        $(tmpInlineExpl).addClass('inline-explanation');
+                        $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+                        $(tmpInlineExpl).append($(this).find('explanation').text());
+                        $('#' + $(this).attr('id')).after($(tmpInlineExpl));
+                    });
+                }
+
+                var explArea = $('#' + assocQID + '-expl');
+                if (explArea.length == 0) {
+                    explArea = document.createElement('div');
+                    $(explArea).attr('id', assocQID + '-expl');
+                    $(explArea).addClass('explanation');
+                }
+                $(explArea).empty();
+                $('#' + assocQID + ' .quick-check').before($(explArea));
+                $(mySolution).children().each(function () {
+                    $(explArea).append($(this));
+                });
+
+                $('#' + checkBtnID).attr('value','Hide Answer');
+            };
+
+            //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
+            $.post('{{exam.slug}}/quick_check', {'question-data':''}, displayMetaData);
         };
 
         $('.question').each(function (idx, el) {
