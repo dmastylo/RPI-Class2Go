@@ -157,7 +157,9 @@ urlpatterns = patterns('',
     url(r'^content_section/get_children_as_contentgroup_parents/(?P<section_id>[0-9]+)/?$', 'courses.content_sections.actions.get_children_as_contentgroup_parents'),
 
     # Videos
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/?$', 'courses.videos.views.list'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/?$',
+        'courses.videos.views.list',
+        name='course_video_list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/upload$', 'courses.videos.views.upload'),
     url(r'^switch_video_quiz_mode', 'courses.videos.actions.switch_quiz_mode'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.videos.views.view'),
