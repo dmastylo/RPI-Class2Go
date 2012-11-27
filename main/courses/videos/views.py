@@ -213,7 +213,7 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
                     #If exercise already in video, don't need to create new videoToEx, just update video_time
                     #If exercise already in video but deleted, undelete
                     #Otherwise create new videoToEx
-                    queryVideoToEx = VideoToExercise.objects.filter(video=video, exercise=exercise, mode='draft')
+                    queryVideoToEx = VideoToExercise.objects.filter(video=video, exercise=exercise, mode='draft').order_by('-id')
                     if queryVideoToEx.exists():
                         existingVideoToEx = queryVideoToEx[0]
                         if existingVideoToEx.is_deleted == 1:

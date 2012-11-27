@@ -370,7 +370,7 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
                     #If exercise already in pset, don't need to create new psetToEx
                     #If exercise already in pset but deleted, undelete
                     #Otherwise create new psetToEx
-                    queryPsetToEx = ProblemSetToExercise.objects.filter(problemSet=pset, exercise=exercise, mode='draft')
+                    queryPsetToEx = ProblemSetToExercise.objects.filter(problemSet=pset, exercise=exercise, mode='draft').order_by('-id')
                     if queryPsetToEx.exists():
                         existingPsetToEx = queryPsetToEx[0]
                         if existingPsetToEx.is_deleted == 1:
