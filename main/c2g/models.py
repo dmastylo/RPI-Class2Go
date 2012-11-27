@@ -1613,4 +1613,6 @@ class ExamScoreField(TimestampMixin, models.Model):
     field_name = models.CharField(max_length=128, db_index=True)
     subscore = models.IntegerField(default=0)
 
-
+class CurrentTermMap(TimestampMixin, models.Model):
+    course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
+    course_suffix = models.CharField(max_length=64)
