@@ -1,6 +1,7 @@
 {% load url from future %}
 
 {% if item.children %}
+    <!-- child item block -->
     {% for child in item.children %}
         <div class="btn-group" style="float: left">
             <a href="{{child.url}}">
@@ -8,4 +9,5 @@
             </a>
         </div>
     {% endfor %}
+    <!-- end child item block -->
 {% endif %}

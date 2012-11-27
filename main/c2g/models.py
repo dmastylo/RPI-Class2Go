@@ -278,41 +278,34 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
         self.save()
 
-    def getChildren(self):
+    def getChildren(self, gettagged=False, getsorted=True):
+        """Return the child items of this section: Videos, Files, etc.
+
+        If gettagged is True, return a list of dictionaries having some item 
+        metadata in addition to the item reference, otherwise return only a 
+        list of item references.
+
+        If getsorted is True, return the list sorted by 'index' field, which
+        indicates manual sorting preference; otherwise ordering is unspecified.
+        """
+
         dict_list = []
-        output_list = []
+        for tag, cls in ContentGroupGroupFactory.groupable_types.iteritems():
+            dict_list.extend([{'item':item, 'index':item.index, 'type':tag} for item in cls.objects.getBySection(section=self)])
 
-        videos = Video.objects.getBySection(section=self)
-        for item in videos:
-            dict_list.append({'item':item, 'index':item.index})
-
-        problemsets = ProblemSet.objects.getBySection(section=self)
-        for item in problemsets:
-            dict_list.append({'item':item, 'index':item.index})
-
-        additionalpages = AdditionalPage.objects.getBySection(section=self)
-        for item in additionalpages:
-            dict_list.append({'item':item, 'index':item.index})
-            
-        files = File.objects.getBySection(section=self)
-        for item in files:
-            dict_list.append({'item':item, 'index':item.index})
-
-        sorted_dict_list = sorted(dict_list, key=lambda k: k['index'])
-
-        for item in sorted_dict_list:
-            output_list.append(item['item'])
-
-        return output_list
+        if getsorted:
+            dict_list = sorted(dict_list, key=lambda k: k['index'])
+        return dict_list if gettagged else [x['item'] for x in dict_list]
 
     def countChildren(self):
-        return len(self.getChildren)
+        return len(self.getChildren(gettagged=True, getsorted=False))
 
     def getNextIndex(self):
-        # We will not return len(children)+1 since this approach is not fail safe. If an index is skipped for whatever reason, we want to make sure we are still robust
-        # So what if the children list is empty?
+        # We will not return len(children)+1 since this approach is not fail-
+        # safe. If an index is skipped for whatever reason, we want to make
+        # sure we are still robust
         children = self.getChildren()
-        if len(children) == 0 :
+        if len(children) == 0:
             return 1
         
         if children[-1].index == None:
@@ -1592,6 +1585,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
     objects = ExamManager()
     total_score = models.IntegerField(null=True, blank=True)
+    exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
     
     
     def past_due(self):
@@ -1774,6 +1768,16 @@ class ExamRecordScoreField(TimestampMixin, models.Model):
     associated_text = models.TextField(null=True, blank=True)
 
 
+class CurrentTermMap(TimestampMixin, models.Model):
+    course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
+    course_suffix = models.CharField(max_length=64)
+    def __unicode__(self):
+        return (self.course_prefix + "--" + self.course_suffix)
+
+class StudentExamStart(TimestampMixin, models.Model):
+    student = models.ForeignKey(User)
+    exam = models.ForeignKey(Exam)
+
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course).order_by('group_id','level')
@@ -1788,20 +1792,188 @@ class ContentGroup(models.Model):
     exam = models.ForeignKey(Exam, null=True, blank=True)
     course = models.ForeignKey(Course)
     objects = ContentGroupManager()
-    
+
+    def get_content_type(self):
+        """This is linear in the number of content types supported for grouping
+        
+        TODO: Replace with a column lookup storing our type explicitly? Not
+              nice to store the same information twice, but constant time
+              lookups are awfully nice...
+        """
+        for keyword in ContentGroupGroupFactory.groupable_types.keys():
+            if getattr(self, keyword, False):
+                return keyword
+        return None
+
+    def __repr__(self):
+        s = "ContentGroup(group_id=" + str(self.group_id) + ", "
+        s += 'course=' + str(self.course.id) + ', ' 
+        s += 'level=' + str(self.level)
+        for keyword in ContentGroupGroupFactory.groupable_types.keys():
+            ref = getattr(self, keyword, '')
+            if not ref or ref == "None":
+                continue
+            s += ', ' + keyword+'=<' + str(ref.id) + '>'
+        return s+')'
+
     def __unicode__(self):
-        return (self.group_id)
+        return unicode(self.group_id)
     
     class Meta:
         db_table = u'c2g_content_group'
         
-        
-class CurrentTermMap(TimestampMixin, models.Model):
-    course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
-    course_suffix = models.CharField(max_length=64)
-    def __unicode__(self):
-        return (self.course_prefix + "--" + self.course_suffix)
+class ContentGroupGroupFactory(object):
+               # ContentGroup field name: model class name
+    groupable_types = { 
+                       'video':           Video,
+                       'problemSet':      ProblemSet,
+                       'additional_page': AdditionalPage, 
+                       'file':            File,
+                      }
 
-class StudentExamStart(TimestampMixin, models.Model):
-    student = models.ForeignKey(User)
-    exam = models.ForeignKey(Exam)
+    def __init__(self, course_ref, *args):
+        ### FIXME: remove this and make this functionality part of ContentGroup (!?)
+        """Instantiate a new content group with a set of parents and children
+
+        Accepts a course reference and an iterable of tuples of the form
+        (type_tag, item_reference)
+        where type_tag is a string like 'problemSet' referring to the class
+        members of ContentGroup.
+
+        The first such tuple is set to be the parent ContentGroup entry, and
+        each subsequent tuple represents a child item in the same ContentGroup.
+        """
+        self.group_id = -1
+
+        for item_type, item in args:
+            if self.group_id == -1:
+                self.group_id = self.add_parent(course_ref, item_type, item)
+            else:
+                self.add_child(self.group_id, item_type, item)
+        return self.group_id
+
+    @classmethod
+    def add_child(thisclass, group_id, tag, obj_ref):
+        """Add obj_ref having type tag to the ContentGroup table.
+
+        Returns the ContentGroup entry id for the resulting child item.
+
+        If group_id doesn't correspond to an existing ContentGroup.group_id, raises ValueError
+        If entry isn't in the table, create it and add it
+        If entry is in the table as a parent of the given group_id, demote it
+        If entry is in the table as a child of a different group, move it to this group.
+        """
+        # Technically there's no reason to restrict the ContentGroups
+        # to two levels of hierarchy, but the UI design is harder for
+        # more level (and as of this iteration the spec says two)
+        cgref         = None
+        content_group = ContentGroup.objects.filter(group_id=group_id)
+        if not content_group:
+            raise ValueError, "ContentGroup "+str(group_id)+" does not exist."
+        try:
+            cgref = obj_ref.contentgroup_set.get()
+        except ContentGroup.DoesNotExist:
+            # it's not in the table, so add it
+            new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id)
+            setattr(new_item, tag, obj_ref)
+            new_item.save()
+            return new_item.id
+        else:
+            # it is in the table, so do something reasonable:
+            for entry in content_group:
+                if getattr(entry, tag, False) == obj_ref:
+                    # If this child is in this group already, return this group
+                    # But if this child is a parent of this group, make it a child first
+                    if entry.level == 1:
+                        entry.level = 2
+                        entry.save()
+                    return entry.id
+            # We have a reference to it, but it's not in content_group
+            if content_group and cgref:
+                cgref.group_id = group_id
+                cgref.level = 2
+                cgref.save()
+            return cgref.id
+
+    @classmethod
+    def add_parent(thisclass, course_ref, tag, obj_ref):
+        """Add obj_ref having type tag to the ContentGroup table.
+
+        Returns a group_id of the resulting ContentGroup.
+        Note that this is the same as the parent object's ContentGroup id.
+
+        If it is already a parent of a ContentGroup, just return
+        If it is nonexistent in ContentGroup, create it as a parent
+        If it is already a child in a group with no parent, promote it
+        If it is a child in a group that has a parent, promote it, creating a
+            new group
+        """
+        group_id = -1
+        cgref    = None
+        try:
+            cgref = obj_ref.contentgroup_set.get()
+        except ContentGroup.DoesNotExist:
+            new_item = ContentGroup(course=course_ref, level=1)
+            new_item.save()
+            setattr(new_item, tag, obj_ref)
+            new_item.group_id = new_item.id
+            new_item.save()
+            return new_item.group_id
+        else:
+            for cgo in ContentGroup.objects.filter(group_id=cgref.group_id):
+                if cgo.level == 1: 
+                    if getattr(cgo, tag, None) == obj_ref:
+                        # This happens when this item is already the parent of its group
+                        return cgref.group_id
+                    else:
+                        # This happens when this item is already a child in a
+                        # group with a different parent (promote it, creating a new group)
+                        cgref.group_id = cgref.id
+                        cgref.level = 1
+                        cgref.save()
+                        return cgref.group_id
+            # This happens when this item is already a child in a group with no parent
+            cgref.level = 1
+            cgref.save()
+            for cgo in ContentGroup.objects.filter(group_id=cgref.group_id):
+                cgo.group_id = cgref.id
+                cgo.save()
+            return cgref.group_id
+
+    @classmethod
+    def groupinfo_by_id(thisclass, tag, id):
+        """Reverse-lookup the members of a group by the object id of a member.
+        
+        nota bene:
+        O(n**2) for # of items in a group. n should be tiny, but be wary.
+        OTOH, if ContentGroup.get_content_type becomes constant-time, this
+        becomes linear, and then we win.
+        """
+        info = {}
+        cls = thisclass.groupable_types[tag]
+        obj = cls.objects.get(id=id)
+        cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
+        for cgo in cgobjs:
+            cttag = cgo.get_content_type()
+            cgref = getattr(cgo, cttag)
+            if not cttag or not cgref:
+                continue
+            if cgo.level == 1:
+                info['__parent'] = cgref
+            else:
+                info.setdefault('__children', []).append(cgref)
+            info.setdefault(cttag, []).append(cgref)
+        if info:
+            info['__group_id'] = cgobjs[0].group_id
+        return info
+
+    @classmethod
+    def get_level2_tag_sorted(cls):
+        info = {}
+        l2cgobjs = ContentGroup.objects.filter(level=2)
+        for l2o in l2cgobjs:
+            l2o_type = l2o.get_content_type()
+            info.setdefault(l2o_type, []).append(getattr(l2o, l2o_type).id)
+        return info
+
+
