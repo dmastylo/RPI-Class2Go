@@ -1648,4 +1648,6 @@ class ExamRecordScoreField(TimestampMixin, models.Model):
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
 
-
+class CurrentTermMap(TimestampMixin, models.Model):
+    course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
+    course_suffix = models.CharField(max_length=64)
