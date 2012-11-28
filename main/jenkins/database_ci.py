@@ -1,12 +1,12 @@
 import os
 
-if os.environ.has_key('C2G_JENKINS_DB_NAME'):
-  DBNAME = os.environ.get('C2G_JENKINS_DB_NAME')
+if os.environ.has_key('C2G_JENKINS_DBNAME'):
+  DBNAME = os.environ.get('C2G_JENKINS_DBNAME')
 else:
-  DBNAME = 'c2g_jenkins'
+  DBNAME = 'class2go'
 
 DATABASES = {
-    DBNAME: {
+    'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': DBNAME,                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
