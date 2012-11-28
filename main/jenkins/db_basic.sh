@@ -41,9 +41,9 @@ fi
 
 mysql --batch -e "drop database if exists ${JENKINS_DB_NAME}; create database ${JENKINS_DB_NAME} default character set 'utf8' default collate 'utf8_unicode_ci';"
 
-python main/manage.py syncdb --noinput
+python main/manage.py syncdb --database=${JENKINS_DB_NAME} --noinput
 
-python main/manage.py migrate --noinput
+python main/manage.py migrate --database=${JENKINS_DB_NAME} --noinput
 
-python main/manage.py db_populate
+#python main/manage.py db_populate --database=${JENKINS_DB_NAME}
 
