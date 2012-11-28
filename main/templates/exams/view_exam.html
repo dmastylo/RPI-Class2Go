@@ -28,10 +28,11 @@ label pre {margin-left:30px;}
 
 /* BEGIN CSS hack for Wed demo */
 .quick-check {clear: both; display: block;}
-.explanation {background: #fff; border-radius: 3px; padding: 1em;}
-#exam-pane .explanation p {margin: 0; padding: 0;}
+.explanation {background: #fff; border-radius: 3px; margin-bottom: .5em; padding: 1em;}
+#exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
 #exam-pane fieldset label {position: relative;}
 #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 80%; margin-left: 10px; padding: 1px;}
+#exam-pane .correct {color: #090;}
 /* BEGIN CSS hack for Wed demo */
 </style>
 
@@ -209,10 +210,13 @@ label pre {margin-left:30px;}
                         var correctVal = $(this).text();
                         console.log('correctVal: ' + correctVal);
                         var inputEl = $('input[name|="' + inputName + '"]');
-                        console.log($(inputEl).val());
-                        console.log(correctVal);
-                        console.log($(inputEl).val() == correctVal);
-                        if ($(inputEl).val() == correctVal.toString()) {
+                        console.log('userData'); 
+                        console.log(typeof userData[inputName]); 
+                        console.log(userData[inputName]); 
+                        console.log(correctVal); 
+                        console.log(parseFloat(userData[inputName]) == correctVal);
+                        console.log(' '); 
+                        if (typeof userData[inputName] != "undefined" && (parseFloat(userData[inputName]) == correctVal)) {
                             $(inputEl).after('<span class="inline-explanation correct">Correct</span>'); 
                         } else {
                             $(inputEl).after('<span class="inline-explanation incorrect">Incorrect</span>'); 
@@ -229,7 +233,11 @@ label pre {margin-left:30px;}
                 $(explArea).empty();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
-                    $(explArea).append($(this));
+                    if ($(this).text() == 'Explanation') {
+                        $(explArea).append('<h4>' + $(this).text() + '</h4>');
+                    } else {
+                        $(explArea).append($(this));
+                    }
                 });
 
                 $('#' + checkBtnID).attr('value','Hide Answer');
