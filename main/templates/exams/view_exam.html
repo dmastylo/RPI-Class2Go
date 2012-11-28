@@ -27,7 +27,7 @@ div.problem, div.problem {float:left; width:95%;}
 label pre {margin-left:30px;}
 
 /* BEGIN CSS hack for Wed demo */
-.quick-check {clear: both; display: block;}
+.quick-check {clear: both; display: block; margin-top: 1em;}
 .explanation {background: #fff; border-radius: 3px; margin-bottom: .5em; padding: 1em;}
 #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
 #exam-pane fieldset label {position: relative;}
@@ -121,10 +121,10 @@ label pre {margin-left:30px;}
             var assocQ = $(this).closest('.question');
             var assocQID = $(assocQ).attr('id');
 
-            if ($(this).attr('value') == "Hide Answer") {
+            if ($(this).attr('value') == "Hide Answers") {
                 $('#' + assocQID + '-expl').empty().remove();
                 $('#' + assocQID).find('.inline-explanation').remove();
-                $(this).attr('value', 'Check Answer');
+                $(this).attr('value', 'Check Answers');
                 return;
             }
 
@@ -236,7 +236,7 @@ label pre {margin-left:30px;}
                     }
                 });
 
-                $('#' + checkBtnID).attr('value','Hide Answer');
+                $('#' + checkBtnID).attr('value','Hide Answers');
             };
 
             //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
@@ -250,7 +250,7 @@ label pre {margin-left:30px;}
             $(tmpBtn).attr('type','button');
             $(tmpBtn).attr('id','quickCheck_' + idx);
             $(tmpBtn).addClass('btn').addClass('quick-check');
-            $(tmpBtn).attr('value', 'Check Answer');
+            $(tmpBtn).attr('value', 'Check Answers');
             $(this).append($(tmpBtn));
         });
 
@@ -416,6 +416,7 @@ label pre {margin-left:30px;}
                 //console.log(userSelections);
                 var tmpObj = {};
                 tmpObj.value = $(this).attr('value');
+                $(this).parent().find('span').remove();
                 tmpObj.associatedText = $(this).parent().text();
                 tmpObj.tag4humans = $(this).attr('tag4humans');
                 tmpObj.questionTag4humans = $(this).closest('fieldset').attr('tag4humans');
