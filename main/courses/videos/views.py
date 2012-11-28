@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import Context, loader
-from c2g.models import Course, Video, VideoToExercise, Exercise, PageVisitLog, ProblemSet, AdditionalPage, File, GroupItem
+from c2g.models import Course, Video, VideoToExercise, Exercise, PageVisitLog, ProblemSet, AdditionalPage, File, ContentGroup
 
 from c2g.models import Course, Video, VideoActivity, ProblemActivity
 from courses.common_page_data import get_common_page_data
@@ -109,7 +109,7 @@ def view(request, course_prefix, course_suffix, slug):
     pset_list =  ProblemSet.objects.getByCourse(course=course)
     additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
     file_list = File.objects.getByCourse(course=course)
-    groups = GroupItem.objects.getByCourse(course=course)
+    groups = ContentGroup.objects.getByCourse(course=course)
     level1_items, level2_items = group_data(groups)
 
     full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, level2_items)

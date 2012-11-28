@@ -11,7 +11,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
         pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
         files = File.objects.getByCourse(course=common_page_data['course'])
-        groups = GroupItem.objects.getByCourse(course=common_page_data['course'])
+        groups = ContentGroup.objects.getByCourse(course=common_page_data['course'])
         level1_items, level2_items = group_data(groups)
 
         if get_video_content:

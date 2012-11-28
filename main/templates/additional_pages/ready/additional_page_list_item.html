@@ -6,15 +6,7 @@
         <h4 class="pull-left"><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4>
         
         <div class="pull-right">
-            {% if item.children %}
-                {% for child in item.children %}
-                     <div class="btn-group" style="float: left">
-                         <a href="{{child.url}}">
-                             <button class="btn btn-mini" title={{child.type}}>{{child.type}}</button>
-                         </a>
-                     </div>
-                {% endfor %}
-            {% endif %}
+            {% include "content_group_buttons.html" %}
         </div>
         
     </div>

@@ -69,7 +69,7 @@ def main(request, course_prefix, course_suffix):
     pset_list =  ProblemSet.objects.getByCourse(course=course)
     additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
     file_list = File.objects.getByCourse(course=course)
-    groups = GroupItem.objects.getByCourse(course=course)
+    groups = ContentGroup.objects.getByCourse(course=course)
     level1_items, level2_items = group_data(groups)
 
     full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, level2_items)
