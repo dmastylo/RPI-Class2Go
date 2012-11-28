@@ -43,18 +43,6 @@ class ManageExercisesForm(forms.Form):
     video_time = forms.IntegerField(min_value=0)
     course = forms.CharField(widget=(forms.HiddenInput()))
 
-    #Check to make sure added exercise file names are unique to the course
-    def clean(self):
-        cleaned_data = super(ManageExercisesForm, self).clean()
-        file = cleaned_data.get('file')
-        course = cleaned_data.get('course')
-        if file and course:
-            course_inst = Course.objects.get(id=course)
-            exercises = Exercise.objects.filter(handle=course_inst.handle, fileName=file, is_deleted=0)
-            if len(exercises) > 0:
-                self._errors['file'] = self.error_class(['An exercise by this name has already been uploaded'])
-        return cleaned_data
-
 class AdditionalExercisesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         used_exercises = kwargs.pop('used_exercises', None)
