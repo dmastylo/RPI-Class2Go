@@ -29,7 +29,8 @@ class StudentVideoTest(AuthenticatedTestBase):
                                    'course_suffix' : self.courseSuffix })
 
         # fetch the response
-        response = self.client.get(test_url)
+        response = self.client.get(test_url,
+                                   HTTP_USER_AGENT=self.userAgent )
         self.assertEqual(response.status_code, 200)
 
         # ensure we got the correct page by matching the title
