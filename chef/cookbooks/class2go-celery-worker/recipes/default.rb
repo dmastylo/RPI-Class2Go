@@ -46,7 +46,7 @@ node["apps"].keys.each do |app|
         action :create
     end
 
-    service "celeryd" do
+    service "celeryd-#{app}" do
         start_command "/etc/init.d/celeryd-#{app} start"
         supports :status => true, :restart => true, :reload => true
         action [ :enable, :restart ]
