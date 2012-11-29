@@ -26,15 +26,22 @@ div.problem, div.problem {float:left; width:95%;}
 #prev-question {float: left;}
 label pre {margin-left:30px;}
 
-/* BEGIN CSS hack for Wed demo */
+/* BEGIN CSS for Wed demo */
 .quick-check {clear: both; display: block; margin-top: 1em;}
 .explanation {background: #fff; border-radius: 3px; margin-bottom: .5em; padding: 1em;}
 #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
 #exam-pane fieldset label {position: relative;}
 #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
 #exam-pane .correct {color: #090;}
-/* BEGIN CSS hack for Wed demo */
+/* END CSS for Wed demo */
 </style>
+{% if videotest %}
+<style>
+{% include 'exams/videotest.css' %}
+#exam-pane {/*position: absolute;*/ display: none; width: 800px;}
+#problemset-nav {display: none;}
+</style>
+{% endif %}
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
 
@@ -61,8 +68,14 @@ label pre {margin-left:30px;}
     </div>
     {% endif %}
 
+    {% if not videotest %}
     <input class="btn" type="submit" value="Submit Problem Set" />
+    {% endif %}
     </div>
+    {% if videotest %}
+        <div id="demoplayer"></div>
+        <div id="slideIndex"></div>
+    {% endif %}
 
 {% endif %}
 
@@ -73,6 +86,9 @@ label pre {margin-left:30px;}
 
 
 {% block addl_scripts %}
+    {% if videotest %}
+        <script src="http://cdn.popcornjs.org/code/dist/popcorn-complete.min.js"></script>
+    {% endif %}
 <script>
     var __exam_type = "exam";
     {% if exam.exam_type != "exam" %}
@@ -114,7 +130,7 @@ label pre {margin-left:30px;}
             $('.question').eq(newQIdx).show();
         });
         
-        /* BEGIN JS hack for Wed demo */
+        /* BEGIN JS for Wed demo */
         var quickCheck = function () {
 
             var checkBtnID = $(this).attr('id');
@@ -255,7 +271,7 @@ label pre {margin-left:30px;}
         });
 
         $('.quick-check').click(quickCheck);
-        /* END JS hack for Wed demo */
+        /* END JS for Wed demo */
     {% endif %}
 
     var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
@@ -497,4 +513,9 @@ label pre {margin-left:30px;}
     });
     
 </script>
+{% if videotest %}
+<script>
+{% include 'exams/videotest.js' %}
+</script>
+{% endif %}
 {% endblock addl_scripts %}

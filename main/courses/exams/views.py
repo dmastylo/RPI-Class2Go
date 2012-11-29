@@ -69,7 +69,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
         raise Http404
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
-                              'scores':"{}",'editable':True,'single_question':True,
+                              'scores':"{}",'editable':True,'single_question':True,'videotest':True,
                               'exam':exam}, RequestContext(request))
 
 @require_POST
@@ -88,7 +88,7 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores, 'editable':editable}, RequestContext(request))
 
-# BEGIN Hack function for Wed demo
+# BEGIN function for Wed demo
 @require_POST
 @auth_view_wrapper
 def show_quick_check(request, course_prefix, course_suffix, exam_slug):
@@ -101,8 +101,11 @@ def show_quick_check(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    return render_to_response('exams/quickcheck.html', {'common_page_data':request.common_page_data, 'exam':exam, 'user_answer_data':user_answer_data}, RequestContext(request))
-# END Hack function for Wed demo
+    return render_to_response('exams/quickcheck.html', {'common_page_data':request.common_page_data, 'exam':exam, 'user_answer_data':user_answer_data, 'videotest':True}, RequestContext(request))
+# END function for Wed demo
+
+def show_invideo_quiz(request, course_prefix, course_suffix, exam_slug):
+    return render_to_response('exams/videotest.html', {'common_page_data':request.common_page_data}, RequestContext(request))
 
 @auth_view_wrapper
 def show_graded_exam(request, course_prefix, course_suffix, exam_slug):
