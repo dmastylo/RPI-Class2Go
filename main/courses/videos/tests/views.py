@@ -42,7 +42,7 @@ class StudentVideoTest(AuthenticatedTestBase):
         # parse the html into a tree and run an xpath for video list items.
         # there should be 3 live videos in the content
         tree = etree.HTML(response.content)
-        result = tree.xpath('//*[contains(@class, "course-list-item")]')
+        result = tree.xpath('//li[@class="course-list-item"]')
         self.assertEqual(len(result), 3, msg="Wrong number of live videos.")
 
     def test_course_video(self):
@@ -50,4 +50,33 @@ class StudentVideoTest(AuthenticatedTestBase):
         Tests the display of an individual video
         """
         # check for the iframe with id=player and/or title=YouTube video player and/or src contains youtube.com
-        pass
+        # get the list of videos
+        list_url = reverse('course_video_list',
+                           kwargs={'course_prefix' : self.coursePrefix,
+                                   'course_suffix' : self.courseSuffix })
+
+        # fetch the response
+        response = self.client.get(list_url)
+        self.assertEqual(response.status_code, 200)
+
+        # pull the urls of each video from the list
+        tree = etree.HTML(response.content)
+        # pull the href from the anchor contained in the course-list-content
+        urls = tree.xpath('//div[@class="course-list-content"]//a/@href')
+        self.assertEqual(len(urls), 3, msg="Wrong number of live videos.")
+
+        # attempt to load each video from the list
+        for url in urls:
+            response = self.client.get(url)
+
+            # if we have a bad slug we get a 404
+            # TODO: figure out what happens if a video is missing from youtube
+            self.assertEqual(response.status_code, 200)
+
+            # check to make sure we have a player div, we can't check for the
+            # YT player as it gets loaded via js - needs a selenium test
+            tree = etree.HTML(response.content)
+            player_divs = tree.xpath('//div[@id="player"]')
+            self.assertEqual(len(player_divs), 1)
+     
+
