@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.contrib.auth.models import User,Group
 from courses.common_page_data import get_common_page_data
 
-from c2g.models import Course, Institution, AdditionalPage
+from c2g.models import Course, Institution, AdditionalPage, CurrentTermMap
 from random import randrange
 import datetime
 from courses.actions import auth_view_wrapper, auth_is_staff_view_wrapper
@@ -93,6 +93,12 @@ def new(request):
         )
         op.save()
         op.create_ready_instance()
+    
+    
+        #Create the CurrentTermMap table entry (note we still do not automatically update the DNS in Route 53)
+        redir_entry, created = CurrentTermMap.objects.get_or_create(course_prefix = request.POST.get('prefix'))
+        redir_entry.course_suffix = request.POST.get('suffix')
+        redir_entry.save()
     
         request.session['course_mode'] = 'draft'
         return redirect('courses.views.main', course_prefix = request.POST.get('prefix'), course_suffix = request.POST.get('suffix'))
