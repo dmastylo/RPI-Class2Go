@@ -357,15 +357,42 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
             file_content = request.FILES['file']
             file_name = file_content.name
 
-            exercise = Exercise()
-            exercise.handle = request.POST['course_prefix'] + '--' + request.POST['course_suffix']
-            exercise.fileName = file_name
-            exercise.file.save(file_name, file_content)
-            exercise.save()
+            exercises = Exercise.objects.filter(handle=course_prefix+"--"+course_suffix,is_deleted=0)
+            exercise_exists = False
+            for exercise in exercises:
+                if exercise.fileName == file_name:
+                    #We don't wipe out all problem activites associated with this
+                    #existing exercise, but if it's a nontrivial overwrite, should we?
+                    exercise.file = file_content
+                    exercise.save()
+                    exercise_exists = True
 
-            index = ProblemSetToExercise.objects.getByProblemset(pset).count()
-            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
-            psetToEx.save()
+                    #If exercise already in pset, don't need to create new psetToEx
+                    #If exercise already in pset but deleted, undelete
+                    #Otherwise create new psetToEx
+                    queryPsetToEx = ProblemSetToExercise.objects.filter(problemSet=pset, exercise=exercise, mode='draft').order_by('-id')
+                    if queryPsetToEx.exists():
+                        existingPsetToEx = queryPsetToEx[0]
+                        if existingPsetToEx.is_deleted == 1:
+                            existingPsetToEx.is_deleted = 0
+                            existingPsetToEx.number = ProblemSetToExercise.objects.getByProblemset(pset).count()
+                            existingPsetToEx.save()
+                    else:
+                        index = ProblemSetToExercise.objects.getByProblemset(pset).count()
+                        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
+                        psetToEx.save()                        
+                    break
+
+            if not exercise_exists:
+                exercise = Exercise()
+                exercise.handle = request.POST['course_prefix'] + '--' + request.POST['course_suffix']
+                exercise.fileName = file_name
+                exercise.file.save(file_name, file_content)
+                exercise.save()
+
+                index = ProblemSetToExercise.objects.getByProblemset(pset).count()
+                psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
+                psetToEx.save()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
     #If form was not submitted then the form should be displayed or if there were errors the page needs to be rendered again
