@@ -9,16 +9,25 @@ template "/etc/apache2/conf.d/servername" do
     mode 00644
 end
 
-template "/etc/apache2/sites-available/class2go" do
-    source "class2go-site.erb"
-    owner "root"
-    group "root"
-    mode 00644
-end
+# create all of our apps
 
-execute "a2ensite class2go" do
-    user "root"
-    action :run
+node["apps"].keys.each do |app|
+
+    template "/etc/apache2/sites-available/#{app}" do
+        source "class2go-site.erb"
+        owner "root"
+        group "root"
+        variables \
+            "servername" => node["apps"][app]["servername"],
+            "appname" => app
+        mode 00644
+    end
+
+    execute "a2ensite #{app}" do
+        user "root"
+        action :run
+    end
+
 end
 
 execute "a2dissite default" do

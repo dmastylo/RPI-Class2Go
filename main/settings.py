@@ -28,6 +28,14 @@ except NameError:
     except:
         INSTANCE="unknown"
 
+# the APP is so we can support multiple instances of class2go running on the
+# same set of servers via apache vhosts.  In dev environments it's safe to just
+# use "class2go", this default
+try:
+    APP
+except NameError:
+    APP="class2go"
+
 # If PRODUCTION flag not set in Database.py, then set it now.
 #PRODUCTION = True
 
@@ -93,7 +101,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/opt/class2go/static/'
+STATIC_ROOT = '/opt/' + APP + '/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -361,16 +369,16 @@ BROKER_TRANSPORT_OPTIONS = {
     'visibility_timeout' : 3600*6,
 }
 
-CELERY_DEFAULT_QUEUE = 'default'
-CELERY_DEFAULT_EXCHANGE = 'default'
-CELERY_DEFAULT_ROUTING_KEY = 'default'
+CELERY_DEFAULT_QUEUE = APP+'-default'
+CELERY_DEFAULT_EXCHANGE = APP+'-default'
+CELERY_DEFAULT_ROUTING_KEY = APP+'-default'
 
 CELERY_QUEUES = {
-    'default': {'exchange': 'default', 'routing_key': 'default'},
-    'long':    {'exchange': 'long',    'routing_key': 'long'},
+    '-default': {'exchange': APP+'-default', 'routing_key': APP+'-default'},
+    '-long':    {'exchange': APP+'-long',    'routing_key': APP+'-long'},
 }
 
-CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': 'long', 'routing_key': 'long'},
-                 'kelvinator.tasks.resize':    {'queue': 'long', 'routing_key': 'long'},
-                 'celerytest.tasks.echo_long': {'queue': 'long', 'routing_key': 'long'},
+CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_key': APP+'-long'},
+                 'kelvinator.tasks.resize':    {'queue': APP+'-long', 'routing_key': APP+'-long'},
+                 'celerytest.tasks.echo_-long': {'queue': APP+'-long', 'routing_key': APP+'-long'},
                 }
