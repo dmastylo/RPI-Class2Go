@@ -374,8 +374,8 @@ CELERY_DEFAULT_EXCHANGE = APP+'-default'
 CELERY_DEFAULT_ROUTING_KEY = APP+'-default'
 
 CELERY_QUEUES = {
-    '-default': {'exchange': APP+'-default', 'routing_key': APP+'-default'},
-    '-long':    {'exchange': APP+'-long',    'routing_key': APP+'-long'},
+    APP+'-default': {'exchange': APP+'-default', 'routing_key': APP+'-default'},
+    APP+'-long':    {'exchange': APP+'-long',    'routing_key': APP+'-long'},
 }
 
 CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_key': APP+'-long'},
