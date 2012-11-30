@@ -38,7 +38,8 @@ label pre {margin-left:30px;}
 {% if videotest %}
 <style>
 {% include 'exams/videotest.css' %}
-#exam-pane {/*position: absolute;*/ display: none; width: 800px;}
+#exam-pane {float: left; position: relative; display: none; width: 800px;}
+#exam-pane .continue-video-btn {position: absolute; bottom: 3em; right: 1.5em;}
 #problemset-nav {display: none;}
 </style>
 {% endif %}
