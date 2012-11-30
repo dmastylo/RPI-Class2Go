@@ -13,8 +13,9 @@ node["apps"].keys.each do |app|
         source "database.py.erb"
         owner node['system']['admin_user']
         group node['system']['admin_group']
-        variables \
-            "appname" => app
+        variables({ 
+            :appname => app
+        })
         mode 00644
     end
 end

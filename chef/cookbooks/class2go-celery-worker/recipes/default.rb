@@ -5,8 +5,10 @@ end
 
 # stop celeryd first explicitly as a one-time cleanup task, since we're renaming
 # the service
-execute "service celeryd stop" do
-    action :run
+if File.exists?("/etc/init.d/celeryd")
+    execute "service celeryd stop" do
+        action :run
+    end
 end
 
 # For now just get rid of the general celery start / stop script.  Eventually we'd
@@ -59,7 +61,9 @@ node["apps"].keys.each do |app|
         owner "root"
         group "root"
         mode 00644
-        variables = { "appname" => app }
+        variables({ 
+            :appname => app
+        })
         action :create
     end
 

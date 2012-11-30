@@ -17,9 +17,10 @@ node["apps"].keys.each do |app|
         source "class2go-site.erb"
         owner "root"
         group "root"
-        variables \
-            "servername" => node["apps"][app]["servername"],
-            "appname" => app
+        variables({
+            :servername => node["apps"][app]["servername"], 
+            :appname => app
+        })
         mode 00644
     end
 
