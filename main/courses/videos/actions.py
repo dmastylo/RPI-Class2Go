@@ -1,36 +1,28 @@
-from django.http import HttpResponse, Http404
-from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
-from django.template import Context, loader
-from c2g.models import Course, Video
-from django.template import RequestContext
-from django.core.urlresolvers import reverse
-
-import subprocess
-from celery import task
-
-from c2g.models import Course, Video, VideoActivity, VideoDownload
-from courses.common_page_data import get_common_page_data
-
-from courses.videos.forms import *
+from atom import ExtensionElement
+from gdata.media import YOUTUBE_NAMESPACE
 import gdata.youtube
 import gdata.youtube.service
-from gdata.media import YOUTUBE_NAMESPACE
-from atom import ExtensionElement
-import urllib2, urllib, json
 import re
+import urllib2, urllib, json
+
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, Http404
+from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
+from django.template import RequestContext
+from django.views.decorators.http import require_POST
+
+from c2g.models import Video, VideoActivity, VideoDownload
+from courses.actions import auth_is_course_admin_view_wrapper
+from courses.common_page_data import get_common_page_data
+from courses.videos.forms import *
+import kelvinator.tasks
 import settings
 
-import kelvinator.tasks
-
-from datetime import datetime
-from courses.actions import auth_is_course_admin_view_wrapper
-from django.views.decorators.http import require_POST
 
 ### Videos ###
 
 @require_POST
 def switch_quiz_mode(request):
-    common_page_data = request.common_page_data
     request.session['video_quiz_mode'] = request.POST.get('to_mode')
     return redirect(request.META['HTTP_REFERER'])
 
@@ -153,7 +145,6 @@ def record_download(request):
 def oauth(request):
     if 'code' in request.GET:
         code = request.GET.get('code')
-#        print code
         client_id = settings.GOOGLE_CLIENT_ID
         client_secret = settings.GOOGLE_CLIENT_SECRET
         redirect_uri = "http://" + request.META['HTTP_HOST'] + "/oauth2callback"
@@ -163,7 +154,7 @@ def oauth(request):
         content = json.loads(result.read())
 
         yt_service = gdata.youtube.service.YouTubeService(additional_headers={'Authorization': "Bearer "+content['access_token']})
-        yt_service.developer_key = settings.YT_SERVICE_DEVELOPER_KEY 
+        yt_service.developer_key = settings.YT_SERVICE_DEVELOPER_KEY
 
         video = Video.objects.get(pk=request.GET.get('state'))
 
@@ -176,13 +167,16 @@ def oauth(request):
                     label='Education')],
             )
         
-        extension = ExtensionElement('accessControl', namespace=YOUTUBE_NAMESPACE, attributes={'action': 'list', 'permission': 'denied'})
-        video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group, extension_elements=[extension])
+        if request.session['video_privacy'] == "public":
+            video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
+        else:
+            #upload as unlisted
+            extension = ExtensionElement('accessControl', namespace=YOUTUBE_NAMESPACE, attributes={'action': 'list', 'permission': 'denied'})
+            video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group, extension_elements=[extension])
 
+        video.file.len = video.file.size # monkeypatch bug in InsertVideoEntry
         entry = yt_service.InsertVideoEntry(video_entry, video.file)
-        #print entry.id.ToString()
         match = re.search('http://gdata.youtube.com/feeds/api/videos/([a-zA-Z0-9_-]+)</ns0:id>', entry.id.ToString())
-        #print match.group(1)
         video.url = match.group(1)
         video.duration = entry.media.duration.seconds
         video.save()
@@ -193,8 +187,6 @@ def oauth(request):
         parts = str(video.handle).split("--")
         return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(parts[0], parts[1], video.slug)))
 
-#    return redirect('courses.videosviews.list', course_prefix, course_suffix)
-    #return redirect("http://" + request.META['HTTP_HOST'] + "/nlp/Fall2012/videos")
 
 def GetOAuth2Url(request, video):
     client_id = settings.GOOGLE_CLIENT_ID
@@ -215,6 +207,8 @@ def upload(request):
     data = {'common_page_data': common_page_data}
 
     if request.method == 'POST':
+        request.session['video_privacy'] = request.POST.get("video_privacy")
+
         # Need partial instance with course for form slug validation
         new_video = Video(course=common_page_data['course'])
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=new_video)

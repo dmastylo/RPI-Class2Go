@@ -41,3 +41,36 @@ cron "logrotate in root cron" do
     command "logrotate -s /var/log/logrotate.status /etc/logrotate.d/apache2"
     action :create
 end
+
+# WTOP
+
+cookbook_file "/tmp/wtop-0.6.3.tar.gz" do
+    owner "root"
+    action :create
+end
+
+bash "install wtop" do
+    user "root"
+    cwd "/tmp"
+    code <<-EOH
+        prior=/usr/local/bin/wtop
+        if [ -e $prior ]; then
+            echo "$prior already exists, skipping install"
+        else
+            tar -zxf wtop-0.6.3.tar.gz
+            cd wtop-0.6.3
+            python setup.py install
+        fi
+    EOH
+    action :run
+end
+
+# do last so it clobbers whatever default the bundle came with
+
+template "/etc/wtop.cfg" do
+    source "wtop.cfg.erb"
+    owner "root"
+    group "root"
+    mode 00644
+end
+

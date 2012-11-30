@@ -70,3 +70,15 @@ exit $rc
     action :run
 end
 
+
+easy_install_package "ipython" do
+    action :install
+end
+
+easy_install_package "ipdb" do
+    action :install
+end
+
+easy_install_package "django_nose" do
+    action :install
+end

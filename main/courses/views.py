@@ -16,7 +16,6 @@ from courses.forms import *
 
 from courses.actions import auth_view_wrapper
 
-from urlparse import urlparse
 import settings
 
 def index(item): # define a index function for list items
@@ -124,43 +123,27 @@ def get_full_contentsection_list(course, contentsection_list, video_list, pset_l
     
         index_list = []
         for video in video_list:
-            if video.section == contentsection:
+            if video.section_id == contentsection.id:
                 index_list.append(('video', video.index, video.id, contentsection.id, video.slug, video.title))
 
         for pset in pset_list:
-            if pset.section == contentsection:
+            if pset.section_id == contentsection.id:
                 index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
                 
         for page in additional_pages:
-            if page.section == contentsection:
+            if page.section_id == contentsection.id:
                 index_list.append(('additional_page', page.index, page.id, contentsection.id, page.slug, page.title))
 
         for file in file_list:
-            if file.section == contentsection:
-                file_path=urlparse(file.file.url).path
-                file_parts=re.split('\.',file_path)
-                file_extension=file_parts.pop().lower()
-                if file_extension in ("html", "htm"):
-                    icon_type="globe"
-                elif (file_extension in ("ppt", "pptx")):
-                    icon_type="list-alt"
-                elif (file_extension in ('jpg', 'png', 'gif', 'jpeg')):
-                    icon_type="picture"  
-                elif (file_extension in ('mp3', 'aac')):
-                    icon_type="music"
-                elif (file_extension in ('gz', 'zip', 'tar', 'bz', 'bz2')):
-                    icon_type="download-alt"
-                elif (file_extension in ('csv', 'xls')):
-                    icon_type="table"
-                else:
-                    icon_type="file"
+            if file.section_id == contentsection.id:
+                icon_type = file.get_icon_type()
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
         index_list.sort(key = index)
         
         full_index_list.append(index_list)
 
-       #don't show empty sections
+        # don't show empty sections
         if index_list:
             full_contentsection_list.append(contentsection)
         

@@ -674,6 +674,10 @@ input[data-datetimepicker] {
   width: auto;
 }
 
+input[type="checkbox"] {
+  margin-top: 0;
+}
+
 /* Footer
 -------------------------------------------------- */
 
