@@ -46,12 +46,15 @@ node["apps"].keys.each do |app|
         action :create
     end
 
-    cookbook_file "celeryd-#{app} init script" do
-        source "celeryd-init-script"
+    template "celeryd-#{app} init script" do
+        source "celeryd-init-script.erb"
         path "/etc/init.d/celeryd-#{app}"
         owner "root"
         group "root"
         mode 00755
+        variables({ 
+            :appname => app
+        })
         action :create
     end
 
