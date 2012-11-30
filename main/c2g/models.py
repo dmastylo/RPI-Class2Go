@@ -426,10 +426,10 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 class FileManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('section','index')
             
     def getBySection(self, section):
         if section.mode == 'draft':
@@ -1613,4 +1613,9 @@ class ExamScoreField(TimestampMixin, models.Model):
     field_name = models.CharField(max_length=128, db_index=True)
     subscore = models.IntegerField(default=0)
 
+class CurrentTermMap(TimestampMixin, models.Model):
+    course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
+    course_suffix = models.CharField(max_length=64)
+    def __unicode__(self):
+        return (self.course_prefix + "--" + self.course_suffix)
 

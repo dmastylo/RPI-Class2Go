@@ -1,0 +1,55 @@
+[main]
+DEFAULT_OUTPUT_FIELDS=ts,class,ip,msec,uas,url,refdom
+
+LOG_FILE_TYPE=apache
+# This  MUST match your Apache LogFormat directive. 
+# To use wtop, you MUST have at least %s, %r, %t and %D.
+LOG_FORMAT=%h %l %u %t "%r" %>s %B "%{Referer}i" "%{User-Agent}i" %D
+LOG_ROOT=/var/log/apache2/
+LOG_FILE=class2go-fall2012-access.log
+
+[wtop]
+# max time before a request is logged in the "slow" column
+MAX_REQUEST_TIME=3000
+# minimum requests/second before a URL class appears in top mode
+MIN_RPS=0.1
+
+[classes]
+# you can define any classes you wish with regular expressions
+#foo=/some/.+/bar
+#baz=/some/other/path
+#affiliate=MY_AFFILIATE_ID
+home=^/(?:\?.*)?$
+#static=\.(?:png|gif|jpe?g|cur|ico|bmp|xml|txt|js|css|swf)(?:\?.*)?$
+js=\.js(?:\?.*)?$
+css=\.css(?:\?.*)?$
+img=\.(?:png|gif|jpe?g|cur|ico|bmp)(?:\?.*)?$
+video_list=^/.+/.+/videos/?$
+video_watch=^/.+/.+/videos/.+/?$
+video_edit=^/.+/.+/videos/.+/.+$
+materials=^/.+/.+/materials.*
+login=^/.+/.+/login.*
+profile=^/.+/.+/profile.*
+problemsets=^/.+/.+/problemsets.*
+exercises=^/.+/.+/exercises.*
+video_exercises=^/.+/.+/video_exercises.*
+exam=^/.+/.+/exams.*
+pages=^/.+/.+/pages.*
+surveys=^/.+/.+/surveys.*
+forums=^/.+/.+/forums.*
+preview=^/.+/.+/preview.*
+reports=^/.+/.+/reports.*
+browse_reports=^/.+/.+/browse_reports.*
+admin=^/admin/?$
+
+
+[patterns]
+# the generic class pattern is used if a URL does not match any 
+# of the named classes above.
+generic=^/([^/\?]+)   # top-level directory
+
+## user-agent pattern for identifying robots (optimized)
+robots=^(-)$|(f(?:e(?:ed(?:fetcher-google|ster|whipbot|demon|tools)|tch)|a(?:ctbot|stsearch)|indexa)|a(?:(?:pach|rchiv)e|iderss)|h(?:ttpmonitor|eritrix|arvest|olmes)|y(?:a(?:hoo(?:feed)?seeker|cy|ndex)|e(?:bolbot|ti)|\!j-srd)|m(?:s[rn]bot|e(?:diapartners|chanize)|j12bot)|t(?:ranslate.google.com|ineye)|n(?:utch|icebot|g/2.0|oxtrum|etnewswire)|g(?:(?:ais|uruji|oogle)bot|rabperf)|s(?:n(?:ap(?:preview)?bot|iffer|oopy)|ogou|(?:[bp]id|cann|tackrambl)er|(?:urvey|eznam)bot|lurp|hopwiki)|v(?:a(?:dixbot|lidator)|isbot|oyager)|l(?:ibwww|arbin)|c(?:h(?:udo|arlotte)|u[ir]l|azoodlebot|(?:onverac)?rawler)|p(?:o(?:lybot|ckey)|agebull|ubsub|ear http_request)|b(?:ecomebot|logpulselive)|w(?:eb(?:images|alta|bot)|wwster|get|ordpress|inhttp)|i(?:n(?:formation-online|dexer)|lluminati|feed)|j(?:a(?:karta|va/1)|yxobot)|d(?:iscoveryengine|ownload)|o(?:gsearchspider|pennms)|(?:entirewe|urlli)b|keywen|xenu|rssmix)
+
+# (original)
+##robots=Feedfetcher-Google|Apache|HttpMonitor|yacy|MSRBOT|translate.google.com|Feedster|Nutch|Gaisbot|Snapbot|VisBot|libwww|CazoodleBot|polybot|VadixBot|Sogou|SBider|BecomeBot|Yandex|Pagebull|chudo|Pockey|nicebot|entireweb|FeedwhipBOT|ConveraCrawler|NG/2.0|WebImages|Factbot|information-online|Jyxobot|BlogPulseLive|YahooFeedSeeker|GurujiBot|wwwster|Y\!J-SRD|Findexa|SurveyBot|discoveryengine|fastsearch|noxtrum|Googlebot|Snapbot|OGSearchSpider|heritrix|Slurp|msnbot|cuil|Mediapartners|YahooSeeker|GrabPERF|keywen|archive|spider|larbin|shopwiki|wget|WebAlta|webbot|crawler|download|harvest|fetch|xenu|mechanize|wordpress|indexer|sniffer|winhttp|validator|voyager|PubSub|Scanner|TinEye|urllib|ILLUMINATI|YebolBot|OpenNMS|Charlotte|SeznamBot|curl|iFeed|FeedDemon|Jakarta|AideRSS|Java/1|Yeti|NetNewsWire|holmes|PEAR HTTP_Request|SnapPreviewBot|RSSMix|MJ12bot|FeedTools|StackRambler|Snoopy|AideRSS

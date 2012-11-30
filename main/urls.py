@@ -107,6 +107,8 @@ urlpatterns = patterns('',
     url(r'^revert/?$', 'courses.actions.revert'),
     url(r'^change_live_datetime/?', 'courses.actions.change_live_datetime'),
 
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/(?P<file_type>files|videos|problemsets)/check_filename/?', 'courses.actions.check_filename'),
+
     # Additional Pages
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/pages/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.additional_pages.views.main'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/manage_nav_menu/?$', 'courses.additional_pages.views.manage_nav_menu'),
@@ -160,7 +162,6 @@ urlpatterns = patterns('',
     url(r'^add_video_exercise/?$', 'courses.videos.views.add_exercise'),
     url(r'^add_existing_video_exercises/?$', 'courses.videos.views.add_existing_exercises'),
     url(r'^save_video_exercises/?', 'courses.videos.views.save_exercises'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_]+)/(?P<course_suffix>[a-zA-Z0-9_]+)/videos/?$', 'courses.videos.views.list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/video_exercises/(?P<video_id>[a-zA-Z0-9_-]+)/?$', 'courses.video_exercises.views.view'),
     url(r'^get_video_exercises/?$', 'courses.videos.views.get_video_exercises'),
 

@@ -1,32 +1,32 @@
 <VirtualHost *:80>
-    ServerName <%= @node[:apache][:servername] %>
+    ServerName <%= @servername %>
     UseCanonicalName On
 
-    Alias /robots.txt /opt/class2go/static/robots.txt
-    Alias /favicon.ico /opt/class2go/static/graphics/core/favicon.ico
+    Alias /robots.txt /opt/<%= @appname %>/static/robots.txt
+    Alias /favicon.ico /opt/<%= @appname %>/static/graphics/core/favicon.ico
 
-    Alias /static/ /opt/class2go/static/
+    Alias /static/ /opt/<%= @appname %>/static/
 
-    <Directory /opt/class2go/static>
+    <Directory /opt/<%= @appname %>/static>
         Order deny,allow
         Allow from all
     </Directory>
 
-    WSGIScriptAlias / /home/ubuntu/class2go/main/wsgi.py
+    WSGIScriptAlias / /home/ubuntu/<%= @appname %>/main/wsgi.py
 
-    <Directory /home/ubuntu/class2go/main>
+    <Directory /home/ubuntu/<%= @appname %>/main>
     <Files wsgi.py>
         Order deny,allow
         Allow from all
     </Files>
     </Directory>
 
-    WSGIDaemonProcess class2go threads=15 maximum-requests=10000 python-path=/home/ubuntu/class2go/main
-    WSGIProcessGroup class2go
+    WSGIDaemonProcess <%= @appname %> threads=15 maximum-requests=10000 python-path=/home/ubuntu/<%= @appname %>/main
+    WSGIProcessGroup <%= @appname %>
 
-    ErrorLog ${APACHE_LOG_DIR}/error_log
+    ErrorLog ${APACHE_LOG_DIR}/<%= @appname %>-error.log
 
     LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %D" class2go
-    CustomLog ${APACHE_LOG_DIR}/access_log class2go
+    CustomLog ${APACHE_LOG_DIR}/<%= @appname %>-access.log class2go
 
 </VirtualHost>

@@ -16,6 +16,7 @@ from courses.forms import *
 
 from courses.actions import auth_view_wrapper
 
+from c2g.models import CurrentTermMap
 import settings
 
 def index(item): # define a index function for list items
@@ -25,8 +26,13 @@ def index(item): # define a index function for list items
 curTerm = 'Fall2012'
 
 def current_redirects(request, course_prefix):
-    if Course.objects.filter(handle=course_prefix+'--'+curTerm).exists():
-        return redirect(reverse('courses.views.main',args=[course_prefix, curTerm]))
+    try:
+        suffix = CurrentTermMap.objects.get(course_prefix=course_prefix).course_suffix
+    except CurrentTermMap.DoesNotExist:
+        suffix = curTerm # Use this as default fallback
+
+    if Course.objects.filter(handle=course_prefix+'--'+suffix).exists():
+        return redirect(reverse('courses.views.main',args=[course_prefix, suffix]))
     else: 
         raise Http404
     
@@ -123,19 +129,19 @@ def get_full_contentsection_list(course, contentsection_list, video_list, pset_l
     
         index_list = []
         for video in video_list:
-            if video.section == contentsection:
+            if video.section_id == contentsection.id:
                 index_list.append(('video', video.index, video.id, contentsection.id, video.slug, video.title))
 
         for pset in pset_list:
-            if pset.section == contentsection:
+            if pset.section_id == contentsection.id:
                 index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
                 
         for page in additional_pages:
-            if page.section == contentsection:
+            if page.section_id == contentsection.id:
                 index_list.append(('additional_page', page.index, page.id, contentsection.id, page.slug, page.title))
 
         for file in file_list:
-            if file.section == contentsection:
+            if file.section_id == contentsection.id:
                 icon_type = file.get_icon_type()
                 index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
 
