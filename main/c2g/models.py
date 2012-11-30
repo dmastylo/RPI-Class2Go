@@ -1556,7 +1556,11 @@ class PageVisitLog(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_page_visit_log'
 
-class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+class ExamManager(models.Manager):
+    def getByCourse(self, course):
+        return self.filter(course=course)
+
+class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
@@ -1564,6 +1568,7 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
                          )
     
     course = models.ForeignKey(Course, db_index=True)
+    section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     html_content = models.TextField(blank=True)
@@ -1572,12 +1577,118 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     grace_period = models.DateTimeField(null=True, blank=True)
     total_score = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    objects = ExamManager()
     
     
     def past_due(self):
         if self.due_date and (datetime.now() > self.due_date):
             return True
         return False
+    
+    def create_ready_instance(self):
+        ready_instance = Exam(
+            course=self.course.image,
+            section=self.section.image,
+            title=self.title,
+            description=self.description,
+            html_content=self.html_content,
+            slug=self.slug,
+            index=self.index,
+            mode='ready',
+            due_date=self.due_date,
+            grace_period=self.grace_period,
+            total_score=self.total_score,
+            exam_type=self.exam_type,
+            live_datetime = self.live_datetime,
+        )
+        ready_instance.save()
+        self.image = ready_instance
+        self.save()
+    
+    def commit(self, clone_fields = None):
+        if self.mode != 'draft': return;
+        if not self.image: self.create_ready_instance()
+
+        ready_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            ready_instance.section = self.section.image
+        if not clone_fields or 'title' in clone_fields:
+            ready_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            ready_instance.description = self.description
+        if not clone_fields or 'html_content' in clone_fields:
+            ready_instance.html_content = self.html_content
+        if not clone_fields or 'slug' in clone_fields:
+            ready_instance.slug = self.slug
+        if not clone_fields or 'index' in clone_fields:
+            ready_instance.index = self.index
+        if not clone_fields or 'due_date' in clone_fields:
+            ready_instance.due_date = self.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            ready_instance.grace_period = self.grace_period
+        if not clone_fields or 'total_score' in clone_fields:
+            ready_instance.total_score = self.total_score
+        if not clone_fields or 'exam_type' in clone_fields:
+            ready_instance.exam_type = self.exam_type
+        if not clone_fields or 'live_datetime' in clone_fields:
+            ready_instance.live_datetime = self.live_datetime
+
+        ready_instance.save()
+    
+    def revert(self, clone_fields = None):
+        if self.mode != 'draft': return;
+
+        ready_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            self.section = ready_instance.section.image        
+        if not clone_fields or 'title' in clone_fields:
+            self.title = ready_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = ready_instance.description            
+        if not clone_fields or 'html_content' in clone_fields:
+            self.html_content = ready_instance.html_content
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = ready_instance.slug
+        if not clone_fields or 'index' in clone_fields:
+            self.index = ready_instance.index
+        if not clone_fields or 'due_date' in clone_fields:
+            self.due_date = ready_instance.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            self.grace_period = ready_instance.grace_period
+        if not clone_fields or 'total_score' in clone_fields:
+            self.total_score = ready_instance.total_score
+        if not clone_fields or 'exam_type' in clone_fields:
+            self.exam_type = ready_instance.exam_type
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = ready_instance.live_datetime
+
+        self.save()
+    
+    def is_synced(self):
+        if self.section != self.image.section:
+            return False
+        if self.title != self.image.title:
+            return False
+        if self.description != self.image.description:
+            return False
+        if self.html_content != self.image.html_content:
+            return False
+        if self.slug != self.image.slug:
+            return False
+        if self.index != self.image.index:
+            return False
+        if self.due_date != self.image.due_date:
+            return False
+        if self.grace_period != self.image.grace_period:
+            return False
+        if self.total_score != self.image.total_score:
+            return False
+        if self.exam_type != self.image.exam_type:
+            return False
+        if self.live_datetime != self.image.live_datetime:
+            return False
+
+        return True
     
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode

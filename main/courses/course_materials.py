@@ -5,12 +5,13 @@ from django.db import connection, transaction
 
 
 
-def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False):
+def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
         pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
         files = File.objects.getByCourse(course=common_page_data['course'])
+        exams = Exam.objects.getByCourse(course=common_page_data['course'])
         groups = ContentGroup.objects.getByCourse(course=common_page_data['course'])
         level1_items, level2_items = group_data(groups)
 
@@ -347,6 +348,15 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             item['progress'] = progress
 
                         item['numQuestions'] = numQuestions
+                        section_dict['items'].append(item)
+
+            if get_exam_content:
+                for exam in exams:
+                    key = 'exam:' + str(exam.id)
+                    if exam.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
+                        
+                        item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children}
                         section_dict['items'].append(item)
 
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
