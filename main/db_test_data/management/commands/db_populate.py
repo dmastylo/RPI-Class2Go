@@ -1047,7 +1047,8 @@ def save_exercise(problemSet, fileName, number, handle, file):
 
     psetToEx = ProblemSetToExercise(problemSet = problemSet,
                                     exercise = ex,
-                                    number = number)
+                                    number = number,
+                                    mode = 'draft')
     psetToEx.save()
     #psetToEx.create_ready_instance()
 

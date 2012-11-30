@@ -16,6 +16,7 @@ from courses.forms import *
 
 from courses.actions import auth_view_wrapper
 
+from c2g.models import CurrentTermMap
 import settings
 
 def index(item): # define a index function for list items
@@ -25,8 +26,13 @@ def index(item): # define a index function for list items
 curTerm = 'Fall2012'
 
 def current_redirects(request, course_prefix):
-    if Course.objects.filter(handle=course_prefix+'--'+curTerm).exists():
-        return redirect(reverse('courses.views.main',args=[course_prefix, curTerm]))
+    try:
+        suffix = CurrentTermMap.objects.get(course_prefix=course_prefix).course_suffix
+    except CurrentTermMap.DoesNotExist:
+        suffix = curTerm # Use this as default fallback
+
+    if Course.objects.filter(handle=course_prefix+'--'+suffix).exists():
+        return redirect(reverse('courses.views.main',args=[course_prefix, suffix]))
     else: 
         raise Http404
     

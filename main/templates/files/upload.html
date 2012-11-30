@@ -3,7 +3,7 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
   <h3>Upload File</h3>
-  <form action="{% url 'courses.files.actions.upload' %}" method="POST" enctype="multipart/form-data">
+  <form action="{% url 'courses.files.actions.upload' %}" method="POST" onsubmit="return checkFilename();" enctype="multipart/form-data">
     <fieldset class="well">
       {% for field in form %}
         <div class="fieldWrapper">
@@ -31,6 +31,23 @@
 
 {% block addl_scripts %}
 <script>
+function checkFilename() {
+    var filename = document.getElementById('id_file').files[0].name;
+    var r = true;
+    $.ajax({
+        type:"POST",
+        url: "check_filename/",
+        async:false,
+        data: {filename:filename, csrfmiddlewaretoken:'{{ csrf_token }}'},
+        success: function(data) {
+            if (data == "File name already exists!") {
+                r=confirm("WARNING: A file with this name already exists. If you proceed with the upload it will be overwritten. Please rename your file if you do not wish to overwrite.");
+            }
+        }
+    });
+    return r;
+}
+
 function showLiveDate(checked) {
     if (checked) {
         $("#live_date").show('fast');
