@@ -33,6 +33,7 @@ default_attributes \
     "apps" => {
         "class2go" => {
             "servername" => "https://example.class.university.edu",
+            "serveralias" => "*.example.class.university.edu",
             "git_branch" => "origin/master"
         }
     },
