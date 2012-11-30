@@ -282,7 +282,7 @@ LOGGING = {
             'level':'INFO', #making this DEBUG will log _all_ SQL queries.
             'class':'logging.handlers.RotatingFileHandler',
             'formatter':'verbose',
-            'filename': LOGGING_DIR+'django.log',
+            'filename': LOGGING_DIR+APP+'-django.log',
             'maxBytes': 1024*1024*500,
             'backupCount': 3,
         },
