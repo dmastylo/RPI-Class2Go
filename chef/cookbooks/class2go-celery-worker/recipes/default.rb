@@ -3,6 +3,23 @@ execute "pip install django-celery" do
     action :run
 end
 
+# stop celeryd first explicitly as a one-time cleanup task, since we're renaming
+# the service
+execute "service celeryd stop" do
+    action :run
+end
+
+# For now just get rid of the general celery start / stop script.  Eventually we'd
+# want to have this helpful interface (start all/ stop all, etc)
+file "/etc/init.d/celeryd" do
+    action :delete
+end
+
+file "/etc/default/celeryd" do
+    action :delete
+end
+
+
 node["apps"].keys.each do |app|
 
     directory "/opt/#{app}/celery" do
