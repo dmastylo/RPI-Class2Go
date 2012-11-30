@@ -357,6 +357,8 @@ else:
 
 #CELERY
 CELERY_ACKS_LATE = True
+CELERY_IGNORE_RESULT = True   # SQS doesn't support, so this stop lots of spurrious
+                              # "*-pidbox" queues from being created
 
 CELERYD_PREFETCH_MULTIPLIER = 1
 
