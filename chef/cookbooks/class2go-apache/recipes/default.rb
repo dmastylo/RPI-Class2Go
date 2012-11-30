@@ -2,11 +2,13 @@ package "libapache2-mod-wsgi" do
     action :install
 end
 
-template "/etc/apache2/conf.d/servername" do
-    source "servername.erb"
-    owner "root"
-    group "root"
-    mode 00644
+# We have confirmed that we no longer need the servername file since 
+# servers are getting set up correctly in the vhosts file.  If it was
+# there before, clear it out, just causes trouble
+if File.exists?("/etc/apache2/conf.d/servername") 
+    file "/etc/apache2/conf.d/servername" do
+        action :delete
+    end
 end
 
 # create all of our apps
