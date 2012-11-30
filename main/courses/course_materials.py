@@ -358,6 +358,25 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         
                         item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children}
                         section_dict['items'].append(item)
+                        
+                        if common_page_data['course_mode'] == 'draft':
+                            prod_exam = exam.image
+                            if not prod_exam.live_datetime:
+                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
+                            else:
+                                if prod_exam.live_datetime > datetime.datetime.now():
+                                    year = prod_exam.live_datetime.year
+                                    month = prod_exam.live_datetime.month
+                                    day = prod_exam.live_datetime.day
+                                    hour = prod_exam.live_datetime.hour
+                                    minute = prod_exam.live_datetime.minute
+                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                else:
+                                    visible_status = "<span style='color:green;'>Live</span>"
+
+                            item['visible_status'] = visible_status                        
+                        
+                        
 
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
                 section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index'])
