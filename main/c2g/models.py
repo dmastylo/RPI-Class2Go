@@ -1651,3 +1651,6 @@ class ExamRecordScoreField(TimestampMixin, models.Model):
 class CurrentTermMap(TimestampMixin, models.Model):
     course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
     course_suffix = models.CharField(max_length=64)
+    def __unicode__(self):
+        return (self.course_prefix + "--" + self.course_suffix)
+
