@@ -7,6 +7,10 @@ package "python-pip" do
     action :install
 end
 
+package "python-numpy" do
+    action :install
+end
+
 # Now that we are install PIL in the base0cookboook, do we still need this for ffmpeg?
 # because we certainly don't need for PIL anymore.
 package "python-dev" do
