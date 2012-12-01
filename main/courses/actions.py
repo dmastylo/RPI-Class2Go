@@ -102,6 +102,8 @@ def commit(request):
             ProblemSet.objects.get(id=parts[1]).commit()
         elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).commit()
+        elif parts[0] == 'exam':
+            Exam.objects.get(id=parts[1]).commit()
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
