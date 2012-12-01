@@ -175,7 +175,7 @@
                 $('#exam-pane').fadeTo('slow', 1.0);}
             );
 
-            popcornVideo.cue('386', function () {
+            popcornVideo.cue('385', function () {
                 setExamStage();
                 $('.question').eq(2).show();
                 $('#exam-pane').fadeTo('slow', 1.0);}

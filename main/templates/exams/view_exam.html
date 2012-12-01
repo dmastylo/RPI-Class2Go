@@ -2,7 +2,14 @@
 {% load url from future %}
 {% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
 
+{% if videotest %}
+{% block l_column_content %}
+    {% include "left_nav.html" %}
+{% endblock l_column_content %}
+{% endif %}
+
 {% block m_column_content %}
+{% if videotest %}<div id="c2g_layout_m_column" class="khan-template" style="margin-left: 25%">{% endif %}
 <div class="alert alert-error" id="nojswarn">
 You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
 </div>
@@ -12,37 +19,39 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     This exam will go live on {{ exam.live_datetime }} PST.
 
-
 {% else %}
-<style>
-#exam-pane label {clear: both; display: block;}
-#exam-pane label input {float: left; margin-right: 1em;}
-#exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
-h3 {clear:both;}
-div.question, div.subquestion {float:left; width:95%;}
-div.problem, div.problem {float:left; width:95%;}
-#problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
-#next-question {float: right;}
-#prev-question {float: left;}
-label pre {margin-left:30px;}
+    <style>
+    #exam-pane label {clear: both; display: block;}
+    #exam-pane label input {float: left; margin-right: 1em;}
+    #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
+    h3 {clear:both;}
+    div.question, div.subquestion {float:left; width:95%;}
+    div.problem, div.problem {float:left; width:95%;}
+    #problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
+    #next-question {float: right;}
+    #prev-question {float: left;}
+    label pre {margin-left:30px;}
 
-/* BEGIN CSS for Wed demo */
-.quick-check {clear: both; display: block; margin-top: 1em;}
-.explanation {background: #fff; border-radius: 3px; margin-bottom: .5em; padding: 1em;}
-#exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
-#exam-pane fieldset label {position: relative;}
-#exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
-#exam-pane .correct {color: #090;}
-/* END CSS for Wed demo */
-</style>
-{% if videotest %}
-<style>
-{% include 'exams/videotest.css' %}
-#exam-pane {float: left; position: relative; display: none; width: 800px;}
-#exam-pane .continue-video-btn {position: absolute; bottom: 3em; right: 1.5em;}
-#problemset-nav {display: none;}
-</style>
-{% endif %}
+    /* BEGIN CSS for Wed demo */
+    .quick-check {clear: both; display: block; margin-top: 1em;}
+    .explanation {background: #fff; border-radius: 3px; margin-bottom: .5em; padding: 1em;}
+    #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
+    #exam-pane fieldset label {position: relative;}
+    #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
+    #exam-pane .correct {color: #090;}
+    /* END CSS for Wed demo */
+    </style>
+
+    {% if videotest %}
+
+    <style>
+    {% include 'exams/videotest.css' %}
+    #exam-pane {float: left; position: relative; display: none; width: 800px;}
+    #exam-pane .continue-video-btn {position: absolute; bottom: 3em; right: 1.5em;}
+    #problemset-nav {display: none;}
+    </style>
+
+    {% endif %}
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
 
@@ -81,10 +90,8 @@ label pre {margin-left:30px;}
 {% endif %}
 
 {% endautoescape %}
+{% if videotest %}</div>{% endif %}
 {% endblock m_column_content %}
-
-
-
 
 {% block addl_scripts %}
     {% if videotest %}
