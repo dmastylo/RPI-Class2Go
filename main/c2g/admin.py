@@ -1,3 +1,4 @@
+import reversion
 from django.contrib import admin
 from c2g.models import *
 from django.contrib.auth.models import Group
@@ -17,8 +18,6 @@ admin.site.register(File)
 admin.site.register(ProblemSetToExercise)
 admin.site.register(Exercise)
 admin.site.register(VideoToExercise)
-admin.site.register(Exam)
-admin.site.register(CurrentTermMap)
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'gender', 'birth_year', 'education', 'work', 'client_ip_first', 'user_agent_first', 'referrer_first', 'accept_language_first')
@@ -38,6 +37,13 @@ class GroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'count')
     def count(self, obj):
         return obj.user_set.count()
+
+class ExamAdmin(reversion.VersionAdmin):
+    pass
+
+
+admin.site.register(Exam, ExamAdmin)
+
 
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(GroupProxy, GroupAdmin)

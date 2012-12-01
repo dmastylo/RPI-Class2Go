@@ -64,7 +64,7 @@ var c2gXMLParse = (function() {
                 questionIdx += 1;
                 var questionMeta=document.createElement('question_metadata');
                 $(questionMeta).attr('id', 'problem_'+questionIdx);
-                $(questionMeta).attr('tag4humans', $(this).attr('tag4humans'));
+                $(questionMeta).attr('data-tag4humans', $(this).attr('tag4humans'));
                 $(metadataObj).append($(questionMeta));
                 
                               
@@ -81,7 +81,7 @@ var c2gXMLParse = (function() {
                 var tmpProbDiv = document.createElement('div');
                 $(tmpProbDiv).addClass('question');
                 $(tmpProbDiv).attr('id', 'problem_'+questionIdx);
-                $(tmpProbDiv).attr('tag4humans', $(this).attr('tag4humans'));
+                $(tmpProbDiv).attr('data-tag4humans', $(this).attr('tag4humans'));
                               
                 //$('#staging-area').append($(tmpProbDiv));
                 $(targetEl).append($(tmpProbDiv));
@@ -109,11 +109,11 @@ var c2gXMLParse = (function() {
                             var questionObj = document.createElement('response');
                             $(questionObj).attr('name', probName);
                             $(questionObj).attr('answertype',nodeName);
-                            $(questionObj).attr('tag4humans',$(node).attr('tag4humans'));
+                            $(questionObj).attr('data-tag4humans',$(node).attr('tag4humans'));
                             $(questionMeta).append($(questionObj));
                               
                             var fieldsetObj = document.createElement('fieldset');
-                            $(fieldsetObj).attr('tag4humans',$(node).attr('tag4humans'));
+                            $(fieldsetObj).attr('data-tag4humans',$(node).attr('tag4humans'));
 
                             $(nodeParent).append($(fieldsetObj));
                               
@@ -124,7 +124,7 @@ var c2gXMLParse = (function() {
                                 //make choice object
                                 var choiceObj = document.createElement('choice');
                                 $(choiceObj).attr('id',choiceID);
-                                $(choiceObj).attr('tag4humans', $(this).attr('tag4humans'));
+                                $(choiceObj).attr('data-tag4humans', $(this).attr('tag4humans'));
                                 $(questionObj).append($(choiceObj));
                                 var explanationObj = document.createElement('explanation');
                                 $(explanationObj).append($(this).find('explanation').text());
@@ -142,7 +142,7 @@ var c2gXMLParse = (function() {
                                 var tmpLabel = document.createElement('label');
                                             
                                 $(tmpLabel).attr('for', choiceID);
-                                $(tmpInput).attr('tag4humans', $(this).attr('tag4humans'));
+                                $(tmpInput).attr('data-tag4humans', $(this).attr('tag4humans'));
                                 $(tmpInput).attr('type', inputtype);
                                 $(tmpInput).attr('id', choiceID);
 
@@ -168,7 +168,7 @@ var c2gXMLParse = (function() {
                               $(questionObj).attr('name', probName);
                               $(questionObj).attr('answertype', nodeName);
                               $(questionObj).text($(node).attr('answer'));
-                              $(questionObj).attr('tag4humans', $(node).attr('tag4humans'));
+                              $(questionObj).attr('data-tag4humans', $(node).attr('tag4humans'));
                               $(questionObj).append($(node).find('responseparam'));
                               $(questionMeta).append($(questionObj));
                             }
@@ -179,7 +179,7 @@ var c2gXMLParse = (function() {
                             $(tmpInput).attr('type', 'text');
                             $(tmpInput).attr('id', probName);
                             $(tmpInput).attr('name', probName);
-                            $(tmpInput).attr('tag4humans', $(node).attr('tag4humans'));
+                            $(tmpInput).attr('data-tag4humans', $(node).attr('tag4humans'));
                     
                             var textInputSize = (false) ? '' : 20;
                             $(tmpInput).attr('size', textInputSize);
