@@ -73,8 +73,6 @@ def main(request, course_prefix, course_suffix):
     contentsection_list, video_list, pset_list, additional_pages, file_list, groups, exam_list, level2_items = get_left_nav_content(course)
     full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, exam_list, level2_items)
 
-    print full_contentsection_list
-
     return render_to_response('courses/view.html',
             {'common_page_data': common_page_data,
              'announcement_list': announcement_list,
