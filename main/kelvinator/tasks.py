@@ -25,6 +25,8 @@ import Image
 import time
 from celery import task
 from utility import *
+import numpy as np
+import shutil
 
     
 ##
@@ -64,7 +66,17 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
         h2 = Image.open(file2).histogram()
         rms = math.sqrt(reduce(operator.add, map(lambda a,b: (a-b)**2, h1, h2))/len(h1))
         return rms
-    
+
+    # get local maximum values from an array, which are also larger the threshold. 
+    # local maximum is extracted by comparing current with three neighbors in both directions. 
+    def localMaximum(candidates, threshold):
+        cuts = [];
+        for i in range(3, len(candidates)-4):
+            cur_score = candidates[i][0]
+            if cur_score > threshold and cur_score > candidates[i-1][0] and cur_score > candidates[i-2][0] and cur_score > candidates[i-3][0] and cur_score > candidates[i+1][0] and cur_score > candidates[i+2][0] and cur_score > candidates[i+3][0] :
+                cuts.append(candidates[i])
+        return cuts
+
     image_list = os.listdir(jpeg_dir)
     if len(image_list) == 0:
         cleanup_working_dir(notify_buf, working_dir)
@@ -75,51 +87,77 @@ def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_
     duration = len(image_list)/extraction_frame_rate    # in seconds
     infoLog(notify_buf, "Video duration: %d seconds" % duration)
     infoLog(notify_buf, "Initial keyframes: %d" % len(image_list))
-    infoLog(notify_buf, "Target keyframes per minute: %d" % frames_per_minute_target)
-    
+    infoLog(notify_buf, "Target keyframes per minute: %d" % frames_per_minute_target) 
     max_keyframes = int(math.ceil(frames_per_minute_target * duration/60.0))
     infoLog(notify_buf, "Upper bound on number of keyframes kelvinator will output: %d" % max_keyframes)
-    infoLog(notify_buf, "Internal differencing threshold: 1000")
+    infoLog(notify_buf, "Internal differencing threshold: average of all scores")
+    image_num = len(image_list)
 
-    differences = [1000000000]
-    differences_sorted = [1000000000]
-    for i in range(len(image_list)-1):
-        diff = computeDiff(jpeg_dir+"/"+image_list[i], jpeg_dir+"/"+image_list[i+1])
-        differences.append(diff)
-        differences_sorted.append(diff)
+    # window size, all the frames in the window centered at 
+    # current frame are used to determine shot boundary. 
+    # this value doesn't need to be changed for different videos.
+    k = 5
+
+    # calculate difference matrix
+    difference_matrix = np.zeros((image_num,image_num))
+    for i in range(0, image_num-1-k):
+        for j in range(i+1, i+k):
+            difference_matrix[i, j] = computeDiff(jpeg_dir+"/"+image_list[i], jpeg_dir+"/"+image_list[j])
+    difference_matrix = difference_matrix + difference_matrix.transpose()
     
-    differences_sorted.sort(reverse=True)
-    if len(differences_sorted) <= max_keyframes:
-        # The number of extracted keyframes is lte to the max allowable 
-        # keyframe count. Keep all
-        threshold = differences_sorted[len(differences_sorted)-1] 
-        term_reason = "Number of initial frames was lte to the maximum number of keyframes allowed"
-    elif differences_sorted[max_keyframes-1] > 1000: 
-        # Too many keyframes will be generated. Choose higher threshold to 
-        # force the number of keyframes down to max_keyframes.
-        threshold = differences_sorted[max_keyframes-1]
-        term_reason = "Capped by maximum number of keyframes allowed"
-    else:
-        threshold = 1000
-        term_reason = "Capped by internal threshold"
-    
+    # callate shot boundary scores for each frames, score = cut(A,B)/associate(A) + cut(A,B)/associate(B) 
+    candidates = []
+    for i in range(k, image_num-1-k):
+        cutAB = np.sum(difference_matrix[i-k:i, i:i+k])
+        assocA = np.sum(difference_matrix[i-k:i, i-k:i])
+        assocB = np.sum(difference_matrix[i:i+k, i:i+k])
+        if (assocA!=0) and (assocB!=0):
+            score = cutAB/assocA + cutAB/assocB
+        else:
+            score = 0
+        candidates.append((score, i))
+
+    # extract local maximum as the shot boundaries.
+    # the threshold is assigned to be the mean of all the scores. 
+    # [important] we may want to change the threshold to control the number of key frames. 
+    # higher threshold generates fewer shot boundaries.
+    threshold = np.mean([pair[0] for pair in candidates]);
+    cuts = localMaximum(candidates, threshold)
+
+    # limit shot boundary number fewer than max_keyframes
+    if len(cuts) >= max_keyframes :
+        # sort key frames by score 
+        cuts.sort(reverse=True)
+        cuts = cuts[:max_keyframes];
+
+    # select the 3nd frame after each shot boundary as the key frame.
+    # alternatively, we can also select middle frame between two shot boundaries as the key frame.
+    cut_offset = 2
+
+    # below code is used to output keyframes.
     keep_frames = []
     keep_times = []
-    
-    for i in range(len(image_list)-1):
-        if differences[i] >= threshold:
-            keep_frames.append(image_list[i])
-            keep_times.append(i)
-        else:
-            os.remove(jpeg_dir+"/"+image_list[i])
+    jpeg_dir_parent = os.path.abspath(os.path.join(jpeg_dir, os.path.pardir))
+    jpeg_dir_result = jpeg_dir_parent + "/tmp"
+    if os.path.exists(jpeg_dir_result):
+        pass
+    else:
+        os.mkdir(jpeg_dir_result)
+    # sort key frames by index
+    sorted(cuts, key=lambda x: x[1])     
 
-    infoLog(notify_buf, "Keyframes selected: %d" % len(keep_frames))
-    infoLog(notify_buf, "Termination reason: %s" % term_reason)
-    
-    os.remove(jpeg_dir+"/"+image_list[len(image_list)-1])
+    # move key frames into a tmp folder, then move back.
+    for i in range(len(cuts)):
+        index = min(cuts[i][1] + cut_offset, len(image_list) - 1)
+        shutil.move(jpeg_dir+"/"+image_list[index], jpeg_dir_result)
+        keep_frames.append(image_list[index])
+        keep_times.append(index)
+
+    cleanup_working_dir(notify_buf, jpeg_dir)
+    os.rename(jpeg_dir_result, jpeg_dir)  
 
     return (keep_frames, keep_times)
-
+    
 
 def write_manifest(notify_buf, jpeg_dir, keep_frames, keep_times):
     outfile_name = jpeg_dir + "/manifest.txt"
@@ -161,7 +199,7 @@ def put_thumbs(notify_buf, jpeg_dir, prefix, suffix, video_id, store_loc):
         infoLog(notify_buf, "Uploading: %s" % fname)
         local_file = open(jpeg_dir + "/" + fname, 'rb')
         store_file = default_storage.open(store_path + "/" + fname, 'wb')
-        file_data = local_file.read();
+        file_data = local_file.read()
         store_file.write(file_data)
         local_file.close()
         store_file.close()
