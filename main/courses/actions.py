@@ -118,6 +118,8 @@ def revert(request):
             ProblemSet.objects.get(id=parts[1]).revert()
         elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).revert()
+        elif parts[0] == 'exam':
+            Exam.objects.get(id=parts[1]).revert()
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
