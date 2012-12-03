@@ -148,6 +148,8 @@ def change_live_datetime(request):
                 content = AdditionalPage.objects.get(id=parts[1])
             elif parts[0] == 'file':
                 content = File.objects.get(id=parts[1])
+            elif parts[0] == 'exam':
+                content = Exam.objects.get(id=parts[1])
 
             if action == "Make Ready and Go Live" and parts[0] != 'file':
                 content.commit()
@@ -166,7 +168,7 @@ def change_live_datetime(request):
         #return redirect(request.META['HTTP_REFERER'])
 
     if list_type == 'course_materials':
-        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
         template = 'courses/draft/course_materials.html'
     elif list_type == 'problemsets':
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_pset_content=True)
