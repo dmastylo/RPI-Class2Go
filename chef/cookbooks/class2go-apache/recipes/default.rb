@@ -21,6 +21,7 @@ node["apps"].keys.each do |app|
         group "root"
         variables({
             :servername => node["apps"][app]["servername"], 
+            :serveralias => node["apps"][app]["serveralias"], 
             :appname => app
         })
         mode 00644

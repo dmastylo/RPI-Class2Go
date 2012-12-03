@@ -254,12 +254,16 @@ body.home {
     font-weight:300;
     margin-bottom:0;
 }
+.databases {
+    background:#fff url(/static/graphics/core/dbLogo.jpg) no-repeat top left; 
+    padding:20px 20px 20px 320px;
+}
 .computernetworking {
-    background:#fff url(/static/graphics/core/computer-networking.jpg) no-repeat top left; 
+    background:url(/static/graphics/core/computer-networking.jpg) no-repeat top left; 
     padding:20px 20px 20px 320px;
 }
 .solarcells {
-    background:#fff url(/static/graphics/core/solarcells.jpg) no-repeat top left; 
+    background:url(/static/graphics/core/solarcells.jpg) no-repeat top left; 
     padding:20px 20px 20px 320px;
 }
 .home h3 a {

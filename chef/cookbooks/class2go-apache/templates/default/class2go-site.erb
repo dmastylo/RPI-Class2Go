@@ -1,5 +1,6 @@
 <VirtualHost *:80>
     ServerName <%= @servername %>
+    ServerAlias <%= @serveralias %>
     UseCanonicalName On
 
     Alias /robots.txt /opt/<%= @appname %>/static/robots.txt
