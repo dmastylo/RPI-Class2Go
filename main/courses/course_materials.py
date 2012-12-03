@@ -673,6 +673,9 @@ def get_child_data(child):
     elif type == 'file':
         file = File.objects.get(id=id)
         url = file.file.url
+    elif type == 'exam':
+        exam = Exam.objects.get(id=id)
+        url = 'exams/' + exam.slug
     else:
         url = ''
     
