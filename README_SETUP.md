@@ -119,7 +119,7 @@ prefix for these.
 
 1. Install test environment dependencies:
 
-        pip install mock nose django_nose
+        pip install mock nose django_nose django_coverage
 
 1. Setup the account and database in MySql
 
@@ -345,7 +345,7 @@ be installed for Mac (and probably Windows too)
 
 3. Install test environment dependencies:
 
-        pip install mock nose django_nose
+        pip install mock nose django_nose django_coverage
 
 3. Go to "main" dir and copy over database settings file:
 
