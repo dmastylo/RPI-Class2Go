@@ -76,6 +76,8 @@ urlpatterns = patterns('',
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
    
+   
+    url(r'^ldap-login/?$', 'accounts.views.ldap_login', name='ldap_login'),
     #shibboleth login
     url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
                        

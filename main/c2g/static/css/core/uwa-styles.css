@@ -114,6 +114,46 @@ ACCORDION
 UNITS _MOVED TO BODY.CSS
 *********/
 
+.home-unit img {height:186px; width:186px;}
+.home-unit-box {width: 100%;}
+
+.mainrow {min-width: 700px;}
+
+.row .sixcol {
+margin-right: 3.8%;
+float: left;
+min-height: 1px;
+width: 48%;}
+
+
+.last {
+margin-right: 0px !important;
+}
+
+
+.home-unit .row {margin-left:0px !important;}
+
+.front {}
+
+/*********
+BADGE
+*********/
+
+#badge { 
+   position: absolute;
+    right: -18px;
+    top: -8px;
+  }
+
+#badge img{height: auto;
+  width: auto;}
+  
+  .home-unit {position:relative}
+  
+  .mainrow {min-width: 800px !important;}
+
+
+
 
 /* ============================= */
 /* ! Layout for mobile version   */
