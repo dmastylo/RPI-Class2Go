@@ -1558,7 +1558,11 @@ class PageVisitLog(TimestampMixin, models.Model):
 
 class ExamManager(models.Manager):
     def getByCourse(self, course):
-        return self.filter(course=course)
+        if course.mode == 'draft':
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
 class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
@@ -1665,11 +1669,14 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         self.save()
     
     def is_synced(self):
-        if self.section != self.image.section:
+        
+        prod_instance = self.image
+        
+        if self.section != prod_instance.section.image:
             return False
-        if self.title != self.image.title:
+        if self.title != prod_instance.title:
             return False
-        if self.description != self.image.description:
+        if self.description != prod_instance.description:
             return False
         if self.html_content != self.image.html_content:
             return False
