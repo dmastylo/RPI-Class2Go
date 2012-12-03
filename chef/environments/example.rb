@@ -25,11 +25,17 @@ default_attributes \
         "production" => "False",
         "instance" => "stage",
         "maint" => "False",
-        "git_branch" => "origin/master",
         "admin_name" => "Class2Go Example",
         "admin_email" => "crash@class.stanford.edu",
         "snippet_email" => "c2g-dev@cs.stanford.edu",
         "django_secret" => "class2go"
+    },
+    "apps" => {
+        "class2go" => {
+            "servername" => "https://example.class.university.edu",
+            "serveralias" => "*.example.class.university.edu",
+            "git_branch" => "origin/master"
+        }
     },
     "util" => {
         "celery_database" => "/opt/class2go/celery/celerydb.sqlite",
@@ -51,7 +57,4 @@ default_attributes \
         "yt_service_developer_key" => "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "google_client_id" => "nnnnnnnnnnnn.apps.googleusercontent.com",
         "google_client_secret" => "sssssssssssssssssssss"
-    },
-    "apache" => {
-        "servername" => "https://example.class.university.edu"
     }

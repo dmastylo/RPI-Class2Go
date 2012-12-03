@@ -26,14 +26,19 @@
         <div class="row">
             <div class="span6">
                 <h3>Welcome to Class2Go! We're Stanford Online's internal platform, designed to be an open platform for online learning and research.</h3>
-                <p>This fall, we're offering two free courses to the world: 
+		<p>Coming Winter, 2013, free to the world:
+		<ul>
+		    <li><a href="{% url 'courses.views.main' 'db' 'Winter2013' %}">Introduction to Databases</a> with Jennifer Widom</li>
+		</ul>
+		</p>
+                <p>Fall 2012, we offered two free courses: 
                 <ul>
                     <li><a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">Computer Networking</a> with Nick McKeown &amp; Philip Levis</li> 
                     <li><a href="{% url 'courses.views.main' 'solar' 'Fall2012' %}">Solar Cells, Fuel Cells, &amp; Batteries</a> with Bruce Clemens</li>
                 </ul>
                 <h4>Here's what you will like about Class2Go:</h4>
                 <p><strong>Videos from Stanford professors</strong> with interactive in-video quizzes give you a chance to learn from Stanford professors and then practice what you've learned.</p>
-                <p><strong>Formative and summative exercises</strong> built on the Khan Academy's exercise framework provide new formats for taking your learning to the next level.</p>
+                <p><strong>Formative and summative exercises</strong> as well as in-video quizzes taking your learning to the next level.</p>
                 <p><strong>Frame extracting</strong> allows you to preview and navigate to specific parts of videos. Scroll through extracted frames underneath a video to quickly find what you're looking for.</p>
                 <p><strong>Love discussion forums?</strong> We've added Piazza forums to get people talking.</p>
             </div>
@@ -41,9 +46,9 @@
                 <h3>It's <a href="http://github.com/Stanford-Online/class2go/">open</a>.</h3>
                 <p>The platform is open source so that anyone who wants to can collaborate with us. We would love to have others use the platform, or to work together with similar efforts in other places.</p>
                 <h3>It's portable.</h3>
-                <p>The platform is open source so that anyone who wants to can collaborate with us. We would love to have others use the platform, or to work together with similar efforts in other placesWe believe strongly that valuable course content shouldn't be tied to any one platform. Documents are already portable; the videos are outside our system (on YouTube) and the assets themselves can be repurposed as faculty see fit. And our exercises and problem sets, instead of being trapped in a proprietary database, are in the Khan Academy format, so they can be used elsewhere.</p>
+                <p>The platform is open source so that anyone who wants to can collaborate with us. We would love to have others use the platform, or to work together with similar efforts in other places. We believe strongly that valuable course content shouldn't be tied to any one platform. Documents are already portable; the videos are outside our system (on YouTube) and the assets themselves can be repurposed as faculty see fit.</p>
                 <h3>It's interoperable.</h3>
-                <p>We don't want to build or maintain more than we have to. We're standing on the shoulders of developments from Khan Academy, Piazza, YouTube, MySQL, Python Django, Amazon AWS, Opscode, and Github.</p>
+                <p>We don't want to build or maintain more than we have to. We're standing on the shoulders of developments from Piazza, YouTube, MySQL, Python Django, Amazon AWS, Opscode, Github, and Popcorn.js.</p>
             </div>
         </div>
     </div>
@@ -57,11 +62,22 @@
         </div>
     </div>
 </div>
+<h3 style="padding-left:50px;">Winter, 2013</h3>
+<div class="home-unit">
+    <div class="container">
+        <div class="row databases">
+            <h3><a href="{% url 'courses.views.main' 'db' 'Winter2013' %}">Introduction to Databases</a></h3>
+            <p><strong>Class begins January 15, 2013</strong></p>
+	    <p>This is an introductory course on databases, primarily focusing on how databases and database systems are used in applications. The course will cover relational databases and SQL as well as cover semi-structured and unstructured data using the XML and JSON models. It will cover different ways of designing databases and include such important topics such as; indexes, views, transactions, authorization, integrity, triggers, and online analytical processing (OLAP). Towards the end of the class, Cloud databases and NoSQL systems will also be covered.</p>
+        </div>
+    </div>
+</div>
+<h3 style="padding-left:50px;">Fall, 2012</h3>
 <div class="home-unit">
     <div class="container">
         <div class="row computernetworking">
             <h3><a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">An Introduction to Computer Networking</a></h3>
-            <p><strong>Class begins October 8, 2012</strong></p>
+            <p><strong>Class began October 8, 2012</strong></p>
             <p>This is an introductory course on computer networking, specifically the Internet. It focuses on explaining how the Internet works, ranging from how bits are modulated on wires and in wireless to application-level protocols like BitTorrent and HTTP. It also explains the principles of how to design networks and network protocols. Students gain experience reading and understanding RFCs (Internet protocol specifications) as statements of what a system should do. The course grounds many of the concepts in current practice and recent developments, such as net neutrality and DNS security.</p>
         </div>
     </div>
@@ -70,7 +86,7 @@
     <div class="container">
         <div class="row solarcells">
             <h3><a href="{% url 'courses.views.main' 'solar' 'Fall2012' %}">Solar Cells, Fuel Cells &amp; Batteries</a></h3>
-            <p><strong>Class begins October 8, 2012</strong></p>
+            <p><strong>Class began October 8, 2012</strong></p>
             <p>This course focuses on the operating principles and applications of emerging technological solutions to the energy demands of the world. We will begin with discussing the scale of global energy usage and requirements for possible solutions. Basic physics and chemistry of solar cells, fuel cells, and batteries will be discussed in quantitative detail. We will explore performance issues, including economics, from the ideal device to the installed system. Finally, we will end with the promise of materials research for providing next generation solutions.</p>
         </div>
     </div>

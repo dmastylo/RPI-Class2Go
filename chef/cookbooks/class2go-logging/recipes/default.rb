@@ -5,6 +5,7 @@
 # Note that specifying modes needs to be done as five digits.  See
 # this chef bug: http://tickets.opscode.com/browse/CHEF-174
 
+
 directory "/var/log/django" do
     owner "root"
     group "root"
@@ -12,16 +13,15 @@ directory "/var/log/django" do
     action :create
 end
 
-file "/var/log/django/django.log" do
-    owner "root"
-    group "root"
-    mode 00666
-    action :create
+node['apps'].keys.each do |app|
+    
+    file "/var/log/django/#{app}-django.log" do
+        owner "root"
+        group "root"
+        mode 00666
+        action :create
+    end
+
 end
 
-# execute "django-log-permissions" do
-#    cwd "/var/log/django"
-#    user "root"
-#    command "chmod 666 django.log"
-# end
 

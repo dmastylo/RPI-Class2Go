@@ -7,11 +7,16 @@ directory "/mnt" do
     action :create
 end
 
-template "database.py" do
-    path node['system']['admin_home'] + "/class2go/main/database.py"
-    source "database.py.erb"
-    owner node['system']['admin_user']
-    group node['system']['admin_group']
-    mode 00644
+node["apps"].keys.each do |app|
+    template "database.py" do
+        path node['system']['admin_home'] + "/#{app}/main/database.py"
+        source "database.py.erb"
+        owner node['system']['admin_user']
+        group node['system']['admin_group']
+        variables({ 
+            :appname => app
+        })
+        mode 00644
+    end
 end
 
