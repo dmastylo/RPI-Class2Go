@@ -94,9 +94,9 @@
             }
 
             if (nearest >-1) {
-                console.log(nearest);
-                console.log(slideIndices[''+nearest]);
-                console.log(slideIndices);
+                //console.log(nearest);
+                //console.log(slideIndices[''+nearest]);
+                //console.log(slideIndices);
                 var selected = slideIndices[''+nearest].displayDiv;
                 $(selected).addClass('selected');
                 $(selected).removeClass('unselected');
@@ -105,7 +105,7 @@
         };
 
         var handleTimeUpdate = function () {
-            console.log(popcornVideo.currentTime());
+            //console.log(popcornVideo.currentTime());
             var timeInSec = Math.floor(popcornVideo.currentTime()).toFixed(1);
             selectSlide(timeInSec);
             /*

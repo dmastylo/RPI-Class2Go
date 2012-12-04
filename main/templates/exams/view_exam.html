@@ -285,17 +285,30 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             };
 
             //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
+
             if ($('#GraderName').length > 0) {
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
                     'select_dict':   '',
-                    'student_input': $wrapper.find('textarea').val(),
+                    'student_input': $('#' + assocQID).find('textarea').val(),
                     'params': {
-                      'qnum': $wrapper.data('qnum')
+                      'qnum': $('#' + assocQID).data('qnum')
                     }
                 };
 
-                $.post("/server/AJAXPostHandler.php", postData, displayHTMLAnswer);
+                //$.post("/server/AJAXPostHandler.php", postData, displayHTMLAnswer);
+                var tObj = {};
+                tObj.score = 0;
+                tObj["maximum-score"] = 1;
+                tObj.feedback = [];
+                tObj.feedback[0] = {};
+                //tObj.feedback[0].user_answer = "SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'";
+                tObj.feedback[0].user_answer = postData["student_input"]; 
+                tObj.feedback[0].score = 0;
+                tObj.feedback[0].explanation = "<br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n";
+                var testJSON = JSON.stringify(tObj);
+                //var testJSON = '{"score":0,"maximum-score":1,"feedback":[{"user_answer":"SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n"}]';
+                displayHTMLAnswer(testJSON);
             } else {
                 $.post('{{exam.slug}}/quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
@@ -498,6 +511,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                    json_data:JSON.stringify(userSelections)
                }
         );
+
         function getDialog() {
             var dialogDiv = $('#dialog-message');
             if (dialogDiv.length == 0) {
