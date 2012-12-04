@@ -69,6 +69,9 @@ easy_install_package "djangorestframework" do
     action :install
 end
 
+easy_install_package "pysimplesoap" do
+    action :install
+end
 
 
 # Use lynx to flatten out HTML emails
