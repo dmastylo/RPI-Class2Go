@@ -3,7 +3,7 @@
         //var thumbnailData = {"0.0":{"imgsrc":"img001.jpeg"},"31.0":{"imgsrc":"img032.jpeg"},"40.0":{"imgsrc":"img041.jpeg"},"62.0":{"imgsrc":"img063.jpeg"},"135.0":{"imgsrc":"img136.jpeg"},"136.0":{"imgsrc":"img137.jpeg"},"179.0":{"imgsrc":"img180.jpeg"},"259.0":{"imgsrc":"img260.jpeg"},"292.0":{"imgsrc":"img293.jpeg"},"353.0":{"imgsrc":"img354.jpeg"},"354.0":{"imgsrc":"img355.jpeg"},"355.0":{"imgsrc":"img356.jpeg"},"385.0":{"imgsrc":"img386.jpeg"}};
         var thumbnailData = {"0":{"imgsrc":"img001.jpeg"},"31":{"imgsrc":"img032.jpeg"},"40":{"imgsrc":"img041.jpeg"},"62":{"imgsrc":"img063.jpeg"},"135":{"imgsrc":"img136.jpeg"},"136":{"imgsrc":"img137.jpeg"},"179":{"imgsrc":"img180.jpeg"},"259":{"imgsrc":"img260.jpeg"},"292":{"imgsrc":"img293.jpeg"},"353":{"imgsrc":"img354.jpeg"},"354":{"imgsrc":"img355.jpeg"},"355":{"imgsrc":"img356.jpeg"} /*,"385":{"imgsrc":"img386.jpeg"}*/};
         var slideIndices = thumbnailData;
-        var questionData = {"184": {"fileName": "arp_q1.html", "problemDiv": 974, "order": 0, "time": 384}, "385": {"fileName": "arp_q2.html", "problemDiv": 975, "order": 1, "time": 385}, "386": {"fileName": "arp_q3.html", "problemDiv": 976, "order": 2, "time": 386}};
+        var questionData = {"184": {"fileName": "arp_q1.html", "problemDiv": 974, "order": 0, "time": 384}, "385": {"fileName": "arp_q2.html", "problemDiv": 975, "order": 1, "time": 385}, "385": {"fileName": "arp_q3.html", "problemDiv": 976, "order": 2, "time": 386}};
         var questions = questionData;
         var imgPath = "http://prod-c2g.s3-website-us-west-2.amazonaws.com/networking/Fall2012/videos/1201/jpegs/";
         var popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
@@ -161,24 +161,39 @@
             $(continueVideoBtn).addClass('btn');
             $(continueVideoBtn).addClass('continue-video-btn');
             $('#exam-pane').append($(continueVideoBtn));
-            $(continueVideoBtn).click(removeExamStage);
-            
+            //$(continueVideoBtn).click(removeExamStage);
+
+            var configureExamButton = function (mode) {
+                if (mode == "multi-question") {
+                    $(continueVideoBtn).attr('value', 'Next Question');
+                    $(continueVideoBtn).click(function () {});
+                } else { 
+                    $(continueVideoBtn).click(removeExamStage);
+                }
+            };
+
             popcornVideo.cue('184', function () {
-                setExamStage();
-                $('.question').eq(0).show();
-                $('#exam-pane').fadeTo('slow', 1.0);}
+                    setExamStage();
+                    $('.question').eq(0).show();
+                    $('#exam-pane').fadeTo('slow', 1.0);
+                    configureExamButton();
+                }
             );
 
             popcornVideo.cue('385', function () {
-                setExamStage();
-                $('.question').eq(1).show();
-                $('#exam-pane').fadeTo('slow', 1.0);}
+                    setExamStage();
+                    $('.question').eq(1).show();
+                    $('#exam-pane').fadeTo('slow', 1.0);
+                    configureExamButton("multi-question");
+                }
             );
 
+            /*
             popcornVideo.cue('385', function () {
                 setExamStage();
                 $('.question').eq(2).show();
                 $('#exam-pane').fadeTo('slow', 1.0);}
             );
+            */
 
         });

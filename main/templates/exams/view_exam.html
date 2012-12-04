@@ -263,10 +263,45 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('#' + checkBtnID).attr('value','Hide Answers');
             };
 
+            var displayHTMLAnswer = function (data, msg, xhr) {
+                
+                var responseData = $.parseJSON(data);
+                
+                if ( responseData == "ERROR" ) {
+                  alert("Error: Invalid grader name");
+                  return;
+                }
+                
+                var explArea = $('#' + assocQID + '-expl');
+                if (explArea.length == 0) {
+                    explArea = document.createElement('div');
+                    $(explArea).attr('id', assocQID + '-expl');
+                    $(explArea).addClass('explanation');
+                }
+                $(explArea).empty();
+                $('#' + assocQID + ' .quick-check').before($(explArea));
+                $(explArea).append(responseData.feedback[0].explanation);
+
+            };
+
             //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
-            $.post('{{exam.slug}}/quick_check', 
+            if ($('#GraderName').length > 0) {
+                var postData = {
+                    'grader_name':   $('#GraderName').text(),
+                    'select_dict':   '',
+                    'student_input': $wrapper.find('textarea').val(),
+                    'params': {
+                      'qnum': $wrapper.data('qnum')
+                    }
+                };
+
+                $.post("/server/AJAXPostHandler.php", postData, displayHTMLAnswer);
+            } else {
+                $.post('{{exam.slug}}/quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
                     function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
+            }
+
         };
 
         $('.question').each(function (idx, el) {
