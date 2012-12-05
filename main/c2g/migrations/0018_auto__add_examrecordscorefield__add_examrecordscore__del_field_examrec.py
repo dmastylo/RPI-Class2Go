@@ -173,6 +173,18 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
+        'c2g.contentgroup': {
+            'Meta': {'object_name': 'ContentGroup', 'db_table': "u'c2g_content_group'"},
+            'additional_page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.AdditionalPage']", 'null': 'True', 'blank': 'True'}),
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']", 'null': 'True', 'blank': 'True'}),
+            'file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.File']", 'null': 'True', 'blank': 'True'}),
+            'group_id': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'level': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
+            'problemSet': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ProblemSet']", 'null': 'True', 'blank': 'True'}),
+            'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Video']", 'null': 'True', 'blank': 'True'})
+        },
         'c2g.contentsection': {
             'Meta': {'object_name': 'ContentSection', 'db_table': "u'c2g_content_sections'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
@@ -226,6 +238,14 @@ class Migration(SchemaMigration):
             'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'to': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
+        },
+        'c2g.currenttermmap': {
+            'Meta': {'object_name': 'CurrentTermMap'},
+            'course_prefix': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '64', 'db_index': 'True'}),
+            'course_suffix': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.emailaddr': {
             'Meta': {'object_name': 'EmailAddr'},
