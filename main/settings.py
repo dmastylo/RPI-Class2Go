@@ -1,5 +1,5 @@
 # Django settings for Class2Go project.
-from os import path
+from os import path, environ
 
 import django.template
 import djcelery
@@ -390,6 +390,7 @@ CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_k
 # Set a specific testrunner to use
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--config=./nose.cfg']
+environ['LIVE_TEST_SERVER_ADDRESS']='localhost:8100-8110'
 
 # we use django_coverage for test coverage reports. Configure here.
 COVERAGE_ADDITIONAL_MODULES = ['accounts', 'kelvinator']

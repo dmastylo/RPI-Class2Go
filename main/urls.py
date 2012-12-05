@@ -1,13 +1,14 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.simple import redirect_to
 
+import settings
+
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
 
-   
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that
     # won't be redirected or change
     url(r'_health$', 'c2g.views.healthcheck'),
@@ -162,7 +163,9 @@ urlpatterns = patterns('',
         name='course_video_list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/upload$', 'courses.videos.views.upload'),
     url(r'^switch_video_quiz_mode', 'courses.videos.actions.switch_quiz_mode'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/?$', 'courses.videos.views.view'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/?$',
+        'courses.videos.views.view',
+        name='course_video_view'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit/?$', 'courses.videos.views.edit'),
     url(r'^add_video/?$', 'courses.videos.actions.add_video'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<slug>[a-zA-Z0-9_-]+)/edit_video/?$', 'courses.videos.actions.edit_video'),
@@ -171,7 +174,9 @@ urlpatterns = patterns('',
     url(r'^upload_video/?', 'courses.videos.actions.upload'), ####ADDED BY KEVIN
     url(r'^oauth2callback/?', 'courses.videos.actions.oauth'),
     url(r'^delete_video_exercise/?$', 'courses.videos.views.delete_exercise'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set?$', 'courses.videos.views.load_video_problem_set'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set/?$',
+        'courses.videos.views.load_video_problem_set',
+        name='course_video_pset'),
     
 
 
@@ -233,3 +238,9 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),
 
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('', 
+        url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': settings.STATIC_URL+'graphics/core/favicon.ico'}),
+    )
+   
