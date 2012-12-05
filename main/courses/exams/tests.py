@@ -67,43 +67,44 @@ class SimpleTest(TestCase):
             <exam_metadata>
                 <question_metadata id="problem_1" data-tag4humans="Apple Competitor Question">
                     <response name="q1d" answertype="multiplechoiceresponse" data-tag4humans="Apple Competitors">
-                        <choice id="q1d_0" data-tag4humans="iPad" correct="false">
+                        <choice value="ipad" data-tag4humans="iPad" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice id="q1d_1" data-tag4humans="Napster" correct="true">
+                        <choice value="napster" data-tag4humans="Napster" correct="true">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice id="q1d_2" data-tag4humans="iPod" correct="true">
+                        <choice value="ipod" data-tag4humans="iPod" correct="true">
                             <explanation>This is right!</explanation>
                         </choice>
-                        <choice id="q1d_3" data-tag4humans="Vegetable Peeler" correct="false">
+                        <choice value="peeler" data-tag4humans="Vegetable Peeler" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice id="q1d_4" data-tag4humans="Android" correct="false">
+                        <choice value="android" data-tag4humans="Android" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice id="q1d_5" data-tag4humans="The Beatles" correct="false">
+                        <choice value="beatles" data-tag4humans="The Beatles" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
                     </response>
                 </question_metadata>
                 <question_metadata id="problem_2">
                     <response name="test2" answertype="multiplechoiceresponse">
-                        <choice id="a" correct="False" />
-                        <choice id="b" correct="True" />
-                        <choice id="c" correct="True" />
+                        <choice value="a" correct="False" />
+                        <choice value="b" correct="True" />
+                        <choice value="c" correct="True" />
                     </response>
                 </question_metadata>
             </exam_metadata>
             """
         ag = AutoGrader(xml)
             #problem 1
-        self.assertTrue(ag.grader_functions['q1d'](["q1d_1", "q1d_2"]))
-        self.assertTrue(ag.grader_functions['q1d'](["q1d_2", "q1d_1"]))
-        self.assertFalse(ag.grader_functions['q1d'](["q1d_1", "q1d_2", "q1d_3"]))
-        self.assertFalse(ag.grader_functions['q1d'](["q1d_2"]))
+        self.assertTrue(ag.grader_functions['q1d'](["napster", "ipod"]))
+        self.assertTrue(ag.grader_functions['q1d'](["ipod", "napster"]))
+        self.assertFalse(ag.grader_functions['q1d'](["ipad", "ipod", "napster"]))
+        self.assertFalse(ag.grader_functions['q1d'](["ipo"]))
+        self.assertFalse(ag.grader_functions['q1d'](["ipod"]))
         self.assertFalse(ag.grader_functions['q1d']([]))
-        self.assertTrue(ag.grade('q1d', ["q1d_1", "q1d_2"]))
+        self.assertTrue(ag.grade('q1d', ["ipod", "napster"]))
         self.assertFalse(ag.grade('q1d', ["q1d_1"]))
 
             #problem 2
@@ -183,12 +184,12 @@ class SimpleTest(TestCase):
             <exam_metadata>
             <question_metadata id="q1">
                 <response name="foo" answertype="multiplechoiceresponse">
-                    <choice id="a" correct="true" />
+                    <choice value="a" correct="true" />
                 </response>
             </question_metadata>
             <question_metadata id="q2">
                 <response name="foo" answertype="multiplechoiceresponse">
-                    <choice id="a" correct="true" />
+                    <choice value="a" correct="true" />
                 </response>
             </question_metadata>
             </exam_metadata>
@@ -220,18 +221,18 @@ class SimpleTest(TestCase):
             <exam_metadata>
             <question_metadata id="q1">
                 <response name="foo" answertype="multiplechoiceresponse">
-                    <choice id="a" correct="true" />
-                    <choice id="a" correct="false" />
+                    <choice value="a" correct="true" />
+                    <choice value="a" correct="false" />
                 </response>
             </question_metadata>
             <question_metadata id="q2">
                 <response name="foo2" answertype="multiplechoiceresponse">
-                    <choice id="a" correct="true" />
+                    <choice value="a" correct="true" />
                 </response>
             </question_metadata>
             </exam_metadata>
             """
-        with self.assertRaisesRegexp(AutoGraderMetadataException, '.*<choice> tags with duplicate id "a"'):
+        with self.assertRaisesRegexp(AutoGraderMetadataException, '.*<choice> tags with duplicate value "a"'):
             ag = AutoGrader(xml)
 
     def test_parse_xml_question_response_no_choice_id(self):
@@ -243,13 +244,13 @@ class SimpleTest(TestCase):
               <exam_metadata>
               <question_metadata id="q1">
                   <response name="foo" answertype="multiplechoiceresponse">
-                      <choice id="a" correct="true"></choice>
+                      <choice value="a" correct="true"></choice>
                       <choice correct="false"></choice>
                   </response>
               </question_metadata>
               </exam_metadata>
               """
-        with self.assertRaisesRegexp(AutoGraderMetadataException, '.*<choice> tag with no "id".*'):
+        with self.assertRaisesRegexp(AutoGraderMetadataException, '.*<choice> tag with no "value".*'):
             ag = AutoGrader(xml)
 
     def test_parse_numericresponse_metadata(self):

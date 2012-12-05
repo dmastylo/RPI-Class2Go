@@ -123,7 +123,8 @@ var c2gXMLParse = (function() {
 
                                 //make choice object
                                 var choiceObj = document.createElement('choice');
-                                $(choiceObj).attr('id',choiceID);
+                                //$(choiceObj).attr('id',choiceID);
+                                $(choiceObj).attr('value',$(this).attr('name'));
                                 $(choiceObj).attr('data-tag4humans', $(this).attr('tag4humans'));
                                 $(questionObj).append($(choiceObj));
                                 var explanationObj = document.createElement('explanation');

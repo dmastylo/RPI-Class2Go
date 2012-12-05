@@ -20,16 +20,16 @@
   {% else %}
     {% for prob, data in sub.json_obj %}
       {% if data|islist and data.0.questionTag4humans %}
-        On question {{data.0.questionTag4humans}}, you answered:
+        On question {{prob}} ({{data.0.questionTag4humans}}), you answered:
       {% else %}
-        On question {{prob}}, you answered:
+        On question {{prob}} ({{data.questionTag4humans}}), you answered:
       {% endif %}
          {% if data|islist %}{# Custom template tag to test if object is a list #}
              {% for i in data %}
                  {{i.associatedText}},
              {% endfor %}
          {% else %}
-             {{ data }}
+             {{ data.value }}
          {% endif %}
     <span id="{{prob}}_score"></span>
     <br />

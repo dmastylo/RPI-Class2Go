@@ -45,6 +45,26 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.TextField')(null=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'Exam.partial_credit_deadline'
+        db.add_column('c2g_exam', 'partial_credit_deadline',
+                      self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Exam.submissions_permitted'
+        db.add_column('c2g_exam', 'submissions_permitted',
+                      self.gf('django.db.models.fields.IntegerField')(default=999, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Exam.resubmission_penalty'
+        db.add_column('c2g_exam', 'resubmission_penalty',
+                      self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Exam.late_penalty'
+        db.add_column('c2g_exam', 'late_penalty',
+                      self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True),
+                      keep_default=False)
+
         # Adding field 'Exam.autograde'
         db.add_column('c2g_exam', 'autograde',
                       self.gf('django.db.models.fields.BooleanField')(default=False),
@@ -99,6 +119,18 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Exam.xml_metadata'
         db.delete_column('c2g_exam', 'xml_metadata')
+
+        # Deleting field 'Exam.partial_credit_deadline'
+        db.delete_column('c2g_exam', 'partial_credit_deadline')
+
+        # Deleting field 'Exam.submissions_permitted'
+        db.delete_column('c2g_exam', 'submissions_permitted')
+
+        # Deleting field 'Exam.resubmission_penalty'
+        db.delete_column('c2g_exam', 'resubmission_penalty')
+
+        # Deleting field 'Exam.late_penalty'
+        db.delete_column('c2g_exam', 'late_penalty')
 
         # Deleting field 'Exam.autograde'
         db.delete_column('c2g_exam', 'autograde')
@@ -278,9 +310,13 @@ class Migration(SchemaMigration):
             'invideo': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'late_penalty': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'partial_credit_deadline': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'resubmission_penalty': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True'}),
+            'submissions_permitted': ('django.db.models.fields.IntegerField', [], {'default': '999', 'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'total_score': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),

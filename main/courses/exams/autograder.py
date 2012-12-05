@@ -78,12 +78,12 @@ class AutoGrader():
         choice_list = [] # This list is really for validation only
         answer_list = [] # This list will build the grader function
         for c in choices:
-            cid = c.getAttribute('id').strip()
+            cid = c.getAttribute('value').strip()
             if cid == "":
-                raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has descendant <choice> tag with no "id" attribute' \
+                raise AutoGraderMetadataException('<question_metadata id="%s">, <response name="%s"> has descendant <choice> tag with no "value" attribute' \
                                                   % (qid, resp_name))
             if cid in choice_list:
-                raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has descendant <choice> tags with duplicate id "%s"' \
+                raise AutoGraderMetadataException('<question_metadata id="%s">, <response name="%s"> has descendant <choice> tags with duplicate value "%s"' \
                                                   % (qid, resp_name, cid))
             choice_list.append(cid)
                     

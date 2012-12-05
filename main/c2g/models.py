@@ -1571,11 +1571,15 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
-    total_score = models.IntegerField(null=True, blank=True)
+    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    late_penalty = models.IntegerField(default=0, null=True, blank=True)
+    submissions_permitted = models.IntegerField(default=999, null=True, blank=True)
+    resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
     autograde = models.BooleanField(default=False)
     display_single = models.BooleanField(default=False)
     invideo = models.BooleanField(default=False)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    total_score = models.IntegerField(null=True, blank=True)
     
     
     def past_due(self):

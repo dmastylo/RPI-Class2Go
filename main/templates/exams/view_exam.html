@@ -2,11 +2,12 @@
 {% load url from future %}
 {% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
 
-{% if videotest %}
 {% block l_column_content %}
+{% if videotest %}
     {% include "left_nav.html" %}
-{% endblock l_column_content %}
 {% endif %}
+{% endblock l_column_content %}
+
 
 {% block m_column_content %}
 {% if videotest %}<div id="c2g_layout_m_column" class="khan-template" style="margin-left: 25%">{% endif %}
@@ -312,7 +313,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 //var testJSON = '{"score":0,"maximum-score":1,"feedback":[{"user_answer":"SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n"}]';
                 displayHTMLAnswer(testJSON);
             } else {
-                $.post('{{exam.slug}}/quick_check', 
+                $.post('quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
                     function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
             }
@@ -330,10 +331,95 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.quick-check').click(quickCheck);
         /* END JS for Wed demo */
+    {% else %}
+/* The page-at-a-time version */
+      var displayMetaData = function (data, userData) {
+          console.log('displayMetaData called');
+          console.log(arguments);
+          console.log(data);
+          var myXML = $.parseXML(data);
+          var examMD = $(myXML).find('exam_metadata');
+          var questionMD = $(examMD).find('question_metadata#' + assocQID);
+          var mySolution = $(questionMD).find('solution');
+          var responses = $(questionMD).find('response');
+          
+          var createInlineExp = function (targetEl) {
+              var tmpInlineExpl = document.createElement('span');
+              $(tmpInlineExpl).addClass('inline-explanation');
+              $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+              $(targetEl).append($(tmpInlineExpl));
+
+              return $(tmpInlineExpl);
+          };
+          
+          responses.each(function () {
+             var responseType = $(this).attr('answertype');
+             if (responseType == "multiplechoiceresponse") {
+                 var choices = $(this).find('choice');
+                 choices.each(function () {
+                      var choiceInput = $('#' + $(this).attr('id'));
+                      console.log(choiceInput.length);
+                      var choiceLabel = $('#' + $(this).attr('id')).closest('label');
+                      console.log(choiceLabel.length);
+                      console.log($(choiceLabel).find('.inline-explanation').length);
+                      var inlineExpl = $(choiceLabel).find('.inline-explanation');
+                      if (inlineExpl.length == 0) {
+                          inlineExpl = createInlineExp($(choiceLabel));
+                      }
+                      console.log(inlineExpl);
+                      if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
+                          $(inlineExpl).addClass('correct');
+                      }
+                          $(inlineExpl).append($(this).find('explanation').text());
+                      });
+             } else {
+                 var inputName = $(this).attr('name');
+                 var correctVal = $(this).text();
+                 var inputEl = $('input[name|="' + inputName + '"]');
+                 if (typeof userData[inputName] != "undefined" && ($.trim(userData[inputName]) == $.trim(String(correctVal)))) {
+                     $(inputEl).after('<span class="inline-explanation correct">Correct</span>');
+                 } else {
+                     $(inputEl).after('<span class="inline-explanation incorrect">Incorrect</span>');
+                 }
+             }
+            });
+            var explArea = $('#' + assocQID + '-expl');
+            if (explArea.length == 0) {
+                explArea = document.createElement('div');
+                $(explArea).attr('id', assocQID + '-expl');
+                $(explArea).addClass('explanation');
+            }
+            $(explArea).empty();
+            $('#' + assocQID + ' .quick-check').before($(explArea));
+            $(mySolution).children().each(function () {
+                if ($(this).text() == 'Explanation') {
+                    $(explArea).append('<h4>' + $(this).text() + '</h4>');
+                } else {
+                    $(explArea).append($(this));
+                }
+            });
+      
+            $('#' + checkBtnID).attr('value','Hide Answers');
+         };
+          // Add a "re-enable inputs" button
+          var qchkBtn = document.createElement('input');
+          $(qchkBtn).attr('id', 'qchkForm');
+          $(qchkBtn).attr('type', 'button');
+          $(qchkBtn).attr('title', 'Check your answers');
+          $(qchkBtn).addClass('btn btn-spaced');
+          $(qchkBtn).val('Check your answers');
+          var submitBtn = $('input[type|="submit"]').not('#login_button');
+          submitBtn.before($(qchkBtn));
+          $(qchkBtn).click(displayMetaData);
+
     {% endif %}
 
+    {% if exam.autograde %}
     var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-    
+    {% else %}
+    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    {% endif %}
+                      
     if (__exam_type=="survey") {
             SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
     }
@@ -389,10 +475,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         // iterate through named form inputs
         for (member in dataObj) {
             
-            if (typeof dataObj[member] == "string") {
+            if ($.type(dataObj[member]) == "object") {
                 // it's a text input/textarea
-                $('input[name|=' + member + ']').val(dataObj[member]);
-                $('textarea[name|=' + member + ']').val(dataObj[member]);
+                $('input[name|=' + member + ']').val(dataObj[member].value);
+                $('textarea[name|=' + member + ']').val(dataObj[member].value);
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
                       $('input[name|=' + member + ']').before("<b style='color:red'>" + scores[member]+" </b> ");
@@ -459,7 +545,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             });
         }
     };
-
+/*
     allFieldsets.each(function() {
         if (!$(this).attr('no-shuffle')) {
             var tmpChoices = $(this).find('label');
@@ -473,6 +559,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
         }
     });
+ */
                       
     $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
@@ -491,7 +578,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
                 userSelections[$(this).attr('name')].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
-                userSelections[$(this).attr('name')] = $(this).val();
+                var tmpObj = {};
+                tmpObj.value = $(this).val();
+                tmpObj.tag4humans = $(this).attr('data-tag4humans');
+                tmpObj.questionTag4humans = $(this).attr('data-tag4humans');
+                        
+                userSelections[$(this).attr('name')] = tmpObj
             }
         });
         $('textarea').each(function () {
