@@ -3,14 +3,13 @@ import tempfile
 
 #from django.contrib.auth.models import Group
 from django.core.files import File as FieldFile
-from django.test import TestCase
+from tests.test_base import SimpleTestBase
 
 from c2g.models import Course
 from c2g.models import File as FileModel
 #from c2g.models import Institution
-from db_test_data.management.commands.db_populate import Command 
 
-class FileUnitTests(TestCase):
+class FileUnitTests(SimpleTestBase):
     """Idempotent unit tests of the File model methods: nothing gets saved"""
 
     def setUp(self):
@@ -32,16 +31,7 @@ class FileUnitTests(TestCase):
         self.assertEqual(self.myFile.get_icon_type(), 'picture')
 
 
-class C2GUnitTests(TestCase):
-    
-    pop_command = Command()
-    #fixtures=['db_snapshot.json']
-    
-    def setUp(self):
-        self.pop_command.handle()
-
-    def tearDown(self):
-        pass
+class C2GUnitTests(SimpleTestBase):
     
 #    def test_multisave(self):
 #        """

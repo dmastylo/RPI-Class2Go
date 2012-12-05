@@ -206,9 +206,9 @@ if INSTANCE != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
                         'django_nose',
+                        'django_coverage',
                        )
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -385,3 +385,16 @@ CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_k
                  'kelvinator.tasks.resize':    {'queue': APP+'-long', 'routing_key': APP+'-long'},
                  'celerytest.tasks.echo_-long': {'queue': APP+'-long', 'routing_key': APP+'-long'},
                 }
+
+# Testing related settings
+# Set a specific testrunner to use
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = ['--verbosity=2', '--config=./nose.cfg']
+
+# we use django_coverage for test coverage reports. Configure here.
+COVERAGE_ADDITIONAL_MODULES = ['accounts', 'kelvinator']
+COVERAGE_MODULE_EXCLUDES = ['tests$', 'settings$', 'urls$', 'locale$',
+                            'common.views.test', '__init__', 'django',
+                            'migrations', 'south', 'djcelery']
+COVERAGE_REPORT_HTML_OUTPUT_DIR = './coverage-report/'
+COVERAGE_CUSTOM_REPORTS = False
