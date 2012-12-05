@@ -167,7 +167,7 @@ var c2gXMLParse = (function() {
                               var questionObj = document.createElement('response');
                               $(questionObj).attr('name', probName);
                               $(questionObj).attr('answertype', nodeName);
-                              $(questionObj).text($(node).attr('answer'));
+                              $(questionObj).attr('answer',$(node).attr('answer'));
                               $(questionObj).attr('data-tag4humans', $(node).attr('tag4humans'));
                               $(questionObj).append($(node).find('responseparam'));
                               $(questionMeta).append($(questionObj));

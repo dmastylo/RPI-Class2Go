@@ -30,6 +30,7 @@ from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
+from courses.exams.autograder import AutoGrader, AutoGraderException
 
 from django.views.decorators.csrf import csrf_protect
 from storages.backends.s3boto import S3BotoStorage
@@ -477,3 +478,20 @@ def validate_row(row):
         return (False, "Score cannot be converted to integer")
 
     return (True, (username, field_name, score))
+
+
+@require_POST
+@auth_is_course_admin_view_wrapper
+def check_metadata_xml(request, course_prefix, course_suffix):
+    xml = request.POST.get('metaXMLContent')
+    if not xml:
+        return HttpResponseBadRequest("No metaXMLContent provided")
+    try:
+        grader = AutoGrader(xml)
+    except Exception as e: #Since this is just a validator, pass back all the exceptions
+        return HttpResponseBadRequest(unicode(e))
+
+    return HttpResponse("Metadata XML is OK.\n" + unicode(grader))
+    
+    
+

@@ -96,7 +96,7 @@
                     <div id="editor"></div>
                 </div>
                 <br />
-                <h4>Edit Exam MetaData below:</h4>
+                <h4>Edit Exam MetaData XML below:</h4>
                 <textarea id="ace_metadata_proxy" style="display:none"></textarea>
                 <div id="container">
                     <div id="metadata_editor"></div>
@@ -143,7 +143,7 @@
     <div class="control-group">
         <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
 
-        <!-- <input class="btn" type="button" id="preview-btn" value="Preview My Exam" /> -->
+        <input class="btn" type="button" id="check_metadata" value="Check Metadata XML" />
 
         <input type="button" id="exercise_submit_and_close" class="btn" value="Save to Server &amp; Close" /> 
         <input type="button" id="exercise_submit" class="btn" value="Save to Server"/> 
@@ -244,9 +244,7 @@
                     The answer is correct if it is within a specified numerical tolerance
                     of the expected answer.
                     </p>
-                    <script type="loncapa/python">
-                        computed_response = 502*9
-                        </script>
+                    
                     
                     <p>Enter the numerical value of Pi:
                     <numericalresponse answer="3.14159" tag4humans="Value of Pi">
@@ -255,7 +253,7 @@
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse answer="$computed_response" tag4humans="502*9">
+                    <numericalresponse answer="4518" tag4humans="502*9">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
@@ -299,9 +297,7 @@
                     The answer is correct if it is within a specified numerical tolerance
                     of the expected answer.
                     </p>
-                    <script type="loncapa/python">
-                        computed_response = 502*9
-                        </script>
+                    
                     
                     <p>Enter the numerical value of Pi:
                     <numericalresponse tag4humans="Value of Pi" answer="3.14159">
@@ -310,7 +306,7 @@
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse tag4humans="value of 502*9" answer="$computed_response">
+                    <numericalresponse tag4humans="value of 502*9" answer="4518">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
@@ -421,6 +417,21 @@
         };
     };
       
+    var checkMetadataXML = function() {
+        var csrftoken = '{{csrf_token}}';
+        $.ajax("{% url 'courses.exams.views.check_metadata_xml' course.prefix course.suffix %}", {
+             headers: {'X-CSRFToken': csrftoken},
+             type: 'POST',
+             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+             data: { metaXMLContent:metadata_editor.getValue() },
+             error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
+             success: function(data, textStatus, jqXHR) {
+                alert(jqXHR.responseText );
+
+             }
+             
+        });
+    };
     var next=true;
       
     var toggleWrap = function () {
@@ -430,7 +441,8 @@
         else {$('#wrap').text('No Wrap');}
         next = !next;
     }
-      
+    
+    $('#check_metadata').click(checkMetadataXML);
     $('#exercise_submit').click(saveExerciseContents(function(){}));
     $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
       
