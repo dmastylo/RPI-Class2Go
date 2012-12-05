@@ -127,16 +127,18 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             return localQuestionIdx;
         }
 
-        $('.question-nav').click(function () {
+        var showQuestion = function () {
             var newQIdx = localQuestionIdx;
-            if ($(this).attr('id') == "next-question") {
+            if ($(this).attr('id') == "next-question" || $(this).attr('value').indexOf('Next') != -1) {
                 var newQIdx = adjustQuestionIdx(1);
             } else if ($(this).attr('id') == "prev-question") {
                 var newQIdx = adjustQuestionIdx(-1);
             }
             $('.question').hide();
             $('.question').eq(newQIdx).show();
-        });
+        };
+
+        $('.question-nav').click(showQuestion);
         
         /* BEGIN JS for Wed demo */
         var quickCheck = function () {
@@ -417,20 +419,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 // loop through each choice listed for this input
                 /*
                 for (var i = 0; i < dataObj[member].length; i += 1) {
-    
                     var obj = dataObj[member][i];
 
                     for (key in obj) {
-
                         if (key == 'value') {
-                      //console.log(key + ' is what we want');
+                            //console.log(key + ' is what we want');
                             $('#' + member + '_' + obj[key]).attr('checked', 'checked');
-
                         } 
-	
-                        
                     }
-
                 }
                  */
             } 
