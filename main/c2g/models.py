@@ -1574,6 +1574,7 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     total_score = models.IntegerField(null=True, blank=True)
     autograde = models.BooleanField(default=False)
     display_single = models.BooleanField(default=False)
+    invideo = models.BooleanField(default=False)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
     
     

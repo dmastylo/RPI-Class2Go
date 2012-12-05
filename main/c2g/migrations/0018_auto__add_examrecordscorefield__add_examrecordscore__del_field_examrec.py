@@ -55,6 +55,11 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.BooleanField')(default=False),
                       keep_default=False)
 
+        # Adding field 'Exam.invideo'
+        db.add_column('c2g_exam', 'invideo',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
         # Adding field 'ExamScoreField.human_name'
         db.add_column('c2g_examscorefield', 'human_name',
                       self.gf('django.db.models.fields.CharField')(db_index=True, max_length=128, null=True, blank=True),
@@ -100,6 +105,9 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Exam.display_single'
         db.delete_column('c2g_exam', 'display_single')
+
+        # Deleting field 'Exam.invideo'
+        db.delete_column('c2g_exam', 'invideo')
 
         # Deleting field 'ExamScoreField.human_name'
         db.delete_column('c2g_examscorefield', 'human_name')
@@ -267,6 +275,7 @@ class Migration(SchemaMigration):
             'html_content': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.Exam']"}),
+            'invideo': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
