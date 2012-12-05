@@ -600,46 +600,55 @@ def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
             
     return False
 
-def group_data(groups):
+# Function to split the group data into level1 and level2 items.
+# The for loop looks for each change in the group_id; which works since ContentGroup.getByCourse
+# is ordered by group_id, level.
+# Format of the dictionaries is:
+#    key: type:id     value: group_id
+# which allows independent lookup of level1 and level2 items.
+# When we need the level2 items for a level1 item we lookup the level2 items with the same group_id (value)
+# as the level1 item.
+def group_data(group_items):
     
     level1_items = {}
     level2_items = {}
     
-    group_id = None
-    for group in groups:
-        if group.group_id == group_id:
-            level, type, id = get_group_item_data(group)
+    group_item_id = None
+    for group_item in group_items:
+        if group_item.group_id == group_item_id:
+            level, type, id = get_group_item_data(group_item)
             if level == 2:
-                level2_items[type + ':' + str(id)] = str(group_id)
+                level2_items[type + ':' + str(id)] = group_item_id
         else:
-            group_id = group.group_id
-            level, type, id = get_group_item_data(group)
+            group_item_id = group_item.group_id
+            level, type, id = get_group_item_data(group_item)
             if level == 1:
-                level1_items[type + ':' + str(id)] = group_id
+                level1_items[type + ':' + str(id)] = group_item_id
             
     return level1_items, level2_items
                 
-def get_group_item_data(group):
-    if group.video_id:
-        level = group.level
+# 
+def get_group_item_data(group_item):
+    if group_item.video_id:
+        level = group_item.level
         type = 'video'
-        id = group.video_id
-    elif group.problemSet_id:
-        level = group.level
+        id = group_item.video_id
+    elif group_item.problemSet_id:
+        level = group_item.level
         type = 'pset'
-        id = group.problemSet_id
-    elif group.additional_page_id:
-        level = group.level
+        id = group_item.problemSet_id
+    elif group_item.additional_page_id:
+        level = group_item.level
         type = 'page'
-        id = group.additional_page_id
-    elif group.file_id:
-        level = group.level
+        id = group_item.additional_page_id
+    elif group_item.file_id:
+        level = group_item.level
         type = 'file'
-        id = group.file_id
-    elif group.exam_id:
-        level = group.level
+        id = group_item.file_id
+    elif group_item.exam_id:
+        level = group_item.level
         type = 'exam'
-        id = group.exam_id
+        id = group_item.exam_id
 
     return level, type, id
 
@@ -647,7 +656,7 @@ def get_children(key, level1_items, level2_items):
     children = []
     if level1_items.has_key(key):
         group_id = level1_items[key]
-        child_items = [k for k, v in level2_items.items() if str(group_id) in v]
+        child_items = [k for k, v in level2_items.items() if group_id == v]
         for child in child_items:
             child_item = {}
             type, url = get_child_data(child)
