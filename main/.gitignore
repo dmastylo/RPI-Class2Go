@@ -3,6 +3,6 @@ database_util.py
 *.pyc
 django-core
 celery.log
-.coverage
+coverage-report
 .noseids
 
