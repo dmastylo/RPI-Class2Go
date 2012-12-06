@@ -22,6 +22,16 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('c2g', ['ExamRecordScoreField'])
 
+        # Adding model 'StudentExamStart'
+        db.create_table('c2g_studentexamstart', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('exam', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Exam'])),
+        ))
+        db.send_create_signal('c2g', ['StudentExamStart'])
+
         # Adding model 'ExamRecordScore'
         db.create_table('c2g_examrecordscore', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -31,9 +41,6 @@ class Migration(SchemaMigration):
             ('score', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
         ))
         db.send_create_signal('c2g', ['ExamRecordScore'])
-
-        # Deleting field 'ExamRecord.score'
-        db.delete_column('c2g_examrecord', 'score')
 
         # Adding field 'ExamRecord.json_score_data'
         db.add_column('c2g_examrecord', 'json_score_data',
@@ -50,6 +57,11 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'Exam.late_penalty'
+        db.add_column('c2g_exam', 'late_penalty',
+                      self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True),
+                      keep_default=False)
+
         # Adding field 'Exam.submissions_permitted'
         db.add_column('c2g_exam', 'submissions_permitted',
                       self.gf('django.db.models.fields.IntegerField')(default=999, null=True, blank=True),
@@ -57,11 +69,6 @@ class Migration(SchemaMigration):
 
         # Adding field 'Exam.resubmission_penalty'
         db.add_column('c2g_exam', 'resubmission_penalty',
-                      self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'Exam.late_penalty'
-        db.add_column('c2g_exam', 'late_penalty',
                       self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True),
                       keep_default=False)
 
@@ -78,6 +85,16 @@ class Migration(SchemaMigration):
         # Adding field 'Exam.invideo'
         db.add_column('c2g_exam', 'invideo',
                       self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'Exam.timed'
+        db.add_column('c2g_exam', 'timed',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'Exam.minutesallowed'
+        db.add_column('c2g_exam', 'minutesallowed',
+                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'ExamScoreField.human_name'
@@ -106,13 +123,11 @@ class Migration(SchemaMigration):
         # Deleting model 'ExamRecordScoreField'
         db.delete_table('c2g_examrecordscorefield')
 
+        # Deleting model 'StudentExamStart'
+        db.delete_table('c2g_studentexamstart')
+
         # Deleting model 'ExamRecordScore'
         db.delete_table('c2g_examrecordscore')
-
-        # Adding field 'ExamRecord.score'
-        db.add_column('c2g_examrecord', 'score',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
-                      keep_default=False)
 
         # Deleting field 'ExamRecord.json_score_data'
         db.delete_column('c2g_examrecord', 'json_score_data')
@@ -123,14 +138,14 @@ class Migration(SchemaMigration):
         # Deleting field 'Exam.partial_credit_deadline'
         db.delete_column('c2g_exam', 'partial_credit_deadline')
 
+        # Deleting field 'Exam.late_penalty'
+        db.delete_column('c2g_exam', 'late_penalty')
+
         # Deleting field 'Exam.submissions_permitted'
         db.delete_column('c2g_exam', 'submissions_permitted')
 
         # Deleting field 'Exam.resubmission_penalty'
         db.delete_column('c2g_exam', 'resubmission_penalty')
-
-        # Deleting field 'Exam.late_penalty'
-        db.delete_column('c2g_exam', 'late_penalty')
 
         # Deleting field 'Exam.autograde'
         db.delete_column('c2g_exam', 'autograde')
@@ -140,6 +155,12 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Exam.invideo'
         db.delete_column('c2g_exam', 'invideo')
+
+        # Deleting field 'Exam.timed'
+        db.delete_column('c2g_exam', 'timed')
+
+        # Deleting field 'Exam.minutesallowed'
+        db.delete_column('c2g_exam', 'minutesallowed')
 
         # Deleting field 'ExamScoreField.human_name'
         db.delete_column('c2g_examscorefield', 'human_name')
@@ -312,12 +333,14 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'late_penalty': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'minutesallowed': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'partial_credit_deadline': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'resubmission_penalty': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True'}),
             'submissions_permitted': ('django.db.models.fields.IntegerField', [], {'default': '999', 'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'timed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'total_score': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'xml_metadata': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
@@ -330,6 +353,7 @@ class Migration(SchemaMigration):
             'json_data': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'json_score_data': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'score': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
@@ -509,6 +533,14 @@ class Migration(SchemaMigration):
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'problemSet': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ProblemSet']"})
+        },
+        'c2g.studentexamstart': {
+            'Meta': {'object_name': 'StudentExamStart'},
+            'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.studentsection': {
             'Meta': {'object_name': 'StudentSection', 'db_table': "u'c2g_sections'"},

@@ -1578,6 +1578,8 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
     autograde = models.BooleanField(default=False)
     display_single = models.BooleanField(default=False)
     invideo = models.BooleanField(default=False)
+    timed = models.BooleanField(default=False)
+    minutesallowed = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
     total_score = models.IntegerField(null=True, blank=True)
     
@@ -1597,7 +1599,7 @@ class ExamRecord(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)   #blob
     json_score_data = models.TextField(null=True, blank=True)  #blob
-    #score was subsumed by ExamRecordScore
+    score = models.IntegerField(null=True, blank=True) #currently unused.
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
@@ -1682,3 +1684,6 @@ class CurrentTermMap(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
+class StudentExamStart(TimestampMixin, models.Model):
+    student = models.ForeignKey(User)
+    exam = models.ForeignKey(Exam)
