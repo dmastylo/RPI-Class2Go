@@ -9,13 +9,19 @@ from django.test import TestCase
 from convenience_redirect.redirector import convenience_redirector
 from django.test.client import RequestFactory
 from django.http import HttpResponseRedirect
+from c2g.models import CurrentTermMap
 
 class SimpleTest(TestCase):
     def setUp(self):
         # Every test needs access to the request factory.
         self.factory = RequestFactory()
         self.redir = convenience_redirector()
-
+        #db class map
+        m1 = CurrentTermMap(course_prefix="db", course_suffix="Winter2013")
+        m1.save()
+        m2 = CurrentTermMap(course_prefix="class2go", course_suffix="tutorial")
+        m2.save()
+    
     def test_basic_addition(self):
         """
         Tests that 1 + 1 always equals 2.
@@ -23,7 +29,8 @@ class SimpleTest(TestCase):
         self.assertEqual(1 + 1, 2)
     
     def test_noop(self):
-        for host in ('class.stanford.edu', 'www.class.stanford.edu', 'staging.class.stanford.edu', 'www.staging.class.stanford.edu'):
+        for host in ('class.stanford.edu', 'www.class.stanford.edu', 'staging.class.stanford.edu', 'www.staging.class.stanford.edu' \
+                     'class2go.stanford.edu', 'www.class2go.stanford.edu', 'staging.class2go.stanford.edu', 'www.staging.class2go.stanford.edu'):
             request = self.factory.get('/')
             request.META['HTTP_HOST']=host
             response = self.redir.process_request(request)
@@ -119,4 +126,19 @@ class SimpleTest(TestCase):
             response = self.redir.process_request(request)
             self.assertTrue(isinstance(response,HttpResponseRedirect))
             self.assertEqual(response['Location'],"http://class.stanford.edu/%s/Fall2012/" % course)
-        
+
+    def test_cur_term_map_classes(self):
+        #db--Winter2013
+        request = self.factory.get('/')
+        request.META['HTTP_HOST']='db.class2go.stanford.edu'
+        response = self.redir.process_request(request)
+        self.assertTrue(isinstance(response,HttpResponseRedirect))
+        self.assertEqual(response['Location'],"http://class2go.stanford.edu/db/Winter2013/")
+        #class2go--tutorial
+        request = self.factory.get('/')
+        request.META['HTTP_HOST']='class2go.class2go.stanford.edu'
+        response = self.redir.process_request(request)
+        self.assertTrue(isinstance(response,HttpResponseRedirect))
+        self.assertEqual(response['Location'],"http://class2go.stanford.edu/class2go/tutorial/")
+
+

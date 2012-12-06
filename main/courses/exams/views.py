@@ -30,6 +30,7 @@ from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
+from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 
 from django.views.decorators.csrf import csrf_protect
 from storages.backends.s3boto import S3BotoStorage
@@ -69,7 +70,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
         raise Http404
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
-                              'scores':"{}",'editable':True,
+                              'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':exam.invideo,
                               'exam':exam}, RequestContext(request))
 
 @require_POST
@@ -88,6 +89,24 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores, 'editable':editable}, RequestContext(request))
 
+# BEGIN function for Wed demo
+@require_POST
+@auth_view_wrapper
+def show_quick_check(request, course_prefix, course_suffix, exam_slug):
+    course = request.common_page_data['course']
+    parser = HTMLParser.HTMLParser()
+    user_answer_data = parser.unescape(request.POST['user-answer-data'])
+ 
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    return render_to_response('exams/quickcheck.html', {'common_page_data':request.common_page_data, 'exam':exam, 'user_answer_data':user_answer_data, 'videotest':True}, RequestContext(request))
+# END function for Wed demo
+
+def show_invideo_quiz(request, course_prefix, course_suffix, exam_slug):
+    return render_to_response('exams/videotest.html', {'common_page_data':request.common_page_data}, RequestContext(request))
 
 @auth_view_wrapper
 def show_graded_exam(request, course_prefix, course_suffix, exam_slug):
@@ -212,7 +231,11 @@ def parse_val(v):
         return reduce(lambda x,y: x+y+",", sorted_list, "")
     elif isinstance(v,basestring):
         return v
-    return str(v)
+    else:
+        try:
+           return(v['value'])
+        except TypeError, AttributeError:
+            return str(v)
 
 
 @require_POST
@@ -226,14 +249,171 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         raise Http404
 
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
-    json.loads(postdata)
+    json_obj=json.loads(postdata)
     
-    record = ExamRecord(course=course, exam=exam, student=request.user, json_data=request.POST['json_data'])
+    record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata)
     record.save()
+
+    if exam.autograde:
+        try:
+            autograder = AutoGrader(exam.xml_metadata)
+        except Exception as e: #Pass back all the exceptions so user can see
+            return HttpResponseBadRequest(unicode(e))
+
+        feedback = {}
+        for prob,v in json_obj.iteritems():
+            try:
+                if isinstance(v,list):
+                    submission = map(lambda li: li['value'], v)
+                    print(submission)
+                    feedback[prob] = autograder.grade(prob, submission)
+                else:
+                    submission = float(v['value'])
+                    print(submission)
+                    feedback[prob] = autograder.grade(prob, submission)
+            except ValueError:
+                feedback[prob] = False
+            except AutoGraderGradingException:
+                pass
+        return HttpResponse(json.dumps(feedback))
+
+    else:
+        return HttpResponse("Submission has been saved.")
+
+
+@require_POST
+@auth_is_course_admin_view_wrapper
+def save_exam_ajax(request, course_prefix, course_suffix):
+    course = request.common_page_data['course']
+    slug = request.POST.get('slug','')
+    title = request.POST.get('title', '')
+    description = request.POST.get('description', '')
+    metaXMLContent = request.POST.get('metaXMLContent', '')
+    htmlContent = request.POST.get('htmlContent', '')
+    due_date = request.POST.get('due_date', '')
+    grace_period = request.POST.get('grace_period', '')
+    partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
+    late_penalty = request.POST.get('late_penalty', '')
+    num_subs_permitted = request.POST.get('num_subs_permitted','')
+    resubmission_penalty = request.POST.get('resubmission_penalty','')
+    assessment_type = request.POST.get('assessment_type','')
     
-    return HttpResponse("Submission has been saved.")
+    #########Validation, lots of validation#######
+    if not slug:
+        return HttpResponseBadRequest("No URL identifier value provided")
+    if Exam.objects.filter(course=course, slug=slug).exists():
+        return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
+    if not title:
+        return HttpResponseBadRequest("No Title value provided")
+    if not metaXMLContent:
+        return HttpResponseBadRequest("No metadataXML provided")
+    try:
+        grader = AutoGrader(metaXMLContent)
+    except Exception as e: #Since this is just a validator, pass back all the exceptions
+        return HttpResponseBadRequest(unicode(e))
+
+    if not htmlContent:
+        return HttpResponseBadRequest("No Exam HTML provided")
+    if not due_date:
+        return HttpResponseBadRequest("No due date provided")
+    if not grace_period:
+        return HttpResponseBadRequest("No grace period provided")
+    if not partial_credit_deadline:
+        return HttpResponseBadRequest("No hard deadline provided")
+
+    dd = datetime.datetime.strptime(due_date, "%m/%d/%Y %H:%M")
+    gp = datetime.datetime.strptime(grace_period, "%m/%d/%Y %H:%M")
+    pcd = datetime.datetime.strptime(partial_credit_deadline, "%m/%d/%Y %H:%M")
+
+    print(assessment_type)
+    if assessment_type == "summative":
+        autograde = True
+        invideo = False
+        display_single = False
+        exam_type = "exam"
+    elif assessment_type == "invideo":
+        autograde = True
+        invideo = True
+        display_single = True
+        exam_type = "exam"
+    elif assessment_type == "exam-autograde":
+        autograde = True
+        invideo = False
+        display_single = False
+        exam_type = "exam"
+    elif assessment_type == "exam-csv":
+        autograde = False
+        invideo = False
+        display_single = False
+        exam_type = "exam"
+    elif assessment_type == "survey":
+        autograde = False
+        invideo = False
+        display_single = False
+        exam_type = "survey"
+    else:
+        return HttpResponseBadRequest("A bad assessment type (" + assessment_type  + ") was provided")
+
+    if not late_penalty:
+        lp = 0
+    else:
+        try:
+            lp = int(late_penalty)
+        except ValueError:
+            return HttpResponseBadRequest("A non-numeric late penalty (" + late_penalty  + ") was provided")
+
+    if not num_subs_permitted:
+        sp = 999
+    else:
+        try:
+            sp = int(late_penalty)
+        except ValueError:
+            return HttpResponseBadRequest("A non-numeric number of submissions permitted (" + sp  + ") was provided")
+
+    if not resubmission_penalty:
+        rp = 0
+    else:
+        try:
+            rp = int(resubmission_penalty)
+        except ValueError:
+            return HttpResponseBadRequest("A non-numeric resubmission penalty (" + resubmission_penalty  + ") was provided")
 
 
+    #create Exam
+    exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent, due_date=dd,
+                    grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp, 
+                    exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo)
+    exam_obj.save()
+
+    return HttpResponse("Exam " + title + " created")
+
+
+@require_POST
+@auth_is_course_admin_view_wrapper
+def check_metadata_xml(request, course_prefix, course_suffix):
+    xml = request.POST.get('metaXMLContent')
+    if not xml:
+        return HttpResponseBadRequest("No metaXMLContent provided")
+    try:
+        grader = AutoGrader(xml)
+    except Exception as e: #Since this is just a validator, pass back all the exceptions
+        return HttpResponseBadRequest(unicode(e))
+    
+    return HttpResponse("Metadata XML is OK.\n" + unicode(grader))
+
+
+
+@auth_is_course_admin_view_wrapper
+def create_exam(request, course_prefix, course_suffix):
+    
+    course = request.common_page_data['course']
+    
+    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'course':course},
+                              RequestContext(request))
+
+
+def show_test_xml(request):
+    return render_to_response('exams/test_xml.html', {'message':'what up G?'}, RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 def view_csv_grades(request, course_prefix, course_suffix, exam_slug):
@@ -410,3 +590,9 @@ def validate_row(row):
         return (False, "Score cannot be converted to integer")
 
     return (True, (username, field_name, score))
+
+
+
+
+
+

@@ -1,6 +1,8 @@
+import re
+
 from django.utils.log import getLogger
 from django.http import HttpResponse, HttpResponseRedirect
-import re
+from c2g.models import CurrentTermMap
 
 class convenience_redirector(object):
     """
@@ -11,18 +13,19 @@ class convenience_redirector(object):
     #List of hostnames that will abort redirect if matched.  Need this because we have lots of
     #domain names are ancestors of each other, like class.stanford.edu, staging.class.stanford.edu, and
     #www.staging.class.stanford.edu
-    do_not_direct = ['class.stanford.edu','staging.class.stanford.edu','www.staging.class.stanford.edu','www.class.stanford.edu']
+    do_not_direct = ['class.stanford.edu','staging.class.stanford.edu','www.staging.class.stanford.edu','www.class.stanford.edu',\
+                     'class2go.stanford.edu','staging.class2go.stanford.edu','www.staging.class2go.stanford.edu','www.class2go.stanford.edu']
     
     #List of regexes of domain names to match against. 
     regex_list = (
                     ('staging.class.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.staging\.class\.stanford\.edu$', re.I)),
                     ('class.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.class\.stanford\.edu$', re.I)),
-                 )
+                    ('staging.class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.staging\.class2go\.stanford\.edu$', re.I)),
+                    ('class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.class2go\.stanford\.edu$', re.I)),
+                  )
     
-    cur_term = 'Fall2012' #There is another cur_term in course/views.  We could use that one, but to reduce
-                          #the number of redirects we maintain both
-                          #otherwise we'll have nlp.class -> class/nlp -> class/nlp/Fall2012
-
+    curTerm = 'Fall2012'
+    
     #factoring this out so we can unit test
     def get_prefix_and_host(self, domain):
         prefix = None
@@ -61,9 +64,16 @@ class convenience_redirector(object):
         else:
             port_str= ':' + port
 
-        
-            
-        return HttpResponseRedirect(scheme + '://' + host + port_str + '/' + prefix + '/' + self.cur_term + request.get_full_path())
+        #lookup suffix from database -- decided this is okay because no DB access will happen if the access
+        #uses the normal URLs (e.g. class.stanford.edu), which we expect to be the common case
+                
+                
+        try:
+            suffix = CurrentTermMap.objects.get(course_prefix=prefix).course_suffix
+        except CurrentTermMap.DoesNotExist:
+            suffix = self.curTerm # Use this as default fallback
+
+        return HttpResponseRedirect(scheme + '://' + host + port_str + '/' + prefix + '/' + suffix + request.get_full_path())
         
             
         

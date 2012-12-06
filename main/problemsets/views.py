@@ -1,10 +1,10 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog, Video, AdditionalPage, File
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog, Video, AdditionalPage, File, ContentGroup
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, render
 from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
-from courses.course_materials import get_course_materials
+from courses.course_materials import get_course_materials, group_data
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
@@ -15,7 +15,7 @@ from courses.forms import *
 from django.contrib import messages
 from django.db import connection
 from courses.course_materials import filename_in_deleted_list
-from courses.views import get_full_contentsection_list
+from courses.views import get_full_contentsection_list, get_left_nav_content
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -129,13 +129,8 @@ def show(request, course_prefix, course_suffix, pset_slug):
 
 
     course = common_page_data['course']
-    contentsection_list = ContentSection.objects.getByCourse(course=course)
-    video_list = Video.objects.getByCourse(course=course)
-    pset_list =  ProblemSet.objects.getByCourse(course=course)
-    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
-    file_list = File.objects.getByCourse(course=course)
-
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+    contentsection_list, video_list, pset_list, additional_pages, file_list, groups, exam_list, level2_items = get_left_nav_content(course)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, exam_list, level2_items)
 
     if request.user.is_authenticated():
         is_logged_in = 1

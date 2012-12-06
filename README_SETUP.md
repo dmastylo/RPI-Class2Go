@@ -119,7 +119,7 @@ prefix for these.
 
 1. Install test environment dependencies:
 
-        pip install mock nose django_nose
+        pip install mock nose django_nose django_coverage
 
 1. Setup the account and database in MySql
 
@@ -214,16 +214,16 @@ Steps:
 
 2. Copy database.example.py to database.py.
 
-2. In database.py, append ‘mysql’ to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user ‘root’ and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
+2. In database.py, append 'mysql' to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user 'root' and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
 
-2. Make sure you’re in the src/class2go/main directory (wherever that is for you)
+2. Make sure you're in the src/class2go/main directory (wherever that is for you)
 
-2. ‘python manage.py syncdb’ followed by ‘python manage.py migrate’ to create the required database tables and make sure the schema is up to date.
+2. 'python manage.py syncdb' followed by 'python manage.py migrate' to create the required database tables and make sure the schema is up to date.
 You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
 
-2. XX -- ‘python manage.py collectstatic    ’ to copy all static files to the directory specified in settings.py.
+2. XX -- 'python manage.py collectstatic' to copy all static files to the directory specified in settings.py.
 
-2. ‘python manage.py runserver xxxx’ to run a dev server on port number xxxx. Example: xxxx = 8000
+2. 'python manage.py runserver xxxx' to run a dev server on port number xxxx. Example: xxxx = 8000
 
 2. Visit localhost:xxxx in your web browser and confirm that you get a C2G page.
 
@@ -345,7 +345,7 @@ be installed for Mac (and probably Windows too)
 
 3. Install test environment dependencies:
 
-        pip install mock nose django_nose
+        pip install mock nose django_nose django_coverage
 
 3. Go to "main" dir and copy over database settings file:
 
@@ -402,7 +402,7 @@ command line tools.
 We partition our django project settings into two settings files:
 
 * **settings.py** - Most of the project settings are in here.  This
-    shoudl be familiar to any django dev.
+    should be familiar to any django dev.
 
 * **database.py** - Anything that should *not* be checked in, i.e.
     secret keys or local configuration, should be in the database.py

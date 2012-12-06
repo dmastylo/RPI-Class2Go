@@ -28,6 +28,14 @@ except NameError:
     except:
         INSTANCE="unknown"
 
+# the APP is so we can support multiple instances of class2go running on the
+# same set of servers via apache vhosts.  In dev environments it's safe to just
+# use "class2go", this default
+try:
+    APP
+except NameError:
+    APP="class2go"
+
 # If PRODUCTION flag not set in Database.py, then set it now.
 #PRODUCTION = True
 
@@ -93,7 +101,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/opt/class2go/static/'
+STATIC_ROOT = '/opt/' + APP + '/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -192,14 +200,15 @@ INSTALLED_APPS = (
                       'db_scripts',
                       'convenience_redirect',
                       'exception_snippet',
+                       #'reversion',
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
                         'db_test_data',
                         'django_nose',
+                        'django_coverage',
                        )
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -274,7 +283,7 @@ LOGGING = {
             'level':'INFO', #making this DEBUG will log _all_ SQL queries.
             'class':'logging.handlers.RotatingFileHandler',
             'formatter':'verbose',
-            'filename': LOGGING_DIR+'django.log',
+            'filename': LOGGING_DIR+APP+'-django.log',
             'maxBytes': 1024*1024*500,
             'backupCount': 3,
         },
@@ -349,6 +358,8 @@ else:
 
 #CELERY
 CELERY_ACKS_LATE = True
+CELERY_IGNORE_RESULT = True   # SQS doesn't support, so this stop lots of spurrious
+                              # "*-pidbox" queues from being created
 
 CELERYD_PREFETCH_MULTIPLIER = 1
 
@@ -361,16 +372,29 @@ BROKER_TRANSPORT_OPTIONS = {
     'visibility_timeout' : 3600*6,
 }
 
-CELERY_DEFAULT_QUEUE = 'default'
-CELERY_DEFAULT_EXCHANGE = 'default'
-CELERY_DEFAULT_ROUTING_KEY = 'default'
+CELERY_DEFAULT_QUEUE = APP+'-default'
+CELERY_DEFAULT_EXCHANGE = APP+'-default'
+CELERY_DEFAULT_ROUTING_KEY = APP+'-default'
 
 CELERY_QUEUES = {
-    'default': {'exchange': 'default', 'routing_key': 'default'},
-    'long':    {'exchange': 'long',    'routing_key': 'long'},
+    APP+'-default': {'exchange': APP+'-default', 'routing_key': APP+'-default'},
+    APP+'-long':    {'exchange': APP+'-long',    'routing_key': APP+'-long'},
 }
 
-CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': 'long', 'routing_key': 'long'},
-                 'kelvinator.tasks.resize':    {'queue': 'long', 'routing_key': 'long'},
-                 'celerytest.tasks.echo_long': {'queue': 'long', 'routing_key': 'long'},
+CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_key': APP+'-long'},
+                 'kelvinator.tasks.resize':    {'queue': APP+'-long', 'routing_key': APP+'-long'},
+                 'celerytest.tasks.echo_-long': {'queue': APP+'-long', 'routing_key': APP+'-long'},
                 }
+
+# Testing related settings
+# Set a specific testrunner to use
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = ['--verbosity=2', '--config=./nose.cfg']
+
+# we use django_coverage for test coverage reports. Configure here.
+COVERAGE_ADDITIONAL_MODULES = ['accounts', 'kelvinator']
+COVERAGE_MODULE_EXCLUDES = ['tests$', 'settings$', 'urls$', 'locale$',
+                            'common.views.test', '__init__', 'django',
+                            'migrations', 'south', 'djcelery']
+COVERAGE_REPORT_HTML_OUTPUT_DIR = './coverage-report/'
+COVERAGE_CUSTOM_REPORTS = False
