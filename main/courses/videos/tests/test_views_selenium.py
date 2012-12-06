@@ -1,61 +1,10 @@
 from django.core.urlresolvers import reverse
-from django.test import LiveServerTestCase
-from nose.plugins.attrib import attr
-from selenium import webdriver
-from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
-#from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
-from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 from lxml import etree
+from nose.plugins.attrib import attr
+from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
+from test_base_selenium import SeleniumTestBase
 
 import ipdb
-
-class C2GTestMixin():
-    fixtures = ['db_snapshot_video_tests.json']
-    login_path = '/preview/?login'
-    course_prefix = 'networking'
-    course_suffix = 'Fall2012'
-    course_name="Natural Language Processing"
-    username = 'professor_0'
-    user_type = 'instructor'
-    password = 'class2go'
-
-class SeleniumTestBase(LiveServerTestCase, C2GTestMixin):
-
-    @classmethod
-    def setup_class(cls):
-        cls.browser = ChromeWebDriver()
-        #cls.browser = FirefoxWebDriver()
-        cls.browser.implicitly_wait(3)
-        super(SeleniumTestBase, cls).setUpClass()
-
-    @classmethod
-    def teardown_class(cls):
-        cls.browser.quit()
-        super(SeleniumTestBase, cls).tearDownClass()
-
-    def do_login(self):
-        browser = self.browser
-        browser.get(self.live_server_url + '/' +
-                    self.course_prefix + '/' +
-                    self.course_suffix +
-                    self.login_path)
-        WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_id('id_username'))
-
-        # now that we have the page, fill out the form
-        userField = browser.find_element_by_id('id_username')
-        userField.send_keys(self.username)
-        passField = browser.find_element_by_id('id_password')
-        passField.send_keys(self.password)
-
-        # trigger the form submission
-        inputEle = browser.find_element_by_xpath('//input[@type="submit"]')
-        inputEle.submit()
-
-        # wait at most 10 seconds or until we see evidence of login
-        if self.user_type == 'instructor':
-            WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//span[contains(text(), "Welcome")]'))
-        else:
-            WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//input[@type="hidden"][@name="csrfmiddlewaretoken"]'))
 
 class SimpleDisplayTest(SeleniumTestBase):
 
@@ -132,9 +81,5 @@ class VideoDisplayTest(SeleniumTestBase):
             WebDriverWait(browser, 15).until(lambda browser : browser.find_element_by_xpath('//div[@id="player"]'))
 
             # switch to the iframe for the YT player
-            ipdb.set_trace()
             browser.switch_to_frame('player')
-            #tree = etree.HTML(browser.page_source)
-            #player_divs = tree.xpath('//div[@id="player"]')
-            #self.assertEqual(len(player_divs), 1)
             self.assertTrue(browser.find_element_by_xpath('//embed[@id="video-player-flash"]'))
