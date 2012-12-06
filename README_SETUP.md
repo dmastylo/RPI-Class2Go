@@ -214,16 +214,16 @@ Steps:
 
 2. Copy database.example.py to database.py.
 
-2. In database.py, append �mysql� to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user �root� and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
+2. In database.py, append 'mysql' to ENGINE, and enter the name of the database you created in step 1, and the credentials of an authorized user of the database (user 'root' and empty password may work on MySQL unless you specified otherwise during the MySQL setup)
 
-2. Make sure you�re in the src/class2go/main directory (wherever that is for you)
+2. Make sure you're in the src/class2go/main directory (wherever that is for you)
 
-2. �python manage.py syncdb� followed by �python manage.py migrate� to create the required database tables and make sure the schema is up to date.
+2. 'python manage.py syncdb' followed by 'python manage.py migrate' to create the required database tables and make sure the schema is up to date.
 You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
 
-2. XX -- �python manage.py collectstatic    � to copy all static files to the directory specified in settings.py.
+2. XX -- 'python manage.py collectstatic' to copy all static files to the directory specified in settings.py.
 
-2. �python manage.py runserver xxxx� to run a dev server on port number xxxx. Example: xxxx = 8000
+2. 'python manage.py runserver xxxx' to run a dev server on port number xxxx. Example: xxxx = 8000
 
 2. Visit localhost:xxxx in your web browser and confirm that you get a C2G page.
 
