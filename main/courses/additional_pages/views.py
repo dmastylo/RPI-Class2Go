@@ -6,7 +6,7 @@ from c2g.models import *
 from courses.course_materials import get_course_materials, group_data
 from courses.common_page_data import get_common_page_data
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
-from courses.views import get_full_contentsection_list
+from courses.views import get_full_contentsection_list, get_left_nav_content
 
 @auth_is_course_admin_view_wrapper
 def manage_nav_menu(request, course_prefix, course_suffix):
@@ -56,15 +56,8 @@ def main(request, course_prefix, course_suffix, slug):
         template = 'additional_pages/view.html'
         
     course = common_page_data['course']
-    contentsection_list = ContentSection.objects.getByCourse(course=course)
-    video_list = Video.objects.getByCourse(course=course)
-    pset_list =  ProblemSet.objects.getByCourse(course=course)
-    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
-    file_list = File.objects.getByCourse(course=course)
-    groups = ContentGroup.objects.getByCourse(course=course)
-    level1_items, level2_items = group_data(groups)
-
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, level2_items)
+    contentsection_list, video_list, pset_list, additional_pages, file_list, groups, exam_list, level2_items = get_left_nav_content(course)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, exam_list, level2_items)
 
     if request.user.is_authenticated():
         is_logged_in = 1

@@ -14,6 +14,9 @@
     {% ifequal item.type 'file' %}
             {% include "files/ready/file_list_item.html" %}
     {% endifequal %}
+    {% ifequal item.type 'exam' %}
+            {% include "exams/ready/exam_list_item.html" %}
+    {% endifequal %}
 {% empty %}
     </ul>
     <p style='margin: 20px;'>No items have been added to this section</p>
