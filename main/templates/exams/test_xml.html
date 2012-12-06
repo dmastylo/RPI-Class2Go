@@ -1,0 +1,171 @@
+<!doctype html>
+<head>
+    <title>Testing jQuery XML Parsing</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <style>
+        h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
+        #input-pane, #preview-pane {float: left; margin-right: 1em; width: 48%;}
+        #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; padding: 1em;}
+        textarea, #staging-area {height: 300px; overflow: auto; width: 100%;}
+        #preview-pane label {clear: both; display: block;}
+        #preview-pane label input {float: left; margin-right: 1em;}
+        #preview-pane #staging-area p {clear: both; display: block; margin: 0; padding: 0 0 1em;}
+        .problem {border:1px solid #999; border-radius: 5px; margin: 1em 0; padding: 1em;}
+    </style>
+</head>
+<body>
+<div id="input-pane">
+    <h2>Enter Problem XML</h2>
+    <textarea>
+    <problem>
+    <p>
+    A multiple choice problem presents radio buttons for student
+    input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+    <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make. 
+    </p>
+
+    <p>What Apple device competed with the portable CD player?</p>
+        <multiplechoiceresponse>
+         <choicegroup type="MultipleChoice">
+            <choice correct="false" name="ipad">The iPad</choice>
+            <choice correct="false" name="beatles">Napster</choice>
+            <choice correct="true" name="ipod">The iPod</choice>
+            <choice correct="false" name="peeler">The vegetable peeler</choice>
+            <choice correct="false" name="android">Android</choice>
+            <choice correct="false" name="beatles">The Beatles</choice>
+         </choicegroup>
+        </multiplechoiceresponse>
+        <solution>
+            <div class="detailed-solution">
+                <p>Explanation</p>
+                <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and enery-intensive spinning disks. </p>
+            </div>
+        </solution>
+    </problem>
+
+    </textarea>
+    <input type="button" id="preview-btn" value="Preview My Problem" />
+</div>
+
+<div id="preview-pane">
+    <h2>Preview Problem HTML</h2>
+    <div id="staging-area">
+    </div>
+</div>
+</body>
+<script>
+
+$(document).ready(function () {
+
+    var questionIdx = 0;
+
+    function renderPreview() {
+
+        $('#staging-area').empty();
+
+        // Set up XML DOM
+        var sourceXML = $('textarea').val();
+        try {
+            var myDOM = $.parseXML(sourceXML);
+        } catch (e) {
+            alert('Your XML is invalid');
+            console.log(e.message);
+            return;
+        }
+        var problemNodes = $(myDOM).find('problem');
+
+        problemNodes.each(function () {
+            var tmpProbDiv = document.createElement('div');
+            $(tmpProbDiv).addClass('problem');
+
+            $('#staging-area').append($(tmpProbDiv));
+
+            var allChildren = $(this).children();
+
+            var renderResponseNode = function (node) {
+
+                var nodeName = $(node)[0].nodeName;
+                var nodeParent = arguments[1] || $(tmpProbDiv); 
+
+                switch (nodeName) {
+                    case 'multiplechoiceresponse':
+                        var choices = $($(node)).find('choice'); 
+                        
+                        $(choices).each(function (idx, el) {
+                            var tmpInput = document.createElement('input');
+                            var tmpLabel = document.createElement('label');
+                            $(tmpLabel).attr('for', 'q' + questionIdx + '_' + idx);
+
+                            $(tmpInput).attr('type', 'radio');
+                            $(tmpInput).attr('id', 'q' + questionIdx + '_' + idx);
+                            $(tmpInput).attr('name', 'q' + questionIdx);
+                            $(tmpInput).attr('value', $(this).attr('name'));
+
+                            $(tmpLabel).text($(this).text());
+
+                            $(nodeParent).append($(tmpLabel));
+                            $(tmpLabel).append($(tmpInput));
+                        });
+                        break;
+                    case 'stringresponse':
+                    case 'numericalresponse':
+                        var textBoxData = $(node).children();   // only goes down one-level
+                        
+                        var tmpInput = document.createElement('input');
+                        $(tmpInput).attr('type', 'text');
+                        $(tmpInput).attr('id', 'q' + questionIdx);
+                        $(tmpInput).attr('name', 'q' + questionIdx);
+
+                        var textInputSize = (false) ? '' : 20;
+                        $(tmpInput).attr('size', textInputSize);
+
+                        $(nodeParent).append($(tmpInput));
+                        break;
+                    case 'optionresponse':
+                        var optionData = $(node).find('optioninput');
+                        var optionItemStr = $(optionData).attr('options');
+                        break;
+                    default:
+                        break;
+                }
+
+                if ($(nodeParent)[0] != $(tmpProbDiv)[0]) {
+                    $(tmpProbDiv).append($(nodeParent));
+                }
+            };
+
+            $(allChildren).each(function () {
+
+                var nodeName = $(this)[0].nodeName;
+
+                if (nodeName == 'p') {
+                    var previewP = document.createElement('p');
+                    $(previewP).text($(this).text());
+                    $(previewP).appendTo($(tmpProbDiv));
+                    
+                    var responseNodes = $(this).children();
+                    if (responseNodes.length > 0) {
+                        responseNodes.each(function () {
+                            renderResponseNode($(this), previewP);
+                        });
+                    }
+                } else {
+                    renderResponseNode($(this), $(tmpProbDiv));
+                }
+
+            });
+
+        }); // end each problem
+       
+        var dataToTransmit = {};
+        dataToTransmit.xmlContent = $('textarea').val();
+        dataToTransmit.htmlContent = $('#staging-area').html(); 
+        console.log(JSON.stringify(dataToTransmit));
+
+    }
+
+    $('#preview-btn').click(renderPreview);
+});
+
+</script>
+</html>

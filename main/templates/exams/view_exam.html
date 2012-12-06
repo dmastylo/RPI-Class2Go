@@ -2,7 +2,15 @@
 {% load url from future %}
 {% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
 
+{% block l_column_content %}
+{% if videotest %}
+    {% include "left_nav.html" %}
+{% endif %}
+{% endblock l_column_content %}
+
+
 {% block m_column_content %}
+{% if videotest %}<div id="c2g_layout_m_column" class="khan-template" style="margin-left: 25%">{% endif %}
 <div class="alert alert-error" id="nojswarn">
 You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
 </div>
@@ -12,8 +20,39 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     This exam will go live on {{ exam.live_datetime }} PST.
 
-
 {% else %}
+    <style>
+    #exam-pane label {clear: both; display: block;}
+    #exam-pane label input {float: left; margin-right: 1em;}
+    #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
+    h3 {clear:both;}
+    div.question, div.subquestion {float:left; width:95%;}
+    div.problem, div.problem {float:left; width:95%;}
+    #problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
+    #next-question {float: right;}
+    #prev-question {float: left;}
+    label pre {margin-left:30px;}
+
+    /* BEGIN CSS for Wed demo */
+    .quick-check {clear: both; display: block; margin-top: 1em;}
+    .explanation {background: #fff; border-radius: 3px; margin-bottom: .5em; padding: 1em;}
+    #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
+    #exam-pane fieldset label {position: relative;}
+    #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
+    #exam-pane .correct {color: #090;}
+    /* END CSS for Wed demo */
+    </style>
+
+    {% if videotest %}
+
+    <style>
+    {% include 'exams/videotest.css' %}
+    #exam-pane {float: left; position: relative; display: none; width: 800px;}
+    #exam-pane .continue-video-btn {position: absolute; bottom: 3em; right: 1.5em;}
+    #problemset-nav {display: none;}
+    </style>
+
+    {% endif %}
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
 
@@ -28,17 +67,37 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <noscript>
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
     </noscript>
+    <div id="exam-pane">
+        <form>
     {{ exam.html_content }}
+        </form>
+
+    {% if single_question %}
+    <div id="problemset-nav">
+        <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
+        <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
+    </div>
+    {% endif %}
+
+    {% if not videotest %}
+    <input class="btn" type="submit" value="Submit Problem Set" />
+    {% endif %}
+    </div>
+    {% if videotest %}
+        <div id="demoplayer"></div>
+        <div id="slideIndex"></div>
+    {% endif %}
 
 {% endif %}
 
 {% endautoescape %}
+{% if videotest %}</div>{% endif %}
 {% endblock m_column_content %}
 
-
-
-
 {% block addl_scripts %}
+    {% if videotest %}
+        <script src="http://cdn.popcornjs.org/code/dist/popcorn-complete.min.js"></script>
+    {% endif %}
 <script>
     var __exam_type = "exam";
     {% if exam.exam_type != "exam" %}
@@ -47,8 +106,320 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     
     $(document).ready(function () {
 
+    {% if single_question %}
+        $('.question').not(':first').hide();
+        var localQuestionIdx = 0;
+
+        var adjustQuestionIdx = function (newIdx) {
+            // right now, just accept neg number as moving back 1,
+            // pos number moving forward 1
+            if (newIdx > 0) {
+                localQuestionIdx += 1;
+            } else if (newIdx < 0) {
+                localQuestionIdx -= 1;
+            }
+
+            if (localQuestionIdx > ($('.question').length - 1)) {
+                localQuestionIdx = 0;
+            } else if (localQuestionIdx < 0) {
+                localQuestionIdx = $('.question').length - 1;
+            }
+
+            return localQuestionIdx;
+        }
+
+        var showQuestion = function () {
+            var newQIdx = localQuestionIdx;
+            if ($(this).attr('id') == "next-question" || $(this).attr('value').indexOf('Next') != -1) {
+                var newQIdx = adjustQuestionIdx(1);
+            } else if ($(this).attr('id') == "prev-question") {
+                var newQIdx = adjustQuestionIdx(-1);
+            }
+            $('.question').hide();
+            $('.question').eq(newQIdx).show();
+        };
+
+        $('.question-nav').click(showQuestion);
+        
+        /* BEGIN JS for Wed demo */
+        var quickCheck = function () {
+
+            var checkBtnID = $(this).attr('id');
+            var assocQ = $(this).closest('.question');
+            var assocQID = $(assocQ).attr('id');
+
+            if ($(this).attr('value') == "Hide Answers") {
+                $('#' + assocQID + '-expl').empty().remove();
+                $('#' + assocQID).find('.inline-explanation').remove();
+                $(this).attr('value', 'Check Answers');
+                return;
+            }
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    var csrftoken = '{{ csrf_token }}';
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            });
+
+            var checkBtn = $(this);
+            var collectUserAnswers = function () {
+                console.log('collectUserAnswers called');
+                var userSelections = {};
+                var inputCollection = $(checkBtn).closest('.question').find('input');
+                console.log($(checkBtn));
+                console.log($(checkBtn).closest('.question'));
+                console.log(inputCollection);
+                $(inputCollection).each(function () {
+                    if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
+                        if (!userSelections[$(this).attr('name')]) {
+                            userSelections[$(this).attr('name')] = [];
+                        }
+                        //console.log(userSelections);
+                        var tmpObj = {};
+                        tmpObj.value = $(this).attr('value');
+                        tmpObj.associatedText = $(this).parent().text();
+                        tmpObj.tag4humans = $(this).attr('data-tag4humans');
+                        tmpObj.questionTag4humans = $(this).closest('fieldset').attr('data-tag4humans');
+
+                        userSelections[$(this).attr('name')].push(tmpObj);
+                    } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
+                        userSelections[$(this).attr('name')] = $(this).val();
+                    }
+                });
+                $('textarea').each(function () {
+                    if ($(this).val() != "") {
+                        userSelections[$(this).attr('name')] = $(this).val();
+                    }
+                });
+
+                return userSelections;
+            };
+
+            var displayMetaData = function (data, userData) {
+                console.log('displayMetaData called');
+                console.log(arguments);
+                console.log(data);
+                var myXML = $.parseXML(data);
+                var examMD = $(myXML).find('exam_metadata');
+                var questionMD = $(examMD).find('question_metadata#' + assocQID);
+                var mySolution = $(questionMD).find('solution');
+                var responses = $(questionMD).find('response');
+
+                var createInlineExp = function (targetEl) {
+                    var tmpInlineExpl = document.createElement('span');
+                    $(tmpInlineExpl).addClass('inline-explanation');
+                    $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+                    $(targetEl).append($(tmpInlineExpl));
+
+                    return $(tmpInlineExpl);
+                };
+
+                responses.each(function () {
+                    var responseType = $(this).attr('answertype');
+                    if (responseType == "multiplechoiceresponse") {
+                        var choices = $(this).find('choice');
+                        choices.each(function () {
+                            var choiceInput = $('#' + $(this).attr('id'));
+                            console.log(choiceInput.length);
+                            var choiceLabel = $('#' + $(this).attr('id')).closest('label');
+                            console.log(choiceLabel.length);
+                            console.log($(choiceLabel).find('.inline-explanation').length);
+                            var inlineExpl = $(choiceLabel).find('.inline-explanation');
+                            if (inlineExpl.length == 0) { 
+                                inlineExpl = createInlineExp($(choiceLabel));
+                            }
+                            console.log(inlineExpl);
+                            if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
+                                $(inlineExpl).addClass('correct');
+                            }
+                            $(inlineExpl).append($(this).find('explanation').text());
+                        });
+                    } else {
+                        var inputName = $(this).attr('name');
+                        var correctVal = $(this).text();
+                        var inputEl = $('input[name|="' + inputName + '"]');
+                        if (typeof userData[inputName] != "undefined" && ($.trim(userData[inputName]) == $.trim(String(correctVal)))) {
+                            $(inputEl).after('<span class="inline-explanation correct">Correct</span>'); 
+                        } else {
+                            $(inputEl).after('<span class="inline-explanation incorrect">Incorrect</span>'); 
+                        }
+                    }
+                });
+
+                var explArea = $('#' + assocQID + '-expl');
+                if (explArea.length == 0) {
+                    explArea = document.createElement('div');
+                    $(explArea).attr('id', assocQID + '-expl');
+                    $(explArea).addClass('explanation');
+                }
+                $(explArea).empty();
+                $('#' + assocQID + ' .quick-check').before($(explArea));
+                $(mySolution).children().each(function () {
+                    if ($(this).text() == 'Explanation') {
+                        $(explArea).append('<h4>' + $(this).text() + '</h4>');
+                    } else {
+                        $(explArea).append($(this));
+                    }
+                });
+
+                $('#' + checkBtnID).attr('value','Hide Answers');
+            };
+
+            var displayHTMLAnswer = function (data, msg, xhr) {
+                
+                var responseData = $.parseJSON(data);
+                
+                if ( responseData == "ERROR" ) {
+                  alert("Error: Invalid grader name");
+                  return;
+                }
+                
+                var explArea = $('#' + assocQID + '-expl');
+                if (explArea.length == 0) {
+                    explArea = document.createElement('div');
+                    $(explArea).attr('id', assocQID + '-expl');
+                    $(explArea).addClass('explanation');
+                }
+                $(explArea).empty();
+                $('#' + assocQID + ' .quick-check').before($(explArea));
+                $(explArea).append(responseData.feedback[0].explanation);
+
+            };
+
+            //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
+
+            if ($('#GraderName').length > 0) {
+                var postData = {
+                    'grader_name':   $('#GraderName').text(),
+                    'select_dict':   '',
+                    'student_input': $('#' + assocQID).find('textarea').val(),
+                    'params': {
+                      'qnum': $('#' + assocQID).data('qnum')
+                    }
+                };
+
+                //$.post("/server/AJAXPostHandler.php", postData, displayHTMLAnswer);
+                var tObj = {};
+                tObj.score = 0;
+                tObj["maximum-score"] = 1;
+                tObj.feedback = [];
+                tObj.feedback[0] = {};
+                //tObj.feedback[0].user_answer = "SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'";
+                tObj.feedback[0].user_answer = postData["student_input"]; 
+                tObj.feedback[0].score = 0;
+                tObj.feedback[0].explanation = "<br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n";
+                var testJSON = JSON.stringify(tObj);
+                //var testJSON = '{"score":0,"maximum-score":1,"feedback":[{"user_answer":"SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n"}]';
+                displayHTMLAnswer(testJSON);
+            } else {
+                $.post('quick_check', 
+                    {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
+                    function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
+            }
+
+        };
+
+        $('.question').each(function (idx, el) {
+            var tmpBtn = document.createElement('input');
+            $(tmpBtn).attr('type','button');
+            $(tmpBtn).attr('id','quickCheck_' + idx);
+            $(tmpBtn).addClass('btn').addClass('quick-check');
+            $(tmpBtn).attr('value', 'Check Answers');
+            $(this).append($(tmpBtn));
+        });
+
+        $('.quick-check').click(quickCheck);
+        /* END JS for Wed demo */
+    {% else %}
+/* The page-at-a-time version */
+      var displayMetaData = function (data, userData) {
+          console.log('displayMetaData called');
+          console.log(arguments);
+          console.log(data);
+          var myXML = $.parseXML(data);
+          var examMD = $(myXML).find('exam_metadata');
+          var questionMD = $(examMD).find('question_metadata#' + assocQID);
+          var mySolution = $(questionMD).find('solution');
+          var responses = $(questionMD).find('response');
+          
+          var createInlineExp = function (targetEl) {
+              var tmpInlineExpl = document.createElement('span');
+              $(tmpInlineExpl).addClass('inline-explanation');
+              $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+              $(targetEl).append($(tmpInlineExpl));
+
+              return $(tmpInlineExpl);
+          };
+          
+          responses.each(function () {
+             var responseType = $(this).attr('answertype');
+             if (responseType == "multiplechoiceresponse") {
+                 var choices = $(this).find('choice');
+                 choices.each(function () {
+                      var choiceInput = $('#' + $(this).attr('id'));
+                      console.log(choiceInput.length);
+                      var choiceLabel = $('#' + $(this).attr('id')).closest('label');
+                      console.log(choiceLabel.length);
+                      console.log($(choiceLabel).find('.inline-explanation').length);
+                      var inlineExpl = $(choiceLabel).find('.inline-explanation');
+                      if (inlineExpl.length == 0) {
+                          inlineExpl = createInlineExp($(choiceLabel));
+                      }
+                      console.log(inlineExpl);
+                      if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
+                          $(inlineExpl).addClass('correct');
+                      }
+                          $(inlineExpl).append($(this).find('explanation').text());
+                      });
+             } else {
+                 var inputName = $(this).attr('name');
+                 var correctVal = $(this).text();
+                 var inputEl = $('input[name|="' + inputName + '"]');
+                 if (typeof userData[inputName] != "undefined" && ($.trim(userData[inputName]) == $.trim(String(correctVal)))) {
+                     $(inputEl).after('<span class="inline-explanation correct">Correct</span>');
+                 } else {
+                     $(inputEl).after('<span class="inline-explanation incorrect">Incorrect</span>');
+                 }
+             }
+            });
+            var explArea = $('#' + assocQID + '-expl');
+            if (explArea.length == 0) {
+                explArea = document.createElement('div');
+                $(explArea).attr('id', assocQID + '-expl');
+                $(explArea).addClass('explanation');
+            }
+            $(explArea).empty();
+            $('#' + assocQID + ' .quick-check').before($(explArea));
+            $(mySolution).children().each(function () {
+                if ($(this).text() == 'Explanation') {
+                    $(explArea).append('<h4>' + $(this).text() + '</h4>');
+                } else {
+                    $(explArea).append($(this));
+                }
+            });
+      
+            $('#' + checkBtnID).attr('value','Hide Answers');
+         };
+          // Add a "re-enable inputs" button
+          var qchkBtn = document.createElement('input');
+          $(qchkBtn).attr('id', 'qchkForm');
+          $(qchkBtn).attr('type', 'button');
+          $(qchkBtn).attr('title', 'Check your answers');
+          $(qchkBtn).addClass('btn btn-spaced');
+          $(qchkBtn).val('Check your answers');
+          var submitBtn = $('input[type|="submit"]').not('#login_button');
+          submitBtn.before($(qchkBtn));
+          $(qchkBtn).click(displayMetaData);
+
+    {% endif %}
+
+    {% if exam.autograde %}
     var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-    
+    {% else %}
+    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    {% endif %}
+                      
     if (__exam_type=="survey") {
             SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
     }
@@ -104,10 +475,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         // iterate through named form inputs
         for (member in dataObj) {
             
-            if (typeof dataObj[member] == "string") {
+            if ($.type(dataObj[member]) == "object") {
                 // it's a text input/textarea
-                $('input[name|=' + member + ']').val(dataObj[member]);
-                $('textarea[name|=' + member + ']').val(dataObj[member]);
+                $('input[name|=' + member + ']').val(dataObj[member].value);
+                $('textarea[name|=' + member + ']').val(dataObj[member].value);
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
                       $('input[name|=' + member + ']').before("<b style='color:red'>" + scores[member]+" </b> ");
@@ -120,25 +491,30 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 }
                 // it's multiple choice, therefore an array
                 $('input[name|=' + member + ']').removeAttr('checked');
+                      
+                var selectedValues = $.map(dataObj[member], function(val, idex) {
+                                           return 'input[value="' + val.value + '"]';
+                                           });
+                      
+                      //check all inputs
+                var selector =  selectedValues.join(",");
+                      
+                      console.log('input[name|=' + member + ']');
+                      console.log(selector);
+                $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
                 // loop through each choice listed for this input
+                /*
                 for (var i = 0; i < dataObj[member].length; i += 1) {
-    
                     var obj = dataObj[member][i];
 
                     for (key in obj) {
-
                         if (key == 'value') {
-                      //console.log(key + ' is what we want');
+                            //console.log(key + ' is what we want');
                             $('#' + member + '_' + obj[key]).attr('checked', 'checked');
-
-                        } else {
-                      //console.log(key + ' is not a real value');
-                        }
-
-                        
+                        } 
                     }
-
                 }
+                 */
             } 
 
         }
@@ -169,7 +545,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             });
         }
     };
-
+/*
     allFieldsets.each(function() {
         if (!$(this).attr('no-shuffle')) {
             var tmpChoices = $(this).find('label');
@@ -183,6 +559,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
         }
     });
+ */
                       
     $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
@@ -194,11 +571,19 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 //console.log(userSelections);
                 var tmpObj = {};
                 tmpObj.value = $(this).attr('value');
+                $(this).parent().find('span').remove();
                 tmpObj.associatedText = $(this).parent().text();
+                tmpObj.tag4humans = $(this).attr('data-tag4humans');
+                tmpObj.questionTag4humans = $(this).closest('fieldset').attr('data-tag4humans');
 
                 userSelections[$(this).attr('name')].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
-                userSelections[$(this).attr('name')] = $(this).val();
+                var tmpObj = {};
+                tmpObj.value = $(this).val();
+                tmpObj.tag4humans = $(this).attr('data-tag4humans');
+                tmpObj.questionTag4humans = $(this).attr('data-tag4humans');
+                        
+                userSelections[$(this).attr('name')] = tmpObj
             }
         });
         $('textarea').each(function () {
@@ -214,6 +599,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                    json_data:JSON.stringify(userSelections)
                }
         );
+
         function getDialog() {
             var dialogDiv = $('#dialog-message');
             if (dialogDiv.length == 0) {
@@ -270,9 +656,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% endif %}
                       
     });
- 
- 
-
     
 </script>
+{% if videotest %}
+<script>
+{% include 'exams/videotest.js' %}
+</script>
+{% endif %}
 {% endblock addl_scripts %}
