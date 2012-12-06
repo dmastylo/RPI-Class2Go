@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+    <head>
+        <title></title>
+        <link rel="stylesheet" href="/static/css/core/bootstrap.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+        <style>
+#slideIndex {
+  display: block;
+  height: 135px;
+  width: 100%;
+  border-top: 1px solid black;
+  //border-bottom: 1px solid black;
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+#slideIndex #slideStrip {
+    float:left;
+    width:1270px;
+}
+
+
+div.divInIndex  {
+    position: relative;
+    display: inline-block;
+    height: 100px;
+    width: 153px;
+    margin: 10px;
+    border: 1px solid black;
+}
+
+div.divInIndex img {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 90px;
+    width: 143px;
+    margin: 5px;
+    display: inline-block;
+    z-index: 1;
+}
+
+#slideIndex .unselected{
+  background:white;
+}
+
+#slideIndex .selected{
+  background:red;
+}
+        </style>
+        <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+        <script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+        <script src="http://cdn.popcornjs.org/code/dist/popcorn-complete.min.js"></script>
+    </head>
+    <body>
+        <div id="demoplayer"></div>
+        <div id="slideIndex"></div>
+    </body>
+    <script>
+        var videoURL = 'http://www.youtube.com/embed/RD5VCBprVvo?autoplay=0&wmode=transparent&fs=0&controls=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
+        //var videoURL = 'http://www.youtube.com/watch?v=RD5VCBprVvo?autoplay=0&wmode=transparent&fs=0&controls=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
+        var thumbnailData = {"0.0":{"imgsrc":"img001.jpeg"},"31.0":{"imgsrc":"img032.jpeg"},"40.0":{"imgsrc":"img041.jpeg"},"62.0":{"imgsrc":"img063.jpeg"},"135.0":{"imgsrc":"img136.jpeg"},"136.0":{"imgsrc":"img137.jpeg"},"179.0":{"imgsrc":"img180.jpeg"},"259.0":{"imgsrc":"img260.jpeg"},"292.0":{"imgsrc":"img293.jpeg"},"353.0":{"imgsrc":"img354.jpeg"},"354.0":{"imgsrc":"img355.jpeg"},"355.0":{"imgsrc":"img356.jpeg"},"385.0":{"imgsrc":"img386.jpeg"}};
+        var slideIndices = thumbnailData;
+        var questionData = {"384": {"fileName": "arp_q1.html", "problemDiv": 974, "order": 0, "time": 384}, "385": {"fileName": "arp_q2.html", "problemDiv": 975, "order": 1, "time": 385}, "386": {"fileName": "arp_q3.html", "problemDiv": 976, "order": 2, "time": 386}};
+        var questions = questionData;
+        var imgPath = "http://prod-c2g.s3-website-us-west-2.amazonaws.com/networking/Fall2012/videos/1201/jpegs/";
+        var popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
+
+        var addSlideIndex = function (idxTime) {
+            var indexDiv = document.getElementById('slideIndex');
+            var tempDiv = document.createElement('div');
+            $(tempDiv).addClass('divInIndex').attr('id','slideIndex'+idxTime.replace('.','-')+'s');
+            var slideImg = document.createElement('img');
+            slideImg.src = imgPath + slideIndices[idxTime].imgsrc;
+            $(slideImg).attr('alt', 'Jump to section ' + idxTime + ' of the video');
+            slideIndices[idxTime].displayDiv = tempDiv;
+            tempDiv.appendChild(slideImg);
+            tempDiv.onclick=(function (time) {return function(evt) {
+                //player.seekTo(time);
+                popcornVideo.play(time);
+                //thumbSet.selectSlide(time);
+                selectSlide(time);
+            };})(idxTime);
+            $('#slideIndex').append(tempDiv);
+            return tempDiv;
+
+        };
+
+        var addQuizSlide = function (idxTime) {
+            var indexDiv = document.getElementById('slideIndex');
+            var tempDiv = document.createElement('div');
+            $(tempDiv).addClass('divInIndex').addClass('quiz-thumb').attr('id','slideIndex'+idxTime.replace('.','-')+'s');
+            var slideImg = document.createElement('img');
+            slideImg.src = '/static/graphics/core/question.png';
+            $(slideImg).attr('alt', 'Go to quiz at section ' + idxTime);
+            tempDiv.appendChild(slideImg);
+
+            tempDiv.onclick=(function (time) {return function(evt) {
+                                //player.seekTo(time-0.5);
+                                popcornVideo.play(time);
+                                //thumbSet.selectSlide(time);
+                                selectSlide(time);
+            };})(idxTime);
+            $('#slideIndex').append(tempDiv);
+            return tempDiv;
+        };
+
+        var setupNavPanel = function (){
+            var merged = Array();
+
+            for (time in slideIndices) {
+                merged.push(time)
+            }
+
+            for (time in questions) {
+                if (!isNaN(parseInt(time))) {
+                    merged.push(time);
+                }
+            }
+
+            var sorted = merged.sort(function(a,b){return parseInt(a)-parseInt(b)});
+
+            var lastTime=-1;
+
+            for (i in sorted) {
+                if (sorted[i] != lastTime) {
+                    if (slideIndices.hasOwnProperty(sorted[i])) {
+                        //thumbSet.addSlideIndex(sorted[i]);
+                        addSlideIndex(sorted[i]);
+                    }
+                    if (questions.hasOwnProperty(sorted[i])) {
+                        //var tmpDiv=thumbSet.addQuizSlide(sorted[i]);
+                        var tmpDiv=addQuizSlide(sorted[i]);
+                        slideIndices[sorted[i]]={displayDiv: tmpDiv}; //Quiz takes precedence and overwrites if both quiz and thumb are at the same time
+                    }
+                }
+                lastTime=sorted[i];
+            }
+
+            window.slideMap = sorted;
+        };
+
+        var selectSlide = function (time) {
+            nearest = -1;
+            for (i in slideIndices) {
+                var numi = parseInt(i);
+                $(slideIndices[i].displayDiv).addClass('unselected');
+                $(slideIndices[i].displayDiv).removeClass('selected');
+                if (numi<=time && numi>nearest) {
+                    nearest=numi;
+                }
+            }
+
+            if (nearest >-1) {
+                console.log(nearest);
+                console.log(slideIndices[''+nearest]);
+                console.log(slideIndices);
+                var selected = slideIndices[''+parseFloat(nearest).toFixed(1)].displayDiv;
+                $(selected).addClass('selected');
+                $(selected).removeClass('unselected');
+                $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width())/2);
+            }
+        };
+
+        var handleTimeUpdate = function () {
+            console.log(popcornVideo.currentTime());
+            var timeInSec = Math.floor(popcornVideo.currentTime()).toFixed(1);
+            selectSlide(timeInSec);
+            /*
+            console.log(window.slideMap);
+            console.log(timeInSec);
+            console.log($.inArray(timeInSec, window.slideMap));
+            if ($.inArray(timeInSec, window.slideMap) != -1) {
+                console.log('in array!');
+                $('.divInIndex.selected').removeClass('selected');
+                console.log($('#slideIndex' + timeInSec + 's'));
+                $('#slideIndex' + timeInSec.replace('.','-') + 's').addClass('selected');
+            }
+            */
+        };
+    
+        $(document).ready(function() {
+
+            setupNavPanel()
+    
+            popcornVideo.on('playing', function () {
+                popcornVideo.on('timeupdate', handleTimeUpdate);
+            });
+
+            popcornVideo.on('pause', function () {
+                popcornVideo.off('timeupdate', handleTimeUpdate);
+            });
+
+        });
+    </script>
+</html>
