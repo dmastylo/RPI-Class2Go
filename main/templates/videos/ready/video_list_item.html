@@ -17,6 +17,9 @@
                 </div>
                 {% endfor %}
             {% endif %}
+            
+            {% include "content_group_buttons.html" %}
+                     
             {% if item.completed_percent > 90 %}
                 <div class="progress progress-success progress-striped" style="margin-left:3px;">
             {% else %}

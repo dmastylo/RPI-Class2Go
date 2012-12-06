@@ -1,10 +1,10 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog, Video, AdditionalPage, File
+from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog, Video, AdditionalPage, File, ContentGroup
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, render
 from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
-from courses.course_materials import get_course_materials
+from courses.course_materials import get_course_materials, group_data
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
@@ -134,8 +134,10 @@ def show(request, course_prefix, course_suffix, pset_slug):
     pset_list =  ProblemSet.objects.getByCourse(course=course)
     additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
     file_list = File.objects.getByCourse(course=course)
+    groups = ContentGroup.objects.getByCourse(course=course)
+    level1_items, level2_items = group_data(groups)
 
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, level2_items)
 
     if request.user.is_authenticated():
         is_logged_in = 1
@@ -357,15 +359,42 @@ def manage_exercises(request, course_prefix, course_suffix, pset_slug):
             file_content = request.FILES['file']
             file_name = file_content.name
 
-            exercise = Exercise()
-            exercise.handle = request.POST['course_prefix'] + '--' + request.POST['course_suffix']
-            exercise.fileName = file_name
-            exercise.file.save(file_name, file_content)
-            exercise.save()
+            exercises = Exercise.objects.filter(handle=course_prefix+"--"+course_suffix,is_deleted=0)
+            exercise_exists = False
+            for exercise in exercises:
+                if exercise.fileName == file_name:
+                    #We don't wipe out all problem activites associated with this
+                    #existing exercise, but if it's a nontrivial overwrite, should we?
+                    exercise.file = file_content
+                    exercise.save()
+                    exercise_exists = True
 
-            index = ProblemSetToExercise.objects.getByProblemset(pset).count()
-            psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
-            psetToEx.save()
+                    #If exercise already in pset, don't need to create new psetToEx
+                    #If exercise already in pset but deleted, undelete
+                    #Otherwise create new psetToEx
+                    queryPsetToEx = ProblemSetToExercise.objects.filter(problemSet=pset, exercise=exercise, mode='draft').order_by('-id')
+                    if queryPsetToEx.exists():
+                        existingPsetToEx = queryPsetToEx[0]
+                        if existingPsetToEx.is_deleted == 1:
+                            existingPsetToEx.is_deleted = 0
+                            existingPsetToEx.number = ProblemSetToExercise.objects.getByProblemset(pset).count()
+                            existingPsetToEx.save()
+                    else:
+                        index = ProblemSetToExercise.objects.getByProblemset(pset).count()
+                        psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
+                        psetToEx.save()                        
+                    break
+
+            if not exercise_exists:
+                exercise = Exercise()
+                exercise.handle = request.POST['course_prefix'] + '--' + request.POST['course_suffix']
+                exercise.fileName = file_name
+                exercise.file.save(file_name, file_content)
+                exercise.save()
+
+                index = ProblemSetToExercise.objects.getByProblemset(pset).count()
+                psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=index, is_deleted=0, mode='draft')
+                psetToEx.save()
             return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
     #If form was not submitted then the form should be displayed or if there were errors the page needs to be rendered again

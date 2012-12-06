@@ -426,10 +426,10 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 class FileManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('section','index')
             
     def getBySection(self, section):
         if section.mode == 'draft':
@@ -1613,4 +1613,32 @@ class ExamScoreField(TimestampMixin, models.Model):
     field_name = models.CharField(max_length=128, db_index=True)
     subscore = models.IntegerField(default=0)
 
+
+class ContentGroupManager(models.Manager):
+    def getByCourse(self, course):
+        return self.filter(course=course).order_by('group_id','level')
+
+class ContentGroup(models.Model):
+    group_id = models.IntegerField(db_index=True, null=True, blank=True)
+    level = models.IntegerField(db_index=True)
+    video = models.ForeignKey(Video, null=True, blank=True)
+    problemSet = models.ForeignKey(ProblemSet, null=True, blank=True)
+    additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
+    file = models.ForeignKey(File, null=True, blank=True)
+    exam = models.ForeignKey(Exam, null=True, blank=True)
+    course = models.ForeignKey(Course)
+    objects = ContentGroupManager()
+    
+    def __unicode__(self):
+        return (self.group_id)
+    
+    class Meta:
+        db_table = u'c2g_content_group'
+        
+        
+class CurrentTermMap(TimestampMixin, models.Model):
+    course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
+    course_suffix = models.CharField(max_length=64)
+    def __unicode__(self):
+        return (self.course_prefix + "--" + self.course_suffix)
 
