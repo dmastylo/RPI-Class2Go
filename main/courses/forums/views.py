@@ -74,6 +74,8 @@ def view(request, course_prefix, course_suffix):
 
     form = PiazzaAuthForm(initial=signed_request['parameters'])
 
+    querystring = request.META['QUERY_STRING']
+
     # Set common_page_data['can_switch_mode'] to false to hide mode switcher on this page.
     request.common_page_data['can_switch_mode'] = False
     
@@ -82,5 +84,6 @@ def view(request, course_prefix, course_suffix):
             'show_confirmation': show_confirmation,
             'form': form,
             'piazza_target_url': PIAZZA_ENDPOINT,
+            'querystring': querystring,
         }, context_instance=RequestContext(request))
 
