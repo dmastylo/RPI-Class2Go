@@ -1,9 +1,9 @@
 import os
 
-if os.environ.has_key('C2G_JENKINS_DBNAME'):
-  DBNAME = os.environ.get('C2G_JENKINS_DBNAME')
+if os.environ.has_key('C2G_JENKINS_DB_NAME'):
+  DBNAME = os.environ.get('C2G_JENKINS_DB_NAME')
 else:
-  DBNAME = 'class2go'
+  DBNAME = 'c2g_jenkins'
 
 DATABASES = {
     'default': {
