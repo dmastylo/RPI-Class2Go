@@ -51,7 +51,7 @@
 <h2>Link your account with Piazza<h2>
 <h3>You'll only see this once, and you can make changes later on your profile page (click on your name).</h3>
     
-<form id="piazza_lti_form" name="piazza_lti_form" action="{{ piazza_target_url }}" method="post" target="piazza_iframe" encType="application/x-www-form-urlencoded">
+<form id="piazza_lti_form" name="piazza_lti_form" action="{{ piazza_target_url }}{% if querystring %}?{{ querystring|safe }}{% endif %}" method="post" target="piazza_iframe" encType="application/x-www-form-urlencoded">
     {% for field in form %}
       {% if field.name == 'lis_person_name_full' %}
         <label for="id_lis_person_name_full">Choose the name (or alias) that you'd like to be publicly known by on Piazza.  (If you've already chosen a handle on Piazza, this may not override your previous choice.)</label>

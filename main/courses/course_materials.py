@@ -5,12 +5,15 @@ from django.db import connection, transaction
 
 
 
-def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False):
+def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
         pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
         files = File.objects.getByCourse(course=common_page_data['course'])
+        exams = Exam.objects.getByCourse(course=common_page_data['course'])
+        groups = ContentGroup.objects.getByCourse(course=common_page_data['course'])
+        level1_items, level2_items = group_data(groups)
 
         if get_video_content:
             videos = Video.objects.getByCourse(course=common_page_data['course'])
@@ -150,8 +153,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_additional_page_content:
                 for page in pages:
-                    if page.section_id == section.id:
-                        item = {'type':'additional_page', 'additional_page':page, 'index':page.index}
+                    
+                    key = 'page:' + str(page.id)
+                    if page.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
+                        
+                        item = {'type':'additional_page', 'additional_page':page, 'index':page.index, 'children': children}
 
                         if common_page_data['course_mode'] == 'draft':
                             prod_page = page.image
@@ -174,8 +181,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_file_content:
                 for file in files:
-                    if file.section_id == section.id:
-                        item = {'type':'file', 'file':file, 'index':file.index}
+                    
+                    key = 'file:' + str(file.id)
+                    if file.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
+                        
+                        item = {'type':'file', 'file':file, 'index':file.index, 'children': children}
 
                         if common_page_data['course_mode'] == 'draft':
                             prod_file = file.image
@@ -199,9 +210,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_video_content:
                         
                 for video in videos:
-                    if video.section_id == section.id:
-                
-                        item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
+                    
+                    key = 'video:' + str(video.id)
+                    if video.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
+                                
+                        item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index, 'children': children}
 
                         numQuestions = 0
                         for videoToEx in videoToExs:
@@ -249,8 +263,11 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_pset_content:
 
                 for problem_set in problem_sets:
-                    if problem_set.section_id == section.id:
-                        item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
+                    key = 'pset:' + str(problem_set.id)
+                    if problem_set.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
+                        
+                        item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index, 'children': children}
 
                         numQuestions = 0
                         for psetToEx in psetToExs:
@@ -332,6 +349,34 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
                         item['numQuestions'] = numQuestions
                         section_dict['items'].append(item)
+
+            if get_exam_content:
+                for exam in exams:
+                    key = 'exam:' + str(exam.id)
+                    if exam.section_id == section.id and not level2_items.has_key(key):
+                        children = get_children(key, level1_items, level2_items)
+                        
+                        item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children}
+                        section_dict['items'].append(item)
+                        
+                        if common_page_data['course_mode'] == 'draft':
+                            prod_exam = exam.image
+                            if not prod_exam.live_datetime:
+                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
+                            else:
+                                if prod_exam.live_datetime > datetime.datetime.now():
+                                    year = prod_exam.live_datetime.year
+                                    month = prod_exam.live_datetime.month
+                                    day = prod_exam.live_datetime.day
+                                    hour = prod_exam.live_datetime.hour
+                                    minute = prod_exam.live_datetime.minute
+                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
+                                else:
+                                    visible_status = "<span style='color:green;'>Live</span>"
+
+                            item['visible_status'] = visible_status                        
+                        
+                        
 
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
                 section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index'])
@@ -554,4 +599,93 @@ def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
             return True
             
     return False
-        
+
+# Function to split the group data into level1 and level2 items.
+# The for loop looks for each change in the group_id; which works since ContentGroup.getByCourse
+# is ordered by group_id, level.
+# Format of the dictionaries is:
+#    key: type:id     value: group_id
+# which allows independent lookup of level1 and level2 items.
+# When we need the level2 items for a level1 item we lookup the level2 items with the same group_id (value)
+# as the level1 item.
+def group_data(group_items):
+    
+    level1_items = {}
+    level2_items = {}
+    
+    group_item_id = None
+    for group_item in group_items:
+        if group_item.group_id == group_item_id:
+            level, type, id = get_group_item_data(group_item)
+            if level == 2:
+                level2_items[type + ':' + str(id)] = group_item_id
+        else:
+            group_item_id = group_item.group_id
+            level, type, id = get_group_item_data(group_item)
+            if level == 1:
+                level1_items[type + ':' + str(id)] = group_item_id
+            
+    return level1_items, level2_items
+                
+# 
+def get_group_item_data(group_item):
+    if group_item.video_id:
+        level = group_item.level
+        type = 'video'
+        id = group_item.video_id
+    elif group_item.problemSet_id:
+        level = group_item.level
+        type = 'pset'
+        id = group_item.problemSet_id
+    elif group_item.additional_page_id:
+        level = group_item.level
+        type = 'page'
+        id = group_item.additional_page_id
+    elif group_item.file_id:
+        level = group_item.level
+        type = 'file'
+        id = group_item.file_id
+    elif group_item.exam_id:
+        level = group_item.level
+        type = 'exam'
+        id = group_item.exam_id
+
+    return level, type, id
+
+def get_children(key, level1_items, level2_items):
+    children = []
+    if level1_items.has_key(key):
+        group_id = level1_items[key]
+        child_items = [k for k, v in level2_items.items() if group_id == v]
+        for child in child_items:
+            child_item = {}
+            type, url = get_child_data(child)
+            child_item['type'] = type
+            child_item['url'] = url
+            children.append(child_item)
+    return children
+    
+def get_child_data(child):
+    parts = str(child).split(":")
+    type = parts[0]
+    id = parts[1]
+    
+    if type == 'video':
+        video = Video.objects.get(id=id)
+        url = 'videos/' + video.slug
+    elif type == 'pset':
+        pset = ProblemSet.objects.get(id=id)
+        url = 'problemsets/' + pset.slug
+    elif type == 'page':
+        page = AdditionalPage.objects.get(id=id)
+        url = 'pages/' + page.slug
+    elif type == 'file':
+        file = File.objects.get(id=id)
+        url = file.file.url
+    elif type == 'exam':
+        exam = Exam.objects.get(id=id)
+        url = 'exams/' + exam.slug
+    else:
+        url = ''
+    
+    return type, url

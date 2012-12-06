@@ -1,0 +1,49 @@
+#demoplayer {
+    height: 470px;
+    width: 800px;
+}
+#slideIndex {
+  display: block;
+  height: 135px;
+  /*width: 100%;*/
+  width: 800px;
+  border-top: 1px solid black;
+  //border-bottom: 1px solid black;
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+#slideIndex #slideStrip {
+    float:left;
+    width:1270px;
+}
+
+
+div.divInIndex  {
+    position: relative;
+    display: inline-block;
+    height: 100px;
+    width: 153px;
+    margin: 10px;
+    border: 1px solid black;
+}
+
+div.divInIndex img {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 90px;
+    width: 143px;
+    margin: 5px;
+    display: inline-block;
+    z-index: 1;
+}
+
+#slideIndex .unselected{
+  background:white;
+}
+
+#slideIndex .selected{
+  background:red;
+}

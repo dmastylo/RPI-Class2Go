@@ -23,6 +23,7 @@
 
 {% block bodytag %}<body>{% endblock bodytag %}
     <div id="viewport">
+      {% if not request.session.headless %}
         <div id="global-header">
             <h1 class="stanford-logo">
                 <a href="http://www.stanford.edu">Stanford University</a>
@@ -30,7 +31,9 @@
             <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
         </div>
         {% block topcontent %}<div id="top-content"></div>{% endblock topcontent %}
+      {% endif %}
         {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}
+          {% if not request.session.headless %}
             {% block navbar %}
             {% ifequal user.is_staff True %}
             <div class="navbar">
@@ -51,6 +54,7 @@
             </div>
             {% endifequal %}
             {% endblock navbar %}
+          {% endif %}
             <div class="row-fluid" style="position:relative;">
             {% block page_title %}
             <div class="pull-left page-title">

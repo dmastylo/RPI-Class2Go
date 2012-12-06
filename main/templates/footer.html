@@ -4,6 +4,7 @@
     <small><a href="http://class2go.stanford.edu">Powered by Class2Go</a></small>
 </div>
 
+{% if not request.session.headless %}
 <div id="global-footer" class="footer hidden-phone">
     <div class="container">
         <div class="row">
@@ -25,3 +26,4 @@
         </div>
     </div>
 </div>
+{% endif %}
