@@ -1,3 +1,4 @@
+#import reversion
 from django.contrib import admin
 from c2g.models import *
 from django.contrib.auth.models import Group
@@ -38,6 +39,13 @@ class GroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'count')
     def count(self, obj):
         return obj.user_set.count()
+
+#class ExamAdmin(reversion.VersionAdmin):
+#    pass
+
+
+#admin.site.register(Exam, ExamAdmin)
+
 
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(GroupProxy, GroupAdmin)

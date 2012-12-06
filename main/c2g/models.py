@@ -1556,7 +1556,15 @@ class PageVisitLog(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_page_visit_log'
 
-class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+class ExamManager(models.Manager):
+    def getByCourse(self, course):
+        if course.mode == 'draft':
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
@@ -1564,20 +1572,140 @@ class Exam(TimestampMixin, Deletable, Stageable, models.Model):
                          )
     
     course = models.ForeignKey(Course, db_index=True)
+    section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     html_content = models.TextField(blank=True)
+    xml_metadata = models.TextField(null=True, blank=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
-    total_score = models.IntegerField(null=True, blank=True)
+    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    late_penalty = models.IntegerField(default=0, null=True, blank=True)
+    submissions_permitted = models.IntegerField(default=999, null=True, blank=True)
+    resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
+    autograde = models.BooleanField(default=False)
+    display_single = models.BooleanField(default=False)
+    invideo = models.BooleanField(default=False)
+    timed = models.BooleanField(default=False)
+    minutesallowed = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    objects = ExamManager()
+    total_score = models.IntegerField(null=True, blank=True)
     
     
     def past_due(self):
         if self.due_date and (datetime.now() > self.due_date):
             return True
         return False
+    
+    def create_ready_instance(self):
+        ready_instance = Exam(
+            course=self.course.image,
+            section=self.section.image,
+            title=self.title,
+            description=self.description,
+            html_content=self.html_content,
+            slug=self.slug,
+            index=self.index,
+            mode='ready',
+            due_date=self.due_date,
+            grace_period=self.grace_period,
+            total_score=self.total_score,
+            exam_type=self.exam_type,
+            live_datetime = self.live_datetime,
+        )
+        ready_instance.save()
+        self.image = ready_instance
+        self.save()
+    
+    def commit(self, clone_fields = None):
+        if self.mode != 'draft': return;
+        if not self.image: self.create_ready_instance()
+
+        ready_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            ready_instance.section = self.section.image
+        if not clone_fields or 'title' in clone_fields:
+            ready_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            ready_instance.description = self.description
+        if not clone_fields or 'html_content' in clone_fields:
+            ready_instance.html_content = self.html_content
+        if not clone_fields or 'slug' in clone_fields:
+            ready_instance.slug = self.slug
+        if not clone_fields or 'index' in clone_fields:
+            ready_instance.index = self.index
+        if not clone_fields or 'due_date' in clone_fields:
+            ready_instance.due_date = self.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            ready_instance.grace_period = self.grace_period
+        if not clone_fields or 'total_score' in clone_fields:
+            ready_instance.total_score = self.total_score
+        if not clone_fields or 'exam_type' in clone_fields:
+            ready_instance.exam_type = self.exam_type
+        if not clone_fields or 'live_datetime' in clone_fields:
+            ready_instance.live_datetime = self.live_datetime
+
+        ready_instance.save()
+    
+    def revert(self, clone_fields = None):
+        if self.mode != 'draft': return;
+
+        ready_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            self.section = ready_instance.section.image        
+        if not clone_fields or 'title' in clone_fields:
+            self.title = ready_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = ready_instance.description            
+        if not clone_fields or 'html_content' in clone_fields:
+            self.html_content = ready_instance.html_content
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = ready_instance.slug
+        if not clone_fields or 'index' in clone_fields:
+            self.index = ready_instance.index
+        if not clone_fields or 'due_date' in clone_fields:
+            self.due_date = ready_instance.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            self.grace_period = ready_instance.grace_period
+        if not clone_fields or 'total_score' in clone_fields:
+            self.total_score = ready_instance.total_score
+        if not clone_fields or 'exam_type' in clone_fields:
+            self.exam_type = ready_instance.exam_type
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = ready_instance.live_datetime
+
+        self.save()
+    
+    def is_synced(self):
+        
+        prod_instance = self.image
+        
+        if self.section != prod_instance.section.image:
+            return False
+        if self.title != prod_instance.title:
+            return False
+        if self.description != prod_instance.description:
+            return False
+        if self.html_content != self.image.html_content:
+            return False
+        if self.slug != self.image.slug:
+            return False
+        if self.index != self.image.index:
+            return False
+        if self.due_date != self.image.due_date:
+            return False
+        if self.grace_period != self.image.grace_period:
+            return False
+        if self.total_score != self.image.total_score:
+            return False
+        if self.exam_type != self.image.exam_type:
+            return False
+        if self.live_datetime != self.image.live_datetime:
+            return False
+
+        return True
     
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
@@ -1587,31 +1715,63 @@ class ExamRecord(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    json_data = models.TextField(null=True, blank=True)
+    json_data = models.TextField(null=True, blank=True)   #blob
+    json_score_data = models.TextField(null=True, blank=True)  #blob
     score = models.IntegerField(null=True, blank=True) #currently unused.
-
+    
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
 
-
 class ExamScore(TimestampMixin, models.Model):
     """
-    This class is meant to be the top level score of each problem set
+    This class is meant to be the top level score of each exam.  
+    It should have a one-to-one relationship with the (exam, student) pair
     """
-    course = models.ForeignKey(Course, db_index=True)
+    course = models.ForeignKey(Course, db_index=True) #mainly for convenience
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    score = models.IntegerField(null=True, blank=True) #this is the parent score
+    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
-
+    
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.score))
 
+    class Meta:
+        unique_together = ("exam", "student")
 
 class ExamScoreField(TimestampMixin, models.Model):
+    """Should be kept basically identical to ExamRecordScoreField"""
     parent = models.ForeignKey(ExamScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     subscore = models.IntegerField(default=0)
+    comments = models.TextField(null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
+	
+
+class ExamRecordScore(TimestampMixin, models.Model):
+    """
+    Making a separate DB table to keep scores associated with each record.
+    Currently for CSV-graded exams this does not get created since there are too many DB operations
+    One of these can be "promoted" -- i.e. copied into ExamScore to be the official score
+       **TODO: Write Promote as a function in the model**
+    """
+    record = models.OneToOneField(ExamRecord, db_index=True)
+    score = models.IntegerField(null=True, blank=True) # this is the score of the entire record
+    #subscores are in ExamRecordScoreField
+    
+    def __unicode__(self):
+        return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.score))
+
+
+class ExamRecordScoreField(TimestampMixin, models.Model):
+    """Should be kept basically identical to ExamScoreField"""
+    parent = models.ForeignKey(ExamRecordScore, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    subscore = models.IntegerField(default=0)
+    comments = models.TextField(null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
 
 
 class ContentGroupManager(models.Manager):
@@ -1642,3 +1802,6 @@ class CurrentTermMap(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
+class StudentExamStart(TimestampMixin, models.Model):
+    student = models.ForeignKey(User)
+    exam = models.ForeignKey(Exam)

@@ -68,6 +68,19 @@
                                 <li><em class="icon-book"></em> <span>{{item.5}}</span></li>
       		 	            {% endif %}
       		 	        {% endifequal %}
+      		 	        
+      		 	        {% ifequal item.0 'exam' %}
+                            {% if is_logged_in %}
+                                {% ifequal item.5 exam.title %}
+                                    <li class="current"><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Exam"><em class="icon-book"></em><span>{{item.5}}</span></a></li>
+                                {% else %}
+                                    <li><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix item.4 %}" title="Exam"><em class="icon-book"></em> <span>{{item.5}}</span></a></li>
+                                {% endifequal %}
+      		 	            {% else %}
+                                <li><em class="icon-book"></em> <span>{{item.5}}</span></li>
+      		 	            {% endif %}
+      		 	        {% endifequal %}
+      		 	        
                         {% ifequal item.0 'file' %}
                             {% if is_logged_in %}
                                 <li><a href="{{item.4}}"><em class="icon-{{item.6}}"></em> <span>{{item.5}}</span></a></li>

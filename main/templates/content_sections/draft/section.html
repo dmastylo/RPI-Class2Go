@@ -37,12 +37,18 @@
                     <input type="hidden" name="order_video_{{item.video.id}}" value="{{forloop.counter0}}" />
                 </li>
             {% endifequal %}
-	    {% ifequal item.type 'file' %}
-		<li id="file_{{item.file.id}}" class="ui-state-default" style="padding: 3px;">
-		    {% include "files/draft/file_list_item.html" %}
-		    <input type="hidden" name="order_file_{{item.file.id}}" value="{{forloop.counter0}}" />
-		</li>
-	    {% endifequal %}
+	        {% ifequal item.type 'file' %}
+		        <li id="file_{{item.file.id}}" class="ui-state-default" style="padding: 3px;">
+		            {% include "files/draft/file_list_item.html" %}
+		            <input type="hidden" name="order_file_{{item.file.id}}" value="{{forloop.counter0}}" />
+		        </li>
+	        {% endifequal %}
+	        {% ifequal item.type 'exam' %}
+		        <li id="exam_{{item.exam.id}}" class="ui-state-default" style="padding: 3px;">
+		            {% include "exams/draft/exam_list_item.html" %}
+		            <input type="hidden" name="order_exam_{{item.exam.id}}" value="{{forloop.counter0}}" />
+		        </li>
+	        {% endifequal %}
         {% empty %}
             <p style='margin: 20px;'>No items have been added to this section</p>
         {% endfor %}

@@ -73,7 +73,7 @@ def save_content_order(request):
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
         
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content = True, get_file_content=True)
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content = True, get_file_content=True, get_exam_content=True)
     
     for section_structure in section_structures:
         if section_structure['section'].id == long(request.POST.get("section_id")):
@@ -102,6 +102,12 @@ def save_content_order(request):
                     file_image = item['file'].image
                     file_image.index = request.POST.get("order_file_"+str(item['file'].id))
                     file_image.save()
+                elif item['type'] == 'exam':
+                    item['exam'].index = request.POST.get("order_exam_"+str(item['exam'].id))
+                    item['exam'].save()
+                    exam_image = item['exam'].image
+                    exam_image.index = request.POST.get("order_exam_"+str(item['exam'].id))
+                    exam_image.save()
             break
             
     return redirect(request.META['HTTP_REFERER'])
