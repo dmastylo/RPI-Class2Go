@@ -313,7 +313,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 //var testJSON = '{"score":0,"maximum-score":1,"feedback":[{"user_answer":"SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n"}]';
                 displayHTMLAnswer(testJSON);
             } else {
-                $.post('quick_check', 
+                $.post('{{exam.slug}}/quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
                     function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
             }

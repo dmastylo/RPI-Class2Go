@@ -275,6 +275,10 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                 feedback[prob] = False
             except AutoGraderGradingException:
                 pass
+
+        record.json_score_data = feedback
+        record.save()
+
         return HttpResponse(json.dumps(feedback))
 
     else:
