@@ -1,4 +1,4 @@
-<li class="course-list-item">
+<!-- video_list_item -->
     <div class="pull-left icon">
         <em class="icon-facetime-video"></em>
     </div>
@@ -8,7 +8,7 @@
             {% if item.video.has_storage %}
                 {% for tag, url, size, sizedesc in item.video.dl_links_all %}
                 <div class="btn-group" style="float: left">
-                    <a href="{{url}}" onclick="record_download( {{item.video.id}}, {{common_page_data.request.user.id}}, {{item.video.course_id}}, '{{tag}}' );">
+                    <a href="{{url}}" onclick="record_video_download( {{item.video.id}}, {{common_page_data.request.user.id}}, {{item.video.course_id}}, '{{tag}}' );">
                         <button class="btn btn-mini" title="{{sizedesc}} ({{size|filesizeformat}})">
                             <em class="icon-download-alt"></em>&nbsp;{{tag}}
                         </button>
@@ -28,10 +28,3 @@
             </div>
         </div>
     </div>
-</li>
-
-<script type="text/javascript">
-        function record_download(video_id, user_id, course_id, format) {
-        	$.ajax({type:"POST", url: "/videos/record_download/", async:false, data: {video_id: video_id, user_id: user_id, course_id: course_id, format: format, csrfmiddlewaretoken: '{{ csrf_token }}'}});
-        }
-</script>

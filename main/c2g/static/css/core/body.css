@@ -557,8 +557,12 @@ small.date {
 }
 
 ul.unstyled.course-list {
-  border-bottom:1px solid #eee;
+  /* border-bottom:1px solid #eee; */
   margin:0;
+}
+
+h3.course-section-heading {
+    border-bottom:1px solid #eee; 
 }
 
 .course-list-item {
@@ -566,6 +570,14 @@ ul.unstyled.course-list {
   padding:8px 0 4px;
   border-bottom: 0;
 }
+
+.course-list-item.zebra_light {
+    background-color: white;
+}
+.course-list-item.zebra_dark {
+    background-color: #eeeeee;
+}
+
 .course-list-item .progress {
     height:14px;
     width:100px;
