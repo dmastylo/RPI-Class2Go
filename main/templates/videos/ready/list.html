@@ -17,3 +17,21 @@
     {% endif %}
 </div>
 {% endblock m_column_content %}
+
+{% block addl_scripts %}
+<!-- included in video list.html; see also course_materials.html -->
+<script type="text/javascript">
+    function record_video_download(video_id, user_id, course_id, format) {
+        $.ajax({type:"POST", 
+                url: "/videos/record_download/", 
+                async:false, 
+                data: {video_id: video_id, 
+                       user_id: user_id, 
+                       course_id: course_id, 
+                       format: format, 
+                       csrfmiddlewaretoken: '{{ csrf_token }}'
+                       }
+               });
+    }
+</script>
+{% endblock addl_scripts%}
