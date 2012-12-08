@@ -233,6 +233,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             
                         if common_page_data['course_mode'] == 'draft':
                             item['visible_status'] = get_live_datetime_for(problem_set)
+                        else:
                             numCompleted = 0
                             for pset_activity in pset_activities:
                                 if pset_activity['problemset_to_exercise__problemSet_id'] == problem_set.id and not filename_in_deleted_list(pset_activity['problemset_to_exercise__exercise__fileName'], problem_set.id, deleted_exercise_list):
