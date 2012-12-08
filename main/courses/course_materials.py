@@ -620,8 +620,6 @@ def get_children(key, level1_items, level2_items):
     children = []
     if level1_items.has_key(key):
         group_id = level1_items[key]
-        #child_items = [k for k, v in level2_items.items() if str(group_id) in v]
-        #import ipdb; ipdb.set_trace();
         child_data = [get_child_data(x) for x in [k for k, v in level2_items.items() if group_id == v]]
         for type, url, title, name, ext in child_data:
             child_item = {
