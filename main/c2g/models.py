@@ -290,7 +290,7 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         """
 
         dict_list = []
-        for tag, cls in ContentGroupGroupFactory.groupable_types.iteritems():
+        for tag, cls in ContentGroup.groupable_types.iteritems():
             dict_list.extend([{'item':item, 'index':item.index, 'type':tag} for item in cls.objects.getBySection(section=self)])
 
         if getsorted:
@@ -1793,36 +1793,6 @@ class ContentGroup(models.Model):
     course = models.ForeignKey(Course)
     objects = ContentGroupManager()
 
-    def get_content_type(self):
-        """This is linear in the number of content types supported for grouping
-        
-        TODO: Replace with a column lookup storing our type explicitly? Not
-              nice to store the same information twice, but constant time
-              lookups are awfully nice...
-        """
-        for keyword in ContentGroupGroupFactory.groupable_types.keys():
-            if getattr(self, keyword, False):
-                return keyword
-        return None
-
-    def __repr__(self):
-        s = "ContentGroup(group_id=" + str(self.group_id) + ", "
-        s += 'course=' + str(self.course.id) + ', ' 
-        s += 'level=' + str(self.level)
-        for keyword in ContentGroupGroupFactory.groupable_types.keys():
-            ref = getattr(self, keyword, '')
-            if not ref or ref == "None":
-                continue
-            s += ', ' + keyword+'=<' + str(ref.id) + '>'
-        return s+')'
-
-    def __unicode__(self):
-        return unicode(self.group_id)
-    
-    class Meta:
-        db_table = u'c2g_content_group'
-        
-class ContentGroupGroupFactory(object):
                # ContentGroup field name: model class name
     groupable_types = { 
                        'video':           Video,
@@ -1831,26 +1801,32 @@ class ContentGroupGroupFactory(object):
                        'file':            File,
                       }
 
-    def __init__(self, course_ref, *args):
-        ### FIXME: remove this and make this functionality part of ContentGroup (!?)
-        """Instantiate a new content group with a set of parents and children
-
-        Accepts a course reference and an iterable of tuples of the form
-        (type_tag, item_reference)
-        where type_tag is a string like 'problemSet' referring to the class
-        members of ContentGroup.
-
-        The first such tuple is set to be the parent ContentGroup entry, and
-        each subsequent tuple represents a child item in the same ContentGroup.
+    @classmethod
+    def groupinfo_by_id(thisclass, tag, id):
+        """Reverse-lookup the members of a group by the object id of a member.
+        
+        nota bene:
+        O(n**2) for # of items in a group. n should be tiny, but be wary.
+        OTOH, if ContentGroup.get_content_type becomes constant-time, this
+        becomes linear, and then we win.
         """
-        self.group_id = -1
-
-        for item_type, item in args:
-            if self.group_id == -1:
-                self.group_id = self.add_parent(course_ref, item_type, item)
+        info = {}
+        cls = thisclass.groupable_types[tag]
+        obj = cls.objects.get(id=id)
+        cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
+        for cgo in cgobjs:
+            cttag = cgo.get_content_type()
+            cgref = getattr(cgo, cttag)
+            if not cttag or not cgref:
+                continue
+            if cgo.level == 1:
+                info['__parent'] = cgref
             else:
-                self.add_child(self.group_id, item_type, item)
-        return self.group_id
+                info.setdefault('__children', []).append(cgref)
+            info.setdefault(cttag, []).append(cgref)
+        if info:
+            info['__group_id'] = cgobjs[0].group_id
+        return info
 
     @classmethod
     def add_child(thisclass, group_id, tag, obj_ref):
@@ -1910,7 +1886,6 @@ class ContentGroupGroupFactory(object):
         If it is a child in a group that has a parent, promote it, creating a
             new group
         """
-        group_id = -1
         cgref    = None
         try:
             cgref = obj_ref.contentgroup_set.get()
@@ -1943,33 +1918,6 @@ class ContentGroupGroupFactory(object):
             return cgref.group_id
 
     @classmethod
-    def groupinfo_by_id(thisclass, tag, id):
-        """Reverse-lookup the members of a group by the object id of a member.
-        
-        nota bene:
-        O(n**2) for # of items in a group. n should be tiny, but be wary.
-        OTOH, if ContentGroup.get_content_type becomes constant-time, this
-        becomes linear, and then we win.
-        """
-        info = {}
-        cls = thisclass.groupable_types[tag]
-        obj = cls.objects.get(id=id)
-        cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
-        for cgo in cgobjs:
-            cttag = cgo.get_content_type()
-            cgref = getattr(cgo, cttag)
-            if not cttag or not cgref:
-                continue
-            if cgo.level == 1:
-                info['__parent'] = cgref
-            else:
-                info.setdefault('__children', []).append(cgref)
-            info.setdefault(cttag, []).append(cgref)
-        if info:
-            info['__group_id'] = cgobjs[0].group_id
-        return info
-
-    @classmethod
     def get_level2_tag_sorted(cls):
         info = {}
         l2cgobjs = ContentGroup.objects.filter(level=2)
@@ -1978,4 +1926,33 @@ class ContentGroupGroupFactory(object):
             info.setdefault(l2o_type, []).append(getattr(l2o, l2o_type).id)
         return info
 
+    def get_content_type(self):
+        """This is linear in the number of content types supported for grouping
+        
+        TODO: Replace with a column lookup storing our type explicitly? Not
+              nice to store the same information twice, but constant time
+              lookups are awfully nice...
+              Compromise is to use django cache table
+        """
+        for keyword in ContentGroup.groupable_types.keys():
+            if getattr(self, keyword, False):
+                return keyword
+        return None
 
+    def __repr__(self):
+        s = "ContentGroup(group_id=" + str(self.group_id) + ", "
+        s += 'course=' + str(self.course.id) + ', ' 
+        s += 'level=' + str(self.level)
+        for keyword in ContentGroup.groupable_types.keys():
+            ref = getattr(self, keyword, '')
+            if not ref or ref == "None":
+                continue
+            s += ', ' + keyword+'=<' + str(ref.id) + '>'
+        return s+')'
+
+    def __unicode__(self):
+        return unicode(self.group_id)
+    
+    class Meta:
+        db_table = u'c2g_content_group'
+        

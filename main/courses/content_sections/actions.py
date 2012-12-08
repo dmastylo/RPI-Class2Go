@@ -120,7 +120,7 @@ def get_children(request, section_id, contentgroup_parents_only=False):
     children = []
     l2_kids = []
     if contentgroup_parents_only:
-        l2_kids = ContentGroupGroupFactory.get_level2_tag_sorted()
+        l2_kids = ContentGroup.get_level2_tag_sorted()
     for child in section.getChildren(gettagged=True, getsorted=True):
         item    = child['item']
         typetag = child['type']

@@ -232,6 +232,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                             
                         if common_page_data['course_mode'] == 'draft':
                             item['visible_status'] = get_live_datetime_for(problem_set)
+                        else:
                             numCompleted = 0
                             for pset_activity in pset_activities:
                                 if pset_activity['problemset_to_exercise__problemSet_id'] == problem_set.id and not filename_in_deleted_list(pset_activity['problemset_to_exercise__exercise__fileName'], problem_set.id, deleted_exercise_list):
@@ -620,7 +621,8 @@ def get_children(key, level1_items, level2_items):
     if level1_items.has_key(key):
         group_id = level1_items[key]
         #child_items = [k for k, v in level2_items.items() if str(group_id) in v]
-        child_data = [get_child_data(x) for x in [k for k, v in level2_items.items() if str(group_id) in v]]
+        #import ipdb; ipdb.set_trace();
+        child_data = [get_child_data(x) for x in [k for k, v in level2_items.items() if group_id == v]]
         for type, url, title, name, ext in child_data:
             child_item = {
                           'type' : type,
@@ -640,13 +642,17 @@ def get_child_data(child):
     title = ''
     name = ''
     ext = ''
+    url = ''
     
     if type == 'video':
         video = Video.objects.get(id=id)
         url = 'videos/' + video.slug
         title = video.title
         name = video.file.name
-        ext = name.rsplit('.')[1]
+        ext = name
+        pair = name.rsplit('.')
+        if len(pair) > 1:
+            ext = pair[1]
     elif type == 'pset':
         pset = ProblemSet.objects.get(id=id)
         url = 'problemsets/' + pset.slug
@@ -659,13 +665,14 @@ def get_child_data(child):
         file = File.objects.get(id=id)
         url = file.file.url
         title = file.title
-        name = file.file.name
-        ext = name.rsplit('.')[1]
+        name = file.file.name.rsplit('/')[-1]
+        ext = name
+        pair = name.rsplit('.')
+        if len(pair) > 1:
+            ext = pair[1]
     elif type == 'exam':
         exam = Exam.objects.get(id=id)
         url = 'exams/' + exam.slug
-    else:
-        url = ''
     
     return type, url, title, name, ext
 
