@@ -1583,10 +1583,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
-    objects = ExamManager()
     total_score = models.IntegerField(null=True, blank=True)
-    exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
-    
+    objects = ExamManager()
     
     def past_due(self):
         if self.due_date and (datetime.now() > self.due_date):
@@ -1608,6 +1606,16 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             total_score=self.total_score,
             exam_type=self.exam_type,
             live_datetime = self.live_datetime,
+            xml_metadata = self.xml_metadata,
+            partial_credit_deadline = self.partial_credit_deadline,
+            late_penalty = self.late_penalty,
+            submissions_permitted = self.submissions_permitted,
+            resubmission_penalty = self.resubmission_penalty,
+            autograde = self.autograde,
+            display_single = self.display_single,
+            invideo = self.invideo,
+            timed = self.timed,
+            minutesallowed = self.minutesallowed,
         )
         ready_instance.save()
         self.image = ready_instance
@@ -1640,7 +1648,27 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.exam_type = self.exam_type
         if not clone_fields or 'live_datetime' in clone_fields:
             ready_instance.live_datetime = self.live_datetime
-
+        if not clone_fields or 'xml_metadata' in clone_fields:
+            ready_instance.xml_metadata = self.xml_metadata
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            ready_instance.partial_credit_deadline = self.partial_credit_deadline
+        if not clone_fields or 'late_penalty' in clone_fields:
+            ready_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            ready_instance.submissions_permitted = self.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            ready_instance.resubmission_penalty = self.resubmission_penalty
+        if not clone_fields or 'autograde' in clone_fields:
+            ready_instance.autograde = self.autograde
+        if not clone_fields or 'display_single' in clone_fields:
+            ready_instance.display_single = self.display_single
+        if not clone_fields or 'invideo' in clone_fields:
+            ready_instance.invideo = self.invideo
+        if not clone_fields or 'timed' in clone_fields:
+            ready_instance.timed = self.timed
+        if not clone_fields or 'minutesallowed' in clone_fields:
+            ready_instance.minutesallowed = self.minutesallowed
+        
         ready_instance.save()
     
     def revert(self, clone_fields = None):
@@ -1669,6 +1697,26 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.exam_type = ready_instance.exam_type
         if not clone_fields or 'live_datetime' in clone_fields:
             self.live_datetime = ready_instance.live_datetime
+        if not clone_fields or 'xml_metadata' in clone_fields:
+            self.xml_metadata = ready_instance.xml_metadata 
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            self.partial_credit_deadline = ready_instance.partial_credit_deadline 
+        if not clone_fields or 'late_penalty' in clone_fields:
+            self.late_penalty = ready_instance.late_penalty 
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            self.submissions_permitted = ready_instance.submissions_permitted 
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            self.resubmission_penalty = ready_instance.resubmission_penalty 
+        if not clone_fields or 'autograde' in clone_fields:
+            self.autograde = ready_instance.autograde 
+        if not clone_fields or 'display_single' in clone_fields:
+            self.display_single = ready_instance.display_single 
+        if not clone_fields or 'invideo' in clone_fields:
+            self.invideo = ready_instance.invideo 
+        if not clone_fields or 'timed' in clone_fields:
+            self.timed = ready_instance.timed 
+        if not clone_fields or 'minutesallowed' in clone_fields:
+            self.minutesallowed = ready_instance.minutesallowed 
 
         self.save()
     
@@ -1697,6 +1745,26 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.exam_type != self.image.exam_type:
             return False
         if self.live_datetime != self.image.live_datetime:
+            return False
+        if self.xml_metadata != self.image.xml_metadata:
+            return False
+        if self.partial_credit_deadline != self.image.partial_credit_deadline:
+            return False
+        if self.late_penalty != self.image.late_penalty:
+            return False
+        if self.submissions_permitted != self.image.submissions_permitted:
+            return False
+        if self.resubmission_penalty != self.image.resubmission_penalty:
+            return False
+        if self.autograde != self.image.autograde:
+            return False
+        if self.display_single != self.image.display_single:
+            return False
+        if self.invideo != self.image.invideo:
+            return False
+        if self.timed != self.image.timed:
+            return False
+        if self.minutesallowed != self.image.minutesallowed:
             return False
 
         return True

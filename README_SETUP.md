@@ -154,13 +154,17 @@ and edit the DATABASES strings as follows substituting proper values for your sy
 
 1. Setup initial db from the main folder
 
-        ./manage.py syncdb  
+        ./manage.py syncdb  ######## answer no to the superuser question for now
         ./manage.py migrate  
         ./manage.py syncdb --database=celery  
         ./manage.py migrate --database=celery  
 
     At this point you should be able to look at the django database in
-    your local mysql and see a bunch of c2g_* tables.  Yay.
+    your local mysql and see a bunch of c2g_* tables. Now you should create the super user
+
+        ./manage.py createsuperuser
+	
+	Yay. :)
 
 1. From the main folder, run server on whatever port you want:
 
@@ -218,8 +222,18 @@ Steps:
 
 2. Make sure you're in the src/class2go/main directory (wherever that is for you)
 
-2. 'python manage.py syncdb' followed by 'python manage.py migrate' to create the required database tables and make sure the schema is up to date.
-You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
+2. 'python manage.py syncdb' followed by 'python manage.py migrate' to create the required database tables and make sure the schema is up to date.You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
+
+        ./manage.py syncdb  ######## answer no to the superuser question for now
+        ./manage.py migrate  
+        ./manage.py syncdb --database=celery  
+        ./manage.py migrate --database=celery  
+
+At this point you should be able to look at the django database in your local mysql and see a bunch of c2g_* tables. Now you should create the super user
+
+    ./manage.py createsuperuser
+	
+Yay. :)
 
 2. XX -- 'python manage.py collectstatic' to copy all static files to the directory specified in settings.py.
 
@@ -358,13 +372,20 @@ be installed for Mac (and probably Windows too)
 
 3. Run syncdb to create database tables 
 
-        ./manage.py syncdb
+        ./manage.py syncdb  ######## answer no to the superuser question for now
     Might need to issue "syncdb" command a couple times if there are errors. The 
     first time, it will ask you for username and password for the database 
 
 3. Migrate user stuff over: 
 
         ./manage.py migrate
+
+Now you should create the super user
+
+        ./manage.py createsuperuser
+	
+Yay. :)
+
 
 3. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
 
