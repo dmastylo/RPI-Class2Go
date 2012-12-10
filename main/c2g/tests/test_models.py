@@ -5,7 +5,7 @@ from django.core.files import File as FieldFile
 
 from c2g.models import File as FileModel
 #from c2g.models import ContentGroup as ContentGroupModel
-#from c2g.models import ContentSection as ContentSectionModel
+from c2g.models import ContentSection as ContentSectionModel
 from test_harness.test_base import SimpleTestBase
 
 
@@ -18,59 +18,58 @@ class ContentGroupUnitTests(SimpleTestBase):
         pass
 
 
-#class ContentSectionUnitTests(SimpleTestBase):
-#
-#    def setUp(self):
-#        self.course_id = 2   # first ready mode course
-#        self.section_id = 4  # selected because it's got few children
-#        self.fixture_data = [('video', 8L),
-#                             ('video', 10L),
-#                             ('video', 12L),
-#                             ('additional_page', 72L),
-#                             ('file', 164L),
-#                             ('file', 166L)]
-#        self.contentsection = ContentSectionModel.objects.get(id=self.section_id)
-#
-#    def tearDown(self):
-#        pass
-#
-##    def test_getChildren(self):
-#        """Test that ContentSection.getChildren behaves w/ various parameters"""
-#        untagged_sorted_children = self.contentsection.getChildren()
-#        tagged_sorted_children   = self.contentsection.getChildren(gettagged=True)
-#        tagged_unsorted_children = self.contentsection.getChildren(gettagged=True, getsorted=False)
-#        self.assertEqual(len(untagged_sorted_children), len(tagged_sorted_children))
-#        self.assertEqual(len(tagged_sorted_children), len(tagged_unsorted_children))
-#        self.assertEqual([item.id for item in untagged_sorted_children], [x[1] for x in self.fixture_data])
-#        self.assertEqual([(item['type'], item['item'].id) for item in tagged_sorted_children], self.fixture_data)
-#        self.assertNotEqual([(item['type'], item['item'].id) for item in tagged_sorted_children],
-#                            [(item['type'], item['item'].id) for item in tagged_unsorted_children])
-#        self.assertItemsEqual([(item['type'], item['item'].id) for item in tagged_sorted_children],
-#                              [(item['type'], item['item'].id) for item in tagged_unsorted_children])
-#
-#    def test_countChildren(self):
-#        """Test counting children of ContentSections using fixtures"""
-#        self.assertEqual(self.contentsection.countChildren(), 6)
-#
-#    def test_getNextIndex(self):
-#        """Test next index generation of ContentSections using fixtures"""
-#        def manufacture_file(title='(unset title)'):
-#            fh, fpath = tempfile.mkstemp(suffix='.jpeg')
-#            new_f = FileModel(section=self.contentsection, title=title, file = FieldFile(open(fpath, 'w')))
-#            self.myFile.file.write('\n')
-#            new_f.save()
-#            new_f.image = new_f.create_read_instance()
-#            new_f.image.save()
-#            return new_f
-#        next_index_shouldbe = 7
-#        self.assertEqual(self.contentsection.getNextIndex(), next_index_shouldbe)
-#        new_f_a = manufacture_file('(should be index 7)')
-#        self.assertEqual(new_f_a.id, self.contentsection.getChildren()[next_index_shouldbe].id)
-#        new_f_b = manufacture_file('(should be index 8)')
-#        self.assertEqual(new_f_b.id, self.contentsection.getChildren()[next_index_shouldbe+1].id)
-#        new_f_a.delete()
-#        self.assertEqual(self.contentsection.getNextIndex(), next_index_shouldbe+2)
-#        self.assertNotEqual(self.contentsection.getNextIndex(), self.contentSection.countChildren()+1)
+class ContentSectionUnitTests(SimpleTestBase):
+
+    def setUp(self):
+        super(ContentSectionUnitTests, self).setUp()
+        self.course_id = 2   # first ready mode course
+        self.section_id = 3  # selected because it's got few children
+        self.fixture_data = [('video', 7L), ('video', 9L), ('video', 11L), ('problemSet', 3L)]
+        self.contentsection = ContentSectionModel.objects.get(id=self.section_id)
+        self.files = []
+
+    def tearDown(self):
+        for f in self.files:
+            FileModel.objects.filter(title=f.title).delete()
+        super(ContentSectionUnitTests, self).tearDown()
+
+    def __manufacture_file(self, title='(unset title)'):
+        fh, fpath = tempfile.mkstemp(suffix='.jpeg')
+        course_handle = self.contentsection.course.handle
+        new_f = FileModel(section=self.contentsection, title=title, file = FieldFile(open(fpath, 'w')), handle=course_handle)
+        new_f.file.write('\n')
+        new_f.save()
+        new_f.image = new_f.create_ready_instance()
+        new_f.image.save()
+        self.files.append(new_f)
+        return new_f
+
+    def test_getChildren(self):
+        """Test that ContentSection.getChildren behaves w/ various parameters"""
+        untagged_sorted_children = self.contentsection.getChildren()
+        tagged_sorted_children   = self.contentsection.getChildren(gettagged=True)
+        tagged_unsorted_children = self.contentsection.getChildren(gettagged=True, getsorted=False)
+        self.assertEqual(len(untagged_sorted_children), len(tagged_sorted_children))
+        self.assertEqual(len(tagged_sorted_children), len(tagged_unsorted_children))
+        self.assertEqual([item.id for item in untagged_sorted_children], [x[1] for x in self.fixture_data])
+        self.assertEqual([(item['type'], item['item'].id) for item in tagged_sorted_children], self.fixture_data)
+
+    def test_countChildren(self):
+        """Test counting children of ContentSections using fixtures"""
+        self.assertEqual(self.contentsection.countChildren(), len(self.fixture_data))
+
+    #def test_getNextIndex(self):
+    #    """Test next index generation of ContentSections using fixtures"""
+    #    next_index_shouldbe = 4 
+    #    self.assertEqual(self.contentsection.getNextIndex(), next_index_shouldbe)
+    #    new_f_a = self.__manufacture_file('(should be index 4)')
+    #    self.assertEqual(new_f_a.id, self.contentsection.getChildren()[next_index_shouldbe].id)
+    #    new_f_b = self.__manufacture_file('(should be index 8)')
+    #    self.assertEqual(new_f_b.id, self.contentsection.getChildren()[next_index_shouldbe+1].id)
+    #    new_f_a.delete()
+    #    self.assertEqual(self.contentsection.getNextIndex(), next_index_shouldbe+2)
+    #    self.assertNotEqual(self.contentsection.getNextIndex(), self.contentSection.countChildren()+1)
+
 
 class FileUnitTests(SimpleTestBase):
     """Idempotent unit tests of the File model methods: nothing gets saved"""
