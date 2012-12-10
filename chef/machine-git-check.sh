@@ -11,6 +11,6 @@ else
     env=$1
 fi
 
-knife ssh -C 1 -Ft "name:app*.${env}" -x bitnami '(cd ~/class2go; git status; git log -1)' -a fqdn
+knife ssh -C 1 -Ft "name:app*.${env}" -x ubuntu '(cd ~/class2go; git status; git log -1)' -a fqdn
 knife ssh -C 1 -Ft "name:util*.${env}" -x ubuntu '(cd ~/class2go; git status; git log -1)' -a fqdn
 

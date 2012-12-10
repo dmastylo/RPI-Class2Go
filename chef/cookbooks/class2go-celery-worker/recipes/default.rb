@@ -34,7 +34,7 @@ node["apps"].keys.each do |app|
     execute "celery worker local database (#{app})" do
         cwd node['system']['admin_home'] + "/#{app}/main"
         user "root"
-        command "./manage.py syncdb --migrate --noinput --settings=settings_util"
+        command "./manage.py syncdb --migrate --noinput --database=celery"
         action :run
     end
 
