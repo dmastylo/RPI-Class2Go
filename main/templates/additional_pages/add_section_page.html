@@ -1,1 +1,78 @@
-{% extends "course_base.html" %}{% load url from future %}{% block course_info_link_class %} active{% endblock course_info_link_class %}{% block course_page_title %}Add New Static Page (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>){% endblock course_page_title %}{% block m_column_content %}<div id="c2g_layout_m_column" class="span12">    <div class="row-fluid">        <div class="well tight span8" id="new_page_form" style="clear:left;overflow:hidden;margin-top:10px;padding-left:15px;">            <form action="{% url 'courses.additional_pages.actions.add' %}" method="POST" class="form-inline" style="margin-bottom:0;">                <table style="width:500px;">                    <tr>                        <td style="width:100px;"><strong>Title</strong></td>                        <td style="width:400px;"><input name="title" id="title" type="text" /></td>                    </tr>                    <tr>                        <td style="width:100px;"><strong>URL identifier</strong></td>                        <td style="width:400px;"><input name="slug" id="slug" type="text" /></td>                    </tr>                    <tr>                        <td style="width:100px;"><strong>Section</strong></td>                        <td style="width:400px;">                            <select name="section_id">                                {% for section in sections %}                                    <option value="{{section.id}}">{{section.title}}</option>                                {% endfor %}                            </select>                        </td>                    </tr>                </table>                <br/>                <input type="submit" value="Create" class="btn" />                                <input type="hidden" name="menu_slug" value="" />                <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />                <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />                {% csrf_token %}            </form>        </div>    </div></div>{% endblock m_column_content %}
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block course_info_link_class %} active{% endblock course_info_link_class %}
+
+{% block course_page_title %}
+    Add New Static Page 
+    (<a href="{% url 'courses.views.main' 
+                     common_page_data.course_prefix 
+                     common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>)
+{% endblock course_page_title %}
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span12">
+    <div class="row-fluid">
+        <div class="well tight span8" id="new_page_form" style="clear:left;overflow:hidden;margin-top:10px;padding-left:15px;">
+            <form action="{% url 'courses.additional_pages.actions.add' %}" method="POST" class="form-inline" style="margin-bottom:0;">
+                <table style="width:500px;">
+                    <tr>
+                        <td style="width:100px;"><strong>Title</strong></td>
+                        <td style="width:400px;"><input name="title" id="title" type="text" /></td>
+                    </tr>
+                    <tr>
+                        <td style="width:100px;"><strong>URL identifier</strong></td>
+                        <td style="width:400px;"><input name="slug" id="slug" type="text" /></td>
+                    </tr>
+                    <tr>
+                        <td style="width:100px;"><strong>Section</strong></td>
+                        <td style="width:400px;">
+                            <select name="section_id" onChange="prefill_children(this);">
+                                {% for section in sections %}
+                                    <option value="{{section.id}}">{{section.title}}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:100px;"><strong>Parent</strong></td>
+                        <td style="width:400px;">
+                            <select name="parent_id">
+                                <!-- Filled by prefill_children() -->
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <br/>
+                <input type="submit" value="Create" class="btn" />
+                
+                <input type="hidden" name="menu_slug" value="" />
+                <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+                <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script type="text/javascript">
+    // force our handler to fire when the page first loads, in addition to onChange
+    $("[name='section_id']").change(prefill_children($("[name='section_id']")[0]));
+    function prefill_children(selector) {
+        var id = selector.value;
+        var pelement = $("[name='parent_id']");
+        pelement.html('<option value="none,none">(this is a top level page)</option>');
+        jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+            for (var i=0; i < data.length; i++) {
+                // For the moment we filter out objects of other types, per the spec.
+                // In the future this restriction will probably be lifted.
+                // See also files/upload.html
+                if (data[i][0] == 'additional_page') {
+                    pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

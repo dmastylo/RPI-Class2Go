@@ -568,7 +568,15 @@ h3.course-section-heading {
 .course-list-item {
   overflow:hidden;
   padding:8px 0 4px;
-  border-bottom: 0;
+  border-bottom: 0; 
+  /* border-bottom: 1px solid #eee; */
+}
+
+.course-list-item.zebra_light {
+    background-color: white;
+}
+.course-list-item.zebra_dark {
+    background-color: #eeeeee;
 }
 
 .course-list-item.zebra_light {

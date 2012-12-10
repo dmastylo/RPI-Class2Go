@@ -1,5 +1,5 @@
-from django.http import HttpResponse, Http404
-from django.shortcuts import render, render_to_response
+from django.http import Http404
+from django.shortcuts import render
 from courses.common_page_data import get_common_page_data
 
 from courses.files.forms import *
