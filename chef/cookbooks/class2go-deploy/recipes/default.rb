@@ -65,7 +65,7 @@ node['apps'].keys.each do |app|
     # Clear out *.pyc in this tree. Makes sure that file deletions aren't
     # hidden by vestigial compilation products.
     execute "remove all *.pyc" do
-        command "find . -name \*.pyc -exec rm {} \; -print"
+        command "find . -name \\*.pyc -exec rm {} \\; -print"
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
         group node['system']['admin_group']
