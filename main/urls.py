@@ -153,6 +153,8 @@ urlpatterns = patterns('',
     url(r'^save_content_section_order$', 'courses.content_sections.actions.save_order'),
     url(r'^delete_content_section$', 'courses.content_sections.actions.delete_content_section'),
     url(r'^save_content_section_content_order$', 'courses.content_sections.actions.save_content_order'),
+    url(r'^content_section/get_children/(?P<section_id>[0-9]+)/?$', 'courses.content_sections.actions.get_children'),
+    url(r'^content_section/get_children_as_contentgroup_parents/(?P<section_id>[0-9]+)/?$', 'courses.content_sections.actions.get_children_as_contentgroup_parents'),
 
     # Videos
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/?$', 'courses.videos.views.list'),

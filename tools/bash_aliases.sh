@@ -24,13 +24,13 @@ function multitail-prod {
     multitail -s 2  \
         --config /usr/local/etc/multitail.conf \
         -CS apache \
-        -l 'ssh ubuntu@app1.prod.c2gops.com "tail -f /var/log/apache2/access.log"' \
-        -l 'ssh ubuntu@app2.prod.c2gops.com "tail -f /var/log/apache2/access.log"' \
+        -l 'ssh ubuntu@app1.prod.c2gops.com "tail -f /var/log/apache2/class2go-access.log"' \
+        -l 'ssh ubuntu@app2.prod.c2gops.com "tail -f /var/log/apache2/class2go-access.log"' \
         -c- \
         -l 'ssh ubuntu@util1.prod.c2gops.com "tail -f /var/log/celery/*.log"' \
         -CS apache_error \
-        -l 'ssh ubuntu@app1.prod.c2gops.com "tail -f /var/log/apache2/error.log"' \
-        -l 'ssh ubuntu@app2.prod.c2gops.com "tail -f /var/log/apache2/error.log"' \
+        -l 'ssh ubuntu@app1.prod.c2gops.com "tail -f /var/log/apache2/class2go-error.log"' \
+        -l 'ssh ubuntu@app2.prod.c2gops.com "tail -f /var/log/apache2/class2go-error.log"' \
         -c- \
         -l 'ssh ubuntu@util2.prod.c2gops.com "tail -f /var/log/celery/*.log"' \
         -c- 
@@ -45,13 +45,3 @@ function multitail-prod-util {
 }
 
 
-function multitail-stage {
-    multitail \
-        --config /usr/local/etc/multitail.conf \
-        -CS apache \
-        -l 'ssh ubuntu@app1.stage.c2gops.com "tail -f /var/log/apache2/access.log"' \
-        -CS apache_error \
-        -l 'ssh ubuntu@app1.stage.c2gops.com "tail -f /var/log/apache2/error.log"' \
-        -c- \
-        -l 'ssh ubuntu@util1.stage.c2gops.com "tail -f /var/log/celery/*.log"' 
-}

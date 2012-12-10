@@ -20,6 +20,10 @@
           {% endif %}
         </div>
       {% endfor %}
+      <div class="fieldWrapper">
+        <label for="parent_id">Parent</label>
+        <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
+      </div>
     </fieldset>
     <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
     <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
@@ -30,6 +34,25 @@
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
+<script type="text/javascript">
+$('#id_section').change(function() { prefill_children($('#parent_id')[0]) });
+$('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
+function prefill_children(element) {
+    var id = $('#id_section')[0].value
+    var pelement = $('#parent_id');
+    pelement.html('<option value="none,none">(this is a top level page)</option>');
+    jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+        for (var i=0; i < data.length; i++) {
+            // For the moment we filter out objects of other types, per the spec.
+            // In the future this restriction will probably be lifted.
+            // See also add_section_page.html
+            if ((data[i][0] === 'video') || (data[i][0] === 'file')) {
+                pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+            }
+        }
+    });
+}
+</script>
 <script>
 function checkFilename() {
     var filename = document.getElementById('id_file').files[0].name;
