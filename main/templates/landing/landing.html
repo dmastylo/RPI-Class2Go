@@ -85,7 +85,7 @@
          	<br />
          	{% for course in course_list %}
          	
-         	{% if forloop.counter == 1  or forloop.counter|divisibleby:"3"  %}
+         	{% if forloop.counter == 1  or not forloop.counter|divisibleby:"2"  %}
          	<div class="sixcol">
 			<div class="home-unit">
 				{% if course.institution_only = 1 %}

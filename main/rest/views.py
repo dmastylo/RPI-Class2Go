@@ -277,7 +277,7 @@ class ExamList(APIView):
     def get(self, request):
 
         course_id = request.GET.get('course')
-        exams = Exam.objects.filter(course=course_id)
+        exams = Exam.objects.filter()
                 
         serializer = ExamSerializer(exams)
     
