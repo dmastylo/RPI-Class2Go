@@ -35,7 +35,7 @@ node['apps'].keys.each do |app|
         EOH
     end
 
-    execute "git checkout" do
+    execute "git remote update" do
         command "git remote update"
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
