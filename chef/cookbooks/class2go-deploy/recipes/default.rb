@@ -35,7 +35,7 @@ node['apps'].keys.each do |app|
         EOH
     end
 
-    execute "git checkout" do
+    execute "git remote update" do
         command "git remote update"
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
@@ -56,6 +56,16 @@ node['apps'].keys.each do |app|
     # necessary, just being double-safe
     execute "git reset" do
         command "git reset --hard " + node['apps'][app]['git_branch']
+        cwd node['system']['admin_home'] + "/#{app}"
+        user node['system']['admin_user']
+        group node['system']['admin_group']
+        action :run
+    end
+
+    # Clear out *.pyc in this tree. Makes sure that file deletions aren't
+    # hidden by vestigial compilation products.
+    execute "remove all *.pyc" do
+        command "find . -name \\*.pyc -exec rm {} \\; -print"
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
         group node['system']['admin_group']

@@ -1,13 +1,9 @@
-<li class="course-list-item">
     <div class="pull-left icon">
         <em class="icon-pencil"></em>
     </div>
     <div class="course-list-content">
         <h4 class="pull-left"><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.problem_set.slug %}" title="{{item.problem_set.description}}">{{item.problem_set.title}}</a></h4>
         <div class="pull-right">
-        
-            {% include "content_group_buttons.html" %}
-        
             {% if item.numCompleted == item.numQuestions %}
                {% if not item.problem_set.assessment_type == "survey" %}
                 <span class="label">Complete with Score: {{item.score}} of {{item.numQuestions}}</span>
@@ -18,7 +14,6 @@
                 <span class="label">In Progress: {{item.numCompleted}} of {{item.numQuestions}}</span>
             {% endif %}
             
-            
             <div class="progress {% if item.numCompleted == item.numQuestions %}progress-success{% else %}progress-warning{% endif %} progress-striped">
                 <div class="bar" style="width:{{item.progress}}%"></div>
             </div>
@@ -26,4 +21,6 @@
         <p class="deadlines"><strong>Full Credit Deadline:</strong> {{item.problem_set.due_date}} PST |
         <strong>Partial Credit Deadline:</strong> {{item.problem_set.partial_credit_deadline}} PST</p>
     </div>
-</li>
+
+    {% include "content_group_buttons.html" %}
+        

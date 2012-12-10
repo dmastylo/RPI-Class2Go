@@ -6,5 +6,5 @@ set nokey
 set boxwidth .5
 
 set ylabel "Users" 
-set title "Class2Go Users"
+set title "Winter 2013 Class2Go Users"
 plot "users_by_class.dat" using 2:xticlabels(1) with boxes fill solid 0.3

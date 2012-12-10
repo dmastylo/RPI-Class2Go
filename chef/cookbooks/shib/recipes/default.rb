@@ -1,8 +1,3 @@
-# bash the configuration files provided by bitnami so they are useful
-# for the particular Sophi EC2 setup.  
-#
-# This is pretty fragile.  Best to be rewritten, see issue #162.
-#
 package "shibboleth-sp2-schemas" do
     action :install
 end

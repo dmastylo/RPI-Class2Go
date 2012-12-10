@@ -1,4 +1,3 @@
-<li class="course-list-item">
     <div class="pull-left icon">
         <em class="icon-file"></em>
     </div>
@@ -8,10 +7,8 @@
             <div class="pull-right"><a href="{{item.file.dl_link}}" class="btn btn-mini" title="{{item.file.title}}" style="float:left;">
                 <em class="icon-download-alt"></em>{{item.file.get_ext}}</a>
                 <div class="progress progress-success progress-striped" style="visibility:hidden; margin-left:3px;"></div>
-                
-                {% include "content_group_buttons.html" %}
-                
             </div>
         {% endif %}        
     </div>
-</li>
+
+    {% include "content_group_buttons.html" %}

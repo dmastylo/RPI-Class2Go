@@ -1,16 +1,13 @@
-from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
-from django.template import Context, loader
-from django.template import RequestContext
-from c2g.models import *
-from courses.course_materials import get_course_materials
-from courses.common_page_data import get_common_page_data
-import re
-from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
-from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_slug, MaxLengthValidator
+from django.core.validators import validate_slug
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
+
+from c2g.models import *
+from courses.common_page_data import get_common_page_data
+from courses.actions import auth_is_course_admin_view_wrapper
+
 
 @require_POST
 @auth_is_course_admin_view_wrapper
@@ -36,6 +33,14 @@ def add(request):
     section = None
     if request.POST.get("section_id") != "":
         section = ContentSection.objects.get(id=request.POST.get("section_id"))
+
+    parent_type,parent_id = None,None
+    if request.POST.get("parent_id") != "":
+        parent_type,parent_id = request.POST.get("parent_id").split(',')
+        if parent_type == 'none':
+            parent_type, parent_id = None,None
+        else:
+            parent_id = int(parent_id)
     
     if request.POST.get("menu_slug") != "":
         index = len(AdditionalPage.objects.filter(course=common_page_data['course'],menu_slug=request.POST.get("menu_slug")))
@@ -54,14 +59,18 @@ def add(request):
     if len(request.POST.get("title")) == 0:
         return redirectWithError("The title cannot be empty")
 
-
     if len(request.POST.get("title")) > AdditionalPage._meta.get_field("title").max_length:
         return redirectWithError("The title length was too long")
 
     draft_page = AdditionalPage(course=common_page_data['draft_course'], menu_slug=menu_slug, section=section, title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='draft')
     draft_page.save()
-    
     draft_page.create_ready_instance()
+    if parent_type != None and parent_type != "none":
+        parent_ref = AdditionalPage.objects.get(id=parent_id).image
+        #print "DEBUG: creating parent/child relationship between", parent_ref.id, "and", draft_page.image.id
+        # XXX: We assume that the parent is an AdditionalPage regardless of parent_type; this is by the spec, but against my nature
+        content_group_groupid = ContentGroup.add_parent(parent_ref.course, parent_type, parent_ref)
+        ContentGroupGroupFactory.add_child(content_group_groupid, 'additional_page', draft_page.image)
     
     if request.POST.get("menu_slug") == "":
         return redirect('courses.views.course_materials', course_prefix, course_suffix)
@@ -153,3 +162,4 @@ def delete(request):
         page.image.delete()
     
     return redirect(request.META['HTTP_REFERER'])
+

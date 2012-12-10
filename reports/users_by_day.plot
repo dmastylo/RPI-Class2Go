@@ -22,7 +22,7 @@ set style line 2 lt 3 lw 3
 
 # set xlabel "Date"
 set ylabel "Users" 
-set title "Class2Go Users"
+set title "DB Class Winter -- Enrolled"
 set output "users_by_day.png"
 plot "users_by_day.dat" using 1:2 with boxes ls 1 fill solid 0.3 title "new", \
    "" u 1:($2 + 600):($2) with labels notitle, \
