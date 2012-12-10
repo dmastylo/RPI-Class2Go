@@ -79,6 +79,7 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
     parser = HTMLParser.HTMLParser()
     json_pre_pop = parser.unescape(request.POST['json-pre-pop'])
+    json_pre_pop_correx = parser.unescape(request.POST['json-pre-pop-correx'])
     scores = request.POST.get('scores',"{}")
     editable = request.POST.get('latest', False)
  
@@ -87,7 +88,7 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores, 'editable':editable}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable}, RequestContext(request))
 
 # BEGIN function for Wed demo
 @require_POST
@@ -171,7 +172,7 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
 def my_subs_helper(s):
     """Helper function to handle badly formed JSON stored in the database"""
     try:
-        return {'time_created':s.time_created, 'json_obj':sorted(json.loads(s.json_data).iteritems(), key=operator.itemgetter(0)), 'plain_json_obj':json.dumps(json.loads(s.json_data)),'id':s.id}
+        return {'time_created':s.time_created, 'json_obj':sorted(json.loads(s.json_data).iteritems(), key=operator.itemgetter(0)), 'plain_json_obj':json.dumps(json.loads(s.json_data)),'id':s.id, 'json_score_data':json.dumps(s.json_score_data)}
     except ValueError:
         return {'time_created':s.time_created, 'json_obj':"__ERROR__", 'plain_json_obj':"__ERROR__", 'id':s.id}
 
@@ -276,7 +277,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             except AutoGraderGradingException:
                 pass
 
-        record.json_score_data = feedback
+        record.json_score_data = json.dumps(feedback)
         record.save()
 
         return HttpResponse(json.dumps(feedback))

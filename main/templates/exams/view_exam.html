@@ -41,6 +41,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
     /* END CSS for Wed demo */
+
+    .correct {color: #090;}
+    .incorrect {color: #900;}
     </style>
 
     {% if videotest %}
@@ -164,12 +167,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
             var checkBtn = $(this);
             var collectUserAnswers = function () {
-                console.log('collectUserAnswers called');
+                //console.log('collectUserAnswers called');
                 var userSelections = {};
                 var inputCollection = $(checkBtn).closest('.question').find('input');
-                console.log($(checkBtn));
-                console.log($(checkBtn).closest('.question'));
-                console.log(inputCollection);
+                //console.log($(checkBtn));
+                //console.log($(checkBtn).closest('.question'));
+                //console.log(inputCollection);
                 $(inputCollection).each(function () {
                     if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
                         if (!userSelections[$(this).attr('name')]) {
@@ -197,9 +200,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             };
 
             var displayMetaData = function (data, userData) {
-                console.log('displayMetaData called');
-                console.log(arguments);
-                console.log(data);
+                //console.log('displayMetaData called');
+                //console.log(arguments);
+                //console.log(data);
                 var myXML = $.parseXML(data);
                 var examMD = $(myXML).find('exam_metadata');
                 var questionMD = $(examMD).find('question_metadata#' + assocQID);
@@ -221,15 +224,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         var choices = $(this).find('choice');
                         choices.each(function () {
                             var choiceInput = $('#' + $(this).attr('id'));
-                            console.log(choiceInput.length);
+                            //console.log(choiceInput.length);
                             var choiceLabel = $('#' + $(this).attr('id')).closest('label');
-                            console.log(choiceLabel.length);
-                            console.log($(choiceLabel).find('.inline-explanation').length);
+                            //console.log(choiceLabel.length);
+                            //console.log($(choiceLabel).find('.inline-explanation').length);
                             var inlineExpl = $(choiceLabel).find('.inline-explanation');
                             if (inlineExpl.length == 0) { 
                                 inlineExpl = createInlineExp($(choiceLabel));
                             }
-                            console.log(inlineExpl);
+                            //console.log(inlineExpl);
                             if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
                                 $(inlineExpl).addClass('correct');
                             }
@@ -334,9 +337,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% else %}
 /* The page-at-a-time version */
       var displayMetaData = function (data, userData) {
-          console.log('displayMetaData called');
-          console.log(arguments);
-          console.log(data);
+          //console.log('displayMetaData called');
+          //console.log(arguments);
+          //console.log(data);
           var myXML = $.parseXML(data);
           var examMD = $(myXML).find('exam_metadata');
           var questionMD = $(examMD).find('question_metadata#' + assocQID);
@@ -358,15 +361,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                  var choices = $(this).find('choice');
                  choices.each(function () {
                       var choiceInput = $('#' + $(this).attr('id'));
-                      console.log(choiceInput.length);
+                      //console.log(choiceInput.length);
                       var choiceLabel = $('#' + $(this).attr('id')).closest('label');
-                      console.log(choiceLabel.length);
-                      console.log($(choiceLabel).find('.inline-explanation').length);
+                      //console.log(choiceLabel.length);
+                      //console.log($(choiceLabel).find('.inline-explanation').length);
                       var inlineExpl = $(choiceLabel).find('.inline-explanation');
                       if (inlineExpl.length == 0) {
                           inlineExpl = createInlineExp($(choiceLabel));
                       }
-                      console.log(inlineExpl);
+                      //console.log(inlineExpl);
                       if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
                           $(inlineExpl).addClass('correct');
                       }
@@ -499,8 +502,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       //check all inputs
                 var selector =  selectedValues.join(",");
                       
-                      console.log('input[name|=' + member + ']');
-                      console.log(selector);
+                      //console.log('input[name|=' + member + ']');
+                      //console.log(selector);
                 $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
                 // loop through each choice listed for this input
                 /*
@@ -543,6 +546,31 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('textarea').removeAttr('disabled');
                 submitBtn.show();
             });
+        }
+    };
+
+    window.showCorrections = function (jsonStr) {
+        
+        // all keys will be form input names as strings
+        var correxStr = JSON.parse(jsonStr);
+        // gotta be a better way than parsing twice...
+        var correxObj = JSON.parse(correxStr);
+
+        for (member in correxObj) {
+            var formEl = $('input[name|="' + member + '"]');
+            switch ($(formEl).attr('type')) {
+                case 'checkbox':
+                case 'radio':
+                    var targetEl =  $('input[name|="' + member + '"]:checked');
+                    break;
+                default:
+                    var targetEl = $(formEl);
+            } 
+            if (correxObj[member] == true) {
+                $(targetEl).after('<span class="correct">Correct</span>');
+            } else {
+                $(targetEl).after('<span class="incorrect">Incorrect</span>');
+            }
         }
     };
 /*
@@ -640,11 +668,16 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     // Make sure pre-pop is in a properly-escaped string 
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
+    var prePopCorrex = JSON.stringify({% autoescape off %}{{json_pre_pop_correx}}{% endautoescape %});
+    alert(prePopCorrex);
     var scores = JSON.parse('{{scores|escapejs}}');
                       
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
+    if (prePopCorrex != '') {
+        window.showCorrections(prePopCorrex);
+    } 
 
     {% if common_page_data.course.mode == "ready" and exam.past_due %}
                       
