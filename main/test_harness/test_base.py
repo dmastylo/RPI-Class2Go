@@ -1,7 +1,5 @@
 from django_nose import FastFixtureTestCase
 
-from django.test import LiveServerTestCase
-
 __all__ = ['SimpleTestBase']
 
 class SimpleTestBase(FastFixtureTestCase):
@@ -13,7 +11,7 @@ class SimpleTestBase(FastFixtureTestCase):
     def tearDown(self):
         pass
 
-class AuthenticatedTestBase(SimpleTestBase, LiveServerTestCase):
+class AuthenticatedTestBase(SimpleTestBase):
     """
     A base class for test classes that need to log in to the system and
     switch to edit mode to ensure access to the correct data.
@@ -30,7 +28,6 @@ class AuthenticatedTestBase(SimpleTestBase, LiveServerTestCase):
     loginPath = '/%s/%s/preview_login/'
     userAgent = 'Mozilla/5.0'
     referer = 'http://testserver/%s/%s/preview/'
-    fixtures = ['pset_testdata.json']
 
     # the following are specific to each TestCase subclass and should be
     # passed in to __init__
