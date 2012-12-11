@@ -669,13 +669,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     // Make sure pre-pop is in a properly-escaped string 
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
     var prePopCorrex = JSON.stringify({% autoescape off %}{{json_pre_pop_correx}}{% endautoescape %});
-    alert(prePopCorrex);
     var scores = JSON.parse('{{scores|escapejs}}');
                       
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
-    if (prePopCorrex != '') {
+    if (typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None') {
         window.showCorrections(prePopCorrex);
     } 
 
