@@ -601,6 +601,10 @@ def validate_row(row):
 @require_POST
 @auth_view_wrapper
 def feedback(request, course_prefix, course_suffix, exam_slug):
+    """
+    Proxies request to the exercise grader so we can both handle the request
+    without CORS, and (more importantly) store the answer for later.
+    """
     course = request.common_page_data['course']
     try:
         exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
@@ -610,12 +614,15 @@ def feedback(request, course_prefix, course_suffix, exam_slug):
     grader_hostname = getattr(settings, 'DB_GRADER_LOADBAL', '')
     grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
     grader_data = request.body
+    grader_timeout = 10    # seconds
 
-    req = urllib2.Request(grader_url, grader_data)
-    import ipdb; ipdb.set_trace()
-    response = urllib2.urlopen(req)
+    try:
+        response = urllib2.urlopen(grader_url, grader_data, grader_timeout)
+    except urllib2.URLError, e:
+        # TODO: what gives Ajax something helpful?
+        raise Http500
+
     graded_raw = response.read()
-        
     graded_json=json.loads(graded_raw)
     # TODO: store result in DB
 
