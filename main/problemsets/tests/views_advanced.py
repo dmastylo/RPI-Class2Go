@@ -1,6 +1,6 @@
 from c2g.models import ProblemSet
 from datetime import datetime, timedelta
-from tests.test_base import AuthenticatedTestBase
+from test_harness.test_base import AuthenticatedTestBase
 
 __all__ = ['InstructorDraftModeTestAdv']
 

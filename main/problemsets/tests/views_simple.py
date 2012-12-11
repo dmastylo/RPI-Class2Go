@@ -1,4 +1,4 @@
-from tests.test_base import AuthenticatedTestBase
+from test_harness.test_base import AuthenticatedTestBase
 
 __all__ = ['test_standalone', 'InstructorDraftModeTest']
 
