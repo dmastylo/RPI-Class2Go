@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from lxml import etree
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
-from tests.test_base_selenium import SeleniumTestBase
+from test_harness.test_base_selenium import SeleniumTestBase
 
 import ipdb
 
