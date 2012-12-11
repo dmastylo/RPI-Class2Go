@@ -389,7 +389,7 @@ CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_k
 # Testing related settings
 # Set a specific testrunner to use
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--verbosity=2', '--config=./nose.cfg']
+NOSE_ARGS = ['--config=./nose.cfg']
 
 # we use django_coverage for test coverage reports. Configure here.
 COVERAGE_ADDITIONAL_MODULES = ['accounts', 'kelvinator']

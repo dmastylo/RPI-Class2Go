@@ -6,7 +6,7 @@ from django.core.files import File as FieldFile
 from c2g.models import File as FileModel
 #from c2g.models import ContentGroup as ContentGroupModel
 #from c2g.models import ContentSection as ContentSectionModel
-from tests.test_base import SimpleTestBase
+from test_harness.test_base import SimpleTestBase
 
 
 class ContentGroupUnitTests(SimpleTestBase):
