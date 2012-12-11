@@ -3,10 +3,8 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 from c2g.models import *
-from courses.course_materials import get_course_materials, group_data
+from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
-import re
-from django.contrib import messages
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
@@ -137,6 +135,7 @@ def get_full_contentsection_list(course, filter_children=True):
     
     full_index_list = []
     full_contentsection_list=[]
+
     for contentsection in ContentSection.objects.getByCourse(course=course):
     
         index_list = []
