@@ -1779,14 +1779,14 @@ class ExamRecord(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)   #blob
     json_score_data = models.TextField(null=True, blank=True)  #blob
-    score = models.IntegerField(null=True, blank=True) #currently unused.
+    score = models.IntegerField(null=True, blank=True) 
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
 
 class ExamScore(TimestampMixin, models.Model):
     """
-    This class is meant to be the top level score of each exam.  
+    This class is meant to be the top level, authoritative score of each exam.  
     It should have a one-to-one relationship with the (exam, student) pair
     """
     course = models.ForeignKey(Course, db_index=True) #mainly for convenience
@@ -1806,9 +1806,15 @@ class ExamScoreField(TimestampMixin, models.Model):
     parent = models.ForeignKey(ExamScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    correct = models.NullBooleanField()
     subscore = models.IntegerField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return (self.parent.student.username + ":" + self.parent.course.title + ":" + self.parent.exam.title + ":" + self.human_name)
+
 	
 
 class ExamRecordScore(TimestampMixin, models.Model):
@@ -1825,15 +1831,43 @@ class ExamRecordScore(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.score))
 
+    def copyToExamScore(self):
+        #copy self to the contents of the authoritative ExamScore
+        es, created = ExamScore.objects.get_or_create(course=self.record.course, exam=self.record.exam, student=self.record.student)
+        es.score = self.score
+        es.save()
+
+        #now do all the fields
+        if not created:
+            ExamScoreField.objects.filter(parent=es).delete()
+        
+        for f in ExamRecordScoreField.objects.filter(parent=self):
+            esf = ExamScoreField(parent=es, field_name=f.field_name, human_name=f.human_name, value=f.value,
+                                 correct=f.correct, subscore=f.subscore, comments=f.comments, associated_text=f.associated_text)
+            esf.save()
 
 class ExamRecordScoreField(TimestampMixin, models.Model):
     """Should be kept basically identical to ExamScoreField"""
     parent = models.ForeignKey(ExamRecordScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    correct = models.NullBooleanField()
     subscore = models.IntegerField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
+    def __unicode__(self):
+        return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
+
+class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
+    """Exploding out even multiple choice answers"""
+    parent = models.ForeignKey(ExamRecordScoreField, db_index=True)
+    choice_value = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
+    def __unicode__(self):
+        return (self.parent.parent.record.student.username + ":" + self.parent.parent.record.course.title + ":" \
+                + self.parent.parent.record.exam.title + ":" + self.parent.human_name + ":" + self.human_name)
 
 
 class CurrentTermMap(TimestampMixin, models.Model):

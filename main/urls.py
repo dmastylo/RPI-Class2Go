@@ -10,7 +10,7 @@ urlpatterns = patterns('',
    
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that
     # won't be redirected or change
-    url(r'_health$', 'c2g.views.healthcheck'),
+    url(r'^_health$', 'c2g.views.healthcheck'),
                        
     # Testing the error pages (404 and 500)
     url(r'^_throw500$', 'c2g.views.throw500'),
