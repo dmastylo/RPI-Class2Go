@@ -302,7 +302,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     }
                 };
 
-                //$.post("/server/AJAXPostHandler.php", postData, displayHTMLAnswer);
+                $.post("{{exam.slug}}/feedback", postData, displayHTMLAnswer);
                 var tObj = {};
                 tObj.score = 0;
                 tObj["maximum-score"] = 1;

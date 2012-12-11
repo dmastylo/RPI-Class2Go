@@ -9,6 +9,7 @@ import datetime
 import csv
 import HTMLParser
 from django.db.models import Sum
+import urllib2
 
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
@@ -597,7 +598,27 @@ def validate_row(row):
     return (True, (username, field_name, score))
 
 
+@require_POST
+@auth_view_wrapper
+def feedback(request, course_prefix, course_suffix, exam_slug):
+    course = request.common_page_data['course']
+    try:
+        exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
 
+    grader_hostname = getattr(settings, 'DB_GRADER_LOADBAL', '')
+    grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
+    grader_data = request.body
 
+    req = urllib2.Request(grader_url, grader_data)
+    import ipdb; ipdb.set_trace()
+    response = urllib2.urlopen(req)
+    graded_raw = response.read()
+        
+    graded_json=json.loads(graded_raw)
+    # TODO: store result in DB
 
+    response = HttpResponse(graded_raw)
+    return response
 
