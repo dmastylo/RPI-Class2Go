@@ -566,7 +566,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 default:
                     var targetEl = $(formEl);
             } 
-            if (correxObj[member] == true) {
+            if (correxObj[member].correct == true) {
                 $(targetEl).after('<span class="correct">Correct</span>');
             } else {
                 $(targetEl).after('<span class="incorrect">Incorrect</span>');
