@@ -8,7 +8,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
-        pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
+        pages = AdditionalPage.objects.getByCourse(course=common_page_data['course'])
         files = File.objects.getByCourse(course=common_page_data['course'])
         exams = Exam.objects.getByCourse(course=common_page_data['course'])
         groups = ContentGroup.objects.getByCourse(course=common_page_data['course'])

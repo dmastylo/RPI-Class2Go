@@ -19,6 +19,7 @@ from courses.actions import auth_view_wrapper
 from c2g.models import CurrentTermMap
 import settings
 
+
 def index(item): # define a index function for list items
  return item[1]
 
@@ -70,21 +71,18 @@ def main(request, course_prefix, course_suffix):
         news_list = []
 
     course = common_page_data['course']
-    contentsection_list, video_list, pset_list, additional_pages, file_list, groups, exam_list, level2_items = get_left_nav_content(course)
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, exam_list, level2_items)
-
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('courses/view.html',
-            {'common_page_data': common_page_data,
-             'announcement_list': announcement_list,
-             'many_announcements':many_announcements,
-             'news_list': news_list,
+            {'common_page_data':    common_page_data,
+             'announcement_list':   announcement_list,
+             'many_announcements':  many_announcements,
+             'news_list':           news_list,
              'contentsection_list': full_contentsection_list,
-             'video_list': video_list,
-             'pset_list': pset_list,
-             'full_index_list': full_index_list,
-             'is_logged_in': is_logged_in
+             'video_list':          Video.objects.getByCourse(course=course),
+             'pset_list':           ProblemSet.objects.getByCourse(course=course),
+             'full_index_list':     full_index_list,
+             'is_logged_in':        is_logged_in
              },
-
             context_instance=RequestContext(request))
 
 @auth_view_wrapper
@@ -114,55 +112,47 @@ def unenroll(request, course_prefix, course_suffix):
     return redirect(request.META['HTTP_REFERER'])
 
 
-def get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, exam_list, level2_items):
+def get_full_contentsection_list(course, filter_children=True):
+    """Return a list of ContentSections with material and a list of all material for this course."""
 
+    def no_child_filter(t=None, i=None):
+        return True
+
+    level2_items = {}                            # level2_items gets filled lazily
+    def working_child_filter(t, i):
+        if len(level2_items) == 0:
+            for cg2 in ContentGroup.objects.filter(course=course).filter(level=2):
+                cg2_t = cg2.get_content_type()
+                level2_items.setdefault(cg2_t, []).append(getattr(cg2, cg2_t).id)
+        if level2_items.has_key(t): return i not in level2_items[t]
+        else:                       return True
+
+    desired_item = working_child_filter
+    if not filter_children:
+        desired_item = no_child_filter
+
+    tagged_object_lists = {}
+    for tag, cls in ContentGroup.groupable_types.iteritems():
+        tagged_object_lists[tag] = cls.objects.getByCourse(course=course)
+    
     full_index_list = []
     full_contentsection_list=[]
-    
-    for contentsection in contentsection_list:
+    for contentsection in ContentSection.objects.getByCourse(course=course):
     
         index_list = []
-        for video in video_list:
-            if video.section_id == contentsection.id and not level2_items.has_key('video:' + str(video.id)):
-                index_list.append(('video', video.index, video.id, contentsection.id, video.slug, video.title))
+        cs_id      = contentsection.id
+        for tag in ContentGroup.groupable_types.keys():
+            for t in tagged_object_lists[tag].filter(section_id=cs_id):
+                t_id = t.id
+                if desired_item(tag, t_id):
+                    if tag != 'file':
+                        index_list.append((tag, t.index, t_id, cs_id, t.slug, t.title))
+                    else:
+                        icon_type = t.get_icon_type()
+                        index_list.append((tag, t.index, t_id, cs_id, t.file.url, t.title, icon_type))
 
-        for pset in pset_list:
-            if pset.section_id == contentsection.id and not level2_items.has_key('pset:' + str(pset.id)):
-                index_list.append(('pset', pset.index, pset.id, contentsection.id, pset.slug, pset.title))
-                
-        for page in additional_pages:
-            if page.section_id == contentsection.id and not level2_items.has_key('page:' + str(page.id)):
-                index_list.append(('additional_page', page.index, page.id, contentsection.id, page.slug, page.title))
-
-        for file in file_list:
-            if file.section_id == contentsection.id and not level2_items.has_key('file:' + str(file.id)):
-                icon_type = file.get_icon_type()
-                index_list.append(('file', file.index, file.id, contentsection.id, file.file.url, file.title, icon_type))
-
-        for exam in exam_list:
-            if exam.section_id == contentsection.id and not level2_items.has_key('exam:' + str(exam.id)):
-                index_list.append(('exam', exam.index, exam.id, contentsection.id, exam.slug, exam.title))
-
-        index_list.sort(key = index)
-        
-        full_index_list.append(index_list)
-
-        # don't show empty sections
-        if index_list:
+        full_index_list.append(sorted(index_list, key = index))
+        if index_list:                           # don't show empty sections
             full_contentsection_list.append(contentsection)
-        
     return full_contentsection_list, full_index_list
 
-
-def get_left_nav_content(course):
-
-    contentsection_list = ContentSection.objects.getByCourse(course=course)
-    video_list = Video.objects.getByCourse(course=course)
-    pset_list =  ProblemSet.objects.getByCourse(course=course)
-    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
-    file_list = File.objects.getByCourse(course=course)
-    groups = ContentGroup.objects.getByCourse(course=course)
-    level1_items, level2_items = group_data(groups)
-    exam_list = Exam.objects.getByCourse(course=course)
-    
-    return contentsection_list, video_list, pset_list, additional_pages, file_list, groups, exam_list, level2_items
