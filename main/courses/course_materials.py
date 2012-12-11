@@ -301,7 +301,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
                         
                         if common_page_data['course_mode'] == 'draft':
-                            item['visible_status'] = get_live_datetime_for(prod_exam)
+                            item['visible_status'] = get_live_datetime_for(exam)
 
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
                 section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index'])
@@ -680,7 +680,7 @@ def get_live_datetime_for(thing):
     if not prod_thing.live_datetime:
         return "<span style='color:#A00000;'>Not Live</span>"
     elif prod_thing.live_datetime > datetime.datetime.now():
-        return prod_problem_set.live_datetime.strftime("<span style='color:#A07000;'>Live %F at %H:%M</span>" )
+        return prod_thing.live_datetime.strftime("<span style='color:#A07000;'>Live %F at %H:%M</span>" )
     else:
         return "<span style='color:green;'>Live</span>"
 
