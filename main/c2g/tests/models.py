@@ -3,7 +3,7 @@ import tempfile
 
 #from django.contrib.auth.models import Group
 from django.core.files import File as FieldFile
-from tests.test_base import SimpleTestBase
+from test_harness.test_base import SimpleTestBase
 
 from c2g.models import Course
 from c2g.models import File as FileModel
