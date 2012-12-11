@@ -110,6 +110,13 @@ var c2gXMLParse = (function() {
                             $(questionObj).attr('name', probName);
                             $(questionObj).attr('answertype',nodeName);
                             $(questionObj).attr('data-tag4humans',$(node).attr('tag4humans'));
+
+                            if ($(node).attr('correct-points') != undefined) {
+                              $(questionObj).attr('correct-points',$(node).attr('correct-points'));
+                            }
+                            if ($(node).attr('wrong-points') != undefined) {
+                              $(questionObj).attr('wrong-points',$(node).attr('wrong-points'));
+                            }
                             $(questionMeta).append($(questionObj));
                               
                             var fieldsetObj = document.createElement('fieldset');
@@ -170,6 +177,14 @@ var c2gXMLParse = (function() {
                               $(questionObj).attr('answertype', nodeName);
                               $(questionObj).attr('answer',$(node).attr('answer'));
                               $(questionObj).attr('data-tag4humans', $(node).attr('tag4humans'));
+                              
+                              if ($(node).attr('correct-points') != undefined) {
+                                  $(questionObj).attr('correct-points',$(node).attr('correct-points'));
+                              }
+                              if ($(node).attr('wrong-points') != undefined) {
+                                  $(questionObj).attr('wrong-points',$(node).attr('wrong-points'));
+                              }
+
                               $(questionObj).append($(node).find('responseparam'));
                               $(questionMeta).append($(questionObj));
                             }

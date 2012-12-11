@@ -1,4 +1,4 @@
-import re
+import re, collections
 from xml.dom.minidom import parseString
 
 class AutoGrader():
@@ -6,20 +6,48 @@ class AutoGrader():
     Autograder for an entire pset here.
     Can be use to grade single problems, of course.
     """
-    
+    __true_default =  {'correct':True, 'score':0}
+    __false_default = {'correct':False, 'score':0}
+
     def __unicode__(self):
         graders=[]
         for k,v in self.grader_functions.iteritems():
             graders.append(k)
         return "AutoGrader functions for responses with names: %s " % (", ".join(sorted(graders)))
     
-    def __init__(self, xml):
+    def __init__(self, xml, default_return=None):
+        """
+            
+        Initializes the autograder.  Takes in one argument, xml, which represents the metadata_xml.
+        default_return is a kwarg which can be (None (default), True, False), which specifies the behavior of the
+        grader when 
+            
+        """
         if xml == "__testing_bypass":
-            return 
+            return
+
+        def return_true_default():
+            def tempFn(submission):
+                return self.__true_default
+            return tempFn
+                
+        def return_false_default():
+            def tempFn(submission):
+                return self.__false_default
+            return tempFn
+    
         self.metadata_xml = xml #The XML metadata for the entire problem set.
         self.metadata_dom = parseString(xml) #The DOM corresponding to the XML metadata
-        self.grader_functions={} #This is a dict that is keyed on the "name" of the submission (the input field) whose
-                                 #value is a grader for that submission.
+
+        if default_return is None:
+            self.grader_functions = {} #This is a dict that is keyed on the "name" of the submission (the input field) whose
+                                       #value is a grader function for that submission.
+                                       #will throw an exception if the key (questionID) is not found
+        elif default_return:
+            self.grader_functions = collections.defaultdict(return_true_default)  #Returns true if key not found
+        else:
+            self.grader_functions = collections.defaultdict(return_false_default) #Returns false if key not found
+                                 
 
         questions = self.metadata_dom.getElementsByTagName('question_metadata')
         for q in questions:
@@ -62,7 +90,23 @@ class AutoGrader():
         return resp_name
              
         
-                    
+    
+    def _get_numeric_attribute_with_default(self, element, attribute, default=0.0):
+        """
+        Helper function that gets an attribute with a numeric value and returns the float numeric value.
+        Throws exception if attribute is not convertible.
+        Returns default if attribute is not set
+        """
+        str_val = element.getAttribute(attribute)
+        if str_val == "": #default
+            return default
+        else:
+            try:
+                return float(str_val)
+            except ValueError:
+                raise AutoGraderMetadataException('Element %s has attribute %s that cannot be converted a number' % (str(element), attribute))
+
+    
     ########## Multiple-choice section ############
     def _parse_mc(self, response_elem, resp_name, qid):
         """
@@ -90,27 +134,31 @@ class AutoGrader():
             if c.getAttribute('correct').strip().lower() == 'true':
                 answer_list.append(cid)
 
-        self.grader_functions[resp_name] = self._MC_grader_factory(answer_list)
+        correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
+        wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
+                    
+        self.grader_functions[resp_name] = self._MC_grader_factory(answer_list, correct_pts=correct_pts, wrong_pts=wrong_pts)
 
 
-    def _MC_grader_factory(self, answer_list):
+    def _MC_grader_factory(self, answer_list, correct_pts=1, wrong_pts=0):
         """
         A factory for returning multiple-choice graders.
         The signature of the returned function is 
             
-            grader_fn(submission_iterable)
+            {'correct':boolean, 'score':float} = grader_fn(submission_iterable)
             
         submission_iterable is an iterable which has as each entry a string of of the name corresponding to a
         student submitted choice.  All correct choices must be selected, and no incorrect choice selected.
+        The return value is a dict with keys 'correct' and 'score' (using dict to be future proof)
         """
         def grader_fn(submission_iterable):
             for sub in submission_iterable:
                 if sub not in answer_list:
-                    return False
+                    return {'correct':False, 'score':wrong_pts}
             for ans in answer_list:
                 if ans not in submission_iterable:
-                    return False
-            return True
+                    return {'correct':False, 'score':wrong_pts}
+            return {'correct':True, 'score':correct_pts}
 
         return grader_fn
             
@@ -151,26 +199,40 @@ class AutoGrader():
             except ValueError:
                 raise AutoGraderMetadataException('In <question_medata id="%s">, <response name="%s">, cannot convert tolerance to number' % (qid,resp_name))
 
-        self.grader_functions[resp_name] = self._NUM_grader_factory(answer, tolerance)
+        correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
+        wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
+
+
+        self.grader_functions[resp_name] = self._NUM_grader_factory(answer, tolerance, correct_pts=correct_pts, wrong_pts=wrong_pts)
                     
-    def _NUM_grader_factory(self, answer, tolerance):
+    def _NUM_grader_factory(self, answer, tolerance, correct_pts=1, wrong_pts=0):
         """
         Factory function for a numeric grader.  The signature of the grader_fn is
         
-            grader_fn(submission)
+            {'correct':boolean, 'score':float} = grader_fn(submission)
             
         which returns True if answer-tolerance <= submission <= answer+tolerance, else returns False
+        Submission is a string that gets converted to a float.
+        The return value dict of with keys 'correct' and 'score' (using dict to be future proof)
+
         """
         def grader_fn(submission):
-            return answer-tolerance <= submission and submission <= answer+tolerance
-
+            try:
+                sub_num = float(submission)
+            except ValueError:
+                raise AutoGraderGradingException("Your submission could not be converted to a number!")
+            if answer-tolerance <= sub_num and sub_num <= answer+tolerance:
+                return {'correct':True, 'score':correct_pts}
+            else:
+                return {'correct':False, 'score':wrong_pts}
         return grader_fn
                     
     def grade(self, input_name, submission):
         """Grades student submission for response name=input_name"""
-        if input_name not in self.grader_functions:
+        try:
+            return self.grader_functions[input_name](submission)
+        except KeyError:
             raise AutoGraderGradingException('Input/Response name="%s" is not defined in grading template' % input_name)
-        return self.grader_functions[input_name](submission)
 
 class AutoGraderException(Exception):
     """Base class for exceptions in this module"""

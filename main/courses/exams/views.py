@@ -9,6 +9,7 @@ import datetime
 import csv
 import HTMLParser
 from django.db.models import Sum
+import urllib2
 
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
@@ -18,7 +19,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField
+from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -255,29 +256,77 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata)
     record.save()
 
-    if exam.autograde:
+    autograder = None
+
+    if exam.exam_type == "survey":
+        autograder = AutoGrader("", default_return=True) #create a null autograder that always returns the "True" object
+    elif exam.autograde:
         try:
             autograder = AutoGrader(exam.xml_metadata)
         except Exception as e: #Pass back all the exceptions so user can see
             return HttpResponseBadRequest(unicode(e))
 
+    if autograder:
+
+        record_score = ExamRecordScore(record = record)
+        record_score.save()
+
         feedback = {}
+        total_score = 0
         for prob,v in json_obj.iteritems():
             try:
-                if isinstance(v,list):
+                if isinstance(v,list): #multiple choice case
                     submission = map(lambda li: li['value'], v)
-                    print(submission)
                     feedback[prob] = autograder.grade(prob, submission)
-                else:
-                    submission = float(v['value'])
-                    print(submission)
+                    field_obj = ExamRecordScoreField(parent=record_score,
+                                                     field_name = prob,
+                                                     human_name=v[0].get('questiontag4humans', "") if len(v)>0 else "",
+                                                     subscore = feedback[prob]['score'],
+                                                     value = submission,
+                                                     correct = feedback[prob]['correct'],
+                                                     comments="",
+                                                     associated_text = v[0].get('associatedText', "") if len(v)>0 else "",
+                                                     )
+                    field_obj.save()
+                    for li in v:
+                        fc = ExamRecordScoreFieldChoice(parent=field_obj,
+                                                        choice_value=li['value'],
+                                                        human_name=li.get('tag4humans',""),
+                                                        associated_text=li.get('associatedText',""))
+                        fc.save()
+                
+                else: #single answer
+                    submission = v['value']
                     feedback[prob] = autograder.grade(prob, submission)
-            except ValueError:
-                feedback[prob] = False
-            except AutoGraderGradingException:
-                pass
+                    field_obj = ExamRecordScoreField(parent=record_score,
+                                 field_name = prob,
+                                 human_name=v.get('questiontag4humans', ""),
+                                 subscore = feedback[prob]['score'],
+                                 value = submission,
+                                 correct = feedback[prob]['correct'],
+                                 comments="",
+                                 associated_text = v.get('associatedText', ""))
+                    field_obj.save()
+            except AutoGraderGradingException as e:
+                feedback[prob]={'correct':False, 'score':0}
+                field_obj = ExamRecordScoreField(parent=record_score,
+                                 field_name = prob,
+                                 human_name=v.get('questiontag4humans', ""),
+                                 subscore = 0,
+                                 correct = feedback[prob]['correct'],
+                                 comments = unicode(e),
+                                 associated_text = v.get('associatedText', ""))
+                field_obj.save()
+            #This is when using code indents to denote blocks is a bit hairy
+            #supposed to be at the same level as try...except.  Run once per prob,v
+            total_score += feedback[prob]['score']
 
+
+        record_score.score = total_score
+        record_score.save()
+        record_score.copyToExamScore()         #Make this score the current ExamScore
         record.json_score_data = json.dumps(feedback)
+        record.score = total_score
         record.save()
 
         return HttpResponse(json.dumps(feedback))
@@ -597,7 +646,34 @@ def validate_row(row):
     return (True, (username, field_name, score))
 
 
+@require_POST
+@auth_view_wrapper
+def feedback(request, course_prefix, course_suffix, exam_slug):
+    """
+    Proxies request to the exercise grader so we can both handle the request
+    without CORS, and (more importantly) store the answer for later.
+    """
+    course = request.common_page_data['course']
+    try:
+        exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
 
+    grader_hostname = getattr(settings, 'DB_GRADER_LOADBAL', '')
+    grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
+    grader_data = request.body
+    grader_timeout = 10    # seconds
 
+    try:
+        response = urllib2.urlopen(grader_url, grader_data, grader_timeout)
+    except urllib2.URLError, e:
+        # TODO: what gives Ajax something helpful?
+        raise Http500
 
+    graded_raw = response.read()
+    graded_json=json.loads(graded_raw)
+    # TODO: store result in DB
+
+    response = HttpResponse(graded_raw)
+    return response
 

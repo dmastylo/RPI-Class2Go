@@ -23,13 +23,13 @@ class SimpleTest(TestCase):
         """
         ag = AutoGrader("__testing_bypass")
             #Regular test case
-        mc_fn = ag._MC_grader_factory(["a","b"])
-        self.assertTrue(mc_fn(["a","b"]))
-        self.assertTrue(mc_fn(("b","a"))) #note this input is a tuple
-        self.assertTrue(mc_fn(("b","b","a","a"))) #and this one too
-        self.assertFalse(mc_fn(["a","b","c"]))
-        self.assertFalse(mc_fn(["a"]))
-        self.assertFalse(mc_fn([]))           
+        mc_fn = ag._MC_grader_factory(["a","b"],correct_pts=15,wrong_pts=-3)
+        self.assertEqual(mc_fn(["a","b"]),{'correct':True,'score':15})
+        self.assertTrue(mc_fn(("b","a"))['correct']) #note this input is a tuple
+        self.assertTrue(mc_fn(("b","b","a","a"))['correct']) #and this one too
+        self.assertEqual(mc_fn(["a","b","c"]), {'correct':False, 'score':-3})
+        self.assertFalse(mc_fn(["a"])['correct'])
+        self.assertFalse(mc_fn([])['correct'])
 
     def test_multiple_choice_factory_empty(self):
         """
@@ -38,9 +38,9 @@ class SimpleTest(TestCase):
         ag = AutoGrader("__testing_bypass")
             #Empty case
         empty_fn = ag._MC_grader_factory([])
-        self.assertTrue(empty_fn([]))
-        self.assertFalse(empty_fn(["a"]))
-        self.assertFalse(empty_fn(["a","b"]))
+        self.assertTrue(empty_fn([])['correct'])
+        self.assertFalse(empty_fn(["a"])['correct'])
+        self.assertFalse(empty_fn(["a","b"])['correct'])
 
     def test_multiple_choice_factory_random(self):
         """
@@ -55,9 +55,9 @@ class SimpleTest(TestCase):
             grader = ag._MC_grader_factory(solutions)
             wrongsub = random.sample(choicelist, random.randint(1,26))
             if Set(solutions) != Set(wrongsub):
-                self.assertFalse(grader(wrongsub))
+                self.assertFalse(grader(wrongsub)['correct'])
             random.shuffle(solutions)
-            self.assertTrue(grader(solutions))
+            self.assertTrue(grader(solutions)['correct'])
 
     def test_multiple_choice_metadata(self):
         """
@@ -66,7 +66,7 @@ class SimpleTest(TestCase):
         xml = """
             <exam_metadata>
                 <question_metadata id="problem_1" data-tag4humans="Apple Competitor Question">
-                    <response name="q1d" answertype="multiplechoiceresponse" data-tag4humans="Apple Competitors">
+                    <response name="q1d" answertype="multiplechoiceresponse" data-tag4humans="Apple Competitors" correct-points="15" wrong-points="-2">
                         <choice value="ipad" data-tag4humans="iPad" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
@@ -98,24 +98,24 @@ class SimpleTest(TestCase):
             """
         ag = AutoGrader(xml)
             #problem 1
-        self.assertTrue(ag.grader_functions['q1d'](["napster", "ipod"]))
-        self.assertTrue(ag.grader_functions['q1d'](["ipod", "napster"]))
-        self.assertFalse(ag.grader_functions['q1d'](["ipad", "ipod", "napster"]))
-        self.assertFalse(ag.grader_functions['q1d'](["ipo"]))
-        self.assertFalse(ag.grader_functions['q1d'](["ipod"]))
-        self.assertFalse(ag.grader_functions['q1d']([]))
-        self.assertTrue(ag.grade('q1d', ["ipod", "napster"]))
-        self.assertFalse(ag.grade('q1d', ["q1d_1"]))
+        self.assertEqual(ag.grader_functions['q1d'](["napster", "ipod"]), {'correct':True, 'score':15})
+        self.assertTrue(ag.grader_functions['q1d'](["ipod", "napster"])['correct'])
+        self.assertEqual(ag.grader_functions['q1d'](["ipad", "ipod", "napster"]), {'correct':False, 'score':-2})
+        self.assertFalse(ag.grader_functions['q1d'](["ipo"])['correct'])
+        self.assertFalse(ag.grader_functions['q1d'](["ipod"])['correct'])
+        self.assertFalse(ag.grader_functions['q1d']([])['correct'])
+        self.assertTrue(ag.grade('q1d', ["ipod", "napster"])['correct'])
+        self.assertFalse(ag.grade('q1d', ["q1d_1"])['correct'])
 
             #problem 2
-        self.assertTrue(ag.grader_functions['test2'](["b","c"]))
-        self.assertTrue(ag.grader_functions['test2'](["c","b"]))
-        self.assertFalse(ag.grader_functions['test2'](["a","b"]))
-        self.assertFalse(ag.grader_functions['test2'](["a","b","c"]))
-        self.assertFalse(ag.grader_functions['test2'](["a"]))
-        self.assertFalse(ag.grader_functions['test2']([]))
-        self.assertTrue(ag.grade('test2',["b","c"]))
-        self.assertFalse(ag.grade('test2',["a"]))
+        self.assertEqual(ag.grader_functions['test2'](["b","c"]),{'correct':True,'score':1})
+        self.assertTrue(ag.grader_functions['test2'](["c","b"])['correct'])
+        self.assertEqual(ag.grader_functions['test2'](["a","b"]),{'correct':False,'score':0})
+        self.assertFalse(ag.grader_functions['test2'](["a","b","c"])['correct'])
+        self.assertFalse(ag.grader_functions['test2'](["a"])['correct'])
+        self.assertFalse(ag.grader_functions['test2']([])['correct'])
+        self.assertTrue(ag.grade('test2',["b","c"])['correct'])
+        self.assertFalse(ag.grade('test2',["a"])['correct'])
 
             #exception due to using an undefined input name
         with self.assertRaisesRegexp(AutoGraderGradingException, 'Input/Response name="notDef" is not defined in grading template'):
@@ -261,7 +261,8 @@ class SimpleTest(TestCase):
         xml = """
             <exam_metadata>
             <question_metadata id="problem_4" data-tag4humans="Short-answer2">
-                <response name="q4d" answertype="numericalresponse" answer="3.14159" data-tag4humans="Value of Pi">
+                <response name="q4d" answertype="numericalresponse" answer="3.14159" data-tag4humans="Value of Pi" 
+                          correct-points="139" wrong-points="-23">
                     <responseparam type="tolerance" default=".02"></responseparam>
                 </response>
                 <response name="q4e" answertype="numericalresponse" answer="4518"
@@ -273,21 +274,68 @@ class SimpleTest(TestCase):
             </exam_metadata>
             """
         ag = AutoGrader(xml)
-        self.assertTrue(ag.grade('q4d', 3.14159))
-        self.assertTrue(ag.grade('q4d', 3.14159+0.02))
-        self.assertTrue(ag.grade('q4d', 3.14159-0.02))
-        self.assertFalse(ag.grade('q4d',3.5))
-        self.assertFalse(ag.grade('q4d',3.0))
+        self.assertEqual(ag.grade('q4d', "3.14159"), {'correct':True, 'score':139})
+        self.assertTrue(ag.grade('q4d', str(3.14159+0.02))['correct'])
+        self.assertTrue(ag.grade('q4d', str(3.14159-0.02))['correct'])
+        self.assertEqual(ag.grade('q4d',"3.5"), {'correct':False,'score':-23})
+        self.assertFalse(ag.grade('q4d',"3.0")['correct'])
     
-        self.assertTrue(ag.grade('q4e', 4518))
-        self.assertTrue(ag.grade('q4e', 4518*1.149))
-        self.assertTrue(ag.grade('q4e', 4518*0.851))
-        self.assertFalse(ag.grade('q4e',4518*1.151))
-        self.assertFalse(ag.grade('q4e',4518*1.849))
+        self.assertEqual(ag.grade('q4e', "4518"), {'correct':True, 'score':1})
+        self.assertTrue(ag.grade('q4e', str(4518*1.149))['correct'])
+        self.assertTrue(ag.grade('q4e', str(4518*0.851))['correct'])
+        self.assertEqual(ag.grade('q4e',str(4518*1.151)), {'correct':False, 'score':0})
+        self.assertFalse(ag.grade('q4e',str(4518*1.849))['correct'])
 
-        self.assertTrue(ag.grade('q4f', 5))
-        self.assertFalse(ag.grade('q4f', 4))
-        self.assertFalse(ag.grade('q4f', 6))
+        self.assertTrue(ag.grade('q4f', "5")['correct'])
+        self.assertFalse(ag.grade('q4f', "4")['correct'])
+        self.assertFalse(ag.grade('q4f', "6")['correct'])
+
+    def test_default_with_numericresponse_metadata(self):
+        """
+        Using the numerical response XML, test AutoGraders with that return "True" and "False" responses if no autograder is defined for a matching
+        problemID
+        """
+        
+        xml = """
+            <exam_metadata>
+            <question_metadata id="problem_4" data-tag4humans="Short-answer2">
+            <response name="q4d" answertype="numericalresponse" answer="3.14159" data-tag4humans="Value of Pi"
+            correct-points="139" wrong-points="-23">
+            <responseparam type="tolerance" default=".02"></responseparam>
+            </response>
+            <response name="q4e" answertype="numericalresponse" answer="4518"
+            data-tag4humans="value of 502*9">
+            <responseparam type="tolerance" default="15%"></responseparam>
+            </response>
+            <response name="q4f" answertype="numericalresponse" answer="5" data-tag4humans="number of fingers on a hand"></response>
+            </question_metadata>
+            </exam_metadata>
+            """
+        #basic, copied over tests
+        ag = AutoGrader(xml)
+        self.assertEqual(ag.grade('q4d', "3.14159"), {'correct':True, 'score':139})
+        self.assertTrue(ag.grade('q4d', str(3.14159+0.02))['correct'])
+        self.assertTrue(ag.grade('q4d', str(3.14159-0.02))['correct'])
+        self.assertEqual(ag.grade('q4d',"3.5"), {'correct':False,'score':-23})
+        self.assertFalse(ag.grade('q4d',"3.0")['correct'])
+        #exception due to using an undefined input name
+        with self.assertRaisesRegexp(AutoGraderGradingException, 'Input/Response name="randomDNE" is not defined in grading template'):
+            ag.grade('randomDNE', "33")
 
 
+        agt = AutoGrader(xml, default_return=True)
+        self.assertEqual(agt.grade('q4d', "3.14159"), {'correct':True, 'score':139})
+        self.assertTrue(agt.grade('q4d', str(3.14159+0.02))['correct'])
+        self.assertTrue(agt.grade('q4d', str(3.14159-0.02))['correct'])
+        self.assertEqual(agt.grade('q4d',"3.5"), {'correct':False,'score':-23})
+        self.assertFalse(agt.grade('q4d',"3.0")['correct'])
+        self.assertTrue(agt.grade('randomDNE',"33")['correct']) #This is the actual test
+
+        agf = AutoGrader(xml, default_return=False)
+        self.assertEqual(agf.grade('q4d', "3.14159"), {'correct':True, 'score':139})
+        self.assertTrue(agf.grade('q4d', str(3.14159+0.02))['correct'])
+        self.assertTrue(agf.grade('q4d', str(3.14159-0.02))['correct'])
+        self.assertEqual(agf.grade('q4d',"3.5"), {'correct':False,'score':-23})
+        self.assertFalse(agf.grade('q4d',"3.0")['correct'])
+        self.assertFalse(agf.grade('randomDNE',"33")['correct']) #This is the actual test
 

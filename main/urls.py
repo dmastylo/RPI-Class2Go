@@ -10,7 +10,7 @@ urlpatterns = patterns('',
    
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that
     # won't be redirected or change
-    url(r'_health$', 'c2g.views.healthcheck'),
+    url(r'^_health$', 'c2g.views.healthcheck'),
                        
     # Testing the error pages (404 and 500)
     url(r'^_throw500$', 'c2g.views.throw500'),
@@ -36,6 +36,8 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/?$', 'courses.exams.views.listAll', {'show_types':['survey',]}, name='survey_list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam', name='survey_show'),
 
+    #interactive_exercise menu item
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/?$', 'courses.exams.views.listAll', {'show_types':['interactive_exercise',]}, name='interactive_exercise_list'),
                        
     # testing new exercise ui
     url(r'^new-ui$', 'courses.exercises.views.show_new_ui'),
@@ -54,6 +56,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/all_submissions_to_grade/?$', 'courses.exams.views.view_submissions_to_grade'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/post_csv_grades/?$', 'courses.exams.views.post_csv_grades'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/get_csv_grades/?$', 'courses.exams.views.view_csv_grades'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/feedback/?$', 'courses.exams.views.feedback'),
     
     #Publishing and management of exams
     url(r'^delete_exam/?', 'courses.exams.actions.delete_exam'),

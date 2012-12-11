@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from tests.test_base import AuthenticatedTestBase
+from test_harness.test_base import AuthenticatedTestBase
 
 class SimpleTest(AuthenticatedTestBase):
     course_name="Natural Language Processing"

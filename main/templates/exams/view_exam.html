@@ -302,7 +302,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     }
                 };
 
-                //$.post("/server/AJAXPostHandler.php", postData, displayHTMLAnswer);
+                $.post("{{exam.slug}}/feedback", postData, displayHTMLAnswer);
                 var tObj = {};
                 tObj.score = 0;
                 tObj["maximum-score"] = 1;
@@ -566,7 +566,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 default:
                     var targetEl = $(formEl);
             } 
-            if (correxObj[member] == true) {
+            if (correxObj[member].correct == true) {
                 $(targetEl).after('<span class="correct">Correct</span>');
             } else {
                 $(targetEl).after('<span class="incorrect">Incorrect</span>');
@@ -602,21 +602,26 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(this).parent().find('span').remove();
                 tmpObj.associatedText = $(this).parent().text();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                tmpObj.questionTag4humans = $(this).closest('fieldset').attr('data-tag4humans');
+                tmpObj.questiontag4humans = $(this).closest('fieldset').attr('data-tag4humans');
 
                 userSelections[$(this).attr('name')].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                tmpObj.questionTag4humans = $(this).attr('data-tag4humans');
+                tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                         
-                userSelections[$(this).attr('name')] = tmpObj
+                userSelections[$(this).attr('name')] = tmpObj;
             }
         });
         $('textarea').each(function () {
             if ($(this).val() != "") {
-                userSelections[$(this).attr('name')] = $(this).val();
+                var tmpObj = {};
+                tmpObj.value = $(this).val();
+                tmpObj.tag4humans = $(this).attr('data-tag4humans');
+                tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
+               
+                userSelections[$(this).attr('name')] = tmpObj;
             }
         });
 
