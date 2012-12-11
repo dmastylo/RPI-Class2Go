@@ -137,10 +137,32 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     suffix = property(_get_suffix)
 
     def has_exams(self):
-        return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam").exists()
+        if self.mode == 'draft':
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam").exists()
+        else:
+            now = datetime.now()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam", live_datetime__lt=now).exists()
 
     def has_surveys(self):
-        return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey").exists()
+        if self.mode == 'draft':
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey").exists()
+        else:
+            now = datetime.now()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey", live_datetime__lt=now).exists()
+        
+    def has_interactive_exercises(self):
+        if self.mode == 'draft':
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type='interactive_exercise').exists()
+        else:
+            now = datetime.now()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type='interactive_exercise', live_datetime__lt=now).exists()
+                
+    def has_problem_sets(self):
+        if self.mode == 'draft':
+            return ProblemSet.objects.filter(course=self, is_deleted=0).exists()
+        else:
+            now = datetime.now()
+            return ProblemSet.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
     
     def get_all_students(self):
         """
@@ -1562,6 +1584,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
                          ('survey', 'survey'),
+                          ('interactive_exercise', 'interactive_exercise'),
                          )
     
     course = models.ForeignKey(Course, db_index=True)

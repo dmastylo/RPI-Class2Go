@@ -36,6 +36,8 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/?$', 'courses.exams.views.listAll', {'show_types':['survey',]}, name='survey_list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam', name='survey_show'),
 
+    #interactive_exercise menu item
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/?$', 'courses.exams.views.listAll', {'show_types':['interactive_exercise',]}, name='interactive_exercise_list'),
                        
     # testing new exercise ui
     url(r'^new-ui$', 'courses.exercises.views.show_new_ui'),

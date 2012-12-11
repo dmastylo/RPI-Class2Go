@@ -4,8 +4,10 @@
 {% block title %}
     {% if "surveys" in request.path %}
         Surveys | {{common_page_data.course.title}}
-    {% else %}
+    {% elif "exams" in request.path %}
         Exams | {{common_page_data.course.title}}
+    {% else %}
+        Interactive Exercises | {{common_page_data.course.title}}
     {% endif %}
 {% endblock title %}
 {% block exams_link_class %}class="active"{% endblock exams_link_class %}
@@ -13,8 +15,10 @@
 {% block course_page_title %}
     {% if "surveys" in request.path %}
         Surveys (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
-    {% else %}
+    {% elif "exams" in request.path %}
         Exams (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+    {% else %}
+        Interactive Exercises (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
     {% endif %}
 {% endblock course_page_title %}
 
