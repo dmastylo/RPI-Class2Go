@@ -4,10 +4,10 @@ from django.core.urlresolvers import reverse
 
 from c2g.models import File as FileModel
 from c2g.models import Course as CourseModel
-from tests.test_base import AuthenticatedTestBase
+from test_harness.test_base import AuthenticatedTestBase
 
 
-class SimpleTest(AuthenticatedTestBase):
+class CourseMaterialsPageAndContentsTest(AuthenticatedTestBase):
     course_name="Natural Language Processing"
 
     def __init__(self, *arrgs, **kwargs):
@@ -20,10 +20,10 @@ class SimpleTest(AuthenticatedTestBase):
             kwargs.update(config)
         else:
             kwargs = config
-        super(SimpleTest, self).__init__(*arrgs, **kwargs)
+        super(CourseMaterialsPageAndContentsTest, self).__init__(*arrgs, **kwargs)
 
     def setUp(self):
-        super(SimpleTest, self).setUp()
+        super(CourseMaterialsPageAndContentsTest, self).setUp()
         self.course = CourseModel.objects.get(id=1)
         self.section = self.course.contentsection_set.all()[0]
         self.poorfile = FileModel(course=self.course, 
@@ -37,7 +37,7 @@ class SimpleTest(AuthenticatedTestBase):
 
     def tearDown(self):
         FileModel.objects.filter(title="XXXDELETEMETESTXXX").delete()
-        super(SimpleTest, self).tearDown()
+        super(CourseMaterialsPageAndContentsTest, self).tearDown()
 
     def test_course_materials_draft_with_futurefile(self):
         """

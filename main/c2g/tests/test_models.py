@@ -58,18 +58,6 @@ class ContentSectionUnitTests(SimpleTestBase):
         """Test counting children of ContentSections using fixtures"""
         self.assertEqual(self.contentsection.countChildren(), len(self.fixture_data))
 
-    #def test_getNextIndex(self):
-    #    """Test next index generation of ContentSections using fixtures"""
-    #    next_index_shouldbe = 4 
-    #    self.assertEqual(self.contentsection.getNextIndex(), next_index_shouldbe)
-    #    new_f_a = self.__manufacture_file('(should be index 4)')
-    #    self.assertEqual(new_f_a.id, self.contentsection.getChildren()[next_index_shouldbe].id)
-    #    new_f_b = self.__manufacture_file('(should be index 8)')
-    #    self.assertEqual(new_f_b.id, self.contentsection.getChildren()[next_index_shouldbe+1].id)
-    #    new_f_a.delete()
-    #    self.assertEqual(self.contentsection.getNextIndex(), next_index_shouldbe+2)
-    #    self.assertNotEqual(self.contentsection.getNextIndex(), self.contentSection.countChildren()+1)
-
 
 class FileUnitTests(SimpleTestBase):
     """Idempotent unit tests of the File model methods: nothing gets saved"""
