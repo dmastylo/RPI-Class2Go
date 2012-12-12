@@ -5,6 +5,11 @@
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
     <h3>Upload Videos</h3>
+        <select>
+        {% for pset in psets %}
+            <option value="{{pset.id}}">{{pset.title}}</option>
+        {% endfor %}
+        </select>
 	<form id="videoform" name="upload_form" action="{% url 'courses.videos.actions.upload' %}" method="POST" enctype="multipart/form-data">
 
 	  {% csrf_token %}
