@@ -1592,8 +1592,10 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
+                         ('problemset','problemset'),
+                         ('invideo','invideo'),
                          ('survey', 'survey'),
-                          ('interactive_exercise', 'interactive_exercise'),
+                         ('interactive_exercise', 'interactive_exercise'),
                          )
     
     course = models.ForeignKey(Course, db_index=True)
@@ -1615,6 +1617,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    #there is a function from assessment_type => (invideo, exam_type, display_single, autograde) that we don't want to write inverse for
+    #so we just store it
+    assessment_type = models.CharField(max_length=64, null=True, blank=True)
     total_score = models.IntegerField(null=True, blank=True)
     objects = ExamManager()
     
@@ -1633,6 +1638,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             slug=self.slug,
             index=self.index,
             mode='ready',
+            image=self,
             due_date=self.due_date,
             grace_period=self.grace_period,
             total_score=self.total_score,

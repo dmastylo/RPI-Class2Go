@@ -2,6 +2,22 @@
 {% load url from future %}
 {% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
 
+{% block exam_link_class %}
+{% if "exam" in reverse_list %}class="active"{% endif %}
+{% endblock exam_link_class %}
+
+{% block problemsets_link_class %}
+{% if "problemset" in reverse_list %}class="active"{% endif %}
+{% endblock problemsets_link_class %}
+
+{% block survey_link_class %}
+{% if "survey" in reverse_list %}class="active"{% endif %}
+{% endblock survey_link_class %}
+
+{% block interactive_exercise_link_class %}
+{% if "interactive_exercise" in reverse_list %}class="active"{% endif %}
+{% endblock interactive_exercise_link_class %}
+
 {% block l_column_content %}
 {% if videotest %}
     {% include "left_nav.html" %}
@@ -418,7 +434,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% endif %}
 
     {% if exam.autograde %}
-    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.show_graded_exam' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     {% else %}
     var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     {% endif %}
@@ -549,13 +565,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
     };
 
-    window.showCorrections = function (jsonStr) {
+    window.showCorrections = function (correxObj) {
         
-        // all keys will be form input names as strings
-        var correxStr = JSON.parse(jsonStr);
-        // gotta be a better way than parsing twice...
-        var correxObj = JSON.parse(correxStr);
-
+       
         for (member in correxObj) {
             var formEl = $('input[name|="' + member + '"]');
             switch ($(formEl).attr('type')) {
@@ -673,7 +685,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     // Make sure pre-pop is in a properly-escaped string 
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
-    var prePopCorrex = JSON.stringify({% autoescape off %}{{json_pre_pop_correx}}{% endautoescape %});
+
+    {% if json_pre_pop_correx %}
+    var prePopCorrex = {{json_pre_pop_correx|safe}};
+    {% endif %}
+    //alert(prePopCorrex);
     var scores = JSON.parse('{{scores|escapejs}}');
                       
     if (prePopData != '') {
