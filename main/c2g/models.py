@@ -349,7 +349,7 @@ class AdditionalPageManager(models.Manager):
         # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
         return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
 
-    def getSectionPagesByCourse(self, course):
+    def getByCourse(self, course):
         # Additional pages displayed under sections have a live_datetime effect.
         if course.mode == 'draft':
             return self.filter(course=course,is_deleted=0, section__is_deleted=0, menu_slug=None).order_by('section','index')
@@ -1581,6 +1581,13 @@ class ExamManager(models.Manager):
             now = datetime.now()
             return self.filter(course=course,is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
+    def getBySection(self, section):
+        if section.mode == 'draft':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
+
 class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
     EXAM_TYPE_CHOICES = (
@@ -1926,6 +1933,7 @@ class ContentGroup(models.Model):
                        'problemSet':      ProblemSet,
                        'additional_page': AdditionalPage, 
                        'file':            File,
+                       'exam':            Exam,
                       }
 
     @classmethod

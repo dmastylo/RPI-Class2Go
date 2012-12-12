@@ -7,9 +7,9 @@ from django.template import RequestContext
 from c2g.models import AdditionalPage, ContentGroup, Exercise, Exam, File, PageVisitLog, ProblemActivity, ProblemSet, Video, VideoActivity, VideoToExercise
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
-from courses.course_materials import get_course_materials, group_data
+from courses.course_materials import get_course_materials
 from courses.videos.forms import *
-from courses.views import get_full_contentsection_list, get_left_nav_content
+from courses.views import get_full_contentsection_list
 from courses.forms import *
 
 
@@ -101,8 +101,7 @@ def view(request, course_prefix, course_suffix, slug):
     no_ex = 1 if (not has_ex) or request.session['video_quiz_mode'] != "quizzes included" else 0
     
     course = common_page_data['course']
-    contentsection_list, video_list, pset_list, additional_pages, file_list, groups, exam_list, level2_items = get_left_nav_content(course)
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, exam_list, level2_items)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, filter_children=False)
 
     if request.user.is_authenticated():
         is_logged_in = 1
@@ -110,15 +109,15 @@ def view(request, course_prefix, course_suffix, slug):
         is_logged_in = 0    
     
     return render_to_response('videos/view.html', 
-                              {'common_page_data': common_page_data, 
-                               'video': video, 
-                               'video_rec':video_rec, 
-                               'prev_slug': prev_slug, 
-                               'next_slug': next_slug, 
-                               'no_ex': no_ex,
+                              {'common_page_data':    common_page_data, 
+                               'video':               video, 
+                               'video_rec':           video_rec, 
+                               'prev_slug':           prev_slug, 
+                               'next_slug':           next_slug, 
+                               'no_ex':               no_ex,
                                'contentsection_list': full_contentsection_list, 
-                               'full_index_list': full_index_list,
-                               'is_logged_in': is_logged_in}, 
+                               'full_index_list':     full_index_list,
+                               'is_logged_in':        is_logged_in}, 
                               context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
