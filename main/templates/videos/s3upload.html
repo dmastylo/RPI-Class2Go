@@ -5,16 +5,21 @@
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
     <h3>Upload Videos</h3>
-        <select>
-        {% for pset in psets %}
-            <option value="{{pset.id}}">{{pset.title}}</option>
-        {% endfor %}
-        </select>
 	<form id="videoform" name="upload_form" action="{% url 'courses.videos.actions.upload' %}" method="POST" enctype="multipart/form-data">
 
 	  {% csrf_token %}
 	  <fieldset class="well">
       
+        <div class="pull-right">
+        <h3>Add Exam</h3>
+        <select name="exam_id" id="exam_id">
+            <option value="">--</option>
+        {% for pset in psets %}
+            <option value="{{pset.id}}">{{pset.title}}</option>
+        {% endfor %}
+        </select>
+        </div>
+
 	    <table>
               <tr>
 		<td>
