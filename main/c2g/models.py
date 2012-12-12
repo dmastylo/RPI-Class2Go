@@ -722,6 +722,7 @@ class VideoManager(models.Manager):
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
+    exam = models.ForeignKey('Exam', null=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
@@ -736,6 +737,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         ready_instance = Video(
             course=self.course.image,
             section=self.section.image,
+            exam=self.exam,
             title=self.title,
             description=self.description,
             type=self.type,
