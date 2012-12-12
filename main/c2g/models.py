@@ -1988,7 +1988,9 @@ class ContentGroup(models.Model):
         becomes linear, and then we win.
         """
         info = {}
-        cls = thisclass.groupable_types[tag]
+        cls = thisclass.groupable_types.get('tag', False)
+        if not cls:
+            return info
         obj = cls.objects.get(id=id)
         cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
         for cgo in cgobjs:
@@ -2020,6 +2022,8 @@ class ContentGroup(models.Model):
         # to two levels of hierarchy, but the UI design is harder for
         # more level (and as of this iteration the spec says two)
         cgref         = None
+        if tag not in thisclass.groupable_types.keys():
+            raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
         content_group = ContentGroup.objects.filter(group_id=group_id)
         if not content_group:
             raise ValueError, "ContentGroup "+str(group_id)+" does not exist."
@@ -2064,6 +2068,8 @@ class ContentGroup(models.Model):
             new group
         """
         cgref    = None
+        if tag not in thisclass.groupable_types.keys():
+            raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
         try:
             cgref = obj_ref.contentgroup_set.get()
         except ContentGroup.DoesNotExist:
