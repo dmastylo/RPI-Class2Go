@@ -239,6 +239,8 @@ urlpatterns = patterns('',
 
 )
 
+# when testing we get a warning about favicon, silence it by mapping to
+# the location of the file
 if settings.DEBUG:
     urlpatterns += patterns('', 
         url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': settings.STATIC_URL+'graphics/core/favicon.ico'}),
