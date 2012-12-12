@@ -89,6 +89,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':exam.invideo,
+                              'allow_submit':True,
                               'exam':exam}, RequestContext(request))
 
 @require_POST
@@ -106,7 +107,7 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable, 'allow_submit':True}, RequestContext(request))
 
 # BEGIN function for Wed demo
 @require_POST
@@ -157,7 +158,7 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
         score_fields = {}
         scores_json = "{}"
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'score':score}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'score':score, 'allow_submit':False}, RequestContext(request))
 
 
 
@@ -278,7 +279,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     autograder = None
 
     if exam.exam_type == "survey":
-        autograder = AutoGrader("", default_return=True) #create a null autograder that always returns the "True" object
+        autograder = AutoGrader("<null></null>", default_return=True) #create a null autograder that always returns the "True" object
     elif exam.autograde:
         try:
             autograder = AutoGrader(exam.xml_metadata)
@@ -578,7 +579,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
     data={'title':exam.title, 'slug':exam.slug, 'due_date':datetime.datetime.strftime(exam.due_date, "%m/%d/%Y %H:%M"),
           'grace_period':datetime.datetime.strftime(exam.grace_period, "%m/%d/%Y %H:%M"),
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
-          'assessment_type':exam.exam_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
+          'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content}
 
