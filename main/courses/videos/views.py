@@ -4,10 +4,10 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import RequestContext
 
-from c2g.models import AdditionalPage, ContentGroup, Exercise, Exam, File, PageVisitLog, ProblemActivity, ProblemSet, Video, VideoActivity, VideoToExercise
+from c2g.models import ContentGroup, Exercise, Exam, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
-from courses.course_materials import get_course_materials
+from courses.course_materials import get_course_materials, get_children, group_data
 from courses.videos.forms import *
 from courses.views import get_full_contentsection_list
 from courses.forms import *
@@ -107,9 +107,14 @@ def view(request, course_prefix, course_suffix, slug):
         is_logged_in = 1
     else:
         is_logged_in = 0    
-    
+
+    key = 'video:'+str(video.id)
+    l1items, l2items = group_data(ContentGroup.objects.getByCourse(course=course))
+    downloadable_content = get_children(key, l1items, l2items)
+
     return render_to_response('videos/view.html', 
-                              {'common_page_data':    common_page_data, 
+                              {
+                               'common_page_data':    common_page_data, 
                                'video':               video, 
                                'video_rec':           video_rec, 
                                'prev_slug':           prev_slug, 
@@ -117,7 +122,9 @@ def view(request, course_prefix, course_suffix, slug):
                                'no_ex':               no_ex,
                                'contentsection_list': full_contentsection_list, 
                                'full_index_list':     full_index_list,
-                               'is_logged_in':        is_logged_in}, 
+                               'is_logged_in':        is_logged_in,
+                               'downloadable_content':downloadable_content,
+                              },
                               context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
