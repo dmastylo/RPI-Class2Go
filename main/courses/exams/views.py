@@ -561,7 +561,12 @@ def create_exam(request, course_prefix, course_suffix):
     
     sections = ContentSection.objects.getByCourse(course)
     
-    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'course':course, 'sections':sections},
+    returnURL = reverse('courses.views.course_materials',args=[course_prefix, course_suffix])
+    
+    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data,
+                              'course':course,
+                              'sections':sections,
+                              'returnURL':returnURL},
                               RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
@@ -575,7 +580,8 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
         raise Http404
     
     sections = ContentSection.objects.getByCourse(course)
-    
+    returnURL = reverse('courses.views.course_materials', args=[course_prefix, course_suffix])
+
     data={'title':exam.title, 'slug':exam.slug, 'due_date':datetime.datetime.strftime(exam.due_date, "%m/%d/%Y %H:%M"),
           'grace_period':datetime.datetime.strftime(exam.grace_period, "%m/%d/%Y %H:%M"),
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
@@ -583,9 +589,10 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content}
 
-    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'course':course, 'sections':sections,
-                              'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug },
-                              RequestContext(request))
+    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'returnURL':returnURL,
+                                                         'course':course, 'sections':sections,
+                                                         'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug },
+                                                        RequestContext(request))
 
 
 def show_test_xml(request):
