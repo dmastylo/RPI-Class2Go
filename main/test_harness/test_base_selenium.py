@@ -20,12 +20,12 @@ class C2GTestDataMixin():
     user_type = 'instructor'
     password = 'class2go'
 
-class SeleniumTestBase(LiveServerTestCase, C2GTestDataMixin):
+#class SeleniumTestBase(LiveServerTestCase, C2GTestDataMixin):
+class SeleniumTestBase(LiveServerTestCase):
 
     @classmethod
     def setup_class(cls):
         cls.browser = webdriver.Chrome()
-        cls.browser.implicitly_wait(3)
         super(SeleniumTestBase, cls).setUpClass()
 
     @classmethod
@@ -34,6 +34,9 @@ class SeleniumTestBase(LiveServerTestCase, C2GTestDataMixin):
         super(SeleniumTestBase, cls).tearDownClass()
 
     def do_login(self):
+        """
+        Login in to the site with the preset username & password.
+        """
         browser = self.browser
 
         # fetch the page and make sure it loads and we have a user entry field
@@ -53,4 +56,34 @@ class SeleniumTestBase(LiveServerTestCase, C2GTestDataMixin):
 
         # wait at most 10 seconds or until we see evidence of login
         WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//span[contains(text(), "Welcome")]'))
+
+
+class StudentBase(SeleniumTestBase):
+    """
+    A class that defines the configurable data needed to target a specific
+    course for a specific user.
+    """
+    fixtures = ['db_snapshot_video_tests.json']
+    login_path = '/accounts/login'
+    course_prefix = 'networking'
+    course_suffix = 'Fall2012'
+    course_name = 'Natural Language Processing'
+    username = 'student_1'
+    user_type = 'student'
+    password = 'class2go'
+
+class InstructorBase(SeleniumTestBase):
+    """
+    A class that defines the configurable data needed to target a specific
+    course for a specific user.
+    """
+    fixtures = ['db_snapshot_video_tests.json']
+    login_path = '/accounts/login'
+    course_prefix = 'networking'
+    course_suffix = 'Fall2012'
+    course_name = 'Natural Language Processing'
+    username = 'professor_0'
+    user_type = 'instructor'
+    password = 'class2go'
+
 

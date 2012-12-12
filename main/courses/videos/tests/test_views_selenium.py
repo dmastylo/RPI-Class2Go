@@ -2,35 +2,21 @@ from django.core.urlresolvers import reverse
 from lxml import etree
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
-from test_harness.test_base_selenium import SeleniumTestBase
+from test_harness.test_base_selenium import InstructorBase, StudentBase
 
-import ipdb
-
-class SimpleDisplayTest(SeleniumTestBase):
-
-    @attr('selenium')
-    @attr(user='instructor')
-    def test_load_networking(self):
-        """
-        [sel] Tests logging in to the networking class
-        """
-        self.do_login()
-        browser = self.browser
-        browser.get('%s%s' % (self.live_server_url, '/networking/Fall2012/'))
-        WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//title'))
-        self.assertTrue(browser.find_element_by_xpath('//title[contains(text(), self.course_name)]'))
+class InstructorVideoTest(InstructorBase):
 
     @attr('selenium')
     @attr(user='instructor')
     def test_course_video_problem_set(self):
         """
-        [sel] Tests the loading and display of a video problemset
-        Is this a valid url to load directly?
+        [sel] Tests an instructor can load and display a video problemset
         """
         # log in to the site before loading a page
         self.do_login()
-
         browser = self.browser
+
+        # load the problem set for video 4
         list_url = reverse('course_video_pset',
                            kwargs={'course_prefix' : self.course_prefix,
                                    'course_suffix' : self.course_suffix,
@@ -38,37 +24,35 @@ class SimpleDisplayTest(SeleniumTestBase):
         browser.get('%s%s' % (self.live_server_url, list_url))
         WebDriverWait(browser, 15).until(lambda browser : browser.find_element_by_xpath('//body'))
 
+        # make sure we have an exercise div
         self.assertTrue(browser.find_element_by_xpath('//div[contains(@class, "exercise")]'))
+        # pull the data-name attributes from exercise divs
         tree = etree.HTML(browser.page_source)
         result = tree.xpath('//div[contains(@class, "exercise")]/@data-name')
         # check that we got the right number of exercises - TODO: use the ORM to get the count
         self.assertEqual(len(result), 1, msg="Unexpected number of divs with data.")
-        # check that we got the right test - TODO: use the ORM to get the name
+        # check that we got the right exercise - TODO: use the ORM to get the name
         self.assertEqual('xx_P1_Regexp', result[0])
 
-class VideoDisplayTest(SeleniumTestBase):
-    username = 'student_1'
-    user_type = 'student'
+class StudentVideoTest(StudentBase):
 
+    @attr('selenium')
     @attr(user='student')
     def test_course_video(self):
         """
-        [sel] Tests the display of an individual video
+        [sel] Tests that a student can display an individual video
         """
         self.do_login()
         browser = self.browser
 
-        # check for the iframe with id=player and/or title=YouTube video player and/or src contains youtube.com
         # get the list of videos
         list_url = reverse('course_video_list',
                            kwargs={'course_prefix' : self.course_prefix,
                                    'course_suffix' : self.course_suffix })
-
-        # fetch the page
         browser.get('%s%s' % (self.live_server_url, list_url))
         WebDriverWait(browser, 15).until(lambda browser : browser.find_element_by_xpath('//body'))
 
-        # pull the urls of each video from the list
+        # pull the urls of each video from the in-page list
         tree = etree.HTML(browser.page_source)
         # pull the href from the anchor contained in the course-list-content
         urls = tree.xpath('//div[@class="course-list-content"]//a/@href')
@@ -77,9 +61,10 @@ class VideoDisplayTest(SeleniumTestBase):
         # attempt to load each video from the list
         for url in urls:
             browser.get('%s%s' % (self.live_server_url, url))
-            # When loaded we should have a div to hold the YT content
-            WebDriverWait(browser, 15).until(lambda browser : browser.find_element_by_xpath('//div[@id="player"]'))
+            # When loaded we should have an iframe that contains the youtube content
+            WebDriverWait(browser, 15).until(lambda browser : browser.find_element_by_tag_name('iframe'))
 
-            # switch to the iframe for the YT player
-            browser.switch_to_frame('player')
+            # switch to the iframe for the youtube player and find the embeded player
+            browser.switch_to_frame(browser.find_element_by_tag_name('iframe'))
             self.assertTrue(browser.find_element_by_xpath('//embed[@id="video-player-flash"]'))
+
