@@ -427,36 +427,43 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         autograde = True
         invideo = False
         display_single = False
+        grade_single = False
         exam_type = "problemset"
     elif assessment_type == "formative":
         autograde = True
         invideo = False
         display_single = True
+        grade_single = False #We will eventually want this to be True
         exam_type = "problemset"
     elif assessment_type == "invideo":
         autograde = True
         invideo = True
         display_single = True
+        grade_single = True
         exam_type = "invideo"
     elif assessment_type == "interactive":
         autograde = True
         invideo = False
         display_single = True
+        grade_single = False
         exam_type = "interactive_exercise"
     elif assessment_type == "exam-autograde":
         autograde = True
         invideo = False
         display_single = False
+        grade_single = False
         exam_type = "exam"
     elif assessment_type == "exam-csv":
         autograde = False
         invideo = False
         display_single = False
+        grade_single = False
         exam_type = "exam"
     elif assessment_type == "survey":
         autograde = False
         invideo = False
         display_single = False
+        grade_single = False
         exam_type = "survey"
     else:
         return HttpResponseBadRequest("A bad assessment type (" + assessment_type  + ") was provided")
@@ -491,7 +498,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         if Exam.objects.filter(course=course, slug=slug, is_deleted=False).exists():
             return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
         exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent,
-                        due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score,
+                        due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
                         grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
                         )
@@ -501,7 +508,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
 
         return HttpResponse("Exam " + title + " created. \n" + unicode(grader))
     else:
-        try:
+        try: #this is nasty code, I know.  It should at least be moved into the model somehow
             exam_obj = Exam.objects.get(course=course, is_deleted=0, slug=old_slug)
             exam_obj.slug=slug
             exam_obj.title=title
@@ -519,6 +526,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.exam_type=exam_type
             exam_obj.autograde=autograde
             exam_obj.display_single=display_single
+            exam_obj.grade_single=grade_single
             exam_obj.invideo=invideo
             exam_obj.section=contentsection
             exam_obj.save()

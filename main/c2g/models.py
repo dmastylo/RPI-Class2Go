@@ -1613,11 +1613,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
     autograde = models.BooleanField(default=False)
     display_single = models.BooleanField(default=False)
+    grade_single = models.BooleanField(default=False)
     invideo = models.BooleanField(default=False)
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
-    #there is a function from assessment_type => (invideo, exam_type, display_single, autograde) that we don't want to write inverse for
+    #there is a function from assessment_type => (invideo, exam_type, display_single, grade_single, autograde) that we don't want to write inverse for
     #so we just store it
     assessment_type = models.CharField(max_length=64, null=True, blank=True)
     total_score = models.IntegerField(null=True, blank=True)
@@ -1651,6 +1652,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             resubmission_penalty = self.resubmission_penalty,
             autograde = self.autograde,
             display_single = self.display_single,
+            grade_single = self.grade_single,
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
@@ -1700,6 +1702,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.autograde = self.autograde
         if not clone_fields or 'display_single' in clone_fields:
             ready_instance.display_single = self.display_single
+        if not clone_fields or 'grade_single' in clone_fields:
+            ready_instance.grade_single = self.grade_single
         if not clone_fields or 'invideo' in clone_fields:
             ready_instance.invideo = self.invideo
         if not clone_fields or 'timed' in clone_fields:
@@ -1749,6 +1753,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.autograde = ready_instance.autograde 
         if not clone_fields or 'display_single' in clone_fields:
             self.display_single = ready_instance.display_single 
+        if not clone_fields or 'grade_single' in clone_fields:
+            self.grade_single = ready_instance.grade_single
         if not clone_fields or 'invideo' in clone_fields:
             self.invideo = ready_instance.invideo 
         if not clone_fields or 'timed' in clone_fields:
@@ -1797,6 +1803,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.autograde != self.image.autograde:
             return False
         if self.display_single != self.image.display_single:
+            return False
+        if self.grade_single != self.image.grade_single:
             return False
         if self.invideo != self.image.invideo:
             return False
