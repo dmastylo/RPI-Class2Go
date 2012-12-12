@@ -2,10 +2,15 @@
         <em class="icon-book"></em>
     </div>
     <div class="course-list-content">
-        <h4 class="pull-left"><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix item.exam.slug %}">{{item.exam.title}}</a></h4>
-        
+        <h4 class="pull-left">
+            <a href="{% url item.exam.show_view common_page_data.course_prefix common_page_data.course_suffix item.exam.slug %}">{{item.exam.title}}</a>
+        </h4>
+        <span>{{item.exam.description}}</span>
         <div class="pull-right">
             {% include "content_group_buttons.html" %}
         </div>
+            <p class="deadlines"><strong>Full Credit Deadline:</strong> {{item.exam.due_date}} PST |
+            <strong>Partial Credit Deadline:</strong> {{item.exam.partial_credit_deadline}} PST</p>
         
     </div>
+

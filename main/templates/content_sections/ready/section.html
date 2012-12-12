@@ -8,9 +8,13 @@
         {% ifequal item.type 'additional_page' %}
             {% include "additional_pages/ready/additional_page_list_item.html" %}
         {% endifequal %}
+
+        {% comment %}
         {% ifequal item.type 'problem_set' %}
             {% include "problemsets/ready/problemset_list_item.html" %}
         {% endifequal %}
+        {% endcomment %}
+
         {% ifequal item.type 'video' %}
             {% include "videos/ready/video_list_item.html" %}
         {% endifequal %}

@@ -4,7 +4,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import RequestContext
 
-from c2g.models import ContentGroup, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
+from c2g.models import ContentGroup, Exercise, Exam, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials, get_children, group_data
@@ -148,8 +148,14 @@ def upload(request, course_prefix, course_suffix):
 
     data = {'common_page_data': common_page_data}
 
+    try:
+        psets = Exam.objects.filter(course_id=common_page_data['course'].id) 
+    except:
+        raise Http404 
+
     form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
+    data['psets'] = psets
 
     return render_to_response('videos/s3upload.html',
                               data,

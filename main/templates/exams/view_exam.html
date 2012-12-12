@@ -2,6 +2,22 @@
 {% load url from future %}
 {% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
 
+{% block exam_link_class %}
+{% if "exam" in exam.exam_type %}class="active"{% endif %}
+{% endblock exam_link_class %}
+
+{% block problemsets_link_class %}
+{% if "problemset" in exam.exam_type %}class="active"{% endif %}
+{% endblock problemsets_link_class %}
+
+{% block survey_link_class %}
+{% if "survey" in exam.exam_type %}class="active"{% endif %}
+{% endblock survey_link_class %}
+
+{% block interactive_exercise_link_class %}
+{% if "interactive_exercise" in exam.exam_type %}class="active"{% endif %}
+{% endblock interactive_exercise_link_class %}
+
 {% block l_column_content %}
 {% if videotest %}
     {% include "left_nav.html" %}
@@ -41,6 +57,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
     /* END CSS for Wed demo */
+
+    .correct {color: #090;}
+    .incorrect {color: #900;}
     </style>
 
     {% if videotest %}
@@ -99,10 +118,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         <script src="http://cdn.popcornjs.org/code/dist/popcorn-complete.min.js"></script>
     {% endif %}
 <script>
-    var __exam_type = "exam";
-    {% if exam.exam_type != "exam" %}
-    __exam_type = "{{exam.exam_type}}";
-    {% endif %}
+    var __exam_type = "{{exam.exam_type}}";
+    var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
+
     
     $(document).ready(function () {
 
@@ -141,6 +159,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.question-nav').click(showQuestion);
         
+        {% if exam.exam_type == "invideo" %}
         /* BEGIN JS for Wed demo */
         var quickCheck = function () {
 
@@ -164,12 +183,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
             var checkBtn = $(this);
             var collectUserAnswers = function () {
-                console.log('collectUserAnswers called');
+                //console.log('collectUserAnswers called');
                 var userSelections = {};
                 var inputCollection = $(checkBtn).closest('.question').find('input');
-                console.log($(checkBtn));
-                console.log($(checkBtn).closest('.question'));
-                console.log(inputCollection);
+                //console.log($(checkBtn));
+                //console.log($(checkBtn).closest('.question'));
+                //console.log(inputCollection);
                 $(inputCollection).each(function () {
                     if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
                         if (!userSelections[$(this).attr('name')]) {
@@ -197,9 +216,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             };
 
             var displayMetaData = function (data, userData) {
-                console.log('displayMetaData called');
-                console.log(arguments);
-                console.log(data);
+                //console.log('displayMetaData called');
+                //console.log(arguments);
+                //console.log(data);
                 var myXML = $.parseXML(data);
                 var examMD = $(myXML).find('exam_metadata');
                 var questionMD = $(examMD).find('question_metadata#' + assocQID);
@@ -221,15 +240,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         var choices = $(this).find('choice');
                         choices.each(function () {
                             var choiceInput = $('#' + $(this).attr('id'));
-                            console.log(choiceInput.length);
+                            //console.log(choiceInput.length);
                             var choiceLabel = $('#' + $(this).attr('id')).closest('label');
-                            console.log(choiceLabel.length);
-                            console.log($(choiceLabel).find('.inline-explanation').length);
+                            //console.log(choiceLabel.length);
+                            //console.log($(choiceLabel).find('.inline-explanation').length);
                             var inlineExpl = $(choiceLabel).find('.inline-explanation');
                             if (inlineExpl.length == 0) { 
                                 inlineExpl = createInlineExp($(choiceLabel));
                             }
-                            console.log(inlineExpl);
+                            //console.log(inlineExpl);
                             if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
                                 $(inlineExpl).addClass('correct');
                             }
@@ -299,7 +318,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     }
                 };
 
-                //$.post("/server/AJAXPostHandler.php", postData, displayHTMLAnswer);
+                $.post("{{exam.slug}}/feedback", postData, displayHTMLAnswer);
                 var tObj = {};
                 tObj.score = 0;
                 tObj["maximum-score"] = 1;
@@ -313,13 +332,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 //var testJSON = '{"score":0,"maximum-score":1,"feedback":[{"user_answer":"SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n"}]';
                 displayHTMLAnswer(testJSON);
             } else {
-                $.post('quick_check', 
+                $.post('{{exam.slug}}/quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
                     function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
             }
 
         };
-
+                      
         $('.question').each(function (idx, el) {
             var tmpBtn = document.createElement('input');
             $(tmpBtn).attr('type','button');
@@ -330,13 +349,16 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         $('.quick-check').click(quickCheck);
+        {% endif %}
         /* END JS for Wed demo */
     {% else %}
 /* The page-at-a-time version */
+      {% if exam.exam_type == "invideo" %}
+
       var displayMetaData = function (data, userData) {
-          console.log('displayMetaData called');
-          console.log(arguments);
-          console.log(data);
+          //console.log('displayMetaData called');
+          //console.log(arguments);
+          //console.log(data);
           var myXML = $.parseXML(data);
           var examMD = $(myXML).find('exam_metadata');
           var questionMD = $(examMD).find('question_metadata#' + assocQID);
@@ -358,15 +380,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                  var choices = $(this).find('choice');
                  choices.each(function () {
                       var choiceInput = $('#' + $(this).attr('id'));
-                      console.log(choiceInput.length);
+                      //console.log(choiceInput.length);
                       var choiceLabel = $('#' + $(this).attr('id')).closest('label');
-                      console.log(choiceLabel.length);
-                      console.log($(choiceLabel).find('.inline-explanation').length);
+                      //console.log(choiceLabel.length);
+                      //console.log($(choiceLabel).find('.inline-explanation').length);
                       var inlineExpl = $(choiceLabel).find('.inline-explanation');
                       if (inlineExpl.length == 0) {
                           inlineExpl = createInlineExp($(choiceLabel));
                       }
-                      console.log(inlineExpl);
+                      //console.log(inlineExpl);
                       if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
                           $(inlineExpl).addClass('correct');
                       }
@@ -411,21 +433,22 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
           var submitBtn = $('input[type|="submit"]').not('#login_button');
           submitBtn.before($(qchkBtn));
           $(qchkBtn).click(displayMetaData);
+        {% endif %}
 
     {% endif %}
 
     {% if exam.autograde %}
-    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     {% else %}
-    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     {% endif %}
                       
     if (__exam_type=="survey") {
             SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
     }
 
+    {% if not exam.autograde %}
     // Add link that just takes you back to submission list without submitting form again
-    if (__exam_type != "survey") {
         var returnToListCont = document.createElement('p');
         $(returnToListCont).addClass('useful-info');
 
@@ -452,7 +475,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
         $(returnToListLink).after($(userNote));
         $(userNote).hide();
-    }
+    {% endif %}
     $('#nojswarn').remove();
                       
     var allFieldsets = $('fieldset');
@@ -499,8 +522,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       //check all inputs
                 var selector =  selectedValues.join(",");
                       
-                      console.log('input[name|=' + member + ']');
-                      console.log(selector);
+                      //console.log('input[name|=' + member + ']');
+                      //console.log(selector);
                 $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
                 // loop through each choice listed for this input
                 /*
@@ -522,8 +545,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('input').attr('disabled','disabled');
-            $('textarea').attr('disabled','disabled');
+            $('#main-content input').attr('disabled','disabled');
+            $('#main-content textarea').attr('disabled','disabled');
 
             // hide submit button
             var submitBtn = $('input[type|="submit"]').not('#login_button');
@@ -543,6 +566,27 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('textarea').removeAttr('disabled');
                 submitBtn.show();
             });
+        }
+    };
+
+    window.showCorrections = function (correxObj) {
+        
+       
+        for (member in correxObj) {
+            var formEl = $('input[name|="' + member + '"]');
+            switch ($(formEl).attr('type')) {
+                case 'checkbox':
+                case 'radio':
+                    var targetEl =  $('input[name|="' + member + '"]:checked');
+                    break;
+                default:
+                    var targetEl = $(formEl);
+            } 
+            if (correxObj[member].correct == true) {
+                $(targetEl).after('<span class="correct">Correct</span>');
+            } else {
+                $(targetEl).after('<span class="incorrect">Incorrect</span>');
+            }
         }
     };
 /*
@@ -574,21 +618,26 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(this).parent().find('span').remove();
                 tmpObj.associatedText = $(this).parent().text();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                tmpObj.questionTag4humans = $(this).closest('fieldset').attr('data-tag4humans');
+                tmpObj.questiontag4humans = $(this).closest('fieldset').attr('data-tag4humans');
 
                 userSelections[$(this).attr('name')].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                tmpObj.questionTag4humans = $(this).attr('data-tag4humans');
+                tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                         
-                userSelections[$(this).attr('name')] = tmpObj
+                userSelections[$(this).attr('name')] = tmpObj;
             }
         });
         $('textarea').each(function () {
             if ($(this).val() != "") {
-                userSelections[$(this).attr('name')] = $(this).val();
+                var tmpObj = {};
+                tmpObj.value = $(this).val();
+                tmpObj.tag4humans = $(this).attr('data-tag4humans');
+                tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
+               
+                userSelections[$(this).attr('name')] = tmpObj;
             }
         });
 
@@ -613,21 +662,27 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         examXHR.success(function (evt, xhr, settings) {
             var dialogDiv = getDialog();
-            var dueDateMessage = "";
+            var message = "";
             var confirmText = "OK";
-            if (__exam_type == "exam") 
-                { dueDateMessage = "\n Please check back after {{exam.due_date|date:'D M d Y'}} for your score.";
-                  confirmText = "See My Submissions"; }
-            else if (__exam_type == "survey")
-                { dueDateMessage = "\n Thanks!"; }
+            if (__autograde) {
+                document.location = SUBMISSION_RETURN_URL;
+            }
+            else {
+                if (__exam_type == "exam")
+                    { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
+                      confirmText = "See My Submissions"; }
+                else if (__exam_type == "survey")
+                    { message = "Thanks!"; }
+                            
+                $(dialogDiv).find('p').text(message);
                         
-            $(dialogDiv).find('p').text(settings.responseText + dueDateMessage);
-            var buttonObj = {};
-            buttonObj[confirmText]=function() {
-                        document.location = SUBMISSION_RETURN_URL;};
+                var buttonObj = {};
+                buttonObj[confirmText]=function() {
+                            document.location = SUBMISSION_RETURN_URL;};
 
-            $(dialogDiv).dialog({ modal: true,
-                                buttons: buttonObj});
+                $(dialogDiv).dialog({ modal: true,
+                                    buttons: buttonObj});
+            }
         });
 
         examXHR.error(function(xhr, status, msg) {
@@ -640,14 +695,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     // Make sure pre-pop is in a properly-escaped string 
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
+
+    {% if json_pre_pop_correx %}
+    var prePopCorrex = {{json_pre_pop_correx|safe}};
+    {% endif %}
+    //alert(prePopCorrex);
     var scores = JSON.parse('{{scores|escapejs}}');
                       
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
+    if (typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None') {
+        window.showCorrections(prePopCorrex);
+    } 
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due %}
-                      
+    {% if common_page_data.course.mode == "ready" and exam.past_due or not allow_submit  %}{# 'not's > 'and's > 'or's #}
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
     $("#reEnableForm").attr('disabled','disabled');
     $('#main-content input').attr('disabled','disabled');

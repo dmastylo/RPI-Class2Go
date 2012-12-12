@@ -14,7 +14,7 @@ class error_ping(object):
             return None
         username = request.user.username if request.user.is_authenticated() else "Anonymous"
         datestring = datetime.datetime.isoformat(datetime.datetime.now())
-        user_agent = request.META['HTTP_USER_AGENT']
+        user_agent = request.META.get('HTTP_USER_AGENT', 'NO USER AGENT FOUND')
         (type, value, tb) = sys.exc_info()
         (path, lineno, exc, text) = traceback.extract_tb(tb)[-1]
         email_subj = "%s on %s" % (repr(exception), repr(socket.gethostname()))

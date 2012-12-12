@@ -202,6 +202,7 @@ def GetOAuth2Url(request, video):
 def upload(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
+    exam_id = request.POST.get("exam_id")
     common_page_data = get_common_page_data(request, course_prefix, course_suffix)
 
     data = {'common_page_data': common_page_data}
@@ -216,7 +217,8 @@ def upload(request):
             new_video.index = new_video.section.getNextIndex()
             new_video.mode = 'draft'
             new_video.handle = course_prefix + "--" + course_suffix
-
+            new_video.exam_id = exam_id 
+            
             # Bit of jiggery pokery to so that the id is set when the upload_path function is called.
             # Now storing file with id appended to the file path so that thumbnail and associated manifest files
             # are easily associated with the video by putting them all in the same directory.

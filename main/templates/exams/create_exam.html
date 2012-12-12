@@ -1,7 +1,7 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block course_page_title %}Exam Creation Form{% endblock course_page_title %}
-
+{% block course_page_title %}Creation Form{% endblock course_page_title %}
+{% block mode_switcher %}{% endblock mode_switcher %}
 {% block m_column_content %}
 
 <style type="text/css" media="screen">
@@ -45,7 +45,7 @@
 </style>
 
 <div class="well create-exam-form">
-    <h2>Create a new exam</h2>
+    <h2>Create a new Exam / ProblemSet / Exercise / Survey</h2>
 
     
     <div class="control-group">
@@ -54,12 +54,33 @@
 
     <div class="control-group">
         <div class="atomic-unit well">
-            <label for="exam_title" class="control-label">Exam Title:*</label><input id="exam_title" name="exam_title" type="text" />
-            <label for="exam_slug" class="control-label">Exam URL Identifier:*</label><input id="exam_slug" name="exam_slug" type="text" />
+            <label class="control-label" for="assessment_type">Select Type:</label>
+            <select id="assessment_type" name="assessment_type">
+                <option value="formative">Formative Problem Set</option>
+                <option value="summative">Summative Problem Set</option>
+                <option value="invideo">In-Video Problem Set</option>
+                <option value="interactive">Interactive Exercise</option>
+                <option value="exam-autograde">Exam (auto-graded)</option>
+                <option value="exam-csv">Exam (csv-graded)</option>
+                <option value="survey">Survey</option>
+            </select>
+            <label for="exam_title" class="control-label">Title:*</label><input id="exam_title" name="exam_title" type="text" />
+            <label for="exam_slug" class="control-label">URL Identifier:*</label><input id="exam_slug" name="exam_slug" type="text" />
         </div>
         <div class="atomic-unit well">
             <label class="control-label" for="description">Assignment Description:</label>
             <textarea id="description"></textarea>
+        </div>
+        <div class="atomic-unit well">
+            <label for="exam_setion" class="control-label">Section:</label>
+            <select id="id_section">
+                {% for section in sections %}
+                <option value="{{section.id}}">{{section.title}}</option>
+                {% endfor %}
+            </select>
+            <label for="parent_id" class="control-label">Parent:</label>
+            <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
+
         </div>
 
         <div class="atomic-unit well">
@@ -69,16 +90,6 @@
             <input id="grace_period" class="picker"  type="text" name="grace_period" value="" data-datetimepicker>
             <label class="control-label" for="due_date">Hard Deadline:*</label>
             <input id="hard_deadline" class="picker"  type="text" name="hard_deadline" value="" data-datetimepicker>
-        </div>
-        <div class="atomic-unit well">
-            <label class="control-label" for="assessment_type">Select Assessment Type:</label>
-            <select id="assessment_type" name="assessment_type">
-                <option value="summative">Summative Problem Set</option>
-                <option value="invideo">In-Video Problem Set</option>
-                <option value="exam-autograde">Exam (auto-graded)</option>
-                <option value="exam-csv">Exam (csv-graded)</option>
-                <option value="survey">Survey</option>
-            </select>
         </div>
         <div class="atomic-unit well" id="penalties" >
             <label class="control-label" for="late_penalty">Late Penalty:</label>
@@ -178,7 +189,7 @@
                     </p>
                     
                     <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse tag4humans="Apple Competitors">
+                    <multiplechoiceresponse tag4humans="Apple Competitors" correct-points="10" wrong-points="-2">
                         <choicegroup type="MultipleChoice">
                             <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
                             <choice correct="false" name="napster" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
@@ -258,7 +269,7 @@
                     
                     
                     <p>Enter the numerical value of Pi:
-                    <numericalresponse answer="3.14159" tag4humans="Value of Pi">
+                    <numericalresponse answer="3.14159" tag4humans="Value of Pi" correct-points="1.5" wrong-points="-.25">
                         <responseparam type="tolerance" default=".02" />
                         <textline />
                     </numericalresponse>
@@ -406,9 +417,16 @@
         var saveExerciseContents = function(callback){return function(){
             var csrftoken = '{{csrf_token}}';
             var filename = '{{filename}}';
+      
+            {% if edit_mode %}
+            var endpointURL = "{% url 'save_edited_exam' course.prefix course.suffix slug %}";
+            {% else %}
+            var endpointURL = "{% url 'courses.exams.views.save_exam_ajax' course.prefix course.suffix %}";
+            {% endif %}
+      
             c2gXMLParse.renderPreview();
       
-            $.ajax("{% url 'courses.exams.views.save_exam_ajax' course.prefix course.suffix %}",{
+            $.ajax(endpointURL, {
                headers: {'X-CSRFToken': csrftoken},
                type: 'POST',
                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -422,6 +440,8 @@
                        num_subs_permitted:$('input#num_subs_permitted').val(),
                        resubmission_penalty:$('input#resubmission_penalty').val(),
                        description:$('textarea#description').val(),
+                       section:$('select#id_section').val(),
+                       parent:$('select#parent_id').val(),
                        metaXMLContent:metadata_editor.getValue(),
                        htmlContent:$('#staging-area').html()
                },
@@ -467,11 +487,53 @@
     $('#wrap').click();
       
       
-      //$('#preview-btn').click(c2gXMLParse.renderPreview);
+    //$('#preview-btn').click(c2gXMLParse.renderPreview);
     $('#preview-tab').click(c2gXMLParse.renderPreview);
+      
+    {% if edit_mode %}
+    var prepop = {{prepop_json|safe}};
+    {% else %}
+    var prepop = false;
+    {% endif %}
+      
+    if (prepop) {
+        $('input#exam_title').val(prepop.title);
+        $('input#exam_slug').val(prepop.slug);
+        $('input#due_date').val(prepop.due_date);
+        $('input#grace_period').val(prepop.grace_period);
+        $('input#hard_deadline').val(prepop.partial_credit_deadline);
+        $('select#assessment_type').val(prepop.assessment_type);
+        $('input#late_penalty').val(prepop.late_penalty);
+        $('input#num_subs_permitted').val(prepop.num_subs_permitted);
+        $('input#resubmission_penalty').val(prepop.resubmission_penalty);
+        $('textarea#description').val(prepop.description);
+        $('select#id_section').val(prepop.section),
+        metadata_editor.setValue(prepop.metadata),
+        editor.setValue(prepop.htmlContent)
+
+    }
 
       
       });
+    </script>
+<script type="text/javascript">
+    $('#id_section').change(function() { prefill_children($('#parent_id')[0]) });
+    $('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
+    function prefill_children(element) {
+        var id = $('#id_section')[0].value
+        var pelement = $('#parent_id');
+        pelement.html('<option value="none,none">(this is a top level item)</option>');
+        jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+                       for (var i=0; i < data.length; i++) {
+                       // For the moment we filter out objects of other types, per the spec.
+                       // In the future this restriction will probably be lifted.
+                       // See also add_section_page.html
+                       if ((data[i][0] === 'video') || (data[i][0] === 'file')) {
+                       pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                       }
+                       }
+                       });
+    }
     </script>
 
 {% endblock addl_scripts %}

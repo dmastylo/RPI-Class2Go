@@ -1,0 +1,52 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+
+
+{% block title %}
+{% if "exam" in reverse_show %}Exams{% endif %}
+{% if "problemset" in reverse_show %}Problem Sets{% endif %}
+{% if "survey" in reverse_show %}Surveys{% endif %}
+{% if "interactive_exercise" in reverse_show %}Interactive Exercises{% endif %}
+ | {{common_page_data.course.title}}
+{% endblock title %}
+
+
+{% block course_page_title %}
+{% if "exam" in reverse_show %}Exams{% endif %}
+{% if "problemset" in reverse_show %}Problem Sets{% endif %}
+{% if "survey" in reverse_show %}Surveys{% endif %}
+{% if "interactive_exercise" in reverse_show %}Interactive Exercises{% endif %}
+ (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+{% endblock course_page_title %}
+
+
+{% block exam_link_class %}
+{% if "exam" in reverse_show %}class="active"{% endif %}
+{% endblock exam_link_class %}
+
+{% block problemsets_link_class %}
+{% if "problemset" in reverse_show %}class="active"{% endif %}
+{% endblock problemsets_link_class %}
+
+{% block survey_link_class %}
+{% if "survey" in reverse_show %}class="active"{% endif %}
+{% endblock survey_link_class %}
+
+{% block interactive_exercise_link_class %}
+{% if "interactive_exercise" in reverse_show %}class="active"{% endif %}
+{% endblock interactive_exercise_link_class %}
+
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column" class="span12">
+    {% if user.is_authenticated %}
+        {% for section_structure in section_structures %}
+            {% include "content_sections/ready/section.html" %}
+        {% empty %}
+            <p style='margin: 20px;'>No content to display.</p>
+        {% endfor %}
+    {% else %}
+        <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to see course materials.</h4>
+    {% endif %}
+</div>
+{% endblock m_column_content %}
