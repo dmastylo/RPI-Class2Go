@@ -1807,6 +1807,31 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
 
         return True
     
+    def show_view_name(self):
+        return self.exam_type+"_show"
+
+    show_view = property(show_view_name)
+    
+    def list_view_name(self):
+        return self.exam_type+"_list"
+
+    list_view = property(list_view_name)
+
+    def populated_view_name(self):
+        return self.exam_type+"_populated"
+    
+    populated_view = property(populated_view_name)
+        
+    def graded_view_name(self):
+        return self.exam_type+"_graded"
+
+    graded_view = property(graded_view_name)
+
+    def my_submissions_view_name(self):
+        return self.exam_type+"_my_submissions"
+    
+    my_submissions_view = property(my_submissions_view_name)
+    
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
 

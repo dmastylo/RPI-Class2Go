@@ -88,7 +88,7 @@ def main(request, course_prefix, course_suffix):
 @auth_view_wrapper
 def course_materials(request, course_prefix, course_suffix):
 
-    section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
+    section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
 
     form = None
     if request.common_page_data['course_mode'] == "draft":

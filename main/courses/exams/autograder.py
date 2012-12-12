@@ -13,7 +13,8 @@ class AutoGrader():
         graders=[]
         for k,v in self.grader_functions.iteritems():
             graders.append(k)
-        return "AutoGrader functions for responses with names: %s " % (", ".join(sorted(graders)))
+        return "AutoGrader functions for responses with names: %s.  Total Possible Points: %s" % \
+            (", ".join(sorted(graders)), str(int(self.points_possible)))
     
     def __init__(self, xml, default_return=None):
         """
@@ -23,6 +24,8 @@ class AutoGrader():
         grader when 
             
         """
+        self.points_possible=0
+        
         if xml == "__testing_bypass":
             return
 
@@ -136,6 +139,8 @@ class AutoGrader():
 
         correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
         wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
+
+        self.points_possible += correct_pts
                     
         self.grader_functions[resp_name] = self._MC_grader_factory(answer_list, correct_pts=correct_pts, wrong_pts=wrong_pts)
 
@@ -202,6 +207,7 @@ class AutoGrader():
         correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
         wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
 
+        self.points_possible += correct_pts
 
         self.grader_functions[resp_name] = self._NUM_grader_factory(answer, tolerance, correct_pts=correct_pts, wrong_pts=wrong_pts)
                     

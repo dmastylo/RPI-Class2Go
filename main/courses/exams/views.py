@@ -74,7 +74,7 @@ def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
             
         
         
-        return render_to_response('exams/ready/list.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'reverse_list':ex_type+'_list', 'reverse_show':ex_type+'_show', 'form':form, }, context_instance=RequestContext(request))
+        return render_to_response('exams/ready/list.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'reverse_show':ex_type+'_show', 'form':form, }, context_instance=RequestContext(request))
 
 
 # Create your views here.
@@ -400,6 +400,8 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     except Exception as e: #Since this is just a validator, pass back all the exceptions
         return HttpResponseBadRequest(unicode(e))
 
+    total_score = grader.points_possible
+
     if not htmlContent:
         return HttpResponseBadRequest("No Exam HTML provided")
     if not due_date:
@@ -489,7 +491,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         if Exam.objects.filter(course=course, slug=slug, is_deleted=False).exists():
             return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
         exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent,
-                        due_date=dd, assessment_type=assessment_type, mode="draft",
+                        due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score,
                         grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
                         )
@@ -497,7 +499,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         exam_obj.save()
         exam_obj.create_ready_instance()
 
-        return HttpResponse("Exam " + title + " created")
+        return HttpResponse("Exam " + title + " created. \n" + unicode(grader))
     else:
         try:
             exam_obj = Exam.objects.get(course=course, is_deleted=0, slug=old_slug)
@@ -507,6 +509,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.html_content=htmlContent
             exam_obj.xml_metadata=metaXMLContent
             exam_obj.due_date=dd
+            exam_obj.total_score=total_score
             exam_obj.assessment_type=assessment_type
             exam_obj.grace_period=gp
             exam_obj.partial_credit_deadline=pcd
@@ -521,7 +524,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.save()
             exam_obj.commit()
 
-            return HttpResponse("Exam " + title + " saved")
+            return HttpResponse("Exam " + title + " saved. \n" + unicode(grader))
 
         except Exam.DoesNotExist:
             return HttpResponseBadRequest("No exam exists with URL identifier %s" % old_slug)

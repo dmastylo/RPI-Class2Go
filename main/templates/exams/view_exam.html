@@ -3,19 +3,19 @@
 {% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
 
 {% block exam_link_class %}
-{% if "exam" in reverse_list %}class="active"{% endif %}
+{% if "exam" in exam.exam_type %}class="active"{% endif %}
 {% endblock exam_link_class %}
 
 {% block problemsets_link_class %}
-{% if "problemset" in reverse_list %}class="active"{% endif %}
+{% if "problemset" in exam.exam_type %}class="active"{% endif %}
 {% endblock problemsets_link_class %}
 
 {% block survey_link_class %}
-{% if "survey" in reverse_list %}class="active"{% endif %}
+{% if "survey" in exam.exam_type %}class="active"{% endif %}
 {% endblock survey_link_class %}
 
 {% block interactive_exercise_link_class %}
-{% if "interactive_exercise" in reverse_list %}class="active"{% endif %}
+{% if "interactive_exercise" in exam.exam_type %}class="active"{% endif %}
 {% endblock interactive_exercise_link_class %}
 
 {% block l_column_content %}
@@ -118,10 +118,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         <script src="http://cdn.popcornjs.org/code/dist/popcorn-complete.min.js"></script>
     {% endif %}
 <script>
-    var __exam_type = "exam";
-    {% if exam.exam_type != "exam" %}
-    __exam_type = "{{exam.exam_type}}";
-    {% endif %}
+    var __exam_type = "{{exam.exam_type}}";
+    var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
+
     
     $(document).ready(function () {
 
@@ -160,6 +159,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.question-nav').click(showQuestion);
         
+        {% if exam.exam_type == "invideo" %}
         /* BEGIN JS for Wed demo */
         var quickCheck = function () {
 
@@ -338,7 +338,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
 
         };
-
+                      
         $('.question').each(function (idx, el) {
             var tmpBtn = document.createElement('input');
             $(tmpBtn).attr('type','button');
@@ -349,6 +349,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         $('.quick-check').click(quickCheck);
+        {% endif %}
         /* END JS for Wed demo */
     {% else %}
 /* The page-at-a-time version */
@@ -434,17 +435,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% endif %}
 
     {% if exam.autograde %}
-    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.show_graded_exam' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     {% else %}
-    var SUBMISSION_RETURN_URL = "{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
     {% endif %}
                       
     if (__exam_type=="survey") {
             SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
     }
 
+    {% if not exam.autograde %}
     // Add link that just takes you back to submission list without submitting form again
-    if (__exam_type != "survey") {
         var returnToListCont = document.createElement('p');
         $(returnToListCont).addClass('useful-info');
 
@@ -471,7 +472,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
         $(returnToListLink).after($(userNote));
         $(userNote).hide();
-    }
+    {% endif %}
     $('#nojswarn').remove();
                       
     var allFieldsets = $('fieldset');
@@ -541,8 +542,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('input').attr('disabled','disabled');
-            $('textarea').attr('disabled','disabled');
+            $('#main-content input').attr('disabled','disabled');
+            $('#main-content textarea').attr('disabled','disabled');
 
             // hide submit button
             var submitBtn = $('input[type|="submit"]').not('#login_button');
@@ -658,21 +659,27 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         examXHR.success(function (evt, xhr, settings) {
             var dialogDiv = getDialog();
-            var dueDateMessage = "";
+            var message = "";
             var confirmText = "OK";
-            if (__exam_type == "exam") 
-                { dueDateMessage = "\n Please check back after {{exam.due_date|date:'D M d Y'}} for your score.";
-                  confirmText = "See My Submissions"; }
-            else if (__exam_type == "survey")
-                { dueDateMessage = "\n Thanks!"; }
+            if (__autograde) {
+                document.location = SUBMISSION_RETURN_URL;
+            }
+            else {
+                if (__exam_type == "exam")
+                    { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
+                      confirmText = "See My Submissions"; }
+                else if (__exam_type == "survey")
+                    { message = "Thanks!"; }
+                            
+                $(dialogDiv).find('p').text(message);
                         
-            $(dialogDiv).find('p').text(settings.responseText + dueDateMessage);
-            var buttonObj = {};
-            buttonObj[confirmText]=function() {
-                        document.location = SUBMISSION_RETURN_URL;};
+                var buttonObj = {};
+                buttonObj[confirmText]=function() {
+                            document.location = SUBMISSION_RETURN_URL;};
 
-            $(dialogDiv).dialog({ modal: true,
-                                buttons: buttonObj});
+                $(dialogDiv).dialog({ modal: true,
+                                    buttons: buttonObj});
+            }
         });
 
         examXHR.error(function(xhr, status, msg) {
@@ -699,8 +706,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         window.showCorrections(prePopCorrex);
     } 
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due %}
-                      
+    {% if common_page_data.course.mode == "ready" and exam.past_due or exam.autograde %}{# 'and's have precedence over 'or's #}
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
     $("#reEnableForm").attr('disabled','disabled');
     $('#main-content input').attr('disabled','disabled');
