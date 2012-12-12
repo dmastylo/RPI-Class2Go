@@ -29,7 +29,7 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
     # Content
     problem_sets = ProblemSet.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
     videos = Video.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
-    additional_pages = AdditionalPage.objects.getSectionPagesByCourse(course=ready_course).order_by('section__index', 'index')
+    additional_pages = AdditionalPage.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
     
     num_all_formative_problem_sets = ProblemSet.objects.getByCourse(course=ready_course.image).filter(assessment_type="formative").count()
     num_live_formative_problem_sets = problem_sets.filter(assessment_type="formative").count()
@@ -37,7 +37,7 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
     num_live_summative_problem_sets = problem_sets.filter(assessment_type="assessive").count()
     num_all_videos = Video.objects.getByCourse(course=ready_course.image).count()
     num_live_videos = videos.count()
-    num_all_pages = AdditionalPage.objects.getSectionPagesByCourse(course=ready_course.image).count()
+    num_all_pages = AdditionalPage.objects.getByCourse(course=ready_course.image).count()
     num_live_pages = additional_pages.count()
     num_all_files = File.objects.getByCourse(course=ready_course.image).count()
     num_live_files = File.objects.getByCourse(course=ready_course).count()
