@@ -31,7 +31,7 @@ class InstructorDraftModeTest(AuthenticatedTestBase):
         """
 
         # load the normal problem set page
-        resp = self.client.get('/networking/Fall2012/problemsets/P2' )
+        resp = self.client.get('/networking/Fall2012/problemsets/P2', HTTP_USER_AGENT=self.userAgent)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('pset_url' in resp.context)
         self.assertEqual(resp.context['pset_url'], '/networking/Fall2012/problemsets/P2/load_problem_set')
@@ -44,7 +44,7 @@ class InstructorDraftModeTest(AuthenticatedTestBase):
                load_problem_set?$', 'problemsets.views.load_problem_set'),
         """
         # load a page with just the problem set
-        resp = self.client.get('/networking/Fall2012/problemsets/P2/load_problem_set' )
+        resp = self.client.get('/networking/Fall2012/problemsets/P2/load_problem_set', HTTP_USER_AGENT=self.userAgent)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('file_names' in resp.context)
         self.assertEqual(resp.context['file_names'][0], 'xx_P2_Lexical1')
@@ -56,7 +56,7 @@ class InstructorDraftModeTest(AuthenticatedTestBase):
                problemsets/?$',
             'problemsets.views.listAll'),
         """
-        resp = self.client.get('/networking/Fall2012/problemsets/' )
+        resp = self.client.get('/networking/Fall2012/problemsets/', HTTP_USER_AGENT=self.userAgent)
         self.assertEqual(resp.status_code, 200)
 
     def test_load_manage_exercises(self):
@@ -67,7 +67,7 @@ class InstructorDraftModeTest(AuthenticatedTestBase):
                manage_exercises?$',
             'problemsets.views.manage_exercises'),
         """
-        resp = self.client.get('/networking/Fall2012/problemsets/P2/manage_exercise' )
+        resp = self.client.get('/networking/Fall2012/problemsets/P2/manage_exercise', HTTP_USER_AGENT=self.userAgent)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(resp.context['exercises']), 2)
 
@@ -78,6 +78,6 @@ class InstructorDraftModeTest(AuthenticatedTestBase):
               createproblemset/?$',
             'problemsets.views.create_form'),
         """
-        resp = self.client.get('/networking/Fall2012/createproblemset/' )
+        resp = self.client.get('/networking/Fall2012/createproblemset/', HTTP_USER_AGENT=self.userAgent)
         self.assertEqual(resp.status_code, 200)
 
