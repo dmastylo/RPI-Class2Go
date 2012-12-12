@@ -722,6 +722,7 @@ class VideoManager(models.Manager):
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
+    exam = models.ForeignKey('Exam', null=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
@@ -736,6 +737,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         ready_instance = Video(
             course=self.course.image,
             section=self.section.image,
+            exam=self.exam,
             title=self.title,
             description=self.description,
             type=self.type,
@@ -1590,8 +1592,10 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
+                         ('problemset','problemset'),
+                         ('invideo','invideo'),
                          ('survey', 'survey'),
-                          ('interactive_exercise', 'interactive_exercise'),
+                         ('interactive_exercise', 'interactive_exercise'),
                          )
     
     course = models.ForeignKey(Course, db_index=True)
@@ -1609,10 +1613,14 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
     autograde = models.BooleanField(default=False)
     display_single = models.BooleanField(default=False)
+    grade_single = models.BooleanField(default=False)
     invideo = models.BooleanField(default=False)
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    #there is a function from assessment_type => (invideo, exam_type, display_single, grade_single, autograde) that we don't want to write inverse for
+    #so we just store it
+    assessment_type = models.CharField(max_length=64, null=True, blank=True)
     total_score = models.IntegerField(null=True, blank=True)
     objects = ExamManager()
     
@@ -1631,6 +1639,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             slug=self.slug,
             index=self.index,
             mode='ready',
+            image=self,
             due_date=self.due_date,
             grace_period=self.grace_period,
             total_score=self.total_score,
@@ -1643,6 +1652,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             resubmission_penalty = self.resubmission_penalty,
             autograde = self.autograde,
             display_single = self.display_single,
+            grade_single = self.grade_single,
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
@@ -1692,6 +1702,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.autograde = self.autograde
         if not clone_fields or 'display_single' in clone_fields:
             ready_instance.display_single = self.display_single
+        if not clone_fields or 'grade_single' in clone_fields:
+            ready_instance.grade_single = self.grade_single
         if not clone_fields or 'invideo' in clone_fields:
             ready_instance.invideo = self.invideo
         if not clone_fields or 'timed' in clone_fields:
@@ -1741,6 +1753,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.autograde = ready_instance.autograde 
         if not clone_fields or 'display_single' in clone_fields:
             self.display_single = ready_instance.display_single 
+        if not clone_fields or 'grade_single' in clone_fields:
+            self.grade_single = ready_instance.grade_single
         if not clone_fields or 'invideo' in clone_fields:
             self.invideo = ready_instance.invideo 
         if not clone_fields or 'timed' in clone_fields:
@@ -1790,6 +1804,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         if self.display_single != self.image.display_single:
             return False
+        if self.grade_single != self.image.grade_single:
+            return False
         if self.invideo != self.image.invideo:
             return False
         if self.timed != self.image.timed:
@@ -1798,6 +1814,31 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
 
         return True
+    
+    def show_view_name(self):
+        return self.exam_type+"_show"
+
+    show_view = property(show_view_name)
+    
+    def list_view_name(self):
+        return self.exam_type+"_list"
+
+    list_view = property(list_view_name)
+
+    def populated_view_name(self):
+        return self.exam_type+"_populated"
+    
+    populated_view = property(populated_view_name)
+        
+    def graded_view_name(self):
+        return self.exam_type+"_graded"
+
+    graded_view = property(graded_view_name)
+
+    def my_submissions_view_name(self):
+        return self.exam_type+"_my_submissions"
+    
+    my_submissions_view = property(my_submissions_view_name)
     
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
@@ -1809,14 +1850,14 @@ class ExamRecord(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)   #blob
     json_score_data = models.TextField(null=True, blank=True)  #blob
-    score = models.IntegerField(null=True, blank=True) #currently unused.
+    score = models.IntegerField(null=True, blank=True) 
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
 
 class ExamScore(TimestampMixin, models.Model):
     """
-    This class is meant to be the top level score of each exam.  
+    This class is meant to be the top level, authoritative score of each exam.  
     It should have a one-to-one relationship with the (exam, student) pair
     """
     course = models.ForeignKey(Course, db_index=True) #mainly for convenience
@@ -1836,9 +1877,15 @@ class ExamScoreField(TimestampMixin, models.Model):
     parent = models.ForeignKey(ExamScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    correct = models.NullBooleanField()
     subscore = models.IntegerField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return (self.parent.student.username + ":" + self.parent.course.title + ":" + self.parent.exam.title + ":" + self.human_name)
+
 	
 
 class ExamRecordScore(TimestampMixin, models.Model):
@@ -1855,15 +1902,43 @@ class ExamRecordScore(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.score))
 
+    def copyToExamScore(self):
+        #copy self to the contents of the authoritative ExamScore
+        es, created = ExamScore.objects.get_or_create(course=self.record.course, exam=self.record.exam, student=self.record.student)
+        es.score = self.score
+        es.save()
+
+        #now do all the fields
+        if not created:
+            ExamScoreField.objects.filter(parent=es).delete()
+        
+        for f in ExamRecordScoreField.objects.filter(parent=self):
+            esf = ExamScoreField(parent=es, field_name=f.field_name, human_name=f.human_name, value=f.value,
+                                 correct=f.correct, subscore=f.subscore, comments=f.comments, associated_text=f.associated_text)
+            esf.save()
 
 class ExamRecordScoreField(TimestampMixin, models.Model):
     """Should be kept basically identical to ExamScoreField"""
     parent = models.ForeignKey(ExamRecordScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    correct = models.NullBooleanField()
     subscore = models.IntegerField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
+    def __unicode__(self):
+        return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
+
+class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
+    """Exploding out even multiple choice answers"""
+    parent = models.ForeignKey(ExamRecordScoreField, db_index=True)
+    choice_value = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
+    def __unicode__(self):
+        return (self.parent.parent.record.student.username + ":" + self.parent.parent.record.course.title + ":" \
+                + self.parent.parent.record.exam.title + ":" + self.parent.human_name + ":" + self.human_name)
 
 
 class CurrentTermMap(TimestampMixin, models.Model):

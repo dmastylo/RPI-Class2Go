@@ -4,13 +4,15 @@ from django.db.models import Count, Max, Q, F
 from django.db import connection
 
 
-def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False):
+def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False, exam_types=[]):
     section_structures = []
     if common_page_data['request'].user.is_authenticated():
         sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
         pages = AdditionalPage.objects.getByCourse(course=common_page_data['course'])
         files = File.objects.getByCourse(course=common_page_data['course'])
         exams = Exam.objects.getByCourse(course=common_page_data['course'])
+        if exam_types:
+            exams = exams.filter(exam_type__in=exam_types)
         groups = ContentGroup.objects.getByCourse(course=common_page_data['course'])
         level1_items, level2_items = group_data(groups)
 

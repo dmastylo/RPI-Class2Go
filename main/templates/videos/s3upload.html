@@ -10,6 +10,16 @@
 	  {% csrf_token %}
 	  <fieldset class="well">
       
+        <div class="pull-right">
+        <h3>Add Exam</h3>
+        <select name="exam_id" id="exam_id">
+            <option value="">--</option>
+        {% for pset in psets %}
+            <option value="{{pset.id}}">{{pset.title}}</option>
+        {% endfor %}
+        </select>
+        </div>
+
 	    <table>
               <tr>
 		<td>

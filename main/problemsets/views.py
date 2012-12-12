@@ -34,7 +34,7 @@ def listAll(request, course_prefix, course_suffix):
     if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
 
-    return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list', 'form': form}, context_instance=RequestContext(request))
+    return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'exam_list', 'form': form}, context_instance=RequestContext(request))
 
 @auth_view_wrapper
 def show(request, course_prefix, course_suffix, pset_slug):
