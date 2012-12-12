@@ -101,7 +101,7 @@ def view(request, course_prefix, course_suffix, slug):
     no_ex = 1 if (not has_ex) or request.session['video_quiz_mode'] != "quizzes included" else 0
     
     course = common_page_data['course']
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, filter_children=False)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, filter_children=True)
 
     if request.user.is_authenticated():
         is_logged_in = 1
