@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from tests.test_base import AuthenticatedTestBase
+from test_harness.test_base import AuthenticatedTestBase
 
 class SimpleTest(AuthenticatedTestBase):
     course_name="Natural Language Processing"
@@ -23,7 +23,8 @@ class SimpleTest(AuthenticatedTestBase):
         """
         response = self.client.get(reverse('course_main',
                                            kwargs={'course_prefix' : self.coursePrefix,
-                                                   'course_suffix' : self.courseSuffix }))
+                                                   'course_suffix' : self.courseSuffix }),
+                                   HTTP_USER_AGENT=self.userAgent)
         self.assertEqual(response.status_code, 200)
 
         course_title_search_string = "<h2>" + self.course_name + "</h2>"
@@ -39,7 +40,8 @@ class SimpleTest(AuthenticatedTestBase):
         """
         response = self.client.get(reverse('course_materials',
                                            kwargs={'course_prefix' : self.coursePrefix,
-                                                   'course_suffix' : self.courseSuffix }))
+                                                   'course_suffix' : self.courseSuffix }),
+                                   HTTP_USER_AGENT=self.userAgent)
         self.assertEqual(response.status_code, 200)
 
         course_title_search_string = self.course_name + "</title>"

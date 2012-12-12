@@ -1,21 +1,21 @@
 from django.core.urlresolvers import reverse
-from c2g.models import Course, ProblemActivity, ProblemSet, ContentSection, Exercise, ProblemSetToExercise, VideoToExercise, PageVisitLog, Video, AdditionalPage, File, ContentGroup
+from c2g.models import Exercise, PageVisitLog, ProblemActivity, ProblemSet, ProblemSetToExercise, VideoToExercise
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, HttpResponseRedirect, render
 from django.template import RequestContext
 from courses.common_page_data import get_common_page_data
-from courses.course_materials import get_course_materials, group_data
+from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from problemsets.forms import *
-from django.db.models import Q, Count, Max
+from django.db.models import Q
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
 from courses.forms import *
 from django.contrib import messages
 from django.db import connection
 from courses.course_materials import filename_in_deleted_list
-from courses.views import get_full_contentsection_list, get_left_nav_content
+from courses.views import get_full_contentsection_list
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
 # many questions there are and how many were completed to calculate progress on
@@ -34,7 +34,7 @@ def listAll(request, course_prefix, course_suffix):
     if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
 
-    return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'problemset_list', 'form': form}, context_instance=RequestContext(request))
+    return render_to_response('problemsets/'+common_page_data['course_mode']+'/list.html', {'common_page_data': common_page_data, 'section_structures':section_structures, 'context':'exam_list', 'form': form}, context_instance=RequestContext(request))
 
 @auth_view_wrapper
 def show(request, course_prefix, course_suffix, pset_slug):
@@ -129,8 +129,7 @@ def show(request, course_prefix, course_suffix, pset_slug):
 
 
     course = common_page_data['course']
-    contentsection_list, video_list, pset_list, additional_pages, file_list, groups, exam_list, level2_items = get_left_nav_content(course)
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list, exam_list, level2_items)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
 
     if request.user.is_authenticated():
         is_logged_in = 1

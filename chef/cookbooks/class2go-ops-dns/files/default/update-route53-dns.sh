@@ -10,9 +10,6 @@ echo "This script must be run as root" 1>&2
     exit 1
 fi
 
-# Need to have environment right for bitnami
-. /opt/bitnami/scripts/setenv.sh
-
 # Load configuration
 . /etc/route53/config
 
