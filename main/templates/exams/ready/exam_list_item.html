@@ -11,6 +11,15 @@
         </div>
             <p class="deadlines"><strong>Full Credit Deadline:</strong> {{item.exam.due_date}} PST |
             <strong>Partial Credit Deadline:</strong> {{item.exam.partial_credit_deadline}} PST</p>
+            <div>
+            <ul>
+                {% for record in item.records %}
+                    <li>
+                    {{ record.time_created }}
+                    </li>
+                {% endfor %}
+            </ul>
+            </div>
         
     </div>
 
