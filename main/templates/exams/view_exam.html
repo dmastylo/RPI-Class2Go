@@ -159,7 +159,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.question-nav').click(showQuestion);
         
-        {% if exam.exam_type == "invideo" %}
+        {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
         /* BEGIN JS for Wed demo */
         var quickCheck = function () {
 
@@ -354,6 +354,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         /* END JS for Wed demo */
     {% else %}
 /* The page-at-a-time version */
+      {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
+
       var displayMetaData = function (data, userData) {
           //console.log('displayMetaData called');
           //console.log(arguments);
@@ -432,6 +434,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
           var submitBtn = $('input[type|="submit"]').not('#login_button');
           submitBtn.before($(qchkBtn));
           $(qchkBtn).click(displayMetaData);
+        {% endif %}
 
     {% endif %}
 
@@ -707,7 +710,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         window.showCorrections(prePopCorrex);
     } 
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due or exam.autograde %}{# 'and's have precedence over 'or's #}
+    {% if common_page_data.course.mode == "ready" and exam.past_due or not allow_submit  %}{# 'not's > 'and's > 'or's #}
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
     $("#reEnableForm").attr('disabled','disabled');
     $('#main-content input').attr('disabled','disabled');
