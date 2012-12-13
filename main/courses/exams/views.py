@@ -138,7 +138,7 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
         raise Http404
 
     try:
-        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).latest('time_created')
+        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).latest('time_created')
         json_pre_pop = record.json_data
         json_pre_pop_correx = record.json_score_data
     except ExamRecord.DoesNotExist:
@@ -171,7 +171,7 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).order_by('-time_created'))
+    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).order_by('-time_created'))
 
     my_subs = map(lambda s: my_subs_helper(s), subs)
 
@@ -209,7 +209,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
     if exam.mode=="draft":
         exam = exam.image
 
-    submitters = ExamRecord.objects.filter(exam=exam,  time_created__lt=exam.grace_period).values('student').distinct()
+    submitters = ExamRecord.objects.filter(exam=exam, complete=True, time_created__lt=exam.grace_period).values('student').distinct()
     fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-"+datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")+".csv"
     outfile = open(FILE_DIR+"/"+fname,"w+")
 
@@ -342,7 +342,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             total_score += feedback[prob]['score']
 
 
-        record_score.score = total_score
+        record_score.raw_score = total_score
         record_score.save()
         record_score.copyToExamScore()         #Make this score the current ExamScore
         record.json_score_data = json.dumps(feedback)

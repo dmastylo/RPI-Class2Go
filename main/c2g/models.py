@@ -1850,6 +1850,9 @@ class ExamRecord(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)   #blob
     json_score_data = models.TextField(null=True, blank=True)  #blob
+    attempt_number = models.IntegerField(default=0)
+    complete = models.BooleanField(default=True)
+    late = models.BooleanField(default=False)
     score = models.IntegerField(null=True, blank=True) 
     
     def __unicode__(self):
@@ -1863,7 +1866,7 @@ class ExamScore(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True) #mainly for convenience
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam
+    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
     
     def __unicode__(self):
@@ -1896,7 +1899,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
        **TODO: Write Promote as a function in the model**
     """
     record = models.OneToOneField(ExamRecord, db_index=True)
-    score = models.IntegerField(null=True, blank=True) # this is the score of the entire record
+    raw_score = models.IntegerField(null=True, blank=True) # this is the raw score of the entire record
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):
