@@ -6,21 +6,6 @@ from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 
 import ipdb
 
-class C2GTestDataMixin():
-    """
-    A class that defines the configurable data needed to target a specific
-    course for a specific user.
-    """
-    fixtures = ['db_snapshot_video_tests.json']
-    login_path = '/accounts/login'
-    course_prefix = 'networking'
-    course_suffix = 'Fall2012'
-    course_name="Natural Language Processing"
-    username = 'professor_0'
-    user_type = 'instructor'
-    password = 'class2go'
-
-#class SeleniumTestBase(LiveServerTestCase, C2GTestDataMixin):
 class SeleniumTestBase(LiveServerTestCase):
 
     @classmethod
