@@ -1959,15 +1959,18 @@ class ContentGroupManager(models.Manager):
         return self.filter(course=course).order_by('group_id','level')
 
 class ContentGroup(models.Model):
-    group_id = models.IntegerField(db_index=True, null=True, blank=True)
-    level = models.IntegerField(db_index=True)
-    video = models.ForeignKey(Video, null=True, blank=True)
-    problemSet = models.ForeignKey(ProblemSet, null=True, blank=True)
+    group_id        = models.IntegerField(db_index=True, null=True, blank=True)
+    level           = models.IntegerField(db_index=True)
+    display_style   = models.CharField(max_length=32, null=True, blank=True)
+
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
-    file = models.ForeignKey(File, null=True, blank=True)
-    exam = models.ForeignKey(Exam, null=True, blank=True)
-    course = models.ForeignKey(Course)
-    objects = ContentGroupManager()
+    course          = models.ForeignKey(Course)
+    exam            = models.ForeignKey(Exam, null=True, blank=True)
+    file            = models.ForeignKey(File, null=True, blank=True)
+    problemSet      = models.ForeignKey(ProblemSet, null=True, blank=True)
+    video           = models.ForeignKey(Video, null=True, blank=True)
+
+    objects         = ContentGroupManager()
 
                # ContentGroup field name: model class name
     groupable_types = { 
@@ -2008,7 +2011,7 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
-    def add_child(thisclass, group_id, tag, obj_ref):
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
         """Add obj_ref having type tag to the ContentGroup table.
 
         Returns the ContentGroup entry id for the resulting child item.
@@ -2017,6 +2020,9 @@ class ContentGroup(models.Model):
         If entry isn't in the table, create it and add it
         If entry is in the table as a parent of the given group_id, demote it
         If entry is in the table as a child of a different group, move it to this group.
+
+        display_style determines how the child items should be rendered with
+        their parent; 'button' is the default.
         """
         # Technically there's no reason to restrict the ContentGroups
         # to two levels of hierarchy, but the UI design is harder for
@@ -2031,7 +2037,7 @@ class ContentGroup(models.Model):
             cgref = obj_ref.contentgroup_set.get()
         except ContentGroup.DoesNotExist:
             # it's not in the table, so add it
-            new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id)
+            new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id, display_style=display_style)
             setattr(new_item, tag, obj_ref)
             new_item.save()
             return new_item.id
