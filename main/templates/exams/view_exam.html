@@ -570,22 +570,40 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     };
 
     window.showCorrections = function (correxObj) {
-        
-       
+                      //Need to do something with correxObj['__metadata__']
+                      console.log(correxObj);
         for (member in correxObj) {
-            var formEl = $('input[name|="' + member + '"]');
-            switch ($(formEl).attr('type')) {
-                case 'checkbox':
-                case 'radio':
-                    var targetEl =  $('input[name|="' + member + '"]:checked');
-                    break;
-                default:
-                    var targetEl = $(formEl);
-            } 
-            if (correxObj[member].correct == true) {
-                $(targetEl).after('<span class="correct">Correct</span>');
-            } else {
-                $(targetEl).after('<span class="incorrect">Incorrect</span>');
+            if (member != "__metadata__") {
+                var has_choices=true;
+                var formEl = $('input[name|="' + member + '"]');
+                if (formEl.length == 0)
+                    formEl = $('textarea[name|="' + member + '"]');
+
+                if ($(formEl).attr('type') == 'checkbox' ||
+                    $(formEl).attr('type') == 'radio') {
+                    var curq = correxObj[member];
+                    for (correctChoice in curq.correct_choices) {
+                        $(formEl).filter('input[value|="' + correctChoice + '"]').after('<span class="correct">Correct</span>');
+                    }
+                    for (wrongChoice in curq.wrong_choices) {
+                        if (curq.wrong_choices[wrongChoice] == "fn")
+                            $(formEl).filter('input[value|="' + wrongChoice + '"]').after('<span class="incorrect">This should be selected.</span>');
+                        else if (curq.wrong_choices[wrongChoice] == "fp")
+                            $(formEl).filter('input[value|="' + wrongChoice + '"]').after('<span class="incorrect">This should not be selected.</span>');
+
+                    }
+                    
+    //                      $(targetEl).each(function() {
+    //                                          if this.val()==3, this.val()
+    //                                       });
+                }
+                else {
+                    if (correxObj[member].correct == true) {
+                        $(targetEl).after('<span class="correct">Correct</span>');
+                    } else {
+                        $(targetEl).after('<span class="incorrect">Incorrect</span>');
+                    }
+                }
             }
         }
     };

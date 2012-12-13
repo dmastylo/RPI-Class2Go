@@ -140,7 +140,10 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
     try:
         record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).latest('time_created')
         json_pre_pop = record.json_data
-        json_pre_pop_correx = record.json_score_data
+        correx_obj = json.loads(record.json_score_data)
+        correx_obj['__metadata__']=exam.xml_metadata
+        json_pre_pop_correx = json.dumps(correx_obj)
+        
     except ExamRecord.DoesNotExist:
         record = None
         json_pre_pop = "{}"
