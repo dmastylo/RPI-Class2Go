@@ -666,10 +666,9 @@ def get_child_data(child):
         url = file.file.url
         title = file.title
         name = file.file.name.rsplit('/')[-1]
-        ext = name
-        pair = name.rsplit('.')
-        if len(pair) > 1:
-            ext = pair[1]
+        ext = file.get_ext()
+        if not ext:
+            ext = name
     elif type == 'exam':
         exam = Exam.objects.get(id=id)
         url = 'exams/' + exam.slug
