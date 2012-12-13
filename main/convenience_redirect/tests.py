@@ -22,12 +22,6 @@ class SimpleTest(TestCase):
         m2 = CurrentTermMap(course_prefix="class2go", course_suffix="tutorial")
         m2.save()
     
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
-    
     def test_noop(self):
         for host in ('class.stanford.edu', 'www.class.stanford.edu', 'staging.class.stanford.edu', 'www.staging.class.stanford.edu' \
                      'class2go.stanford.edu', 'www.class2go.stanford.edu', 'staging.class2go.stanford.edu', 'www.staging.class2go.stanford.edu'):
