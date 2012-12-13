@@ -491,7 +491,7 @@
     $('#preview-tab').click(c2gXMLParse.renderPreview);
       
     {% if edit_mode %}
-    var prepop = {{prepop_json|safe}};
+    var prepop = JSON.parse("{{prepop_json|escapejs}}");
     {% else %}
     var prepop = false;
     {% endif %}
