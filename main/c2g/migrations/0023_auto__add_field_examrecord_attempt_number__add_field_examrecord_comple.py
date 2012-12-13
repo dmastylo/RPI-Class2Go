@@ -23,6 +23,14 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.BooleanField')(default=False),
                       keep_default=False)
 
+        # Deleting field 'ExamRecordScore.score'
+        db.delete_column('c2g_examrecordscore', 'score')
+
+        # Adding field 'ExamRecordScore.raw_score'
+        db.add_column('c2g_examrecordscore', 'raw_score',
+                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
         # Deleting field 'ExamRecord.attempt_number'
@@ -33,6 +41,14 @@ class Migration(SchemaMigration):
 
         # Deleting field 'ExamRecord.late'
         db.delete_column('c2g_examrecord', 'late')
+
+        # Adding field 'ExamRecordScore.score'
+        db.add_column('c2g_examrecordscore', 'score',
+                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Deleting field 'ExamRecordScore.raw_score'
+        db.delete_column('c2g_examrecordscore', 'raw_score')
 
 
     models = {
@@ -231,8 +247,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'ExamRecordScore'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'raw_score': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'record': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['c2g.ExamRecord']", 'unique': 'True'}),
-            'score': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.examrecordscorefield': {

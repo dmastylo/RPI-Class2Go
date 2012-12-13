@@ -1899,7 +1899,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
        **TODO: Write Promote as a function in the model**
     """
     record = models.OneToOneField(ExamRecord, db_index=True)
-    score = models.IntegerField(null=True, blank=True) # this is the raw score of the entire record
+    raw_score = models.IntegerField(null=True, blank=True) # this is the raw score of the entire record
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):

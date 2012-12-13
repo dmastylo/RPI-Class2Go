@@ -342,7 +342,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             total_score += feedback[prob]['score']
 
 
-        record_score.score = total_score
+        record_score.raw_score = total_score
         record_score.save()
         record_score.copyToExamScore()         #Make this score the current ExamScore
         record.json_score_data = json.dumps(feedback)
