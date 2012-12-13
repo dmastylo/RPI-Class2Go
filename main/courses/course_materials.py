@@ -301,7 +301,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     if exam.section_id == section.id and not level2_items.has_key(key):
                         children = get_children(key, level1_items, level2_items)
                         
-                        item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children, 'records':exam_user_records, 'foo':'foo'}
+                        item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children, 'records':exam_user_records}
                         section_dict['items'].append(item)
                         
                         if common_page_data['course_mode'] == 'draft':
