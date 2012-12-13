@@ -1625,9 +1625,18 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     objects = ExamManager()
     
     def past_due(self):
-        if self.due_date and (datetime.now() > self.due_date):
+        if self.due_date and (datetime.now() > self.grace_period):
             return True
         return False
+    
+    def past_all_deadlines(self):
+        future = datetime(3000,1,1)
+        grace_period = self.grace_period if self.grace_period else future
+        partial_credit_deadline = self.partial_credit_deadline if self.partial_credit_deadline else future
+
+        compareD = max(grace_period, partial_credit_deadline)
+    
+        return datetime.now() > compareD
     
     def create_ready_instance(self):
         ready_instance = Exam(
@@ -1908,7 +1917,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     def copyToExamScore(self):
         #copy self to the contents of the authoritative ExamScore
         es, created = ExamScore.objects.get_or_create(course=self.record.course, exam=self.record.exam, student=self.record.student)
-        es.score = self.score
+        es.score = self.record.score # use the score with deductions included, not the raw score.
         es.save()
 
         #now do all the fields

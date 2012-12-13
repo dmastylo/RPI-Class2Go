@@ -272,7 +272,11 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
     json_obj=json.loads(postdata)
-    
+
+    if exam.past_all_deadlines():
+        return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
+                                      datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
+
     record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata)
     record.save()
 
