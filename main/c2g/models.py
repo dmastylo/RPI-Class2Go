@@ -1883,6 +1883,7 @@ class ExamScore(TimestampMixin, models.Model):
     class Meta:
         unique_together = ("exam", "student")
 
+# Deprecated
 class ExamScoreField(TimestampMixin, models.Model):
     """Should be kept basically identical to ExamRecordScoreField"""
     parent = models.ForeignKey(ExamScore, db_index=True)
@@ -1933,13 +1934,24 @@ class ExamRecordScoreField(TimestampMixin, models.Model):
     parent = models.ForeignKey(ExamRecordScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
-    value = models.CharField(max_length=128, null=True, blank=True)
+    value = models.TextField(null=True, blank=True)
     correct = models.NullBooleanField()
     subscore = models.FloatField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
     def __unicode__(self):
         return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
+
+class ExamRecordFieldLog(TimestampMixin, models.Model):
+    """Log oriented table recording activity for each submission of a field."""
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    score = models.IntegerField(default=0, blank=True)
+    max_score = models.IntegerField(default=0, blank=True)   # info only, for interactive 
+    associated_text = models.TextField(null=True, blank=True)
 
 class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
     """Exploding out even multiple choice answers"""
@@ -1952,34 +1964,16 @@ class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
         return (self.parent.parent.record.student.username + ":" + self.parent.parent.record.course.title + ":" \
                 + self.parent.parent.record.exam.title + ":" + self.parent.human_name + ":" + self.human_name)
 
-
 class CurrentTermMap(TimestampMixin, models.Model):
     course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
     course_suffix = models.CharField(max_length=64)
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
-# Original table to store exam start times -- superceded by ExamProblemAttempt
-# in Winter 2012
+# Deprecated in favor of ExamScore (complete / incomplete to track state)
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)
-
-class ExamProblemAttempt(TimestampMixin, models.Model):
-    student = models.ForeignKey(User)
-    exam = models.ForeignKey(Exam)
-    json_data = models.TextField(null=True, blank=True)   #blob
-    complete = models.BooleanField(default=False)
-
-class ExamProblemAttemptActivity(TimestampMixin, models.Model):
-    parent = models.ForeignKey(ExamScore, db_index=True)
-    field_name = models.CharField(max_length=128, db_index=True)
-    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
-    user_answer = models.TextField(null=True, blank=True)   #blob
-    explanation = models.TextField(null=True, blank=True)
-    score = models.IntegerField(default=0)
-    maxscore = models.IntegerField(default=0)
-
 
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
