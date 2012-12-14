@@ -40,6 +40,10 @@ if [[ $DATABASES =~ $INVALID_HOSTNAME ]]; then
     exit 1
 fi
 
+# Remove the test database in case tests failed on the last run and failed
+# to remove the database.
+mysql --batch -e "drop database if exists test_${JENKINS_DB_NAME};"
+
 # Make sure we have a clean database
 mysql --batch -e "drop database if exists ${JENKINS_DB_NAME}; create database ${JENKINS_DB_NAME} default character set 'utf8' default collate 'utf8_unicode_ci';"
 
