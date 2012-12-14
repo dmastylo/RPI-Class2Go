@@ -8,7 +8,7 @@ import settings
 import datetime
 import csv
 import HTMLParser
-from django.db.models import Sum
+from django.db.models import Sum, Count
 import urllib2
 
 
@@ -273,7 +273,14 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
     json_obj=json.loads(postdata)
     
-    record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata)
+    #Determine attempt_number
+    submissions = ExamRecord.objects.values('student_id').filter(exam=exam.id, student=request.user).annotate(acount=Count('student'))
+    if submissions:
+        attempt_number = submissions[0]['acount'] + 1
+    else:
+        attempt_number = 1
+
+    record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata, attempt_number=attempt_number)
     record.save()
 
     autograder = None
@@ -341,13 +348,23 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             #supposed to be at the same level as try...except.  Run once per prob,v
             total_score += feedback[prob]['score']
 
-
+        #Set raw score for ExamRecordScore
         record_score.raw_score = total_score
         record_score.save()
         record_score.copyToExamScore()         #Make this score the current ExamScore
+
+        #Set penalty inclusive score for ExamRecord
         record.json_score_data = json.dumps(feedback)
+        
+        #apply resubmission penalty
+        resubmission_penalty_percent = pow(((100 - exam.resubmission_penalty)/100), (attempt_number -1))
+        total_score = max(total_score * resubmission_penalty_percent, 0)
         record.score = total_score
         record.save()
+        
+        #apply the late penalty
+        
+        
 
         return HttpResponse(json.dumps(feedback))
 
