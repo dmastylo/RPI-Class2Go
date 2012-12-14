@@ -4,7 +4,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import RequestContext
 
-from c2g.models import ContentGroup, Exercise, Exam, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
+from c2g.models import ContentGroup, ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials, get_children, group_data
@@ -112,7 +112,28 @@ def view(request, course_prefix, course_suffix, slug):
     l1items, l2items = group_data(ContentGroup.objects.getByCourse(course=course))
     downloadable_content = get_children(key, l1items, l2items)
 
-    return render_to_response('videos/view.html', 
+    # START copy from courses.exams.views.show_exam:
+    if video.exam_id:
+        try:
+            #exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+            exam = Exam.objects.get(id=video.exam_id)
+            display_single = exam.display_single
+            invideo = exam.invideo
+        except Exam.DoesNotExist:
+            raise Http404
+    else:
+        sections = ContentSection.objects.getByCourse(course) 
+        section = sections[0]
+        exam = Exam(course=course, slug=slug, title=video.title, description="Empty Exam", html_content="", xml_metadata="", due_date='', assessment_type="invideo", mode="draft", total_score=0, grade_single=0, grace_period='', partial_credit_deadline='', late_penalty=0, submissions_permitted=0, resubmission_penalty=0, exam_type="invideo", autograde=0, display_single=0, invideo=1, section=section,)
+        #exam_obj.create_ready_instance()
+        #exam = '' 
+        #display_single = '' 
+        #invideo = '' 
+
+    # END copy from courses.exams.views.show_exam
+
+    # change from 'videos/view.html' to 'exams/view_exam.html'
+    return render_to_response('exams/view_exam.html', 
                               {
                                'common_page_data':    common_page_data, 
                                'video':               video, 
@@ -124,6 +145,13 @@ def view(request, course_prefix, course_suffix, slug):
                                'full_index_list':     full_index_list,
                                'is_logged_in':        is_logged_in,
                                'downloadable_content':downloadable_content,
+                               'json_pre_pop':"{}",
+                               'scores':"{}",
+                               'editable':True,
+                               'single_question':exam.display_single,
+                               'videotest':exam.invideo,
+                               'allow_submit':True,
+                               'exam':exam
                               },
                               context_instance=RequestContext(request))
 

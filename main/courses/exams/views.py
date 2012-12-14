@@ -109,7 +109,6 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable, 'allow_submit':True}, RequestContext(request))
 
-# BEGIN function for Wed demo
 @require_POST
 @auth_view_wrapper
 def show_quick_check(request, course_prefix, course_suffix, exam_slug):
@@ -123,7 +122,6 @@ def show_quick_check(request, course_prefix, course_suffix, exam_slug):
         raise Http404
 
     return render_to_response('exams/quickcheck.html', {'common_page_data':request.common_page_data, 'exam':exam, 'user_answer_data':user_answer_data, 'videotest':True}, RequestContext(request))
-# END function for Wed demo
 
 def show_invideo_quiz(request, course_prefix, course_suffix, exam_slug):
     return render_to_response('exams/videotest.html', {'common_page_data':request.common_page_data}, RequestContext(request))

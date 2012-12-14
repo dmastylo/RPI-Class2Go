@@ -1,139 +1,205 @@
-        var videoURL = 'http://www.youtube.com/embed/RD5VCBprVvo?autoplay=0&wmode=transparent&fs=0&controls=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
-        //var videoURL = 'http://www.youtube.com/watch?v=RD5VCBprVvo?autoplay=0&wmode=transparent&fs=0&controls=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
-        var thumbnailData = {"0":{"imgsrc":"img001.jpeg"},"31":{"imgsrc":"img032.jpeg"},"40":{"imgsrc":"img041.jpeg"},"62":{"imgsrc":"img063.jpeg"},"135":{"imgsrc":"img136.jpeg"},"136":{"imgsrc":"img137.jpeg"},"179":{"imgsrc":"img180.jpeg"},"259":{"imgsrc":"img260.jpeg"},"292":{"imgsrc":"img293.jpeg"},"353":{"imgsrc":"img354.jpeg"},"354":{"imgsrc":"img355.jpeg"},"355":{"imgsrc":"img356.jpeg"} /*,"385":{"imgsrc":"img386.jpeg"}*/};
-        var slideIndices = thumbnailData;
-        var questionData = {"184": {"fileName": "arp_q1.html", "problemDiv": 974, "order": 0, "time": 384}, "385": {"fileName": "arp_q2.html", "problemDiv": 975, "order": 1, "time": 385}, "385": {"fileName": "arp_q3.html", "problemDiv": 976, "order": 2, "time": 386}};
-        var questions = questionData;
-        var imgPath = "http://prod-c2g.s3-website-us-west-2.amazonaws.com/networking/Fall2012/videos/1201/jpegs/";
-        var popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
+        /*
+            videoURL, thumbnailPath are declared & initialized in the view_exam.html template
+        */
+        // Define Namespace
+        var C2G = window.C2G || {};
+        C2G.videoSetup = {};
 
-        var addSlideIndex = function (idxTime) {
-            var indexDiv = document.getElementById('slideIndex');
-            var tempDiv = document.createElement('div');
-            $(tempDiv).addClass('divInIndex').attr('id','slideIndex'+idxTime.replace('.','-')+'s');
-            var slideImg = document.createElement('img');
-            slideImg.src = imgPath + slideIndices[idxTime].imgsrc;
-            $(slideImg).attr('alt', 'Jump to section ' + idxTime + ' of the video');
-            slideIndices[idxTime].displayDiv = tempDiv;
-            tempDiv.appendChild(slideImg);
-            tempDiv.onclick=(function (time) {return function(evt) {
-                //player.seekTo(time);
-                popcornVideo.play(time);
-                //thumbSet.selectSlide(time);
-                selectSlide(time);
-            };})(idxTime);
-            $('#slideIndex').append(tempDiv);
-            return tempDiv;
+        // Key methods
+        C2G.videoSetup.fetchThumbs = function () {
 
-        };
+            // set up deferred object for proper chaining of function calls
+            var fetchDeferred = $.Deferred();
 
-        var addQuizSlide = function (idxTime) {
-            var indexDiv = document.getElementById('slideIndex');
-            var tempDiv = document.createElement('div');
-            $(tempDiv).addClass('divInIndex').addClass('quiz-thumb').attr('id','slideIndex'+idxTime.replace('.','-')+'s');
-            var slideImg = document.createElement('img');
-            slideImg.src = '/static/graphics/core/question.png';
-            $(slideImg).attr('alt', 'Go to quiz at section ' + idxTime);
-            tempDiv.appendChild(slideImg);
+            // private vars
+            var thumbManifest = {};
+            var psManifest = {};
+            var thumbsChecked = false;
+            var psChecked = false;
 
-            tempDiv.onclick=(function (time) {return function(evt) {
-                                //player.seekTo(time-0.5);
-                                popcornVideo.play(time);
-                                //thumbSet.selectSlide(time);
-                                selectSlide(time);
-            };})(idxTime);
-            $('#slideIndex').append(tempDiv);
-            return tempDiv;
-        };
+            // private methods
+            var loadThumbManifest = function (data, textStatus, jqXHR) {
 
-        var setupNavPanel = function (){
-            var merged = Array();
+                $.each(data, function (key, val) {
+                       $.each(val, function (k, v) {
+                              if (k == "imgsrc") {
+                              val[k] = thumbnailPath + v;
+                              }
+                              })
+                       thumbManifest[parseInt(key)] = val;
+                       });
 
-            for (time in slideIndices) {
-                merged.push(time)
+                C2G.videoSetup.slideIndices = thumbManifest;
+            };
+
+            // TODO: This function should go away soon, as real data will be in XML metadata
+            var loadPSManifest = function (data, textStatus, jqXHR) {
+                $.each(data, function (key, val) {
+                       $.each(val, function (k, v) {
+                              if (k == "imgsrc") {
+                              val[k] = thumbnailPath + v;
+                              }
+                              })
+                       psManifest[parseInt(key)] = val;
+                       });
+                C2G.videoSetup.questions = psManifest;
+            };
+
+            var initThumbManifest = function () {
+                return $.getJSON(thumbnailPath + "manifest.txt", "", loadThumbManifest).always(function() {
+                        thumbsChecked = true;
+                    });  //The request may fail if there are no thumbs, but we know we tried.
             }
 
-            for (time in questions) {
-                if (!isNaN(parseInt(time))) {
-                    merged.push(time);
-                }
+            var initPSManifest = function () {
+                return $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest).always(function() {
+                    psChecked = true;
+                });  //The request may fail if there are no exercises, but we know we tried.
             }
 
-            var sorted = merged.sort(function(a,b){return parseInt(a)-parseInt(b)});
+            $.when(initThumbManifest(), initPSManifest()).then(function () {
+                //console.log("thumbsChecked: " + thumbsChecked);
+                //console.log("psChecked: " + psChecked);
+            }).then(function () {fetchDeferred.resolve();});
 
-            var lastTime=-1;
+            return fetchDeferred.promise();
+        };
 
-            for (i in sorted) {
-                if (sorted[i] != lastTime) {
-                    if (slideIndices.hasOwnProperty(sorted[i])) {
-                        //thumbSet.addSlideIndex(sorted[i]);
-                        addSlideIndex(sorted[i]);
+        C2G.videoSetup.displayThumbs = function () {
+
+            var imgPath = "";
+            var selectSlide = function (time) {
+                nearest = -1;
+                for (i in C2G.videoSetup.slideIndices) {
+                    var numi = parseInt(i);
+                    $(C2G.videoSetup.slideIndices[i].displayDiv).addClass('unselected');
+                    $(C2G.videoSetup.slideIndices[i].displayDiv).removeClass('selected');
+                    if (numi<=time && numi>nearest) {
+                        nearest=numi;
                     }
-                    if (questions.hasOwnProperty(sorted[i])) {
-                        //var tmpDiv=thumbSet.addQuizSlide(sorted[i]);
-                        var tmpDiv=addQuizSlide(sorted[i]);
-                        slideIndices[sorted[i]]={displayDiv: tmpDiv}; //Quiz takes precedence and overwrites if both quiz and thumb are at the same time
+                }
+
+                if (nearest >-1) {
+                    var selected = C2G.videoSetup.slideIndices[''+nearest].displayDiv;
+                    $(selected).addClass('selected');
+                    $(selected).removeClass('unselected');
+                    $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width())/2);
+                }
+            };
+
+            var addSlideIndex = function (idxTime) {
+                var indexDiv = document.getElementById('slideIndex');
+                var tempDiv = document.createElement('div');
+                $(tempDiv).addClass('divInIndex').attr('id','slideIndex'+idxTime.replace('.','-')+'s');
+                var slideImg = document.createElement('img');
+                slideImg.src = imgPath + C2G.videoSetup.slideIndices[idxTime].imgsrc;
+                $(slideImg).attr('alt', 'Jump to section ' + idxTime + ' of the video');
+                C2G.videoSetup.slideIndices[idxTime].displayDiv = tempDiv;
+                tempDiv.appendChild(slideImg);
+                tempDiv.onclick=(function (time) {return function(evt) {
+                    //player.seekTo(time);
+                    window.popcornVideo.play(time);
+                    //thumbSet.selectSlide(time);
+                    selectSlide(time);
+                };})(idxTime);
+                $('#slideIndex').append(tempDiv);
+                return tempDiv;
+
+            };
+
+            var addQuizSlide = function (idxTime) {
+                var indexDiv = document.getElementById('slideIndex');
+                var tempDiv = document.createElement('div');
+                $(tempDiv).addClass('divInIndex').addClass('quiz-thumb').attr('id','slideIndex'+idxTime.replace('.','-')+'s');
+                var slideImg = document.createElement('img');
+                slideImg.src = '/static/graphics/core/question.png';
+                $(slideImg).attr('alt', 'Go to quiz at section ' + idxTime);
+                tempDiv.appendChild(slideImg);
+
+                tempDiv.onclick=(function (time) {return function(evt) {
+                                    //player.seekTo(time-0.5);
+                                    window.popcornVideo.play(time);
+                                    //thumbSet.selectSlide(time);
+                                    selectSlide(time);
+                };})(idxTime);
+                $('#slideIndex').append(tempDiv);
+                return tempDiv;
+            };
+
+            var setupNavPanel = function (){
+                var merged = Array();
+
+                for (time in C2G.videoSetup.slideIndices) {
+                    merged.push(time)
+                }
+
+                for (time in C2G.videoSetup.questions) {
+                    if (!isNaN(parseInt(time))) {
+                        merged.push(time);
                     }
                 }
-                lastTime=sorted[i];
-            }
 
-            window.slideMap = sorted;
-        };
+                var sorted = merged.sort(function(a,b){return parseInt(a)-parseInt(b)});
 
-        var selectSlide = function (time) {
-            nearest = -1;
-            for (i in slideIndices) {
-                var numi = parseInt(i);
-                $(slideIndices[i].displayDiv).addClass('unselected');
-                $(slideIndices[i].displayDiv).removeClass('selected');
-                if (numi<=time && numi>nearest) {
-                    nearest=numi;
+                var lastTime=-1;
+
+                for (i in sorted) {
+                    if (sorted[i] != lastTime) {
+                        if (C2G.videoSetup.slideIndices.hasOwnProperty(sorted[i])) {
+                            //thumbSet.addSlideIndex(sorted[i]);
+                            addSlideIndex(sorted[i]);
+                        }
+                        if (C2G.videoSetup.questions.hasOwnProperty(sorted[i])) {
+                            //var tmpDiv=thumbSet.addQuizSlide(sorted[i]);
+                            var tmpDiv=addQuizSlide(sorted[i]);
+                            C2G.videoSetup.slideIndices[sorted[i]]={displayDiv: tmpDiv}; //Quiz takes precedence and overwrites if both quiz and thumb are at the same time
+                        }
+                    }
+                    lastTime=sorted[i];
                 }
-            }
 
-            if (nearest >-1) {
-                //console.log(nearest);
-                //console.log(slideIndices[''+nearest]);
-                //console.log(slideIndices);
-                var selected = slideIndices[''+nearest].displayDiv;
-                $(selected).addClass('selected');
-                $(selected).removeClass('unselected');
-                $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width())/2);
-            }
+                window.slideMap = sorted;
+            };
+
+            var handleTimeUpdate = function () {
+                //console.log(popcornVideo.currentTime());
+                var timeInSec = Math.floor(window.popcornVideo.currentTime()).toFixed(1);
+                selectSlide(timeInSec);
+                /*
+                if ($.inArray(timeInSec, window.slideMap) != -1) {
+                    $('.divInIndex.selected').removeClass('selected');
+                    $('#slideIndex' + timeInSec.replace('.','-') + 's').addClass('selected');
+                }
+                */
+            };
+
+            C2G.videoSetup.handleTimeUpdate = handleTimeUpdate;
+            setupNavPanel();
+
         };
 
-        var handleTimeUpdate = function () {
-            //console.log(popcornVideo.currentTime());
-            var timeInSec = Math.floor(popcornVideo.currentTime()).toFixed(1);
-            selectSlide(timeInSec);
-            /*
-            console.log(window.slideMap);
-            console.log(timeInSec);
-            console.log($.inArray(timeInSec, window.slideMap));
-            if ($.inArray(timeInSec, window.slideMap) != -1) {
-                console.log('in array!');
-                $('.divInIndex.selected').removeClass('selected');
-                console.log($('#slideIndex' + timeInSec + 's'));
-                $('#slideIndex' + timeInSec.replace('.','-') + 's').addClass('selected');
-            }
-            */
-        };
-    
         $(document).ready(function() {
+            /*
+            Chain of events:
+            1. Fetch video, cue question breakpoints via Popcorn
+            2. Fetch screenshot thumbnails, quiz thumbnails manifests 
+            2. Load thumbnail strip
+            4. ???
+            5. PROFIT!!!
+            */
 
-            setupNavPanel()
+            window.popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
     
-            popcornVideo.on('playing', function () {
-                popcornVideo.on('timeupdate', handleTimeUpdate);
+            window.popcornVideo.on('playing', function () {
+                window.popcornVideo.on('timeupdate', C2G.videoSetup.handleTimeUpdate);
             });
 
-            popcornVideo.on('pause', function () {
-                popcornVideo.off('timeupdate', handleTimeUpdate);
+            window.popcornVideo.on('pause', function () {
+                window.popcornVideo.off('timeupdate', C2G.videoSetup.handleTimeUpdate);
             });
 
             var setExamStage = function() {
-                popcornVideo.pause();
+                window.popcornVideo.pause();
                 $('#demoplayer').css('position', 'absolute');
                 $('#demoplayer').css('z-index', '-1');
                 $('#demoplayer').hide();
@@ -151,7 +217,7 @@
                         $('#demoplayer').css('z-index', '1');
                         $('#demoplayer').show();
                     });
-                popcornVideo.play();
+                window.popcornVideo.play();
             };
 
             var continueVideoBtn = document.createElement('input');
@@ -162,13 +228,15 @@
             $('#exam-pane').append($(continueVideoBtn));
             //$(continueVideoBtn).click(removeExamStage);
 
-            var configureExamButton = function (mode) {
+            var configureExamButton = function (mode, questionArray) {
                 $(continueVideoBtn).unbind('click');
                 if (mode == "multi-question") {
                     $(continueVideoBtn).attr('value', 'Next Question');
                     $(continueVideoBtn).click(function () {
+                        var curQ = $(this).closest('.question');
+                        var curIdx = $('.question').inArray($(curQ));
                         setExamStage();
-                        $('.question').eq(2).show();
+                        $('.question').eq((curIdx + 1)).show();
                         $('#exam-pane').fadeTo('slow', 1.0);
                         $(continueVideoBtn).attr('value', 'Resume Video');
                         $(continueVideoBtn).click(removeExamStage);
@@ -179,27 +247,26 @@
                 }
             };
 
-            popcornVideo.cue('184', function () {
-                    setExamStage();
-                    $('.question').eq(0).show();
-                    $('#exam-pane').fadeTo('slow', 1.0);
-                    configureExamButton();
-                }
-            );
+            for (var q = 0; q < questionTimes.length; q += 1) {
+                var qMarker = questionTimes[q];
+                window.popcornVideo.cue(qMarker.timeInSec, function () {
+                        setExamStage();
+                        var firstQuestionNum = -1;
+                        if ($.isArray(qMarker.questionNum) && qMarker.questionNum.length > 1) {
+                            firstQuestionNum = qMarker.questionNum[0];
+                            configureExamButton("multi-question", qMarker.questionNum);
+                        } else {
+                            firstQuestionNum = qMarker.questionNum;
+                            configureExamButton();
+                        } 
+                        $('.question').eq(firstQuestionNum).show();
+                        $('#exam-pane').fadeTo('slow', 1.0);
+                    }
+                );
+            }
 
-            popcornVideo.cue('385', function () {
-                    setExamStage();
-                    $('.question').eq(1).show();
-                    $('#exam-pane').fadeTo('slow', 1.0);
-                    configureExamButton("multi-question");
-                }
-            );
+            $.when(C2G.videoSetup.fetchThumbs())
+            .then(C2G.videoSetup.displayThumbs)
+            .then(console.log("DONE!"));
 
-            /*
-            popcornVideo.cue('385', function () {
-                setExamStage();
-                $('.question').eq(2).show();
-                $('#exam-pane').fadeTo('slow', 1.0);}
-            );
-            */
         });
