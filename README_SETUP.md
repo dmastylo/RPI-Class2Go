@@ -134,7 +134,7 @@ prefix for these.
         # move onto your path
         sudo mv ./chromedriver /usr/bin/
         # install Chrome -- or download from https://www.google.com/intl/en/chrome/browser/
-        brew install chromium-browser chromium-browser-110n
+        brew install chromium-browser chromium-browser-l10n
 
 1. [Optional] Install dependenices to run selenium tests "headless"
 
@@ -395,7 +395,7 @@ be installed for Mac (and probably Windows too)
         # move onto your path
         sudo mv ./chromedriver /usr/bin/
         # install Chrome -- or download from https://www.google.com/intl/en/chrome/browser/
-        sudo apt-get install chromium-browser chromium-browser-110n
+        sudo apt-get install chromium-browser chromium-browser-l10n
 
 3. [Optional] Install dependenices to run selenium tests "headless"
 
