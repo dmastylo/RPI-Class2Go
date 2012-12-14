@@ -138,7 +138,7 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
         raise Http404
 
     try:
-        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).latest('time_created')
+        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).latest('time_created')
         json_pre_pop = record.json_data
         json_pre_pop_correx = record.json_score_data
     except ExamRecord.DoesNotExist:
@@ -171,7 +171,7 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).order_by('-time_created'))
+    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).order_by('-time_created'))
 
     my_subs = map(lambda s: my_subs_helper(s), subs)
 
@@ -209,7 +209,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
     if exam.mode=="draft":
         exam = exam.image
 
-    submitters = ExamRecord.objects.filter(exam=exam,  time_created__lt=exam.grace_period).values('student').distinct()
+    submitters = ExamRecord.objects.filter(exam=exam, complete=True, time_created__lt=exam.grace_period).values('student').distinct()
     fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-"+datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")+".csv"
     outfile = open(FILE_DIR+"/"+fname,"w+")
 
@@ -342,7 +342,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             total_score += feedback[prob]['score']
 
 
-        record_score.score = total_score
+        record_score.raw_score = total_score
         record_score.save()
         record_score.copyToExamScore()         #Make this score the current ExamScore
         record.json_score_data = json.dumps(feedback)
@@ -373,6 +373,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     description = request.POST.get('description', '')
     metaXMLContent = request.POST.get('metaXMLContent', '')
     htmlContent = request.POST.get('htmlContent', '')
+    xmlImported = request.POST.get('xmlImported','')
     due_date = request.POST.get('due_date', '')
     grace_period = request.POST.get('grace_period', '')
     partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
@@ -502,6 +503,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
                         grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
+                        xml_imported=xmlImported
                         )
 
         exam_obj.save()
@@ -516,6 +518,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.description=description
             exam_obj.html_content=htmlContent
             exam_obj.xml_metadata=metaXMLContent
+            exam_obj.xml_imported=xmlImported
             exam_obj.due_date=dd
             exam_obj.total_score=total_score
             exam_obj.assessment_type=assessment_type
@@ -561,7 +564,12 @@ def create_exam(request, course_prefix, course_suffix):
     
     sections = ContentSection.objects.getByCourse(course)
     
-    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'course':course, 'sections':sections},
+    returnURL = reverse('courses.views.course_materials',args=[course_prefix, course_suffix])
+    
+    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data,
+                              'course':course,
+                              'sections':sections,
+                              'returnURL':returnURL},
                               RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
@@ -575,17 +583,19 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
         raise Http404
     
     sections = ContentSection.objects.getByCourse(course)
-    
+    returnURL = reverse('courses.views.course_materials', args=[course_prefix, course_suffix])
+
     data={'title':exam.title, 'slug':exam.slug, 'due_date':datetime.datetime.strftime(exam.due_date, "%m/%d/%Y %H:%M"),
           'grace_period':datetime.datetime.strftime(exam.grace_period, "%m/%d/%Y %H:%M"),
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,
-          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content}
+          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported}
 
-    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'course':course, 'sections':sections,
-                              'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug },
-                              RequestContext(request))
+    return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'returnURL':returnURL,
+                                                         'course':course, 'sections':sections,
+                                                         'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug },
+                                                        RequestContext(request))
 
 
 def show_test_xml(request):

@@ -159,7 +159,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.question-nav').click(showQuestion);
         
-        {% if exam.exam_type == "invideo" %}
+        {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
         /* BEGIN JS for Wed demo */
         var quickCheck = function () {
 
@@ -353,7 +353,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         /* END JS for Wed demo */
     {% else %}
 /* The page-at-a-time version */
-      {% if exam.exam_type == "invideo" %}
+      {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
 
       var displayMetaData = function (data, userData) {
           //console.log('displayMetaData called');

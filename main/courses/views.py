@@ -91,7 +91,7 @@ def course_materials(request, course_prefix, course_suffix):
     form = None
     if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
-    
+
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
 
 @auth_view_wrapper

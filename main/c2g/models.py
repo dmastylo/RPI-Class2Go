@@ -1604,6 +1604,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     description = models.TextField(null=True, blank=True)
     html_content = models.TextField(blank=True)
     xml_metadata = models.TextField(null=True, blank=True)
+    xml_imported = models.TextField(null=True, blank=True) ###This is the XML used to import the exam content.  We only store it to re-display it.
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
@@ -1646,6 +1647,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             exam_type=self.exam_type,
             live_datetime = self.live_datetime,
             xml_metadata = self.xml_metadata,
+            xml_imported = self.xml_imported,
             partial_credit_deadline = self.partial_credit_deadline,
             late_penalty = self.late_penalty,
             submissions_permitted = self.submissions_permitted,
@@ -1690,6 +1692,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.live_datetime = self.live_datetime
         if not clone_fields or 'xml_metadata' in clone_fields:
             ready_instance.xml_metadata = self.xml_metadata
+        if not clone_fields or 'xml_imported' in clone_fields:
+            ready_instance.xml_imported = self.xml_imported
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             ready_instance.partial_credit_deadline = self.partial_credit_deadline
         if not clone_fields or 'late_penalty' in clone_fields:
@@ -1741,6 +1745,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.live_datetime = ready_instance.live_datetime
         if not clone_fields or 'xml_metadata' in clone_fields:
             self.xml_metadata = ready_instance.xml_metadata 
+        if not clone_fields or 'xml_imported' in clone_fields:
+            self.xml_imported = ready_instance.xml_imported
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             self.partial_credit_deadline = ready_instance.partial_credit_deadline 
         if not clone_fields or 'late_penalty' in clone_fields:
@@ -1791,6 +1797,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.live_datetime != self.image.live_datetime:
             return False
         if self.xml_metadata != self.image.xml_metadata:
+            return False
+        if self.xml_imported != self.image.xml_imported:
             return False
         if self.partial_credit_deadline != self.image.partial_credit_deadline:
             return False
@@ -1850,7 +1858,10 @@ class ExamRecord(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     json_data = models.TextField(null=True, blank=True)   #blob
     json_score_data = models.TextField(null=True, blank=True)  #blob
-    score = models.IntegerField(null=True, blank=True) 
+    attempt_number = models.IntegerField(default=0)
+    complete = models.BooleanField(default=True)
+    late = models.BooleanField(default=False)
+    score = models.FloatField(null=True, blank=True)
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
@@ -1863,7 +1874,7 @@ class ExamScore(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True) #mainly for convenience
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam
+    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
     
     def __unicode__(self):
@@ -1896,7 +1907,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
        **TODO: Write Promote as a function in the model**
     """
     record = models.OneToOneField(ExamRecord, db_index=True)
-    score = models.IntegerField(null=True, blank=True) # this is the score of the entire record
+    raw_score = models.FloatField(null=True, blank=True) # this is the raw score of the entire record
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):
@@ -1924,7 +1935,7 @@ class ExamRecordScoreField(TimestampMixin, models.Model):
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     value = models.CharField(max_length=128, null=True, blank=True)
     correct = models.NullBooleanField()
-    subscore = models.IntegerField(default=0)
+    subscore = models.FloatField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
     def __unicode__(self):
@@ -1935,6 +1946,7 @@ class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
     parent = models.ForeignKey(ExamRecordScoreField, db_index=True)
     choice_value = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    correct = models.NullBooleanField()
     associated_text = models.TextField(null=True, blank=True)
     def __unicode__(self):
         return (self.parent.parent.record.student.username + ":" + self.parent.parent.record.course.title + ":" \
@@ -1956,15 +1968,18 @@ class ContentGroupManager(models.Manager):
         return self.filter(course=course).order_by('group_id','level')
 
 class ContentGroup(models.Model):
-    group_id = models.IntegerField(db_index=True, null=True, blank=True)
-    level = models.IntegerField(db_index=True)
-    video = models.ForeignKey(Video, null=True, blank=True)
-    problemSet = models.ForeignKey(ProblemSet, null=True, blank=True)
+    group_id        = models.IntegerField(db_index=True, null=True, blank=True)
+    level           = models.IntegerField(db_index=True)
+    display_style   = models.CharField(max_length=32, null=True, blank=True)
+
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
-    file = models.ForeignKey(File, null=True, blank=True)
-    exam = models.ForeignKey(Exam, null=True, blank=True)
-    course = models.ForeignKey(Course)
-    objects = ContentGroupManager()
+    course          = models.ForeignKey(Course)
+    exam            = models.ForeignKey(Exam, null=True, blank=True)
+    file            = models.ForeignKey(File, null=True, blank=True)
+    problemSet      = models.ForeignKey(ProblemSet, null=True, blank=True)
+    video           = models.ForeignKey(Video, null=True, blank=True)
+
+    objects         = ContentGroupManager()
 
                # ContentGroup field name: model class name
     groupable_types = { 
@@ -1985,7 +2000,9 @@ class ContentGroup(models.Model):
         becomes linear, and then we win.
         """
         info = {}
-        cls = thisclass.groupable_types[tag]
+        cls = thisclass.groupable_types.get('tag', False)
+        if not cls:
+            return info
         obj = cls.objects.get(id=id)
         cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
         for cgo in cgobjs:
@@ -2003,7 +2020,7 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
-    def add_child(thisclass, group_id, tag, obj_ref):
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
         """Add obj_ref having type tag to the ContentGroup table.
 
         Returns the ContentGroup entry id for the resulting child item.
@@ -2012,11 +2029,16 @@ class ContentGroup(models.Model):
         If entry isn't in the table, create it and add it
         If entry is in the table as a parent of the given group_id, demote it
         If entry is in the table as a child of a different group, move it to this group.
+
+        display_style determines how the child items should be rendered with
+        their parent; 'button' is the default.
         """
         # Technically there's no reason to restrict the ContentGroups
         # to two levels of hierarchy, but the UI design is harder for
         # more level (and as of this iteration the spec says two)
         cgref         = None
+        if tag not in thisclass.groupable_types.keys():
+            raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
         content_group = ContentGroup.objects.filter(group_id=group_id)
         if not content_group:
             raise ValueError, "ContentGroup "+str(group_id)+" does not exist."
@@ -2024,7 +2046,7 @@ class ContentGroup(models.Model):
             cgref = obj_ref.contentgroup_set.get()
         except ContentGroup.DoesNotExist:
             # it's not in the table, so add it
-            new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id)
+            new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id, display_style=display_style)
             setattr(new_item, tag, obj_ref)
             new_item.save()
             return new_item.id
@@ -2061,6 +2083,8 @@ class ContentGroup(models.Model):
             new group
         """
         cgref    = None
+        if tag not in thisclass.groupable_types.keys():
+            raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
         try:
             cgref = obj_ref.contentgroup_set.get()
         except ContentGroup.DoesNotExist:
