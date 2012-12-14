@@ -119,7 +119,7 @@ prefix for these.
 
 1. Install test environment dependencies:
 
-        pip install mock nose django_nose django_coverage
+        pip install mock nose django_nose django_coverage selenium selenose lxml
 
 1. Setup the account and database in MySql
 
@@ -359,7 +359,7 @@ be installed for Mac (and probably Windows too)
 
 3. Install test environment dependencies:
 
-        pip install mock nose django_nose django_coverage
+        pip install mock nose django_nose django_coverage selenium selenose lxml
 
 3. Go to "main" dir and copy over database settings file:
 
