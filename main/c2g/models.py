@@ -1908,7 +1908,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     def copyToExamScore(self):
         #copy self to the contents of the authoritative ExamScore
         es, created = ExamScore.objects.get_or_create(course=self.record.course, exam=self.record.exam, student=self.record.student)
-        es.score = self.score
+        es.score = self.raw_score
         es.save()
 
         #now do all the fields
