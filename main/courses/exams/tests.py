@@ -59,24 +59,24 @@ class SimpleTest(TestCase):
         """
         xml = """
             <exam_metadata>
-                <question_metadata id="problem_1" data-tag4humans="Apple Competitor Question">
-                    <response name="q1d" answertype="multiplechoiceresponse" data-tag4humans="Apple Competitors" correct-points="15" wrong-points="-2">
-                        <choice value="ipad" data-tag4humans="iPad" correct="false">
+                <question_metadata id="problem_1" data-report="Apple Competitor Question">
+                    <response name="q1d" answertype="multiplechoiceresponse" data-report="Apple Competitors" correct-points="15" wrong-points="-2">
+                        <choice value="ipad" data-report="iPad" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice value="napster" data-tag4humans="Napster" correct="true">
+                        <choice value="napster" data-report="Napster" correct="true">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice value="ipod" data-tag4humans="iPod" correct="true">
+                        <choice value="ipod" data-report="iPod" correct="true">
                             <explanation>This is right!</explanation>
                         </choice>
-                        <choice value="peeler" data-tag4humans="Vegetable Peeler" correct="false">
+                        <choice value="peeler" data-report="Vegetable Peeler" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice value="android" data-tag4humans="Android" correct="false">
+                        <choice value="android" data-report="Android" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
-                        <choice value="beatles" data-tag4humans="The Beatles" correct="false">
+                        <choice value="beatles" data-report="The Beatles" correct="false">
                             <explanation>Try again</explanation>
                         </choice>
                     </response>
@@ -254,16 +254,16 @@ class SimpleTest(TestCase):
 
         xml = """
             <exam_metadata>
-            <question_metadata id="problem_4" data-tag4humans="Short-answer2">
-                <response name="q4d" answertype="numericalresponse" answer="3.14159" data-tag4humans="Value of Pi" 
+            <question_metadata id="problem_4" data-report="Short-answer2">
+                <response name="q4d" answertype="numericalresponse" answer="3.14159" data-report="Value of Pi" 
                           correct-points="139" wrong-points="-23">
                     <responseparam type="tolerance" default=".02"></responseparam>
                 </response>
                 <response name="q4e" answertype="numericalresponse" answer="4518"
-                    data-tag4humans="value of 502*9">
+                    data-report="value of 502*9">
                     <responseparam type="tolerance" default="15%"></responseparam>
                 </response>
-                <response name="q4f" answertype="numericalresponse" answer="5" data-tag4humans="number of fingers on a hand"></response>
+                <response name="q4f" answertype="numericalresponse" answer="5" data-report="number of fingers on a hand"></response>
             </question_metadata>
             </exam_metadata>
             """
@@ -292,16 +292,16 @@ class SimpleTest(TestCase):
         
         xml = """
             <exam_metadata>
-            <question_metadata id="problem_4" data-tag4humans="Short-answer2">
-            <response name="q4d" answertype="numericalresponse" answer="3.14159" data-tag4humans="Value of Pi"
+            <question_metadata id="problem_4" data-report="Short-answer2">
+            <response name="q4d" answertype="numericalresponse" answer="3.14159" data-report="Value of Pi"
             correct-points="139" wrong-points="-23">
             <responseparam type="tolerance" default=".02"></responseparam>
             </response>
             <response name="q4e" answertype="numericalresponse" answer="4518"
-            data-tag4humans="value of 502*9">
+            data-report="value of 502*9">
             <responseparam type="tolerance" default="15%"></responseparam>
             </response>
-            <response name="q4f" answertype="numericalresponse" answer="5" data-tag4humans="number of fingers on a hand"></response>
+            <response name="q4f" answertype="numericalresponse" answer="5" data-report="number of fingers on a hand"></response>
             </question_metadata>
             </exam_metadata>
             """

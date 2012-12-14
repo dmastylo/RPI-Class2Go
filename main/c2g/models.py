@@ -1941,7 +1941,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):
-        return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.score))
+        return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.raw_score))
 
     def copyToExamScore(self):
         #copy self to the contents of the authoritative ExamScore
