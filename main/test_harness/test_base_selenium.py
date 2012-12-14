@@ -4,8 +4,6 @@ from nose.plugins.attrib import attr
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 
-import ipdb
-
 class SeleniumTestBase(LiveServerTestCase):
 
     @classmethod
