@@ -1856,7 +1856,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         return self.exam_type+"_my_submissions"
     
     my_submissions_view = property(my_submissions_view_name)
+
+    def record_view_name(self):
+        return self.exam_type+"_record"
     
+    record_view = property(record_view_name)
+
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
 

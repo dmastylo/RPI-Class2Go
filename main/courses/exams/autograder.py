@@ -14,7 +14,7 @@ class AutoGrader():
         for k,v in self.grader_functions.iteritems():
             graders.append(k)
         return "AutoGrader functions for responses with names: %s.  Total Possible Points: %s" % \
-            (", ".join(sorted(graders)), str(int(self.points_possible)))
+            (", ".join(sorted(graders)), str(self.points_possible))
     
     def __init__(self, xml, default_return=None):
         """
@@ -24,7 +24,7 @@ class AutoGrader():
         grader when 
             
         """
-        self.points_possible=0
+        self.points_possible=0.0
         
         if xml == "__testing_bypass":
             return

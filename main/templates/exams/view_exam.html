@@ -80,7 +80,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% endif %}
 
     {% if score %}
-    <h4><b style="color:red">Your grade: {{score}}/{{exam.total_score}}</b></h4>
+    <h4><b style="color:red">Score: {{score}}/{{exam.total_score}}</b></h4>
+    {% endif %}
+
+    {% if raw_score %}
+    <h4><b style="color:red">Raw Score (without late or resubmission penalites): {{raw_score}}</b></h4>
     {% endif %}
 
 
@@ -606,10 +610,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
-        $('input').each(function () {
+        $('#exam-pane input').each(function () {
+            var name = $(this).attr('name');
+            var key = (name != undefined) ? name.trim() : "";
+                    
             if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
-                if (!userSelections[$(this).attr('name')]) {
-                    userSelections[$(this).attr('name')] = [];
+                if (!userSelections[key]) {
+                    userSelections[key] = [];
                 }
                 //console.log(userSelections);
                 var tmpObj = {};
@@ -619,24 +626,28 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).closest('fieldset').attr('data-tag4humans');
 
-                userSelections[$(this).attr('name')].push(tmpObj);
+                userSelections[key].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                         
-                userSelections[$(this).attr('name')] = tmpObj;
+                userSelections[key] = tmpObj;
             }
         });
         $('textarea').each(function () {
+                           
+            var name = $(this).attr('name');
+            var key = (name != undefined) ? name.trim() : "";
+                           
             if ($(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                
-                userSelections[$(this).attr('name')] = tmpObj;
+                userSelections[key] = tmpObj;
             }
         });
 

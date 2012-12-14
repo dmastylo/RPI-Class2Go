@@ -164,6 +164,44 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'score':score, 'allow_submit':False}, RequestContext(request))
 
 
+@auth_view_wrapper
+def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_id, type="exam"):
+    course = request.common_page_data['course']
+    
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+    
+    try:
+        #the addition of the user filter performs access control
+        record = ExamRecord.objects.get(id=record_id, course=course, exam=exam, student=request.user, complete=True)
+    except ExamRecord.DoesNotExist:
+        raise Http404
+
+    json_pre_pop = record.json_data
+    correx_obj = json.loads(record.json_score_data)
+    correx_obj['__metadata__']=exam.xml_metadata
+    json_pre_pop_correx = json.dumps(correx_obj)
+
+    try:
+        score_obj = ExamRecordScore.objects.get(record=record)
+    except ExamRecordScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
+        raw_score = None
+        scores_json = "{}"
+
+    score = record.score
+    raw_score = score_obj.raw_score
+    score_fields = {}
+    for s in list(ExamRecordScoreField.objects.filter(parent=score_obj)):
+        score_fields[s.field_name] = s.subscore
+    scores_json = json.dumps(score_fields)
+
+    
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False}, RequestContext(request))
+
+
+
 
 @auth_view_wrapper
 def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
@@ -300,7 +338,8 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
         feedback = {}
         total_score = 0
-        for prob,v in json_obj.iteritems():
+        for prob,v in json_obj.iteritems():  #prob is the "input" id, v is the associated value,
+                                             #which can be an object (input box) or a list of objects (multiple-choice)
             try:
                 if isinstance(v,list): #multiple choice case
                     submission = map(lambda li: li['value'], v)
@@ -318,6 +357,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                     for li in v:
                         fc = ExamRecordScoreFieldChoice(parent=field_obj,
                                                         choice_value=li['value'],
+                                                        correct=li['value'] in feedback[prob]['correct_choices'],
                                                         human_name=li.get('tag4humans',""),
                                                         associated_text=li.get('associatedText',""))
                         fc.save()

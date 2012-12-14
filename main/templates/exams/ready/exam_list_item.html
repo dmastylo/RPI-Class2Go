@@ -1,4 +1,6 @@
-    <div class="pull-left icon">
+{% load listtest %}
+
+   <div class="pull-left icon">
         <em class="icon-book"></em>
     </div>
     <div class="course-list-content">
@@ -15,14 +17,20 @@
             <ul>
                 {% for record in item.records %}
                     <li>
-                        Attempt at {{ record.time_created }} :  Score {{ record.score }} / {{item.exam.total_score}}
+                        <a href="{% url item.exam.record_view common_page_data.course_prefix common_page_data.course_suffix item.exam.slug record.id %}">
+                            Attempt at {{ record.time_created }}
+                        </a>
+                        :  Score {{record.score}} / {{item.exam.total_score}}
                         {% if record.late or record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
-                            (
+                        ( Raw score: {{ record.examrecordscore.raw_score }} with
                             {% if record.late %}
                                 {{item.exam.late_penalty}}% late penalty
+                                {% if record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
+                                and
+                                {% endif %}
                             {% endif %}
                             {% if record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
-                                {{item.exam.resubmission_penalty}}% resubmission penalty
+                              {{item.exam.resubmission_penalty|subOneThenMult:record.attempt_number}}% resubmission penalty
                             {% endif %}
                             )
                         {% endif %}
