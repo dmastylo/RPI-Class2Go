@@ -359,11 +359,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         /* END JS for Wed demo */
     {% endif %}
 
-    {% if exam.autograde %}
-    var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-    {% else %}
     var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-    {% endif %}
                       
     if (__exam_type=="survey") {
             SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
@@ -671,13 +667,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
 
         examXHR.success(function (evt, xhr, settings) {
-            var dialogDiv = getDialog();
-            var message = "";
-            var confirmText = "OK";
             if (__autograde) {
-                document.location = SUBMISSION_RETURN_URL;
+                document.location = settings.responseText;
             }
             else {
+                var dialogDiv = getDialog();
+                var message = "";
+                var confirmText = "OK";
+
                 if (__exam_type == "exam")
                     { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
                       confirmText = "See My Submissions"; }
@@ -692,6 +689,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
                 $(dialogDiv).dialog({ modal: true,
                                     buttons: buttonObj});
+                
             }
         });
 
@@ -715,9 +713,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
-    if (typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None') {
+                      
+    {% if json_pre_pop_correx %}
+    if (prePopCorrex && typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None' && prePopCorrex != null) {
         window.showCorrections(prePopCorrex);
-    } 
+    }
+    {% endif %}
+
 
     {% if common_page_data.course.mode == "ready" and exam.past_due or not allow_submit  %}{# 'not's > 'and's > 'or's #}
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');

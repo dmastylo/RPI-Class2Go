@@ -34,7 +34,7 @@ from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 from courses.course_materials import get_course_materials, group_data
-
+from django.db.models import Avg, Count, Max, StdDev
 from django.views.decorators.csrf import csrf_protect
 from storages.backends.s3boto import S3BotoStorage
 
@@ -140,8 +140,11 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
     try:
         record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).latest('time_created')
         json_pre_pop = record.json_data
-        correx_obj = json.loads(record.json_score_data)
-        correx_obj['__metadata__']=exam.xml_metadata
+        if record.json_score_data:
+            correx_obj = json.loads(record.json_score_data)
+        else:
+            correx_obj = {}
+        correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
         json_pre_pop_correx = json.dumps(correx_obj)
         
     except ExamRecord.DoesNotExist:
@@ -176,26 +179,32 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
     try:
         #the addition of the user filter performs access control
         record = ExamRecord.objects.get(id=record_id, course=course, exam=exam, student=request.user, complete=True)
+        json_pre_pop = record.json_data
+        if record.json_score_data:
+            correx_obj = json.loads(record.json_score_data)
+        else:
+            correx_obj = {}
+
+        correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
+        json_pre_pop_correx = json.dumps(correx_obj)
+        score = record.score
+
     except ExamRecord.DoesNotExist:
         raise Http404
 
-    json_pre_pop = record.json_data
-    correx_obj = json.loads(record.json_score_data)
-    correx_obj['__metadata__']=exam.xml_metadata
-    json_pre_pop_correx = json.dumps(correx_obj)
 
     try:
         score_obj = ExamRecordScore.objects.get(record=record)
+        raw_score = score_obj.raw_score
+        score_fields = {}
+        for s in list(ExamRecordScoreField.objects.filter(parent=score_obj)):
+            score_fields[s.field_name] = s.subscore
+        scores_json = json.dumps(score_fields)
+
     except ExamRecordScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
         raw_score = None
         scores_json = "{}"
 
-    score = record.score
-    raw_score = score_obj.raw_score
-    score_fields = {}
-    for s in list(ExamRecordScoreField.objects.filter(parent=score_obj)):
-        score_fields[s.field_name] = s.subscore
-    scores_json = json.dumps(score_fields)
 
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False}, RequestContext(request))
@@ -318,7 +327,10 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
                                       datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
 
-    record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata)
+    attempt_num_obj = ExamRecord.objects.filter(exam=exam, student=request.user, complete=True).aggregate(Max('attempt_number'))
+    attempt_number = 1 if not attempt_num_obj['attempt_number__max'] else attempt_num_obj['attempt_number__max']+1
+
+    record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata, attempt_number=attempt_number, late=exam.past_due())
     record.save()
 
     autograder = None
@@ -355,9 +367,13 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                                                      )
                     field_obj.save()
                     for li in v:
+                        if 'correct_choices' not in feedback[prob]:
+                            is_correct = None
+                        else:
+                            is_correct = li['value'] in feedback[prob]['correct_choices']                        
                         fc = ExamRecordScoreFieldChoice(parent=field_obj,
                                                         choice_value=li['value'],
-                                                        correct=li['value'] in feedback[prob]['correct_choices'],
+                                                        correct=is_correct,
                                                         human_name=li.get('tag4humans',""),
                                                         associated_text=li.get('associatedText',""))
                         fc.save()
@@ -396,7 +412,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         record.score = total_score
         record.save()
 
-        return HttpResponse(json.dumps(feedback))
+        return HttpResponse(reverse(exam.record_view, args=[course.prefix, course.suffix, exam.slug, record.id]))
 
     else:
         return HttpResponse("Submission has been saved.")
