@@ -49,14 +49,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #prev-question {float: left;}
     label pre {margin-left:30px;}
 
-    /* BEGIN CSS for Wed demo */
     .quick-check {clear: both; display: block; margin-top: 1em;}
     .explanation {background: #fff; border-radius: 3px; margin: 1em; border: 1px solid black; padding: 1em;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
-    /* END CSS for Wed demo */
 
     .correct {color: #090;}
     .incorrect {color: #900;}
@@ -161,7 +159,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('.question-nav').click(showQuestion);
         
         {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
-        /* BEGIN JS for Wed demo */
         var quickCheck = function () {
 
             var checkBtnID = $(this).attr('id');
@@ -352,7 +349,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.quick-check').click(quickCheck);
         {% endif %}
-        /* END JS for Wed demo */
     {% endif %}
 
     {% if exam.html_content != "" %}
@@ -735,12 +731,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         // questionTimes to be replaced by parsed XML metadata 
         var questionTimes = [
             {
-                timeInSec: 184,
+                timeInSec: 14,
                 questionNum: [1,2,3]
             },
-            {timeInSec:250, questionNum:4}    
+            {timeInSec:25, questionNum:4}    
         ];
 {% include 'exams/videotest.js' %}
+{% if not video.url %}
+    $('#demoplayer').hide();
+    $('.question').eq(0).show();
+    $('#exam-pane').fadeTo("slow", 1.0);
+{% endif %} 
 </script>
 {% endif %}
 {% endblock addl_scripts %}
