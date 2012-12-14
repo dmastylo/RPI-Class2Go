@@ -16,6 +16,16 @@
                 {% for record in item.records %}
                     <li>
                         Attempt at {{ record.time_created }} :  Score {{ record.score }} / {{item.exam.total_score}}
+                        {% if record.late or record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
+                            (
+                            {% if record.late %}
+                                {{item.exam.late_penalty}}% late penalty
+                            {% endif %}
+                            {% if record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
+                                {{item.exam.resubmission_penalty}}% resubmission penalty
+                            {% endif %}
+                            )
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
