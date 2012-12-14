@@ -1958,9 +1958,27 @@ class CurrentTermMap(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
+# Original table to store exam start times -- superceded by ExamProblemAttempt
+# in Winter 2012
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)
+
+class ExamProblemAttempt(TimestampMixin, models.Model):
+    student = models.ForeignKey(User)
+    exam = models.ForeignKey(Exam)
+    json_data = models.TextField(null=True, blank=True)   #blob
+    complete = models.BooleanField(default=False)
+
+class ExamProblemAttemptActivity(TimestampMixin, models.Model):
+    parent = models.ForeignKey(ExamScore, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    user_answer = models.TextField(null=True, blank=True)   #blob
+    explanation = models.TextField(null=True, blank=True)
+    score = models.IntegerField(default=0)
+    maxscore = models.IntegerField(default=0)
+
 
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
@@ -2153,3 +2171,5 @@ class ContentGroup(models.Model):
     class Meta:
         db_table = u'c2g_content_group'
         
+
+
