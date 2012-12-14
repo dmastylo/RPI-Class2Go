@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 from lxml import etree
-from tests.test_base import AuthenticatedTestBase
+from test_harness.test_base import AuthenticatedTestBase
 
 class StudentVideoTest(AuthenticatedTestBase):
     course_name="Natural Language Processing"
