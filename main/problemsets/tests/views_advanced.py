@@ -1,3 +1,4 @@
+import unittest
 from c2g.models import ProblemSet
 from datetime import datetime, timedelta
 from test_harness.test_base import AuthenticatedTestBase
@@ -18,6 +19,7 @@ class InstructorDraftModeTestAdv(AuthenticatedTestBase):
             kwargs = config
         super(InstructorDraftModeTestAdv, self).__init__(*arrgs, **kwargs)
 
+    @unittest.skip('this is obsolete with the landing of exams')
     def test_create_problemset_action(self):
         """
         Tests the creation of a new problemset

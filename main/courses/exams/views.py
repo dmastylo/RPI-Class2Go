@@ -136,7 +136,7 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
         raise Http404
 
     try:
-        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).latest('time_created')
+        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).latest('time_created')
         json_pre_pop = record.json_data
         correx_obj = json.loads(record.json_score_data)
         correx_obj['__metadata__']=exam.xml_metadata
@@ -172,7 +172,7 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, time_created__lt=exam.grace_period).order_by('-time_created'))
+    subs = list(ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).order_by('-time_created'))
 
     my_subs = map(lambda s: my_subs_helper(s), subs)
 
@@ -210,7 +210,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
     if exam.mode=="draft":
         exam = exam.image
 
-    submitters = ExamRecord.objects.filter(exam=exam,  time_created__lt=exam.grace_period).values('student').distinct()
+    submitters = ExamRecord.objects.filter(exam=exam, complete=True, time_created__lt=exam.grace_period).values('student').distinct()
     fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-"+datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")+".csv"
     outfile = open(FILE_DIR+"/"+fname,"w+")
 
@@ -273,7 +273,11 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
     json_obj=json.loads(postdata)
-    
+
+    if exam.past_all_deadlines():
+        return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
+                                      datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
+
     record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata)
     record.save()
 
@@ -343,7 +347,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             total_score += feedback[prob]['score']
 
 
-        record_score.score = total_score
+        record_score.raw_score = total_score
         record_score.save()
         record_score.copyToExamScore()         #Make this score the current ExamScore
         record.json_score_data = json.dumps(feedback)
