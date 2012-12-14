@@ -119,7 +119,28 @@ prefix for these.
 
 1. Install test environment dependencies:
 
-        pip install mock nose django_nose django_coverage selenium selenose lxml
+        pip install mock nose django_nose django_coverage lxml
+
+1. Install test dependencies for Selenium based testing:
+
+        pip install selenium selenose
+
+1. Install chrome for Selenium testing
+
+        # chromedriver - list of options available here:
+        # https://code.google.com/p/chromedriver/downloads/list
+        curl -O http://chromedriver.googlecode.com/files/chromedriver_mac_23.0.1240.0.zip
+        unzip chromedriver_mac_23.0.1240.0.zip
+        # move onto your path
+        sudo mv ./chromedriver /usr/bin/
+        # install Chrome -- or download from https://www.google.com/intl/en/chrome/browser/
+        brew install chromium-browser chromium-browser-110n
+
+1. [Optional] Install dependenices to run selenium tests "headless"
+
+        # Needs testing!!!
+        pip install pyvirtualdisplay
+        brew install xvfb xserver-xephyr
 
 1. Setup the account and database in MySql
 
@@ -359,7 +380,27 @@ be installed for Mac (and probably Windows too)
 
 3. Install test environment dependencies:
 
-        pip install mock nose django_nose django_coverage selenium selenose lxml
+        pip install mock nose django_nose django_coverage lxml
+
+3. Install test dependencies for Selenium based testing:
+
+        pip install selenium selenose
+
+3. Install chrome for Selenium testing
+
+        # chromedriver - list of options available here:
+        # https://code.google.com/p/chromedriver/downloads/list
+        curl -O http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip
+        unzip chromedriver_linux32_23.0.1240.0.zip
+        # move onto your path
+        sudo mv ./chromedriver /usr/bin/
+        # install Chrome -- or download from https://www.google.com/intl/en/chrome/browser/
+        sudo apt-get install chromium-browser chromium-browser-110n
+
+3. [Optional] Install dependenices to run selenium tests "headless"
+
+        pip install pyvirtualdisplay
+        sudo apt-get install xvfb xserver-xephyr
 
 3. Go to "main" dir and copy over database settings file:
 

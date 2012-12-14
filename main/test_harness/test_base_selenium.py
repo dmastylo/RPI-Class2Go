@@ -4,16 +4,29 @@ from nose.plugins.attrib import attr
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 
+from os import environ
+
+if ( environ.has_key('C2G_HEADLESS_TESTS') and
+     environ['C2G_HEADLESS_TESTS'] ):
+  from pyvirtualdisplay import Display
+
 class SeleniumTestBase(LiveServerTestCase):
 
     @classmethod
     def setup_class(cls):
+        if ( environ.has_key('C2G_HEADLESS_TESTS') and
+             environ['C2G_HEADLESS_TESTS'] ):
+            cls.display = Display(visible=0, size=(800, 600))
+            cls.display.start()
         cls.browser = webdriver.Chrome()
         super(SeleniumTestBase, cls).setUpClass()
 
     @classmethod
     def teardown_class(cls):
         cls.browser.quit()
+        if ( environ.has_key('C2G_HEADLESS_TESTS') and
+             environ['C2G_HEADLESS_TESTS'] ):
+            cls.display.stop()
         super(SeleniumTestBase, cls).tearDownClass()
 
     def do_login(self):
