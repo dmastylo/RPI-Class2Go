@@ -382,6 +382,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     description = request.POST.get('description', '')
     metaXMLContent = request.POST.get('metaXMLContent', '')
     htmlContent = request.POST.get('htmlContent', '')
+    xmlImported = request.POST.get('xmlImported','')
     due_date = request.POST.get('due_date', '')
     grace_period = request.POST.get('grace_period', '')
     partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
@@ -511,6 +512,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
                         grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
+                        xml_imported=xmlImported
                         )
 
         exam_obj.save()
@@ -525,6 +527,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.description=description
             exam_obj.html_content=htmlContent
             exam_obj.xml_metadata=metaXMLContent
+            exam_obj.xml_imported=xmlImported
             exam_obj.due_date=dd
             exam_obj.total_score=total_score
             exam_obj.assessment_type=assessment_type
@@ -596,7 +599,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,
-          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content}
+          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported}
 
     return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'returnURL':returnURL,
                                                          'course':course, 'sections':sections,
