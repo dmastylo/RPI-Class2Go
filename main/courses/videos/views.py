@@ -132,11 +132,17 @@ def edit(request, course_prefix, course_suffix, slug):
     common_page_data = request.common_page_data
     video = common_page_data['course'].video_set.all().get(slug=slug)
     form = S3UploadForm(course=common_page_data['course'], instance=video)
+    try:
+        psets = Exam.objects.filter(course_id=common_page_data['course'].id) 
+    except:
+        raise Http404 
 
     return render(request, 'videos/edit.html',
             {'common_page_data': common_page_data,
              'slug': slug,
              'form': form,
+             'video': video,
+             'psets': psets,
              })
 
 @auth_is_course_admin_view_wrapper

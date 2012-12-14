@@ -18,11 +18,11 @@ class SimpleTest(TestCase):
         ag = AutoGrader("__testing_bypass")
             #Regular test case
         mc_fn = ag._MC_grader_factory(["a","b"],correct_pts=15,wrong_pts=-3)
-        self.assertEqual(mc_fn(["a","b"]),{'correct':True,'score':15})
+        self.assertEqual(mc_fn(["a","b"]),{'correct':True,'score':15,'correct_choices':{"a":True,"b":True}, 'wrong_choices':{}})
         self.assertTrue(mc_fn(("b","a"))['correct']) #note this input is a tuple
         self.assertTrue(mc_fn(("b","b","a","a"))['correct']) #and this one too
-        self.assertEqual(mc_fn(["a","b","c"]), {'correct':False, 'score':-3})
-        self.assertFalse(mc_fn(["a"])['correct'])
+        self.assertEqual(mc_fn(["a","b","c"]), {'correct':False, 'score':-3, 'correct_choices':{"a":True,"b":True}, 'wrong_choices':{"c":'fp'}})
+        self.assertEqual(mc_fn(["a"]), {'correct':False, 'score':-3, 'correct_choices':{"a":True}, 'wrong_choices':{"b":'fn'}})
         self.assertFalse(mc_fn([])['correct'])
 
     def test_multiple_choice_factory_empty(self):
@@ -92,9 +92,9 @@ class SimpleTest(TestCase):
             """
         ag = AutoGrader(xml)
             #problem 1
-        self.assertEqual(ag.grader_functions['q1d'](["napster", "ipod"]), {'correct':True, 'score':15})
+        self.assertEqual(ag.grader_functions['q1d'](["napster", "ipod"]), {'correct':True, 'score':15, 'correct_choices':{'ipod':True,'napster':True}, 'wrong_choices':{}})
         self.assertTrue(ag.grader_functions['q1d'](["ipod", "napster"])['correct'])
-        self.assertEqual(ag.grader_functions['q1d'](["ipad", "ipod", "napster"]), {'correct':False, 'score':-2})
+        self.assertEqual(ag.grader_functions['q1d'](["ipad", "ipod", "napster"]), {'correct':False, 'score':-2, 'correct_choices':{'ipod':True, 'napster':True}, 'wrong_choices':{'ipad':'fp'}})
         self.assertFalse(ag.grader_functions['q1d'](["ipo"])['correct'])
         self.assertFalse(ag.grader_functions['q1d'](["ipod"])['correct'])
         self.assertFalse(ag.grader_functions['q1d']([])['correct'])
@@ -102,9 +102,9 @@ class SimpleTest(TestCase):
         self.assertFalse(ag.grade('q1d', ["q1d_1"])['correct'])
 
             #problem 2
-        self.assertEqual(ag.grader_functions['test2'](["b","c"]),{'correct':True,'score':1})
+        self.assertEqual(ag.grader_functions['test2'](["b","c"]),{'correct':True,'score':1, 'correct_choices':{'b':True, 'c':True}, 'wrong_choices':{}})
         self.assertTrue(ag.grader_functions['test2'](["c","b"])['correct'])
-        self.assertEqual(ag.grader_functions['test2'](["a","b"]),{'correct':False,'score':0})
+        self.assertEqual(ag.grader_functions['test2'](["a","b"]),{'correct':False,'score':0, 'correct_choices':{'b':True}, 'wrong_choices':{'a':'fp','c':'fn'}})
         self.assertFalse(ag.grader_functions['test2'](["a","b","c"])['correct'])
         self.assertFalse(ag.grader_functions['test2'](["a"])['correct'])
         self.assertFalse(ag.grader_functions['test2']([])['correct'])

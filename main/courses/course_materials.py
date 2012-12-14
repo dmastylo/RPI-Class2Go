@@ -294,7 +294,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_exam_content:
-                user_records = ExamRecord.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user, complete=True)
+                user_records = ExamRecord.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user, complete=True).order_by('time_created')
                 for exam in exams:
                     exam_user_records = user_records.filter(exam=exam) #might change this to a python list filter if want to trade db access for memory
                     key = 'exam:' + str(exam.id)

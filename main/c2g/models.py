@@ -24,6 +24,7 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.db import models
+from django.db.models import Avg, Count, Max, StdDev
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
@@ -1625,10 +1626,34 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     total_score = models.IntegerField(null=True, blank=True)
     objects = ExamManager()
     
+    def num_of_student_records(self, student):
+        """This returns the number of completed records on this exam by student"""
+        attempt_num_obj = ExamRecord.objects.filter(exam=self, student=student, complete=True).aggregate(Max('attempt_number'))
+        if not attempt_num_obj['attempt_number__max']:
+            return 0
+        else:
+            return attempt_num_obj['attempt_number__max']
+
+
+    def max_attempts_exceeded(self, student):
+        """Returns True if student has used up max number of attempts"""
+        if self.submissions_permitted==0:
+            return False
+        return self.num_of_student_records(student) >= self.submissions_permitted
+    
     def past_due(self):
-        if self.due_date and (datetime.now() > self.due_date):
+        if self.due_date and (datetime.now() > self.grace_period):
             return True
         return False
+    
+    def past_all_deadlines(self):
+        future = datetime(3000,1,1)
+        grace_period = self.grace_period if self.grace_period else future
+        partial_credit_deadline = self.partial_credit_deadline if self.partial_credit_deadline else future
+
+        compareD = max(grace_period, partial_credit_deadline)
+    
+        return datetime.now() > compareD
     
     def create_ready_instance(self):
         ready_instance = Exam(
@@ -1847,7 +1872,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         return self.exam_type+"_my_submissions"
     
     my_submissions_view = property(my_submissions_view_name)
+
+    def record_view_name(self):
+        return self.exam_type+"_record"
     
+    record_view = property(record_view_name)
+
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
 
@@ -1916,7 +1946,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     def copyToExamScore(self):
         #copy self to the contents of the authoritative ExamScore
         es, created = ExamScore.objects.get_or_create(course=self.record.course, exam=self.record.exam, student=self.record.student)
-        es.score = self.score
+        es.score = self.record.score # use the score with deductions included, not the raw score.
         es.save()
 
         #now do all the fields

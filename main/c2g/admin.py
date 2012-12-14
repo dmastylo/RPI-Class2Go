@@ -33,7 +33,8 @@ class GroupProxy(Group):
 
 class ExamRecordAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','time_created','mode')
-    fields=['json_data']
+    readonly_fields = ('course','exam','student')
+    #fields=['json_data']
     
     def mode(self, obj):
         return obj.course.mode
