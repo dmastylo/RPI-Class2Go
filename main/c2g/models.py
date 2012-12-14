@@ -1870,7 +1870,7 @@ class ExamRecord(TimestampMixin, models.Model):
     attempt_number = models.IntegerField(default=0)
     complete = models.BooleanField(default=True)
     late = models.BooleanField(default=False)
-    score = models.IntegerField(null=True, blank=True) 
+    score = models.FloatField(null=True, blank=True)
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
@@ -1916,7 +1916,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
        **TODO: Write Promote as a function in the model**
     """
     record = models.OneToOneField(ExamRecord, db_index=True)
-    raw_score = models.IntegerField(null=True, blank=True) # this is the raw score of the entire record
+    raw_score = models.FloatField(null=True, blank=True) # this is the raw score of the entire record
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):
@@ -1944,7 +1944,7 @@ class ExamRecordScoreField(TimestampMixin, models.Model):
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     value = models.CharField(max_length=128, null=True, blank=True)
     correct = models.NullBooleanField()
-    subscore = models.IntegerField(default=0)
+    subscore = models.FloatField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
     def __unicode__(self):
@@ -1955,6 +1955,7 @@ class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
     parent = models.ForeignKey(ExamRecordScoreField, db_index=True)
     choice_value = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    correct = models.NullBooleanField()
     associated_text = models.TextField(null=True, blank=True)
     def __unicode__(self):
         return (self.parent.parent.record.student.username + ":" + self.parent.parent.record.course.title + ":" \
