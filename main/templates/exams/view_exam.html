@@ -36,7 +36,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     This exam will go live on {{ exam.live_datetime }} PST.
 
+    
 {% else %}
+
     <style>
     #exam-pane label {clear: both; display: block;}
     #exam-pane label input {float: left; margin-right: 1em;}
@@ -73,9 +75,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% endif %}
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due %}
+    {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines %}
 
-       <h3>This exam was closed on {{ exam.due_date }} PST.  Submissions are disabled. </h3>
+       <h3>This exam was closed on {{ exam.partial_credit_deadline }} PST.  Submissions are disabled. </h3>
+    
+    
+    {% elif too_many_attempts %}
+    
+        <h3>You've made too many attempts. Submissions are disabled.</h3>
 
     {% endif %}
 
@@ -721,10 +728,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% endif %}
 
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due or not allow_submit  %}{# 'not's > 'and's > 'or's #}
+    {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
     $("#reEnableForm").remove();
-    $('#main-content input').attr('disabled','disabled');
+    $('#main-content input').not('.question-nav').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
 
                       

@@ -86,10 +86,12 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
         exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
     except Exam.DoesNotExist:
         raise Http404
+
+    too_many_attempts = exam.max_attempts_exceeded(request.user)
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':exam.invideo,
-                              'allow_submit':True,
+                              'allow_submit':True, 'too_many_attempts':too_many_attempts,
                               'exam':exam}, RequestContext(request))
 
 @require_POST
@@ -107,7 +109,13 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable, 'allow_submit':True}, RequestContext(request))
+    too_many_attempts = exam.max_attempts_exceeded(request.user)
+
+
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop,
+                                                       'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable,
+                                                       'allow_submit':True, 'too_many_attempts':too_many_attempts},
+                              RequestContext(request))
 
 # BEGIN function for Wed demo
 @require_POST
@@ -327,8 +335,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
                                       datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
 
-    attempt_num_obj = ExamRecord.objects.filter(exam=exam, student=request.user, complete=True).aggregate(Max('attempt_number'))
-    attempt_number = 1 if not attempt_num_obj['attempt_number__max'] else attempt_num_obj['attempt_number__max']+1
+    attempt_number = exam.num_of_student_records(request.user)+1
 
     record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata, attempt_number=attempt_number, late=exam.past_due())
     record.save()
