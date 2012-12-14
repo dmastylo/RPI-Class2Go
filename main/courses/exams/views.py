@@ -87,10 +87,14 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
     
+    #self.metadata_xml = xml #The XML metadata for the entire problem set.
+    metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
+    questions = metadata_dom.getElementsByTagName('video')
+
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':exam.invideo,
                               'allow_submit':True,
-                              'exam':exam}, RequestContext(request))
+                              'exam':exam, 'question_times':questions}, RequestContext(request))
 
 @require_POST
 @auth_view_wrapper
