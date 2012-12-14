@@ -33,8 +33,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
-from courses.course_materials import get_course_materials, group_data
-from django.db.models import Avg, Count, Max, StdDev
+from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_protect
 from storages.backends.s3boto import S3BotoStorage
 
