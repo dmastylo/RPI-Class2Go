@@ -24,6 +24,8 @@
         {% ifequal item.type 'exam' %}
             {% include "exams/ready/exam_list_item.html" %}
         {% endifequal %}
+
+        {% include "content_groups/display.html" %}
     </li>
 {% empty %}
     <li class="course-list-item {{ stripecolor }}">
