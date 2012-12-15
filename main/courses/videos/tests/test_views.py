@@ -42,6 +42,6 @@ class StudentVideoTest(AuthenticatedTestBase):
         # parse the html into a tree and run an xpath for video list items.
         # there should be 3 live videos in the content
         tree = etree.HTML(response.content)
-        result = tree.xpath('//li[@class="course-list-item"]')
+        result = tree.xpath('//li[contains(@class, "course-list-item")]')
         self.assertEqual(len(result), 3, msg="Wrong number of live videos.")
 
