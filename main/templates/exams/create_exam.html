@@ -474,7 +474,7 @@
                        section:$('select#id_section').val(),
                        parent:$('select#parent_id').val(),
                        metaXMLContent:metadata_editor.getValue(),
-                       htmlContent:$('#staging-area').html(),
+                       htmlContent:editor.getValue(),
                        xmlImported:$('#xml-entry').val()
                },
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
