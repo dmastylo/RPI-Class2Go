@@ -2,6 +2,26 @@
 {% load url from future %}
 {% block course_page_title %}Creation Form{% endblock course_page_title %}
 {% block mode_switcher %}{% endblock mode_switcher %}
+
+{% block addl_head_scripts %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+                       tex2jax: {inlineMath: [['$$','$$']],
+                       displayMath: [['\\[','\\]']]}
+                       });
+    </script>
+    {% if request.is_secure %}
+    <script type="text/javascript"
+        src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% else %}
+    <script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% endif %}
+{% endblock addl_head_scripts %}
+
+
 {% block m_column_content %}
 
 <style type="text/css" media="screen">

@@ -19,6 +19,7 @@ var c2gXMLParse = (function() {
         renderPreview: function() {
             $('#staging-area').empty();
             $('#staging-area').append(editor.getValue());
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
         },
 
         renderMarkup: function(sourceEl, targetEl) {
