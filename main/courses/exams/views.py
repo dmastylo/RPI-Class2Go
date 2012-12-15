@@ -365,7 +365,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                     feedback[prob] = autograder.grade(prob, submission)
                     field_obj = ExamRecordScoreField(parent=record_score,
                                                      field_name = prob,
-                                                     human_name=v[0].get('questiontag4humans', "") if len(v)>0 else "",
+                                                     human_name=v[0].get('questionreport', "") if len(v)>0 else "",
                                                      subscore = feedback[prob]['score'],
                                                      value = submission,
                                                      correct = feedback[prob]['correct'],
@@ -381,7 +381,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                         fc = ExamRecordScoreFieldChoice(parent=field_obj,
                                                         choice_value=li['value'],
                                                         correct=is_correct,
-                                                        human_name=li.get('tag4humans',""),
+                                                        human_name=li.get('report',""),
                                                         associated_text=li.get('associatedText',""))
                         fc.save()
                 
@@ -390,7 +390,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                     feedback[prob] = autograder.grade(prob, submission)
                     field_obj = ExamRecordScoreField(parent=record_score,
                                  field_name = prob,
-                                 human_name=v.get('questiontag4humans', ""),
+                                 human_name=v.get('report', ""),
                                  subscore = feedback[prob]['score'],
                                  value = submission,
                                  correct = feedback[prob]['correct'],
@@ -401,7 +401,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                 feedback[prob]={'correct':False, 'score':0}
                 field_obj = ExamRecordScoreField(parent=record_score,
                                  field_name = prob,
-                                 human_name=v.get('questiontag4humans', ""),
+                                 human_name=v.get('report', ""),
                                  subscore = 0,
                                  correct = feedback[prob]['correct'],
                                  comments = unicode(e),

@@ -183,8 +183,8 @@
     <fieldset>
         <label for="name" id="xml-import-label">Import your XML here.  This will overwrite the HTML and XML Metadata editors.</label>
         <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> 
-            <problemset tag4humans="EXAMPLE">
-                <problem tag4humans="Apple Competitor Question">
+            <problemset report="EXAMPLE">
+                <problem report="Apple Competitor Question">
                     <p>
                     A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
                         Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
@@ -192,14 +192,14 @@
                     </p>
                     
                     <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse tag4humans="Apple Competitors" correct-points="10" wrong-points="-2">
+                    <multiplechoiceresponse report="Apple Competitors" correct-points="10" wrong-points="-2">
                         <choicegroup type="MultipleChoice">
-                            <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="napster" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
-                            <choice correct="true" name="ipod" tag4humans="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
-                            <choice correct="false" name="peeler" tag4humans="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="android" tag4humans="Android"><text>Android</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="beatles" tag4humans="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="ipad" report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="napster" report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
                         </choicegroup>
                     </multiplechoiceresponse>
                     <solution>
@@ -209,13 +209,13 @@
                         </div>
                     </solution>
                 </problem>
-                <problem tag4humans="JSON-Multiple-Choice">
+                <problem report="JSON-Multiple-Choice">
                     <p>
                      Which of the following is NOT a valid JSON object?
                     </p>
-                    <multiplechoiceresponse tag4humans="Valid/Invalid JSON objects">
+                    <multiplechoiceresponse report="Valid/Invalid JSON objects">
                         <choicegroup type="MultipleChoice">
-                            <choice correct="true" name="a" tag4humans="Missing comma">
+                            <choice correct="true" name="a" report="Missing comma">
                                 <text><![CDATA[
 <pre>
 { "name": "Smiley",
@@ -226,7 +226,7 @@
                         ]]></text>
                                 <explanation>check commas</explanation>
                             </choice>
-                            <choice correct="true" name="b" tag4humans="Missing quotes">
+                            <choice correct="true" name="b" report="Missing quotes">
                                 <text><![CDATA[
 <pre>
 { "name": "Smiley",
@@ -237,7 +237,7 @@
                                     ]]></text>
                                 <explanation>check commas</explanation>
                             </choice>
-                            <choice correct="false" name="c" tag4humans="OK choice1">
+                            <choice correct="false" name="c" report="OK choice1">
                                 <text><![CDATA[
 <pre>
 { "name": "Smiley",
@@ -258,7 +258,7 @@
                         </div>
                     </solution>
                 </problem>
-                <problem tag4humans="Short-answer1">
+                <problem report="Short-answer1">
                     <p>
                     A numerical response problem accepts a line of text input from the
                     student, and evaluates the input for correctness based on its
@@ -272,33 +272,33 @@
                     
                     
                     <p>Enter the numerical value of Pi:
-                    <numericalresponse answer="3.14159" tag4humans="Value of Pi" correct-points="1.5" wrong-points="-.25">
+                    <numericalresponse answer="3.14159" report="Value of Pi" correct-points="1.5" wrong-points="-.25">
                         <responseparam type="tolerance" default=".02" />
                         <textline />
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse answer="4518" tag4humans="502*9">
+                    <numericalresponse answer="4518" report="502*9">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>Enter the number of fingers on a human hand:
-                    <numericalresponse answer="5" tag4humans="number of fingers on a hand">
+                    <numericalresponse answer="5" report="number of fingers on a hand">
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse tag4humans="Apple Competitors">
+                    <multiplechoiceresponse report="Apple Competitors">
                         <choicegroup type="MultipleChoice">
-                            <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="napster" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
-                            <choice correct="true" name="ipod" tag4humans="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
-                            <choice correct="false" name="peeler" tag4humans="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="android" tag4humans="Android"><text>Android</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="beatles" tag4humans="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="ipad" report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="napster" report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
                         </choicegroup>
                     </multiplechoiceresponse>
                     
@@ -311,7 +311,7 @@
                         </div>
                     </solution>
                 </problem>
-                <problem tag4humans="Short-answer2">
+                <problem report="Short-answer2">
                     <p>
                     A numerical response problem accepts a line of text input from the
                     student, and evaluates the input for correctness based on its
@@ -325,20 +325,20 @@
                     
                     
                     <p>Enter the numerical value of Pi:
-                    <numericalresponse tag4humans="Value of Pi" answer="3.14159">
+                    <numericalresponse report="Value of Pi" answer="3.14159">
                         <responseparam type="tolerance" default=".02" />
                         <textline />
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse tag4humans="value of 502*9" answer="4518">
+                    <numericalresponse report="value of 502*9" answer="4518">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>Enter the number of fingers on a human hand:
-                    <numericalresponse tag4humans="number of finers on a hand" answer="5">
+                    <numericalresponse report="number of finers on a hand" answer="5">
                         <textline />
                     </numericalresponse>
                     </p>
