@@ -331,7 +331,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     }
                 };
 
-                $.post("{{exam.slug}}/feedback", postData, displayHTMLAnswer);
+                feedback_url = "{% url 'courses.exams.views.feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+                $.post(feedback_url, postData, displayHTMLAnswer);
                 /*
                 var tObj = {};
                 tObj.score = 0;
