@@ -14,7 +14,7 @@ class AutoGrader():
         for k,v in self.grader_functions.iteritems():
             graders.append(k)
         return "AutoGrader functions for responses with names: %s.  Total Possible Points: %s" % \
-            (", ".join(sorted(graders)), str(int(self.points_possible)))
+            (", ".join(sorted(graders)), str(self.points_possible))
     
     def __init__(self, xml, default_return=None):
         """
@@ -24,7 +24,7 @@ class AutoGrader():
         grader when 
             
         """
-        self.points_possible=0
+        self.points_possible=0.0
         
         if xml == "__testing_bypass":
             return
@@ -150,20 +150,32 @@ class AutoGrader():
         A factory for returning multiple-choice graders.
         The signature of the returned function is 
             
-            {'correct':boolean, 'score':float} = grader_fn(submission_iterable)
+            {'correct':boolean, 'score':float, 'correct_choices':dict, 'wrong_choices':dict} = grader_fn(submission_iterable)
             
         submission_iterable is an iterable which has as each entry a string of of the name corresponding to a
         student submitted choice.  All correct choices must be selected, and no incorrect choice selected.
         The return value is a dict with keys 'correct' and 'score' (using dict to be future proof)
+        'correct_choices' is a dict whose keys are all the correct choices selected by the student.
+        'wrong_choices' is a dict whose keys are all the 'wrong' choices for the student, and whose value is either
+            'fp' (false_positive) where the student selected a wrong answer, or 'fn', where the student did not select a right answer.
+            
         """
         def grader_fn(submission_iterable):
+            correct=True
+            cc = {}
+            wc = {}
             for sub in submission_iterable:
                 if sub not in answer_list:
-                    return {'correct':False, 'score':wrong_pts}
+                    wc[sub]='fp'
+                    correct=False
+                else:
+                    cc[sub]=True
             for ans in answer_list:
                 if ans not in submission_iterable:
-                    return {'correct':False, 'score':wrong_pts}
-            return {'correct':True, 'score':correct_pts}
+                    wc[ans]='fn'
+                    correct=False
+            points = correct_pts if correct else wrong_pts
+            return {'correct':correct, 'score':points, 'correct_choices':cc, 'wrong_choices':wc}
 
         return grader_fn
             

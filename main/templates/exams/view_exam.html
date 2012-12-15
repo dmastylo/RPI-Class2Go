@@ -36,7 +36,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     This exam will go live on {{ exam.live_datetime }} PST.
 
+    
 {% else %}
+
     <style>
     #exam-pane label {clear: both; display: block;}
     #exam-pane label input {float: left; margin-right: 1em;}
@@ -51,7 +53,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     /* BEGIN CSS for Wed demo */
     .quick-check {clear: both; display: block; margin-top: 1em;}
-    .explanation {background: #fff; border-radius: 3px; margin-bottom: .5em; padding: 1em;}
+    .explanation {background: #fff; border-radius: 3px; margin: 1em; border: 1px solid black; padding: 1em;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
@@ -73,15 +75,25 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% endif %}
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due %}
+    {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines %}
 
-       <h3>This exam was closed on {{ exam.due_date }} PST.  Submissions are disabled. </h3>
+       <h3>This exam was closed on {{ exam.partial_credit_deadline }} PST.  Submissions are disabled. </h3>
+    
+    
+    {% elif too_many_attempts %}
+    
+        <h3>You've made too many attempts. Submissions are disabled.</h3>
+
+    {% endif %}
 
     {% if score %}
-    <h4><b style="color:red">Your grade: {{score}}/{{exam.total_score}}</b></h4>
+    <h4><b style="color:red">Score: {{score}}/{{exam.total_score}}</b></h4>
     {% endif %}
 
+    {% if raw_score %}
+    <h4><b style="color:red">Raw Score (without late or resubmission penalites): {{raw_score}}</b></h4>
     {% endif %}
+
 
     <noscript>
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
@@ -99,7 +111,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% endif %}
 
     {% if not videotest %}
-    <input class="btn" type="submit" value="Submit Problem Set" />
+    <input class="btn" type="submit" value="Submit" />
     {% endif %}
     </div>
     {% if videotest %}
@@ -308,7 +320,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
             //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
 
-            if ($('#GraderName').length > 0) {
+            //if ($('#GraderName').length > 0) {
+            if (__exam_type == "interactive_exercise") {
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
                     'select_dict':   '',
@@ -319,18 +332,18 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 };
 
                 $.post("{{exam.slug}}/feedback", postData, displayHTMLAnswer);
+                /*
                 var tObj = {};
                 tObj.score = 0;
                 tObj["maximum-score"] = 1;
                 tObj.feedback = [];
                 tObj.feedback[0] = {};
-                //tObj.feedback[0].user_answer = "SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'";
                 tObj.feedback[0].user_answer = postData["student_input"]; 
                 tObj.feedback[0].score = 0;
                 tObj.feedback[0].explanation = "<br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n";
                 var testJSON = JSON.stringify(tObj);
-                //var testJSON = '{"score":0,"maximum-score":1,"feedback":[{"user_answer":"SELECT Movie.title WHERE Movie.director = 'Steven Spielberg'","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n"}]';
                 displayHTMLAnswer(testJSON);
+                */
             } else {
                 $.post('{{exam.slug}}/quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
@@ -351,97 +364,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('.quick-check').click(quickCheck);
         {% endif %}
         /* END JS for Wed demo */
-    {% else %}
-/* The page-at-a-time version */
-      {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
-
-      var displayMetaData = function (data, userData) {
-          //console.log('displayMetaData called');
-          //console.log(arguments);
-          //console.log(data);
-          var myXML = $.parseXML(data);
-          var examMD = $(myXML).find('exam_metadata');
-          var questionMD = $(examMD).find('question_metadata#' + assocQID);
-          var mySolution = $(questionMD).find('solution');
-          var responses = $(questionMD).find('response');
-          
-          var createInlineExp = function (targetEl) {
-              var tmpInlineExpl = document.createElement('span');
-              $(tmpInlineExpl).addClass('inline-explanation');
-              $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
-              $(targetEl).append($(tmpInlineExpl));
-
-              return $(tmpInlineExpl);
-          };
-          
-          responses.each(function () {
-             var responseType = $(this).attr('answertype');
-             if (responseType == "multiplechoiceresponse") {
-                 var choices = $(this).find('choice');
-                 choices.each(function () {
-                      var choiceInput = $('#' + $(this).attr('id'));
-                      //console.log(choiceInput.length);
-                      var choiceLabel = $('#' + $(this).attr('id')).closest('label');
-                      //console.log(choiceLabel.length);
-                      //console.log($(choiceLabel).find('.inline-explanation').length);
-                      var inlineExpl = $(choiceLabel).find('.inline-explanation');
-                      if (inlineExpl.length == 0) {
-                          inlineExpl = createInlineExp($(choiceLabel));
-                      }
-                      //console.log(inlineExpl);
-                      if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
-                          $(inlineExpl).addClass('correct');
-                      }
-                          $(inlineExpl).append($(this).find('explanation').text());
-                      });
-             } else {
-                 var inputName = $(this).attr('name');
-                 var correctVal = $(this).text();
-                 var inputEl = $('input[name|="' + inputName + '"]');
-                 if (typeof userData[inputName] != "undefined" && ($.trim(userData[inputName]) == $.trim(String(correctVal)))) {
-                     $(inputEl).after('<span class="inline-explanation correct">Correct</span>');
-                 } else {
-                     $(inputEl).after('<span class="inline-explanation incorrect">Incorrect</span>');
-                 }
-             }
-            });
-            var explArea = $('#' + assocQID + '-expl');
-            if (explArea.length == 0) {
-                explArea = document.createElement('div');
-                $(explArea).attr('id', assocQID + '-expl');
-                $(explArea).addClass('explanation');
-            }
-            $(explArea).empty();
-            $('#' + assocQID + ' .quick-check').before($(explArea));
-            $(mySolution).children().each(function () {
-                if ($(this).text() == 'Explanation') {
-                    $(explArea).append('<h4>' + $(this).text() + '</h4>');
-                } else {
-                    $(explArea).append($(this));
-                }
-            });
-      
-            $('#' + checkBtnID).attr('value','Hide Answers');
-         };
-          // Add a "re-enable inputs" button
-          var qchkBtn = document.createElement('input');
-          $(qchkBtn).attr('id', 'qchkForm');
-          $(qchkBtn).attr('type', 'button');
-          $(qchkBtn).attr('title', 'Check your answers');
-          $(qchkBtn).addClass('btn btn-spaced');
-          $(qchkBtn).val('Check your answers');
-          var submitBtn = $('input[type|="submit"]').not('#login_button');
-          submitBtn.before($(qchkBtn));
-          $(qchkBtn).click(displayMetaData);
-        {% endif %}
-
     {% endif %}
 
-    {% if exam.autograde %}
-    var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-    {% else %}
     var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-    {% endif %}
                       
     if (__exam_type=="survey") {
             SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
@@ -504,13 +429,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('textarea[name|=' + member + ']').val(dataObj[member].value);
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
-                      $('input[name|=' + member + ']').before("<b style='color:red'>" + scores[member]+" </b> ");
+                      $('input[name|=' + member + ']').before("<b style='color:red'> " + scores[member]+" </b> ");
                 };
                 
             } else {
                 if (scores.hasOwnProperty(member)) {
                       //Label the closet div enclosing the choices with the score (probably want fieldset instead)
-                      $('input[name|=' + member + ']').first().closest('div').children(':first').before("<b style='color:red'>" + scores[member]+" </b> ");
+                      $('input[name|=' + member + ']').first().closest('fieldset').before("<b style='color:red'> " + scores[member]+" </b> ");
                 }
                 // it's multiple choice, therefore an array
                 $('input[name|=' + member + ']').removeAttr('checked');
@@ -525,19 +450,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       //console.log('input[name|=' + member + ']');
                       //console.log(selector);
                 $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
-                // loop through each choice listed for this input
-                /*
-                for (var i = 0; i < dataObj[member].length; i += 1) {
-                    var obj = dataObj[member][i];
 
-                    for (key in obj) {
-                        if (key == 'value') {
-                            //console.log(key + ' is what we want');
-                            $('#' + member + '_' + obj[key]).attr('checked', 'checked');
-                        } 
-                    }
-                }
-                 */
             } 
 
         }
@@ -569,29 +482,122 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
     };
 
-    window.showCorrections = function (correxObj) {
+    window.displayQuestionExplanation = function(questionMD){
+        //This function takes a DOM object of the metadata and displays the question explanation after the
+        //question with the corresponding id
+        var mySolution = $(questionMD).find('solution');
+        var assocQID = $(questionMD).attr('id');
+        var explArea = $('#' + assocQID + '-expl');
+        if (explArea.length == 0) {
+            explArea = document.createElement('div');
+            $(explArea).attr('id', assocQID + '-expl');
+            $(explArea).addClass('explanation');
+        }
+        $(explArea).empty();
+        $(explArea).append("<h4>Explanation</h4>");
+        $(mySolution).contents().each(function(){
+            //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
+            if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
+                $(explArea).append($(this).text());
+            }
+            else { //for DOM nodes that are elements
+                $(explArea).append($(this).clone());
+            }
+        });
+        $('div.question#' + assocQID ).append($(explArea));
+    };
+
+    window.displayChoiceExplanations = function(questionMD) {
+        //This function takes a DOM object of the metadata and displays the choice explanations
+        //for question with the corresponding id, if that question is multiple choice
+                      
+        var createInlineExp = function (targetEl) {
+            var tmpInlineExpl = document.createElement('span');
+            $(tmpInlineExpl).addClass('inline-explanation');
+            $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+            $(targetEl).append($(tmpInlineExpl));
+
+            return $(tmpInlineExpl);
+        };
+                      
+        var responses = $(questionMD).find('response');
+        responses.each(function () {
+            var responseType = $(this).attr('answertype');
+            if (responseType == "multiplechoiceresponse") {
+                var choices = $(this).find('choice');
+                var response = this;
+                choices.each(function () {
+                    var choiceInput = $('input[name|="' + $(response).attr('name') + '"]')
+                                      .filter('input[value|="' + $(this).attr('value') + '"]');
+                    if(choiceInput.attr('checked')){
+                        var choiceLabel = $(choiceInput).closest('label');
+                        //console.log(choiceLabel.length);
+                        //console.log($(choiceLabel).find('.inline-explanation').length);
+                        var inlineExpl = $(choiceLabel).find('.inline-explanation');
+                        if (inlineExpl.length == 0) {
+                            inlineExpl = createInlineExp($(choiceLabel));
+                        }
+                        //console.log(inlineExpl);
+                        if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
+                            $(inlineExpl).addClass('correct');
+                        }
+                        $(inlineExpl).append($(this).find('explanation').text());
+                    }
+                });
+        }});
         
-       
+    };
+
+    window.showCorrections = function (correxObj) {
+        //This function marks the user answer correct or wrong and then
+        //shows the question level explainations as well as relevant choice-level explanations
+                      
         for (member in correxObj) {
-            var formEl = $('input[name|="' + member + '"]');
-            switch ($(formEl).attr('type')) {
-                case 'checkbox':
-                case 'radio':
-                    var targetEl =  $('input[name|="' + member + '"]:checked');
-                    break;
-                default:
-                    var targetEl = $(formEl);
-            } 
-            if (correxObj[member].correct == true) {
-                $(targetEl).after('<span class="correct">Correct</span>');
-            } else {
-                $(targetEl).after('<span class="incorrect">Incorrect</span>');
+            if (member != "__metadata__") {
+                var has_choices=true;
+                var formEl = $('input[name|="' + member + '"]');
+                if (formEl.length == 0)
+                    formEl = $('textarea[name|="' + member + '"]');
+
+                if ($(formEl).attr('type') == 'checkbox' ||
+                    $(formEl).attr('type') == 'radio') {
+                    var curq = correxObj[member];
+                    for (correctChoice in curq.correct_choices) {
+                        $(formEl).filter('input[value|="' + correctChoice + '"]')
+                                .after('<span class="correct"> Yes! </span>');
+                    }
+                    for (wrongChoice in curq.wrong_choices) {
+                      //if (curq.wrong_choices[wrongChoice] == "fn")
+                      //      $(formEl).filter('input[value|="' + wrongChoice + '"]')
+                      //          .after('<span class="incorrect"> Should be selected. </span>');
+                      //else
+                        if (curq.wrong_choices[wrongChoice] == "fp")
+                            $(formEl).filter('input[value|="' + wrongChoice + '"]')
+                                .after('<span class="incorrect"> No. </span>');
+                    }
+                }
+                else {
+                    if (correxObj[member].correct == true) {
+                        $(formEl).after('<span class="correct"> Yes! </span>');
+                    } else {
+                        $(formEl).after('<span class="incorrect"> No. </span>');
+                    }
+                }
             }
         }
+                      
+        var myXML = $.parseXML(correxObj["__metadata__"]);
+        console.log(myXML);
+        var examMD = $(myXML).find('exam_metadata');
+        var questionMD = $(examMD).find('question_metadata');
+        $(questionMD).each(function(){displayQuestionExplanation(this);
+                         displayChoiceExplanations(this);});
+
     };
-/*
+
+    {% if exam.exam_type == "survey" %}
     allFieldsets.each(function() {
-        if (!$(this).attr('no-shuffle')) {
+        if ($(this).attr('shuffle')) {
             var tmpChoices = $(this).find('label');
             var tmpChoicesCopy = tmpChoices.slice(0); // make copy of jQuery array to manipulate
             $(this).empty();
@@ -603,14 +609,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
         }
     });
- */
+  {% endif %}
                       
     $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
-        $('input').each(function () {
+        $('#exam-pane input').each(function () {
+            var name = $(this).attr('name');
+            var key = (name != undefined) ? name.trim() : "";
+                    
             if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
-                if (!userSelections[$(this).attr('name')]) {
-                    userSelections[$(this).attr('name')] = [];
+                if (!userSelections[key]) {
+                    userSelections[key] = [];
                 }
                 //console.log(userSelections);
                 var tmpObj = {};
@@ -620,24 +629,28 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).closest('fieldset').attr('data-tag4humans');
 
-                userSelections[$(this).attr('name')].push(tmpObj);
+                userSelections[key].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                         
-                userSelections[$(this).attr('name')] = tmpObj;
+                userSelections[key] = tmpObj;
             }
         });
         $('textarea').each(function () {
+                           
+            var name = $(this).attr('name');
+            var key = (name != undefined) ? name.trim() : "";
+                           
             if ($(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                
-                userSelections[$(this).attr('name')] = tmpObj;
+                userSelections[key] = tmpObj;
             }
         });
 
@@ -661,13 +674,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
 
         examXHR.success(function (evt, xhr, settings) {
-            var dialogDiv = getDialog();
-            var message = "";
-            var confirmText = "OK";
             if (__autograde) {
-                document.location = SUBMISSION_RETURN_URL;
+                document.location = settings.responseText;
             }
             else {
+                var dialogDiv = getDialog();
+                var message = "";
+                var confirmText = "OK";
+
                 if (__exam_type == "exam")
                     { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
                       confirmText = "See My Submissions"; }
@@ -682,6 +696,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
                 $(dialogDiv).dialog({ modal: true,
                                     buttons: buttonObj});
+                
             }
         });
 
@@ -697,7 +712,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
 
     {% if json_pre_pop_correx %}
-    var prePopCorrex = {{json_pre_pop_correx|safe}};
+    var prePopCorrex = JSON.parse('{{json_pre_pop_correx|escapejs}}');
     {% endif %}
     //alert(prePopCorrex);
     var scores = JSON.parse('{{scores|escapejs}}');
@@ -705,15 +720,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
-    if (typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None') {
+                      
+    {% if json_pre_pop_correx %}
+    if (prePopCorrex && typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None' && prePopCorrex != null) {
         window.showCorrections(prePopCorrex);
-    } 
+    }
+    {% endif %}
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due or not allow_submit  %}{# 'not's > 'and's > 'or's #}
+
+    {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
-    $("#reEnableForm").attr('disabled','disabled');
-    $('#main-content input').attr('disabled','disabled');
-                  
+    $("#reEnableForm").remove();
+    $('#main-content input').not('.question-nav').attr('disabled','disabled');
+    $('#main-content textarea').attr('disabled','disabled');
+
                       
     {% endif %}
                       

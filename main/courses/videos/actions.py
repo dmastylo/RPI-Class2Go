@@ -60,10 +60,12 @@ def add_video(request):
 def edit_video(request, course_prefix, course_suffix, slug):
     common_page_data = request.common_page_data
     video = common_page_data['course'].video_set.all().get(slug=slug)
+    exam_id = request.POST.get("exam_id")
 
     action = request.POST['action']
     form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
     if form.is_valid():
+        video.exam_id = exam_id 
         form.save()
         if action == "Save and Set as Ready":
             video.commit()
