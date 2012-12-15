@@ -1,3 +1,5 @@
+import json
+
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponse, Http404
@@ -12,6 +14,7 @@ from courses.videos.forms import *
 from courses.views import get_full_contentsection_list
 from courses.forms import *
 
+from xml.dom.minidom import parseString
 
 @auth_view_wrapper
 def list(request, course_prefix, course_suffix):
@@ -112,25 +115,36 @@ def view(request, course_prefix, course_suffix, slug):
     l1items, l2items = group_data(ContentGroup.objects.getByCourse(course=course))
     downloadable_content = get_children(key, l1items, l2items)
 
-    # START copy from courses.exams.views.show_exam:
     if video.exam_id:
         try:
             #exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
             exam = Exam.objects.get(id=video.exam_id)
             display_single = exam.display_single
             invideo = exam.invideo
+            metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
+            video_questions = metadata_dom.getElementsByTagName('video')
+           
+            question_times = {}
+            for video_node in video_questions:
+                video_slug = video_node.getAttribute("url_identifier")
+                if video_slug == exam.slug:
+                    question_children = video_node.getElementsByTagName("question")
+                    times = []
+                    for question in question_children:
+                        time = "sec_%s" % question.getAttribute("time")
+                        if time not in question_times:
+                            question_times[time] = [] 
+                        question_times[time].append(question.getAttribute("id"))
+
+            print json.dumps(question_times)
+
         except Exam.DoesNotExist:
             raise Http404
     else:
         sections = ContentSection.objects.getByCourse(course) 
         section = sections[0]
         exam = Exam(course=course, slug=slug, title=video.title, description="Empty Exam", html_content="", xml_metadata="", due_date='', assessment_type="invideo", mode="draft", total_score=0, grade_single=0, grace_period='', partial_credit_deadline='', late_penalty=0, submissions_permitted=0, resubmission_penalty=0, exam_type="invideo", autograde=0, display_single=0, invideo=1, section=section,)
-        #exam_obj.create_ready_instance()
-        #exam = '' 
-        #display_single = '' 
-        #invideo = '' 
-
-    # END copy from courses.exams.views.show_exam
+        question_times = ""
 
     # change from 'videos/view.html' to 'exams/view_exam.html'
     return render_to_response('exams/view_exam.html', 
@@ -150,6 +164,7 @@ def view(request, course_prefix, course_suffix, slug):
                                'editable':True,
                                'single_question':exam.display_single,
                                'videotest':exam.invideo,
+                               'question_times':json.dumps(question_times),
                                'allow_submit':True,
                                'exam':exam
                               },

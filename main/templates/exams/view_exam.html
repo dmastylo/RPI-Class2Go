@@ -111,8 +111,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% endautoescape %}
 {% if videotest %}</div>{% endif %}
 <h3>{{exam}}</h3>
-<h3>{{exam.xml_metadata}}</h3>
-<h3>{{question_metadata}}</h3>
+<h3>question times: {{question_times}}</h3>
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
@@ -309,7 +308,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
             //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
 
-            //if ($('#GraderName').length > 0) {
             if (__exam_type == "interactive_exercise") {
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
@@ -321,18 +319,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 };
 
                 $.post("{{exam.slug}}/feedback", postData, displayHTMLAnswer);
-                /*
-                var tObj = {};
-                tObj.score = 0;
-                tObj["maximum-score"] = 1;
-                tObj.feedback = [];
-                tObj.feedback[0] = {};
-                tObj.feedback[0].user_answer = postData["student_input"]; 
-                tObj.feedback[0].score = 0;
-                tObj.feedback[0].explanation = "<br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n";
-                var testJSON = JSON.stringify(tObj);
-                displayHTMLAnswer(testJSON);
-                */
             } else {
                 $.post('{{exam.slug}}/quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
@@ -354,7 +340,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         {% endif %}
     {% endif %}
 
-    {% if exam.html_content != "" %}
+    {% if exam.html_content != "" and exam.exam_type != "invideo" %}
         {% if exam.autograde %}
         var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
         {% else %}

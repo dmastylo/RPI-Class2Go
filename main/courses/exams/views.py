@@ -10,6 +10,7 @@ import csv
 import HTMLParser
 from django.db.models import Sum
 import urllib2
+from xml.dom.minidom import parseString
 
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
@@ -94,7 +95,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':exam.invideo,
                               'allow_submit':True,
-                              'exam':exam, 'question_times':questions}, RequestContext(request))
+                              'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
 
 @require_POST
 @auth_view_wrapper

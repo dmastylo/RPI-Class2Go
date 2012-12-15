@@ -57,7 +57,7 @@
                 });  //The request may fail if there are no exercises, but we know we tried.
             }
 
-            $.when(initThumbManifest(), initPSManifest()).then(function () {
+            $.when(initThumbManifest()).then(function () {
                 //console.log("thumbsChecked: " + thumbsChecked);
                 //console.log("psChecked: " + psChecked);
             }).then(function () {fetchDeferred.resolve();});
