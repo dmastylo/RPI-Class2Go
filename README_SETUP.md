@@ -132,15 +132,12 @@ prefix for these.
         curl -O http://chromedriver.googlecode.com/files/chromedriver_mac_23.0.1240.0.zip
         unzip chromedriver_mac_23.0.1240.0.zip
         # move onto your path
-        sudo mv ./chromedriver /usr/bin/
-        # install Chrome -- or download from https://www.google.com/intl/en/chrome/browser/
-        brew install chromium-browser chromium-browser-l10n
+        sudo mv ./chromedriver /usr/local/bin/
+        # install Chrome -- download from https://www.google.com/intl/en/chrome/browser/
 
 1. [Optional] Install dependenices to run selenium tests "headless"
 
-        # Needs testing!!!
-        pip install pyvirtualdisplay
-        brew install xvfb xserver-xephyr
+        # TODO: Figure out how to run headless on Mac OSX (see Linux section for starters)
 
 1. Setup the account and database in MySql
 
@@ -393,9 +390,8 @@ be installed for Mac (and probably Windows too)
         curl -O http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip
         unzip chromedriver_linux32_23.0.1240.0.zip
         # move onto your path
-        sudo mv ./chromedriver /usr/bin/
-        # install Chrome -- or download from https://www.google.com/intl/en/chrome/browser/
-        sudo apt-get install chromium-browser chromium-browser-l10n
+        sudo mv ./chromedriver /usr/local/bin/
+        # install Chrome -- download from https://www.google.com/intl/en/chrome/browser/
 
 3. [Optional] Install dependenices to run selenium tests "headless"
 
