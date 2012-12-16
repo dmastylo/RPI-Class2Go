@@ -429,6 +429,9 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
         return True
 
+    def get_url(self):
+        return 'pages/' + self.slug
+
     def __unicode__(self):
         if self.title:
             return self.title
@@ -525,6 +528,9 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         }
         file_extension = self.get_ext()
         return extensions.get(file_extension, 'file')
+
+    def get_url(self):
+        return self.file.url # FIXME: cache this
 
     def __unicode__(self):
         if self.title:
@@ -988,6 +994,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             if needle.exercise.fileName == hay.exercise.fileName:
                 return True
         return False
+
+    def get_url(self):
+        return 'videos/' + self.slug
         
     def __unicode__(self):
         if self.title:
@@ -1405,6 +1414,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             if needle.exercise.fileName == hay.exercise.fileName:
                 return True
         return False
+
+    def get_url(self):
+        return 'problemsets/' + self.slug
 
     def __unicode__(self):
         return self.title
@@ -1875,6 +1887,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
 
     def record_view_name(self):
         return self.exam_type+"_record"
+
+    def get_url(self):
+        return self.show_view_name()
     
     record_view = property(record_view_name)
 
@@ -1941,7 +1956,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):
-        return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.score))
+        return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.raw_score))
 
     def copyToExamScore(self):
         #copy self to the contents of the authoritative ExamScore
@@ -1996,11 +2011,14 @@ class StudentExamStart(TimestampMixin, models.Model):
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course).order_by('group_id','level')
+    def getChildrenByGroupId(self, group_id):
+        return self.filter(level=2, group_id=group_id).order_by('display_style')
 
 class ContentGroup(models.Model):
     group_id        = models.IntegerField(db_index=True, null=True, blank=True)
     level           = models.IntegerField(db_index=True)
     display_style   = models.CharField(max_length=32, null=True, blank=True)
+    #content_type_tag= models.CharField(max_length=32, null=True, blank=True)
 
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
     course          = models.ForeignKey(Course)
