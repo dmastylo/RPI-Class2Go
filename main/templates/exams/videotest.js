@@ -65,27 +65,28 @@
             return fetchDeferred.promise();
         };
 
+        C2G.videoSetup.selectSlide = function (time) {
+            nearest = -1;
+            for (i in C2G.videoSetup.slideIndices) {
+                var numi = parseInt(i);
+                $(C2G.videoSetup.slideIndices[i].displayDiv).addClass('unselected');
+                $(C2G.videoSetup.slideIndices[i].displayDiv).removeClass('selected');
+                if (numi<=time && numi>nearest) {
+                    nearest=numi;
+                }
+            }
+
+            if (nearest >-1) {
+                var selected = C2G.videoSetup.slideIndices[''+nearest].displayDiv;
+                $(selected).addClass('selected');
+                $(selected).removeClass('unselected');
+                $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width())/2);
+            }
+        };
+
         C2G.videoSetup.displayThumbs = function () {
 
             var imgPath = "";
-            var selectSlide = function (time) {
-                nearest = -1;
-                for (i in C2G.videoSetup.slideIndices) {
-                    var numi = parseInt(i);
-                    $(C2G.videoSetup.slideIndices[i].displayDiv).addClass('unselected');
-                    $(C2G.videoSetup.slideIndices[i].displayDiv).removeClass('selected');
-                    if (numi<=time && numi>nearest) {
-                        nearest=numi;
-                    }
-                }
-
-                if (nearest >-1) {
-                    var selected = C2G.videoSetup.slideIndices[''+nearest].displayDiv;
-                    $(selected).addClass('selected');
-                    $(selected).removeClass('unselected');
-                    $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width())/2);
-                }
-            };
 
             var addSlideIndex = function (idxTime) {
                 var indexDiv = document.getElementById('slideIndex');
@@ -100,7 +101,7 @@
                     //player.seekTo(time);
                     window.popcornVideo.play(time);
                     //thumbSet.selectSlide(time);
-                    selectSlide(time);
+                    C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
                 $('#slideIndex').append(tempDiv);
                 return tempDiv;
@@ -120,7 +121,7 @@
                                     //player.seekTo(time-0.5);
                                     window.popcornVideo.play(time);
                                     //thumbSet.selectSlide(time);
-                                    selectSlide(time);
+                                    C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
                 $('#slideIndex').append(tempDiv);
                 return tempDiv;
@@ -161,19 +162,6 @@
                 window.slideMap = sorted;
             };
 
-            var handleTimeUpdate = function () {
-                //console.log(popcornVideo.currentTime());
-                var timeInSec = Math.floor(window.popcornVideo.currentTime()).toFixed(1);
-                selectSlide(timeInSec);
-                /*
-                if ($.inArray(timeInSec, window.slideMap) != -1) {
-                    $('.divInIndex.selected').removeClass('selected');
-                    $('#slideIndex' + timeInSec.replace('.','-') + 's').addClass('selected');
-                }
-                */
-            };
-
-            C2G.videoSetup.handleTimeUpdate = handleTimeUpdate;
             setupNavPanel();
 
         };
@@ -189,7 +177,19 @@
             */
 
             window.popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
-    
+
+            C2G.videoSetup.handleTimeUpdate = function () {
+                //console.log(popcornVideo.currentTime());
+                var timeInSec = Math.floor(window.popcornVideo.currentTime()).toFixed(1);
+                C2G.videoSetup.selectSlide(timeInSec);
+                /*
+                if ($.inArray(timeInSec, window.slideMap) != -1) {
+                    $('.divInIndex.selected').removeClass('selected');
+                    $('#slideIndex' + timeInSec.replace('.','-') + 's').addClass('selected');
+                }
+                */
+            };
+
             window.popcornVideo.on('playing', function () {
                 window.popcornVideo.on('timeupdate', C2G.videoSetup.handleTimeUpdate);
             });
@@ -228,18 +228,27 @@
             $('#exam-pane').append($(continueVideoBtn));
             //$(continueVideoBtn).click(removeExamStage);
 
+            var currentQuestionId = "";
             var configureExamButton = function (mode, questionArray) {
                 $(continueVideoBtn).unbind('click');
                 if (mode == "multi-question") {
                     $(continueVideoBtn).attr('value', 'Next Question');
                     $(continueVideoBtn).click(function () {
-                        var curQ = $(this).closest('.question');
-                        var curIdx = $('.question').inArray($(curQ));
+                        var curQ = $('#' + currentQuestionId);
+                        console.log("curQ...");
+                        console.log($(curQ));
                         setExamStage();
-                        $('.question').eq((curIdx + 1)).show();
+                        currentQuestionId = $(curQ).next().attr('id');
+                        console.log("Now currentQuestionId...");
+                        console.log(currentQuestionId);
+                        $(curQ).next().show();
                         $('#exam-pane').fadeTo('slow', 1.0);
-                        $(continueVideoBtn).attr('value', 'Resume Video');
-                        $(continueVideoBtn).click(removeExamStage);
+                        console.log("questionArray[questionArray.length - 1]...");
+                        console.log(questionArray[questionArray.length - 1]);
+                        if (currentQuestionId == questionArray[questionArray.length - 1]) {
+                            $(continueVideoBtn).attr('value', 'Resume Video');
+                            $(continueVideoBtn).click(removeExamStage);
+                        }
                     });
                 } else { 
                     $(continueVideoBtn).attr('value', 'Resume Video');
@@ -247,22 +256,34 @@
                 }
             };
 
-            for (var q = 0; q < questionTimes.length; q += 1) {
-                var qMarker = questionTimes[q];
-                window.popcornVideo.cue(qMarker.timeInSec, function () {
+            for (q in questionTimes) {
+                
+                var cueSecond = q.split('_')[1];
+                var questionsToShow = questionTimes[q];
+
+                var showQuestion = function (questionsToShow) {
+                    return function () {
                         setExamStage();
-                        var firstQuestionNum = -1;
-                        if ($.isArray(qMarker.questionNum) && qMarker.questionNum.length > 1) {
-                            firstQuestionNum = qMarker.questionNum[0];
-                            configureExamButton("multi-question", qMarker.questionNum);
+                        var firstQuestionId = "";
+                        if ($.isArray(questionsToShow)) {
+                            firstQuestionId = questionsToShow[0];
+                            if (questionsToShow.length > 1) {
+                                configureExamButton("multi-question", questionsToShow);
+                            } else {
+                                configureExamButton();
+                            }
                         } else {
-                            firstQuestionNum = qMarker.questionNum;
+                            firstQuestionId = questionsToShow;
                             configureExamButton();
                         } 
-                        $('.question').eq(firstQuestionNum).show();
+                        $('#' + firstQuestionId).show();
+                        currentQuestionId = firstQuestionId;
                         $('#exam-pane').fadeTo('slow', 1.0);
-                    }
-                );
+                    };
+                };
+
+                window.popcornVideo.cue(cueSecond, showQuestion(questionsToShow));
+
             }
 
             $.when(C2G.videoSetup.fetchThumbs())

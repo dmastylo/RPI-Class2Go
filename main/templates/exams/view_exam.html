@@ -36,7 +36,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     This exam will go live on {{ exam.live_datetime }} PST.
 
+    
 {% else %}
+
     <style>
     #exam-pane label {clear: both; display: block;}
     #exam-pane label input {float: left; margin-right: 1em;}
@@ -71,14 +73,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% endif %}
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due %}
+    {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines %}
 
-       <h3>This exam was closed on {{ exam.due_date }} PST.  Submissions are disabled. </h3>
+       <h3>This exam was closed on {{ exam.partial_credit_deadline }} PST.  Submissions are disabled. </h3>
+    
+    
+    {% elif too_many_attempts %}
+    
+        <h3>You've made too many attempts. Submissions are disabled.</h3>
 
     {% endif %}
 
     {% if score %}
-    <h4><b style="color:red">Your grade: {{score}}/{{exam.total_score}}</b></h4>
+    <h4><b style="color:red">Score: {{score}}/{{exam.total_score}}</b></h4>
+    {% endif %}
+
+    {% if raw_score %}
+    <h4><b style="color:red">Raw Score (without late or resubmission penalites): {{raw_score}}</b></h4>
     {% endif %}
 
 
@@ -110,8 +121,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 {% endautoescape %}
 {% if videotest %}</div>{% endif %}
-<h3>{{exam}}</h3>
-<h3>question times: {{question_times}}</h3>
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
@@ -595,10 +604,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
-        $('input').each(function () {
+        $('#exam-pane input').each(function () {
+            var name = $(this).attr('name');
+            var key = (name != undefined) ? name.trim() : "";
+                    
             if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
-                if (!userSelections[$(this).attr('name')]) {
-                    userSelections[$(this).attr('name')] = [];
+                if (!userSelections[key]) {
+                    userSelections[key] = [];
                 }
                 //console.log(userSelections);
                 var tmpObj = {};
@@ -608,24 +620,28 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).closest('fieldset').attr('data-tag4humans');
 
-                userSelections[$(this).attr('name')].push(tmpObj);
+                userSelections[key].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                         
-                userSelections[$(this).attr('name')] = tmpObj;
+                userSelections[key] = tmpObj;
             }
         });
         $('textarea').each(function () {
+                           
+            var name = $(this).attr('name');
+            var key = (name != undefined) ? name.trim() : "";
+                           
             if ($(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.tag4humans = $(this).attr('data-tag4humans');
                 tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
                
-                userSelections[$(this).attr('name')] = tmpObj;
+                userSelections[key] = tmpObj;
             }
         });
 
@@ -649,13 +665,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
 
         examXHR.success(function (evt, xhr, settings) {
-            var dialogDiv = getDialog();
-            var message = "";
-            var confirmText = "OK";
             if (__autograde) {
-                document.location = SUBMISSION_RETURN_URL;
+                document.location = settings.responseText;
             }
             else {
+                var dialogDiv = getDialog();
+                var message = "";
+                var confirmText = "OK";
+
                 if (__exam_type == "exam")
                     { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
                       confirmText = "See My Submissions"; }
@@ -670,6 +687,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
                 $(dialogDiv).dialog({ modal: true,
                                     buttons: buttonObj});
+                
             }
         });
 
@@ -693,14 +711,18 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     if (prePopData != '') {
         window.repopulateForm(prePopData);
     }
-    if (typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None') {
+                      
+    {% if json_pre_pop_correx %}
+    if (prePopCorrex && typeof prePopCorrex != "undefined" && prePopCorrex != "" && prePopCorrex != 'None' && prePopCorrex != null) {
         window.showCorrections(prePopCorrex);
-    } 
+    }
+    {% endif %}
 
-    {% if common_page_data.course.mode == "ready" and exam.past_due or not allow_submit  %}{# 'not's > 'and's > 'or's #}
+
+    {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
     $("#reEnableForm").remove();
-    $('#main-content input').attr('disabled','disabled');
+    $('#main-content input').not('.question-nav').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
 
                       
@@ -711,20 +733,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 </script>
 {% if videotest %}
 <script>
-        var videoURL = 'http://www.youtube.com/embed/{{video.url}}?autoplay=0&wmode=transparent&fs=0&controls=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
+        var videoURL = 'http://www.youtube.com/embed/{{video.url}}?autoplay=0&wmode=transparent&fs=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
         var thumbnailPath = "http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
         //var thumbnailData = {"0":{"imgsrc":"img001.jpeg"},"31":{"imgsrc":"img032.jpeg"},"40":{"imgsrc":"img041.jpeg"},"62":{"imgsrc":"img063.jpeg"},"135":{"imgsrc":"img136.jpeg"},"136":{"imgsrc":"img137.jpeg"},"179":{"imgsrc":"img180.jpeg"},"259":{"imgsrc":"img260.jpeg"},"292":{"imgsrc":"img293.jpeg"},"353":{"imgsrc":"img354.jpeg"},"354":{"imgsrc":"img355.jpeg"},"355":{"imgsrc":"img356.jpeg"} /*,"385":{"imgsrc":"img386.jpeg"}*/};
         //var questionData = {"184": {"fileName": "arp_q1.html", "problemDiv": 974, "order": 0, "time": 384}, "385": {"fileName": "arp_q2.html", "problemDiv": 975, "order": 1, "time": 385}, "385": {"fileName": "arp_q3.html", "problemDiv": 976, "order": 2, "time": 386}};
         //var imgPath = "http://prod-c2g.s3-website-us-west-2.amazonaws.com/networking/Fall2012/videos/1201/jpegs/";
 
-        // questionTimes to be replaced by parsed XML metadata 
-        var questionTimes = [
-            {
-                timeInSec: 14,
-                questionNum: [1,2,3]
-            },
-            {timeInSec:25, questionNum:4}    
-        ];
+        // questionTimes from parsed XML metadata 
+        var questionTimes = JSON.parse('{{question_times|escapejs}}');
 {% include 'exams/videotest.js' %}
 {% if not video.url %}
     $('#demoplayer').hide();
