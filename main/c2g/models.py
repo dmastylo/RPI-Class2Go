@@ -1667,6 +1667,16 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
         return datetime.now() > compareD
     
+    def load_mathjax(self):
+        """uses a regexp to figure out if the rendering of the exam needs mathjax
+           the regexp are rough, but should not have any false negatives.  (at
+           worst we load mathjax when we don't need it.
+        """
+        if re.search(r"\$\$.*\$\$", self.html_content) or re.search(r"\\\[.*\\\]", self.html_content):
+            return True
+        return False
+        
+    
     def create_ready_instance(self):
         ready_instance = Exam(
             course=self.course.image,
