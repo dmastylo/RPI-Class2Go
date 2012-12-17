@@ -84,6 +84,17 @@
 
     };
 
+    c2g.toggleChevron = function (iconElemID) {
+ 
+        if ($("#"+iconElemID).hasClass('icon-chevron-right')) {
+            $("#"+iconElemID).removeClass('icon-chevron-right');
+            $("#"+iconElemID).addClass('icon-chevron-down');
+        }
+        else if ($("#"+iconElemID).hasClass('icon-chevron-down')) {
+            $("#"+iconElemID).removeClass('icon-chevron-down');
+            $("#"+iconElemID).addClass('icon-chevron-right');
+        }
+    };
 
 
     // live events

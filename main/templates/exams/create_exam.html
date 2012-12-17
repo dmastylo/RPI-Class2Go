@@ -42,6 +42,9 @@
     div.ui-dialog div.ui-widget-header {background: #900;}
     label pre {margin-left:30px;}
     #description{width:150px; height:150px;}
+    .warning{color:red;margin-right:5px;}
+    #xml-import-label{font-size:22px;font-weight:bolder;}
+
 </style>
 
 <div class="well create-exam-form">
@@ -95,7 +98,7 @@
             <label class="control-label" for="late_penalty">Late Penalty:</label>
             <input id="late_penalty" name="late_penalty" type="text" />
             <label class="control-label" for="num_subs_permitted">Number of Submissions Allowed:</label>
-            <input id="num_subs_permitted" name="num_subs_permitted" type="text" />
+            <input id="num_subs_permitted" name="num_subs_permitted" type="text" value="999"/>
             <label class="control-label" for="resubmission_penalty">Penalty per Incorrect Submission:</label>
             <input id="resubmission_penalty" name="resubmission_penalty" type="text" />
         </div>
@@ -178,7 +181,7 @@
 <div id="dialog-form" title="Paste Your XML">
     <form>
     <fieldset>
-        <label for="name">XML</label>
+        <label for="name" id="xml-import-label">Import your XML here.  This will overwrite the HTML and XML Metadata editors.</label>
         <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> 
             <problemset tag4humans="EXAMPLE">
                 <problem tag4humans="Apple Competitor Question">
@@ -366,37 +369,45 @@
                         })
     
     
+    var __saved_import_xml="";
+    var __xml_saved=false;
     $( "#dialog-form" ).dialog({
         autoOpen: false,
         height: 500,
         width: "90%",
         modal: true,
-        buttons: {
-            "Add XML": function() {
-                var bValid = true;
-
-                c2gXMLParse.renderMarkup($('#xml-entry'), "");
-
-                if ( bValid ) {
-                    editor.setValue(style_html(editor.getValue(), {'max_char':80}));
-                    metadata_editor.setValue(style_html(metadata_editor.getValue(), {'max_char':80}));
-
-                    $( this ).dialog( "close" );
-                }
-                               
-            },
-            Cancel: function() {
-                $( this ).dialog( "close" );
-            }
-        },
         close: function() {
-            //allFields.val( "" ).removeClass( "ui-state-error" );
-        }
+            if (!__xml_saved)  $('#xml-entry').val(__saved_import_xml);
+        },
+        buttons: [{
+                    text:"Import XML",
+                    id:"import-xml-button",
+                    click: function() {
+                        c2gXMLParse.renderMarkup($('#xml-entry'), "");
+                        editor.setValue(style_html(editor.getValue(), {'max_char':80}));
+                        metadata_editor.setValue(style_html(metadata_editor.getValue(), {'max_char':80}));
+                        __xml_saved=true;
+                        $( this ).dialog( "close" );
+                        }
+                  },
+                  {
+                    text:"Cancel",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                        }
+                  }],
     });
+                               
+
     $('#xml-entry-btn').click(function() {
+        __saved_import_xml=$('#xml-entry').val();
         $( "#dialog-form" ).dialog( "open" );
     });
-
+    $("#import-xml-button").before("<span class='warning' id='clobber-warning'>Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.</span>");
+    $("#clobber-warning").hide();
+    $("#import-xml-button").hover(function(){$("#clobber-warning").show();},
+                                function(){$("#clobber-warning").hide();});
+    
     var editor = ace.edit("editor");
     editor.setValue($('#ace_proxy').val());
     editor.setTheme("ace/theme/eclipse");
@@ -443,7 +454,8 @@
                        section:$('select#id_section').val(),
                        parent:$('select#parent_id').val(),
                        metaXMLContent:metadata_editor.getValue(),
-                       htmlContent:$('#staging-area').html()
+                       htmlContent:$('#staging-area').html(),
+                       xmlImported:$('#xml-entry').val()
                },
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
                success: function(data,textStatus,jqXHR) {
@@ -491,7 +503,7 @@
     $('#preview-tab').click(c2gXMLParse.renderPreview);
       
     {% if edit_mode %}
-    var prepop = {{prepop_json|safe}};
+    var prepop = JSON.parse("{{prepop_json|escapejs}}");
     {% else %}
     var prepop = false;
     {% endif %}
@@ -507,9 +519,10 @@
         $('input#num_subs_permitted').val(prepop.num_subs_permitted);
         $('input#resubmission_penalty').val(prepop.resubmission_penalty);
         $('textarea#description').val(prepop.description);
-        $('select#id_section').val(prepop.section),
-        metadata_editor.setValue(prepop.metadata),
-        editor.setValue(prepop.htmlContent)
+        $('select#id_section').val(prepop.section);
+        metadata_editor.setValue(prepop.metadata);
+        editor.setValue(prepop.htmlContent);
+        $('#xml-entry').val(prepop.xmlImported);
 
     }
 

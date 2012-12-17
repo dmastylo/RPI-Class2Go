@@ -56,6 +56,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/snapshot/?$', 'courses.exams.views.show_populated_exam', name='exam_populated'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam', name='exam_graded'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='exam_my_submissions'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='exam_record'),
 
     #problemset subtype of exam
     #This and the exams list use the same view, so any reversing should be done using the name, i.e. 'survey_list', otherwise it
@@ -65,6 +66,8 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<exam_slug>[a-zA-Z0-9_-]+)/snapshot/?$', 'courses.exams.views.show_populated_exam', name='problemset_populated'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam', name='problemset_graded'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='problemset_my_submissions'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='problemset_record'),
+
 
     #survey subtype of exam
     #This and the exams list use the same view, so any reversing should be done using the name, i.e. 'survey_list', otherwise it
@@ -74,6 +77,8 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/snapshot/?$', 'courses.exams.views.show_populated_exam', name='survey_populated'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam', name='surveys_graded'), #admittedly doesn't make sense, here for consistency
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='survey_my_submissions'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='survey_record'),
+
 
     #interactive_exercise subtype of exam
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/?$', 'courses.exams.views.listAll', {'show_types':['interactive_exercise',]}, name='interactive_exercise_list'),
@@ -81,6 +86,8 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/snapshot/?$', 'courses.exams.views.show_populated_exam', name='interactive_exercise_populated'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam', name='interactive_exercise_graded'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='interactive_exercise_my_submissions'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='interactive_exercise_record'),
+
 
     
 
