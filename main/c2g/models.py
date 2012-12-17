@@ -1937,6 +1937,14 @@ class ExamScore(TimestampMixin, models.Model):
 
     class Meta:
         unique_together = ("exam", "student")
+        
+    def setScore(self):
+        #Set score to max of ExamRecordScore.score for this exam, student
+        exam_records = ExamRecord.objects.values('student').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score'))
+        
+        if exam_records:
+            self.score = exam_records[0]['max_score']
+            self.save()        
 
 class ExamScoreField(TimestampMixin, models.Model):
     """Should be kept basically identical to ExamRecordScoreField"""
@@ -1968,20 +1976,6 @@ class ExamRecordScore(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.raw_score))
 
-    def copyToExamScore(self):
-        #copy self to the contents of the authoritative ExamScore
-        es, created = ExamScore.objects.get_or_create(course=self.record.course, exam=self.record.exam, student=self.record.student)
-        es.score = self.record.score # use the score with deductions included, not the raw score.
-        es.save()
-
-        #now do all the fields
-        if not created:
-            ExamScoreField.objects.filter(parent=es).delete()
-        
-        for f in ExamRecordScoreField.objects.filter(parent=self):
-            esf = ExamScoreField(parent=es, field_name=f.field_name, human_name=f.human_name, value=f.value,
-                                 correct=f.correct, subscore=f.subscore, comments=f.comments, associated_text=f.associated_text)
-            esf.save()
 
 class ExamRecordScoreField(TimestampMixin, models.Model):
     """Should be kept basically identical to ExamScoreField"""
