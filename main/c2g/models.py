@@ -1998,15 +1998,15 @@ class ExamRecordScoreField(TimestampMixin, models.Model):
         return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
 
 class ExamRecordFieldLog(TimestampMixin, models.Model):
-    """Log oriented table recording activity for each submission of a field."""
+    """Log oriented table recording activity for each submission of each field."""
     course = models.ForeignKey(Course, db_index=True)
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
-    score = models.IntegerField(default=0, blank=True)
+    value = models.TextField(null=True, blank=True)
+    raw_score = models.IntegerField(default=0, blank=True)
     max_score = models.IntegerField(default=0, blank=True)   # info only, for interactive 
-    associated_text = models.TextField(null=True, blank=True)
 
 class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
     """Exploding out even multiple choice answers"""
