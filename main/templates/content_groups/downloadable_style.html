@@ -1,11 +1,10 @@
 {% load url from future %}
 
-{% if downloadable_content %}
-    <!-- child item block -->
+{% if children %} {# needed because this template is called directly #}
     <div class="button-tray" style="display: block; clear: both">
     <h3>Downloadable Content for {{video.title}}</h3>
     <ul class="unstyled course-list">
-    {% for child in downloadable_content %}
+    {% for child in children %}
         {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
         <li class="course-list-item {{ stripecolor }}">
             <span style="float: left;"><strong>{{child.title}}</strong></span>
@@ -25,6 +24,6 @@
             </span>
         </li>
     {% endfor %}
+    </ul>
     </div>
-    <!-- end child item block -->
 {% endif %}

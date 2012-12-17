@@ -24,6 +24,13 @@
         <label for="parent_id">Parent</label>
         <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
       </div>
+      <div class="fieldWrapper child_metadata">
+        <label for="display_style_id">Child Display Style</label>
+        <span id="display_style_id">
+            <input type="radio" name="display_style" value="button" checked>Button</input> 
+            <input type="radio" name="display_style" value="list">List</input> 
+        </span>
+      </div>
     </fieldset>
     <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
     <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
@@ -35,8 +42,16 @@
 
 {% block addl_scripts %}
 <script type="text/javascript">
+$('.child_metadata').hide();
 $('#id_section').change(function() { prefill_children($('#parent_id')[0]) });
 $('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
+$('#parent_id').change(function() { 
+                        if ($(this).val() === "none,none") { 
+                            $('.child_metadata').hide(); 
+                        } else { 
+                            $('.child_metadata').show(); 
+                        }});
+
 function prefill_children(element) {
     var id = $('#id_section')[0].value
     var pelement = $('#parent_id');
@@ -52,8 +67,7 @@ function prefill_children(element) {
         }
     });
 }
-</script>
-<script>
+
 function checkFilename() {
     var filename = document.getElementById('id_file').files[0].name;
     var r = true;

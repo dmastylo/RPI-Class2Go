@@ -1,0 +1,34 @@
+{% load url from future %}
+
+    <div class="button-tray" style="display: block; clear: both; padding-left: 64px;">
+        <!-- <ul class="unstyled course-list"> -->
+    {% for child in children %}
+        {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
+            {% if child.type == 'exam' %}
+                <ul><li>
+                    {% with child.ref as item.exam %}
+                        {% include "exams/ready/exam_list_item.html" %}
+                    {% endwith %}
+                </li></ul>
+            {% else %}
+                <span style="float: left;"><strong><a href="{{child.url}}">{{child.title}}</a></strong>: {{child.type}} {{item.description}}</span>
+            {% endif %}
+        <!-- <li class="course-list-item sublist {{ stripecolor }}"> -->
+        <!-- <span style="float: left;"><strong><a href="{{child.url}}">{{child.title}}</a></strong>: {{child.type}} {{item.description}}</span> -->
+            <!-- <span style="float: right;">
+                <a href="{{child.url}}">
+                    {% if child.name %}
+                        <button class="btn btn-mini" title="Download {{child.type}} {{child.name}}">
+                            <em class="icon-download-alt">&nbsp;</em>{{child.ext}}
+                        </button>
+                    {% else %}
+                        <button class="btn btn-mini icon" title="Go to {{child.title}}">
+                            <em class="icon-download-alt">&nbsp;</em>{{child.type}}
+                        </button>
+                    {% endif %}
+                </a>
+
+            </span> -->
+            <!-- </li> -->
+    {% endfor %}
+    </div>

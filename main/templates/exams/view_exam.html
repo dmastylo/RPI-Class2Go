@@ -24,6 +24,26 @@
 {% endif %}
 {% endblock l_column_content %}
 
+{% block addl_head_scripts %}
+    {% if exam.load_mathjax %}
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+                       tex2jax: {inlineMath: [['$$','$$']],
+                                 displayMath: [['\\[','\\]']]}
+                       });
+    </script>
+        {% if request.is_secure %}
+            <script type="text/javascript"
+                src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+                </script>
+        {% else %}
+            <script type="text/javascript"
+                src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+                </script>
+
+        {% endif %}
+    {% endif %}
+{% endblock addl_head_scripts %}
 
 {% block m_column_content %}
 {% if videotest %}<div id="c2g_layout_m_column" class="khan-template" style="margin-left: 25%">{% endif %}
@@ -210,8 +230,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         var tmpObj = {};
                         tmpObj.value = $(this).attr('value');
                         tmpObj.associatedText = $(this).parent().text();
-                        tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                        tmpObj.questionTag4humans = $(this).closest('fieldset').attr('data-tag4humans');
+                        tmpObj.report = $(this).attr('data-report');
+                        tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
 
                         userSelections[$(this).attr('name')].push(tmpObj);
                     } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
@@ -627,15 +647,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 tmpObj.value = $(this).attr('value');
                 $(this).parent().find('span').remove();
                 tmpObj.associatedText = $(this).parent().text();
-                tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                tmpObj.questiontag4humans = $(this).closest('fieldset').attr('data-tag4humans');
+                tmpObj.report = $(this).attr('data-report');
+                tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
 
                 userSelections[key].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
-                tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
+                tmpObj.report = $(this).attr('data-report');
+                tmpObj.questionreport = $(this).attr('data-report');
                         
                 userSelections[key] = tmpObj;
             }
@@ -648,8 +668,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             if ($(this).val() != "") {
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
-                tmpObj.tag4humans = $(this).attr('data-tag4humans');
-                tmpObj.questiontag4humans = $(this).attr('data-tag4humans');
+                tmpObj.report = $(this).attr('data-report');
+                tmpObj.questionreport = $(this).attr('data-report');
                
                 userSelections[key] = tmpObj;
             }
