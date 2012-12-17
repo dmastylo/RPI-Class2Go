@@ -317,8 +317,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('#' + checkBtnID).attr('value','Hide Answers');
             };
 
-            var displayHTMLAnswer = function (data, msg, xhr) {
-                
+            var HTMLAnswerSuccess  = function (data, msg, xhr) {
                 var responseData = $.parseJSON(data);
                 
                 if ( responseData == "ERROR" ) {
@@ -335,7 +334,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(explArea).empty();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(explArea).append(responseData.feedback[0].explanation);
+            };
 
+            var HTMLAnswerError = function (jqXHR, error, errorThrown) {
+                var explArea = $('#' + assocQID + '-expl');
+                if (explArea.length == 0) {
+                    explArea = document.createElement('div');
+                    $(explArea).attr('id', assocQID + '-expl');
+                    $(explArea).addClass('explanation');
+                }
+                $(explArea).empty();
+                $('#' + assocQID + ' .quick-check').before($(explArea));
+
+                if (jqXHR.status && jqXHR.status >= 500){
+                    $(explArea).append(jqXHR.responseText);
+                } else {
+                    $(explArea).append("There was an error contacting the grader service, please try again later");
+                }
             };
 
             //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
@@ -352,7 +367,16 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 };
 
                 feedback_url = "{% url 'courses.exams.views.feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-                $.post(feedback_url, postData, displayHTMLAnswer);
+                //$.post(feedback_url, postData, displayHTMLAnswer);
+                $.ajax({
+                    url: feedback_url,
+                    type: "post",
+                    data: postData,
+                    success: HTMLAnswerSuccess,
+                    error: HTMLAnswerError
+                });
+
+
                 /*
                 var tObj = {};
                 tObj.score = 0;

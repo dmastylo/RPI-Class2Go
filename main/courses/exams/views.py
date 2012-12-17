@@ -19,7 +19,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice, ContentSection
+from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -868,12 +868,11 @@ def feedback(request, course_prefix, course_suffix, exam_slug):
     try:
         response = urllib2.urlopen(grader_url, grader_data, grader_timeout)
     except urllib2.URLError, e:
-        # TODO: what gives Ajax something helpful?
-        raise Http500
+        return HttpResponse("Backend error: could not contact interactive grader, please try again later.",
+                status=500)
 
     graded_raw = response.read()
     graded_json=json.loads(graded_raw)
-    # TODO: store result in DB
 
     response = HttpResponse(graded_raw)
     return response
