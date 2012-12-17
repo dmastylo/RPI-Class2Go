@@ -74,6 +74,8 @@ def edit_video(request, course_prefix, course_suffix, slug):
                 exam = Exam.objects.get(id=exam_id)
                 exam.live_datetime = video.live_datetime
                 exam.save()
+                exam.image.live_datetime = video.live_datetime
+                exam.image.save()
             except Exam.DoesNotExist:
                 raise Http404
 
@@ -247,6 +249,8 @@ def upload(request):
                 exam = Exam.objects.get(id=exam_id)
                 exam.live_datetime = new_video.live_datetime
                 exam.save()
+                exam.image.live_datetime = new_video.live_datetime
+                exam.image.save()
             except Exam.DoesNotExist:
                 raise Http404
 

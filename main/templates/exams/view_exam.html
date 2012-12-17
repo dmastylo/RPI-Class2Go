@@ -753,7 +753,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 </script>
 {% if videotest %}
 <script>
-        var videoURL = 'http://www.youtube.com/embed/{{video.url}}?autoplay=0&wmode=transparent&fs=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
+        var videoURL = 'http://www.youtube.com/embed/{% if video.mode == 'draft' %}{{video.url}}{% else %}{{video.image.url}}{% endif %}?autoplay=0&wmode=transparent&fs=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
         var thumbnailPath = "http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
         //var thumbnailData = {"0":{"imgsrc":"img001.jpeg"},"31":{"imgsrc":"img032.jpeg"},"40":{"imgsrc":"img041.jpeg"},"62":{"imgsrc":"img063.jpeg"},"135":{"imgsrc":"img136.jpeg"},"136":{"imgsrc":"img137.jpeg"},"179":{"imgsrc":"img180.jpeg"},"259":{"imgsrc":"img260.jpeg"},"292":{"imgsrc":"img293.jpeg"},"353":{"imgsrc":"img354.jpeg"},"354":{"imgsrc":"img355.jpeg"},"355":{"imgsrc":"img356.jpeg"} /*,"385":{"imgsrc":"img386.jpeg"}*/};
         //var questionData = {"184": {"fileName": "arp_q1.html", "problemDiv": 974, "order": 0, "time": 384}, "385": {"fileName": "arp_q2.html", "problemDiv": 975, "order": 1, "time": 385}, "385": {"fileName": "arp_q3.html", "problemDiv": 976, "order": 2, "time": 386}};
