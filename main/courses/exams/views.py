@@ -325,6 +325,7 @@ def parse_val(v):
 def collect_data(request, course_prefix, course_suffix, exam_slug):
     
     course = request.common_page_data['course']
+    user = request.user
     try:
         exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
     except Exam.DoesNotExist:
@@ -337,9 +338,9 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
                                       datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
 
-    attempt_number = exam.num_of_student_records(request.user)+1
+    attempt_number = exam.num_of_student_records(user)+1
 
-    record = ExamRecord(course=course, exam=exam, student=request.user, json_data=postdata, attempt_number=attempt_number, late=exam.past_due())
+    record = ExamRecord(course=course, exam=exam, student=user, json_data=postdata, attempt_number=attempt_number, late=exam.past_due())
     record.save()
 
     autograder = None
@@ -413,13 +414,27 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             #supposed to be at the same level as try...except.  Run once per prob,v
             total_score += feedback[prob]['score']
 
-
+        #Set raw score for ExamRecordScore
         record_score.raw_score = total_score
         record_score.save()
-        record_score.copyToExamScore()         #Make this score the current ExamScore
+
+        #Set penalty inclusive score for ExamRecord
         record.json_score_data = json.dumps(feedback)
+        
+        #apply resubmission penalty
+        resubmission_penalty_percent = pow(((100 - exam.resubmission_penalty)/100), (attempt_number -1))
+        total_score = max(total_score * resubmission_penalty_percent, 0)
+        
+        #apply the late penalty
+        if exam.grace_period and exam.late_penalty > 0 and datetime.datetime.now() > exam.grace_period:
+            total_score = max(total_score * ((100 - exam.late_penalty)/100), 0)
+        
         record.score = total_score
         record.save()
+        
+        #Set ExamScore.score to max of ExamRecord.score for that student, exam. 
+        exam_score, created = ExamScore.objects.get_or_create(course=course, exam=exam, student=user)
+        exam_score.setScore()
 
         return HttpResponse(reverse(exam.record_view, args=[course.prefix, course.suffix, exam.slug, record.id]))
 
