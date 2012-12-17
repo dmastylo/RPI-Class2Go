@@ -2,6 +2,26 @@
 {% load url from future %}
 {% block course_page_title %}Creation Form{% endblock course_page_title %}
 {% block mode_switcher %}{% endblock mode_switcher %}
+
+{% block addl_head_scripts %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+                       tex2jax: {inlineMath: [['$$','$$']],
+                       displayMath: [['\\[','\\]']]}
+                       });
+    </script>
+    {% if request.is_secure %}
+    <script type="text/javascript"
+        src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% else %}
+    <script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% endif %}
+{% endblock addl_head_scripts %}
+
+
 {% block m_column_content %}
 
 <style type="text/css" media="screen">
@@ -95,12 +115,12 @@
             <input id="hard_deadline" class="picker"  type="text" name="hard_deadline" value="" data-datetimepicker>
         </div>
         <div class="atomic-unit well" id="penalties" >
-            <label class="control-label" for="late_penalty">Late Penalty:</label>
-            <input id="late_penalty" name="late_penalty" type="text" />
-            <label class="control-label" for="num_subs_permitted">Number of Submissions Allowed:</label>
+            <label class="control-label" for="late_penalty">Late Penalty:*</label>
+            <input id="late_penalty" name="late_penalty" type="text" value="0"/>
+            <label class="control-label" for="num_subs_permitted">Number of Submissions Allowed:*</label>
             <input id="num_subs_permitted" name="num_subs_permitted" type="text" value="999"/>
-            <label class="control-label" for="resubmission_penalty">Penalty per Incorrect Submission:</label>
-            <input id="resubmission_penalty" name="resubmission_penalty" type="text" />
+            <label class="control-label" for="resubmission_penalty">Penalty Per Submission After First:*</label>
+            <input id="resubmission_penalty" name="resubmission_penalty" type="text" value="0" />
         </div>
     </div>
 
@@ -183,23 +203,26 @@
     <fieldset>
         <label for="name" id="xml-import-label">Import your XML here.  This will overwrite the HTML and XML Metadata editors.</label>
         <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> 
-            <problemset tag4humans="EXAMPLE">
-                <problem tag4humans="Apple Competitor Question">
+            <problemset data-report="EXAMPLE">
+                <problem data-report="Apple Competitor Question">
                     <p>
                     A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
                         Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
                     <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
                     </p>
+                    <p>Handy numbers: $$R = 8.314\ {\rm J/mole\ K}\ \ \ \ \ \ F = 96500\ {\rm C/mole}\ \ \ \ \  k_B =  1.38\times 10^{-23}\ {\rm J/K} = 8.62\times 10^{-5}\ {\rm eV/K}\ \ \ \ \ \hbar = 1.055 \times 10^{-34}\ {\rm J\ s} = 6.58 \times 10^{-16}\ {\rm eV\ s}\\ m = 9.11 \times 10^{-31} {\rm kg}\ \ \ \ \ 1\ {\rm eV} = 1.602 \times 10^{-19}\ {\rm J}$$</p>
+                    
+                    <p>The pythagorean theorem: \[ a^2 + b^2 = c^2 \]</p>
                     
                     <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse tag4humans="Apple Competitors" correct-points="10" wrong-points="-2">
+                    <multiplechoiceresponse data-report="Apple Competitors" correct-points="10" wrong-points="-2">
                         <choicegroup type="MultipleChoice">
-                            <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="napster" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
-                            <choice correct="true" name="ipod" tag4humans="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
-                            <choice correct="false" name="peeler" tag4humans="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="android" tag4humans="Android"><text>Android</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="beatles" tag4humans="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
                         </choicegroup>
                     </multiplechoiceresponse>
                     <solution>
@@ -209,13 +232,13 @@
                         </div>
                     </solution>
                 </problem>
-                <problem tag4humans="JSON-Multiple-Choice">
+                <problem data-report="JSON-Multiple-Choice">
                     <p>
                      Which of the following is NOT a valid JSON object?
                     </p>
-                    <multiplechoiceresponse tag4humans="Valid/Invalid JSON objects">
+                    <multiplechoiceresponse data-report="Valid/Invalid JSON objects">
                         <choicegroup type="MultipleChoice">
-                            <choice correct="true" name="a" tag4humans="Missing comma">
+                            <choice correct="true" name="a" data-report="Missing comma">
                                 <text><![CDATA[
 <pre>
 { "name": "Smiley",
@@ -226,7 +249,7 @@
                         ]]></text>
                                 <explanation>check commas</explanation>
                             </choice>
-                            <choice correct="true" name="b" tag4humans="Missing quotes">
+                            <choice correct="true" name="b" data-report="Missing quotes">
                                 <text><![CDATA[
 <pre>
 { "name": "Smiley",
@@ -237,7 +260,7 @@
                                     ]]></text>
                                 <explanation>check commas</explanation>
                             </choice>
-                            <choice correct="false" name="c" tag4humans="OK choice1">
+                            <choice correct="false" name="c" data-report="OK choice1">
                                 <text><![CDATA[
 <pre>
 { "name": "Smiley",
@@ -258,7 +281,7 @@
                         </div>
                     </solution>
                 </problem>
-                <problem tag4humans="Short-answer1">
+                <problem data-report="Short-answer1">
                     <p>
                     A numerical response problem accepts a line of text input from the
                     student, and evaluates the input for correctness based on its
@@ -272,33 +295,33 @@
                     
                     
                     <p>Enter the numerical value of Pi:
-                    <numericalresponse answer="3.14159" tag4humans="Value of Pi" correct-points="1.5" wrong-points="-.25">
+                    <numericalresponse answer="3.14159" data-report="Value of Pi" correct-points="1.5" wrong-points="-.25">
                         <responseparam type="tolerance" default=".02" />
                         <textline />
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse answer="4518" tag4humans="502*9">
+                    <numericalresponse answer="4518" data-report="502*9">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>Enter the number of fingers on a human hand:
-                    <numericalresponse answer="5" tag4humans="number of fingers on a hand">
+                    <numericalresponse answer="5" data-report="number of fingers on a hand">
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse tag4humans="Apple Competitors">
+                    <multiplechoiceresponse data-report="Apple Competitors">
                         <choicegroup type="MultipleChoice">
-                            <choice correct="false" name="ipad" tag4humans="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="napster" tag4humans="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
-                            <choice correct="true" name="ipod" tag4humans="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
-                            <choice correct="false" name="peeler" tag4humans="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="android" tag4humans="Android"><text>Android</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="beatles" tag4humans="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
                         </choicegroup>
                     </multiplechoiceresponse>
                     
@@ -311,7 +334,7 @@
                         </div>
                     </solution>
                 </problem>
-                <problem tag4humans="Short-answer2">
+                <problem data-report="Short-answer2">
                     <p>
                     A numerical response problem accepts a line of text input from the
                     student, and evaluates the input for correctness based on its
@@ -325,20 +348,20 @@
                     
                     
                     <p>Enter the numerical value of Pi:
-                    <numericalresponse tag4humans="Value of Pi" answer="3.14159">
+                    <numericalresponse data-report="Value of Pi" answer="3.14159">
                         <responseparam type="tolerance" default=".02" />
                         <textline />
                     </numericalresponse>
                     </p>
                     <p>Enter the approximate value of 502*9:
-                    <numericalresponse tag4humans="value of 502*9" answer="4518">
+                    <numericalresponse data-report="value of 502*9" answer="4518">
                         <responseparam type="tolerance" default="15%"/>
                         <textline />
                     </numericalresponse>
                     </p>
                     
                     <p>Enter the number of fingers on a human hand:
-                    <numericalresponse tag4humans="number of finers on a hand" answer="5">
+                    <numericalresponse data-report="number of finers on a hand" answer="5">
                         <textline />
                     </numericalresponse>
                     </p>
@@ -454,7 +477,7 @@
                        section:$('select#id_section').val(),
                        parent:$('select#parent_id').val(),
                        metaXMLContent:metadata_editor.getValue(),
-                       htmlContent:$('#staging-area').html(),
+                       htmlContent:editor.getValue(),
                        xmlImported:$('#xml-entry').val()
                },
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},

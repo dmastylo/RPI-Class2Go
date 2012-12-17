@@ -5,19 +5,23 @@ from django.db import connection
 
 
 def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False, exam_types=[]):
+    COURSE  = common_page_data['course']
+    REQUEST = common_page_data['request']
+    USER    = REQUEST.user
     section_structures = []
-    if common_page_data['request'].user.is_authenticated():
-        sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
-        pages = AdditionalPage.objects.getByCourse(course=common_page_data['course'])
-        files = File.objects.getByCourse(course=common_page_data['course'])
-        exams = Exam.objects.getByCourse(course=common_page_data['course'])
+    if USER.is_authenticated():
+        sections = ContentSection.objects.getByCourse(course=COURSE)
+        pages = AdditionalPage.objects.getByCourse(course=COURSE)
+        files = File.objects.getByCourse(course=COURSE)
+        exams = Exam.objects.getByCourse(course=COURSE)
+        print "DEBUG: exams # at top:", len(exams)
         if exam_types:
             exams = exams.filter(exam_type__in=exam_types)
-        groups = ContentGroup.objects.getByCourse(course=common_page_data['course'])
-        level1_items, level2_items = group_data(groups)
+        print "DEBUG: after filtering with", str(exam_types), "# is", len(exams)
+        l1items, l2items = get_contentgroup_data(COURSE)
 
         if get_video_content:
-            videos = Video.objects.getByCourse(course=common_page_data['course'])
+            videos = Video.objects.getByCourse(course=COURSE)
             if videos:
                 video_list = []
                 for video in videos:
@@ -25,12 +29,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                 videoToExs = VideoToExercise.objects.values('video').filter(video__in=video_list, is_deleted=0).annotate(dcount=Count('video'))
                     
                 if common_page_data['course_mode'] == 'ready':
-                    video_recs = VideoActivity.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user)
-                    video_downloads = VideoDownload.objects.values('video').filter(course=common_page_data['course'], student=common_page_data['request'].user).annotate(dcount=Count('video'))
+                    video_recs = VideoActivity.objects.filter(course=COURSE, student=USER)
+                    video_downloads = VideoDownload.objects.values('video').filter(course=COURSE, student=USER).annotate(dcount=Count('video'))
 
         if get_pset_content:
             
-            problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
+            problem_sets = ProblemSet.objects.getByCourse(course=COURSE)
             if problem_sets:
                 problem_set_list = []
                 for problem_set in problem_sets:
@@ -38,7 +42,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                 psetToExs = ProblemSetToExercise.objects.values('problemSet').filter(problemSet__in=problem_set_list, is_deleted=0).annotate(dcount=Count('problemSet'))
 
                 if common_page_data['course_mode'] == 'ready':
-                    pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=common_page_data['request'].user).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
+                    pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=USER).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
                     
                     cursor = connection.cursor()
                     #The following 2 sqls are the same except the first is for a list of 2 or more and the second is for
@@ -154,10 +158,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_additional_page_content:
                 for page in pages:
-                    
-                    key = 'page:' + str(page.id)
-                    if page.section_id == section.id and not level2_items.has_key(key):
-                        children = get_children(key, level1_items, level2_items)
+                    key = ('additional_page', page.id)
+                    if page.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
                         
                         item = {'type':'additional_page', 'additional_page':page, 'index':page.index, 'children': children}
 
@@ -167,10 +170,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_file_content:
                 for file in files:
-                    
-                    key = 'file:' + str(file.id)
-                    if file.section_id == section.id and not level2_items.has_key(key):
-                        children = get_children(key, level1_items, level2_items)
+                    key = ('file', file.id)
+                    if file.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
                         
                         item = {'type':'file', 'file':file, 'index':file.index, 'children': children}
 
@@ -181,10 +183,9 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
             if get_video_content:
                         
                 for video in videos:
-                    
-                    key = 'video:' + str(video.id)
-                    if video.section_id == section.id and not level2_items.has_key(key):
-                        children = get_children(key, level1_items, level2_items)
+                    key = ('video', video.id)
+                    if video.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
                                 
                         item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index, 'children': children}
 
@@ -218,11 +219,10 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_pset_content:
-
                 for problem_set in problem_sets:
-                    key = 'pset:' + str(problem_set.id)
-                    if problem_set.section_id == section.id and not level2_items.has_key(key):
-                        children = get_children(key, level1_items, level2_items)
+                    key = ('problemSet', problem_set.id)
+                    if problem_set.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
                         
                         item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index, 'children': children}
 
@@ -277,7 +277,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                         score += exercise_percent/100.0
                             
                                     else:
-                                        score = problem_set.get_score(common_page_data['request'].user)
+                                        score = problem_set.get_score(USER)
                                         break
 
                             #Divide by zero safety check
@@ -294,12 +294,13 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_exam_content:
-                user_records = ExamRecord.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user, complete=True).order_by('time_created')
+                user_records = ExamRecord.objects.filter(course=COURSE, student=USER, complete=True).order_by('time_created')
+                print "DEBUG: exams #", len(exams)
                 for exam in exams:
-                    exam_user_records = user_records.filter(exam=exam) #might change this to a python list filter if want to trade db access for memory
-                    key = 'exam:' + str(exam.id)
-                    if exam.section_id == section.id and not level2_items.has_key(key):
-                        children = get_children(key, level1_items, level2_items)
+                    key = ('exam', exam.id)
+                    if exam.section_id == section.id and not l2items.has_key(key):
+                        exam_user_records = user_records.filter(exam=exam) #might change this to a python list filter if want to trade db access for memory
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
                         
                         item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children, 'records':exam_user_records}
                         section_dict['items'].append(item)
@@ -314,8 +315,124 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
     return section_structures
 
+def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
+    for item in deleted_exercise_list:
+        if item['filename'] == filename and item['problemset_id'] == problem_set_id:
+            return True
+    return False
+
+def get_contentgroup_data(course):
+    l1_items = {}
+    l2_items = {}
+    for cgtype, cgtid, cgref, target, level, display in [get_group_item_data(x, selfref=True) for x in 
+                                                            ContentGroup.objects.getByCourse(course=course)]:
+        if not target.is_live():
+            continue
+        if level == 2:
+            l2_items[(cgtype, cgtid)] = (cgref, target, level, display)
+        else:
+            l1_items[(cgtype, cgtid)] = cgref.group_id
+    return l1_items, l2_items
+
+def get_group_item_data(group_item, selfref=False):
+    ctype   = group_item.get_content_type()
+    level   = group_item.level
+    display = group_item.display_style or 'button'
+    target  = getattr(group_item, ctype)
+    cgid    = target.id
+    if not selfref:
+        return ctype, cgid, target, level, display
+    return ctype, cgid, group_item, target, level, display
+
+def get_children_by_display_style(key, level1_items, level2_items, user=None):
+    children = get_children(key, level1_items, level2_items, user)
+    tagged_children = {}
+    for child in children:
+        display_style = child.get('display', 'button')
+        if not tagged_children.has_key(display_style):
+            tagged_children[display_style] = [child]
+        else:
+            tagged_children[display_style].append(child)
+    return tagged_children
+
+def get_children(key, level1_items, level2_items, user=None):
+
+    def type_sorter(ci1, ci2):
+        ci1_type = ci1['type']
+        ci2_type = ci2['type']
+        ci1_title = ci1['title']
+        ci2_title = ci2['title']
+        if ci1_type < ci2_type:
+            return -1
+        elif ci1_type > ci2_type:
+            return +1
+        else:
+            # equal types, go by title
+            if ci1_title < ci2_title:
+                return -1
+            elif ci1_title > ci2_title:
+                return +1
+            else:
+                return 0
+
+    def name_sorter(ci1, ci2):
+        ci1_name = ci1['name']
+        ci2_name = ci2['name']
+        ci1_ext = ci1['ext']
+        ci2_ext = ci2['ext']
+        if ci1_name and ci2_name:
+            if ci1_ext < ci2_ext:
+                return -1
+            elif ci1_ext > ci2_ext:
+                return +1
+            else:
+                # equal extensions, go by filename
+                if ci1_name < ci2_name:
+                    return -1
+                elif ci1_name > ci2_name:
+                    return +1
+                else:
+                    return 0
+        else:
+            return 0
+
+    children = []
+    if level1_items.has_key(key):
+        group_id = level1_items[key]
+        children.extend([augment_child_data(k, v, user) for k,v in level2_items.items() if v[0].group_id == group_id])
+        children = sorted(sorted(children, type_sorter), name_sorter)
+    return children
+
+def augment_child_data(key, value, user=None):
+    class NoFile():
+        name = ''
+    cgtype = key[0]
+    ref    = value[1]
+    tmp_f  = getattr(ref, 'file', NoFile())
+    name   = tmp_f.name.split('/').pop()
+    ext    = name.split('.').pop().lower()
+
+    #              target             target        this entry    target ref  
+    child_data = {'type': cgtype, 'id': key[1], 'self': value[0], 'ref': ref, 'display': value[3], 'ext': ext,
+                  'name': name, 'title': ref.title, 'url': ref.get_url(), 'index': ref.index, 'children': None, }
+    child_data[cgtype] = ref      # FIXME: set 'exam':exam - remove after making templates use 'ref'
+    if cgtype == "exam" and user: # FIXME: per-type special cases belong somewhere else?
+        child_data['records'] = ExamRecord.objects.filter(course=ref.course, student=user, complete=True, exam=ref)
+    return child_data
+    
+def get_live_datetime_for(thing):
+    """Return the appropriate .live_datetime string for thing"""
+    prod_thing = thing.image
+    if not prod_thing.live_datetime:
+        return "<span style='color:#A00000;'>Not Live</span>"
+    elif prod_thing.live_datetime > datetime.datetime.now():
+        return prod_thing.live_datetime.strftime("<span style='color:#A07000;'>Live %F at %H:%M</span>" )
+    else:
+        return "<span style='color:green;'>Live</span>"
+
+
 #Test purposes only - not to be run in production
-def test_for_pset_progress_and_score():
+def test_for_pset_progress_and_score(): 
     
     logfile = open('zzzz.log', 'w')
     
@@ -522,168 +639,3 @@ def test_for_pset_progress_and_score():
                                             
     logfile.close()
     
-def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
-    for item in deleted_exercise_list:
-        if item['filename'] == filename and item['problemset_id'] == problem_set_id:
-            return True
-            
-    return False
-
-# Function to split the group data into level1 and level2 items.
-# The for loop looks for each change in the group_id; which works since ContentGroup.getByCourse
-# is ordered by group_id, level.
-# Format of the dictionaries is:
-#    key: type:id     value: group_id
-# which allows independent lookup of level1 and level2 items.
-# When we need the level2 items for a level1 item we lookup the level2 items with the same group_id (value)
-# as the level1 item.
-def group_data(group_items):
-    
-    level1_items = {}
-    level2_items = {}
-    
-    group_item_id = None
-    for group_item in group_items:
-        if group_item.group_id == group_item_id:
-            level, type, id = get_group_item_data(group_item)
-            if level == 2:
-                level2_items[type + ':' + str(id)] = group_item_id
-        else:
-            group_item_id = group_item.group_id
-            level, type, id = get_group_item_data(group_item)
-            if level == 1:
-                level1_items[type + ':' + str(id)] = group_item_id
-            
-    return level1_items, level2_items
-                
-def get_group_item_data(group_item):
-    if group_item.video_id:
-        level = group_item.level
-        type = 'video'
-        id = group_item.video_id
-    elif group_item.problemSet_id:
-        level = group_item.level
-        type = 'pset'
-        id = group_item.problemSet_id
-    elif group_item.additional_page_id:
-        level = group_item.level
-        type = 'page'
-        id = group_item.additional_page_id
-    elif group_item.file_id:
-        level = group_item.level
-        type = 'file'
-        id = group_item.file_id
-    elif group_item.exam_id:
-        level = group_item.level
-        type = 'exam'
-        id = group_item.exam_id
-
-    return level, type, id
-
-def get_children(key, level1_items, level2_items):
-
-    def type_sorter(ci1, ci2):
-        ci1_type = ci1['type']
-        ci2_type = ci2['type']
-        ci1_title = ci1['title']
-        ci2_title = ci2['title']
-        if ci1_type < ci2_type:
-            return -1
-        elif ci1_type > ci2_type:
-            return +1
-        else:
-            # equal types, go by title
-            if ci1_title < ci2_title:
-                return -1
-            elif ci1_title > ci2_title:
-                return +1
-            else:
-                return 0
-
-    def name_sorter(ci1, ci2):
-        ci1_name = ci1['name']
-        ci2_name = ci2['name']
-        ci1_ext = ci1['ext']
-        ci2_ext = ci2['ext']
-        if ci1_name and ci2_name:
-            if ci1_ext < ci2_ext:
-                return -1
-            elif ci1_ext > ci2_ext:
-                return +1
-            else:
-                # equal extensions, go by filename
-                if ci1_name < ci2_name:
-                    return -1
-                elif ci1_name > ci2_name:
-                    return +1
-                else:
-                    return 0
-        else:
-            return 0
-
-    children = []
-    if level1_items.has_key(key):
-        group_id = level1_items[key]
-        child_data = [get_child_data(x) for x in [k for k, v in level2_items.items() if group_id == v]]
-        for type, url, title, name, ext in child_data:
-            child_item = {
-                          'type' : type,
-                          'url'  : url,
-                          'title': title,
-                          'name' : name,
-                          'ext'  : ext,
-                         }
-            children.append(child_item)
-    children = sorted(sorted(children, type_sorter), name_sorter)
-    return children
-    
-def get_child_data(child):
-    parts = str(child).split(":")
-    type = parts[0]
-    id = parts[1]
-    title = ''
-    name = ''
-    ext = ''
-    url = ''
-    
-    if type == 'video':
-        video = Video.objects.get(id=id)
-        url = 'videos/' + video.slug
-        title = video.title
-        name = video.file.name
-        ext = name
-        pair = name.rsplit('.')
-        if len(pair) > 1:
-            ext = pair[1]
-    elif type == 'pset':
-        pset = ProblemSet.objects.get(id=id)
-        url = 'problemsets/' + pset.slug
-        title = pset.title
-    elif type == 'page':
-        page = AdditionalPage.objects.get(id=id)
-        url = 'pages/' + page.slug
-        title = page.title
-    elif type == 'file':
-        file = File.objects.get(id=id)
-        url = file.file.url
-        title = file.title
-        name = file.file.name.rsplit('/')[-1]
-        ext = file.get_ext()
-        if not ext:
-            ext = name
-    elif type == 'exam':
-        exam = Exam.objects.get(id=id)
-        url = 'exams/' + exam.slug
-    
-    return type, url, title, name, ext
-
-def get_live_datetime_for(thing):
-    """Return the appropriate .live_datetime string for thing"""
-    prod_thing = thing.image
-    if not prod_thing.live_datetime:
-        return "<span style='color:#A00000;'>Not Live</span>"
-    elif prod_thing.live_datetime > datetime.datetime.now():
-        return prod_thing.live_datetime.strftime("<span style='color:#A07000;'>Live %F at %H:%M</span>" )
-    else:
-        return "<span style='color:green;'>Live</span>"
-

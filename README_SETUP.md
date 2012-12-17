@@ -119,7 +119,25 @@ prefix for these.
 
 1. Install test environment dependencies:
 
-        pip install mock nose django_nose django_coverage
+        pip install mock nose django_nose django_coverage lxml
+
+1. Install test dependencies for Selenium based testing:
+
+        pip install selenium selenose
+
+1. Install chrome for Selenium testing
+
+        # chromedriver - list of options available here:
+        # https://code.google.com/p/chromedriver/downloads/list
+        curl -O http://chromedriver.googlecode.com/files/chromedriver_mac_23.0.1240.0.zip
+        unzip chromedriver_mac_23.0.1240.0.zip
+        # move onto your path
+        sudo mv ./chromedriver /usr/local/bin/
+        # install Chrome -- download from https://www.google.com/intl/en/chrome/browser/
+
+1. [Optional] Install dependenices to run selenium tests "headless"
+
+        # TODO: Figure out how to run headless on Mac OSX (see Linux section for starters)
 
 1. Setup the account and database in MySql
 
@@ -359,7 +377,26 @@ be installed for Mac (and probably Windows too)
 
 3. Install test environment dependencies:
 
-        pip install mock nose django_nose django_coverage
+        pip install mock nose django_nose django_coverage lxml
+
+3. Install test dependencies for Selenium based testing:
+
+        pip install selenium selenose
+
+3. Install chrome for Selenium testing
+
+        # chromedriver - list of options available here:
+        # https://code.google.com/p/chromedriver/downloads/list
+        curl -O http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip
+        unzip chromedriver_linux32_23.0.1240.0.zip
+        # move onto your path
+        sudo mv ./chromedriver /usr/local/bin/
+        # install Chrome -- download from https://www.google.com/intl/en/chrome/browser/
+
+3. [Optional] Install dependenices to run selenium tests "headless"
+
+        pip install pyvirtualdisplay
+        sudo apt-get install xvfb xserver-xephyr
 
 3. Go to "main" dir and copy over database settings file:
 

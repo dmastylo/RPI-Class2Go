@@ -1,0 +1,15 @@
+<!-- contentgroup display of items -->
+{% load url from future %}
+
+{% if item.children.button %}
+  {% with item.children.button as children %}
+      {% include "content_groups/button_style.html" %}
+  {% endwith %}
+{% endif %}
+
+{% if item.children.list %}
+  {% with item.children.list as children %}
+      {% include "content_groups/list_style.html" %}
+  {% endwith %}
+{% endif %}
+<!-- end contentgroup display of items -->

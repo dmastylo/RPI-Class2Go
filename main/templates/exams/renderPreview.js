@@ -19,6 +19,7 @@ var c2gXMLParse = (function() {
         renderPreview: function() {
             $('#staging-area').empty();
             $('#staging-area').append(editor.getValue());
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
         },
 
         renderMarkup: function(sourceEl, targetEl) {
@@ -64,7 +65,7 @@ var c2gXMLParse = (function() {
                 questionIdx += 1;
                 var questionMeta=document.createElement('question_metadata');
                 $(questionMeta).attr('id', 'problem_'+questionIdx);
-                $(questionMeta).attr('data-tag4humans', $(this).attr('tag4humans'));
+                $(questionMeta).attr('data-report', $(this).attr('data-report'));
                 $(metadataObj).append($(questionMeta));
                 
                               
@@ -81,7 +82,7 @@ var c2gXMLParse = (function() {
                 var tmpProbDiv = document.createElement('div');
                 $(tmpProbDiv).addClass('question');
                 $(tmpProbDiv).attr('id', 'problem_'+questionIdx);
-                $(tmpProbDiv).attr('data-tag4humans', $(this).attr('tag4humans'));
+                $(tmpProbDiv).attr('data-report', $(this).attr('data-report'));
                               
                 //$('#staging-area').append($(tmpProbDiv));
                 $(targetEl).append($(tmpProbDiv));
@@ -109,7 +110,7 @@ var c2gXMLParse = (function() {
                             var questionObj = document.createElement('response');
                             $(questionObj).attr('name', probName);
                             $(questionObj).attr('answertype',nodeName);
-                            $(questionObj).attr('data-tag4humans',$(node).attr('tag4humans'));
+                            $(questionObj).attr('data-report',$(node).attr('data-report'));
 
                             if ($(node).attr('correct-points') != undefined) {
                               $(questionObj).attr('correct-points',$(node).attr('correct-points'));
@@ -120,7 +121,7 @@ var c2gXMLParse = (function() {
                             $(questionMeta).append($(questionObj));
                               
                             var fieldsetObj = document.createElement('fieldset');
-                            $(fieldsetObj).attr('data-tag4humans',$(node).attr('tag4humans'));
+                            $(fieldsetObj).attr('data-report',$(node).attr('data-report'));
 
                             $(nodeParent).append($(fieldsetObj));
                               
@@ -132,7 +133,7 @@ var c2gXMLParse = (function() {
                                 var choiceObj = document.createElement('choice');
                                 //$(choiceObj).attr('id',choiceID);
                                 $(choiceObj).attr('value',$(this).attr('name'));
-                                $(choiceObj).attr('data-tag4humans', $(this).attr('tag4humans'));
+                                $(choiceObj).attr('data-report', $(this).attr('data-report'));
                                 $(questionObj).append($(choiceObj));
                                 var explanationObj = document.createElement('explanation');
                                 $(explanationObj).append($(this).find('explanation').text());
@@ -150,7 +151,7 @@ var c2gXMLParse = (function() {
                                 var tmpLabel = document.createElement('label');
                                             
                                 $(tmpLabel).attr('for', choiceID);
-                                $(tmpInput).attr('data-tag4humans', $(this).attr('tag4humans'));
+                                $(tmpInput).attr('data-report', $(this).attr('data-report'));
                                 $(tmpInput).attr('type', inputtype);
                                 $(tmpInput).attr('id', choiceID);
 
@@ -176,7 +177,7 @@ var c2gXMLParse = (function() {
                               $(questionObj).attr('name', probName);
                               $(questionObj).attr('answertype', nodeName);
                               $(questionObj).attr('answer',$(node).attr('answer'));
-                              $(questionObj).attr('data-tag4humans', $(node).attr('tag4humans'));
+                              $(questionObj).attr('data-report', $(node).attr('data-report'));
                               
                               if ($(node).attr('correct-points') != undefined) {
                                   $(questionObj).attr('correct-points',$(node).attr('correct-points'));
@@ -195,7 +196,7 @@ var c2gXMLParse = (function() {
                             $(tmpInput).attr('type', 'text');
                             $(tmpInput).attr('id', probName);
                             $(tmpInput).attr('name', probName);
-                            $(tmpInput).attr('data-tag4humans', $(node).attr('tag4humans'));
+                            $(tmpInput).attr('data-report', $(node).attr('data-report'));
                     
                             var textInputSize = (false) ? '' : 20;
                             $(tmpInput).attr('size', textInputSize);
