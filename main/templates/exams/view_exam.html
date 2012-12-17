@@ -318,22 +318,22 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             };
 
             var getAndClearExplArea = function () {
-                var explArea = $('#' + assocQID + '-expl');
-                if (explArea.length == 0) {
-                    explArea = document.createElement('div');
-                    $(explArea).attr('id', assocQID + '-expl');
-                    $(explArea).addClass('explanation');
+                var target = $('#' + assocQID + '-expl');
+                if (target.length == 0) {
+                    target = document.createElement('div');
+                    $(target).attr('id', assocQID + '-expl');
+                    $(target).addClass('explanation');
                 }
-                $(explArea).empty();
-                $('#' + assocQID + ' .quick-check').before($(explArea));
-                return explArea
+                $(target).empty();
+                $('#' + assocQID + ' .quick-check').before($(target));
+                return target
             }
 
             var HTMLAnswerSuccess  = function (data, msg, xhr) {
                 var explArea = getAndClearExplArea();
                 var responseData = $.parseJSON(data);
                 if (responseData == "ERROR") {
-                    $(explArea).append("There was a data error with this question, please contact the course TA's.");
+                    $(explArea).append("There was a data error with this question, please contact the course staff for help.");
                     return;
                 }
                 $(explArea).append(responseData.feedback[0].explanation);
@@ -348,10 +348,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(explArea).append(jqXHR.responseText);
             };
 
-            //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
-
-            //if ($('#GraderName').length > 0) {
             if (__exam_type == "interactive_exercise") {
+                feedback_url = "{% url 'courses.exams.views.feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
                     'select_dict':   '',
@@ -360,9 +358,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       'qnum': $('#' + assocQID).data('qnum')
                     }
                 };
-
-                feedback_url = "{% url 'courses.exams.views.feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-                //$.post(feedback_url, postData, displayHTMLAnswer);
                 $.ajax({
                     url: feedback_url,
                     type: "post",
@@ -370,21 +365,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     success: HTMLAnswerSuccess,
                     error: HTMLAnswerError
                 });
-
-
-                /*
-                var tObj = {};
-                tObj.score = 0;
-                tObj["maximum-score"] = 1;
-                tObj.feedback = [];
-                tObj.feedback[0] = {};
-                tObj.feedback[0].user_answer = postData["student_input"]; 
-                tObj.feedback[0].score = 0;
-                tObj.feedback[0].explanation = "<br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <font style=\"color:red\">Query failed to execute: <class 'sqlite3.OperationalError'>no such column: Movie.title<\/font><br> \n";
-                var testJSON = JSON.stringify(tObj);
-                displayHTMLAnswer(testJSON);
-                */
             } else {
+                $.post("{% url 'courses.exams.views.show_quick_check' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}", 
                 $.post('{{exam.slug}}/quick_check', 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
                     function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
