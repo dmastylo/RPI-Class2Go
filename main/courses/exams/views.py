@@ -8,7 +8,7 @@ import settings
 import datetime
 import csv
 import HTMLParser
-from django.db.models import Sum, Count
+from django.db.models import Sum
 import urllib2
 
 
