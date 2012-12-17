@@ -317,14 +317,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('#' + checkBtnID).attr('value','Hide Answers');
             };
 
-            var HTMLAnswerSuccess  = function (data, msg, xhr) {
-                var responseData = $.parseJSON(data);
-                
-                if ( responseData == "ERROR" ) {
-                  alert("Error: Invalid grader name");
-                  return;
-                }
-                
+            var getAndClearExplArea = function () {
                 var explArea = $('#' + assocQID + '-expl');
                 if (explArea.length == 0) {
                     explArea = document.createElement('div');
@@ -333,24 +326,26 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 }
                 $(explArea).empty();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
+                return explArea
+            }
+
+            var HTMLAnswerSuccess  = function (data, msg, xhr) {
+                var explArea = getAndClearExplArea();
+                var responseData = $.parseJSON(data);
+                if (responseData == "ERROR") {
+                    $(explArea).append("There was a data error with this question, please contact the course TA's.");
+                    return;
+                }
                 $(explArea).append(responseData.feedback[0].explanation);
             };
 
             var HTMLAnswerError = function (jqXHR, error, errorThrown) {
-                var explArea = $('#' + assocQID + '-expl');
-                if (explArea.length == 0) {
-                    explArea = document.createElement('div');
-                    $(explArea).attr('id', assocQID + '-expl');
-                    $(explArea).addClass('explanation');
+                var explArea = getAndClearExplArea();
+                if (jqXHR.status && jqXHR.status >= 500) {
+                    $(explArea).append("There was an error contacting the grader service, please try again later.");
+                    return;
                 }
-                $(explArea).empty();
-                $('#' + assocQID + ' .quick-check').before($(explArea));
-
-                if (jqXHR.status && jqXHR.status >= 500){
-                    $(explArea).append(jqXHR.responseText);
-                } else {
-                    $(explArea).append("There was an error contacting the grader service, please try again later");
-                }
+                $(explArea).append(jqXHR.responseText);
             };
 
             //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
