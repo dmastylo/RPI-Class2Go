@@ -1985,7 +1985,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
             esf.save()
 
 class ExamRecordScoreField(TimestampMixin, models.Model):
-    """Should be kept basically identical to ExamScoreField"""
+    """Should be kept basically identical to ExamScoreField."""
     parent = models.ForeignKey(ExamRecordScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
@@ -2005,8 +2005,10 @@ class ExamRecordFieldLog(TimestampMixin, models.Model):
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     value = models.TextField(null=True, blank=True)
-    raw_score = models.IntegerField(default=0, blank=True)
-    max_score = models.IntegerField(default=0, blank=True)   # info only, for interactive 
+    raw_score = models.FloatField(default=0, blank=True)
+    max_score = models.FloatField(default=0, blank=True)  # info only, for interactive 
+    def __unicode__(self):
+        return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
 
 class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
     """Exploding out even multiple choice answers"""
