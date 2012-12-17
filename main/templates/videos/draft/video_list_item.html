@@ -20,7 +20,6 @@
     	    <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">Edit</a>
     	</td>
         <td width="140">
-            <a href="{% url 'courses.videos.views.manage_exercises' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">Manage Exercises: {{ item.numQuestions }}</a>
         </td>
         <td width="20">
             <a href="javascript:DeleteVideo('{{item.video.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>

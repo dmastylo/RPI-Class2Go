@@ -121,22 +121,12 @@ def view(request, course_prefix, course_suffix, slug):
             exam = Exam.objects.get(id=video.exam_id)
             display_single = exam.display_single
             invideo = exam.invideo
-            print " *** exam.xml_metadata is..."
-            print exam.xml_metadata
             metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
             video_questions = metadata_dom.getElementsByTagName('video')
-            print " *** video_questions..."
-            print video_questions 
            
             question_times = {}
             for video_node in video_questions:
                 video_slug = video_node.getAttribute("url_identifier")
-                print "*** video_slug..."
-                print video_slug
-                print "*** exam.slug..."
-                print exam.slug
-                print "*** video.slug..."
-                print video.slug
                 if video_slug == video.slug:
                     question_children = video_node.getElementsByTagName("question")
                     times = []
@@ -209,13 +199,13 @@ def upload(request, course_prefix, course_suffix):
     data = {'common_page_data': common_page_data}
 
     try:
-        psets = Exam.objects.filter(course_id=common_page_data['course'].id) 
+        exam = Exam.objects.filter(course_id=common_page_data['course'].id) 
     except:
         raise Http404 
 
     form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
-    data['psets'] = psets
+    data['psets'] = exam 
 
     return render_to_response('videos/s3upload.html',
                               data,

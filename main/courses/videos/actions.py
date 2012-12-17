@@ -11,7 +11,7 @@ from django.shortcuts import render, render_to_response, redirect, HttpResponseR
 from django.template import RequestContext
 from django.views.decorators.http import require_POST
 
-from c2g.models import Video, VideoActivity, VideoDownload
+from c2g.models import Exam, Video, VideoActivity, VideoDownload
 from courses.actions import auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.videos.forms import *
@@ -68,6 +68,15 @@ def edit_video(request, course_prefix, course_suffix, slug):
     form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
     if form.is_valid():
         video.exam_id = exam_id 
+
+        if exam_id:
+            try:
+                exam = Exam.objects.get(id=exam_id)
+                exam.live_datetime = video.live_datetime
+                exam.save()
+            except Exam.DoesNotExist:
+                raise Http404
+
         form.save()
         if action == "Save and Set as Ready":
             video.commit()
@@ -233,6 +242,13 @@ def upload(request):
             new_video.save()
             new_video.create_ready_instance()
             #print new_video.file.url
+
+            try:
+                exam = Exam.objects.get(id=exam_id)
+                exam.live_datetime = new_video.live_datetime
+                exam.save()
+            except Exam.DoesNotExist:
+                raise Http404
 
             # kick off remote jobs
             kelvinator.tasks.kelvinate.delay(new_video.file.name)
