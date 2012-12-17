@@ -121,13 +121,23 @@ def view(request, course_prefix, course_suffix, slug):
             exam = Exam.objects.get(id=video.exam_id)
             display_single = exam.display_single
             invideo = exam.invideo
+            print " *** exam.xml_metadata is..."
+            print exam.xml_metadata
             metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
             video_questions = metadata_dom.getElementsByTagName('video')
+            print " *** video_questions..."
+            print video_questions 
            
             question_times = {}
             for video_node in video_questions:
                 video_slug = video_node.getAttribute("url_identifier")
-                if video_slug == exam.slug:
+                print "*** video_slug..."
+                print video_slug
+                print "*** exam.slug..."
+                print exam.slug
+                print "*** video.slug..."
+                print video.slug
+                if video_slug == video.slug:
                     question_children = video_node.getElementsByTagName("question")
                     times = []
                     for question in question_children:

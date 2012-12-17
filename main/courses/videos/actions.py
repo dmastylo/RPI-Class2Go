@@ -62,6 +62,8 @@ def edit_video(request, course_prefix, course_suffix, slug):
     video = common_page_data['course'].video_set.all().get(slug=slug)
     exam_id = request.POST.get("exam_id")
 
+    print '*** live_datetime is...'
+    print request.POST.get('live_datetime')
     action = request.POST['action']
     form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
     if form.is_valid():
