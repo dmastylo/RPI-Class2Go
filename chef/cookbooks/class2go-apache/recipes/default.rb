@@ -22,7 +22,7 @@ node["apps"].keys.each do |app|
         variables({
             :servername => node["apps"][app]["servername"], 
             :serveralias => node["apps"][app]["serveralias"], 
-            :shib_id => nodes["apps"][app]["shib_id"],
+            :shib_id => node["apps"][app]["shib_id"],
             :appname => app
         })
         mode 00644
