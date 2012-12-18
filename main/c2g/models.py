@@ -798,7 +798,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if not clone_fields or 'url' in clone_fields:
             ready_instance.url = self.url
         if not clone_fields or 'exam' in clone_fields:
-            ready_instance.url = self.exam
+            ready_instance.exam = self.exam
         if not clone_fields or 'live_datetime' in clone_fields:
             ready_instance.live_datetime = self.live_datetime
 
@@ -864,7 +864,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if not clone_fields or 'url' in clone_fields:
             self.url = ready_instance.url
         if not clone_fields or 'exam' in clone_fields:
-            self.url = ready_instance.exam
+            self.exam = ready_instance.exam
         if not clone_fields or 'live_datetime' in clone_fields:
             self.live_datetime = ready_instance.live_datetime
 
