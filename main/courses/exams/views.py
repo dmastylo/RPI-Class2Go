@@ -922,10 +922,10 @@ def save_feedback(course, exam, student, student_input, field_name, graded_obj):
     (exam_score_rec, created) = ExamRecordScore.objects.get_or_create(record=exam_rec)
     exam_score_rec.save()
 
-    
+
 @require_POST
 @auth_view_wrapper
-def feedback(request, course_prefix, course_suffix, exam_slug):
+def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_slug):
     """
     Proxies request to the exercise grader so we can both handle the request
     without CORS, and (more importantly) store the answer for later.
@@ -967,5 +967,27 @@ def feedback(request, course_prefix, course_suffix, exam_slug):
     save_feedback(course, exam, request.user, student_input, qid, graded_obj)
 
     response = HttpResponse(graded_raw)
+    return response
+
+    
+@require_POST
+@auth_view_wrapper
+def invideo_feedback(request, course_prefix, course_suffix, exam_slug):
+    """
+    Store results from invideo formative exams.  Problem ID in "id" query param.
+    """
+    course = request.common_page_data['course']
+    try:
+        exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    # the question ID is in the query string, "unknown" if not provided
+    qid = request.GET.get('id', 'unknown')
+
+    # TODO -- video 
+    save_feedback(course, exam, request.user, request.body, qid, 'result')
+
+    response = HttpResponse()  # TODO -- return anything?
     return response
 

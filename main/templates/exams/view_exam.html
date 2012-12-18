@@ -346,7 +346,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             };
 
             if (__exam_type == "interactive_exercise") {
-                feedback_url = "{% url 'courses.exams.views.feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
+                feedback_url = "{% url 'courses.exams.views.interactive_exercise_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
                     'select_dict':   '',
