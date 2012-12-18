@@ -8,10 +8,14 @@
             <a href="{% url item.exam.show_view common_page_data.course_prefix common_page_data.course_suffix item.exam.slug %}">{{item.exam.title}}</a>
         </h4>
         <span>{{item.exam.description}}</span>
-        <p class="deadlines" style="margin-bottom:5px"><strong>Full Credit Deadline:</strong> {{item.exam.due_date}} PST
-        {% if not item.exam.partial_credit_deadline == item.exam.partial_credit_deadline %}
-        | <strong>Late Deadline ({{100|sub:item.exam.late_penalty}}% credit):</strong> {{item.exam.partial_credit_deadline}} PST |
-        {% endif %}<br/>
+        {% if is_child == None %}
+            <p class="deadlines" style="margin-bottom:5px"><strong>Full Credit Deadline:</strong> {{item.exam.due_date}} PST
+            {% if not item.exam.partial_credit_deadline == item.exam.partial_credit_deadline %}
+            | <strong>Late Deadline ({{100|sub:item.exam.late_penalty}}% credit):</strong> {{item.exam.partial_credit_deadline}} PST |
+            {% endif %}<br/>
+        {% else %}
+        <p><br />
+        {% endif %}
             {% if item.exam.autograde %}
 
             <div class="accordion" id="attempts_{{item.exam.slug}}">

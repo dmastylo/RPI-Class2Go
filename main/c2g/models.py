@@ -744,7 +744,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         ready_instance = Video(
             course=self.course.image,
             section=self.section.image,
-            exam=self.exam,
+            exam=self.exam.image,
             title=self.title,
             description=self.description,
             type=self.type,
@@ -790,6 +790,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             ready_instance.file = self.file
         if not clone_fields or 'url' in clone_fields:
             ready_instance.url = self.url
+        if not clone_fields or 'exam' in clone_fields:
+            ready_instance.url = self.exam
         if not clone_fields or 'live_datetime' in clone_fields:
             ready_instance.live_datetime = self.live_datetime
 
@@ -854,6 +856,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.file = ready_instance.file
         if not clone_fields or 'url' in clone_fields:
             self.url = ready_instance.url
+        if not clone_fields or 'exam' in clone_fields:
+            self.url = ready_instance.exam
         if not clone_fields or 'live_datetime' in clone_fields:
             self.live_datetime = ready_instance.live_datetime
 
@@ -906,6 +910,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         if self.file != prod_instance.file:
             return False
         if self.url != prod_instance.url:
+            return False
+        if self.exam != prod_instance.exam:
             return False
         if self.live_datetime != prod_instance.live_datetime:
             return False
@@ -1705,6 +1711,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
+            assessment_type = self.assessment_type,
         )
         ready_instance.save()
         self.image = ready_instance
@@ -1761,6 +1768,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.timed = self.timed
         if not clone_fields or 'minutesallowed' in clone_fields:
             ready_instance.minutesallowed = self.minutesallowed
+        if not clone_fields or 'assessment_type' in clone_fields:
+            ready_instance.assessment_type = self.assessment_type
         
         ready_instance.save()
     
@@ -1813,7 +1822,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if not clone_fields or 'timed' in clone_fields:
             self.timed = ready_instance.timed 
         if not clone_fields or 'minutesallowed' in clone_fields:
-            self.minutesallowed = ready_instance.minutesallowed 
+            self.minutesallowed = ready_instance.minutesallowed
+        if not clone_fields or 'assessment_type' in clone_fields:
+            self.assessment_type = ready_instance.assessment_type
 
         self.save()
     
@@ -1866,6 +1877,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.timed != self.image.timed:
             return False
         if self.minutesallowed != self.image.minutesallowed:
+            return False
+        if self.assessment_type != self.image.assessment_type:
             return False
 
         return True

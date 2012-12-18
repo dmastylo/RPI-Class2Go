@@ -562,13 +562,13 @@
         jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
                        for (var i=0; i < data.length; i++) {
                        // For the moment we filter out objects of other types, per the spec.
-                       // In the future this restriction will probably be lifted.
-                       // See also add_section_page.html
-                       if ((data[i][0] === 'video') || (data[i][0] === 'file')) {
-                       pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                       // FIXME: in the future we should have information about what can be children of what in
+                       //        just one place, not everywhere it's implemented. Cf. add_section_page.html
+                           if ((data[i][0] === 'video') || (data[i][0] === 'exam')) {
+                               pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                           }
                        }
-                       }
-                       });
+        });
     }
     </script>
 

@@ -14,10 +14,8 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
         pages = AdditionalPage.objects.getByCourse(course=COURSE)
         files = File.objects.getByCourse(course=COURSE)
         exams = Exam.objects.getByCourse(course=COURSE)
-        print "DEBUG: exams # at top:", len(exams)
         if exam_types:
             exams = exams.filter(exam_type__in=exam_types)
-        print "DEBUG: after filtering with", str(exam_types), "# is", len(exams)
         l1items, l2items = get_contentgroup_data(COURSE)
 
         if get_video_content:
@@ -295,7 +293,6 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_exam_content:
                 user_records = ExamRecord.objects.filter(course=COURSE, student=USER, complete=True).order_by('time_created')
-                print "DEBUG: exams #", len(exams)
                 for exam in exams:
                     key = ('exam', exam.id)
                     if exam.section_id == section.id and not l2items.has_key(key):

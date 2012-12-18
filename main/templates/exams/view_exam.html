@@ -71,14 +71,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #prev-question {float: left;}
     label pre {margin-left:30px;}
 
-    /* BEGIN CSS for Wed demo */
     .quick-check {clear: both; display: block; margin-top: 1em;}
     .explanation {background: #fff; border-radius: 3px; margin: 1em; border: 1px solid black; padding: 1em;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
-    /* END CSS for Wed demo */
 
     .correct {color: #090;}
     .incorrect {color: #900;}
@@ -192,7 +190,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('.question-nav').click(showQuestion);
         
         {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
-        /* BEGIN JS for Wed demo */
         var quickCheck = function () {
 
             var checkBtnID = $(this).attr('id');
@@ -384,10 +381,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.quick-check').click(quickCheck);
         {% endif %}
-        /* END JS for Wed demo */
     {% endif %}
 
-    var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    {% if exam.html_content != "" and exam.exam_type != "invideo" %}
+        {% if exam.autograde %}
+        var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+        {% else %}
+        var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+        {% endif %}
+    {% else %}
+        var SUBMISSION_RETURN_URL = "";
+    {% endif %}
                       
     if (__exam_type=="survey") {
             SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
@@ -763,7 +767,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 </script>
 {% if videotest %}
 <script>
+        var videoURL = 'http://www.youtube.com/embed/{% if video.mode == 'draft' %}{{video.url}}{% else %}{{video.image.url}}{% endif %}?autoplay=0&wmode=transparent&fs=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
+        var thumbnailPath = "http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
+        //var thumbnailData = {"0":{"imgsrc":"img001.jpeg"},"31":{"imgsrc":"img032.jpeg"},"40":{"imgsrc":"img041.jpeg"},"62":{"imgsrc":"img063.jpeg"},"135":{"imgsrc":"img136.jpeg"},"136":{"imgsrc":"img137.jpeg"},"179":{"imgsrc":"img180.jpeg"},"259":{"imgsrc":"img260.jpeg"},"292":{"imgsrc":"img293.jpeg"},"353":{"imgsrc":"img354.jpeg"},"354":{"imgsrc":"img355.jpeg"},"355":{"imgsrc":"img356.jpeg"} /*,"385":{"imgsrc":"img386.jpeg"}*/};
+        //var questionData = {"184": {"fileName": "arp_q1.html", "problemDiv": 974, "order": 0, "time": 384}, "385": {"fileName": "arp_q2.html", "problemDiv": 975, "order": 1, "time": 385}, "385": {"fileName": "arp_q3.html", "problemDiv": 976, "order": 2, "time": 386}};
+        //var imgPath = "http://prod-c2g.s3-website-us-west-2.amazonaws.com/networking/Fall2012/videos/1201/jpegs/";
+
+        // questionTimes from parsed XML metadata 
+        var questionTimes = JSON.parse('{{question_times|escapejs}}');
 {% include 'exams/videotest.js' %}
+{% if not video.url %}
+    $('#demoplayer').hide();
+    $('.question').eq(0).show();
+    $('#exam-pane').fadeTo("slow", 1.0);
+{% endif %} 
 </script>
 {% endif %}
 {% endblock addl_scripts %}
