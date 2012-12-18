@@ -24,7 +24,7 @@ package "opensaml2-tools" do
 end
 
 execute "remove shib.conf" do
-    cmd "F=/etc/apache2/conf.d/shib.conf; if [ -e $F ]; then rm $F; fi"
+    command "F=/etc/apache2/conf.d/shib.conf; if [ -e $F ]; then rm $F; fi"
     action :run
 end
 
@@ -60,19 +60,4 @@ template "class.pem" do
     mode 00644
 end
 
-template "class2go.key" do
-    path "/etc/shibboleth/class2go.key"
-    source "class2go.key.erb"
-    owner "_shibd"
-    group "_shibd"
-    mode 00600
-end
-
-template "class2go.pem" do
-    path "/etc/shibboleth/class2go.pem"
-    source "class2go.pem.erb"
-    owner "_shibd"
-    group "_shibd"
-    mode 00644
-end
 

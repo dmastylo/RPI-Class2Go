@@ -135,12 +135,8 @@
         <!--
         <ApplicationOverride id="admin" entityID="https://admin.example.org/shibboleth"/>
         -->
-	<ApplicationOverride id="class2go" entityID="<%= @node[:shib][:class2go][:entity_id] %>">
-                <CredentialResolver type="File" key="class2go.key" certificate="class2go.pem"/>
-        </ApplicationOverride>   
-        <ApplicationOverride id="class" entityID="<%= @node[:shib][:class][:entity_id] %>">
-                <CredentialResolver type="File" key="class.key" certificate="class.pem"/>
-        </ApplicationOverride>
+	<ApplicationOverride id="class2go" entityID="<%= @node[:shib][:class2go][:entity_id] %>"/>
+        <ApplicationOverride id="class" entityID="<%= @node[:shib][:class][:entity_id] %>"/>
     </ApplicationDefaults>
     
     <!-- Policies that determine how to process and authenticate runtime messages. -->
