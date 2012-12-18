@@ -23,6 +23,11 @@ package "opensaml2-tools" do
     action :install
 end
 
+execute "remove shib.conf" do
+    cmd "F=/etc/apache2/conf.d/shib.conf; if [ -e $F ]; then rm $F; fi"
+    action :run
+end
+
 template "shibboleth2.xml" do
     path "/etc/shibboleth/shibboleth2.xml"
     source "shibboleth2.xml.erb"
