@@ -1966,6 +1966,7 @@ class ExamScore(TimestampMixin, models.Model):
             self.score = exam_records[0]['max_score']
             self.save()        
 
+# Deprecated
 class ExamScoreField(TimestampMixin, models.Model):
     """Should be kept basically identical to ExamRecordScoreField"""
     parent = models.ForeignKey(ExamScore, db_index=True)
@@ -1998,15 +1999,28 @@ class ExamRecordScore(TimestampMixin, models.Model):
 
 
 class ExamRecordScoreField(TimestampMixin, models.Model):
-    """Should be kept basically identical to ExamScoreField"""
+    """Should be kept basically identical to ExamScoreField."""
     parent = models.ForeignKey(ExamRecordScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
-    value = models.CharField(max_length=128, null=True, blank=True)
+    value = models.TextField(null=True, blank=True)
     correct = models.NullBooleanField()
     subscore = models.FloatField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
+    def __unicode__(self):
+        return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
+
+class ExamRecordFieldLog(TimestampMixin, models.Model):
+    """Log oriented table recording activity for each submission of each field."""
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.TextField(null=True, blank=True)
+    raw_score = models.FloatField(default=0, blank=True)
+    max_score = models.FloatField(default=0, blank=True)  # info only, for interactive 
     def __unicode__(self):
         return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
 
@@ -2021,13 +2035,13 @@ class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
         return (self.parent.parent.record.student.username + ":" + self.parent.parent.record.course.title + ":" \
                 + self.parent.parent.record.exam.title + ":" + self.parent.human_name + ":" + self.human_name)
 
-
 class CurrentTermMap(TimestampMixin, models.Model):
     course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
     course_suffix = models.CharField(max_length=64)
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
+# Deprecated in favor of ExamScore (complete / incomplete to track state)
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)
@@ -2226,3 +2240,5 @@ class ContentGroup(models.Model):
     class Meta:
         db_table = u'c2g_content_group'
         
+
+
