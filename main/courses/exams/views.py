@@ -10,6 +10,7 @@ import csv
 import HTMLParser
 from django.db.models import Sum
 import urllib2
+from xml.dom.minidom import parseString
 
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
@@ -88,10 +89,14 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
 
     too_many_attempts = exam.max_attempts_exceeded(request.user)
     
+    #self.metadata_xml = xml #The XML metadata for the entire problem set.
+    metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
+    questions = metadata_dom.getElementsByTagName('video')
+
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':exam.invideo,
                               'allow_submit':True, 'too_many_attempts':too_many_attempts,
-                              'exam':exam}, RequestContext(request))
+                              'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
 
 @require_POST
 @auth_view_wrapper
@@ -116,7 +121,6 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
                                                        'allow_submit':True, 'too_many_attempts':too_many_attempts},
                               RequestContext(request))
 
-# BEGIN function for Wed demo
 @require_POST
 @auth_view_wrapper
 def show_quick_check(request, course_prefix, course_suffix, exam_slug):
@@ -130,7 +134,6 @@ def show_quick_check(request, course_prefix, course_suffix, exam_slug):
         raise Http404
 
     return render_to_response('exams/quickcheck.html', {'common_page_data':request.common_page_data, 'exam':exam, 'user_answer_data':user_answer_data, 'videotest':True}, RequestContext(request))
-# END function for Wed demo
 
 def show_invideo_quiz(request, course_prefix, course_suffix, exam_slug):
     return render_to_response('exams/videotest.html', {'common_page_data':request.common_page_data}, RequestContext(request))

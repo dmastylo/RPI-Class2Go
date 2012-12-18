@@ -1,10 +1,12 @@
+import json
+
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import RequestContext
 
-from c2g.models import Exercise, Exam, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
+from c2g.models import ContentGroup, ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials, get_children, get_contentgroup_data
@@ -12,6 +14,7 @@ from courses.videos.forms import *
 from courses.views import get_full_contentsection_list
 from courses.forms import *
 
+from xml.dom.minidom import parseString
 
 @auth_view_wrapper
 def list(request, course_prefix, course_suffix):
@@ -112,7 +115,42 @@ def view(request, course_prefix, course_suffix, slug):
     l1items, l2items = get_contentgroup_data(course=course)
     downloadable_content = get_children(key, l1items, l2items)
 
-    return render_to_response('videos/view.html', 
+    if video.exam_id:
+        try:
+            #exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+            exam = Exam.objects.get(id=video.exam_id)
+            display_single = exam.display_single
+            invideo = exam.invideo
+            metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
+            video_questions = metadata_dom.getElementsByTagName('video')
+           
+            question_times = {}
+            for video_node in video_questions:
+                video_slug = video_node.getAttribute("url_identifier")
+                if video_slug == video.slug:
+                    question_children = video_node.getElementsByTagName("question")
+                    times = []
+                    for question in question_children:
+                        time = "sec_%s" % question.getAttribute("time")
+                        if time not in question_times:
+                            question_times[time] = [] 
+                        question_times[time].append(question.getAttribute("id"))
+
+            print json.dumps(question_times)
+
+        except Exam.DoesNotExist:
+            raise Http404
+    else:
+        sections = ContentSection.objects.getByCourse(course) 
+        section = sections[0]
+        # create fake exam as exam template (which is what displays all videos) needs exam data to function
+        # correctly (TODO: Refactor this)
+        exam = Exam(course=course, slug=slug, title=video.title, description="Empty Exam", html_content="", xml_metadata="", due_date='', assessment_type="invideo", mode="draft", total_score=0, grade_single=0, grace_period='', partial_credit_deadline='', late_penalty=0, submissions_permitted=0, resubmission_penalty=0, exam_type="invideo", autograde=0, display_single=0, invideo=1, section=section,)
+        exam.live_datetime = video.live_datetime    # needed so video shows up
+        question_times = ""
+
+    # change from 'videos/view.html' to 'exams/view_exam.html'
+    return render_to_response('exams/view_exam.html', 
                               {
                                'common_page_data':    common_page_data, 
                                'video':               video, 
@@ -123,7 +161,16 @@ def view(request, course_prefix, course_suffix, slug):
                                'contentsection_list': full_contentsection_list, 
                                'full_index_list':     full_index_list,
                                'is_logged_in':        is_logged_in,
-                               'children':            downloadable_content,
+                               'downloadable_content':downloadable_content,
+                               'json_pre_pop':"{}",
+                               'scores':"{}",
+                               'editable':True,
+                               'single_question':exam.display_single,
+                               'videotest':exam.invideo,
+                               'question_times':json.dumps(question_times),
+                               'allow_submit':True,
+                               'children': downloadable_content,
+                               'exam':exam
                               },
                               context_instance=RequestContext(request))
 
@@ -155,13 +202,13 @@ def upload(request, course_prefix, course_suffix):
     data = {'common_page_data': common_page_data}
 
     try:
-        psets = Exam.objects.filter(course_id=common_page_data['course'].id) 
+        exam = Exam.objects.filter(course_id=common_page_data['course'].id) 
     except:
         raise Http404 
 
     form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
-    data['psets'] = psets
+    data['psets'] = exam 
 
     return render_to_response('videos/s3upload.html',
                               data,
