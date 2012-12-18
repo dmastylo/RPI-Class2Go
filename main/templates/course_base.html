@@ -41,9 +41,11 @@
                     <a href="{% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
                 </li>
                 {% endif %}
+                {% if common_page_data.course.has_videos %}
                 <li {% block videos_link_class %}{% endblock videos_link_class %}>
                     <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
                 </li>
+                {% endif %}
                 {% if common_page_data.course.has_exams %}
                 <li {% block exam_link_class %}{% endblock exam_link_class %}>
                     <a href="{% url 'exam_list' common_page_data.course_prefix common_page_data.course_suffix %}">Exams</a>
