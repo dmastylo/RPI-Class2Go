@@ -28,6 +28,7 @@
     {% endifnotequal %}
     <form name="edit_form" action="{% url 'courses.additional_pages.actions.save' %}" method="POST">
         <fieldset class="well">
+
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
             <label class="control-label">Title</label>
@@ -57,6 +58,26 @@
         </div>
         {% else %}
             <input type='hidden' name='slug' value='overview' />
+        {% endifnotequal %}
+
+        {% ifnotequal page.slug 'overview' %}
+        <div class="control-group">
+            <label class="control-label">Item Parent</label>
+            <div class="controls">
+                <select name="parent" id="parent_id">
+                    <!-- Filled by prefill_children() -->
+                    {% if contentgroup_info %}
+                        <option value="{{contentgroup_info.parent_type}},{{contentgroup_info.parent_id}}" selected>{{contentgroup_info.parent.title}}</option>
+                    {% endif %}
+                </select>
+            </div>
+        </div>
+        {% else %}
+            {% if contentgroup_info %}
+                <option value="{{contentgroup_info.parent_type}},{{contentgroup_info.parent_id}}" selected>{{contentgroup_info.parent.title}}</option>
+            {% else %}
+                <input type='hidden' name='parent' value='overview' />
+            {% endif %}
         {% endifnotequal %}
 
         {% csrf_token %}
@@ -100,5 +121,32 @@
 $('#id_slug').focus(function() {
     $('#slug_warning').show();
 });
+</script>
+<script type="text/javascript">
+    // force our handler to fire when the page first loads, in addition to onChange
+    $("#parent_id").ready(
+    function prefill_children() {
+        var id = {{ page.section_id }}; /* FIXME: using template substitutions in js is evil. better to seed a data structure. */
+        var pelement = $("#parent_id");
+        pelement.append('<option value="none,none">(this is a top level page)</option>');
+        jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+            for (var i=0; i < data.length; i++) {
+                // For the moment we filter out objects of other types, per the spec.
+                // In the future this restriction will probably be lifted.
+                // See also files/upload.html
+                if (data[i][0] == 'additional_page') {
+                    {% if contentgroup_info %}
+                    if ((data[i][2] != {{contentgroup_info.parent.title}}) && (data[i][2] != {{page.title}})) {
+                        pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                    }
+                    {% else %}
+                    if (data[i][2] != {{page.title}}) {
+                        pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                    }
+                    {% endif %}
+                }
+            }
+        });
+    });
 </script>
 {% endblock addl_scripts %}
