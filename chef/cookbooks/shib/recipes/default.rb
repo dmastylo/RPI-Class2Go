@@ -23,14 +23,6 @@ package "opensaml2-tools" do
     action :install
 end
 
-template "shib.conf" do
-    path "/etc/apache2/conf.d/shib.conf"
-    source "shib.conf.erb"
-    owner "root"
-    group "root"
-    mode 00644
-end
-
 template "shibboleth2.xml" do
     path "/etc/shibboleth/shibboleth2.xml"
     source "shibboleth2.xml.erb"
@@ -47,17 +39,33 @@ template "attribute-map.xml" do
     mode 00644
 end
 
-template "sp-key.pem" do
-    path "/etc/shibboleth/sp-key.pem"
-    source "sp-key.pem.erb"
+template "class.key" do
+    path "/etc/shibboleth/class.key"
+    source "class.key.erb"
     owner "_shibd"
     group "_shibd"
     mode 00600
 end
 
-template "sp-cert.pem" do
-    path "/etc/shibboleth/sp-cert.pem"
-    source "sp-cert.pem.erb"
+template "class.pem" do
+    path "/etc/shibboleth/class.pem"
+    source "class.pem.erb"
+    owner "_shibd"
+    group "_shibd"
+    mode 00644
+end
+
+template "class2go.key" do
+    path "/etc/shibboleth/class2go.key"
+    source "class2go.key.erb"
+    owner "_shibd"
+    group "_shibd"
+    mode 00600
+end
+
+template "class2go.pem" do
+    path "/etc/shibboleth/class2go.pem"
+    source "class2go.pem.erb"
     owner "_shibd"
     group "_shibd"
     mode 00644
