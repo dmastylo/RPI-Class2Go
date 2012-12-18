@@ -8,8 +8,9 @@ import settings
 import datetime
 import csv
 import HTMLParser
+import json
 from django.db.models import Sum
-import urllib2
+import urllib2, urlparse
 
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
@@ -498,7 +499,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         return HttpResponseBadRequest("No hard deadline provided")
     if not section:
         return HttpResponseBadRequest("Bad section provided!")
-    print(section)
+
     try:
         contentsection = ContentSection.objects.get(id=section, course=course, is_deleted=False)
     except ContentSection.DoesNotExist:
@@ -508,7 +509,6 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     gp = datetime.datetime.strptime(grace_period, "%m/%d/%Y %H:%M")
     pcd = datetime.datetime.strptime(partial_credit_deadline, "%m/%d/%Y %H:%M")
 
-    print(assessment_type)
     if assessment_type == "summative":
         autograde = True
         invideo = False
@@ -861,6 +861,14 @@ def validate_row(row):
 
     return (True, (username, field_name, score))
 
+# Test values for interactive exercises
+canned_feedback = {}
+canned_feedback['wrong'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"select * from movie","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>101<\/td><td>Gone with the Wind<\/td><td>1939<\/td><td>Victor Fleming<\/td><\/tr><tr><td>102<\/td><td>Star Wars<\/td><td>1977<\/td><td>George Lucas<\/td><\/tr><tr><td>103<\/td><td>The Sound of Music<\/td><td>1965<\/td><td>Robert Wise<\/td><\/tr><tr><td>104<\/td><td>E.T.<\/td><td>1982<\/td><td>Steven Spielberg<\/td><\/tr><tr><td>105<\/td><td>Titanic<\/td><td>1997<\/td><td>James Cameron<\/td><\/tr><tr><td>106<\/td><td>Snow White<\/td><td>1937<\/td><td>&lt;NULL&gt;<\/td><\/tr><tr><td>107<\/td><td>Avatar<\/td><td>2009<\/td><td>James Cameron<\/td><\/tr><tr><td>108<\/td><td>Raiders of the Lost Ark<\/td><td>1981<\/td><td>Steven Spielberg<\/td><\/tr><\/table> <br>Expected Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>E.T.<\/td><\/tr><tr><td>Raiders of the Lost Ark<\/td><\/tr><\/table>"}]}'
+canned_feedback['correct'] = r'{"score":1,"maximum-score":1,"feedback":[{"user_answer":"select title from movie where director=\"Steven Spielberg\";","score":1,"explanation":" <br><font style=\"color:green; font-weight:bold;\">Correct<\/font><br><br>Your Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>E.T.<\/td><\/tr><tr><td>Raiders of the Lost Ark<\/td><\/tr><\/table> <br>Expected Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>E.T.<\/td><\/tr><tr><td>Raiders of the Lost Ark<\/td><\/tr><\/table>"}]}'
+canned_feedback['right'] = canned_feedback['correct']
+canned_feedback['help'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"help","score":0,"explanation":"You are in localhost debugging mode.<br>Try <tt>right_answer</tt> or <tt>wrong_answer</tt>"}]}'
+canned_feedback['error'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"error","score":0,"explanation":"You are in localhost debugging mode.<br>Did not send a well-formatted request."}]}'
+
 
 @require_POST
 @auth_view_wrapper
@@ -875,7 +883,20 @@ def feedback(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    grader_hostname = getattr(settings, 'DB_GRADER_LOADBAL', '')
+    # import ipdb; ipdb.set_trace()
+    grader_hostname = getattr(settings, 'DB_GRADER_LOADBAL', 'localhost')
+    if grader_hostname == 'localhost':
+        try:
+            parsed_body=urlparse.parse_qs(request.body)
+            student_input=parsed_body['student_input'][0]
+        except:
+            student_input='error'
+        graded_raw = canned_feedback['help']
+        if student_input in canned_feedback.keys():
+            graded_raw = canned_feedback[student_input]
+        response = HttpResponse(graded_raw)
+        return response
+
     grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
     grader_data = request.body
     grader_timeout = 10    # seconds
@@ -883,9 +904,8 @@ def feedback(request, course_prefix, course_suffix, exam_slug):
     try:
         response = urllib2.urlopen(grader_url, grader_data, grader_timeout)
     except urllib2.URLError, e:
-        return HttpResponse("Backend error: could not contact interactive grader, please try again later.",
+        return HttpResponse("Error in the interactive grader backend, please try again later.",
                 status=500)
-
     graded_raw = response.read()
     graded_json=json.loads(graded_raw)
 
