@@ -19,7 +19,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice, ContentSection
+from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice, ContentSection
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -578,6 +578,10 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         except ValueError:
             return HttpResponseBadRequest("A non-numeric resubmission penalty (" + resubmission_penalty  + ") was provided")
 
+    if parent and parent[:4] != 'none':
+        parent_type, parent = parent.split(',')
+    else:
+        parent_type, parent = None, None
 
     #create or edit the Exam
     if create_or_edit == "create":
@@ -592,6 +596,11 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
 
         exam_obj.save()
         exam_obj.create_ready_instance()
+
+        if parent_type:
+            parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
+            content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
+            ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
 
         return HttpResponse("Exam " + title + " created. \n" + unicode(grader))
     else:
@@ -619,6 +628,15 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.section=contentsection
             exam_obj.save()
             exam_obj.commit()
+
+            if parent_type:
+                parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
+                content_group_parent = parent_ref.contentgroup_set.all()
+                if content_group_parent:
+                    content_group_groupid = content_group_parent[0].group_id
+                else:
+                    content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
+                ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
 
             return HttpResponse("Exam " + title + " saved. \n" + unicode(grader))
 
