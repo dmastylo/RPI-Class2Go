@@ -314,42 +314,56 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('#' + checkBtnID).attr('value','Hide Answers');
             };
 
-            var displayHTMLAnswer = function (data, msg, xhr) {
-                
-                var responseData = $.parseJSON(data);
-                
-                if ( responseData == "ERROR" ) {
-                  alert("Error: Invalid grader name");
-                  return;
+            var getAndClearExplArea = function () {
+                var target = $('#' + assocQID + '-expl');
+                if (target.length == 0) {
+                    target = document.createElement('div');
+                    $(target).attr('id', assocQID + '-expl');
+                    $(target).addClass('explanation');
                 }
-                
-                var explArea = $('#' + assocQID + '-expl');
-                if (explArea.length == 0) {
-                    explArea = document.createElement('div');
-                    $(explArea).attr('id', assocQID + '-expl');
-                    $(explArea).addClass('explanation');
-                }
-                $(explArea).empty();
-                $('#' + assocQID + ' .quick-check').before($(explArea));
-                $(explArea).append(responseData.feedback[0].explanation);
+                $(target).empty();
+                $('#' + assocQID + ' .quick-check').before($(target));
+                return target
+            }
 
+            var HTMLAnswerSuccess  = function (data, msg, xhr) {
+                var explArea = getAndClearExplArea();
+                var responseData = $.parseJSON(data);
+                if (responseData == "ERROR") {
+                    $(explArea).append("There was a data error with this question, contact the course staff for help.");
+                    return;
+                }
+                $(explArea).append(responseData.feedback[0].explanation);
             };
 
-            //$.post('{{exam.slug}}/quick_check', {'course_prefix': '{{common_page_data.course.prefix}}', 'course_suffix': '{{common_page_data.course.suffix}}', 'exam_slug': '{{exam.slug}}', 'question-data': '', 'csrf_token':'{{ csrf_token }}'}, displayMetaData);
+            var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
+                var explArea = getAndClearExplArea();
+                $(explArea).append("There was an error contacting the grader service, try again later.");
+                if (textStatus != "null") {
+                    $(explArea).append("   (" + textStatus + ")");
+                }
+                return;
+            };
 
             if (__exam_type == "interactive_exercise") {
+                feedback_url = "{% url 'courses.exams.views.interactive_exercise_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
                     'select_dict':   '',
                     'student_input': $('#' + assocQID).find('textarea').val(),
                     'params': {
-                      'qnum': 1 //$('#' + assocQID).data('qnum')
+                      'qnum': $('#' + assocQID).data('qnum')
                     }
                 };
-
-                $.post("{{exam.slug}}/feedback", postData, displayHTMLAnswer);
+                $.ajax({
+                    url: feedback_url,
+                    type: "post",
+                    data: postData,
+                    success: HTMLAnswerSuccess,
+                    error: HTMLAnswerError
+                });
             } else {
-                $.post('{{exam.slug}}/quick_check', 
+                $.post("{% url 'courses.exams.views.show_quick_check' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}", 
                     {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
                     function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
             }

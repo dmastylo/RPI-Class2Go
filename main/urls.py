@@ -44,7 +44,6 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/all_submissions_to_grade/?$', 'courses.exams.views.view_submissions_to_grade'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/post_csv_grades/?$', 'courses.exams.views.post_csv_grades'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/get_csv_grades/?$', 'courses.exams.views.view_csv_grades'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/feedback/?$', 'courses.exams.views.feedback'),
 
     #The rest of these URLs end up in the location bar of student users.  We should alias them for each exam subtype so that students do not get
     #confused.  Would love to make this DRY, because it's very repetitive, but I don't know how.
@@ -69,7 +68,6 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='problemset_my_submissions'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='problemset_record'),
 
-
     #survey subtype of exam
     #This and the exams list use the same view, so any reversing should be done using the name, i.e. 'survey_list', otherwise it
     #will be always return /exams/
@@ -80,7 +78,6 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='survey_my_submissions'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/surveys/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='survey_record'),
 
-
     #interactive_exercise subtype of exam
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/?$', 'courses.exams.views.listAll', {'show_types':['interactive_exercise',]}, name='interactive_exercise_list'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam', name='interactive_exercise_show'),
@@ -88,10 +85,16 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam', name='interactive_exercise_graded'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='interactive_exercise_my_submissions'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='interactive_exercise_record'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/interactive_exercises/(?P<exam_slug>[a-zA-Z0-9_-]+)/feedback', 'courses.exams.views.interactive_exercise_feedback',),  # no dollar sign for query param
 
-
-    
-
+    #invideo subtype of exam
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/invideo/?$', 'courses.exams.views.listAll', {'show_types':['invideo',]}, name='invideo_list'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/invideo/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.exams.views.show_exam', name='invideo_show'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/invideo/(?P<exam_slug>[a-zA-Z0-9_-]+)/snapshot/?$', 'courses.exams.views.show_populated_exam', name='invideo_populated'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/invideo/(?P<exam_slug>[a-zA-Z0-9_-]+)/graded/?$', 'courses.exams.views.show_graded_exam', name='invideo_graded'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/invideo/(?P<exam_slug>[a-zA-Z0-9_-]+)/view_submissions/?$', 'courses.exams.views.view_my_submissions', name='invideo_my_submissions'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/invideo/(?P<exam_slug>[a-zA-Z0-9_-]+)/record/(?P<record_id>[0-9]+)/?$', 'courses.exams.views.show_graded_record', name='invideo_record'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/invideo/(?P<exam_slug>[a-zA-Z0-9_-]+)/feedback', 'courses.exams.views.invideo_feedback',),  # no dollar sign for query param
 
     #emailoptout
     url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
