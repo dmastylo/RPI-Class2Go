@@ -22,6 +22,21 @@
     </Files>
     </Directory>
 
+    <Location /Shibboleth.sso>
+        SetHandler shib
+        Satisfy Any
+        Allow from all
+        AuthType None
+        Require all granted
+        ShibRequestSetting applicationId <%= @shib_id %>
+    </Location>
+    <Location '/shib-login'>
+        ShibRequestSetting applicationId <%= @shib_id %>
+        AuthType shibboleth
+        ShibRequestSetting requireSession 1
+        require valid-user
+    </Location>
+
     WSGIDaemonProcess <%= @appname %> threads=15 maximum-requests=10000 python-path=/home/ubuntu/<%= @appname %>/main
     WSGIProcessGroup <%= @appname %>
 
