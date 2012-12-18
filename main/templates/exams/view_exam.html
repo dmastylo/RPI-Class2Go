@@ -333,23 +333,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 var explArea = getAndClearExplArea();
                 var responseData = $.parseJSON(data);
                 if (responseData == "ERROR") {
-                    $(explArea).append("There was a data error with this question, please contact the course staff for help.");
+                    $(explArea).append("There was a data error with this question, contact the course staff for help.");
                     return;
                 }
                 $(explArea).append(responseData.feedback[0].explanation);
             };
 
-            var HTMLAnswerError = function (jqXHR, error, errorThrown) {
+            var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
                 var explArea = getAndClearExplArea();
-                if (jqXHR.status && jqXHR.status >= 500) {
-                    $(explArea).append("There was an error contacting the grader service, please try again later.");
-                    return;
+                $(explArea).append("There was an error contacting the grader service, try again later.");
+                if (textStatus != "null") {
+                    $(explArea).append("   (" + textStatus + ")");
                 }
-                $(explArea).append(jqXHR.responseText);
+                return;
             };
 
             if (__exam_type == "interactive_exercise") {
-                feedback_url = "{% url 'courses.exams.views.feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+                feedback_url = "{% url 'courses.exams.views.feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
                     'select_dict':   '',

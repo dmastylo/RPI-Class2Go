@@ -26,7 +26,7 @@ urlpatterns = patterns('',
     url(r'^contactus$', 'c2g.views.contactus'),
     url(r'^faq$', 'c2g.views.faq'),
     url(r'^test_xml$', 'courses.exams.views.show_test_xml'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/feedback/?$', 'courses.exams.views.feedback'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/feedback', 'courses.exams.views.feedback',),  # no dollar sign on purpose
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/quick_check/?$', 'courses.exams.views.show_quick_check'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/videotest/?$', 'courses.exams.views.show_invideo_quiz'),
 

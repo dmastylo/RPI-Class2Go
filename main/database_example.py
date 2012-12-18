@@ -89,3 +89,7 @@ SES_SMTP_PASSWD = "PWD"
 YT_SERVICE_DEVELOPER_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 GOOGLE_CLIENT_ID = "NNNNNNNNNNNN.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "YYYYYYYYYYYYYYYYYYYYYYYY"
+
+# Specify this if you want to hit this endpoint to do interactive grading. 
+# If left blank, grading has a fallback "localhost" mode with dummy answers.
+# GRADER_ENDPOINT = "nnnnnnnnnnnnnnnnnnnn.us-west-2.elb.amazonaws.com"

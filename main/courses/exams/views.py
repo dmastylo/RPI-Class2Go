@@ -861,6 +861,9 @@ def validate_row(row):
 
     return (True, (username, field_name, score))
 
+
+
+
 # Test values for interactive exercises
 canned_feedback = {}
 canned_feedback['wrong'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"select * from movie","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>101<\/td><td>Gone with the Wind<\/td><td>1939<\/td><td>Victor Fleming<\/td><\/tr><tr><td>102<\/td><td>Star Wars<\/td><td>1977<\/td><td>George Lucas<\/td><\/tr><tr><td>103<\/td><td>The Sound of Music<\/td><td>1965<\/td><td>Robert Wise<\/td><\/tr><tr><td>104<\/td><td>E.T.<\/td><td>1982<\/td><td>Steven Spielberg<\/td><\/tr><tr><td>105<\/td><td>Titanic<\/td><td>1997<\/td><td>James Cameron<\/td><\/tr><tr><td>106<\/td><td>Snow White<\/td><td>1937<\/td><td>&lt;NULL&gt;<\/td><\/tr><tr><td>107<\/td><td>Avatar<\/td><td>2009<\/td><td>James Cameron<\/td><\/tr><tr><td>108<\/td><td>Raiders of the Lost Ark<\/td><td>1981<\/td><td>Steven Spielberg<\/td><\/tr><\/table> <br>Expected Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>E.T.<\/td><\/tr><tr><td>Raiders of the Lost Ark<\/td><\/tr><\/table>"}]}'
@@ -870,12 +873,43 @@ canned_feedback['help'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answ
 canned_feedback['error'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"error","score":0,"explanation":"You are in localhost debugging mode.<br>Did not send a well-formatted request."}]}'
 
 
+def save_feedback(course, exam, student, student_input, field_name, graded_obj):
+    (exam_rec, created) = ExamRecord.objects.get_or_create(course=course, exam=exam, student=student)
+
+    exam_rec.complete = False
+    exam_rec.score = 0
+    exam_rec.attempt_number += 1
+
+    # append to json_data -- the student input
+    try:
+        field_student_data_obj = json.loads(exam_rec.json_data)
+    except:
+        field_student_data_obj = {}
+    field_student_data_obj[field_name] = {'value': student_input}
+    exam_rec.json_data = json.dumps(field_student_data_obj)
+
+    # append to json_score_data -- what the grader came back with
+    try:
+        field_graded_data_obj = json.loads(exam_rec.json_score_data)
+    except:
+        field_graded_data_obj = {}
+    field_graded_data_obj[field_name] = graded_obj
+    exam_rec.json_score_data = json.dumps(field_graded_data_obj)
+
+    exam_rec.save()
+
+    (exam_score_rec, created) = ExamRecordScore.objects.get_or_create(record=exam_rec)
+    exam_score_rec.save()
+
+    
 @require_POST
 @auth_view_wrapper
 def feedback(request, course_prefix, course_suffix, exam_slug):
     """
     Proxies request to the exercise grader so we can both handle the request
     without CORS, and (more importantly) store the answer for later.
+
+    Expects the ID of the question to be in a query parameter
     """
     course = request.common_page_data['course']
     try:
@@ -883,31 +917,33 @@ def feedback(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    # import ipdb; ipdb.set_trace()
-    grader_hostname = getattr(settings, 'DB_GRADER_LOADBAL', 'localhost')
+    # the question ID is in the query string, "unknown" if not provided
+    qid = request.GET.get('id', 'unknown')
+
+    grader_hostname = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
+    try:
+        parsed_body=urlparse.parse_qs(request.body)
+        student_input=parsed_body['student_input'][0]
+    except:
+        student_input='error'
+
     if grader_hostname == 'localhost':
-        try:
-            parsed_body=urlparse.parse_qs(request.body)
-            student_input=parsed_body['student_input'][0]
-        except:
-            student_input='error'
         graded_raw = canned_feedback['help']
         if student_input in canned_feedback.keys():
             graded_raw = canned_feedback[student_input]
-        response = HttpResponse(graded_raw)
-        return response
+    else:
+        grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
+        grader_data = request.body
+        grader_timeout = 5    # seconds
+        try:
+            response = urllib2.urlopen(grader_url, grader_data, grader_timeout)
+        except urllib2.URLError, e:
+            return HttpResponse("Error in the interactive grader backend, please try again later.",
+                    status=500)
+        graded_raw = response.read()
 
-    grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
-    grader_data = request.body
-    grader_timeout = 10    # seconds
-
-    try:
-        response = urllib2.urlopen(grader_url, grader_data, grader_timeout)
-    except urllib2.URLError, e:
-        return HttpResponse("Error in the interactive grader backend, please try again later.",
-                status=500)
-    graded_raw = response.read()
-    graded_json=json.loads(graded_raw)
+    graded_obj=json.loads(graded_raw)
+    save_feedback(course, exam, request.user, student_input, qid, graded_obj)
 
     response = HttpResponse(graded_raw)
     return response
