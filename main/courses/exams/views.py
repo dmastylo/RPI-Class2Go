@@ -10,7 +10,7 @@ import csv
 import HTMLParser
 import json
 from django.db.models import Sum
-import urllib2
+import urllib2, urlparse
 from xml.dom.minidom import parseString
 
 
