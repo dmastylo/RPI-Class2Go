@@ -164,6 +164,13 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
         else:
             now = datetime.now()
             return ProblemSet.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
+        
+    def has_videos(self):
+        if self.mode == 'draft':
+            return Video.objects.filter(course=self, is_deleted=0).exists()
+        else:
+            now = datetime.now()
+            return Video.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
     
     def get_all_students(self):
         """
