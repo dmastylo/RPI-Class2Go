@@ -35,13 +35,13 @@ def add(request):
         section = ContentSection.objects.get(id=request.POST.get("section_id"))
 
     parent_type,parent_id = None,None
-    if request.POST.get("parent_id") != "":
+    parent_type = request.POST.get('parent_id')
+    if parent_type and parent_type[:4] != 'none':
         parent_type,parent_id = request.POST.get("parent_id").split(',')
-        if parent_type == 'none':
-            parent_type, parent_id = None,None
-        else:
-            parent_id = int(parent_id)
-    
+        parent_id = long(parent_id)
+    else:
+        parent_type, parent_id = None,None
+
     if request.POST.get("menu_slug") != "":
         index = len(AdditionalPage.objects.filter(course=common_page_data['course'],menu_slug=request.POST.get("menu_slug")))
     else:
