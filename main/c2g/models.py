@@ -1705,6 +1705,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
+            assessment_type = self.assessment_type,
         )
         ready_instance.save()
         self.image = ready_instance
@@ -1761,6 +1762,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.timed = self.timed
         if not clone_fields or 'minutesallowed' in clone_fields:
             ready_instance.minutesallowed = self.minutesallowed
+        if not clone_fields or 'assessment_type' in clone_fields:
+            ready_instance.assessment_type = self.assessment_type
         
         ready_instance.save()
     
@@ -1813,7 +1816,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if not clone_fields or 'timed' in clone_fields:
             self.timed = ready_instance.timed 
         if not clone_fields or 'minutesallowed' in clone_fields:
-            self.minutesallowed = ready_instance.minutesallowed 
+            self.minutesallowed = ready_instance.minutesallowed
+        if not clone_fields or 'assessment_type' in clone_fields:
+            self.assessment_type = ready_instance.assessment_type
 
         self.save()
     
@@ -1866,6 +1871,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.timed != self.image.timed:
             return False
         if self.minutesallowed != self.image.minutesallowed:
+            return False
+        if self.assessment_type != self.image.assessment_type:
             return False
 
         return True
