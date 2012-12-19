@@ -65,9 +65,6 @@
         pelement.html('<option value="none,none">(this is a top level page)</option>');
         jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
             for (var i=0; i < data.length; i++) {
-                // For the moment we filter out objects of other types, per the spec.
-                // In the future this restriction will probably be lifted.
-                // See also files/upload.html
                 if ((data[i][0] == 'video') || (data[i][0] == 'exam') || (data[i][0] == 'additional_page')) {
                     pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
                 }
