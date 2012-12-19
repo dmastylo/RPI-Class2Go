@@ -2178,7 +2178,7 @@ class ContentGroupManager(models.Manager):
     def getByFieldnameAndId(self, fieldname, fieldid):
         # TODO: cache this
         this = ContentGroup.groupable_types[fieldname].objects.get(id=fieldid)
-        retset = this.contentgroup_set.all()
+        retset = this.contentgroup_set.get()
         if len(retset) == 1:
             return retset[0]
         else: return retset
@@ -2260,40 +2260,63 @@ class ContentGroup(models.Model):
         # Technically there's no reason to restrict the ContentGroups
         # to two levels of hierarchy, but the UI design is harder for
         # more level (and as of this iteration the spec says two)
-        cgref         = None
         if tag not in thisclass.groupable_types.keys():
             raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
         content_group = ContentGroup.objects.filter(group_id=group_id)
         if not content_group:
             raise ValueError, "ContentGroup "+str(group_id)+" does not exist."
-        try:
-            cgref = obj_ref.contentgroup_set.get()
-        except ContentGroup.DoesNotExist:
+        cgref = obj_ref.contentgroup_set.all()
+        if not cgref:
             # it's not in the table, so add it
             new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id, display_style=display_style)
             setattr(new_item, tag, obj_ref)
             new_item.save()
             return new_item.id
         else:
+            cgref = cgref[0]
             # it is in the table, so do something reasonable:
             for entry in content_group:
                 if getattr(entry, tag, False) == obj_ref:
                     # If this child is in this group already, return this group
-                    # But if this child is a parent of this group, make it a child first
                     if entry.level == 1:
-                        entry.level = 2
+                        # It is an error to make a parent into a child of its own group
+                        # Instead, make a new group, then reassign_membership 
+                        raise ValueError, "ContentGroup "+str(entry.id)+" is the parent of group "+str(group_id)
                     entry.display_style = display_style
                     entry.save()
                     return entry.id
-            # We have a reference to it, but it's not in content_group
-            # TODO: Decide: If cgref was previously a parent and we reassign
-            #       it, what happnes to its (old) children?
+            # We have a reference to it, but it's not in content_group, so reassign it
             if content_group and cgref:
-                cgref.group_id = group_id
-                cgref.level = 2
-                cgref.display_style = display_style
-                cgref.save()
-            return cgref.id
+                new_group_id = thisclass.reassign_membership(cgref, content_group.get(level=1))
+            return new_group_id
+
+    @classmethod
+    def reassign_membership(thisclass, contentgroup, new_parent_cg):
+        """Reassign a ContentGroup entry from its current parent to another.
+
+        If a parent is reassigned in this way, also reassign all of its child
+        items.
+
+        Arguments:
+        contentgroup: the ContentGroup entry to be made into a child
+        new_parent_cg: the ContentGroup entry to which parent_cg should be reassigned
+
+        Returns:
+        new_parent_cg.group_id
+        """
+        new_group_id = new_parent_cg.group_id
+        if contentgroup.level == 2:
+            contentgroup.group_id = new_parent_cg.group_id
+            contentgroup.save()
+        else:
+            children = ContentGroup.objects.filter(level=2, group_id=contentgroup.group_id)
+            contentgroup.group_id = new_group_id
+            contentgroup.level = 2
+            for child in children:
+                child.group_id = new_group_id
+                child.save()
+            contentgroup.save()
+        return new_group_id
 
     @classmethod
     def add_parent(thisclass, course_ref, tag, obj_ref):
