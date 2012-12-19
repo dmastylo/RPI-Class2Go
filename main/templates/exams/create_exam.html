@@ -95,7 +95,7 @@
             <textarea id="description"></textarea>
         </div>
         <div class="atomic-unit well">
-            <label for="exam_setion" class="control-label">Section:</label>
+            <label for="id_section" class="control-label">Section:</label>
             <select id="id_section">
                 {% for section in sections %}
                 <option value="{{section.id}}">{{section.title}}</option>
@@ -203,7 +203,12 @@
     <fieldset>
         <label for="name" id="xml-import-label">Import your XML here.  This will overwrite the HTML and XML Metadata editors.</label>
         <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> 
-            <problemset data-report="EXAMPLE">
+            <problemset data-report="EXAMPLE" type="survey" title="problemset1" url-identifier="test343">
+                <!-- possible types are: "formative" / "summative" / "invideo" / "interactive" / "exam-autograde" / "exam-csv" / "survey" -->
+                <description>This is the problem set description.</description>
+                <dates due-date="12/29/2012 00:00" grace-period="12/29/2012 00:00" hard-deadline="12/29/2012 00:00" />
+                <grading late-penalty="10" num-submissions="9999" resubmission-penalty="10" />
+                <section section="Problem set templates" parent="Example formative multiple choice (checkbox)" />
                 <problem data-report="Apple Competitor Question">
                     <p>
                     A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
@@ -556,10 +561,10 @@
     $('#id_section').change(function() { prefill_children($('#parent_id')[0]) });
     $('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
     function prefill_children(element) {
-        var id = $('#id_section')[0].value
+        var id = $('#id_section').val(); //.val() more cross browser than .value
         var pelement = $('#parent_id');
         pelement.html('<option value="none,none">(this is a top level item)</option>');
-        jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+        return jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
                        for (var i=0; i < data.length; i++) {
                        // For the moment we filter out objects of other types, per the spec.
                        // FIXME: in the future we should have information about what can be children of what in
