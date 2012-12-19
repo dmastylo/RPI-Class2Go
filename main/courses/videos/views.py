@@ -126,7 +126,9 @@ def view(request, course_prefix, course_suffix, slug):
            
             question_times = {}
             for video_node in video_questions:
-                video_slug = video_node.getAttribute("url_identifier")
+                video_slug = video_node.getAttribute("url-identifier")
+                if not video_slug:
+                    video_slug = video_node.getAttribute("url_identifier")
                 if video_slug == video.slug:
                     question_children = video_node.getElementsByTagName("question")
                     times = []
