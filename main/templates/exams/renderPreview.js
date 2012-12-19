@@ -42,6 +42,51 @@ var c2gXMLParse = (function() {
                 console.log(e.message);
                 return;
             }
+             
+            //This parses the "metadata" for the problem set.  title, description, etc.
+            var parsePsetFields = function() {
+                var psetDOM = $(myDOM).find('problemset');
+                var datesDOM = $(psetDOM).find('dates');
+                var gradingDOM = $(psetDOM).find('grading');
+                var sectionDOM = $(psetDOM).find('section');
+                   
+                $('input#exam_title').val($(psetDOM).attr('title'));
+                $('input#exam_slug').val($(psetDOM).attr('url-identifier'));
+                $('select#assessment_type').val($(psetDOM).attr('type'));
+
+                   
+                $('textarea#description').val($(psetDOM).find('description').text());
+
+                $('input#due_date').val($(datesDOM).attr('due-date'));
+                $('input#grace_period').val($(datesDOM).attr('grace-period'));
+                $('input#hard_deadline').val($(datesDOM).attr('hard-deadline'));
+                   
+                $('input#late_penalty').val($(gradingDOM).attr('late-penalty'));
+                $('input#num_subs_permitted').val($(gradingDOM).attr('num-submissions'));
+                $('input#resubmission_penalty').val($(gradingDOM).attr('resubmission-penalty'));
+         
+
+                $('select#id_section option').each(function() {
+                   //Go through each option to see if any of their text is the same as the XML
+                   //select if that's the case
+                    if ($(this).text().trim() == $(sectionDOM).attr('section').trim())
+                        $('select#id_section').val($(this).val());
+                });
+                prefill_children($('#parent_id')[0]).success(prepop_children);
+
+            };
+            var prepop_children = function () {
+                var psetDOM = $(myDOM).find('problemset');
+                var sectionDOM = $(psetDOM).find('section');
+                $('select#parent_id option').each(function() {
+                      //Go through each option to see if any of their text is the same as the XML
+                      //select if that's the case
+                      if ($(this).text().trim() == $(sectionDOM).attr('parent').trim())
+                            $('select#parent_id').val($(this).val());
+                });
+
+            };
+            parsePsetFields();
 
             var problemNodes = $(myDOM).find('problem');
 
