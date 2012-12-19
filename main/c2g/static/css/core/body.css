@@ -595,6 +595,7 @@ h3.course-section-heading {
 .course-list-item .icon-pencil,
 .course-list-item .icon-book,
 .course-list-item .icon-file,
+.course-list-item .icon-check,
 .course-list-item .icon-facetime-video {
     font-size:24px; 
     color:#999;
@@ -1018,6 +1019,9 @@ ul.icons li .icon-large:before {
   content: "\f02c";
 }
 .icon-book:before {
+  content: "\f02d";
+}
+.icon-check:before {
   content: "\f02d";
 }
 .icon-bookmark:before {
