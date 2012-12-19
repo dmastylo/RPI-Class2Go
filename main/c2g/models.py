@@ -22,9 +22,9 @@ import time
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
 from django.db import models
-from django.db.models import Avg, Count, Max, StdDev
+from django.db.models import Max
+from django.db.models.signals import post_save
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
@@ -2170,9 +2170,19 @@ class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)
 
+
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course).order_by('group_id','level')
+
+    def getByFieldnameAndId(self, fieldname, fieldid):
+        # TODO: cache this
+        this = ContentGroup.groupable_types[fieldname].objects.get(id=fieldid)
+        retset = this.contentgroup_set.all()
+        if len(retset) == 1:
+            return retset[0]
+        else: return retset
+
     def getChildrenByGroupId(self, group_id):
         return self.filter(level=2, group_id=group_id).order_by('display_style')
 
@@ -2180,7 +2190,6 @@ class ContentGroup(models.Model):
     group_id        = models.IntegerField(db_index=True, null=True, blank=True)
     level           = models.IntegerField(db_index=True)
     display_style   = models.CharField(max_length=32, null=True, blank=True)
-    #content_type_tag= models.CharField(max_length=32, null=True, blank=True)
 
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
     course          = models.ForeignKey(Course)

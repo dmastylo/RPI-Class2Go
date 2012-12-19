@@ -1,6 +1,6 @@
 from c2g.models import *
 import datetime
-from django.db.models import Count, Max, Q, F
+from django.db.models import Count, Max
 from django.db import connection
 
 
