@@ -7,46 +7,47 @@
     {% endif %}
     
     <div class="course-list-content">
+        {% with exam=item.exam %}
         <h4 class="pull-left rightmargin" >
-            <a href="{% url item.exam.show_view common_page_data.course_prefix common_page_data.course_suffix item.exam.slug %}">{{item.exam.title}}</a>
+            <a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a>
         </h4>
-        <span>{{item.exam.description}}</span>
+        <span>{{exam.description}}</span>
 
-            {% if item.exam.autograde %}
+            {% if exam.autograde %}
 
-            <span class="accordion" id="attempts_{{item.exam.slug}}">
+            <span class="accordion" id="attempts_{{exam.slug}}">
             <span class="accordion-group">
                 
                 <span class="accordion-heading attempts">
                     {% if item.records|length != 0 %}
-                    <a class="collapsed attempts" data-toggle="collapse" data-parent="attempts_{{item.exam.slug}}" href="#collapse_{{item.exam.slug}}" onclick="c2g.toggleChevron('chevron_{{item.exam.slug}}')" >
-                    <i id="chevron_{{item.exam.slug}}"class="icon-chevron-right chevron"></i>
+                    <a class="collapsed attempts" data-toggle="collapse" data-parent="attempts_{{exam.slug}}" href="#collapse_{{exam.slug}}" onclick="c2g.toggleChevron('chevron_{{exam.slug}}')" >
+                    <i id="chevron_{{exam.slug}}"class="icon-chevron-right chevron"></i>
                     {% endif %}
                         
-                        <strong>Attempts:</strong> {{item.records|length}}/{{item.exam.submissions_permitted}}
+                        <strong>Attempts:</strong> {{item.records|length}}/{{exam.submissions_permitted}}
                     {% if item.records|length != 0 %}    
                     </a>
                     {% endif %}
                 </span>
                 
-                <span id="collapse_{{item.exam.slug}}" class="accordion-body collapse attempts">
+                <span id="collapse_{{exam.slug}}" class="accordion-body collapse attempts">
                     <ul class="unstyled">
                         {% for record in item.records %}
                             <li>
-                                <a href="{% url item.exam.record_view common_page_data.course_prefix common_page_data.course_suffix item.exam.slug record.id %}">
+                                <a href="{% url exam.record_view common_page_data.course_prefix common_page_data.course_suffix exam.slug record.id %}">
                                     Attempt at {{ record.time_created }}
                                 </a>
-                                :  Score {{record.score}} / {{item.exam.total_score}}
-                                {% if record.late or record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
+                                :  Score {{record.score}} / {{exam.total_score}}
+                                {% if record.late or record.attempt_number > 1 and exam.resubmission_penalty > 0 %}
                                 ( Raw score: {{ record.examrecordscore.raw_score }} with
                                     {% if record.late %}
-                                        {{item.exam.late_penalty}}% late penalty
-                                        {% if record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
+                                        {{exam.late_penalty}}% late penalty
+                                        {% if record.attempt_number > 1 and exam.resubmission_penalty > 0 %}
                                         and
                                         {% endif %}
                                     {% endif %}
-                                    {% if record.attempt_number > 1 and item.exam.resubmission_penalty > 0 %}
-                                      {{item.exam.resubmission_penalty|subOneThenMult:record.attempt_number}}% re-attempt penalty
+                                    {% if record.attempt_number > 1 and exam.resubmission_penalty > 0 %}
+                                      {{exam.resubmission_penalty|subOneThenMult:record.attempt_number}}% re-attempt penalty
                                     {% endif %}
                                     )
                                 {% endif %}
@@ -57,14 +58,14 @@
             </span>
             </span>
             {% endif %}
-                {% if is_child == None %}
-                <p class="deadlines"><strong>Full Credit Deadline:</strong> {{item.exam.due_date}} PST
-                {% if not item.exam.partial_credit_deadline == item.exam.partial_credit_deadline %}
-                | <strong>Late Deadline ({{100|sub:item.exam.late_penalty}}% credit):</strong> {{item.exam.partial_credit_deadline}} PST | </p>
+            {% if is_child == None %}
+                <p class="deadlines"><strong>Full Credit Deadline:</strong> {{exam.due_date}} PST
+                {% if not exam.partial_credit_deadline == exam.partial_credit_deadline %}
+                | <strong>Late Deadline ({{100|sub:exam.late_penalty}}% credit):</strong> {{exam.partial_credit_deadline}} PST | </p>
                 {% endif %}<br/>
             {% else %}
        
-        {% endif %}
-
+            {% endif %}
+        {% endwith %}
     </div> <!--course list context-->
 

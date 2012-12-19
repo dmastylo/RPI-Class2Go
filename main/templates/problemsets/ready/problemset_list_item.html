@@ -2,23 +2,28 @@
         <em class="icon-pencil"></em>
     </div>
     <div class="course-list-content">
-        <h4 class="pull-left"><a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix item.problem_set.slug %}" title="{{item.problem_set.description}}">{{item.problem_set.title}}</a></h4>
-        <div class="pull-right">
-            {% if item.numCompleted == item.numQuestions %}
-               {% if not item.problem_set.assessment_type == "survey" %}
-                <span class="label">Complete with Score: {{item.score}} of {{item.numQuestions}}</span>
-               {% else %}
-                <span class="label">Complete</span>
-               {% endif %}
-            {% elif item.numCompleted > 0 %}
-                <span class="label">In Progress: {{item.numCompleted}} of {{item.numQuestions}}</span>
-            {% endif %}
-            
-            <div class="progress {% if item.numCompleted == item.numQuestions %}progress-success{% else %}progress-warning{% endif %} progress-striped">
-                <div class="bar" style="width:{{item.progress}}%"></div>
+        {% with problems=item.problem_set %}
+            <h4 class="pull-left">
+                <a href="{% url 'problemsets.views.show' common_page_data.course_prefix common_page_data.course_suffix problems.slug %}" title="{{problems.description}}">
+                    {{problems.title}}</a>
+            </h4>
+            <div class="pull-right">
+                {% if item.numCompleted == item.numQuestions %}
+                   {% if not problems.assessment_type == "survey" %}
+                    <span class="label">Complete with Score: {{item.score}} of {{item.numQuestions}}</span>
+                   {% else %}
+                    <span class="label">Complete</span>
+                   {% endif %}
+                {% elif item.numCompleted > 0 %}
+                    <span class="label">In Progress: {{item.numCompleted}} of {{item.numQuestions}}</span>
+                {% endif %}
+                
+                <div class="progress {% if item.numCompleted == item.numQuestions %}progress-success{% else %}progress-warning{% endif %} progress-striped">
+                    <div class="bar" style="width:{{item.progress}}%"></div>
+                </div>
             </div>
-        </div>
-        <p class="deadlines"><strong>Full Credit Deadline:</strong> {{item.problem_set.due_date}} PST |
-        <strong>Partial Credit Deadline:</strong> {{item.problem_set.partial_credit_deadline}} PST</p>
+            <p class="deadlines"><strong>Full Credit Deadline:</strong> {{problems.due_date}} PST |
+            <strong>Partial Credit Deadline:</strong> {{problems.partial_credit_deadline}} PST</p>
+        {% endwith %}
     </div>
 
