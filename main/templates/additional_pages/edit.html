@@ -67,17 +67,15 @@
                 <select name="parent" id="parent_id">
                     <!-- Filled by prefill_children() -->
                     {% if contentgroup_info %}
-                        <option value="{{contentgroup_info.parent_type}},{{contentgroup_info.parent_id}}" selected>{{contentgroup_info.parent.title}}</option>
+                        {% if contentgroup_info.parent_id != page.image.id %}
+                            <option value="{{contentgroup_info.parent_type}},{{contentgroup_info.parent_id}}" selected>{{contentgroup_info.parent.title}}</option>
+                        {% endif %}
                     {% endif %}
                 </select>
             </div>
         </div>
         {% else %}
-            {% if contentgroup_info %}
-                <option value="{{contentgroup_info.parent_type}},{{contentgroup_info.parent_id}}" selected>{{contentgroup_info.parent.title}}</option>
-            {% else %}
-                <input type='hidden' name='parent' value='overview' />
-            {% endif %}
+            <input type='hidden' name='parent' value='overview' />
         {% endifnotequal %}
 
         {% csrf_token %}
@@ -136,11 +134,11 @@ $('#id_slug').focus(function() {
                 // See also files/upload.html
                 if (data[i][0] == 'additional_page') {
                     {% if contentgroup_info %}
-                    if ((data[i][2] != {{contentgroup_info.parent.title}}) && (data[i][2] != {{page.title}})) {
+                    if ((data[i][2] != "{{contentgroup_info.parent.title}}") && (data[i][2] != "{{page.title}}")) {
                         pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
                     }
                     {% else %}
-                    if (data[i][2] != {{page.title}}) {
+                    if (data[i][2] != "{{page.title}}") {
                         pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
                     }
                     {% endif %}
