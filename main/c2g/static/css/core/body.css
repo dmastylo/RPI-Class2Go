@@ -6,6 +6,17 @@ h1,h2,h3,h4 {margin:0;}
 h3 {margin-bottom:.5em;font-size:20px; line-height:1.2em;}
 h4 {margin-bottom:.5em;font-size:16px;}
 
+.attempts 
+{
+font-size:12; 
+float:right;
+}
+
+.chevron
+{
+padding-left:7px;
+}
+
 a {color:#820000;}
 a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
