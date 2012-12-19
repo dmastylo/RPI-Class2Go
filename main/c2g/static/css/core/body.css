@@ -1021,6 +1021,9 @@ ul.icons li .icon-large:before {
 .icon-book:before {
   content: "\f02d";
 }
+.icon-check:before {
+  content: "\f02d";
+}
 .icon-bookmark:before {
   content: "\f02e";
 }
