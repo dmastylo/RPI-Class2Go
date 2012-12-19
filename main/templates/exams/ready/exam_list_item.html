@@ -2,7 +2,7 @@
 
     {% if is_child == None %} {# we don't need to display the  icon for every child #}
     <div class="pull-left icon">
-        <em class="icon-check"></em>
+        <em class="icon-pencil"></em>
     </div>
     {% endif %}
     
@@ -30,7 +30,7 @@
                 </span>
                 
                 <span id="collapse_{{item.exam.slug}}" class="accordion-body collapse" style="float:right;">
-                    <ul class="unstyled">
+                    <ul>
                         {% for record in item.records %}
                             <li>
                                 <a href="{% url item.exam.record_view common_page_data.course_prefix common_page_data.course_suffix item.exam.slug record.id %}">
