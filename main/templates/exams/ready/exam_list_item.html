@@ -2,12 +2,12 @@
 
     {% if is_child == None %} {# we don't need to display the  icon for every child #}
     <div class="pull-left icon">
-        <em class="icon-check"></em>
+        <em class="icon-pencil"></em>
     </div>
     {% endif %}
     
     <div class="course-list-content">
-        <h4 class="pull-left" style="margin-right:50px">
+        <h4 class="pull-left rightmargin" >
             <a href="{% url item.exam.show_view common_page_data.course_prefix common_page_data.course_suffix item.exam.slug %}">{{item.exam.title}}</a>
         </h4>
         <span>{{item.exam.description}}</span>
@@ -16,13 +16,20 @@
 
             <span class="accordion" id="attempts_{{item.exam.slug}}">
             <span class="accordion-group">
-                <span class="accordion-heading">
-                    <a style="color:black;font-size:12; float:right;" class="collapsed" data-toggle="collapse" data-parent="attempts_{{item.exam.slug}}" href="#collapse_{{item.exam.slug}}" onclick="c2g.toggleChevron('chevron_{{item.exam.slug}}')" >
-                        <i id="chevron_{{item.exam.slug}}"class="icon-chevron-right"></i>
+                
+                <span class="accordion-heading attempts">
+                    {% if item.records|length != 0 %}
+                    <a class="collapsed attempts" data-toggle="collapse" data-parent="attempts_{{item.exam.slug}}" href="#collapse_{{item.exam.slug}}" onclick="c2g.toggleChevron('chevron_{{item.exam.slug}}')" >
+                    <i id="chevron_{{item.exam.slug}}"class="icon-chevron-right chevron"></i>
+                    {% endif %}
+                        
                         <strong>Attempts:</strong> {{item.records|length}}/{{item.exam.submissions_permitted}}
+                    {% if item.records|length != 0 %}    
                     </a>
+                    {% endif %}
                 </span>
-                <span id="collapse_{{item.exam.slug}}" class="accordion-body collapse" style="float:right;">
+                
+                <span id="collapse_{{item.exam.slug}}" class="accordion-body collapse attempts">
                     <ul class="unstyled">
                         {% for record in item.records %}
                             <li>
@@ -51,7 +58,7 @@
             </span>
             {% endif %}
                 {% if is_child == None %}
-                <p class="deadlines" style="margin-bottom:5px"><strong>Full Credit Deadline:</strong> {{item.exam.due_date}} PST
+                <p class="deadlines"><strong>Full Credit Deadline:</strong> {{item.exam.due_date}} PST
                 {% if not item.exam.partial_credit_deadline == item.exam.partial_credit_deadline %}
                 | <strong>Late Deadline ({{100|sub:item.exam.late_penalty}}% credit):</strong> {{item.exam.partial_credit_deadline}} PST | </p>
                 {% endif %}<br/>
