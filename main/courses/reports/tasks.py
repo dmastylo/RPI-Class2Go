@@ -130,6 +130,17 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
             else:
                 logger.info("Failed to generate class roster for course %s for user %s." % (course_handle, username))
                     
+        elif rr['type'] == 'course_assessments':
+            logger.info("User %s requested to generate course assessments report for course %s." % (username, course_handle))
+            report = gen_course_assessments_report(ready_course, save_to_s3=True)
+            report['type'] = rr['type']
+            if report:
+                reports.append(report)
+                logger.info("Course assessments report for course %s generated successfully for user %s." % (course_handle, username))
+            else:
+                logger.info("Failed to generate course assessments report for course %s for user %s." % (course_handle, username))
+                
+            
             
     # Email Generated Reports
     staff_email = ready_course.contact
