@@ -10,12 +10,19 @@ h4 {margin-bottom:.5em;font-size:16px;}
 {
 font-size:12; 
 float:right;
+color:black;
 }
 
 .chevron
 {
 padding-left:7px;
 }
+
+.rightmargin
+{
+margin-right:50px;
+}
+
 
 a {color:#820000;}
 a:hover {color:#820000;}
@@ -643,6 +650,7 @@ h3.course-section-heading {
 .course-list-item .course-list-content .deadlines {
     clear: both;
     font-size: 90%;
+    margin-bottom:5px;
 }
 
 /* FAQs
