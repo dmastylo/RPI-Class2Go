@@ -2176,6 +2176,9 @@ class ContentGroupManager(models.Manager):
         return self.filter(course=course).order_by('group_id','level')
 
     def getByFieldnameAndId(self, fieldname, fieldid):
+        """Use the type tag (video, etc.) and id to dereference an entry.
+        
+        Returns the ContentGroup entry for this item."""
         # TODO: cache this
         this = ContentGroup.groupable_types[fieldname].objects.get(id=fieldid)
         retset = this.contentgroup_set.get()
