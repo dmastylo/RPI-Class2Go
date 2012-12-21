@@ -112,6 +112,8 @@ var c2gXMLParse = (function() {
 
             var problemNodes = $(myDOM).find('problem');
 
+            var videoNodes = $(myDOM).find('video');
+
             //Helper function
             var isChoiceCorrect = function(choiceElem) {
                 if (!$(choiceElem).attr('correct')) {
@@ -125,6 +127,10 @@ var c2gXMLParse = (function() {
             var outerMetadataObj = document.createElement('metadata'); //outermost metadata--won't actually be displayed since we use $.html()
             var metadataObj = document.createElement('exam_metadata');
             $(outerMetadataObj).append($(metadataObj));
+            
+            // Add video metadata (problem:time mappings for in-video exams)
+            $(metadataObj).append($(videoNodes));
+
             //Build up a DOM object corresponding to the answer key
             var answerkeyObj = document.createElement('answerkey');
             problemNodes.each(function () {
