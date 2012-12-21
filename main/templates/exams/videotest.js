@@ -178,6 +178,13 @@
 
             window.popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
 
+            C2G.checkSubmitStatus = function () {
+                if ($('#survey-submit').length && $('.question:last').css('display') == "block") {
+                    $('.continue-video-btn').hide();
+                    $('#survey-submit').show();
+                }
+            };
+
             C2G.videoSetup.handleTimeUpdate = function () {
                 //console.log(popcornVideo.currentTime());
                 var timeInSec = Math.floor(window.popcornVideo.currentTime()).toFixed(1);
@@ -241,7 +248,7 @@
                         currentQuestionId = $(curQ).next().attr('id');
                         console.log("Now currentQuestionId...");
                         console.log(currentQuestionId);
-                        $(curQ).next().show();
+                        $(curQ).next().show(0, C2G.checkSubmitStatus);
                         $('#exam-pane').fadeTo('slow', 1.0);
                         console.log("questionArray[questionArray.length - 1]...");
                         console.log(questionArray[questionArray.length - 1]);
@@ -276,7 +283,7 @@
                             firstQuestionId = questionsToShow;
                             configureExamButton();
                         } 
-                        $('#' + firstQuestionId).show();
+                        $('#' + firstQuestionId).show(0, C2G.checkSubmitStatus);
                         currentQuestionId = firstQuestionId;
                         $('#exam-pane').fadeTo('slow', 1.0);
                     };
