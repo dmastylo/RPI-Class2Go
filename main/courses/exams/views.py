@@ -95,7 +95,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     questions = metadata_dom.getElementsByTagName('video')
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
-                              'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':exam.invideo,
+                              'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':False,
                               'allow_submit':True, 'too_many_attempts':too_many_attempts,
                               'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
 
@@ -475,8 +475,6 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     invideo_val=request.POST.get('invideo','')
     parent=request.POST.get('parent','none,none')
     
-    print (repr(invideo_val))
-
     if invideo_val and invideo_val == "true":
         invideo = True
     else:

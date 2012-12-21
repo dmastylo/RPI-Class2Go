@@ -87,7 +87,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <style>
     {% include 'exams/videotest.css' %}
     #exam-pane {float: left; position: relative; display: none; width: 800px;}
-    {% if exam.exam_type == "survey" and exam.invideo %}
+    {% if exam.exam_type == "survey" and exam.invideo and "/videos" in request.path%}
     #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 4.3em; right: 1.5em;}
     {% else %}
     #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;}
@@ -195,7 +195,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.question-nav').click(showQuestion);
         
-        {% if exam.exam_type == "invideo" or exam.exam_type == "interactive_exercise" %}
+        {% if exam.invideo or exam.exam_type == "interactive_exercise" %}
         var quickCheck = function () {
 
             var checkBtnID = $(this).attr('id');
@@ -389,25 +389,29 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         {% endif %}
     {% endif %}
 
-    {% if exam.html_content != "" and exam.exam_type != "invideo" %}
-        {% if exam.autograde %}
-        var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+    {% if exam.html_content != "" and "/videos" not in request.path %} {# not viewing in a video context #}
+        {% if exam.exam_type == "survey" %}
+            SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
         {% else %}
-        var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+            {% if exam.autograde %}
+            var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+            {% else %}
+            var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+            {% endif %}
         {% endif %}
+    {% elif "/videos" in request.path %}{# viewing in a video context, return to Video list #}
+        var SUBMISSION_RETURN_URL = "{% url 'courses.videos.views.list' common_page_data.course.prefix common_page_data.course.suffix %}";
     {% else %}
         var SUBMISSION_RETURN_URL = "";
     {% endif %}
                       
-    if (__exam_type=="survey") {
-            SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
-    }
 
-    {% if not exam.autograde %}
+    {% if not exam.autograde and not exam.exam_type == "survey" %}
     // Add link that just takes you back to submission list without submitting form again
         var returnToListCont = document.createElement('p');
         $(returnToListCont).addClass('useful-info');
 
+                    
         var returnToListLink = document.createElement('a');
         $(returnToListLink).attr('id', 'returnToListLink');
         $(returnToListLink).attr('href', SUBMISSION_RETURN_URL);
@@ -419,6 +423,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(userNote).hide();
         });
 
+            
         var submitBtn = $('input[type|="submit"]').not('#login_button');
         submitBtn.after($(returnToListCont));
         $(returnToListCont).append($(returnToListLink));

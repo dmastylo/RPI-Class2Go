@@ -748,8 +748,6 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     objects = VideoManager()
 
     def create_ready_instance(self):
-        print(self.exam)
-        print(self.exam_id)
         if (self.exam and self.exam.image):
             image_exam = self.exam.image
         else:
