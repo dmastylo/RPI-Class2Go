@@ -1602,10 +1602,17 @@ class PageVisitLog(TimestampMixin, models.Model):
 class ExamManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
+            return self.filter(course=course, is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course, is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+    def getByCourseSubTypes(self, course, types):
+        if course.mode == 'draft':
+            return self.filter(course=course, is_deleted=0, exam_type__in=types, section__is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course, is_deleted=0, exam_type__in=types, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
     def getBySection(self, section):
         if section.mode == 'draft':
@@ -1619,7 +1626,6 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
                          ('problemset','problemset'),
-                         ('invideo','invideo'),
                          ('survey', 'survey'),
                          ('interactive_exercise', 'interactive_exercise'),
                          )
@@ -1937,6 +1943,7 @@ class ExamRecord(TimestampMixin, models.Model):
     complete = models.BooleanField(default=True)
     late = models.BooleanField(default=False)
     score = models.FloatField(null=True, blank=True)
+    onpage = models.CharField(max_length=512, null=True, blank=True) #this is the URL in the nav-bar of the page
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)

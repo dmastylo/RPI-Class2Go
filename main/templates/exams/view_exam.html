@@ -682,8 +682,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         window.myData = JSON.stringify(userSelections);
 
         var examXHR = $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
-               {csrfmiddlewaretoken: "{{ csrf_token }}",
-                   json_data:JSON.stringify(userSelections)
+               {   csrfmiddlewaretoken: "{{ csrf_token }}",
+                   json_data:JSON.stringify(userSelections),
+                   onpage:document.location
                }
         );
 

@@ -341,7 +341,9 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
     attempt_number = exam.num_of_student_records(user)+1
 
-    record = ExamRecord(course=course, exam=exam, student=user, json_data=postdata, attempt_number=attempt_number, late=exam.past_due())
+    onpage = request.POST.get('onpage','')
+    
+    record = ExamRecord(course=course, exam=exam, student=user, json_data=postdata, onpage=onpage, attempt_number=attempt_number, late=exam.past_due())
     record.save()
 
     autograder = None
@@ -470,9 +472,16 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     resubmission_penalty = request.POST.get('resubmission_penalty','')
     assessment_type = request.POST.get('assessment_type','')
     section=request.POST.get('section','')
+    invideo_val=request.POST.get('invideo','')
     parent=request.POST.get('parent','none,none')
     
-    
+    print (repr(invideo_val))
+
+    if invideo_val and invideo_val == "true":
+        invideo = True
+    else:
+        invideo = False
+
     #########Validation, lots of validation#######
     if not slug:
         return HttpResponseBadRequest("No URL identifier value provided")
@@ -514,43 +523,31 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
 
     if assessment_type == "summative":
         autograde = True
-        invideo = False
         display_single = False
         grade_single = False
         exam_type = "problemset"
     elif assessment_type == "formative":
         autograde = True
-        invideo = False
         display_single = True
         grade_single = False #We will eventually want this to be True
         exam_type = "problemset"
-    elif assessment_type == "invideo":
-        autograde = True
-        invideo = True
-        display_single = True
-        grade_single = True
-        exam_type = "invideo"
     elif assessment_type == "interactive":
         autograde = True
-        invideo = False
         display_single = True
         grade_single = False
         exam_type = "interactive_exercise"
     elif assessment_type == "exam-autograde":
         autograde = True
-        invideo = False
         display_single = False
         grade_single = False
         exam_type = "exam"
     elif assessment_type == "exam-csv":
         autograde = False
-        invideo = False
         display_single = False
         grade_single = False
         exam_type = "exam"
     elif assessment_type == "survey":
         autograde = False
-        invideo = False
         display_single = False
         grade_single = False
         exam_type = "survey"
@@ -694,7 +691,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'grace_period':datetime.datetime.strftime(exam.grace_period, "%m/%d/%Y %H:%M"),
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
-          'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,
+          'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported}
 
     return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'returnURL':returnURL,

@@ -99,10 +99,6 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
         
-    has_ex = VideoToExercise.objects.filter(is_deleted=False, video=video).exists()
-
-    no_ex = 1 if (not has_ex) or request.session['video_quiz_mode'] != "quizzes included" else 0
-    
     course = common_page_data['course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course, filter_children=True)
 
@@ -147,7 +143,7 @@ def view(request, course_prefix, course_suffix, slug):
         section = sections[0]
         # create fake exam as exam template (which is what displays all videos) needs exam data to function
         # correctly (TODO: Refactor this)
-        exam = Exam(course=course, slug=slug, title=video.title, description="Empty Exam", html_content="", xml_metadata="", due_date='', assessment_type="invideo", mode="draft", total_score=0, grade_single=0, grace_period='', partial_credit_deadline='', late_penalty=0, submissions_permitted=0, resubmission_penalty=0, exam_type="invideo", autograde=0, display_single=0, invideo=1, section=section,)
+        exam = Exam(course=course, slug=slug, title=video.title, description="Empty Exam", html_content="", xml_metadata="", due_date='', assessment_type="survey", mode="draft", total_score=0, grade_single=0, grace_period='', partial_credit_deadline='', late_penalty=0, submissions_permitted=0, resubmission_penalty=0, exam_type="survey", autograde=0, display_single=0, invideo=1, section=section,)
         exam.live_datetime = video.live_datetime    # needed so video shows up
         question_times = ""
 
@@ -159,7 +155,6 @@ def view(request, course_prefix, course_suffix, slug):
                                'video_rec':           video_rec, 
                                'prev_slug':           prev_slug, 
                                'next_slug':           next_slug, 
-                               'no_ex':               no_ex,
                                'contentsection_list': full_contentsection_list, 
                                'full_index_list':     full_index_list,
                                'is_logged_in':        is_logged_in,
@@ -204,7 +199,7 @@ def upload(request, course_prefix, course_suffix):
     data = {'common_page_data': common_page_data}
 
     try:
-        exam = Exam.objects.filter(course_id=common_page_data['course'].id, exam_type="invideo") 
+        exam = Exam.objects.filter(course_id=common_page_data['course'].id, invideo=True)
     except:
         raise Http404 
 

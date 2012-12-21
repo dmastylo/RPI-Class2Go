@@ -81,7 +81,7 @@
             <select id="assessment_type" name="assessment_type">
                 <option value="formative">Formative Problem Set</option>
                 <option value="summative">Summative Problem Set</option>
-                <option value="invideo">In-Video Problem Set</option>
+                <!-- <option value="invideo">In-Video Problem Set</option> -->
                 <option value="interactive">Interactive Exercise</option>
                 <option value="exam-autograde">Exam (auto-graded)</option>
                 <option value="exam-csv">Exam (csv-graded)</option>
@@ -103,6 +103,8 @@
             </select>
             <label for="parent_id" class="control-label">Parent:</label>
             <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
+            <label for"invideo_toggle" class="control-label">In-Video?</label>
+            <input name="invideo" id="invideo_id" type="checkbox" />
 
         </div>
 
@@ -481,6 +483,7 @@
                        description:$('textarea#description').val(),
                        section:$('select#id_section').val(),
                        parent:$('select#parent_id').val(),
+                       invideo:$('input#invideo_id')[0].checked,
                        metaXMLContent:metadata_editor.getValue(),
                        htmlContent:editor.getValue(),
                        xmlImported:$('#xml-entry').val()
@@ -548,6 +551,7 @@
         $('input#resubmission_penalty').val(prepop.resubmission_penalty);
         $('textarea#description').val(prepop.description);
         $('select#id_section').val(prepop.section);
+        $('input#invideo_id')[0].checked=prepop.invideo;
         metadata_editor.setValue(prepop.metadata);
         editor.setValue(prepop.htmlContent);
         $('#xml-entry').val(prepop.xmlImported);
