@@ -128,7 +128,7 @@ def generate_report(request):
         email_title = "[Class2Go] Course Assessments Report for %s" % course_handle_pretty
         req_reports = [{'type': 'course_assessments'}]
     
-    generate_and_email_reports(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
+    generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
     return redirect(request.META.get('HTTP_REFERER', None))
 
