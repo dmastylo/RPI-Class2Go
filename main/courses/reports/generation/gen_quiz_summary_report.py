@@ -70,6 +70,33 @@ def gen_quiz_summary_report(ready_course, ready_quiz, save_to_s3=False):
     return {'name': report_name, 'content': report_content, 'path': s3_filepath}
 
 
+def gen_course_assessments_report(ready_course, save_to_s3=False):
+    
+    ### 1- Compose the report file name and instantiate the report writer object
+    dt = datetime.now()
+    course_prefix = ready_course.handle.split('--')[0]
+    course_suffix = ready_course.handle.split('--')[1]
+    
+    report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s-Course-Assessments.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix)
+    s3_filepath = "%s/%s/reports/course_assessments/%s" % (course_prefix, course_suffix, report_name)
+    
+    rw = C2GReportWriter(save_to_s3, s3_filepath)
+    
+    ### 2- Write the Report Title
+    rw.write(content = ["Course Assessment Summaries for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
+    
+    ### 3- Write problem set reports
+    rw.write(content = ["Assessments"], nl = 1)
+    
+    exams = Exam.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
+    for exam in exams:
+        WriteAssessmentSummaryReportContent(exam, rw, full=False)
+    
+    ### 4- Proceed to write out and return
+    report_content = rw.writeout()
+    return {'name': report_name, 'content': report_content, 'path': s3_filepath}
+
+
 def WriteQuizSummaryReportContent(ready_quiz, rw, full=False):
     ### 1- Get the quiz data
     quiz_data = get_quiz_data(ready_quiz)
@@ -141,3 +168,50 @@ def WriteQuizSummaryReportContent(ready_quiz, rw, full=False):
         rw.write(content, indent = 1)
         
     rw.write([""])
+    
+def WriteAssessmentSummaryReportContent(ready_exam, rw, full=False):
+    ### 1- Get the assessment data
+    exam_summary = get_assessment_data(ready_exam)
+    
+    ### 2- Write the title line
+    rw.write([exam_summary['title']])
+
+    # Field summary table header
+    content = ["Field"]
+    if exam_summary['assessment_type'] == 'summative': content.extend(["Mean score", "Max score"])
+    content.extend([
+        "Total attempts",
+        "Students who have attempted",
+        "Correct attempts",
+        "Correct 1st attempts",
+        "Correct 2nd attempts",
+        "Correct 3rd attempts",
+    ])
+    rw.write(content, indent = 1, nl=1)
+
+    content = []
+    # Fill in the values
+    for key, value in exam_summary['total_attempts'].iteritems():
+        content.extend([key])
+        
+        if exam_summary['assessment_type'] == 'summative':
+            content.extend([
+                exam_summary['mean_score'].get(key, 0),
+                exam_summary['max_score'].get(key, 0),
+                ])
+        
+        content.extend([
+            value,
+            exam_summary['distinct_students'].get(key, 0),
+            exam_summary['correct_attempts'].get(key,0),
+            exam_summary['correct_first_attempts'].get(key, 0),
+            exam_summary['correct_second_attempts'].get(key, 0),
+            exam_summary['correct_third_attempts'].get(key, 0),
+        ])
+        rw.write(content, indent = 1)
+        content = []
+        
+    rw.write(content, indent = 1)
+        
+    rw.write([""])
+
