@@ -111,10 +111,10 @@ def view(request, course_prefix, course_suffix, slug):
     l1items, l2items = get_contentgroup_data(course=course)
     downloadable_content = get_children(key, l1items, l2items)
 
-    if video.exam_id:
+    if video.exam:
         try:
             #exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
-            exam = Exam.objects.get(id=video.exam_id)
+            exam = video.exam
             display_single = exam.display_single
             invideo = exam.invideo
             metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
@@ -177,7 +177,7 @@ def edit(request, course_prefix, course_suffix, slug):
     video = common_page_data['course'].video_set.all().get(slug=slug)
     form = S3UploadForm(course=common_page_data['course'], instance=video)
     try:
-        psets = Exam.objects.filter(course_id=common_page_data['course'].id, exam_type="invideo") 
+        psets = Exam.objects.filter(course_id=common_page_data['course'].id, invideo=True)
     except:
         raise Http404 
 

@@ -13,9 +13,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
         sections = ContentSection.objects.getByCourse(course=COURSE)
         pages = AdditionalPage.objects.getByCourse(course=COURSE)
         files = File.objects.getByCourse(course=COURSE)
-        #The invideo=False filter is here instead of in the model because we might want
-        #to use getByCourse also on invideo
-        exams = Exam.objects.getByCourse(course=COURSE).filter(invideo=False)
+        exams = Exam.objects.getByCourse(course=COURSE)
         if exam_types:
             exams = exams.filter(exam_type__in=exam_types)
         l1items, l2items = get_contentgroup_data(COURSE)
