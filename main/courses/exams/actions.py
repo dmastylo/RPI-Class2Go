@@ -14,5 +14,6 @@ def delete_exam(request):
 
     exam = Exam.objects.get(id=request.POST.get("exam_id"))
     exam.delete()
+    exam.image.delete()
 
     return redirect(request.META['HTTP_REFERER'])
