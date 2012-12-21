@@ -1902,33 +1902,38 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
 
         return True
     
+    def safe_exam_type(self):
+        if self.exam_type not in [li[0] for li in self.EXAM_TYPE_CHOICES]:
+            return "exam"
+        return self.exam_type
+    
     def show_view_name(self):
-        return self.exam_type+"_show"
+        return self.safe_exam_type()+"_show"
 
     show_view = property(show_view_name)
     
     def list_view_name(self):
-        return self.exam_type+"_list"
+        return self.safe_exam_type()+"_list"
 
     list_view = property(list_view_name)
 
     def populated_view_name(self):
-        return self.exam_type+"_populated"
+        return self.safe_exam_type()+"_populated"
     
     populated_view = property(populated_view_name)
         
     def graded_view_name(self):
-        return self.exam_type+"_graded"
+        return self.safe_exam_type()+"_graded"
 
     graded_view = property(graded_view_name)
 
     def my_submissions_view_name(self):
-        return self.exam_type+"_my_submissions"
+        return self.safe_exam_type()+"_my_submissions"
     
     my_submissions_view = property(my_submissions_view_name)
 
     def record_view_name(self):
-        return self.exam_type+"_record"
+        return self.safe_exam_type()+"_record"
 
     def get_url(self):
         return self.show_view_name()
