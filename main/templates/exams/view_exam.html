@@ -391,7 +391,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% if exam.html_content != "" and "/videos" not in request.path %} {# not viewing in a video context #}
         {% if exam.exam_type == "survey" %}
-            SUBMISSION_RETURN_URL="{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}";
+            SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
         {% else %}
             {% if exam.autograde %}
             var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
