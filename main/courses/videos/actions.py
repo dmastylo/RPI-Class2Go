@@ -200,7 +200,7 @@ def oauth(request):
         video.image.save()
 
         parts = str(video.handle).split("--")
-        return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(parts[0], parts[1], video.slug)))
+        return HttpResponseRedirect(reverse('courses.videos.views.list', args=(parts[0], parts[1])))
 
 
 def GetOAuth2Url(request, video):
