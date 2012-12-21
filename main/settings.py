@@ -384,7 +384,7 @@ CELERY_QUEUES = {
 
 CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_key': APP+'-long'},
                  'kelvinator.tasks.resize':    {'queue': APP+'-long', 'routing_key': APP+'-long'},
-                 'celerytest.tasks.echo_-long': {'queue': APP+'-long', 'routing_key': APP+'-long'},
+                 'celerytest.tasks.echo_long': {'queue': APP+'-long', 'routing_key': APP+'-long'},
                 }
 
 # Testing related settings
