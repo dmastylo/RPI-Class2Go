@@ -30,8 +30,14 @@ def current_redirects(request, course_prefix):
     except CurrentTermMap.DoesNotExist:
         suffix = curTerm # Use this as default fallback
 
+    scheme='https://' if request.is_secure() else 'http://'
+
     if Course.objects.filter(handle=course_prefix+'--'+suffix).exists():
-        return redirect(reverse('courses.views.main',args=[course_prefix, suffix]))
+        if suffix == 'Fall2012': #send requests to Fall2012 classes under the new codebase back to the old codebase
+            http_host=re.sub(r'class2go\.', 'class.', request.META['HTTP_HOST'], flags=re.I)
+        else:  #send everyone else to the new codebase
+            http_host=re.sub(r'class\.', 'class2go.', request.META['HTTP_HOST'], flags=re.I)
+        return redirect(scheme+http_host+reverse('courses.views.main',args=[course_prefix, suffix]))
     else: 
         raise Http404
     
