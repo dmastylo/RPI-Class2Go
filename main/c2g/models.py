@@ -748,10 +748,14 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     objects = VideoManager()
 
     def create_ready_instance(self):
+        if (self.exam and self.exam.image):
+            image_exam = self.exam.image
+        else:
+            image_exam = None
         ready_instance = Video(
             course=self.course.image,
             section=self.section.image,
-            exam=self.exam.image,
+            exam=image_exam,
             title=self.title,
             description=self.description,
             type=self.type,
@@ -1602,10 +1606,17 @@ class PageVisitLog(TimestampMixin, models.Model):
 class ExamManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
+            return self.filter(course=course, is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course, is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+    def getByCourseSubTypes(self, course, types):
+        if course.mode == 'draft':
+            return self.filter(course=course, is_deleted=0, exam_type__in=types, section__is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course, is_deleted=0, exam_type__in=types, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
 
     def getBySection(self, section):
         if section.mode == 'draft':
@@ -1619,7 +1630,6 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
                          ('problemset','problemset'),
-                         ('invideo','invideo'),
                          ('survey', 'survey'),
                          ('interactive_exercise', 'interactive_exercise'),
                          )
@@ -1890,33 +1900,38 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
 
         return True
     
+    def safe_exam_type(self):
+        if self.exam_type not in [li[0] for li in self.EXAM_TYPE_CHOICES]:
+            return "exam"
+        return self.exam_type
+    
     def show_view_name(self):
-        return self.exam_type+"_show"
+        return self.safe_exam_type()+"_show"
 
     show_view = property(show_view_name)
     
     def list_view_name(self):
-        return self.exam_type+"_list"
+        return self.safe_exam_type()+"_list"
 
     list_view = property(list_view_name)
 
     def populated_view_name(self):
-        return self.exam_type+"_populated"
+        return self.safe_exam_type()+"_populated"
     
     populated_view = property(populated_view_name)
         
     def graded_view_name(self):
-        return self.exam_type+"_graded"
+        return self.safe_exam_type()+"_graded"
 
     graded_view = property(graded_view_name)
 
     def my_submissions_view_name(self):
-        return self.exam_type+"_my_submissions"
+        return self.safe_exam_type()+"_my_submissions"
     
     my_submissions_view = property(my_submissions_view_name)
 
     def record_view_name(self):
-        return self.exam_type+"_record"
+        return self.safe_exam_type()+"_record"
 
     def get_url(self):
         return self.show_view_name()
@@ -1937,6 +1952,7 @@ class ExamRecord(TimestampMixin, models.Model):
     complete = models.BooleanField(default=True)
     late = models.BooleanField(default=False)
     score = models.FloatField(null=True, blank=True)
+    onpage = models.CharField(max_length=512, null=True, blank=True) #this is the URL in the nav-bar of the page
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
