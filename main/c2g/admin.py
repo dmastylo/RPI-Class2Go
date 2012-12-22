@@ -10,7 +10,6 @@ admin.site.register(AdditionalPage)
 admin.site.register(Announcement)
 admin.site.register(ProblemSet)
 admin.site.register(EmailAddr)
-admin.site.register(MailingList)
 admin.site.register(ListEmail)
 admin.site.register(CourseEmail)
 admin.site.register(ContentSection)
@@ -51,6 +50,9 @@ class GroupAdmin(admin.ModelAdmin):
     def count(self, obj):
         return obj.user_set.count()
 
+class MailingListAdmin(admin.ModelAdmin):
+    readonly_fields = ('members',)
+
 #class ExamAdmin(reversion.VersionAdmin):
 #    pass
 
@@ -64,3 +66,4 @@ admin.site.register(ExamRecord, ExamRecordAdmin)
 admin.site.register(ExamRecordScore, ExamRecordScoreAdmin)
 admin.site.register(ExamRecordScoreField, ExamRecordScoreFieldAdmin)
 admin.site.register(ExamRecordScoreFieldChoice, ExamRecordScoreFieldChoiceAdmin)
+admin.site.register(MailingList, MailingListAdmin)
