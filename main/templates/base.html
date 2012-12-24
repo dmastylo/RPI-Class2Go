@@ -19,7 +19,7 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
     {% endblock top_scripts %}
     {% block addl_stylesheets %}{% endblock addl_stylesheets %}
-    <title>{% block title %}Stanford Online{% endblock %}</title>
+    <title>{% block title %}{{ SITE_TITLE }}{% endblock %}</title>
 </head>
 
 {% block bodytag %}<body>{% endblock bodytag %}
@@ -89,11 +89,11 @@
                         {% csrf_token %}
                     </form>
                 </li>
-                <li class="hidden-phone"><span>Welcome <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
+                <li class="hidden-phone"><span>Welcome2 <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
             {% else %}
                 {% if common_page_data.ready_course.institution_only %}
                 <li class="hidden-phone">
-                    <a id="login_button" class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Login</a>
+                    <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">Login</a>
                 </li>
                 {% else %}
                 <li class="hidden-phone"><a id="login_button" class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Login</a></li>

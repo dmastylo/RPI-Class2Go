@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load url from future %}
-{% block title %}Register | Stanford Online{% endblock title %}
+{% block title %}{{ SITE_TITLE }} | Register{% endblock title %}
 {% block topnav %} {% endblock topnav %}
 {% block navbar %} {% endblock navbar %}
 {% block m_column_content %}
@@ -28,7 +28,7 @@
        {% endif %}
        <div class="well preview-registration span5" style="margin-top:50px;">
        <h3>Confirm your login name</h3>
-<form method="post" action="{% url 'ldap_login' %}?next={{ next }}" class="form-vertical">  
+<form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">  
 {% csrf_token %}
 
 <table>

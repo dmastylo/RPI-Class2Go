@@ -83,7 +83,7 @@
        {% endif %}
        <div class="well preview-registration">
        <h3>Confirm your login name</h3>
-       <form method="post" action="{% url 'courses.preview.views.preview_login' common_page_data.course_prefix common_page_data.course_suffix %}" class="form-vertical">  
+       <form method="post" action="{% url 'accounts.views.default_login' common_page_data.course_prefix common_page_data.course_suffix %}" class="form-vertical">  
            {% csrf_token %}
            <table>
                <tr>

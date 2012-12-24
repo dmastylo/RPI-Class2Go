@@ -76,10 +76,10 @@ urlpatterns = patterns('',
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
    
-   
-    url(r'^ldap-login/?$', 'accounts.views.ldap_login', name='ldap_login'),
+    url(r'^default-login/?$', 'accounts.views.default_login', name='default_login'),
+    #url(r'^ldap-login/?$', 'accounts.views.ldap_login', name='ldap_login'),
     #shibboleth login
-    url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
+    #url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
                        
     
     #impersonate
@@ -220,8 +220,8 @@ urlpatterns = patterns('',
     #Preview
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview/$', 'courses.preview.views.preview'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_reg/$', 'courses.preview.views.preview_reg'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'courses.preview.views.preview_login'),
-    
+    # url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'courses.preview.views.preview_login'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'accounts.views.default_preview_login'),
     #Email
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),             
     
