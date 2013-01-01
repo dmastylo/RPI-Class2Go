@@ -17,9 +17,10 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth import get_backends, REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, authenticate as auth_authenticate
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from c2g.models import Course, Institution
+from c2g.models import Course, Institution,Video, Instructor, CourseInstructor
 from accounts.forms import *
 from registration import signals
+from registration.forms import RegistrationFormUniqueEmail
 from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.http import HttpResponseBadRequest
@@ -135,7 +136,7 @@ def impersonate(request,username):
     return HttpResponse('You are now logged in as ' + username)
 
 @never_cache
-def preview_login(request, course_prefix, course_suffix):
+def default_preview_login(request, course_prefix, course_suffix):
     if settings.SITE_NAME_SHORT == "Stanford":
         return shib_login(request)
     else:
@@ -146,7 +147,17 @@ def default_login(request):
     if settings.SITE_NAME_SHORT == "Stanford":
         return shib_login(request)
     else:
-        return ldap_login(request)
+        if request.method == 'GET':
+            extra_context = {}
+            context = RequestContext(request)
+            for key, value in extra_context.items():
+                context[key] = callable(value) and value() or value
+            layout = {'m': 800}
+            return render_to_response('registration/login.html',
+                              {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next': request.GET.get('next', '/')},
+                              context_instance=context)
+        else:
+            return ldap_login(request, '', '')
 
 
 @never_cache
@@ -165,124 +176,64 @@ def shib_login(request):
     # host.
     if netloc and netloc != request.get_host():
         redir_to = '/accounts/profile'
-        
-        
-        
-    if request.method == 'GET':
-        extra_context = {}
-        context = RequestContext(request)
-        for key, value in extra_context.items():
-            context[key] = callable(value) and value() or value
-        layout = {'m': 800}
-        return render_to_response('registration/login.html',
-                              {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next':request.GET.get('next', '/')},
-                              context_instance=context)
-
-    
-    #setup the redirect first: code borrowed from django contrib library
-    redir_to = request.GET.get('next', '/')
-    netloc = urlparse.urlparse(redir_to)[1]
-       
-    # Heavier security check -- don't allow redirection to a different
-    # host.
-    if netloc and netloc != request.get_host():
-        redir_to = '/'
-        
-    
-    
-    # check if username exists to find out what type of user 
-    # this ensures that we don't unecessarily do the ldap auth
-    
-    is_institution_logon = False
-    user_exists = False
-    
-    username = request.POST['username']
-    password = request.POST['password'] 
-    
-    user_exists = User.objects.filter(username=username).exists()
-    
-    if user_exists:
-        user = User.objects.get(username=username)
-        is_institution_logon = user.get_profile().site_data == "UWA"
-
-    result = 'error'
-    
-    if not user_exists or (user_exists and is_institution_logon):    
-    
                 
-        #Use EduPersonPrincipalName http://www.incommonfederation.org/attributesummary.html#eduPersonPrincipal
-        #as username in our system.  We could support other persistent identifiers later, but it will take some
-        #work
-        if ('REMOTE_USER' in request.META) and ('eppn' in request.META) and (request.META['REMOTE_USER']==request.META['eppn']) and request.META['eppn']:
-            
-            #if we get here, the user has authenticated properly
-            
-            shib = {'givenName':'',
-                    'sn':'',
-                    'mail':'',
-                    'affiliation':'',
-                    'Shib-Identity-Provider':'',}
-            
-            shib.update(request.META)
-            #Clean up first name, last name, and email address
-            shib['sn'] = string.split(shib['sn'],";")[0]
-            shib['givenName'] = string.split(shib['givenName'],";")[0]
-            if not shib['mail']:
-                shib['mail'] = shib['eppn']
-    
-            if not User.objects.filter(username=shib['REMOTE_USER']).exists():
-                #here, we need to create the new user
-                ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                rg = random.SystemRandom(random.randint(0,100000))
-                password = (''.join(rg.choice(ALPHABET) for i in range(16))) + '1' #create a random password, which they will never use
-                User.objects.create_user(shib['REMOTE_USER'], shib['mail'], password)
-                # authenticate() always has to be called before login(), and
-                # will return the user we just created.
-                new_user = auth_authenticate(username=shib['REMOTE_USER'], password=password)
-    
-                new_user.first_name, new_user.last_name = shib['givenName'].capitalize(), shib['sn'].capitalize()
-                new_user.save()
-                    
-                profile = new_user.get_profile()
-                profile.site_data = shib['affiliation']
+    #Use EduPersonPrincipalName http://www.incommonfederation.org/attributesummary.html#eduPersonPrincipal
+    #as username in our system.  We could support other persistent identifiers later, but it will take some
+    #work
+    if ('REMOTE_USER' in request.META) and ('eppn' in request.META) and (request.META['REMOTE_USER']==request.META['eppn']) and request.META['eppn']:
+        
+        #if we get here, the user has authenticated properly
+        
+        shib = {'givenName':'',
+                'sn':'',
+                'mail':'',
+                'affiliation':'',
+                'Shib-Identity-Provider':'',}
+        
+        shib.update(request.META)
+        #Clean up first name, last name, and email address
+        shib['sn'] = string.split(shib['sn'],";")[0]
+        shib['givenName'] = string.split(shib['givenName'],";")[0]
+        if not shib['mail']:
+            shib['mail'] = shib['eppn']
+
+        if not User.objects.filter(username=shib['REMOTE_USER']).exists():
+            #here, we need to create the new user
+            ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            rg = random.SystemRandom(random.randint(0,100000))
+            password = (''.join(rg.choice(ALPHABET) for i in range(16))) + '1' #create a random password, which they will never use
+            User.objects.create_user(shib['REMOTE_USER'], shib['mail'], password)
+            # authenticate() always has to be called before login(), and
+            # will return the user we just created.
+            new_user = auth_authenticate(username=shib['REMOTE_USER'], password=password)
+
+            new_user.first_name, new_user.last_name = shib['givenName'].capitalize(), shib['sn'].capitalize()
+            new_user.save()
                 
-                if 'stanford.edu' in shib['affiliation']:
-                    profile.institutions.add(Institution.objects.get(title='Stanford'))
-                    profile.save()
+            profile = new_user.get_profile()
+            profile.site_data = shib['affiliation']
             
-                auth_login(request, new_user)
-    
-                signals.user_registered.send(sender=__file__,
-                                 user=new_user,
-                                 request=request)
-    
-            else:
-                #User already exists, so log him/her in
-                user = User.objects.get(username=shib['REMOTE_USER'])
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
-                auth_login(request, user)
-                messages.add_message(request,messages.SUCCESS, 'You have successfully logged in!')
+            if 'stanford.edu' in shib['affiliation']:
+                profile.institutions.add(Institution.objects.get(title='Stanford'))
+                profile.save()
+        
+            auth_login(request, new_user)
 
-            return HttpResponseRedirect(redir_to)
-    
-    # check regular auth now
-    form = AuthenticationForm(data=request.POST)
-    if form.is_valid():
-        auth_login(request, form.get_user())
-        return HttpResponseRedirect(redir_to)
+            signals.user_registered.send(sender=__file__,
+                             user=new_user,
+                             request=request)
 
-    else:                
+        else:
+            #User already exists, so log him/her in
+            user = User.objects.get(username=shib['REMOTE_USER'])
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_login(request, user)
+            messages.add_message(request,messages.SUCCESS, 'You have successfully logged in!')
+
+    else:
         messages.add_message(request,messages.ERROR, 'WebAuth did not return your identity to us!  Please try logging in again.  If the problem continues please contact c2g-techsupport@class.stanford.edu')
-        extra_context = {}
-        context = RequestContext(request)
-        for key, value in extra_context.items():
-            context[key] = callable(value) and value() or value
-        layout = {'m': 800}
-    
-        return render_to_response('registration/login.html',
-                          {'form': form, 'layout': json.dumps(layout)},
-                          context_instance=context)
 
+    return HttpResponseRedirect(redir_to) 
 
 @never_cache
 def ldap_login(request, course_prefix, course_suffix):
@@ -292,23 +243,16 @@ def ldap_login(request, course_prefix, course_suffix):
     #if one does not exist, create it and assign to proper institution
     #then redirect
     
-        
-    print course_prefix
-    print course_suffix
-    print request.common_page_data['course']
-    
-    return redirect(reverse('courses.views.main', args=['crypto', 'fall']))
-    
-    
-    if request.method == 'GET':
-        extra_context = {}
-        context = RequestContext(request)
-        for key, value in extra_context.items():
-            context[key] = callable(value) and value() or value
-        layout = {'m': 800}
-        return render_to_response('registration/login.html',
-                              {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next': request.GET.get('next', '/')},
-                              context_instance=context)
+
+    #if request.method == 'GET':
+    #    extra_context = {}
+    #    context = RequestContext(request)
+    #    for key, value in extra_context.items():
+    #        context[key] = callable(value) and value() or value
+    #    layout = {'m': 800}
+    #    return render_to_response('registration/login.html',
+    #                          {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next': request.GET.get('next', '/')},
+    #                          context_instance=context)
 
     
     #setup the redirect first: code borrowed from django contrib library
@@ -436,9 +380,9 @@ def ldap_preview_login(request, course_prefix, course_suffix):
     if 'error' in result:
         ''' Now try and do regular auth
         '''
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            auth_login(request, form.get_user())
+        login_form = AuthenticationForm(data=request.POST)
+        if login_form.is_valid():
+            auth_login(request, login_form.get_user())
             
             if not request.common_page_data['course'].preview_only_mode and \
                 date.today() >= request.common_page_data['course'].calendar_start :
@@ -449,17 +393,29 @@ def ldap_preview_login(request, course_prefix, course_suffix):
             return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
             
         else:
+            form_class = RegistrationFormUniqueEmail
             form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
             context = RequestContext(request)                
             
-            return render_to_response(#'previews/'+request.common_page_data['course'].handle+'.html',
-                                  'previews/default.html',
-                                  {'form': form,
-                                   'login_form': login_form,
-                                   'common_page_data': request.common_page_data,
-                                   'display_login': True},
-                                  context_instance=context)
-                
+            try:
+                video = Video.objects.getByCourse(course=request.common_page_data['course']).get(slug='intro')
+            except Video.DoesNotExist:
+                video = None
+        
+            instructors = Instructor.objects.filter(courseinstructor=request.common_page_data['course'])
+       
+            template_name='previews/default.html'
+
+            return render_to_response(template_name,
+                              {'form': form,
+                               'login_form': login_form,
+                               'video':video,
+                               'instructors':instructors,
+                               'common_page_data': request.common_page_data,
+                               'course': request.common_page_data['course'],
+                               'display_login': True},
+                               context_instance=context)
+            
  
     
     ldapUser = json.loads(result)

@@ -18,6 +18,8 @@
 <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
 
 {% else %}
+    {% if SITE_NAME_SHORT = 'Stanford' %}{% endif %}
+<div class="row-fluid"><div class="span3"></div><h3 style="margin-left:330px;" >Stanford students, please log in <a data-toggle="modal" href="{% url 'shib_login' %}?next=/">here</a></h3></div>
  <div class="row-fluid">
  <div class="span3"> </div>
        {% if login_form.errors %}
