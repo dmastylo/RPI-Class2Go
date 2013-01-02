@@ -13,8 +13,6 @@
 # <location to be inserted>
 
 from datetime import datetime
-import gdata.youtube
-import gdata.youtube.service
 from hashlib import md5
 import os
 import re
@@ -24,9 +22,9 @@ import time
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
-from django.core.files.storage import DefaultStorage, get_storage_class, FileSystemStorage
 from django.db.models.signals import post_save
 from django.db import models
+from django.db.models import Avg, Count, Max, StdDev
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
@@ -154,10 +152,39 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     suffix = property(_get_suffix)
 
     def has_exams(self):
-        return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam").exists()
+        if self.mode == 'draft':
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam").exists()
+        else:
+            now = datetime.now()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="exam", live_datetime__lt=now).exists()
 
     def has_surveys(self):
-        return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey").exists()
+        if self.mode == 'draft':
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey").exists()
+        else:
+            now = datetime.now()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="survey", live_datetime__lt=now).exists()
+        
+    def has_interactive_exercises(self):
+        if self.mode == 'draft':
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type='interactive_exercise').exists()
+        else:
+            now = datetime.now()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type='interactive_exercise', live_datetime__lt=now).exists()
+                
+    def has_problem_sets(self):
+        if self.mode == 'draft':
+            return ProblemSet.objects.filter(course=self, is_deleted=0).exists()
+        else:
+            now = datetime.now()
+            return ProblemSet.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
+        
+    def has_videos(self):
+        if self.mode == 'draft':
+            return Video.objects.filter(course=self, is_deleted=0).exists()
+        else:
+            now = datetime.now()
+            return Video.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
     
     def get_all_students(self):
         """
@@ -330,41 +357,34 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
         self.save()
 
-    def getChildren(self):
+    def getChildren(self, gettagged=False, getsorted=True):
+        """Return the child items of this section: Videos, Files, etc.
+
+        If gettagged is True, return a list of dictionaries having some item 
+        metadata in addition to the item reference, otherwise return only a 
+        list of item references.
+
+        If getsorted is True, return the list sorted by 'index' field, which
+        indicates manual sorting preference; otherwise ordering is unspecified.
+        """
+
         dict_list = []
-        output_list = []
+        for tag, cls in ContentGroup.groupable_types.iteritems():
+            dict_list.extend([{'item':item, 'index':item.index, 'type':tag} for item in cls.objects.getBySection(section=self)])
 
-        videos = Video.objects.getBySection(section=self)
-        for item in videos:
-            dict_list.append({'item':item, 'index':item.index})
-
-        problemsets = ProblemSet.objects.getBySection(section=self)
-        for item in problemsets:
-            dict_list.append({'item':item, 'index':item.index})
-
-        additionalpages = AdditionalPage.objects.getBySection(section=self)
-        for item in additionalpages:
-            dict_list.append({'item':item, 'index':item.index})
-            
-        files = File.objects.getBySection(section=self)
-        for item in files:
-            dict_list.append({'item':item, 'index':item.index})
-
-        sorted_dict_list = sorted(dict_list, key=lambda k: k['index'])
-
-        for item in sorted_dict_list:
-            output_list.append(item['item'])
-
-        return output_list
+        if getsorted:
+            dict_list = sorted(dict_list, key=lambda k: k['index'])
+        return dict_list if gettagged else [x['item'] for x in dict_list]
 
     def countChildren(self):
-        return len(self.getChildren)
+        return len(self.getChildren(gettagged=True, getsorted=False))
 
     def getNextIndex(self):
-        # We will not return len(children)+1 since this approach is not fail safe. If an index is skipped for whatever reason, we want to make sure we are still robust
-        # So what if the children list is empty?
+        # We will not return len(children)+1 since this approach is not fail-
+        # safe. If an index is skipped for whatever reason, we want to make
+        # sure we are still robust
         children = self.getChildren()
-        if len(children) == 0 :
+        if len(children) == 0:
             return 1
         
         if children[-1].index == None:
@@ -386,7 +406,7 @@ class AdditionalPageManager(models.Manager):
         # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
         return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
 
-    def getSectionPagesByCourse(self, course):
+    def getByCourse(self, course):
         # Additional pages displayed under sections have a live_datetime effect.
         if course.mode == 'draft':
             return self.filter(course=course,is_deleted=0, section__is_deleted=0, menu_slug=None).order_by('section','index')
@@ -465,6 +485,9 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 
         return True
 
+    def get_url(self):
+        return 'pages/' + self.slug
+
     def __unicode__(self):
         if self.title:
             return self.title
@@ -478,10 +501,10 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
 class FileManager(models.Manager):
     def getByCourse(self, course):
         if course.mode == 'draft':
-            return self.filter(course=course,is_deleted=0).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0).order_by('section','index')
         else:
             now = datetime.now()
-            return self.filter(course=course,is_deleted=0,live_datetime__lt=now).order_by('section','index')
+            return self.filter(course=course,is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('section','index')
             
     def getBySection(self, section):
         if section.mode == 'draft':
@@ -491,11 +514,11 @@ class FileManager(models.Manager):
             return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
 
 class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
-    course = models.ForeignKey(Course, db_index=True)
+    course  = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    file = models.FileField(upload_to=get_file_path)
-    handle = models.CharField(max_length=255, null=True, db_index=True)
+    title   = models.CharField(max_length=255, null=True, blank=True)
+    file    = models.FileField(upload_to=get_file_path)
+    handle  = models.CharField(max_length=255, null=True, db_index=True)
     objects = FileManager()
 
     def create_ready_instance(self):
@@ -520,11 +543,50 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def dl_link(self):
         # File
-        if not self.file.storage.exists(self.file.name):
+        filename = self.file.name
+        if not self.file.storage.exists(filename):
             return ""
-        
-        url = self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+        if is_storage_local():
+            url = get_site_url() + self.file.storage.url(filename)
+        else:
+            url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
         return url
+        
+    def get_ext(self):
+        """ Return the extension of a file - eg pdf - or just '' if it doesn't have one """
+        # TODO: use filemagic or python-magic for this instead
+        file_parts = self.file.name.split('.')
+        if len(file_parts) > 1:
+            return (file_parts.pop().lower())
+        return ''
+            
+    def get_icon_type(self):
+        """ return an appropriate icon for a file, based on its extension """
+        extensions = {
+          # extension : icon name
+                'html': 'globe',
+                'htm':  'globe',
+                'ppt':  'list-alt',
+                'pptx': 'list-alt',
+                'jpg':  'picture',
+                'png':  'picture',
+                'gif':  'picture',
+                'jpeg': 'picture',
+                'mp3':  'music',
+                'aac':  'music',
+                'gz':   'download-alt',
+                'zip':  'download-alt',
+                'tar':  'download-alt',
+                'bz':   'download-alt',
+                'bz2':  'download-alt',
+                'csv':  'table',
+                'xls':  'table'
+        }
+        file_extension = self.get_ext()
+        return extensions.get(file_extension, 'file')
+
+    def get_url(self):
+        return self.file.url # FIXME: cache this
 
     def __unicode__(self):
         if self.title:
@@ -723,6 +785,7 @@ class VideoManager(models.Manager):
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
+    exam = models.ForeignKey('Exam', null=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
@@ -734,9 +797,14 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     objects = VideoManager()
 
     def create_ready_instance(self):
+        if (self.exam and self.exam.image):
+            image_exam = self.exam.image
+        else:
+            image_exam = None
         ready_instance = Video(
             course=self.course.image,
             section=self.section.image,
+            exam=image_exam,
             title=self.title,
             description=self.description,
             type=self.type,
@@ -782,6 +850,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             ready_instance.file = self.file
         if not clone_fields or 'url' in clone_fields:
             ready_instance.url = self.url
+        if not clone_fields or 'exam' in clone_fields:
+            ready_instance.exam = self.exam
         if not clone_fields or 'live_datetime' in clone_fields:
             ready_instance.live_datetime = self.live_datetime
 
@@ -846,6 +916,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.file = ready_instance.file
         if not clone_fields or 'url' in clone_fields:
             self.url = ready_instance.url
+        if not clone_fields or 'exam' in clone_fields:
+            self.exam = ready_instance.exam
         if not clone_fields or 'live_datetime' in clone_fields:
             self.live_datetime = ready_instance.live_datetime
 
@@ -899,6 +971,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.url != prod_instance.url:
             return False
+        if self.exam != prod_instance.exam:
+            return False
         if self.live_datetime != prod_instance.live_datetime:
             return False
         draft_videoToExs = VideoToExercise.objects.getByVideo(self)
@@ -912,23 +986,29 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return self.file.storage.exists(self.file.name)
 
     def dl_link(self):
+        """Return fully-qualified download URL for this video, or empty string."""
         # Video
-        if not self.file.storage.exists(self.file.name):
+        videoname = self.file.name
+        if not self.file.storage.exists(videoname):
             return ""
-        return self.file.storage.url(self.file.name, response_headers={'response-content-disposition': 'attachment'})
+        if is_storage_local():
+            # FileSystemStorage returns a path, not a url
+            return get_site_url() + self.file.storage.url(videoname)
+        else:
+            return self.file.storage.url_monkeypatched(videoname, response_headers={'response-content-disposition': 'attachment'})
 
     def dl_links_all(self):
         """Return list of fully-qualified download URLs for video variants."""
         # Video
+        myname  = self.file.name
+        mystore = self.file.storage
         if is_storage_local():
             # FIXME: doesn't work on local sites yet
-            print "DEBUG: I don't work on local sites yet, sorry." 
-            return []
+            print "DEBUG: Multiple download links don't work on local sites yet, sorry." 
+            return [('large', get_site_url() + mystore.url(myname), self.file.size, '')]
         else:
             # XXX: very S3 specific
-            myname  = self.file.name
-            mystore = self.file.storage
-            urlof   = mystore.url
+            urlof   = mystore.url_monkeypatched
             basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
             names = []
             for size in sorted(video_resize_options):
@@ -980,6 +1060,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             if needle.exercise.fileName == hay.exercise.fileName:
                 return True
         return False
+
+    def get_url(self):
+        return 'videos/' + self.slug
         
     def __unicode__(self):
         if self.title:
@@ -1398,6 +1481,9 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 return True
         return False
 
+    def get_url(self):
+        return 'problemsets/' + self.slug
+
     def __unicode__(self):
         return self.title
     
@@ -1566,29 +1652,341 @@ class PageVisitLog(TimestampMixin, models.Model):
     class Meta:
         db_table = u'c2g_page_visit_log'
 
-class Exam(TimestampMixin, Deletable, Stageable, models.Model):
+class ExamManager(models.Manager):
+    def getByCourse(self, course):
+        if course.mode == 'draft':
+            return self.filter(course=course, is_deleted=0, section__is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course, is_deleted=0, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+    def getByCourseSubTypes(self, course, types):
+        if course.mode == 'draft':
+            return self.filter(course=course, is_deleted=0, exam_type__in=types, section__is_deleted=0).order_by('section','index')
+        else:
+            now = datetime.now()
+            return self.filter(course=course, is_deleted=0, exam_type__in=types, section__is_deleted=0,live_datetime__lt=now).order_by('section','index')
+
+    def getBySection(self, section):
+        if section.mode == 'draft':
+            return self.filter(section=section, is_deleted=0).order_by('index')
+        else:
+            now = datetime.now()
+            return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
+
+class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
     EXAM_TYPE_CHOICES = (
                          ('exam', 'exam'),
+                         ('problemset','problemset'),
                          ('survey', 'survey'),
+                         ('interactive_exercise', 'interactive_exercise'),
                          )
     
     course = models.ForeignKey(Course, db_index=True)
+    section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     html_content = models.TextField(blank=True)
+    xml_metadata = models.TextField(null=True, blank=True)
+    xml_imported = models.TextField(null=True, blank=True) ###This is the XML used to import the exam content.  We only store it to re-display it.
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
-    total_score = models.IntegerField(null=True, blank=True)
+    partial_credit_deadline = models.DateTimeField(null=True, blank=True)
+    late_penalty = models.IntegerField(default=0, null=True, blank=True)
+    submissions_permitted = models.IntegerField(default=999, null=True, blank=True)
+    resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
+    autograde = models.BooleanField(default=False)
+    display_single = models.BooleanField(default=False)
+    grade_single = models.BooleanField(default=False)
+    invideo = models.BooleanField(default=False)
+    timed = models.BooleanField(default=False)
+    minutesallowed = models.IntegerField(null=True, blank=True)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
+    #there is a function from assessment_type => (invideo, exam_type, display_single, grade_single, autograde) that we don't want to write inverse for
+    #so we just store it
+    assessment_type = models.CharField(max_length=64, null=True, blank=True)
+    total_score = models.IntegerField(null=True, blank=True)
+    objects = ExamManager()
     
+    def num_of_student_records(self, student):
+        """This returns the number of completed records on this exam by student"""
+        attempt_num_obj = ExamRecord.objects.filter(exam=self, student=student, complete=True).aggregate(Max('attempt_number'))
+        if not attempt_num_obj['attempt_number__max']:
+            return 0
+        else:
+            return attempt_num_obj['attempt_number__max']
+
+
+    def max_attempts_exceeded(self, student):
+        """Returns True if student has used up max number of attempts"""
+        if self.submissions_permitted==0:
+            return False
+        return self.num_of_student_records(student) >= self.submissions_permitted
     
     def past_due(self):
-        if self.due_date and (datetime.now() > self.due_date):
+        if self.due_date and (datetime.now() > self.grace_period):
             return True
         return False
     
+    def past_all_deadlines(self):
+        future = datetime(3000,1,1)
+        grace_period = self.grace_period if self.grace_period else future
+        partial_credit_deadline = self.partial_credit_deadline if self.partial_credit_deadline else future
+
+        compareD = max(grace_period, partial_credit_deadline)
+    
+        return datetime.now() > compareD
+    
+    def load_mathjax(self):
+        """uses a regexp to figure out if the rendering of the exam needs mathjax
+           the regexp are rough, but should not have any false negatives.  (at
+           worst we load mathjax when we don't need it.
+        """
+        if re.search(r"\$\$.*\$\$", self.html_content) or re.search(r"\\\[.*\\\]", self.html_content):
+            return True
+        return False
+        
+    
+    def create_ready_instance(self):
+        ready_instance = Exam(
+            course=self.course.image,
+            section=self.section.image,
+            title=self.title,
+            description=self.description,
+            html_content=self.html_content,
+            slug=self.slug,
+            index=self.index,
+            mode='ready',
+            image=self,
+            due_date=self.due_date,
+            grace_period=self.grace_period,
+            total_score=self.total_score,
+            exam_type=self.exam_type,
+            live_datetime = self.live_datetime,
+            xml_metadata = self.xml_metadata,
+            xml_imported = self.xml_imported,
+            partial_credit_deadline = self.partial_credit_deadline,
+            late_penalty = self.late_penalty,
+            submissions_permitted = self.submissions_permitted,
+            resubmission_penalty = self.resubmission_penalty,
+            autograde = self.autograde,
+            display_single = self.display_single,
+            grade_single = self.grade_single,
+            invideo = self.invideo,
+            timed = self.timed,
+            minutesallowed = self.minutesallowed,
+            assessment_type = self.assessment_type,
+        )
+        ready_instance.save()
+        self.image = ready_instance
+        self.save()
+    
+    def commit(self, clone_fields = None):
+        if self.mode != 'draft': return;
+        if not self.image: self.create_ready_instance()
+
+        ready_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            ready_instance.section = self.section.image
+        if not clone_fields or 'title' in clone_fields:
+            ready_instance.title = self.title
+        if not clone_fields or 'description' in clone_fields:
+            ready_instance.description = self.description
+        if not clone_fields or 'html_content' in clone_fields:
+            ready_instance.html_content = self.html_content
+        if not clone_fields or 'slug' in clone_fields:
+            ready_instance.slug = self.slug
+        if not clone_fields or 'index' in clone_fields:
+            ready_instance.index = self.index
+        if not clone_fields or 'due_date' in clone_fields:
+            ready_instance.due_date = self.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            ready_instance.grace_period = self.grace_period
+        if not clone_fields or 'total_score' in clone_fields:
+            ready_instance.total_score = self.total_score
+        if not clone_fields or 'exam_type' in clone_fields:
+            ready_instance.exam_type = self.exam_type
+        if not clone_fields or 'live_datetime' in clone_fields:
+            ready_instance.live_datetime = self.live_datetime
+        if not clone_fields or 'xml_metadata' in clone_fields:
+            ready_instance.xml_metadata = self.xml_metadata
+        if not clone_fields or 'xml_imported' in clone_fields:
+            ready_instance.xml_imported = self.xml_imported
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            ready_instance.partial_credit_deadline = self.partial_credit_deadline
+        if not clone_fields or 'late_penalty' in clone_fields:
+            ready_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            ready_instance.submissions_permitted = self.submissions_permitted
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            ready_instance.resubmission_penalty = self.resubmission_penalty
+        if not clone_fields or 'autograde' in clone_fields:
+            ready_instance.autograde = self.autograde
+        if not clone_fields or 'display_single' in clone_fields:
+            ready_instance.display_single = self.display_single
+        if not clone_fields or 'grade_single' in clone_fields:
+            ready_instance.grade_single = self.grade_single
+        if not clone_fields or 'invideo' in clone_fields:
+            ready_instance.invideo = self.invideo
+        if not clone_fields or 'timed' in clone_fields:
+            ready_instance.timed = self.timed
+        if not clone_fields or 'minutesallowed' in clone_fields:
+            ready_instance.minutesallowed = self.minutesallowed
+        if not clone_fields or 'assessment_type' in clone_fields:
+            ready_instance.assessment_type = self.assessment_type
+        
+        ready_instance.save()
+    
+    def revert(self, clone_fields = None):
+        if self.mode != 'draft': return;
+
+        ready_instance = self.image
+        if not clone_fields or 'section' in clone_fields:
+            self.section = ready_instance.section.image        
+        if not clone_fields or 'title' in clone_fields:
+            self.title = ready_instance.title
+        if not clone_fields or 'description' in clone_fields:
+            self.description = ready_instance.description            
+        if not clone_fields or 'html_content' in clone_fields:
+            self.html_content = ready_instance.html_content
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = ready_instance.slug
+        if not clone_fields or 'index' in clone_fields:
+            self.index = ready_instance.index
+        if not clone_fields or 'due_date' in clone_fields:
+            self.due_date = ready_instance.due_date
+        if not clone_fields or 'grace_period' in clone_fields:
+            self.grace_period = ready_instance.grace_period
+        if not clone_fields or 'total_score' in clone_fields:
+            self.total_score = ready_instance.total_score
+        if not clone_fields or 'exam_type' in clone_fields:
+            self.exam_type = ready_instance.exam_type
+        if not clone_fields or 'live_datetime' in clone_fields:
+            self.live_datetime = ready_instance.live_datetime
+        if not clone_fields or 'xml_metadata' in clone_fields:
+            self.xml_metadata = ready_instance.xml_metadata 
+        if not clone_fields or 'xml_imported' in clone_fields:
+            self.xml_imported = ready_instance.xml_imported
+        if not clone_fields or 'partial_credit_deadline' in clone_fields:
+            self.partial_credit_deadline = ready_instance.partial_credit_deadline 
+        if not clone_fields or 'late_penalty' in clone_fields:
+            self.late_penalty = ready_instance.late_penalty 
+        if not clone_fields or 'submissions_permitted' in clone_fields:
+            self.submissions_permitted = ready_instance.submissions_permitted 
+        if not clone_fields or 'resubmission_penalty' in clone_fields:
+            self.resubmission_penalty = ready_instance.resubmission_penalty 
+        if not clone_fields or 'autograde' in clone_fields:
+            self.autograde = ready_instance.autograde 
+        if not clone_fields or 'display_single' in clone_fields:
+            self.display_single = ready_instance.display_single 
+        if not clone_fields or 'grade_single' in clone_fields:
+            self.grade_single = ready_instance.grade_single
+        if not clone_fields or 'invideo' in clone_fields:
+            self.invideo = ready_instance.invideo 
+        if not clone_fields or 'timed' in clone_fields:
+            self.timed = ready_instance.timed 
+        if not clone_fields or 'minutesallowed' in clone_fields:
+            self.minutesallowed = ready_instance.minutesallowed
+        if not clone_fields or 'assessment_type' in clone_fields:
+            self.assessment_type = ready_instance.assessment_type
+
+        self.save()
+    
+    def is_synced(self):
+        
+        prod_instance = self.image
+        
+        if self.section != prod_instance.section.image:
+            return False
+        if self.title != prod_instance.title:
+            return False
+        if self.description != prod_instance.description:
+            return False
+        if self.html_content != self.image.html_content:
+            return False
+        if self.slug != self.image.slug:
+            return False
+        if self.index != self.image.index:
+            return False
+        if self.due_date != self.image.due_date:
+            return False
+        if self.grace_period != self.image.grace_period:
+            return False
+        if self.total_score != self.image.total_score:
+            return False
+        if self.exam_type != self.image.exam_type:
+            return False
+        if self.live_datetime != self.image.live_datetime:
+            return False
+        if self.xml_metadata != self.image.xml_metadata:
+            return False
+        if self.xml_imported != self.image.xml_imported:
+            return False
+        if self.partial_credit_deadline != self.image.partial_credit_deadline:
+            return False
+        if self.late_penalty != self.image.late_penalty:
+            return False
+        if self.submissions_permitted != self.image.submissions_permitted:
+            return False
+        if self.resubmission_penalty != self.image.resubmission_penalty:
+            return False
+        if self.autograde != self.image.autograde:
+            return False
+        if self.display_single != self.image.display_single:
+            return False
+        if self.grade_single != self.image.grade_single:
+            return False
+        if self.invideo != self.image.invideo:
+            return False
+        if self.timed != self.image.timed:
+            return False
+        if self.minutesallowed != self.image.minutesallowed:
+            return False
+        if self.assessment_type != self.image.assessment_type:
+            return False
+
+        return True
+    
+    def safe_exam_type(self):
+        if self.exam_type not in [li[0] for li in self.EXAM_TYPE_CHOICES]:
+            return "exam"
+        return self.exam_type
+    
+    def show_view_name(self):
+        return self.safe_exam_type()+"_show"
+
+    show_view = property(show_view_name)
+    
+    def list_view_name(self):
+        return self.safe_exam_type()+"_list"
+
+    list_view = property(list_view_name)
+
+    def populated_view_name(self):
+        return self.safe_exam_type()+"_populated"
+    
+    populated_view = property(populated_view_name)
+        
+    def graded_view_name(self):
+        return self.safe_exam_type()+"_graded"
+
+    graded_view = property(graded_view_name)
+
+    def my_submissions_view_name(self):
+        return self.safe_exam_type()+"_my_submissions"
+    
+    my_submissions_view = property(my_submissions_view_name)
+
+    def record_view_name(self):
+        return self.safe_exam_type()+"_record"
+
+    def get_url(self):
+        return self.show_view_name()
+    
+    record_view = property(record_view_name)
+
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
 
@@ -1597,9 +1995,14 @@ class ExamRecord(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    json_data = models.TextField(null=True, blank=True)
-    score = models.IntegerField(null=True, blank=True) #currently unused.
-
+    json_data = models.TextField(null=True, blank=True)   #blob
+    json_score_data = models.TextField(null=True, blank=True)  #blob
+    attempt_number = models.IntegerField(default=0)
+    complete = models.BooleanField(default=True)
+    late = models.BooleanField(default=False)
+    score = models.FloatField(null=True, blank=True)
+    onpage = models.CharField(max_length=512, null=True, blank=True) #this is the URL in the nav-bar of the page
+    
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
     
@@ -1642,21 +2045,302 @@ class CourseInstructor(TimestampMixin,  models.Model):
 
 class ExamScore(TimestampMixin, models.Model):
     """
-    This class is meant to be the top level score of each problem set
+    This class is meant to be the top level, authoritative score of each exam.  
+    It should have a one-to-one relationship with the (exam, student) pair
     """
-    course = models.ForeignKey(Course, db_index=True)
+    course = models.ForeignKey(Course, db_index=True) #mainly for convenience
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    score = models.IntegerField(null=True, blank=True) #this is the parent score
+    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
-
+    
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.score))
 
+    class Meta:
+        unique_together = ("exam", "student")
+        
+    def setScore(self):
+        #Set score to max of ExamRecordScore.score for this exam, student
+        exam_records = ExamRecord.objects.values('student').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score'))
+        
+        if exam_records:
+            self.score = exam_records[0]['max_score']
+            self.save()        
 
+# Deprecated
 class ExamScoreField(TimestampMixin, models.Model):
+    """Should be kept basically identical to ExamRecordScoreField"""
     parent = models.ForeignKey(ExamScore, db_index=True)
     field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    correct = models.NullBooleanField()
     subscore = models.IntegerField(default=0)
+    comments = models.TextField(null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return (self.parent.student.username + ":" + self.parent.course.title + ":" + self.parent.exam.title + ":" + self.human_name)
+
+	
+
+class ExamRecordScore(TimestampMixin, models.Model):
+    """
+    Making a separate DB table to keep scores associated with each record.
+    Currently for CSV-graded exams this does not get created since there are too many DB operations
+    One of these can be "promoted" -- i.e. copied into ExamScore to be the official score
+       **TODO: Write Promote as a function in the model**
+    """
+    record = models.OneToOneField(ExamRecord, db_index=True)
+    raw_score = models.FloatField(null=True, blank=True) # this is the raw score of the entire record
+    #subscores are in ExamRecordScoreField
+    
+    def __unicode__(self):
+        return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.raw_score))
+
+
+class ExamRecordScoreField(TimestampMixin, models.Model):
+    """Should be kept basically identical to ExamScoreField."""
+    parent = models.ForeignKey(ExamRecordScore, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.TextField(null=True, blank=True)
+    correct = models.NullBooleanField()
+    subscore = models.FloatField(default=0)
+    comments = models.TextField(null=True, blank=True)
+    associated_text = models.TextField(null=True, blank=True)
+    def __unicode__(self):
+        return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
+
+class ExamRecordFieldLog(TimestampMixin, models.Model):
+    """Log oriented table recording activity for each submission of each field."""
+    course = models.ForeignKey(Course, db_index=True)
+    exam = models.ForeignKey(Exam, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    field_name = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    value = models.TextField(null=True, blank=True)
+    raw_score = models.FloatField(default=0, blank=True)
+    max_score = models.FloatField(default=0, blank=True)  # info only, for interactive 
+    def __unicode__(self):
+        return (self.parent.record.student.username + ":" + self.parent.record.course.title + ":" + self.parent.record.exam.title + ":" + self.human_name)
+
+class ExamRecordScoreFieldChoice(TimestampMixin, models.Model):
+    """Exploding out even multiple choice answers"""
+    parent = models.ForeignKey(ExamRecordScoreField, db_index=True)
+    choice_value = models.CharField(max_length=128, db_index=True)
+    human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    correct = models.NullBooleanField()
+    associated_text = models.TextField(null=True, blank=True)
+    def __unicode__(self):
+        return (self.parent.parent.record.student.username + ":" + self.parent.parent.record.course.title + ":" \
+                + self.parent.parent.record.exam.title + ":" + self.parent.human_name + ":" + self.human_name)
+
+class CurrentTermMap(TimestampMixin, models.Model):
+    course_prefix = models.CharField(max_length=64, unique=True, db_index=True)
+    course_suffix = models.CharField(max_length=64)
+    def __unicode__(self):
+        return (self.course_prefix + "--" + self.course_suffix)
+
+# Deprecated in favor of ExamScore (complete / incomplete to track state)
+class StudentExamStart(TimestampMixin, models.Model):
+    student = models.ForeignKey(User)
+    exam = models.ForeignKey(Exam)
+
+class ContentGroupManager(models.Manager):
+    def getByCourse(self, course):
+        return self.filter(course=course).order_by('group_id','level')
+    def getChildrenByGroupId(self, group_id):
+        return self.filter(level=2, group_id=group_id).order_by('display_style')
+
+class ContentGroup(models.Model):
+    group_id        = models.IntegerField(db_index=True, null=True, blank=True)
+    level           = models.IntegerField(db_index=True)
+    display_style   = models.CharField(max_length=32, null=True, blank=True)
+    #content_type_tag= models.CharField(max_length=32, null=True, blank=True)
+
+    additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
+    course          = models.ForeignKey(Course)
+    exam            = models.ForeignKey(Exam, null=True, blank=True)
+    file            = models.ForeignKey(File, null=True, blank=True)
+    problemSet      = models.ForeignKey(ProblemSet, null=True, blank=True)
+    video           = models.ForeignKey(Video, null=True, blank=True)
+
+    objects         = ContentGroupManager()
+
+               # ContentGroup field name: model class name
+    groupable_types = { 
+                       'video':           Video,
+                       'problemSet':      ProblemSet,
+                       'additional_page': AdditionalPage, 
+                       'file':            File,
+                       'exam':            Exam,
+                      }
+
+    @classmethod
+    def groupinfo_by_id(thisclass, tag, id):
+        """Reverse-lookup the members of a group by the object id of a member.
+        
+        nota bene:
+        O(n**2) for # of items in a group. n should be tiny, but be wary.
+        OTOH, if ContentGroup.get_content_type becomes constant-time, this
+        becomes linear, and then we win.
+        """
+        info = {}
+        cls = thisclass.groupable_types.get('tag', False)
+        if not cls:
+            return info
+        obj = cls.objects.get(id=id)
+        cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
+        for cgo in cgobjs:
+            cttag = cgo.get_content_type()
+            cgref = getattr(cgo, cttag)
+            if not cttag or not cgref:
+                continue
+            if cgo.level == 1:
+                info['__parent'] = cgref
+            else:
+                info.setdefault('__children', []).append(cgref)
+            info.setdefault(cttag, []).append(cgref)
+        if info:
+            info['__group_id'] = cgobjs[0].group_id
+        return info
+
+    @classmethod
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
+        """Add obj_ref having type tag to the ContentGroup table.
+
+        Returns the ContentGroup entry id for the resulting child item.
+
+        If group_id doesn't correspond to an existing ContentGroup.group_id, raises ValueError
+        If entry isn't in the table, create it and add it
+        If entry is in the table as a parent of the given group_id, demote it
+        If entry is in the table as a child of a different group, move it to this group.
+
+        display_style determines how the child items should be rendered with
+        their parent; 'button' is the default.
+        """
+        # Technically there's no reason to restrict the ContentGroups
+        # to two levels of hierarchy, but the UI design is harder for
+        # more level (and as of this iteration the spec says two)
+        cgref         = None
+        if tag not in thisclass.groupable_types.keys():
+            raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
+        content_group = ContentGroup.objects.filter(group_id=group_id)
+        if not content_group:
+            raise ValueError, "ContentGroup "+str(group_id)+" does not exist."
+        try:
+            cgref = obj_ref.contentgroup_set.get()
+        except ContentGroup.DoesNotExist:
+            # it's not in the table, so add it
+            new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id, display_style=display_style)
+            setattr(new_item, tag, obj_ref)
+            new_item.save()
+            return new_item.id
+        else:
+            # it is in the table, so do something reasonable:
+            for entry in content_group:
+                if getattr(entry, tag, False) == obj_ref:
+                    # If this child is in this group already, return this group
+                    # But if this child is a parent of this group, make it a child first
+                    if entry.level == 1:
+                        entry.level = 2
+                        entry.save()
+                    return entry.id
+            # We have a reference to it, but it's not in content_group
+            # TODO: Decide: If cgref was previously a parent and we reassign
+            #       it, what happnes to its (old) children?
+            if content_group and cgref:
+                cgref.group_id = group_id
+                cgref.level = 2
+                cgref.save()
+            return cgref.id
+
+    @classmethod
+    def add_parent(thisclass, course_ref, tag, obj_ref):
+        """Add obj_ref having type tag to the ContentGroup table.
+
+        Returns a group_id of the resulting ContentGroup.
+        Note that this is the same as the parent object's ContentGroup id.
+
+        If it is already a parent of a ContentGroup, just return
+        If it is nonexistent in ContentGroup, create it as a parent
+        If it is already a child in a group with no parent, promote it
+        If it is a child in a group that has a parent, promote it, creating a
+            new group
+        """
+        cgref    = None
+        if tag not in thisclass.groupable_types.keys():
+            raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
+        try:
+            cgref = obj_ref.contentgroup_set.get()
+        except ContentGroup.DoesNotExist:
+            new_item = ContentGroup(course=course_ref, level=1)
+            new_item.save()
+            setattr(new_item, tag, obj_ref)
+            new_item.group_id = new_item.id
+            new_item.save()
+            return new_item.group_id
+        else:
+            for cgo in ContentGroup.objects.filter(group_id=cgref.group_id):
+                if cgo.level == 1: 
+                    if getattr(cgo, tag, None) == obj_ref:
+                        # This happens when this item is already the parent of its group
+                        return cgref.group_id
+                    else:
+                        # This happens when this item is already a child in a
+                        # group with a different parent (promote it, creating a new group)
+                        cgref.group_id = cgref.id
+                        cgref.level = 1
+                        cgref.save()
+                        return cgref.group_id
+            # This happens when this item is already a child in a group with no parent
+            cgref.level = 1
+            cgref.save()
+            for cgo in ContentGroup.objects.filter(group_id=cgref.group_id):
+                cgo.group_id = cgref.id
+                cgo.save()
+            return cgref.group_id
+
+    @classmethod
+    def get_level2_tag_sorted(cls):
+        info = {}
+        l2cgobjs = ContentGroup.objects.filter(level=2)
+        for l2o in l2cgobjs:
+            l2o_type = l2o.get_content_type()
+            info.setdefault(l2o_type, []).append(getattr(l2o, l2o_type).id)
+        return info
+
+    def get_content_type(self):
+        """This is linear in the number of content types supported for grouping
+        
+        TODO: Replace with a column lookup storing our type explicitly? Not
+              nice to store the same information twice, but constant time
+              lookups are awfully nice...
+              Compromise is to use django cache table
+        """
+        for keyword in ContentGroup.groupable_types.keys():
+            if getattr(self, keyword, False):
+                return keyword
+        return None
+
+    def __repr__(self):
+        s = "ContentGroup(group_id=" + str(self.group_id) + ", "
+        s += 'course=' + str(self.course.id) + ', ' 
+        s += 'level=' + str(self.level)
+        for keyword in ContentGroup.groupable_types.keys():
+            ref = getattr(self, keyword, '')
+            if not ref or ref == "None":
+                continue
+            s += ', ' + keyword+'=<' + str(ref.id) + '>'
+        return s+')'
+
+    def __unicode__(self):
+        return unicode(self.group_id)
+    
+    class Meta:
+        db_table = u'c2g_content_group'
+        
 
 

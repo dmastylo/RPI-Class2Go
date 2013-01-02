@@ -1,12 +1,14 @@
-from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
-from django.template import Context, loader
-from django.template import RequestContext
+import json
+
+from django.http import Http404, HttpResponse
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
+
 from c2g.models import *
+from courses.actions import auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
-from courses.actions import auth_is_course_admin_view_wrapper
-from django.views.decorators.http import require_POST
+
 
 @require_POST
 @auth_is_course_admin_view_wrapper
@@ -73,7 +75,7 @@ def save_content_order(request):
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
         
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content = True, get_file_content=True)
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content = True, get_file_content=True, get_exam_content=True)
     
     for section_structure in section_structures:
         if section_structure['section'].id == long(request.POST.get("section_id")):
@@ -102,7 +104,35 @@ def save_content_order(request):
                     file_image = item['file'].image
                     file_image.index = request.POST.get("order_file_"+str(item['file'].id))
                     file_image.save()
+                elif item['type'] == 'exam':
+                    item['exam'].index = request.POST.get("order_exam_"+str(item['exam'].id))
+                    item['exam'].save()
+                    exam_image = item['exam'].image
+                    exam_image.index = request.POST.get("order_exam_"+str(item['exam'].id))
+                    exam_image.save()
             break
             
     return redirect(request.META['HTTP_REFERER'])
     
+def get_children(request, section_id, contentgroup_parents_only=False):
+    """Return JSON list of type, id, title triples of section_id's children"""
+    section = ContentSection.objects.get(id=int(section_id))
+    children = []
+    l2_kids = []
+    if contentgroup_parents_only:
+        l2_kids = ContentGroup.get_level2_tag_sorted()
+    for child in section.getChildren(gettagged=True, getsorted=True):
+        item    = child['item']
+        typetag = child['type']
+        if contentgroup_parents_only:
+            if item.image.id in l2_kids.get(typetag, []):
+                continue
+        children.append((typetag, item.image.id, item.title))
+    return HttpResponse(json.dumps(children), mimetype='application/json')
+
+def get_children_as_contentgroup_parents(request, section_id):
+    """Return JSON list of type, id, title triples of section_id's children.
+    
+    Limit return results to items which are ContentGroup parents.
+    """
+    return get_children(request, section_id, contentgroup_parents_only=True)

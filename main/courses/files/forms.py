@@ -11,5 +11,5 @@ class FileUploadForm(forms.ModelForm):
         model = File
         fields = ('title', 'section', 'file', 'live_datetime')
         widgets = {
-            'live_datetime': forms.widgets.DateTimeInput(format='%m/%d/%Y %H:%M', attrs={'data-datetimepicker':''})
+            'live_datetime': forms.widgets.DateTimeInput(format='%m/%d/%Y %H:%M', attrs={'data-datetimepicker':''}),
         }

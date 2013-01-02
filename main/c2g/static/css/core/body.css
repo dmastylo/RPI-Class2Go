@@ -6,6 +6,24 @@ h1,h2,h3,h4 {margin:0;}
 h3 {margin-bottom:.5em;font-size:20px; line-height:1.2em;}
 h4 {margin-bottom:.5em;font-size:16px;}
 
+.attempts 
+{
+font-size:12; 
+float:right;
+color:black;
+}
+
+.chevron
+{
+padding-left:7px;
+}
+
+.rightmargin
+{
+margin-right:50px;
+}
+
+
 a {color:#820000;}
 a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
@@ -296,12 +314,16 @@ end home unit boxes
     font-weight:300;
     margin-bottom:0;
 }
+.databases {
+    background:#fff url(/static/graphics/core/dbLogo.jpg) no-repeat top left; 
+    padding:20px 20px 20px 320px;
+}
 .computernetworking {
-    background:#fff url(../../graphics/core/computer-networking.jpg) no-repeat top left; 
+    background:url(/static/graphics/core/computer-networking.jpg) no-repeat top left; 
     padding:20px 20px 20px 320px;
 }
 .solarcells {
-    background:#fff url(../../graphics/core/solarcells.jpg) no-repeat top left; 
+    background:url(/static/graphics/core/solarcells.jpg) no-repeat top left; 
     padding:20px 20px 20px 320px;
 }
 .home h3 a {
@@ -595,15 +617,35 @@ small.date {
 }
 
 ul.unstyled.course-list {
-  border-bottom:1px solid #eee;
+  /* border-bottom:1px solid #eee; */
   margin:0;
+}
+
+h3.course-section-heading {
+    border-bottom:1px solid #eee; 
 }
 
 .course-list-item {
   overflow:hidden;
   padding:8px 0 4px;
-  border-bottom: 0;
+  border-bottom: 0; 
+  /* border-bottom: 1px solid #eee; */
 }
+
+.course-list-item.zebra_light {
+    background-color: white;
+}
+.course-list-item.zebra_dark {
+    background-color: #eeeeee;
+}
+
+.course-list-item.zebra_light {
+    background-color: white;
+}
+.course-list-item.zebra_dark {
+    background-color: #eeeeee;
+}
+
 .course-list-item .progress {
     height:14px;
     width:100px;
@@ -613,6 +655,7 @@ ul.unstyled.course-list {
 .course-list-item .icon-pencil,
 .course-list-item .icon-book,
 .course-list-item .icon-file,
+.course-list-item .icon-check,
 .course-list-item .icon-facetime-video {
     font-size:24px; 
     color:#999;
@@ -649,6 +692,7 @@ ul.unstyled.course-list {
 .course-list-item .course-list-content .deadlines {
     clear: both;
     font-size: 90%;
+    margin-bottom:5px;
 }
 
 /* FAQs
@@ -714,6 +758,10 @@ ul.unstyled.course-list {
 /* for datetime fields */
 input[data-datetimepicker] {
   width: auto;
+}
+
+input[type="checkbox"] {
+  margin-top: 0;
 }
 
 /* Footer
@@ -1032,6 +1080,9 @@ ul.icons li .icon-large:before {
   content: "\f02c";
 }
 .icon-book:before {
+  content: "\f02d";
+}
+.icon-check:before {
   content: "\f02d";
 }
 .icon-bookmark:before {

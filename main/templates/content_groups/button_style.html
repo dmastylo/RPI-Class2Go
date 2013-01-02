@@ -1,0 +1,19 @@
+{% load url from future %}
+
+    <span class="button-tray" style="display: block; clear: both; position: relative; left: 40px; line-height: 15px; font-size: 90%">
+    {% for child in children %}
+        <div class="btn-group" style="float: left;">
+            <a href="{{child.url}}">
+                {% if child.name %}
+                    <button class="btn btn-mini" title="{{child.type}}: {{child.title}}">
+                        <em class="icon-download-alt">&nbsp;</em>{{child.ext}}
+                    </button>
+                {% else %}
+                    <button class="btn btn-mini icon" title="{{child.title}}">
+                        <em class="icon-download-alt">&nbsp;</em>{{child.type}}
+                    </button>
+                {% endif %}
+            </a>
+        </div>
+    {% endfor %}
+    </span>

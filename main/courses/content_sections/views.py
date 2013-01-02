@@ -1,18 +1,16 @@
-from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
-from django.template import Context, loader
-from django.template import RequestContext
-from django import forms
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
+from django.http import Http404
+from django.shortcuts import render_to_response, redirect
+from django.template import RequestContext
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
 
 from c2g.models import *
-from courses.common_page_data import get_common_page_data
 from courses.actions import auth_is_course_admin_view_wrapper
+from courses.common_page_data import get_common_page_data
 from courses.content_sections.forms import *
 from courses.copy_content import copySection
-import time
+
 
 @auth_is_course_admin_view_wrapper
 def reorder(request, course_prefix, course_suffix):

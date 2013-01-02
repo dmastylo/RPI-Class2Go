@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.shortcuts import render, render_to_response, redirect
 from django.template import Context, loader
 from django.template import RequestContext
@@ -13,6 +14,7 @@ from courses.forms import *
 from c2g.models import *
 from random import randrange
 from datetime import datetime
+from os.path import basename
 
 from django.utils.functional import wraps
 
@@ -100,6 +102,8 @@ def commit(request):
             ProblemSet.objects.get(id=parts[1]).commit()
         elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).commit()
+        elif parts[0] == 'exam':
+            Exam.objects.get(id=parts[1]).commit()
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
@@ -114,6 +118,8 @@ def revert(request):
             ProblemSet.objects.get(id=parts[1]).revert()
         elif parts[0] == 'additionalpage':
             AdditionalPage.objects.get(id=parts[1]).revert()
+        elif parts[0] == 'exam':
+            Exam.objects.get(id=parts[1]).revert()
     return redirect(request.META['HTTP_REFERER'])
 
 @require_POST
@@ -142,6 +148,8 @@ def change_live_datetime(request):
                 content = AdditionalPage.objects.get(id=parts[1])
             elif parts[0] == 'file':
                 content = File.objects.get(id=parts[1])
+            elif parts[0] == 'exam':
+                content = Exam.objects.get(id=parts[1])
 
             if action == "Make Ready and Go Live" and parts[0] != 'file':
                 content.commit()
@@ -160,7 +168,7 @@ def change_live_datetime(request):
         #return redirect(request.META['HTTP_REFERER'])
 
     if list_type == 'course_materials':
-        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True)
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
         template = 'courses/draft/course_materials.html'
     elif list_type == 'problemsets':
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_pset_content=True)
@@ -172,6 +180,29 @@ def change_live_datetime(request):
                   {'common_page_data': request.common_page_data,
                    'section_structures': section_structures,
                    'form': form})
+
+@require_POST
+@auth_is_course_admin_view_wrapper
+def check_filename(request, course_prefix, course_suffix, file_type):
+    filename = request.POST.get('filename')
+    
+    if file_type == "files":
+        #Validate that file doesn't already exist for course
+        files = File.objects.getByCourse(course=request.common_page_data['course'])
+        for file in files:
+            if basename(file.file.name) == filename:
+                return HttpResponse("File name already exists!")
+    else:
+        exercises = Exercise.objects.filter(handle=course_prefix+"--"+course_suffix,is_deleted=0)
+        for exercise in exercises:
+            if exercise.fileName == filename:
+                #File name already exists, check if it has been taken yet
+                if ProblemActivity.objects.filter(Q(video_to_exercise__exercise=exercise) | Q(problemset_to_exercise__exercise=exercise)).exists():
+                    return HttpResponse("File name already exists! Exercise taken")
+                else:
+                    return HttpResponse("File name already exists!")
+
+    return HttpResponse("File name is available")            
 
 def is_member_of_course(course, user):
     student_group_id = course.student_group.id

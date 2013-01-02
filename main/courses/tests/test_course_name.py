@@ -1,50 +1,53 @@
-from django.test import TestCase
-from c2g.models import Institution, Course
-from courses.common_page_data import get_common_page_data
-from django.contrib.auth.models import Group, AnonymousUser, User
-from db_test_data.management.commands.db_populate import Command 
-from django.test.client import RequestFactory, Client
-import courses.views
-import courses.videos.views
-import problemsets.views
+from django.core.urlresolvers import reverse
+from test_harness.test_base import AuthenticatedTestBase
 
-class SimpleTest(TestCase):
-    fixtures=['db_snapshot.json']
-
-    course_prefix="networking"
-    course_suffix="Fall2012"
-    course_url="/"+course_prefix+"/"+course_suffix
+class SimpleTest(AuthenticatedTestBase):
     course_name="Natural Language Processing"
-    course_title_search_string="<h2>"+course_name+"</h2>"
 
-    # Database setup
-    pop_command = Command()
-    def setUp(self):
-        self.user = User.objects.get(username="professor_1")
-        self.pop_command.handle()
-        self.factory = RequestFactory()
-        self.client = Client()
+    def __init__(self, *arrgs, **kwargs):
+        config = { 'username' : 'professor_0',
+                   'password' : 'class2go',
+                   'course_prefix' :'networking',
+                   'course_suffix' :'Fall2012',
+                   'mode' : 'draft' }
+        if kwargs != None:
+            kwargs.update(config)
+        else:
+            kwargs = config
+        super(SimpleTest, self).__init__(*arrgs, **kwargs)
 
-    def tearDown(self):
-        pass
 
-    def request_and_search(self, viewname):
-        # import pdb; pdb.set_trace();
-        request = self.factory.get(self.course_url)
-        # TODO - not working
-        request.user = self.client.login(username="professor_1", password="class2go")
-        request.common_page_data=get_common_page_data(request, 
-                self.course_prefix, self.course_suffix)
-        request.session = {}
-        response = viewname(request, self.course_prefix, self.course_suffix)
+    def test_course_main(self):
+        """
+        Tests the display of the main course page
+        """
+        response = self.client.get(reverse('course_main',
+                                           kwargs={'course_prefix' : self.coursePrefix,
+                                                   'course_suffix' : self.courseSuffix }),
+                                   HTTP_USER_AGENT=self.userAgent)
+        self.assertEqual(response.status_code, 200)
+
+        course_title_search_string = "<h2>" + self.course_name + "</h2>"
         self.assertRegexpMatches(response.content, 
-                self.course_title_search_string,
-                msg="Couldn't find course name in from view '%s'" % viewname.__name__)
+                course_title_search_string,
+                msg="Couldn't find course name in '%s'" % reverse('course_main',
+                                           kwargs={'course_prefix' : self.coursePrefix,
+                                                   'course_suffix' : self.courseSuffix }))
 
-    def test_coursename_header_for_course_views(self):
-        self.request_and_search(courses.views.main)
-        self.request_and_search(courses.views.overview)
-        self.request_and_search(courses.views.syllabus)
-        self.request_and_search(courses.videos.views.list)
-        self.request_and_search(problemsets.views.listAll)
+    def test_course_materials(self):
+        """
+        Tests the display of course materials
+        """
+        response = self.client.get(reverse('course_materials',
+                                           kwargs={'course_prefix' : self.coursePrefix,
+                                                   'course_suffix' : self.courseSuffix }),
+                                   HTTP_USER_AGENT=self.userAgent)
+        self.assertEqual(response.status_code, 200)
+
+        course_title_search_string = self.course_name + "</title>"
+        self.assertRegexpMatches(response.content, 
+                course_title_search_string,
+                msg="Couldn't find course name in '%s'" % reverse('course_materials',
+                                           kwargs={'course_prefix' : self.coursePrefix,
+                                                   'course_suffix' : self.courseSuffix }))
 

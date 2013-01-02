@@ -1,7 +1,13 @@
+import os
+
+DB_NAME = 'c2g_jenkins_'
+if os.environ.has_key('JOB_NAME'):
+  DB_NAME += os.environ.get('JOB_NAME')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'class2go',                      # Or path to database file if using sqlite3.
+        'NAME': DB_NAME,                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': 'root',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -25,7 +31,7 @@ AWS_ACCESS_KEY_ID = 'local'
 AWS_SECRET_ACCESS_KEY = 'local'
 AWS_STORAGE_BUCKET_NAME = 'local'
 
-# MEDIA_ROOT = '/opt/class2go/uploads'
+MEDIA_ROOT = '/var/lib/jenkins/test-data-sandbox/uploads'
 
 PIAZZA_ENDPOINT = "https://piazza.com/basic_lti"
 PIAZZA_KEY = "class2go.testing"

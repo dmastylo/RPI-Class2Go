@@ -3,3 +3,8 @@ database_util.py
 *.pyc
 django-core
 celery.log
+coverage-report
+.noseids
+chromedriver.log*
+selenium-server.log*
+

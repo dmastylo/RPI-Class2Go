@@ -1,0 +1,29 @@
+{% load url from future %}
+
+{% if children %} {# needed because this template is called directly #}
+    <div class="button-tray" style="display: block; clear: both">
+    <h3>Downloadable Content for {{video.title}}</h3>
+    <ul class="unstyled course-list">
+    {% for child in children %}
+        {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
+        <li class="course-list-item {{ stripecolor }}">
+            <span style="float: left;"><strong>{{child.title}}</strong></span>
+            <span style="float: right;">
+                <a href="{{child.url}}">
+                    {% if child.name %}
+                        <button class="btn btn-mini" title="Download {{child.type}} {{child.name}}">
+                            <em class="icon-download-alt">&nbsp;</em>{{child.ext}}
+                        </button>
+                    {% else %}
+                        <button class="btn btn-mini icon" title="Go to {{child.title}}">
+                            <em class="icon-download-alt">&nbsp;</em>{{child.type}}
+                        </button>
+                    {% endif %}
+                </a>
+
+            </span>
+        </li>
+    {% endfor %}
+    </ul>
+    </div>
+{% endif %}

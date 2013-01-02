@@ -1,12 +1,12 @@
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.shortcuts import render_to_response, redirect
-from django.template import Context, loader
 from django.template import RequestContext
+
 from c2g.models import *
-from courses.course_materials import get_course_materials
 from courses.common_page_data import get_common_page_data
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.views import get_full_contentsection_list
+
 
 @auth_is_course_admin_view_wrapper
 def manage_nav_menu(request, course_prefix, course_suffix):
@@ -76,6 +76,7 @@ def main(request, course_prefix, course_suffix, slug):
         
         
     course = common_page_data['course']
+
     contentsection_list = ContentSection.objects.getByCourse(course=course)
     video_list = Video.objects.getByCourse(course=course)
     pset_list =  ProblemSet.objects.getByCourse(course=course)
@@ -91,6 +92,7 @@ def main(request, course_prefix, course_suffix, slug):
         video = Video.objects.getByCourse(course=common_page_data['course']).get(slug='intro')
     except Video.DoesNotExist:
         video = None
+
 
     if request.user.is_authenticated():
         is_logged_in = 1

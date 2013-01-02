@@ -10,7 +10,7 @@
         <div class="tabbable span12">  
             <ul class="nav nav-tabs" style='font-size: 10pt;'>  
                 <li class="active"><a href="#dashboard" data-toggle="tab">Course Dashboard</a></li>
-                <li><a href="#all_quiz_summary" data-toggle="tab">Combined Summary of all Quizzes</a></li>
+                <li><a href="#all_assessment_summary" data-toggle="tab">Combined Summary of all Assessments</a><li>
                 <li><a href="#psets_full" data-toggle="tab">Problem set Student Data</a></li>
                 <li><a href="#psets_summary" data-toggle="tab">Problem set Summary</a></li>
                 <li><a href="#videos_full" data-toggle="tab">Video Student Data</a></li>
@@ -36,6 +36,26 @@
                         {% endfor %}
                     </table>
                 </div>
+                
+                <div id="all_assessment_summary" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new course assessment summary</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <input type="submit" class='btn' value="Generate new course assessment summary" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="course_assessments" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available course assessment summaries</h3>
+                    <table class="table table-striped" style="width: 600px;">
+                        {% for rep in course_assessment_reports %}
+                            <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'course_assessments' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                        {% empty %}
+                            <tr><td style="width: 600px;">No course assessment reports available at the moment.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>                
+                
                 
                 <div id="all_quiz_summary" class="tab-pane" style="padding-left: 10px;">
                     <h3>Generate new course quizzes summary</h3>

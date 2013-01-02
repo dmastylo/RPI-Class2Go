@@ -1,0 +1,15 @@
+{% load url from future %}
+
+    <div class="button-tray" style="display: block; clear: both; padding-left: 3em;">
+        <!-- <ul class="unstyled course-list"> -->
+    {% for child in children %}
+        {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
+            {% if child.type == 'exam' %}
+                <ul><li>
+                    {% include "exams/ready/exam_list_item.html" with item=child is_child="TRUE" %} 
+                </li></ul>
+            {% else %}
+                <span style="float: left;"><strong><a href="{{child.url}}">{{child.title}}</a></strong>: {{child.type}} {{item.description}}</span>
+            {% endif %}
+    {% endfor %}
+    </div>

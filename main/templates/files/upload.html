@@ -3,7 +3,7 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
   <h3>Upload File</h3>
-  <form action="{% url 'courses.files.actions.upload' %}" method="POST" enctype="multipart/form-data">
+  <form action="{% url 'courses.files.actions.upload' %}" method="POST" onsubmit="return checkFilename();" enctype="multipart/form-data">
     <fieldset class="well">
       {% for field in form %}
         <div class="fieldWrapper">
@@ -20,6 +20,17 @@
           {% endif %}
         </div>
       {% endfor %}
+      <div class="fieldWrapper">
+        <label for="parent_id">Parent</label>
+        <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
+      </div>
+      <div class="fieldWrapper child_metadata">
+        <label for="display_style_id">Child Display Style</label>
+        <span id="display_style_id">
+            <input type="radio" name="display_style" value="button" checked>Button</input> 
+            <input type="radio" name="display_style" value="list">List</input> 
+        </span>
+      </div>
     </fieldset>
     <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
     <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
@@ -30,7 +41,50 @@
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
-<script>
+<script type="text/javascript">
+$('.child_metadata').hide();
+$('#id_section').change(function() { prefill_children($('#parent_id')[0]) });
+$('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
+$('#parent_id').change(function() { 
+                        if ($(this).val() === "none,none") { 
+                            $('.child_metadata').hide(); 
+                        } else { 
+                            $('.child_metadata').show(); 
+                        }});
+
+function prefill_children(element) {
+    var id = $('#id_section')[0].value
+    var pelement = $('#parent_id');
+    pelement.html('<option value="none,none">(this is a top level page)</option>');
+    jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+        for (var i=0; i < data.length; i++) {
+            // For the moment we filter out objects of other types, per the spec.
+            // In the future this restriction will probably be lifted.
+            // See also add_section_page.html
+            if ((data[i][0] === 'video') || (data[i][0] === 'file')) {
+                pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+            }
+        }
+    });
+}
+
+function checkFilename() {
+    var filename = document.getElementById('id_file').files[0].name;
+    var r = true;
+    $.ajax({
+        type:"POST",
+        url: "check_filename/",
+        async:false,
+        data: {filename:filename, csrfmiddlewaretoken:'{{ csrf_token }}'},
+        success: function(data) {
+            if (data == "File name already exists!") {
+                r=confirm("WARNING: A file with this name already exists. If you proceed with the upload it will be overwritten. Please rename your file if you do not wish to overwrite.");
+            }
+        }
+    });
+    return r;
+}
+
 function showLiveDate(checked) {
     if (checked) {
         $("#live_date").show('fast');

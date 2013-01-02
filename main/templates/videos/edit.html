@@ -9,8 +9,21 @@
         {% csrf_token %}
       </form>
       <form name="upload_form" action="{% url 'courses.videos.actions.edit_video' common_page_data.course_prefix common_page_data.course_suffix slug %}" method="POST" enctype="multipart/form-data">
+
         {% csrf_token %}
         <fieldset class="well">
+
+            <div class="pull-right">
+            <h3>Associated Problem Set/Survey</h3>
+            <!-- <h4>video: {{video.exam_id}}</h4> -->
+            <select name="exam_id" id="exam_id">
+                <option value="">--</option>
+            {% for pset in psets %}
+                <option value="{{pset.id}}" {% if pset.id == video.exam_id %}selected="selected"{% endif %}>{{pset.title}}</option>
+            {% endfor %}
+            </select>
+            </div>
+
         {% for field in form %}
           <div class="fieldWrapper {% if field.errors %}errors{% endif %}">
 	    {% if field.name == "live_datetime" %}

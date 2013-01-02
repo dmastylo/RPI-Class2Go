@@ -1,22 +1,20 @@
+import json
+
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
-from django.template import Context, loader
-from c2g.models import Course, Video, VideoToExercise, Exercise, PageVisitLog, ProblemSet, AdditionalPage, File
-
-from c2g.models import Course, Video, VideoActivity, ProblemActivity
-from courses.common_page_data import get_common_page_data
-from courses.course_materials import get_course_materials
-import datetime
-from courses.videos.forms import *
-from courses.forms import *
-import gdata.youtube
-import gdata.youtube.service
-from django.db.models import Q
-
 from django.template import RequestContext
+
+from c2g.models import ContentGroup, ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
+from courses.common_page_data import get_common_page_data
+from courses.course_materials import get_course_materials, get_children, get_contentgroup_data
+from courses.videos.forms import *
 from courses.views import get_full_contentsection_list
+from courses.forms import *
+
+from xml.dom.minidom import parseString
 
 @auth_view_wrapper
 def list(request, course_prefix, course_suffix):
@@ -24,6 +22,8 @@ def list(request, course_prefix, course_suffix):
         common_page_data = get_common_page_data(request, course_prefix, course_suffix)
     except:
         raise Http404
+
+    request.session['headless'] = request.GET.get('headless')
 
     if 'id' in request.GET:
         #process Video model instance with this youtube id
@@ -99,34 +99,76 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec = VideoActivity(student=request.user, course=common_page_data['course'], video=video)
         video_rec.save()
         
-    has_ex = VideoToExercise.objects.filter(is_deleted=False, video=video).exists()
-
-    no_ex = 1 if (not has_ex) or request.session['video_quiz_mode'] != "quizzes included" else 0
-    
     course = common_page_data['course']
-    contentsection_list = ContentSection.objects.getByCourse(course=course)
-    video_list = videos #Video.objects.getByCourse(course=course)
-    pset_list =  ProblemSet.objects.getByCourse(course=course)
-    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
-    file_list = File.objects.getByCourse(course=course)
-
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course, filter_children=True)
 
     if request.user.is_authenticated():
         is_logged_in = 1
     else:
         is_logged_in = 0    
-    
-    return render_to_response('videos/view.html', 
-                              {'common_page_data': common_page_data, 
-                               'video': video, 
-                               'video_rec':video_rec, 
-                               'prev_slug': prev_slug, 
-                               'next_slug': next_slug, 
-                               'no_ex': no_ex,
+
+    key = ('video', video.id)
+    l1items, l2items = get_contentgroup_data(course=course)
+    downloadable_content = get_children(key, l1items, l2items)
+
+    if video.exam:
+        try:
+            #exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+            exam = video.exam
+            display_single = exam.display_single
+            invideo = exam.invideo
+            metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
+            video_questions = metadata_dom.getElementsByTagName('video')
+           
+            question_times = {}
+            for video_node in video_questions:
+                video_slug = video_node.getAttribute("url-identifier")
+                if video_slug == "":
+                    video_slug = video_node.getAttribute("url_identifier")
+                if video_slug == video.slug:
+                    question_children = video_node.getElementsByTagName("question")
+                    times = []
+                    for question in question_children:
+                        time = "sec_%s" % question.getAttribute("time")
+                        if time not in question_times:
+                            question_times[time] = [] 
+                        question_times[time].append(question.getAttribute("id"))
+
+            print json.dumps(question_times)
+
+        except Exam.DoesNotExist:
+            raise Http404
+    else:
+        sections = ContentSection.objects.getByCourse(course) 
+        section = sections[0]
+        # create fake exam as exam template (which is what displays all videos) needs exam data to function
+        # correctly (TODO: Refactor this)
+        exam = Exam(course=course, slug=slug, title=video.title, description="Empty Exam", html_content="", xml_metadata="", due_date='', assessment_type="survey", mode="draft", total_score=0, grade_single=0, grace_period='', partial_credit_deadline='', late_penalty=0, submissions_permitted=0, resubmission_penalty=0, exam_type="survey", autograde=0, display_single=0, invideo=1, section=section,)
+        exam.live_datetime = video.live_datetime    # needed so video shows up
+        question_times = ""
+
+    # change from 'videos/view.html' to 'exams/view_exam.html'
+    return render_to_response('exams/view_exam.html', 
+                              {
+                               'common_page_data':    common_page_data, 
+                               'video':               video, 
+                               'video_rec':           video_rec, 
+                               'prev_slug':           prev_slug, 
+                               'next_slug':           next_slug, 
                                'contentsection_list': full_contentsection_list, 
-                               'full_index_list': full_index_list,
-                               'is_logged_in': is_logged_in}, 
+                               'full_index_list':     full_index_list,
+                               'is_logged_in':        is_logged_in,
+                               'downloadable_content':downloadable_content,
+                               'json_pre_pop':"{}",
+                               'scores':"{}",
+                               'editable':True,
+                               'single_question':exam.display_single,
+                               'videotest':exam.invideo,
+                               'question_times':json.dumps(question_times),
+                               'allow_submit':True,
+                               'children': downloadable_content,
+                               'exam':exam
+                              },
                               context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
@@ -134,11 +176,17 @@ def edit(request, course_prefix, course_suffix, slug):
     common_page_data = request.common_page_data
     video = common_page_data['course'].video_set.all().get(slug=slug)
     form = S3UploadForm(course=common_page_data['course'], instance=video)
+    try:
+        psets = Exam.objects.filter(course_id=common_page_data['course'].id, invideo=True)
+    except:
+        raise Http404 
 
     return render(request, 'videos/edit.html',
             {'common_page_data': common_page_data,
              'slug': slug,
              'form': form,
+             'video': video,
+             'psets': psets,
              })
 
 @auth_is_course_admin_view_wrapper
@@ -150,8 +198,14 @@ def upload(request, course_prefix, course_suffix):
 
     data = {'common_page_data': common_page_data}
 
+    try:
+        exam = Exam.objects.filter(course_id=common_page_data['course'].id, invideo=True)
+    except:
+        raise Http404 
+
     form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
+    data['psets'] = exam 
 
     return render_to_response('videos/s3upload.html',
                               data,
@@ -196,18 +250,47 @@ def manage_exercises(request, course_prefix, course_suffix, video_slug):
             #don't catch video DoesNotExist here because we want some tangible error to happen if
             #the video id changes in form submission, like emailing us
             video = Video.objects.get(id=request.POST['video_id'])
+            video_time = request.POST['video_time']
             file_content = request.FILES['file']
             file_name = file_content.name
 
-            exercise = Exercise()
-            exercise.handle = request.POST['course_prefix'] + '--' + request.POST['course_suffix']
-            exercise.fileName = file_name
-            exercise.file.save(file_name, file_content)
-            exercise.save()
+            exercises = Exercise.objects.filter(handle=course_prefix+"--"+course_suffix,is_deleted=0)
+            exercise_exists = False
+            for exercise in exercises:
+                if exercise.fileName == file_name:
+                    #We don't wipe out all problem activites associated with this
+                    #existing exercise, but if it's a nontrivial overwrite, should we?
+                    exercise.file = file_content
+                    exercise.save()
+                    exercise_exists = True
 
-            video_time = request.POST['video_time']
-            videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='draft')
-            videoToEx.save()
+                    #If exercise already in video, don't need to create new videoToEx, just update video_time
+                    #If exercise already in video but deleted, undelete
+                    #Otherwise create new videoToEx
+                    queryVideoToEx = VideoToExercise.objects.filter(video=video, exercise=exercise, mode='draft').order_by('-id')
+                    if queryVideoToEx.exists():
+                        existingVideoToEx = queryVideoToEx[0]
+                        if existingVideoToEx.is_deleted == 1:
+                            existingVideoToEx.is_deleted = 0
+                            existingVideoToEx.video_time = video_time
+                            existingVideoToEx.save()
+                        else:
+                            existingVideoToEx.video_time = video_time
+                            existingVideoToEx.save()
+                    else:
+                        videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='draft')
+                        videoToEx.save()
+                    break
+
+            if not exercise_exists:
+                exercise = Exercise()
+                exercise.handle = request.POST['course_prefix'] + '--' + request.POST['course_suffix']
+                exercise.fileName = file_name
+                exercise.file.save(file_name, file_content)
+                exercise.save()
+
+                videoToEx = VideoToExercise(video=video, exercise=exercise, video_time=video_time, is_deleted=0, mode='draft')
+                videoToEx.save()
             return HttpResponseRedirect(reverse('courses.videos.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], video.slug,)))
 
     #If form was not submitted then the form should be displayed or if there were errors the page needs to be rendered again

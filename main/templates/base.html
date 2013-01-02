@@ -19,11 +19,13 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
     {% endblock top_scripts %}
     {% block addl_stylesheets %}{% endblock addl_stylesheets %}
+    {% block addl_head_scripts %}{% endblock addl_head_scripts %}
     <title>{% block title %}{{ SITE_TITLE }}{% endblock %}</title>
 </head>
 
 {% block bodytag %}<body>{% endblock bodytag %}
     <div id="viewport">
+      {% if not request.session.headless %}
         <div id="global-header">
             <h1 class="stanford-logo">
             	{% if SITE_NAME_SHORT = 'Stanford' %}
@@ -35,7 +37,9 @@
             <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
         </div>
         {% block topcontent %}<div id="top-content"></div>{% endblock topcontent %}
+      {% endif %}
         {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}
+          {% if not request.session.headless %}
             {% block navbar %}
             {% ifequal user.is_staff True %}
             <div class="navbar">
@@ -56,6 +60,7 @@
             </div>
             {% endifequal %}
             {% endblock navbar %}
+          {% endif %}
             <div class="row-fluid" style="position:relative;">
             {% block page_title %}
             <div class="pull-left page-title">
@@ -138,7 +143,7 @@
             </div>
         </div>
         {% endblock content %}
-        </div>
+        
     </div>
     {% with "sites/"|add:SITE_NAME_SHORT|add:"/footer.html" as footer_include %}
     {% include  footer_include  %}

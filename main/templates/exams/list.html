@@ -4,8 +4,12 @@
 {% block title %}
     {% if "surveys" in request.path %}
         Surveys | {{common_page_data.course.title}}
-    {% else %}
+    {% elif "exams" in request.path %}
         Exams | {{common_page_data.course.title}}
+    {% elif "problemsets" in request.path %}
+        Problem Sets | {{common_page_data.course.title}}
+    {% else %}
+        Interactive Exercises | {{common_page_data.course.title}}
     {% endif %}
 {% endblock title %}
 {% block exams_link_class %}class="active"{% endblock exams_link_class %}
@@ -13,8 +17,12 @@
 {% block course_page_title %}
     {% if "surveys" in request.path %}
         Surveys (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
-    {% else %}
+    {% elif "exams" in request.path %}
         Exams (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+    {% elif "problemsets" in request.path %}
+        Problem Sets (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+    {% else %}
+        Interactive Exercises (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
     {% endif %}
 {% endblock course_page_title %}
 
@@ -31,7 +39,8 @@
             {% if common_page_data.course.mode == "ready" and exam.past_due %}
                 <h4>{{exam.title}}</h4>
             {% else %}
-                <h4><a href="{% url 'courses.exams.views.show_exam' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
+            
+                   <h4><a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
             {% endif %}
             <p>{{exam.description}}</p>
             
@@ -57,7 +66,7 @@
                     <h3 id="ModalLabel{{exam.slug}}">Select a CSV File with Student Grades</h3>
                 </div>
                 <div class="modal-body">
-                    <form id="csv_upload" enctype="multipart/form-data" method="POST" action="{% url 'courses.exams.views.post_csv_grades' common_page_data.course.prefix common_page_data.course.suffix exam.slug%}">
+                    <form id="csv_upload{{exam.slug}}" enctype="multipart/form-data" method="POST" action="{% url 'courses.exams.views.post_csv_grades' common_page_data.course.prefix common_page_data.course.suffix exam.slug%}">
                         {% csrf_token %}
                         <input style="line-height:0px" id="fileinput" type="file" name="file" />
                     </form>
@@ -65,17 +74,17 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                    <input class="btn btn-primary" type="submit" value="Import Grade CSV" onclick="$('#csv_upload').submit()" />
+                    <input class="btn btn-primary" type="submit" value="Import Grade CSV" onclick="$('#csv_upload{{exam.slug}}').submit()" />
                 </div>
             </div>
 
             {% endif %}
             {% if score %}
-            <b><a href="{% url 'courses.exams.views.show_graded_exam' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Score: {{score}}/{{exam.total_score}} </a></b>
+            <b><a href="{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Score: {{score}}/{{exam.total_score}} </a></b>
             &nbsp;
             {% endif %}
             {% if exam.exam_type == "exam" %}
-            <a href="{% url 'courses.exams.views.view_my_submissions' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">
+            <a href="{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">
             View Submissions</a>
             {% endif %}
             

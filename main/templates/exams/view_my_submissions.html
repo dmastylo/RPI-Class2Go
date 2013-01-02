@@ -19,13 +19,17 @@
     <div class="alert alert-error">We're sorry, there was an error decoding this submission. If this is the graded submission you'll need to retake the exam or restore from a previous submission. </div>
   {% else %}
     {% for prob, data in sub.json_obj %}
-    On question {{prob}}, you answered:
+      {% if data|islist and data.0.questionTag4humans %}
+        On question {{prob}} ({{data.0.questionTag4humans}}), you answered:
+      {% else %}
+        On question {{prob}} ({{data.questionTag4humans}}), you answered:
+      {% endif %}
          {% if data|islist %}{# Custom template tag to test if object is a list #}
              {% for i in data %}
                  {{i.associatedText}},
              {% endfor %}
          {% else %}
-             {{ data }}
+             {{ data.value }}
          {% endif %}
     <span id="{{prob}}_score"></span>
     <br />
@@ -36,6 +40,7 @@
     
     
 <input type="hidden" name="json-pre-pop" value="{{sub.plain_json_obj}}" />
+<input type="hidden" name="json-pre-pop-correx" value="{{sub.json_score_data}}" />
 {% if forloop.first %}
     <input type="hidden" name="latest" value="True" />
     <input type="hidden" name="scores" value="{{score_fields}}" />
@@ -60,7 +65,7 @@
             $('#graded_sub #'+key+'_score').append(" =>  <b style='color:red'>" + scores[key] + "</b>");
          }
          else {
-            $('#graded_sub #addl_scores').append("Additional score_id " + key + " =>  <b style='color:red'>" + scores[key] + "10</b>" + "<br />");
+            $('#graded_sub #addl_scores').append("Additional score_id " + key + " =>  <b style='color:red'>" + scores[key] + "</b>" + "<br />");
          }
      }
    });

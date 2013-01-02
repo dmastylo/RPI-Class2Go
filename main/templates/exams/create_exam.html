@@ -1,0 +1,583 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block course_page_title %}Creation Form{% endblock course_page_title %}
+{% block mode_switcher %}{% endblock mode_switcher %}
+
+{% block addl_head_scripts %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+                       tex2jax: {inlineMath: [['$$','$$']],
+                       displayMath: [['\\[','\\]']]}
+                       });
+    </script>
+    {% if request.is_secure %}
+    <script type="text/javascript"
+        src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% else %}
+    <script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% endif %}
+{% endblock addl_head_scripts %}
+
+
+{% block m_column_content %}
+
+<style type="text/css" media="screen">
+    #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    #metadata_editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    #container{
+        position:relative;
+        height:450px;
+    }
+    h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
+    #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
+    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 600px; padding: 1em;}
+    textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
+    #preview-pane label {clear: both; display: block; min-width:200px;}
+    #preview-pane label input {float: left; margin-right: 1em;}
+    #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 1em;}
+    .problem {border:1px solid #999; border-radius: 5px; margin: 1em 0; padding: 1em;}
+    .picker {position:relative; z-index:10;}
+    h3 {clear:both;}
+    div.question, div.subquestion {float:left; width:95%;}
+    div.problem, div.problem {float:left; width:95%;}
+    .control-group {clear:both; padding:1em; zoom:1;}
+    .control-group .atomic-unit {float:left; margin-right: 1em;}
+    .atomic-unit{min-height:200px;}
+    div#summative {display:none}
+    div.ui-dialog div.ui-widget-header {background: #900;}
+    label pre {margin-left:30px;}
+    #description{width:150px; height:150px;}
+    .warning{color:red;margin-right:5px;}
+    #xml-import-label{font-size:22px;font-weight:bolder;}
+
+</style>
+
+<div class="well create-exam-form">
+    <h2>Create a new Exam / ProblemSet / Exercise / Survey</h2>
+
+    
+    <div class="control-group">
+        <input type="button" id="xml-entry-btn" class="btn" value="Import XML" title="Click to import XML" />
+    </div>
+
+    <div class="control-group">
+        <div class="atomic-unit well">
+            <label class="control-label" for="assessment_type">Select Type:</label>
+            <select id="assessment_type" name="assessment_type">
+                <option value="formative">Formative Problem Set</option>
+                <option value="summative">Summative Problem Set</option>
+                <option value="interactive">Interactive Exercise</option>
+                <option value="exam-autograde">Exam (auto-graded)</option>
+                <option value="exam-csv">Exam (csv-graded)</option>
+                <option value="survey">Survey</option>
+            </select>
+            <label for="exam_title" class="control-label">Title:*</label><input id="exam_title" name="exam_title" type="text" />
+            <label for="exam_slug" class="control-label">URL Identifier:*</label><input id="exam_slug" name="exam_slug" type="text" />
+        </div>
+        <div class="atomic-unit well">
+            <label class="control-label" for="description">Assignment Description:</label>
+            <textarea id="description"></textarea>
+        </div>
+        <div class="atomic-unit well">
+            <label for="id_section" class="control-label">Section:</label>
+            <select id="id_section">
+                {% for section in sections %}
+                <option value="{{section.id}}">{{section.title}}</option>
+                {% endfor %}
+            </select>
+            <label for="parent_id" class="control-label">Parent:</label>
+            <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
+            <label for"invideo_toggle" class="control-label">In-Video?</label>
+            <input name="invideo" id="invideo_id" type="checkbox" />
+
+        </div>
+
+        <div class="atomic-unit well">
+            <label class="control-label" for="due_date">Due Date:*</label>
+            <input id="due_date" class="picker" type="text" name="due_date" value="{{current_datetime}}" data-datetimepicker>
+            <label class="control-label" for="due_date">Grace Period End:*</label>
+            <input id="grace_period" class="picker"  type="text" name="grace_period" value="" data-datetimepicker>
+            <label class="control-label" for="due_date">Hard Deadline:*</label>
+            <input id="hard_deadline" class="picker"  type="text" name="hard_deadline" value="" data-datetimepicker>
+        </div>
+        <div class="atomic-unit well" id="penalties" >
+            <label class="control-label" for="late_penalty">Late Penalty:*</label>
+            <input id="late_penalty" name="late_penalty" type="text" value="0"/>
+            <label class="control-label" for="num_subs_permitted">Number of Submissions Allowed:*</label>
+            <input id="num_subs_permitted" name="num_subs_permitted" type="text" value="999"/>
+            <label class="control-label" for="resubmission_penalty">Penalty Per Submission After First:*</label>
+            <input id="resubmission_penalty" name="resubmission_penalty" type="text" value="0" />
+        </div>
+    </div>
+
+    
+       
+    <div class="well control-group">
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="active"><a id="enter-tab" href="#enter-content">Edit</a></li>
+            <li><a id="preview-tab" href="#preview-content">Preview</a></li>
+            
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="enter-content">
+                <h4>Edit Exam HTML below:</h4>
+                <textarea id="ace_proxy" style="display:none"></textarea>
+                <div id="container">
+                    <div id="editor"></div>
+                </div>
+                <br />
+                <h4>Edit Exam MetaData XML below:</h4>
+                <textarea id="ace_metadata_proxy" style="display:none"></textarea>
+                <div id="container">
+                    <div id="metadata_editor"></div>
+                </div>
+                
+            </div>
+            <div class="tab-pane" id="preview-content">
+                <div id="preview-pane">
+                    <h4>Preview Exam HTML</h4>
+                    <div id="staging-area"></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+<!--  Non-tabbed version
+    <div class="control-group">
+        <div class="row-fluid">
+            <div class="span6">
+                <h4>Edit Exam HTML below:</h4>
+                <textarea id="ace_proxy" style="display:none"></textarea>
+                <div id="container">
+                    <div id="editor"></div>
+                </div>
+                <br />
+                <h4>Edit Exam MetaData below:</h4>
+                <textarea id="ace_metadata_proxy" style="display:none"></textarea>
+                <div id="container">
+                    <div id="metadata_editor"></div>
+                </div>
+                
+            </div>
+            <div class="span6">
+                <div id="preview-pane">
+                    <h4>Preview Exam HTML</h4>
+                    <div id="staging-area"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>  --> <!-- end of "control-group" -->
+
+    <div class="control-group">
+        <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
+
+        <input class="btn" type="button" id="check_metadata" value="Check Metadata XML" />
+
+        <input type="button" id="exercise_submit_and_close" class="btn" value="Save to Server &amp; Close" /> 
+        <input type="button" id="exercise_submit" class="btn" value="Save to Server"/> 
+        <a class="btn" href={{returnURL}}> Close </a>
+
+    </div>
+
+</div>
+
+<div id="dialog-form" title="Paste Your XML">
+    <form>
+    <fieldset>
+        <label for="name" id="xml-import-label">Import your XML here.  This will overwrite the HTML and XML Metadata editors.</label>
+        <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> 
+            <problemset data-report="EXAMPLE" type="survey" title="problemset1" url-identifier="test343">
+                <!-- possible types are: "formative" / "summative" / "interactive" / "exam-autograde" / "exam-csv" / "survey" -->
+                <description>This is the problem set description.</description>
+                <dates due-date="12/29/2012 00:00" grace-period="12/29/2012 00:00" hard-deadline="12/29/2012 00:00" />
+                <grading late-penalty="10" num-submissions="9999" resubmission-penalty="10" />
+                <section section="Problem set templates" parent="Example formative multiple choice (checkbox)" />
+                <problem data-report="Apple Competitor Question">
+                    <p>
+                    A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
+                        Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+                    <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
+                    </p>
+                    <p>Handy numbers: $$R = 8.314\ {\rm J/mole\ K}\ \ \ \ \ \ F = 96500\ {\rm C/mole}\ \ \ \ \  k_B =  1.38\times 10^{-23}\ {\rm J/K} = 8.62\times 10^{-5}\ {\rm eV/K}\ \ \ \ \ \hbar = 1.055 \times 10^{-34}\ {\rm J\ s} = 6.58 \times 10^{-16}\ {\rm eV\ s}\\ m = 9.11 \times 10^{-31} {\rm kg}\ \ \ \ \ 1\ {\rm eV} = 1.602 \times 10^{-19}\ {\rm J}$$</p>
+                    
+                    <p>The pythagorean theorem: \[ a^2 + b^2 = c^2 \]</p>
+                    
+                    <p>What Apple device competed with the portable CD player?</p>
+                    <multiplechoiceresponse data-report="Apple Competitors" correct-points="10" wrong-points="-2">
+                        <choicegroup type="MultipleChoice">
+                            <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+                        </choicegroup>
+                    </multiplechoiceresponse>
+                    <solution>
+                        <div class="detailed-solution">
+                            <p>Explanation</p>
+                            <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks. </p>
+                        </div>
+                    </solution>
+                </problem>
+                <problem data-report="JSON-Multiple-Choice">
+                    <p>
+                     Which of the following is NOT a valid JSON object?
+                    </p>
+                    <multiplechoiceresponse data-report="Valid/Invalid JSON objects">
+                        <choicegroup type="MultipleChoice">
+                            <choice correct="true" name="a" data-report="Missing comma">
+                                <text><![CDATA[
+<pre>
+{ "name": "Smiley",
+"age": 20,
+"phone": "888-123-4567"
+"email": "smiley@xyz.com",
+"happy": true }</pre>
+                        ]]></text>
+                                <explanation>check commas</explanation>
+                            </choice>
+                            <choice correct="true" name="b" data-report="Missing quotes">
+                                <text><![CDATA[
+<pre>
+{ "name": "Smiley",
+  age: 20,
+"phone": "888-123-4567"
+"email": "smiley@xyz.com",
+"happy": true }</pre>
+                                    ]]></text>
+                                <explanation>check commas</explanation>
+                            </choice>
+                            <choice correct="false" name="c" data-report="OK choice1">
+                                <text><![CDATA[
+<pre>
+{ "name": "Smiley",
+"age": 20,
+"phone": "888-123-4567",
+"email": "smiley@xyz.com",
+"happy": true }
+</pre>
+                                ]]></text>
+                                <explanation>correctly formatted</explanation>
+                            </choice>
+                       </choicegroup>
+                    </multiplechoiceresponse>
+                    <solution>
+                        <div class="detailed-solution">
+                            <p>Explanation</p>
+                            <p>In JSON objects, all labels (property names) must be quoted, and all label-value pairs must be separated by commas. Values in label-value pairs can be numbers, quoted strings, true, false, null, objects, or arrays. Objects and arrays may be empty. </p>
+                        </div>
+                    </solution>
+                </problem>
+                <problem data-report="Short-answer1">
+                    <p>
+                    A numerical response problem accepts a line of text input from the
+                    student, and evaluates the input for correctness based on its
+                    numerical value.
+                    </p>
+                    
+                    <p>
+                    The answer is correct if it is within a specified numerical tolerance
+                    of the expected answer.
+                    </p>
+                    
+                    
+                    <p>Enter the numerical value of Pi:
+                    <numericalresponse answer="3.14159" data-report="Value of Pi" correct-points="1.5" wrong-points="-.25">
+                        <responseparam type="tolerance" default=".02" />
+                        <textline />
+                    </numericalresponse>
+                    </p>
+                    <p>Enter the approximate value of 502*9:
+                    <numericalresponse answer="4518" data-report="502*9">
+                        <responseparam type="tolerance" default="15%"/>
+                        <textline />
+                    </numericalresponse>
+                    </p>
+                    
+                    <p>Enter the number of fingers on a human hand:
+                    <numericalresponse answer="5" data-report="number of fingers on a hand">
+                        <textline />
+                    </numericalresponse>
+                    </p>
+                    
+                    <p>What Apple device competed with the portable CD player?</p>
+                    <multiplechoiceresponse data-report="Apple Competitors">
+                        <choicegroup type="MultipleChoice">
+                            <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                            <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                            <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                            <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+                        </choicegroup>
+                    </multiplechoiceresponse>
+                    
+                    <solution>
+                        <div class="detailed-solution">
+                            <p>Explanation</p>
+                            <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                            <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                            <p>If you look at your hand, you can count that you have five fingers.</p>
+                        </div>
+                    </solution>
+                </problem>
+                <problem data-report="Short-answer2">
+                    <p>
+                    A numerical response problem accepts a line of text input from the
+                    student, and evaluates the input for correctness based on its
+                    numerical value.
+                    </p>
+                    
+                    <p>
+                    The answer is correct if it is within a specified numerical tolerance
+                    of the expected answer.
+                    </p>
+                    
+                    
+                    <p>Enter the numerical value of Pi:
+                    <numericalresponse data-report="Value of Pi" answer="3.14159">
+                        <responseparam type="tolerance" default=".02" />
+                        <textline />
+                    </numericalresponse>
+                    </p>
+                    <p>Enter the approximate value of 502*9:
+                    <numericalresponse data-report="value of 502*9" answer="4518">
+                        <responseparam type="tolerance" default="15%"/>
+                        <textline />
+                    </numericalresponse>
+                    </p>
+                    
+                    <p>Enter the number of fingers on a human hand:
+                    <numericalresponse data-report="number of finers on a hand" answer="5">
+                        <textline />
+                    </numericalresponse>
+                    </p>
+                    <solution>
+                        <div class="detailed-solution">
+                            <p>Explanation</p>
+                            <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                            <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                            <p>If you look at your hand, you can count that you have five fingers.</p>
+                        </div>
+                    </solution>
+                </problem>
+            </problemset>
+        </textarea> <!-- End Example Template -->
+    </fieldset>
+    </form>
+</div>
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
+<script src="{{STATIC_URL}}js/core/beautify-html.js"></script>
+
+<script>
+    $('#myTab a').click(function (e) {
+                        e.preventDefault();
+                        $(this).tab('show');
+                        })
+    
+    
+    var __saved_import_xml="";
+    var __xml_saved=false;
+    $( "#dialog-form" ).dialog({
+        autoOpen: false,
+        height: 500,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__xml_saved)  $('#xml-entry').val(__saved_import_xml);
+        },
+        buttons: [{
+                    text:"Import XML",
+                    id:"import-xml-button",
+                    click: function() {
+                        c2gXMLParse.renderMarkup($('#xml-entry'), "");
+                        editor.setValue(style_html(editor.getValue(), {'max_char':80}));
+                        metadata_editor.setValue(style_html(metadata_editor.getValue(), {'max_char':80}));
+                        __xml_saved=true;
+                        $( this ).dialog( "close" );
+                        }
+                  },
+                  {
+                    text:"Cancel",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                        }
+                  }],
+    });
+                               
+
+    $('#xml-entry-btn').click(function() {
+        __saved_import_xml=$('#xml-entry').val();
+        $( "#dialog-form" ).dialog( "open" );
+    });
+    $("#import-xml-button").before("<span class='warning' id='clobber-warning'>Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.</span>");
+    $("#clobber-warning").hide();
+    $("#import-xml-button").hover(function(){$("#clobber-warning").show();},
+                                function(){$("#clobber-warning").hide();});
+    
+    var editor = ace.edit("editor");
+    editor.setValue($('#ace_proxy').val());
+    editor.setTheme("ace/theme/eclipse");
+    editor.getSession().setMode("ace/mode/html");
+    editor.getSession().setUseWrapMode(true);
+    
+    var metadata_editor = ace.edit("metadata_editor");
+    metadata_editor.setValue($('#ace_metadata_proxy').val());
+    metadata_editor.setTheme("ace/theme/eclipse");
+    metadata_editor.getSession().setMode("ace/mode/xml");
+    metadata_editor.getSession().setUseWrapMode(true);
+    
+    var questionIdx = 0;
+      
+    {% include "exams/renderPreview.js" %}
+
+    $(function() {
+        var saveExerciseContents = function(callback){return function(){
+            var csrftoken = '{{csrf_token}}';
+            var filename = '{{filename}}';
+      
+            {% if edit_mode %}
+            var endpointURL = "{% url 'save_edited_exam' course.prefix course.suffix slug %}";
+            {% else %}
+            var endpointURL = "{% url 'courses.exams.views.save_exam_ajax' course.prefix course.suffix %}";
+            {% endif %}
+      
+            c2gXMLParse.renderPreview();
+      
+            $.ajax(endpointURL, {
+               headers: {'X-CSRFToken': csrftoken},
+               type: 'POST',
+               contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+               data: { title:$('input#exam_title').val(),
+                       slug:$('input#exam_slug').val(),
+                       due_date:$('input#due_date').val(),
+                       grace_period:$('input#grace_period').val(),
+                       partial_credit_deadline:$('input#hard_deadline').val(),
+                       assessment_type:$('select#assessment_type').val(),
+                       late_penalty:$('input#late_penalty').val(),
+                       num_subs_permitted:$('input#num_subs_permitted').val(),
+                       resubmission_penalty:$('input#resubmission_penalty').val(),
+                       description:$('textarea#description').val(),
+                       section:$('select#id_section').val(),
+                       parent:$('select#parent_id').val(),
+                       invideo:$('input#invideo_id')[0].checked,
+                       metaXMLContent:metadata_editor.getValue(),
+                       htmlContent:editor.getValue(),
+                       xmlImported:$('#xml-entry').val()
+               },
+               error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
+               success: function(data,textStatus,jqXHR) {
+                   alert(jqXHR.responseText );
+                   callback();
+               },
+            });
+        };
+    };
+      
+    var checkMetadataXML = function() {
+        var csrftoken = '{{csrf_token}}';
+        $.ajax("{% url 'courses.exams.views.check_metadata_xml' course.prefix course.suffix %}", {
+             headers: {'X-CSRFToken': csrftoken},
+             type: 'POST',
+             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+             data: { metaXMLContent:metadata_editor.getValue() },
+             error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
+             success: function(data, textStatus, jqXHR) {
+                alert(jqXHR.responseText );
+
+             }
+             
+        });
+    };
+    var next=true;
+      
+    var toggleWrap = function () {
+        editor.getSession().setUseWrapMode(next);
+        metadata_editor.getSession().setUseWrapMode(next);
+        if (next) { $('#wrap').text('Wrap');}
+        else {$('#wrap').text('No Wrap');}
+        next = !next;
+    }
+    
+    $('#check_metadata').click(checkMetadataXML);
+    $('#exercise_submit').click(saveExerciseContents(function(){}));
+    $('#exercise_submit_and_close').click(saveExerciseContents(function(){ document.location="{{ returnURL }}"; }));
+      
+    $('#wrap').click(toggleWrap);
+    $('#wrap').click();
+      
+      
+    //$('#preview-btn').click(c2gXMLParse.renderPreview);
+    $('#preview-tab').click(c2gXMLParse.renderPreview);
+      
+    {% if edit_mode %}
+    var prepop = JSON.parse("{{prepop_json|escapejs}}");
+    {% else %}
+    var prepop = false;
+    {% endif %}
+      
+    if (prepop) {
+        $('input#exam_title').val(prepop.title);
+        $('input#exam_slug').val(prepop.slug);
+        $('input#due_date').val(prepop.due_date);
+        $('input#grace_period').val(prepop.grace_period);
+        $('input#hard_deadline').val(prepop.partial_credit_deadline);
+        $('select#assessment_type').val(prepop.assessment_type);
+        $('input#late_penalty').val(prepop.late_penalty);
+        $('input#num_subs_permitted').val(prepop.num_subs_permitted);
+        $('input#resubmission_penalty').val(prepop.resubmission_penalty);
+        $('textarea#description').val(prepop.description);
+        $('select#id_section').val(prepop.section);
+        $('input#invideo_id')[0].checked=prepop.invideo;
+        metadata_editor.setValue(prepop.metadata);
+        editor.setValue(prepop.htmlContent);
+        $('#xml-entry').val(prepop.xmlImported);
+
+    }
+
+      
+      });
+    </script>
+<script type="text/javascript">
+    $('#id_section').change(function() { prefill_children($('#parent_id')[0]) });
+    $('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
+    function prefill_children(element) {
+        var id = $('#id_section').val(); //.val() more cross browser than .value
+        var pelement = $('#parent_id');
+        pelement.html('<option value="none,none">(this is a top level item)</option>');
+        return jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+                       for (var i=0; i < data.length; i++) {
+                       // For the moment we filter out objects of other types, per the spec.
+                       // FIXME: in the future we should have information about what can be children of what in
+                       //        just one place, not everywhere it's implemented. Cf. add_section_page.html
+                           if ((data[i][0] === 'video') || (data[i][0] === 'exam')) {
+                               pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                           }
+                       }
+        });
+    }
+    </script>
+
+{% endblock addl_scripts %}

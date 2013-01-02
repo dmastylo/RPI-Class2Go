@@ -1,19 +1,25 @@
 from c2g.models import *
 import datetime
 from django.db.models import Count, Max, Q, F
-from django.db import connection, transaction
+from django.db import connection
 
 
-
-def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False):
+def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False, exam_types=[]):
+    COURSE  = common_page_data['course']
+    REQUEST = common_page_data['request']
+    USER    = REQUEST.user
     section_structures = []
-    if common_page_data['request'].user.is_authenticated():
-        sections = ContentSection.objects.getByCourse(course=common_page_data['course'])
-        pages = AdditionalPage.objects.getSectionPagesByCourse(course=common_page_data['course'])
-        files = File.objects.getByCourse(course=common_page_data['course'])
+    if USER.is_authenticated():
+        sections = ContentSection.objects.getByCourse(course=COURSE)
+        pages = AdditionalPage.objects.getByCourse(course=COURSE)
+        files = File.objects.getByCourse(course=COURSE)
+        exams = Exam.objects.getByCourse(course=COURSE)
+        if exam_types:
+            exams = exams.filter(exam_type__in=exam_types)
+        l1items, l2items = get_contentgroup_data(COURSE)
 
         if get_video_content:
-            videos = Video.objects.getByCourse(course=common_page_data['course'])
+            videos = Video.objects.getByCourse(course=COURSE)
             if videos:
                 video_list = []
                 for video in videos:
@@ -21,12 +27,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                 videoToExs = VideoToExercise.objects.values('video').filter(video__in=video_list, is_deleted=0).annotate(dcount=Count('video'))
                     
                 if common_page_data['course_mode'] == 'ready':
-                    video_recs = VideoActivity.objects.filter(course=common_page_data['course'], student=common_page_data['request'].user)
-                    video_downloads = VideoDownload.objects.values('video').filter(course=common_page_data['course'], student=common_page_data['request'].user).annotate(dcount=Count('video'))
+                    video_recs = VideoActivity.objects.filter(course=COURSE, student=USER)
+                    video_downloads = VideoDownload.objects.values('video').filter(course=COURSE, student=USER).annotate(dcount=Count('video'))
 
         if get_pset_content:
             
-            problem_sets = ProblemSet.objects.getByCourse(course=common_page_data['course'])
+            problem_sets = ProblemSet.objects.getByCourse(course=COURSE)
             if problem_sets:
                 problem_set_list = []
                 for problem_set in problem_sets:
@@ -34,7 +40,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                 psetToExs = ProblemSetToExercise.objects.values('problemSet').filter(problemSet__in=problem_set_list, is_deleted=0).annotate(dcount=Count('problemSet'))
 
                 if common_page_data['course_mode'] == 'ready':
-                    pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=common_page_data['request'].user).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
+                    pset_activities = ProblemActivity.objects.values('problemset_to_exercise__problemSet_id', 'problemset_to_exercise__problemSet__submissions_permitted', 'problemset_to_exercise__exercise__fileName').select_related('problemset_to_exercise').filter(problemset_to_exercise__problemSet_id__in=problem_set_list, student=USER).annotate(correct=Max('complete'), num_attempts=Max('attempt_number'))
                     
                     cursor = connection.cursor()
                     #The following 2 sqls are the same except the first is for a list of 2 or more and the second is for
@@ -150,58 +156,36 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
             if get_additional_page_content:
                 for page in pages:
-                    if page.section_id == section.id:
-                        item = {'type':'additional_page', 'additional_page':page, 'index':page.index}
+                    key = ('additional_page', page.id)
+                    if page.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
+                        
+                        item = {'type':'additional_page', 'additional_page':page, 'index':page.index, 'children': children}
 
                         if common_page_data['course_mode'] == 'draft':
-                            prod_page = page.image
-                            if not prod_page.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
-                            else:
-                                if prod_page.live_datetime > datetime.datetime.now():
-                                    year = prod_page.live_datetime.year
-                                    month = prod_page.live_datetime.month
-                                    day = prod_page.live_datetime.day
-                                    hour = prod_page.live_datetime.hour
-                                    minute = prod_page.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
-                                else:
-                                    visible_status = "<span style='color:green;'>Live</span>"
-
-                            item['visible_status'] = visible_status
-
+                            item['visible_status'] = get_live_datetime_for(page)
                         section_dict['items'].append(item)
 
             if get_file_content:
                 for file in files:
-                    if file.section_id == section.id:
-                        item = {'type':'file', 'file':file, 'index':file.index}
+                    key = ('file', file.id)
+                    if file.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
+                        
+                        item = {'type':'file', 'file':file, 'index':file.index, 'children': children}
 
                         if common_page_data['course_mode'] == 'draft':
-                            prod_file = file.image
-                            if not prod_file.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
-                            else:
-                                if prod_file.live_datetime > datetime.datetime.now():
-                                    year = prod_file.live_datetime.year
-                                    month = prod_file.live_datetime.month
-                                    day = prod_file.live_datetime.day
-                                    hour = prod_file.live_datetime.hour
-                                    minute = prod_file.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
-                                else:
-                                    visible_status = "<span style='color:green;'>Live</span>"
-
-                            item['visible_status'] = visible_status
-
+                            item['visible_status'] = get_live_datetime_for(file)
                         section_dict['items'].append(item)
 
             if get_video_content:
                         
                 for video in videos:
-                    if video.section_id == section.id:
-                
-                        item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index}
+                    key = ('video', video.id)
+                    if video.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
+                                
+                        item = {'type':'video', 'video':video, 'completed_percent': 0, 'index':video.index, 'children': children}
 
                         numQuestions = 0
                         for videoToEx in videoToExs:
@@ -210,21 +194,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                 break
                         
                         if common_page_data['course_mode'] == 'draft':
-                            prod_video = video.image
-                            if not prod_video.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
-                            else:
-                                if prod_video.live_datetime > datetime.datetime.now():
-                                    year = prod_video.live_datetime.year
-                                    month = prod_video.live_datetime.month
-                                    day = prod_video.live_datetime.day
-                                    hour = prod_video.live_datetime.hour
-                                    minute = prod_video.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
-                                else:
-                                    visible_status = "<span style='color:green;'>Live</span>"
-
-                            item['visible_status'] = visible_status
+                            item['visible_status'] = get_live_datetime_for(video)
                         else:
                             download_count = 0
                             for video_download in video_downloads:
@@ -247,10 +217,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_pset_content:
-
                 for problem_set in problem_sets:
-                    if problem_set.section_id == section.id:
-                        item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index}
+                    key = ('problemSet', problem_set.id)
+                    if problem_set.section_id == section.id and not l2items.has_key(key):
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
+                        
+                        item = {'type':'problem_set', 'problem_set':problem_set, 'index':problem_set.index, 'children': children}
 
                         numQuestions = 0
                         for psetToEx in psetToExs:
@@ -259,22 +231,8 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                 break                            
                             
                         if common_page_data['course_mode'] == 'draft':
-                            prod_problem_set = problem_set.image
-                            if not prod_problem_set.live_datetime:
-                                visible_status = "<span style='color:#A00000;'>Not Live</span>"
-                            else:
-                                if prod_problem_set.live_datetime > datetime.datetime.now():
-                                    year = prod_problem_set.live_datetime.year
-                                    month = prod_problem_set.live_datetime.month
-                                    day = prod_problem_set.live_datetime.day
-                                    hour = prod_problem_set.live_datetime.hour
-                                    minute = prod_problem_set.live_datetime.minute
-                                    visible_status = "<span style='color:#A07000;'>Live %02d-%02d-%04d at %02d:%02d</span>" % (month,day,year,hour,minute)
-                                else:
-                                    visible_status = "<span style='color:green;'>Live</span>"
-                            item['visible_status'] = visible_status
+                            item['visible_status'] = get_live_datetime_for(problem_set)
                         else:
-                                        
                             numCompleted = 0
                             for pset_activity in pset_activities:
                                 if pset_activity['problemset_to_exercise__problemSet_id'] == problem_set.id and not filename_in_deleted_list(pset_activity['problemset_to_exercise__exercise__fileName'], problem_set.id, deleted_exercise_list):
@@ -317,7 +275,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                                         score += exercise_percent/100.0
                             
                                     else:
-                                        score = problem_set.get_score(common_page_data['request'].user)
+                                        score = problem_set.get_score(USER)
                                         break
 
                             #Divide by zero safety check
@@ -333,6 +291,20 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         item['numQuestions'] = numQuestions
                         section_dict['items'].append(item)
 
+            if get_exam_content:
+                user_records = ExamRecord.objects.filter(course=COURSE, student=USER, complete=True).order_by('time_created')
+                for exam in exams:
+                    key = ('exam', exam.id)
+                    if exam.section_id == section.id and not l2items.has_key(key):
+                        exam_user_records = user_records.filter(exam=exam) #might change this to a python list filter if want to trade db access for memory
+                        children = get_children_by_display_style(key, l1items, l2items, USER)
+                        
+                        item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children, 'records':exam_user_records}
+                        section_dict['items'].append(item)
+                        
+                        if common_page_data['course_mode'] == 'draft':
+                            item['visible_status'] = get_live_datetime_for(exam)
+
             if common_page_data['course_mode'] == 'draft' or len(section_dict['items']) > 0:
                 section_dict['items'] = sorted(section_dict['items'], key=lambda k: k['index'])
                 section_structures.append(section_dict)
@@ -340,8 +312,124 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
     return section_structures
 
+def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
+    for item in deleted_exercise_list:
+        if item['filename'] == filename and item['problemset_id'] == problem_set_id:
+            return True
+    return False
+
+def get_contentgroup_data(course):
+    l1_items = {}
+    l2_items = {}
+    for cgtype, cgtid, cgref, target, level, display in [get_group_item_data(x, selfref=True) for x in 
+                                                            ContentGroup.objects.getByCourse(course=course)]:
+        if not target.is_live():
+            continue
+        if level == 2:
+            l2_items[(cgtype, cgtid)] = (cgref, target, level, display)
+        else:
+            l1_items[(cgtype, cgtid)] = cgref.group_id
+    return l1_items, l2_items
+
+def get_group_item_data(group_item, selfref=False):
+    ctype   = group_item.get_content_type()
+    level   = group_item.level
+    display = group_item.display_style or 'button'
+    target  = getattr(group_item, ctype)
+    cgid    = target.id
+    if not selfref:
+        return ctype, cgid, target, level, display
+    return ctype, cgid, group_item, target, level, display
+
+def get_children_by_display_style(key, level1_items, level2_items, user=None):
+    children = get_children(key, level1_items, level2_items, user)
+    tagged_children = {}
+    for child in children:
+        display_style = child.get('display', 'button')
+        if not tagged_children.has_key(display_style):
+            tagged_children[display_style] = [child]
+        else:
+            tagged_children[display_style].append(child)
+    return tagged_children
+
+def get_children(key, level1_items, level2_items, user=None):
+
+    def type_sorter(ci1, ci2):
+        ci1_type = ci1['type']
+        ci2_type = ci2['type']
+        ci1_title = ci1['title']
+        ci2_title = ci2['title']
+        if ci1_type < ci2_type:
+            return -1
+        elif ci1_type > ci2_type:
+            return +1
+        else:
+            # equal types, go by title
+            if ci1_title < ci2_title:
+                return -1
+            elif ci1_title > ci2_title:
+                return +1
+            else:
+                return 0
+
+    def name_sorter(ci1, ci2):
+        ci1_name = ci1['name']
+        ci2_name = ci2['name']
+        ci1_ext = ci1['ext']
+        ci2_ext = ci2['ext']
+        if ci1_name and ci2_name:
+            if ci1_ext < ci2_ext:
+                return -1
+            elif ci1_ext > ci2_ext:
+                return +1
+            else:
+                # equal extensions, go by filename
+                if ci1_name < ci2_name:
+                    return -1
+                elif ci1_name > ci2_name:
+                    return +1
+                else:
+                    return 0
+        else:
+            return 0
+
+    children = []
+    if level1_items.has_key(key):
+        group_id = level1_items[key]
+        children.extend([augment_child_data(k, v, user) for k,v in level2_items.items() if v[0].group_id == group_id])
+        children = sorted(sorted(children, type_sorter), name_sorter)
+    return children
+
+def augment_child_data(key, value, user=None):
+    class NoFile():
+        name = ''
+    cgtype = key[0]
+    ref    = value[1]
+    tmp_f  = getattr(ref, 'file', NoFile())
+    name   = tmp_f.name.split('/').pop()
+    ext    = name.split('.').pop().lower()
+
+    #              target             target        this entry    target ref  
+    child_data = {'type': cgtype, 'id': key[1], 'self': value[0], 'ref': ref, 'display': value[3], 'ext': ext,
+                  'name': name, 'title': ref.title, 'url': ref.get_url(), 'index': ref.index, 'children': None, }
+    child_data[cgtype] = ref      # FIXME: set 'exam':exam - remove after making templates use 'ref'
+    if cgtype == "exam" and user: # FIXME: per-type special cases belong somewhere else?
+        child_data['records'] = ExamRecord.objects.filter(course=ref.course, student=user, complete=True, exam=ref)
+    return child_data
+    
+def get_live_datetime_for(thing):
+    """Return the appropriate .live_datetime string for thing"""
+    prod_thing = thing.image
+    if not prod_thing.live_datetime:
+        return "<span style='color:#A00000;'>Not Live</span>"
+    elif prod_thing.live_datetime > datetime.datetime.now():
+        return prod_thing.live_datetime.strftime("<span style='color:#A07000;'>Live %F at %H:%M</span>" )
+    else:
+        return "<span style='color:green;'>Live</span>"
+
+
 #Test purposes only - not to be run in production
-def test_for_pset_progress_and_score():
+def test_for_pset_progress_and_score(): 
     
     logfile = open('zzzz.log', 'w')
     
@@ -548,10 +636,3 @@ def test_for_pset_progress_and_score():
                                             
     logfile.close()
     
-def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
-    for item in deleted_exercise_list:
-        if item['filename'] == filename and item['problemset_id'] == problem_set_id:
-            return True
-            
-    return False
-        
