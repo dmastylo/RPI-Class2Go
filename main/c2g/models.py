@@ -80,11 +80,23 @@ class Deletable(models.Model):
                 self.slug = ''
                 break
         self.save()
+
+        # Delete ContentGroup relationships when items are deleted
+        contentgroup_entries = self.contentgroup_set.all()
+        # Our object may not have a ContentGroup entry, but if it does, it
+        # should have exactly one - the current specification is that objects
+        # can't be in multiple parent/child relationships.
+        if len(contentgroup_entries) == 1:
+            contentgroup_entries[0].delete()
+        elif len(contentgroup_entries) > 1:
+            # To allow multiple ContentGroup relationships, we can iterate
+            # here, but other changes will have to be made elsewhere...
+            raise ValueError, "Deletion of %s, which has multiple ContentGroup entries. Multiple entries not allowed." % (str(self))
+
     class Meta:
        abstract = True
 
 class Institution(TimestampMixin, models.Model):
-#    #id = models.BigIntegerField(primary_key=True)
     title = models.TextField()
     country = models.TextField(blank=True)
     city = models.TextField(blank=True)
@@ -2225,6 +2237,31 @@ class ContentGroup(models.Model):
             l2o_type = l2o.get_content_type()
             info.setdefault(l2o_type, []).append(getattr(l2o, l2o_type).id)
         return info
+
+    def delete(self):
+        """Do housekeeping on related ContentGroup entries before calling up
+        
+        Level 2 ContentGroup entries are deleted without side effects.
+        Level 1 ContentGroup entries promote all of their children to Level 1,
+                making each its own group parent.
+        """
+        if self.level == 1:
+            children = ContentGroup.objects.getChildrenByGroupId(self.group_id)
+            for child in children:
+                child.level = 1
+                child.group_id = child.id
+                child.save()
+        super(ContentGroup, self).delete()
+
+    def get_content(self):
+        """Return the object to which this ContentGroup entry refers"""
+        tag = self.get_content_type()
+        return getattr(self, tag)
+
+    def get_content_id(self):
+        """Return the id of the object to which this ContentGroup entry refers"""
+        tag = self.get_content_type()
+        return getattr(self, tag+'_id')
 
     def get_content_type(self):
         """This is linear in the number of content types supported for grouping
