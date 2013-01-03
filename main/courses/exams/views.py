@@ -215,8 +215,6 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
     except ExamRecordScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
         raw_score = None
         scores_json = "{}"
-
-
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False}, RequestContext(request))
 
@@ -949,9 +947,10 @@ def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_sl
         student_input='error'
 
     if grader_hostname == 'localhost':
-        graded_raw = canned_feedback['help']
         if student_input in canned_feedback.keys():
             graded_raw = canned_feedback[student_input]
+        else:
+            graded_raw = canned_feedback['help']
     else:
         grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
         grader_data = request.body
@@ -972,7 +971,7 @@ def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_sl
     
 @require_POST
 @auth_view_wrapper
-def invideo_feedback(request, course_prefix, course_suffix, exam_slug):
+def exam_feedback(request, course_prefix, course_suffix, exam_slug):
     """
     Store results from invideo formative exams.  Problem ID in "id" query param.
     """
@@ -984,10 +983,31 @@ def invideo_feedback(request, course_prefix, course_suffix, exam_slug):
 
     # the question ID is in the query string, "unknown" if not provided
     qid = request.GET.get('id', 'unknown')
+    json_obj = json.loads(request.POST['json_data'])
 
-    # TODO -- video 
-    save_feedback(course, exam, request.user, request.body, qid, 'result')
+    feedback = {}
+    autograder = None
+    if exam.exam_type == "survey":
+        autograder = AutoGrader("<null></null>", default_return=True) #create a null autograder that always returns the "True" object
+    elif exam.autograde:
+        try:
+            autograder = AutoGrader(exam.xml_metadata)
+        except Exception as e:
+            return HttpResponseBadRequest(unicode(e))
+    if autograder:
+        for prob, v in json_obj.iteritems():
+            try:
+                if isinstance(v,list):    # multiple choice case
+                    submission = map(lambda li: li['value'], v)
+                    feedback[prob] = autograder.grade(prob, submission)
+                else:                     # single answer case
+                    submission = v['value']
+                    feedback[prob] = autograder.grade(prob, submission)
+            except AutoGraderGradingException as e:
+                feedback[prob] = {'correct':False, 'score':0}
 
-    response = HttpResponse()  # TODO -- return anything?
+    save_feedback(course, exam, request.user, request.body, qid, feedback)
+
+    response = HttpResponse()
     return response
 

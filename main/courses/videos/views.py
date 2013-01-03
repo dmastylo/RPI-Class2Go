@@ -147,9 +147,9 @@ def view(request, course_prefix, course_suffix, slug):
         # correctly (TODO: Refactor this)
         exam = Exam(course=course, slug=slug, title=video.title, description="Empty Exam", html_content="", xml_metadata="", due_date='', assessment_type="invideo", mode="draft", total_score=0, grade_single=0, grace_period='', partial_credit_deadline='', late_penalty=0, submissions_permitted=0, resubmission_penalty=0, exam_type="invideo", autograde=0, display_single=0, invideo=1, section=section,)
         exam.live_datetime = video.live_datetime    # needed so video shows up
+        exam.slug = "empty"
         question_times = ""
 
-    # change from 'videos/view.html' to 'exams/view_exam.html'
     return render_to_response('exams/view_exam.html', 
                               {
                                'common_page_data':    common_page_data, 

@@ -363,8 +363,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     error: HTMLAnswerError
                 });
             } else {
-                $.post("{% url 'courses.exams.views.show_quick_check' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}", 
-                    {'user-answer-data': JSON.stringify(collectUserAnswers())}, 
+                feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
+                $.post(feedback_url, 
+                    {'json_data': JSON.stringify(collectUserAnswers())}, 
                     function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
             }
 
