@@ -1670,7 +1670,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     #there is a function from assessment_type => (invideo, exam_type, display_single, grade_single, autograde) that we don't want to write inverse for
     #so we just store it
     assessment_type = models.CharField(max_length=64, null=True, blank=True)
-    total_score = models.IntegerField(null=True, blank=True)
+    total_score = models.FloatField(null=True, blank=True)
     objects = ExamManager()
     
     def num_of_student_records(self, student):
@@ -1977,7 +1977,7 @@ class ExamScore(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True) #mainly for convenience
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
-    score = models.IntegerField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
+    score = models.FloatField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
     
     def __unicode__(self):
@@ -2002,7 +2002,7 @@ class ExamScoreField(TimestampMixin, models.Model):
     human_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     value = models.CharField(max_length=128, null=True, blank=True)
     correct = models.NullBooleanField()
-    subscore = models.IntegerField(default=0)
+    subscore = models.FloatField(default=0)
     comments = models.TextField(null=True, blank=True)
     associated_text = models.TextField(null=True, blank=True)
 
