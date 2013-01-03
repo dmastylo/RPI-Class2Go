@@ -168,9 +168,9 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
     
     p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
     (plaintext, err_from_stderr) = p.communicate(input=msg.html_message.encode('utf-8')) #use lynx to get plaintext
-    staff_email = 'noreply@class.stanford.edu'
+    staff_email = 'noreply@class2go.stanford.edu'
     if course_handle:
-        staff_email = re.sub(r'\--', r'-',course_handle) + '-staff@class.stanford.edu'
+        staff_email = re.sub(r'\--', r'-',course_handle) + '-staff@class2go.stanford.edu'
     course_title_no_quotes = re.sub(r'"', '', course_title) # strip out all quotes
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
 

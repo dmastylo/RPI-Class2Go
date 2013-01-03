@@ -42,8 +42,77 @@ var c2gXMLParse = (function() {
                 console.log(e.message);
                 return;
             }
+             
+            var setValIfDef = function (elem, val) {
+                if (typeof val !== "undefined")
+                   $(elem).val(val);
+            };
+                
+            //This parses the "metadata" for the problem set.  title, description, etc.
+            var parsePsetFields = function() {
+                var psetDOM = $(myDOM).find('problemset');
+                 
+                if (psetDOM.length) {
+                   
+                   setValIfDef($('input#exam_title'), $(psetDOM).attr('title'));
+                   setValIfDef($('input#exam_slug'), $(psetDOM).attr('url-identifier'));
+                   setValIfDef($('select#assessment_type'), $(psetDOM).attr('type'));
+                   
+                   var descDOM = $(psetDOM).find('description');
+                   var datesDOM = $(psetDOM).find('dates');
+                   var gradingDOM = $(psetDOM).find('grading');
+                   var sectionDOM = $(psetDOM).find('section');
+                   
+                   if (descDOM.length) {
+                       $('textarea#description').val($(descDOM).text());
+                   }
+                   
+                   if (datesDOM.length) {
+                       setValIfDef($('input#due_date'), $(datesDOM).attr('due-date'));
+                       setValIfDef($('input#grace_period'), $(datesDOM).attr('grace-period'));
+                       setValIfDef($('input#hard_deadline'), $(datesDOM).attr('hard-deadline'));
+                   }
+                   
+                   if (gradingDOM.length) {
+                       setValIfDef($('input#late_penalty'), $(gradingDOM).attr('late-penalty'));
+                       setValIfDef($('input#num_subs_permitted'), $(gradingDOM).attr('num-submissions'));
+                       setValIfDef($('input#resubmission_penalty'), $(gradingDOM).attr('resubmission-penalty'));
+    
+                   }
+                   if (sectionDOM.length) {
+                       $('select#id_section option').each(function() {
+                          //Go through each option to see if any of their text is the same as the XML
+                          //select if that's the case
+                           if ($(this).text() && $(sectionDOM).attr('section') &&  $(this).text().trim() == $(sectionDOM).attr('section').trim()) {
+                              setValIfDef($('select#id_section'), $(this).val());
+                              prefill_children($('#parent_id')[0]).success(prepop_children);
+                           }
+                       });
+
+                   }
+                }
+            };
+                   
+            var prepop_children = function () {
+                var psetDOM = $(myDOM).find('problemset');
+                if (psetDOM.length) {
+                    var sectionDOM = $(psetDOM).find('section');
+                    if (sectionDOM.length) {
+                        $('select#parent_id option').each(function() {
+                              //Go through each option to see if any of their text is the same as the XML
+                              //select if that's the case
+                              if ($(this).text() && $(sectionDOM).attr('parent') && $(this).text().trim() == $(sectionDOM).attr('parent').trim())
+                                    setValIfDef($('select#parent_id'), $(this).val());
+                        });
+                    }
+                }
+            };
+                   
+            parsePsetFields();
 
             var problemNodes = $(myDOM).find('problem');
+
+            var videoNodes = $(myDOM).find('video');
 
             //Helper function
             var isChoiceCorrect = function(choiceElem) {
@@ -58,6 +127,10 @@ var c2gXMLParse = (function() {
             var outerMetadataObj = document.createElement('metadata'); //outermost metadata--won't actually be displayed since we use $.html()
             var metadataObj = document.createElement('exam_metadata');
             $(outerMetadataObj).append($(metadataObj));
+            
+            // Add video metadata (problem:time mappings for in-video exams)
+            $(metadataObj).append($(videoNodes));
+
             //Build up a DOM object corresponding to the answer key
             var answerkeyObj = document.createElement('answerkey');
             problemNodes.each(function () {
