@@ -138,24 +138,25 @@ def impersonate(request,username):
 @never_cache
 def default_preview_login(request, course_prefix, course_suffix):
     if settings.SITE_NAME_SHORT == "Stanford":
-        return shib_login(request)
+        return standard_preview_login(request, course_prefix, course_suffix)
     else:
         return ldap_preview_login(request, course_prefix, course_suffix)
     
 @never_cache
 def default_login(request):
-    if settings.SITE_NAME_SHORT == "Stanford":
-        return shib_login(request)
+ 
+    if request.method == 'GET':
+        extra_context = {}
+        context = RequestContext(request)
+        for key, value in extra_context.items():
+            context[key] = callable(value) and value() or value
+        layout = {'m': 800}
+        return render_to_response('registration/login.html',
+                            {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next': request.GET.get('next', '/')},
+                            context_instance=context)
     else:
-        if request.method == 'GET':
-            extra_context = {}
-            context = RequestContext(request)
-            for key, value in extra_context.items():
-                context[key] = callable(value) and value() or value
-            layout = {'m': 800}
-            return render_to_response('registration/login.html',
-                              {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next': request.GET.get('next', '/')},
-                              context_instance=context)
+        if settings.SITE_NAME_SHORT == "Stanford":
+            return standard_login(request)
         else:
             return ldap_login(request, '', '')
 
@@ -235,6 +236,81 @@ def shib_login(request):
 
     return HttpResponseRedirect(redir_to) 
 
+# login for public courses
+
+def standard_login(request):
+    
+    #setup the redirect first: code borrowed from django contrib library
+    redir_to = request.GET.get('next', '/')
+    netloc = urlparse.urlparse(redir_to)[1]
+       
+    # Heavier security check -- don't allow redirection to a different
+    # host.
+    if netloc and netloc != request.get_host():
+        redir_to = '/'
+            
+    form = AuthenticationForm(data=request.POST)
+    if form.is_valid():
+        auth_login(request, form.get_user())
+        return HttpResponseRedirect(redir_to)
+
+    else:                
+        messages.add_message(request,messages.ERROR, 'WebAuth did not return your identity to us!  Please try logging in again.  If the problem continues please contact c2g-techsupport@class.stanford.edu')
+        extra_context = {}
+        context = RequestContext(request)
+        for key, value in extra_context.items():
+            context[key] = callable(value) and value() or value
+        layout = {'m': 800}
+        
+        return render_to_response('registration/login.html',
+                              {'form': form, 'layout': json.dumps(layout)},
+                              context_instance=context)
+
+
+def standard_preview_login(request, course_prefix, course_suffix):
+    
+    # check if username exists to find out what type of user 
+    # this ensures that we don't unecessarily do the ldap auth
+    
+    login_form = AuthenticationForm(data=request.POST)
+    if login_form.is_valid():
+        auth_login(request, login_form.get_user())
+            
+        if not request.common_page_data['course'].preview_only_mode and \
+            date.today() >= request.common_page_data['course'].calendar_start :
+            redirect_to = 'courses.views.main'
+        else:
+            redirect_to = 'courses.preview.views.preview'
+   
+        return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
+       
+    else:
+        form_class = RegistrationFormUniqueEmail
+        form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
+        context = RequestContext(request)                
+       
+        try:
+            video = Video.objects.getByCourse(course=request.common_page_data['course']).get(slug='intro')
+        except Video.DoesNotExist:
+            video = None
+   
+        instructors = Instructor.objects.filter(courseinstructor=request.common_page_data['course'])
+  
+        template_name='previews/default.html'
+
+        return render_to_response(template_name,
+                         {'form': form,
+                          'login_form': login_form,
+                          'video':video,
+                          'instructors':instructors,
+                          'common_page_data': request.common_page_data,
+                          'course': request.common_page_data['course'],
+                          'display_login': True},
+                          context_instance=context)
+       
+
+    
+
 @never_cache
 def ldap_login(request, course_prefix, course_suffix):
     
@@ -242,19 +318,7 @@ def ldap_login(request, course_prefix, course_suffix):
     #if one exists, try to match them
     #if one does not exist, create it and assign to proper institution
     #then redirect
-    
 
-    #if request.method == 'GET':
-    #    extra_context = {}
-    #    context = RequestContext(request)
-    #    for key, value in extra_context.items():
-    #        context[key] = callable(value) and value() or value
-    #    layout = {'m': 800}
-    #    return render_to_response('registration/login.html',
-    #                          {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next': request.GET.get('next', '/')},
-    #                          context_instance=context)
-
-    
     #setup the redirect first: code borrowed from django contrib library
     redir_to = request.GET.get('next', '/')
     netloc = urlparse.urlparse(redir_to)[1]
@@ -308,8 +372,7 @@ def ldap_login(request, course_prefix, course_suffix):
                               context_instance=context)
 
     
-    ldapUser = json.loads(result)
-    print result   
+    ldapUser = json.loads(result) 
  
     if not User.objects.filter(username=request.POST['username']).exists():
             #here, we need to create the new user
@@ -419,7 +482,6 @@ def ldap_preview_login(request, course_prefix, course_suffix):
  
     
     ldapUser = json.loads(result)
-    print result   
  
     if not User.objects.filter(username=request.POST['username']).exists():
             #here, we need to create the new user
