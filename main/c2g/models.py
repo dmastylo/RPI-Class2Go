@@ -83,8 +83,15 @@ class Deletable(models.Model):
 
         # Delete ContentGroup relationships when items are deleted
         contentgroup_entries = self.contentgroup_set.all()
-        if len(contentgroup_entries):
+        # Our object may not have a ContentGroup entry, but if it does, it
+        # should have exactly one - the current specification is that objects
+        # can't be in multiple parent/child relationships.
+        if len(contentgroup_entries) == 1:
             contentgroup_entries[0].delete()
+        elif len(contentgroup_entries) > 1:
+            # To allow multiple ContentGroup relationships, we can iterate
+            # here, but other changes will have to be made elsewhere...
+            raise ValueError, "Deletion of %s, which has multiple ContentGroup entries. Multiple entries not allowed." % (str(self))
 
     class Meta:
        abstract = True
