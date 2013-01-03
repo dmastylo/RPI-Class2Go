@@ -323,6 +323,16 @@ def get_assessment_data(ready_exam, get_visits = False):
     
     return exam_summary
 
+def get_full_assessment_data(ready_exam, get_visits = False):
+
+    #Get total score for each student that has attempted the exam
+    student_scores = ExamScore.objects.values('student__username', 'student__first_name', 'student__last_name', 'score').select_related('student').filter(exam_id=ready_exam.id).order_by('student__username')
+
+    #Get data for each field attempted
+    student_field_scores = ExamRecordScoreField.objects.values('human_name', 'parent__record__student__username', 'parent__record__student__first_name', 'parent__record__student__last_name').select_related('parent').filter(parent__record__exam_id=ready_exam.id).annotate(correct=Max('correct'), sub_score=Max('subscore'), total_attempts=Count('parent__record__attempt_number')).order_by('parent__record__student__username')
+    
+    return student_scores, student_field_scores
+    
 
 def compute_score_summative(first_correct_attempt_number, first_correct_attempt_time_created, resubmission_penalty, submissions_permitted, grace_deadline, partial_credit_deadline, late_penalty):
     if (first_correct_attempt_number > submissions_permitted):

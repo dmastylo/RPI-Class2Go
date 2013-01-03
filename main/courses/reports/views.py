@@ -24,6 +24,7 @@ def main(request, course_prefix, course_suffix):
     # 1- List all problem sets and videos, since instructors may let something fo non-live then try to get its report. If instructors try to generate a report for something that doesn't have a live instance, we will write that in the report
     problemsets = ProblemSet.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     videos = Video.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
+    exams = Exam.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     
     
     # 2- Read a list of all reports for that course that are on the server
@@ -37,12 +38,16 @@ def main(request, course_prefix, course_suffix):
     
     #New assessment reports
     course_assessment_reports = list_reports_in_dir("%s/%s/reports/course_assessments/" % (course_prefix, course_suffix))
+    assessment_full_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
     
     # 3- Divide ps and video reports into lists of dicts ready for grouped display by object
     ps_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(problemsets, problemset_full_reports)
     ps_quiz_summ_reports_list_of_dicts = ClassifyReportsBySlug(problemsets, problemset_summ_reports)
     vd_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_full_reports)
     vd_quiz_summ_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_summ_reports)
+    
+    assessment_full_reports_list_of_dicts = ClassifyReportsBySlug(exams, assessment_full_reports)
+    
     
     # 4- Render to response
     return render_to_response('reports/main.html', {
@@ -57,6 +62,8 @@ def main(request, course_prefix, course_suffix):
         'videos': videos.order_by('title'),
         'problemsets': problemsets.order_by('title'),
         'course_assessment_reports': course_assessment_reports,
+        'exams': exams.order_by('title'),
+        'assessment_full_reports': assessment_full_reports_list_of_dicts,
     }, context_instance=RequestContext(request))
     
     
@@ -127,6 +134,14 @@ def generate_report(request):
     elif report_type == 'course_assessments':
         email_title = "[Class2Go] Course Assessments Report for %s" % course_handle_pretty
         req_reports = [{'type': 'course_assessments'}]
+    
+    elif report_type == 'assessment_full':
+        slug = request.POST["slug"]
+        email_title = "[Class2Go] Assessment Full Report for %s %s" % (course_handle_pretty, slug)
+        # TODO: Remove the following message  and attachment flag override after report email attachment is fixed
+        attach_reports_to_email = False
+        email_message = "The report has been generated. You can download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
+        req_reports = [{'type': 'assessment_full', 'slug': slug}]
     
     generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
