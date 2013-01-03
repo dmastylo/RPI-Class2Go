@@ -28,6 +28,7 @@ from django.db.models import Avg, Count, Max, StdDev
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
+from xml.dom.minidom import parseString
 
 
 RE_S3_PATH_FILENAME_SPLIT = re.compile('(?P<path>.+)\/(?P<filename>.*)$')
@@ -1962,9 +1963,82 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     
     record_view = property(record_view_name)
 
+    def sync_videos_foreignkeys_with_metadata(self):
+        """ 
+            This will read self.xml_metadata and synchronize the foreignkey
+            relationships in the database with those described in the xml_metadata.
+            WHAT TO DO ABOUT PUBLICATION MODEL. WE ARE IGNORING IT FOR NOW, SO
+            WILL HAVE TO CALL SEPARATELY FOR THE IMAGE.
+        """
+        #Clear out the old assocations first
+        prev_videos = self.video_set.all()
+        for video in prev_videos:
+            video.exam = None
+            video.save()
+                
+        new_video_slugs = videos_in_exam_metadata(self.xml_metadata)['video_slugs']
+        new_videos = Video.objects.filter(course=self.course, mode=self.mode, is_deleted=False, slug__in=new_video_slugs)
+        for new_video in new_videos:
+            new_video.exam = self
+            new_video.save()
+
+        video_slugs_set = map(lambda li:li.slug, list(new_videos))
+        video_slugs_not_set = list(set(new_video_slugs)-(set(video_slugs_set)))
+    
+        return {'video_slugs_set':video_slugs_set, 'video_slugs_not_set':video_slugs_not_set}
+    
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
 
+def videos_in_exam_metadata(xml, times_for_video_slug=None):
+    """
+        Refactored code that parses exam_metadata for video associations.
+        'question_times' only gets populated in the returned dict if a
+        times_for_video_slug argument is specified.
+    """
+    metadata_dom = parseString(xml) #The DOM corresponding to the XML metadata
+    video_questions = metadata_dom.getElementsByTagName('video')
+    
+    question_times = {}
+    video_slugs = []
+    for video_node in video_questions:
+        video_slug = video_node.getAttribute("url-identifier")
+        if video_slug == "":
+            video_slug = video_node.getAttribute("url_identifier")
+        video_slugs = video_slugs + [video_slug]
+        if video_slug == times_for_video_slug:
+            question_children = video_node.getElementsByTagName("question")
+            times = []
+            for question in question_children:
+                time = "sec_%s" % question.getAttribute("time")
+                if time not in question_times:
+                    question_times[time] = []
+                question_times[time].append(question.getAttribute("id"))
+    
+    return {'dom':metadata_dom, 'questions':video_questions,
+        'video_slugs':video_slugs, 'question_times':question_times}
+
+def parse_video_exam_metadata(xml):
+    """
+        Helper function to parse the exam metadata for associated videos.
+        Returns the response string detailing the videos found.
+        Should also return a list of slugs
+    """
+    videos_obj = videos_in_exam_metadata(xml)
+    if videos_obj['video_slugs']:
+        video_times = {}
+        for slug in videos_obj['video_slugs']:
+            v1 = videos_in_exam_metadata(xml, times_for_video_slug=slug)
+            video_times[slug]=v1['question_times']
+        
+        video_return_string = "This exam will be associated with the following videos:\n"
+        for slug,times in video_times.iteritems():
+            video_return_string += slug + " with questions at times " + \
+                ",".join(list(times.iterkeys())) + "\n"
+    else:
+        video_return_string = ""
+    
+    return {'description':video_return_string, 'slug_list':videos_obj['video_slugs']}
 
 class ExamRecord(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
