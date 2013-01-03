@@ -183,7 +183,9 @@
                 }
                 */
             };
-                          
+               
+            window.popcornVideo.on('seeking', C2G.videoSetup.handleTimeUpdate);
+
             /*
              Don't need these
             window.popcornVideo.on('playing', function () {
@@ -216,7 +218,10 @@
                     });
                 window.popcornVideo.play();
             };
-
+                          
+            C2G.videoSetup.setExamStage = setExamStage;
+            C2G.videoSetup.removeExamStage = removeExamStage;
+                          
             var continueVideoBtn = document.createElement('input');
             $(continueVideoBtn).attr('type', 'button');
             $(continueVideoBtn).attr('value', 'Continue Video');
