@@ -323,7 +323,7 @@ def get_contentgroup_data(course):
     l2_items = {}
     for cgtype, cgtid, cgref, target, level, display in [get_group_item_data(x, selfref=True) for x in 
                                                             ContentGroup.objects.getByCourse(course=course)]:
-        if not target.is_live():
+        if not target.is_live() or target.is_deleted:
             continue
         if level == 2:
             l2_items[(cgtype, cgtid)] = (cgref, target, level, display)
