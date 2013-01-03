@@ -419,7 +419,9 @@ def augment_child_data(key, value, user=None):
     
 def get_live_datetime_for(thing):
     """Return the appropriate .live_datetime string for thing"""
-    prod_thing = thing.image
+    prod_thing = getattr(thing, 'image', None)
+    if prod_thing == None:
+        return "<span style='color:#Ac7000;'>Error: No Live Mode Object</span>"
     if not prod_thing.live_datetime:
         return "<span style='color:#A00000;'>Not Live</span>"
     elif prod_thing.live_datetime > datetime.datetime.now():
