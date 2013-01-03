@@ -736,7 +736,7 @@ class VideoManager(models.Manager):
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
-    exam = models.ForeignKey('Exam', null=True)
+    exam = models.ForeignKey('Exam', null=True, blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
@@ -787,7 +787,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     def commit(self, clone_fields = None):
         if self.mode != 'draft': return;
         if not self.image: self.create_ready_instance()
-
+        
         ready_instance = self.image
         if not clone_fields or 'title' in clone_fields:
             ready_instance.title = self.title
@@ -801,8 +801,12 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             ready_instance.file = self.file
         if not clone_fields or 'url' in clone_fields:
             ready_instance.url = self.url
+        if (self.exam and self.exam.image):
+            image_exam = self.exam.image
+        else:
+            image_exam = None
         if not clone_fields or 'exam' in clone_fields:
-            ready_instance.exam = self.exam
+            ready_instance.exam = image_exam
         if not clone_fields or 'live_datetime' in clone_fields:
             ready_instance.live_datetime = self.live_datetime
 
@@ -867,8 +871,12 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             self.file = ready_instance.file
         if not clone_fields or 'url' in clone_fields:
             self.url = ready_instance.url
+        if (ready_instance.exam and ready_instance.exam.image):
+            image_exam = ready_instance.exam.image
+        else:
+            image_exam = None
         if not clone_fields or 'exam' in clone_fields:
-            self.exam = ready_instance.exam
+            self.exam = image_exam
         if not clone_fields or 'live_datetime' in clone_fields:
             self.live_datetime = ready_instance.live_datetime
 
@@ -922,7 +930,11 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return False
         if self.url != prod_instance.url:
             return False
-        if self.exam != prod_instance.exam:
+        if (self.exam and self.exam.image):
+            image_exam = self.exam.image
+        else:
+            image_exam = None
+        if image_exam != prod_instance.exam:
             return False
         if self.live_datetime != prod_instance.live_datetime:
             return False
