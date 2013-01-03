@@ -162,7 +162,10 @@ def gen_assessment_full_report(ready_course, ready_exam, save_to_s3=False):
         
         for student_field_score in student_field_scores:
             if student_score['student__username'] == student_field_score['parent__record__student__username']:
-                content.extend([student_field_score['human_name'],
+                field_name = student_field_score['human_name']
+                if not field_name:
+                    field_name = student_field_score['field_name']
+                content.extend([field_name,
                                 student_field_score['correct'],
                                 student_field_score['total_attempts'],
                                 student_field_score['sub_score']])

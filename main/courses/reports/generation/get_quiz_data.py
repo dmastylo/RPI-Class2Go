@@ -329,7 +329,7 @@ def get_full_assessment_data(ready_exam, get_visits = False):
     student_scores = ExamScore.objects.values('student__username', 'student__first_name', 'student__last_name', 'score').select_related('student').filter(exam_id=ready_exam.id).order_by('student__username')
 
     #Get data for each field attempted
-    student_field_scores = ExamRecordScoreField.objects.values('human_name', 'parent__record__student__username', 'parent__record__student__first_name', 'parent__record__student__last_name').select_related('parent').filter(parent__record__exam_id=ready_exam.id).annotate(correct=Max('correct'), sub_score=Max('subscore'), total_attempts=Count('parent__record__attempt_number')).order_by('parent__record__student__username')
+    student_field_scores = ExamRecordScoreField.objects.values('human_name', 'field_name', 'parent__record__student__username', 'parent__record__student__first_name', 'parent__record__student__last_name').select_related('parent').filter(parent__record__exam_id=ready_exam.id).annotate(correct=Max('correct'), sub_score=Max('subscore'), total_attempts=Count('parent__record__attempt_number')).order_by('parent__record__student__username')
     
     return student_scores, student_field_scores
     
