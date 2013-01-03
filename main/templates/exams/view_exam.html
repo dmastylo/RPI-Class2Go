@@ -663,8 +663,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(this).parent().find('span').remove();
                 tmpObj.associatedText = $(this).parent().text();
                 tmpObj.report = $(this).attr('data-report');
-                tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
-
+                if ($(this).closest('fieldset').length > 0) //inputs enclosed by a <fieldset>, use its data-report attr
+                   tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
+                else if ($(this).closest('tr').length > 0) //else if it's enclosed by a <tr>, check that elem for the data-report attr
+                    tmpObj.questionreport = $(this).closest('tr').attr('data-report');
                 userSelections[key].push(tmpObj);
             } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
                 var tmpObj = {};
