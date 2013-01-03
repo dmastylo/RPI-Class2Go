@@ -184,7 +184,7 @@
                 */
             };
                
-            window.popcornVideo.on('seeking', C2G.videoSetup.handleTimeUpdate);
+            window.popcornVideo.on('seeked', C2G.videoSetup.handleTimeUpdate);
 
             /*
              Don't need these
