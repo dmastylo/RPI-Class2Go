@@ -32,29 +32,10 @@
                 C2G.videoSetup.slideIndices = thumbManifest;
             };
 
-            // TODO: This function should go away soon, as real data will be in XML metadata
-            var loadPSManifest = function (data, textStatus, jqXHR) {
-                $.each(data, function (key, val) {
-                       $.each(val, function (k, v) {
-                              if (k == "imgsrc") {
-                              val[k] = thumbnailPath + v;
-                              }
-                              })
-                       psManifest[parseInt(key)] = val;
-                       });
-                C2G.videoSetup.questions = psManifest;
-            };
-
             var initThumbManifest = function () {
                 return $.getJSON(thumbnailPath + "manifest.txt", "", loadThumbManifest).always(function() {
                         thumbsChecked = true;
                     });  //The request may fail if there are no thumbs, but we know we tried.
-            }
-
-            var initPSManifest = function () {
-                return $.getJSON("/get_video_exercises?video_id={{video.id}}", "", loadPSManifest).always(function() {
-                    psChecked = true;
-                });  //The request may fail if there are no exercises, but we know we tried.
             }
 
             $.when(initThumbManifest()).then(function () {
@@ -80,7 +61,7 @@
                 var selected = C2G.videoSetup.slideIndices[''+nearest].displayDiv;
                 $(selected).addClass('selected');
                 $(selected).removeClass('unselected');
-                $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width())/2);
+                $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width()));
             }
         };
 
@@ -119,7 +100,7 @@
 
                 tempDiv.onclick=(function (time) {return function(evt) {
                                     //player.seekTo(time-0.5);
-                                    window.popcornVideo.play(time);
+                                    window.popcornVideo.play(time-0.5);
                                     //thumbSet.selectSlide(time);
                                     C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
@@ -166,6 +147,12 @@
 
         };
 
+        C2G.videoSetup.cueThumbs = function() {
+            for (time in C2G.videoSetup.slideIndices) {
+                window.popcornVideo.cue(time, C2G.videoSetup.handleTimeUpdate);
+            }
+        };
+
         $(document).ready(function() {
             /*
             Chain of events:
@@ -196,7 +183,9 @@
                 }
                 */
             };
-
+                          
+            /*
+             Don't need these
             window.popcornVideo.on('playing', function () {
                 window.popcornVideo.on('timeupdate', C2G.videoSetup.handleTimeUpdate);
             });
@@ -204,6 +193,7 @@
             window.popcornVideo.on('pause', function () {
                 window.popcornVideo.off('timeupdate', C2G.videoSetup.handleTimeUpdate);
             });
+            */
 
             var setExamStage = function() {
                 window.popcornVideo.pause();
@@ -262,12 +252,14 @@
                     $(continueVideoBtn).click(removeExamStage);
                 }
             };
-
+                          
+            C2G.videoSetup.questions={};
+                          
             for (q in questionTimes) {
                 
                 var cueSecond = q.split('_')[1];
                 var questionsToShow = questionTimes[q];
-
+                C2G.videoSetup.questions[cueSecond] = true;
                 var showQuestion = function (questionsToShow) {
                     return function () {
                         setExamStage();
@@ -295,6 +287,7 @@
 
             $.when(C2G.videoSetup.fetchThumbs())
             .then(C2G.videoSetup.displayThumbs)
+            .then(C2G.videoSetup.cueThumbs)
             .then(console.log("DONE!"));
 
         });
