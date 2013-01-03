@@ -225,20 +225,22 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 //console.log($(checkBtn).closest('.question'));
                 //console.log(inputCollection);
                 $(inputCollection).each(function () {
+                    var tmpObj = {};
                     if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
                         if (!userSelections[$(this).attr('name')]) {
                             userSelections[$(this).attr('name')] = [];
                         }
-                        //console.log(userSelections);
-                        var tmpObj = {};
                         tmpObj.value = $(this).attr('value');
                         tmpObj.associatedText = $(this).parent().text();
                         tmpObj.report = $(this).attr('data-report');
                         tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
-
                         userSelections[$(this).attr('name')].push(tmpObj);
                     } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
-                        userSelections[$(this).attr('name')] = $(this).val();
+                        tmpObj.value = $(this).val();
+                        tmpObj.associatedText = $(this).parent().text();
+                        tmpObj.report = $(this).attr('data-report');
+                        tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
+                        userSelections[$(this).attr('name')]=tmpObj;
                     }
                 });
                 $('textarea').each(function () {
@@ -361,16 +363,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 };
                 $.ajax({
                     url: feedback_url,
-                    type: "post",
+                    type: "POST",
                     data: postData,
                     success: HTMLAnswerSuccess,
                     error: HTMLAnswerError
                 });
             } else {
                 feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
-                $.post(feedback_url, 
-                    {'json_data': JSON.stringify(collectUserAnswers())}, 
-                    function (data, message, xhr) {displayMetaData(data, collectUserAnswers());});
+                var postData = {'json_data': JSON.stringify(collectUserAnswers())};
+                $.ajax({
+                    url: feedback_url, 
+                    type: "POST",
+                    data: postData,
+                    // success: function (data, message, xhr) {displayMetaData(data, collectUserAnswers())}
+                });
             }
 
         };

@@ -959,9 +959,7 @@ def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_sl
 
     graded_obj=json.loads(graded_raw)
     save_feedback(course, exam, request.user, student_input, qid, graded_obj)
-
-    response = HttpResponse(graded_raw)
-    return response
+    return HttpResponse(graded_raw)
 
     
 @require_POST
@@ -1002,7 +1000,5 @@ def exam_feedback(request, course_prefix, course_suffix, exam_slug):
                 feedback[prob] = {'correct':False, 'score':0}
 
     save_feedback(course, exam, request.user, request.body, qid, feedback)
-
-    response = HttpResponse()
-    return response
+    return HttpResponse(str(feedback))
 
