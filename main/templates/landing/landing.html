@@ -21,7 +21,7 @@
     </div>
 
 {% block topnav %}
-    <div class="top-nav" style="top:25px;">
+    <div class="top-nav" style="top:4px;">
 {% if user.is_authenticated %}
        <li>
           <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
@@ -29,7 +29,7 @@
               {% csrf_token %}
           </form>
        </li>
-       <li class="hidden-phone"><span>Welcome <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
+       <li class="hidden-phone"><span>Welcome <strong><a style="color:white;" href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
 {% else %}
        <li class="hidden-phone"><a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}" >Login</a></li>
        <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
