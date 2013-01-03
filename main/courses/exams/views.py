@@ -373,7 +373,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                                                      field_name = prob,
                                                      human_name=v[0].get('questionreport', "") if len(v)>0 else "",
                                                      subscore = feedback[prob]['score'],
-                                                     value = submission,
+                                                     value = map(lambda li:li.encode('utf-8'),submission),
                                                      correct = feedback[prob]['correct'],
                                                      comments="",
                                                      associated_text = v[0].get('associatedText', "") if len(v)>0 else "",

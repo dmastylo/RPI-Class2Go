@@ -5,7 +5,7 @@
     {% for child in children %}
         {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
             {% if child.type == 'exam' %}
-                <ul><li>
+                <ul class="unstyled"><li>
                     {% include "exams/ready/exam_list_item.html" with item=child is_child="TRUE" %} 
                 </li></ul>
             {% else %}
