@@ -140,7 +140,28 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
             else:
                 logger.info("Failed to generate course assessments report for course %s for user %s." % (course_handle, username))
                 
-            
+        elif rr['type'] == 'assessment_full':
+            if (not 'slug' in rr) or (not rr['slug']):
+                logger.info("Missing slug -- Failed to generate assessment full report")
+            else:
+                slug = rr['slug']
+                logger.info("User %s requested to generate assessment full report for course %s assessment slug %s." % (username, course_handle, slug))
+                
+                # If instructors ask for a report for an exam that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
+                try:
+                    exam = Exam.objects.get(course=ready_course, slug=slug)
+                except Exam.DoesNotExist:
+                    exam = Exam.objects.get(course=ready_course.image, slug=slug)
+                    
+                report = gen_assessment_full_report(ready_course, exam, save_to_s3=True)
+                report['type'] = rr['type']
+                if report:
+                    reports.append(report)
+                    logger.info("Assessment full report for course %s assessment %s generated successfully for user %s." % (course_handle, slug, username))
+                else:
+                    logger.info("Failed to generate assessment full report for course %s assessment %s for user %s." % (course_handle, slug, username))
+                            
+
             
     # Email Generated Reports
     staff_email = ready_course.contact
