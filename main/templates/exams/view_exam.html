@@ -133,14 +133,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% endif %}
 
     {% if not videotest %} 
-    <input class="btn" type="submit" value="Submit" />
+        <input class="btn" type="submit" value="Submit" />
     {% elif exam.exam_type == "survey" and exam.invideo %}
-    <input class="btn" id="survey-submit" type="submit" value="Submit" />
+        <input class="btn" id="survey-submit" type="submit" value="Submit" />
     {% endif %}
     </div>
     {% if videotest %}
         <div id="demoplayer"></div>
         <div id="slideIndex"></div>
+        {% include "content_groups/downloadable_style.html" %}
     {% endif %}
 
 {% endif %}
