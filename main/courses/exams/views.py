@@ -1000,5 +1000,7 @@ def exam_feedback(request, course_prefix, course_suffix, exam_slug):
                 feedback[prob] = {'correct':False, 'score':0}
 
     save_feedback(course, exam, request.user, request.body, qid, feedback)
-    return HttpResponse(str(feedback))
+    correx_obj = feedback
+    correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
+    return HttpResponse(json.dumps(correx_obj))
 

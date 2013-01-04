@@ -72,6 +72,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     label pre {margin-left:30px;}
 
     .quick-check {clear: both; display: block; margin-top: 1em;}
+    .hide-button {clear: both; display: block; margin-top: 1em;}
     .explanation {background: #fff; border-radius: 3px; margin: 1em; border: 1px solid black; padding: 1em;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
@@ -190,24 +191,27 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 var newQIdx = adjustQuestionIdx(-1);
             }
             $('.question').hide();
+            $('.inline-explanation').remove();
+            $('.explanation').remove();
             $('.question').eq(newQIdx).show();
         };
 
         $('.question-nav').click(showQuestion);
         
         {% if exam.invideo or exam.exam_type == "interactive_exercise" %}
-        var quickCheck = function () {
 
+        var hideButton = function () {
+            var assocQ = $(this).closest('.question');
+            var assocQID = $(assocQ).attr('id');
+            $('#' + assocQID + '-expl').empty().remove();
+            $('#' + assocQID).find('.inline-explanation').remove();
+            return;
+        } 
+
+        var quickCheck = function () {
             var checkBtnID = $(this).attr('id');
             var assocQ = $(this).closest('.question');
             var assocQID = $(assocQ).attr('id');
-
-            if ($(this).attr('value') == "Hide Answers") {
-                $('#' + assocQID + '-expl').empty().remove();
-                $('#' + assocQID).find('.inline-explanation').remove();
-                $(this).attr('value', 'Check Answers');
-                return;
-            }
 
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
@@ -334,26 +338,27 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 return target
             }
 
-            var HTMLAnswerSuccess  = function (data, msg, xhr) {
-                var explArea = getAndClearExplArea();
-                var responseData = $.parseJSON(data);
-                if (responseData == "ERROR") {
-                    $(explArea).append("There was a data error with this question, contact the course staff for help.");
-                    return;
-                }
-                $(explArea).append(responseData.feedback[0].explanation);
-            };
-
-            var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
-                var explArea = getAndClearExplArea();
-                $(explArea).append("There was an error contacting the grader service, try again later.");
-                if (textStatus != "null") {
-                    $(explArea).append("   (" + textStatus + ")");
-                }
-                return;
-            };
-
             if (__exam_type == "interactive_exercise") {
+
+                var HTMLAnswerSuccess  = function (data, msg, xhr) {
+                    var explArea = getAndClearExplArea();
+                    var responseData = $.parseJSON(data);
+                    if (responseData == "ERROR") {
+                        $(explArea).append("There was a data error with this question, contact the course staff for help.");
+                        return;
+                    }
+                    $(explArea).append(responseData.feedback[0].explanation);
+                };
+
+                var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
+                    var explArea = getAndClearExplArea();
+                    $(explArea).append("There was an error contacting the grader service, try again later.");
+                    if (textStatus != "null") {
+                        $(explArea).append("   (" + textStatus + ")");
+                    }
+                    return;
+                };
+
                 feedback_url = "{% url 'courses.exams.views.interactive_exercise_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
                 var postData = {
                     'grader_name':   $('#GraderName').text(),
@@ -368,14 +373,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     success: HTMLAnswerSuccess,
                     error: HTMLAnswerError
                 });
-            } else {
+
+            } else {    // INVIDEO CASE
+                var InvideoFeedbackSuccess = function (data, msg, xhr) {
+                    var prePopCorrex = JSON.parse(data);
+                    if (prePopCorrex && typeof prePopCorrex != "undefined" && prePopCorrex != "" 
+                            && prePopCorrex != 'None' && prePopCorrex != null) {
+                        window.showCorrections(prePopCorrex);
+                    }
+                };
+
                 feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
                 var postData = {'json_data': JSON.stringify(collectUserAnswers())};
                 $.ajax({
                     url: feedback_url, 
                     type: "POST",
                     data: postData,
-                    // success: function (data, message, xhr) {displayMetaData(data, collectUserAnswers())}
+                    success: InvideoFeedbackSuccess
                 });
             }
 
@@ -391,6 +405,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         $('.quick-check').click(quickCheck);
+
+        $('.question').each(function (idx, el) {
+            var tmpBtn = document.createElement('input');
+            $(tmpBtn).attr('type','button');
+            $(tmpBtn).attr('id','hideAnswers_' + idx);
+            $(tmpBtn).addClass('btn').addClass('hide-button');
+            $(tmpBtn).attr('value', 'Hide Answers');
+            $(this).append($(tmpBtn));
+        });
+
+        $('.hide-button').click(hideButton);
         {% endif %}
     {% endif %}
 
