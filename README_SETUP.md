@@ -2,12 +2,12 @@ Setting up Your Class2Go Dev Environment
 ========================================
 
 These instructions should help you get started setting up a dev
-environment.  You should be able to do most of your developmnet on
+environment.  You should be able to do most of your development on
 your laptop by running a local database (mysqld) and storing files
 locally instead of in S3.
 
 The majority of our dev team uses Macs, so the Mac instructions are
-genereally the most up to date.  But we do have some developers who
+generally the most up to date.  But we do have some developers who
 have had windows or Ubuntu Linux as their day-to-day dev machines, so
 we know it works.
 
@@ -20,7 +20,7 @@ them and send us a pull request!
 * [Configuring Django](#config)
 * [Generating Test Data](#testdata)
 
-It is a big step to go from a dev instance to a full-on deployed 
+It is a big step to go from a dev instance to a full-on deployed
 cloud instance.  Instructions for that are forthcoming.
 
 <a id="mac"></a>
@@ -34,7 +34,7 @@ General Instructions:
 * Set-up Django
 * Set-up Mysql
 
-For MAC OS-X Lion: Instructions mainly taken from 
+For MAC OS-X Lion: Instructions mainly taken from
 http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-and-homebrew/
 
 Some people don't have their normal user set up with write permissions
@@ -44,7 +44,7 @@ prefix for these.
 
 1. Install XCode from the Apple App Store Version 4.5 or later
 
-1. Within XCode, add the command line tools: Preferences -> Download -> 
+1. Within XCode, add the command line tools: Preferences -> Download ->
 "Command Line Tools" -> Install button
 
 1. Install Homebrew:
@@ -53,15 +53,15 @@ prefix for these.
 
 1. Install Python (we are expecting 2.7.x):
 
-        brew install readline sqlite gdbm  
-        brew install python --universal --framework  
+        brew install readline sqlite gdbm
+        brew install python --universal --framework
 
 1. Install mysql
 
-        brew install mysql  
+        brew install mysql
 
-    (Optional but useful for looking at the database)  
-    Install phpmyadmin (?!) following the directions here:  
+    (Optional but useful for looking at the database)
+    Install phpmyadmin (?!) following the directions here:
     http://www.djangoapp.com/blog/2011/07/24/installing-phpmyadmin-on-mac-os-x-lion/
 
 1. Install pip, a python package manager
@@ -70,23 +70,23 @@ prefix for these.
 
 1. Install python's virtual env
 
-        pip install virtualenv 
+        pip install virtualenv
 
-1. Create the class2go virtual env (if you want) 
+1. Create the class2go virtual env (if you want)
 
-        virtualenv class2go-venv --no-site-packages    
+        virtualenv class2go-venv --no-site-packages
 
     This should create the class2go-venv directory under the
     directory where this README is found.  All our django stuff
     will happen in there now.
 
-1. Start using the virtual environment that we just created.  
+1. Start using the virtual environment that we just created.
 
         . ./class2go-venv/bin/activate
 
-    WARNING:  you need to do this from whatever shell you're using.
+    WARNING:  You need to do this from whatever shell you're using.
     You can tell this because is puts an environment indicator at
-    the beginning of your prompt
+    the beginning of your prompt.
 
 1. Install django itself (this will be inside the virtualenv)
 
@@ -108,7 +108,7 @@ prefix for these.
 
         pip install django-storages
         pip install boto
- 
+
 1. Install GData (2.0.17)
 
         pip install gdata
@@ -141,47 +141,47 @@ prefix for these.
 
 1. Setup the account and database in MySql
 
-        create database class2go;  
-        grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';  
-        grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';  
+        create database class2go;
+        grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';
+        grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';
 
 1. Set up some folders for logs and the celery database.
 
     Put them somewhere writable. Make sure the django settings.py entry for LOGGING_DIR and the database.py entry for DATABASES.celery.NAME match these locations.
 
         mkdir /home/account/django-logs/
-        mkdir /home/account/sqlite3/  
+        mkdir /home/account/sqlite3/
 
-1. In the main folder, make a copy of database_example.py to database.py 
+1. In the main folder, make a copy of database_example.py to database.py
 and edit the DATABASES strings as follows substituting proper values for your system.
 
-        DATABASES = {  
-            'default': {  
-                'ENGINE': 'django.db.backends.mysql',  
-                'NAME': 'class2go',  
-                'USER': 'class2go',  
-                'PASSWORD': 'class2gopw',  
-                'HOST': '',  
-                'PORT': '',  
-            },  
-            'celery': {  
-                'ENGINE': 'django.db.backends.sqlite3',  
-                'NAME': '/Users/account/sqlite3/celerydb.sqlite',  
-            },  
-        }  
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': 'class2go',
+                'USER': 'class2go',
+                'PASSWORD': 'class2gopw',
+                'HOST': '',
+                'PORT': '',
+            },
+            'celery': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': '/Users/account/sqlite3/celerydb.sqlite',
+            },
+        }
 
 1. Setup initial db from the main folder
 
         ./manage.py syncdb  ######## answer no to the superuser question for now
-        ./manage.py migrate  
-        ./manage.py syncdb --database=celery  
-        ./manage.py migrate --database=celery  
+        ./manage.py migrate
+        ./manage.py syncdb --database=celery
+        ./manage.py migrate --database=celery
 
     At this point you should be able to look at the django database in
     your local mysql and see a bunch of c2g_* tables. Now you should create the super user
 
         ./manage.py createsuperuser
-	
+
 	Yay. :)
 
 1. From the main folder, run server on whatever port you want:
@@ -219,7 +219,7 @@ Steps:
 
 **Requirements**
 
-2. Prereqs: 
+2. Prereqs:
 	If you do not have the following, install them:
 		python 2.7
 		django
@@ -243,14 +243,14 @@ Steps:
 2. 'python manage.py syncdb' followed by 'python manage.py migrate' to create the required database tables and make sure the schema is up to date.You will be asked to create your admin account on the way. Skip it. You will later be able to create a user and promote it to admin manually using your DBMS client.
 
         ./manage.py syncdb  ######## answer no to the superuser question for now
-        ./manage.py migrate  
-        ./manage.py syncdb --database=celery  
-        ./manage.py migrate --database=celery  
+        ./manage.py migrate
+        ./manage.py syncdb --database=celery
+        ./manage.py migrate --database=celery
 
 At this point you should be able to look at the django database in your local mysql and see a bunch of c2g_* tables. Now you should create the super user
 
     ./manage.py createsuperuser
-	
+
 Yay. :)
 
 2. XX -- 'python manage.py collectstatic' to copy all static files to the directory specified in settings.py.
@@ -298,7 +298,7 @@ be installed for Mac (and probably Windows too)
         export VIRTUALENV_DISTRIBUTE=true
 
         # virtualenvwrapper setup
-        export WORKON_HOME=~/DevEnvs 
+        export WORKON_HOME=~/DevEnvs
         export PROJECT_HOME=~/DevProjects
         export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
         export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
@@ -318,13 +318,13 @@ be installed for Mac (and probably Windows too)
         echo $PATH
     (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
 
-3. Make sure PROJECT_HOME is defined 
+3. Make sure PROJECT_HOME is defined
 
         echo $PROJECT_HOME
 
 3. Make new project directory:
 
-        mkdir -p $PROJECT_HOME 
+        mkdir -p $PROJECT_HOME
 
 3. Issue command to set up new project subdirectory and link it to virtual env:
 
@@ -405,22 +405,22 @@ be installed for Mac (and probably Windows too)
 
 3. Edit file and add db name, username and password (see mac instructions)
 
-        vim database.py 
+        vim database.py
 
-3. Run syncdb to create database tables 
+3. Run syncdb to create database tables
 
         ./manage.py syncdb  ######## answer no to the superuser question for now
-    Might need to issue "syncdb" command a couple times if there are errors. The 
-    first time, it will ask you for username and password for the database 
+    Might need to issue "syncdb" command a couple times if there are errors. The
+    first time, it will ask you for username and password for the database
 
-3. Migrate user stuff over: 
+3. Migrate user stuff over:
 
         ./manage.py migrate
 
 Now you should create the super user
 
         ./manage.py createsuperuser
-	
+
 Yay. :)
 
 
@@ -481,8 +481,8 @@ Generating Test Data
     option it will delete your current django users so you'll have to
     recreate those users if you want.
 
-3. To run the script that populates the data do "manage.py help db_populate" first. 
-    This will tell you where to setup the params for the test data. 
+3. To run the script that populates the data do "manage.py help db_populate" first.
+    This will tell you where to setup the params for the test data.
 
 A helper script for this exists at main/repave\_dev\_database.sh.  It
 drops/recreates your dev database and then does the syncdb / migrate

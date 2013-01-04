@@ -6,7 +6,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import RequestContext
 
-from c2g.models import ContentGroup, ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise
+from c2g.models import ContentGroup, ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise, videos_in_exam_metadata
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials, get_children, get_contentgroup_data
@@ -117,23 +117,8 @@ def view(request, course_prefix, course_suffix, slug):
             exam = video.exam
             display_single = exam.display_single
             invideo = exam.invideo
-            metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
-            video_questions = metadata_dom.getElementsByTagName('video')
-           
-            question_times = {}
-            for video_node in video_questions:
-                video_slug = video_node.getAttribute("url-identifier")
-                if video_slug == "":
-                    video_slug = video_node.getAttribute("url_identifier")
-                if video_slug == video.slug:
-                    question_children = video_node.getElementsByTagName("question")
-                    times = []
-                    for question in question_children:
-                        time = "sec_%s" % question.getAttribute("time")
-                        if time not in question_times:
-                            question_times[time] = [] 
-                        question_times[time].append(question.getAttribute("id"))
-
+            video_obj = videos_in_exam_metadata(exam.xml_metadata, times_for_video_slug=video.slug)
+            question_times = video_obj['question_times']
             print json.dumps(question_times)
 
         except Exam.DoesNotExist:
@@ -170,6 +155,8 @@ def view(request, course_prefix, course_suffix, slug):
                                'exam':exam
                               },
                               context_instance=RequestContext(request))
+
+
 
 @auth_is_course_admin_view_wrapper
 def edit(request, course_prefix, course_suffix, slug):

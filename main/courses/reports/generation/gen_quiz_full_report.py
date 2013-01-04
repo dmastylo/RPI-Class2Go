@@ -115,3 +115,63 @@ def has_activity(per_student_data):
             return True
             
     return False
+
+def gen_assessment_full_report(ready_course, ready_exam, save_to_s3=False):
+
+    ### 1- Create the S3 file name and report writer object
+    dt = datetime.now()
+    course_prefix = ready_course.handle.split('--')[0]
+    course_suffix = ready_course.handle.split('--')[1]
+    
+    is_video = ready_exam.invideo
+    assessment_type = ready_exam.assessment_type
+    
+    report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, ready_exam.slug)
+    
+    #I'm pretty sure we want to put all the assessment reports in one place and should be classified as problemset reports.
+#    if is_video:
+#        s3_filepath = "%s/%s/reports/videos/%s" % (course_prefix, course_suffix, report_name)
+#    else:
+    s3_filepath = "%s/%s/reports/problemsets/%s" % (course_prefix, course_suffix, report_name)
+    
+    rw = C2GReportWriter(save_to_s3, s3_filepath)
+    
+    ### 2- Get the exam data
+    student_scores, student_field_scores = get_full_assessment_data(ready_exam)
+    
+    ### 3- Writeout
+    rw.write(["Activity for %s" % ready_exam.title], nl = 1)
+    
+    content = []
+    content = ["", "Field", "Correct", "# Attempts", "Sub score", "Total score", "Max possible score"]
+    rw.write(content, indent = 1)
+    content = []
+    
+    for student_score in student_scores:
+        name = student_score['student__first_name'] + " " + student_score['student__last_name']
+        content.extend([student_score['student__username'], 
+                        name,
+                        "",
+                        "",
+                        "",
+                        "",
+                        student_score['score'],
+                        ready_exam.total_score])
+        rw.write(content)
+        content = []
+        
+        for student_field_score in student_field_scores:
+            if student_score['student__username'] == student_field_score['parent__record__student__username']:
+                field_name = student_field_score['human_name']
+                if not field_name:
+                    field_name = student_field_score['field_name']
+                content.extend([field_name,
+                                student_field_score['correct'],
+                                student_field_score['total_attempts'],
+                                student_field_score['sub_score']])
+                rw.write(content, indent=2)
+                content = []
+          
+    
+    report_content = rw.writeout()
+    return {'name': report_name, 'content': report_content, 'path': s3_filepath}
