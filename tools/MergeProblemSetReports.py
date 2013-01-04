@@ -35,7 +35,9 @@ sys.stdout.write('\n')
                 
 # write a row for each student
 for student in sorted(students.keys()):
+    sys.stdout.write('\'')
     sys.stdout.write (student)
+    sys.stdout.write('\'')
     for Problemset in sorted(files.keys()):
         if Problemset in students[student]:
             sys.stdout.write(',')
