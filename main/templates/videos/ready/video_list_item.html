@@ -3,26 +3,31 @@
         <em class="icon-facetime-video"></em>
     </div>
     <div class="course-list-content">
-        <h4 class="pull-left"><a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}" title="{{item.video.description}}">{{item.video.title}}</a> ({{item.video.runtime}})</h4>
-        <div class="pull-right">
-            {% if item.video.has_storage %}
-                {% for tag, url, size, sizedesc in item.video.dl_links_all %}
-                <div class="btn-group" style="float: left">
-                    <a href="{{url}}" onclick="record_video_download( {{item.video.id}}, {{common_page_data.request.user.id}}, {{item.video.course_id}}, '{{tag}}' );">
-                        <button class="btn btn-mini" title="{{sizedesc}} ({{size|filesizeformat}})">
-                            <em class="icon-download-alt"></em>&nbsp;{{tag}}
-                        </button>
-                    </a>
-                </div>
-                {% endfor %}
-            {% endif %}
-            
-            {% if item.completed_percent > 90 %}
-                <div class="progress progress-success progress-striped" style="margin-left:3px;">
-            {% else %}
-                <div class="progress progress-info progress-striped" style="margin-left:3px;">
-            {% endif %}
-                    <div class="bar" style="width:{{item.completed_percent}}%"></div>
+        {% with video=item.video %}
+            <h4 class="pull-left">
+                <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" title="{{video.description}}">
+                    {{video.title}}</a> ({{video.runtime}})
+            </h4>
+            <div class="pull-right">
+                {% if video.has_storage %}
+                    {% for tag, url, size, sizedesc in video.dl_links_all %}
+                    <div class="btn-group" style="float: left">
+                        <a href="{{url}}" onclick="record_video_download( {{video.id}}, {{common_page_data.request.user.id}}, {{video.course_id}}, '{{tag}}' );">
+                            <button class="btn btn-mini" title="{{sizedesc}} ({{size|filesizeformat}})">
+                                <em class="icon-download-alt"></em>&nbsp;{{tag}}
+                            </button>
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                
+                {% if item.completed_percent > 90 %}
+                    <div class="progress progress-success progress-striped" style="margin-left:3px;">
+                {% else %}
+                    <div class="progress progress-info progress-striped" style="margin-left:3px;">
+                {% endif %}
+                        <div class="bar" style="width:{{item.completed_percent}}%"></div>
+                    </div>
             </div>
-        </div>
+        {% endwith %}
     </div>

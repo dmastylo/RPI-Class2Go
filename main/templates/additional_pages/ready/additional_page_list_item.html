@@ -2,7 +2,12 @@
         <em class="icon-book"></em>
     </div>
     <div class="course-list-content">
-        <h4 class="pull-left"><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4>
+        {% with page=item.additional_page %}
+        <h4 class="pull-left">
+            <a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix page.slug %}">
+                {{page.title}}</a>
+        </h4>
+        {% endwith %}
         
         <div class="pull-right"></div>
         
