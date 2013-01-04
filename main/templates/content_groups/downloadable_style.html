@@ -1,8 +1,9 @@
 {% load url from future %}
 
 {% if children %} {# needed because this template is called directly #}
-    <div class="button-tray" style="display: block; clear: both">
-    <h3>Downloadable Content for {{video.title}}</h3>
+    {# <div class="button-tray" style="display: block; clear: both"> #}
+    <div class="button-tray" style="display: block;">
+    <h3 style="clear: none;">Downloadable Content for {{video.title}}</h3>
     <ul class="unstyled course-list">
     {% for child in children %}
         {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
