@@ -96,6 +96,28 @@ def gen_course_assessments_report(ready_course, save_to_s3=False):
     report_content = rw.writeout()
     return {'name': report_name, 'content': report_content, 'path': s3_filepath}
 
+def gen_assessment_summary_report(ready_course, exam, save_to_s3=False):
+    
+    ### 1- Compose the report file name and instantiate the report writer object
+    dt = datetime.now()
+    course_prefix = ready_course.handle.split('--')[0]
+    course_suffix = ready_course.handle.split('--')[1]
+    
+    report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, exam.slug)
+    s3_filepath = "%s/%s/reports/problemsets_summary/%s" % (course_prefix, course_suffix, report_name)
+    
+    rw = C2GReportWriter(save_to_s3, s3_filepath)
+    
+    ### 2- Write the Report Title
+    rw.write(content = ["Assessment Summary for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
+    
+    ### 3- Write problem set reports
+    WriteAssessmentSummaryReportContent(exam, rw, full=False)
+    
+    ### 4- Proceed to write out and return
+    report_content = rw.writeout()
+    return {'name': report_name, 'content': report_content, 'path': s3_filepath}
+
 
 def WriteQuizSummaryReportContent(ready_quiz, rw, full=False):
     ### 1- Get the quiz data
@@ -192,7 +214,11 @@ def WriteAssessmentSummaryReportContent(ready_exam, rw, full=False):
     content = []
     # Fill in the values
     for key, value in exam_summary['total_attempts'].iteritems():
-        content.extend([key])
+        field_name = exam_summary['human_field'].get(key)
+        if not field_name:
+            field_name = key
+
+        content.extend([field_name])
         
         if exam_summary['assessment_type'] == 'summative':
             content.extend([
