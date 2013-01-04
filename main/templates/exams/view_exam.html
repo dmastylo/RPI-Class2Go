@@ -760,8 +760,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(dialogDiv).find('p').text(message);
                         
                 var buttonObj = {};
-                buttonObj[confirmText]=function() {
-                            document.location = SUBMISSION_RETURN_URL;};
+                buttonObj[confirmText] = function() {
+                    if ($(location).attr('href').indexOf('/videos/') >= 0) {//In a video, so just dismiss and resume video
+                        C2G.videoSetup.removeExamStage();
+                        $(this).dialog("close");
+                    }
+                    else
+                        document.location = SUBMISSION_RETURN_URL;
+                };
 
                 $(dialogDiv).dialog({ modal: true,
                                     buttons: buttonObj});

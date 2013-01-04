@@ -67,8 +67,12 @@ def edit_video(request, course_prefix, course_suffix, slug):
     action = request.POST['action']
     form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
     if form.is_valid():
-        video.exam_id = exam_id 
+        form.save()
+        
+        if action == "Save and Set as Ready":
+            video.commit()
 
+                
         if exam_id:
             try:
                 exam = Exam.objects.get(id=exam_id)
@@ -76,12 +80,11 @@ def edit_video(request, course_prefix, course_suffix, slug):
                 exam.save()
                 exam.image.live_datetime = video.live_datetime
                 exam.image.save()
+                video.exam = exam
+                video.save()
+                video.commit()
             except Exam.DoesNotExist:
                 raise Http404
-
-        form.save()
-        if action == "Save and Set as Ready":
-            video.commit()
 
         #Make sure slug is same for draft and ready versions
         if video.slug != video.image.slug:
