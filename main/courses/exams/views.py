@@ -21,7 +21,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice, ContentSection
+from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -593,14 +593,25 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
                         )
 
         exam_obj.save()
-        exam_obj.create_ready_instance()
+        exam_obj.create_ready_instance()        
 
         if parent_type:
             parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
             content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
             ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
 
-        return HttpResponse("Exam " + title + " created. \n" + unicode(grader))
+        #Now set the video associations
+        exam_obj.sync_videos_foreignkeys_with_metadata()
+        vid_status_obj = exam_obj.image.sync_videos_foreignkeys_with_metadata()
+        vid_status_string = "This exam was successfully associated with the following videos:\n" + \
+                            ", ".join(vid_status_obj['video_slugs_set']) + "\n"
+        if vid_status_obj['video_slugs_not_set']:
+            vid_status_string += "The following videos WERE NOT automatically associated with this exam:\n" + \
+                ", ".join(vid_status_obj['video_slugs_not_set']) + "\n\n" + \
+                "You may have provided the wrong url-identifier or have not yet uploaded the video"
+
+
+        return HttpResponse("Exam " + title + " created. \n" + unicode(grader) + "\n\n" + vid_status_string)
     else:
         try: #this is nasty code, I know.  It should at least be moved into the model somehow
             exam_obj = Exam.objects.get(course=course, is_deleted=0, slug=old_slug)
@@ -635,8 +646,18 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
                 else:
                     content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
                 ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
+        
+            #Now set the video associations
+            exam_obj.sync_videos_foreignkeys_with_metadata()
+            vid_status_obj = exam_obj.image.sync_videos_foreignkeys_with_metadata()
+            vid_status_string = "This exam was successfully associated with the following videos:\n" + \
+                ", ".join(vid_status_obj['video_slugs_set']) + "\n\n"
+            if vid_status_obj['video_slugs_not_set']:
+                vid_status_string += "The following videos WERE NOT automatically associated with this exam:\n" + \
+                    ", ".join(vid_status_obj['video_slugs_not_set']) + "\n" + \
+                    "You may have provided the wrong url-identifier or have not yet uploaded the video"
 
-            return HttpResponse("Exam " + title + " saved. \n" + unicode(grader))
+            return HttpResponse("Exam " + title + " saved. \n" + unicode(grader) + "\n\n" + vid_status_string)
 
         except Exam.DoesNotExist:
             return HttpResponseBadRequest("No exam exists with URL identifier %s" % old_slug)
@@ -653,7 +674,8 @@ def check_metadata_xml(request, course_prefix, course_suffix):
     except Exception as e: #Since this is just a validator, pass back all the exceptions
         return HttpResponseBadRequest(unicode(e))
     
-    return HttpResponse("Metadata XML is OK.\n" + unicode(grader))
+    videos_obj = parse_video_exam_metadata(xml)
+    return HttpResponse("Metadata XML is OK.\n" + unicode(grader) + "\n" + videos_obj['description'])
 
 
 
