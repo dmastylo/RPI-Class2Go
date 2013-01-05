@@ -60,7 +60,7 @@
     // force our handler to fire when the page first loads, in addition to onChange
     $("[name='section_id']").change(prefill_children($("[name='section_id']")[0]));
     function prefill_children(selector) {
-        var id = (selector.value * 1) + 1;       // make sure we get ready mode of section for child selection
+        var id = (selector.value * 1);       // make sure we get ready mode of section for child selection
         var pelement = $("[name='parent_id']");
         pelement.html('<option value="none,none">(this is a top level page)</option>');
         jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {

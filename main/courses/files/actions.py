@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 
 from c2g.models import ContentGroup
-from courses.actions import auth_is_course_admin_view_wrapper
+from courses.actions import auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 from courses.common_page_data import get_common_page_data
 from courses.files.forms import *
 
@@ -25,15 +25,7 @@ def upload(request):
             new_file.save()
             new_file.create_ready_instance()
 
-            parent_type = request.POST.get('parent')
-            if parent_type and parent_type[:4] != 'none':
-                parent_type, parent_id = parent_type.split(',')
-            else:
-                parent_type, parent_id = None, None
-            if parent_type:
-                parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent_id)).image
-                content_group_groupid = ContentGroup.add_parent(new_file.image.course, parent_type, parent_ref.image)
-                ContentGroup.add_child(content_group_groupid, 'file', new_file.image, display_style=request.POST.get('display_style'))
+            create_contentgroup_entries_from_post(request, 'parent', new_file.image, 'file', request.POST.get('display_style'))
 
             return redirect('courses.views.course_materials', course_prefix, course_suffix)
     else:

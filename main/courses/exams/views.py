@@ -30,7 +30,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.core.validators import validate_slug, ValidationError
 from django.core.exceptions import MultipleObjectsReturned
-from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
+from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -455,7 +455,6 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     assessment_type = request.POST.get('assessment_type','')
     section=request.POST.get('section','')
     invideo_val=request.POST.get('invideo','')
-    parent=request.POST.get('parent','none,none')
     
     if invideo_val and invideo_val == "true":
         invideo = True
@@ -558,10 +557,10 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         except ValueError:
             return HttpResponseBadRequest("A non-numeric resubmission penalty (" + resubmission_penalty  + ") was provided")
 
-    if parent and parent[:4] != 'none':
-        parent_type, parent = parent.split(',')
-    else:
-        parent_type, parent = None, None
+    #if parent and parent[:4] != 'none':
+    #    parent_type, parent = parent.split(',')
+    #else:
+    #    parent_type, parent = None, None
 
     #create or edit the Exam
     if create_or_edit == "create":
@@ -577,10 +576,12 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         exam_obj.save()
         exam_obj.create_ready_instance()        
 
-        if parent_type:
-            parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
-            content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
-            ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
+        create_contentgroup_entries_from_post(request, 'parent', exam_obj.image, 'exam', display_style='list')
+
+        #if parent_type:
+        #    parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
+        #    content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
+        #    ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
 
         #Now set the video associations
         exam_obj.sync_videos_foreignkeys_with_metadata()
