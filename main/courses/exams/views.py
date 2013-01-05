@@ -21,7 +21,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata
+from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -908,8 +908,19 @@ canned_feedback['right'] = canned_feedback['correct']
 canned_feedback['help'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"help","score":0,"explanation":"You are in localhost debugging mode.<br>Try \"<tt>right</tt>\" or \"<tt>wrong</tt>\""}]}'
 canned_feedback['error'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"error","score":0,"explanation":"You are in localhost debugging mode.<br>Did not send a well-formatted request."}]}'
 
+def log_attempt(course, exam, student, student_input, human_name, field_name, graded_obj):
+    examLogRow = ExamRecordFieldLog(course=course, 
+            exam=exam, 
+            student=student, 
+            field_name=field_name,
+            human_name=human_name,
+            value=student_input,
+            raw_score=0,                # TODO - FIX
+            max_score=0)                # TODO - FIX
+    examLogRow.save()
 
-def save_feedback(course, exam, student, student_input, field_name, graded_obj):
+
+def update_score(course, exam, student, student_input, field_name, graded_obj):
     (exam_rec, created) = ExamRecord.objects.get_or_create(course=course, exam=exam, student=student)
 
     exam_rec.complete = False
@@ -960,9 +971,12 @@ def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_sl
     try:
         parsed_body=urlparse.parse_qs(request.body)
         student_input=parsed_body['student_input'][0]
+        human_name=parsed_body['params[report]'][0]
     except:
         student_input='error'
+        human_name=''
 
+    # import ipdb; ipdb.set_trace()
     if grader_hostname == 'localhost':
         if student_input in canned_feedback.keys():
             graded_raw = canned_feedback[student_input]
@@ -980,7 +994,8 @@ def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_sl
         graded_raw = response.read()
 
     graded_obj=json.loads(graded_raw)
-    save_feedback(course, exam, request.user, student_input, qid, graded_obj)
+    log_attempt(course, exam, request.user, student_input, human_name, qid, graded_obj)
+    update_score(course, exam, request.user, student_input, qid, graded_obj)
     return HttpResponse(graded_raw)
 
     
@@ -1021,7 +1036,7 @@ def exam_feedback(request, course_prefix, course_suffix, exam_slug):
             except AutoGraderGradingException as e:
                 feedback[prob] = {'correct':False, 'score':0}
 
-    save_feedback(course, exam, request.user, request.body, qid, feedback)
+    update_score(course, exam, request.user, request.body, qid, feedback)
     correx_obj = feedback
     correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
     return HttpResponse(json.dumps(correx_obj))
