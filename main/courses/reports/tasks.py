@@ -28,58 +28,6 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
             else:
                 logger.info("Failed to generate dashboard report for course %s for user %s." % (course_handle, username))
             
-        elif rr['type'] == 'course_quizzes':
-            logger.info("User %s requested to generate course quizzes report for course %s." % (username, course_handle))
-            report = gen_course_quizzes_report(ready_course, save_to_s3=True)
-            report['type'] = rr['type']
-            if report:
-                reports.append(report)
-                logger.info("Course quizzes report for course %s generated successfully for user %s." % (course_handle, username))
-            else:
-                logger.info("Failed to generate course quizzes report for course %s for user %s." % (course_handle, username))
-                
-        elif rr['type'] == 'problemset_full':
-            if (not 'slug' in rr) or (not rr['slug']):
-                logger.info("Missing slug -- Failed to generate problem set full report")
-            else:
-                slug = rr['slug']
-                logger.info("User %s requested to generate problemset full report for course %s problemset slug %s." % (username, course_handle, slug))
-                
-                # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
-                try:
-                    quiz = ProblemSet.objects.get(course=ready_course, slug=slug)
-                except ProblemSet.DoesNotExist:
-                    quiz = ProblemSet.objects.get(course=ready_course.image, slug=slug)
-                    
-                report = gen_quiz_full_report(ready_course, quiz, save_to_s3=True)
-                report['type'] = rr['type']
-                if report:
-                    reports.append(report)
-                    logger.info("Problemset full report for course %s problemset %s generated successfully for user %s." % (course_handle, slug, username))
-                else:
-                    logger.info("Failed to generate problemset full report for course %s problemset %s for user %s." % (course_handle, slug, username))
-                    
-        elif rr['type'] == 'problemset_summary':
-            if (not 'slug' in rr) or (not rr['slug']):
-                logger.info("Missing slug -- Failed to generate problem set summary report")
-            else:
-                slug = rr['slug']
-                logger.info("User %s requested to generate problemset summary report for course %s problemset slug %s." % (username, course_handle, slug))
-                
-                # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
-                try:
-                    quiz = ProblemSet.objects.get(course=ready_course, slug=slug)
-                except ProblemSet.DoesNotExist:
-                    quiz = ProblemSet.objects.get(course=ready_course.image, slug=slug)
-                    
-                report = gen_quiz_summary_report(ready_course, quiz, save_to_s3=True)
-                report['type'] = rr['type']
-                if report:
-                    reports.append(report)
-                    logger.info("Problemset summary report for course %s problemset %s generated successfully for user %s." % (course_handle, slug, username))
-                else:
-                    logger.info("Failed to generate problemset summary report for course %s problemset %s for user %s." % (course_handle, slug, username))
-            
         elif rr['type'] == 'video_full':
             if (not 'slug' in rr) or (not rr['slug']):
                 logger.info("Missing slug -- Failed to generate video full report")
@@ -160,6 +108,27 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
                     logger.info("Assessment full report for course %s assessment %s generated successfully for user %s." % (course_handle, slug, username))
                 else:
                     logger.info("Failed to generate assessment full report for course %s assessment %s for user %s." % (course_handle, slug, username))
+                    
+        elif rr['type'] == 'assessment_summary':
+            if (not 'slug' in rr) or (not rr['slug']):
+                logger.info("Missing slug -- Failed to generate assessment summary report")
+            else:
+                slug = rr['slug']
+                logger.info("User %s requested to generate assessment summary report for course %s assessment slug %s." % (username, course_handle, slug))
+                
+                # If instructors ask for a report for a quiz that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
+                try:
+                    exam = Exam.objects.get(course=ready_course, slug=slug)
+                except Exam.DoesNotExist:
+                    exam = Exam.objects.get(course=ready_course.image, slug=slug)
+                    
+                report = gen_assessment_summary_report(ready_course, exam, save_to_s3=True)
+                report['type'] = rr['type']
+                if report:
+                    reports.append(report)
+                    logger.info("Assessment summary report for course %s assessment %s generated successfully for user %s." % (course_handle, slug, username))
+                else:
+                    logger.info("Failed to generate assessment summary report for course %s assessment %s for user %s." % (course_handle, slug, username))
                             
 
             
