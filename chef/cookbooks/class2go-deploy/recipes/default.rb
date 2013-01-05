@@ -25,7 +25,7 @@ node['apps'].keys.each do |app|
 
     # For initial machine bring up, check out the first time.  Doing as a
     # shell script so we can test first.
-    bash "git clone" do
+    bash "git clone: #{app}" do
         user node['system']['admin_user']
         cwd node['system']['admin_home']
         code <<-EOH
@@ -35,7 +35,15 @@ node['apps'].keys.each do |app|
         EOH
     end
 
-    execute "git remote update" do
+    execute "git remote prune origin: #{app}" do
+        command "git remote prune origin"
+        cwd node['system']['admin_home'] + "/#{app}"
+        user node['system']['admin_user']
+        group node['system']['admin_group']
+        action :run
+    end
+
+    execute "git remote update: #{app}" do
         command "git remote update"
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
@@ -44,7 +52,7 @@ node['apps'].keys.each do |app|
     end
 
     # Be really super sure that we get the revision we want
-    execute "git checkout" do
+    execute "git checkout: #{app}" do
         command "git checkout -f " + node['apps'][app]['git_branch']
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
@@ -54,7 +62,7 @@ node['apps'].keys.each do |app|
 
     # ... and then do a reset hard <branch>.  Unclear if this is even 
     # necessary, just being double-safe
-    execute "git reset" do
+    execute "git reset: #{app} to #{node['apps'][app]['git_branch']}" do
         command "git reset --hard " + node['apps'][app]['git_branch']
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
@@ -64,7 +72,7 @@ node['apps'].keys.each do |app|
 
     # Clear out *.pyc in this tree. Makes sure that file deletions aren't
     # hidden by vestigial compilation products.
-    execute "remove all *.pyc" do
+    execute "remove all *.pyc: #{app}" do
         command "find . -name \\*.pyc -exec rm {} \\; -print"
         cwd node['system']['admin_home'] + "/#{app}"
         user node['system']['admin_user']
