@@ -3,7 +3,7 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
   <h3>Upload File</h3>
-  <form action="{% url 'courses.files.actions.upload' %}" method="POST" onsubmit="return checkFilename();" enctype="multipart/form-data">
+  <form action="{% url reverseview %}" method="POST" onsubmit="return checkFilename();" enctype="multipart/form-data">
     <fieldset class="well">
       {% for field in form %}
         <div class="fieldWrapper">
@@ -34,8 +34,9 @@
     </fieldset>
     <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
     <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+    <input type="hidden" name="file_id" value="{{file.id}}" />
     {% csrf_token %}
-    <input type="submit" value="Upload" class="btn"/>
+    <input type="submit" value="Submit" class="btn"/>
   </form>
 </div>
 {% endblock m_column_content %}
@@ -65,6 +66,10 @@ function prefill_children(element) {
                 pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
             }
         }
+        {% if parent_val %}
+        var parent_val = '{{parent_val|escapejs}}';
+        $('select#parent_id').val(parent_val);
+        {% endif %}
     });
 }
 

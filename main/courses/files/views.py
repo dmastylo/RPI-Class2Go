@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.shortcuts import render
 from courses.common_page_data import get_common_page_data
-from c2g.models import File
+from c2g.models import File, ContentGroup
 from courses.files.forms import *
 from courses.actions import auth_is_course_admin_view_wrapper
 
@@ -12,8 +12,11 @@ def upload(request, course_prefix, course_suffix):
     
     form = FileUploadForm(course=common_page_data['course'])
 
+    reverseview = 'courses.files.actions.upload'
+    
     return render(request, 'files/upload.html',
-            {'common_page_data': common_page_data,
+            {'reverseview': reverseview,
+             'common_page_data': common_page_data,
              'form': form,
              })
 
@@ -27,8 +30,19 @@ def edit(request, course_prefix, course_suffix, file_id):
     except File.DoesNotExist:
         raise Http404
                          
-    form = FileEditForm(instance=file, course=common_page_data['course'])
+    form = FileEditForm(instance=file, course=common_page_data['draft_course'])
+
+    reverseview = 'courses.files.actions.edit'
+    cg_info = ContentGroup.groupinfo_by_id('file', file.image.id)
+    parent = cg_info.get('__parent', None)
+    if not parent:
+        parent_val = "none,none"
+    else:
+        parent_val = "%s,%d" % (cg_info['__parent_tag'], parent.id)
     return render(request, 'files/upload.html',
-                      {'common_page_data': common_page_data,
-                      'form': form,
-                  })
+            {'file':file,
+             'parent_val':parent_val,
+             'reverseview': reverseview,
+             'common_page_data': common_page_data,
+             'form': form,
+             })
