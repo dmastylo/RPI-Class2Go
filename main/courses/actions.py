@@ -78,18 +78,18 @@ def create_contentgroup_entries_from_post(request, postparam, ready_obj, ready_o
     """
     parent_tag, parent_id = None,None
     parent_tag = request.POST.get(postparam)
-    print "DEBUG: got post parameter", parent_tag
+    #print "DEBUG: got post parameter", parent_tag
     if parent_tag and parent_tag != 'none,none':
         parent_tag,parent_id = parent_tag.split(',')
         parent_id = long(parent_id)
     if parent_tag == "none,none" or parent_tag == None:                   # make this object the parent
-        print "DEBUG: adding a new parent %s %s to course %s" % (ready_obj_tag, str(ready_obj.id), str(ready_obj.course.id))
+        #print "DEBUG: adding a new parent %s %s to course %s" % (ready_obj_tag, str(ready_obj.id), str(ready_obj.course.id))
         content_group_groupid = ContentGroup.add_parent(ready_obj.course, ready_obj_tag, ready_obj) # add_parent should handle special cases already
     else:
         parent_ref = ContentGroup.groupable_types[parent_tag].objects.get(id=long(parent_id))
         if (parent_ref.mode != 'ready'):
             parent_ref = parent_ref.image
-        print "DEBUG: adding a new child %s %s to parent %s %s on course %s" % (ready_obj_tag, str(ready_obj.id), parent_tag, str(parent_ref.id), str(ready_obj.course.id))
+        #print "DEBUG: adding a new child %s %s to parent %s %s on course %s" % (ready_obj_tag, str(ready_obj.id), parent_tag, str(parent_ref.id), str(ready_obj.course.id))
         content_group_groupid = ContentGroup.add_parent(parent_ref.course, parent_tag, parent_ref)
         ContentGroup.add_child(content_group_groupid, ready_obj_tag, ready_obj, display_style=display_style)
     return content_group_groupid

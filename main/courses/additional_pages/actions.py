@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 
 from c2g.models import *
 from courses.common_page_data import get_common_page_data
-from courses.actions import auth_is_course_admin_view_wrapper
+from courses.actions import auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 
 
 @require_POST
@@ -34,13 +34,6 @@ def add(request):
     if request.POST.get("section_id") != "":
         section = ContentSection.objects.get(id=request.POST.get("section_id"))
 
-    parent_type, parent_id = None,None
-    parent_type = request.POST.get('parent_id')
-    if parent_type:
-        parent_type,parent_id = parent_type.split(',')
-        if parent_type[:4] != 'none':
-            parent_id = long(parent_id)
-
     if request.POST.get("menu_slug") != "":
         index = len(AdditionalPage.objects.filter(course=common_page_data['course'],menu_slug=request.POST.get("menu_slug")))
     else:
@@ -64,14 +57,9 @@ def add(request):
     draft_page = AdditionalPage(course=common_page_data['draft_course'], menu_slug=menu_slug, section=section, title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='draft')
     draft_page.save()
     draft_page.create_ready_instance()
-    if parent_type == "none":
-        parent_ref = draft_page.image
-        ContentGroup.add_parent(parent_ref.course, 'additional_page', parent_ref)
-    else:
-        parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=parent_id)
-        content_group_groupid = ContentGroup.add_parent(parent_ref.course, parent_type, parent_ref)
-        ContentGroup.add_child(content_group_groupid, 'additional_page', draft_page.image, display_style="button")
-    
+
+    create_contentgroup_entries_from_post(request, 'parent_id', draft_page.image, 'additional_page', display_style='list')
+
     if request.POST.get("menu_slug") == "":
         return redirect('courses.views.course_materials', course_prefix, course_suffix)
     else:
@@ -110,13 +98,6 @@ def save(request):
         if len(request.POST.get("title")) > AdditionalPage._meta.get_field("title").max_length:
             return redirectWithError("The title length was too long")
 
-        parent_type,parent_id = None,None
-        parent_type = request.POST.get('parent')
-        if parent_type:
-            parent_type,parent_id = parent_type.split(',')
-            if parent_type != 'none':
-                parent_id = long(parent_id)
-
         page.title = request.POST.get("title")
         page.description = request.POST.get("description")
         page.slug = request.POST.get("slug")
@@ -126,15 +107,7 @@ def save(request):
         page.image.slug = request.POST.get("slug")
         page.image.save()
 
-        print "DEBUG: page_id", page.id, "and page.image_id", page.image.id
-        print "DEBUG: parent_type", parent_type, "and parent_id", parent_id
-        if parent_type == "none" or parent_type == None:           # this is to be a parent
-            content_group_groupid = ContentGroup.add_parent(page.image.course, 'additional_page', page.image) # add_parent should handle special cases already
-            print "DEBUG: parent type none adds a new ContentGroup entry ", content_group_groupid
-        else:
-            parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=parent_id)
-            content_group_groupid = ContentGroup.add_parent(parent_ref.course, parent_type, parent_ref)
-            ContentGroup.add_child(content_group_groupid, 'additional_page', page.image, display_style="button")
+        create_contentgroup_entries_from_post(request, 'parent', page.image, 'additional_page')
 
         if request.POST.get("commit") == '1':
             page.commit()
