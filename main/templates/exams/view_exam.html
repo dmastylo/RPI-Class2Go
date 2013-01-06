@@ -222,37 +222,30 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
             var checkBtn = $(this);
             var collectUserAnswers = function () {
-                //console.log('collectUserAnswers called');
                 var userSelections = {};
-                var inputCollection = $(checkBtn).closest('.question').find('input');
-                //console.log($(checkBtn));
-                //console.log($(checkBtn).closest('.question'));
-                //console.log(inputCollection);
+                inputCollection = $(checkBtn).closest('.question').find('input,textarea');
                 $(inputCollection).each(function () {
-                    var tmpObj = {};
-                    if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
+                    if (($(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio') 
+                            && $(this).get(0).checked == true) {
+                        var tmpObj = {};
                         if (!userSelections[$(this).attr('name')]) {
                             userSelections[$(this).attr('name')] = [];
                         }
                         tmpObj.value = $(this).attr('value');
                         tmpObj.associatedText = $(this).parent().text();
                         tmpObj.report = $(this).attr('data-report');
-                        tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
+                        tmpObj.questionreport = $(this).closest('.question').attr('data-report');
                         userSelections[$(this).attr('name')].push(tmpObj);
-                    } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
+                    } else if (($(this).prop('type') == 'text' || $(this).prop('type') == 'textarea') 
+                            && $(this).val() != "") {
+                        var tmpObj = {};
                         tmpObj.value = $(this).val();
                         tmpObj.associatedText = $(this).parent().text();
                         tmpObj.report = $(this).attr('data-report');
-                        tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
+                        tmpObj.questionreport = $(this).closest('.question').attr('data-report');
                         userSelections[$(this).attr('name')]=tmpObj;
                     }
                 });
-                $('textarea').each(function () {
-                    if ($(this).val() != "") {
-                        userSelections[$(this).attr('name')] = $(this).val();
-                    }
-                });
-
                 return userSelections;
             };
 
@@ -342,12 +335,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
                 var HTMLAnswerSuccess  = function (data, msg, xhr) {
                     var explArea = getAndClearExplArea();
-                    var responseData = $.parseJSON(data);
-                    if (responseData == "ERROR") {
-                        $(explArea).append("There was a data error with this question, contact the course staff for help.");
-                        return;
+                    var response = $.parseJSON(data);
+                    for (var k in response) {
+                        if (k != "__metadata__") {
+                            $(explArea).append(response[k].feedback[0].explanation);
+                        }
                     }
-                    $(explArea).append(responseData.feedback[0].explanation);
                 };
 
                 var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
@@ -359,13 +352,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     return;
                 };
 
-                feedback_url = "{% url 'courses.exams.views.interactive_exercise_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
-                var postData = {
-                    'grader_name':   $('#GraderName').text(),
-                    'select_dict':   '',
-                    'student_input': $('#' + assocQID).find('textarea').val(),
-                    'params':        $('#' + assocQID).data()
-                };
+                feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
+                var postData = {'json_data': JSON.stringify(collectUserAnswers())};
                 $.ajax({
                     url: feedback_url,
                     type: "POST",
@@ -383,7 +371,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     }
                 };
 
-                feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}" + "?id=" + assocQID;
+                feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
                 var postData = {'json_data': JSON.stringify(collectUserAnswers())};
                 $.ajax({
                     url: feedback_url, 
