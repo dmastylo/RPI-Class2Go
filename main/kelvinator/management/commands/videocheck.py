@@ -125,7 +125,11 @@ class Command(BaseCommand):
             else:
                 conn=boto.connect_s3(awsKey, awsSecret)
                 bucket_conn=conn.get_bucket(awsBucket)
-                store_contents_s3=bucket_conn.list(limitHandle)
+                if limitHandle is None:
+                    store_contents_s3=bucket_conn.list()
+                else:
+                    limitPath=limitHandle.replace("==", "/")  # db--Winter2013 to db/Winter2013
+                    store_contents_s3=bucket_conn.list(limitPath)
                 store_contents=map(lambda x: x.name, store_contents_s3)
 
             def filterStoragePaths(paths, regexp):
