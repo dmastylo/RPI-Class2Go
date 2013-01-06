@@ -1,7 +1,7 @@
 {% extends "course_base.html" %}
 {% block title %}Course Materials | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
-{% block course_materials_link_class %}class="active"{% endblock course_materials_link_class %}
+{% block course_materials_link_class %} active{% endblock course_materials_link_class %}
 
 {% block course_page_title %}Course Materials (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
