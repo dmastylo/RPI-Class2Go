@@ -501,6 +501,16 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.image = ready_instance
         self.save()
 
+    def commit(self):
+        img = self.image
+        img.course=self.course.image
+        img.section=self.section.image
+        img.title=self.title
+        img.index = self.index
+        img.handle = self.handle
+        img.live_datetime = self.live_datetime
+        img.save()
+    
     def has_storage(self):
         """Return True if we have a copy of this file on our storage."""
         return self.file.storage.exists(self.file.name)
@@ -754,7 +764,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField("Youtube Video ID", max_length=255, null=True, blank=True)
-    duration = models.IntegerField(null=True)
+    duration = models.IntegerField(null=True, blank=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     file = models.FileField(upload_to=get_file_path)
     handle = models.CharField(max_length=255, null=True, db_index=True)
@@ -2200,11 +2210,15 @@ class ContentGroup(models.Model):
         becomes linear, and then we win.
         """
         info = {}
-        cls = thisclass.groupable_types.get('tag', False)
+        cls = thisclass.groupable_types.get(tag, False)
         if not cls:
             return info
         obj = cls.objects.get(id=id)
-        cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
+
+        try:
+            cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
+        except ContentGroup.DoesNotExist:
+            return info
         for cgo in cgobjs:
             cttag = cgo.get_content_type()
             cgref = getattr(cgo, cttag)
@@ -2212,6 +2226,7 @@ class ContentGroup(models.Model):
                 continue
             if cgo.level == 1:
                 info['__parent'] = cgref
+                info['__parent_tag'] = cttag
             else:
                 info.setdefault('__children', []).append(cgref)
             info.setdefault(cttag, []).append(cgref)
@@ -2258,7 +2273,8 @@ class ContentGroup(models.Model):
                     # But if this child is a parent of this group, make it a child first
                     if entry.level == 1:
                         entry.level = 2
-                        entry.save()
+                    entry.display_style = display_style
+                    entry.save()
                     return entry.id
             # We have a reference to it, but it's not in content_group
             # TODO: Decide: If cgref was previously a parent and we reassign
@@ -2266,6 +2282,7 @@ class ContentGroup(models.Model):
             if content_group and cgref:
                 cgref.group_id = group_id
                 cgref.level = 2
+                cgref.display_style = display_style
                 cgref.save()
             return cgref.id
 

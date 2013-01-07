@@ -234,7 +234,9 @@ urlpatterns = patterns('',
 
     #Files
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/files/upload$', 'courses.files.views.upload'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/files/edit/(?P<file_id>[0-9]+)/?$', 'courses.files.views.edit'),
     url(r'^upload_file/?', 'courses.files.actions.upload'),
+    url(r'^edit_file/?', 'courses.files.actions.edit'),
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
                        
     #Content Sharing

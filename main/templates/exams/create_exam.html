@@ -68,7 +68,7 @@
 </style>
 
 <div class="well create-exam-form">
-    <h2>Create a new Exam / ProblemSet / Exercise / Survey</h2>
+    <h2>Create a new Exam / ProblemSet / Survey</h2>
 
     
     <div class="control-group">
@@ -81,7 +81,7 @@
             <select id="assessment_type" name="assessment_type">
                 <option value="formative">Formative Problem Set</option>
                 <option value="summative">Summative Problem Set</option>
-                <option value="interactive">Interactive Exercise</option>
+                <option value="interactive">External Grader</option>
                 <option value="exam-autograde">Exam (auto-graded)</option>
                 <option value="exam-csv">Exam (csv-graded)</option>
                 <option value="survey">Survey</option>
@@ -454,24 +454,28 @@
     {% include "exams/renderPreview.js" %}
 
     $(function() {
+        {% if edit_mode %}
+        var endpointURL = "{% url 'save_edited_exam' course.prefix course.suffix slug %}";
+        {% else %}
+        var endpointURL = "{% url 'courses.exams.views.save_exam_ajax' course.prefix course.suffix %}";
+        {% endif %}
+
+        var saved_slug;
+
         var saveExerciseContents = function(callback){return function(){
             var csrftoken = '{{csrf_token}}';
             var filename = '{{filename}}';
       
-            {% if edit_mode %}
-            var endpointURL = "{% url 'save_edited_exam' course.prefix course.suffix slug %}";
-            {% else %}
-            var endpointURL = "{% url 'courses.exams.views.save_exam_ajax' course.prefix course.suffix %}";
-            {% endif %}
-      
             c2gXMLParse.renderPreview();
+      
+            saved_slug = $('input#exam_slug').val().trim();
       
             $.ajax(endpointURL, {
                headers: {'X-CSRFToken': csrftoken},
                type: 'POST',
                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                data: { title:$('input#exam_title').val(),
-                       slug:$('input#exam_slug').val(),
+                       slug:saved_slug,
                        due_date:$('input#due_date').val(),
                        grace_period:$('input#grace_period').val(),
                        partial_credit_deadline:$('input#hard_deadline').val(),
@@ -490,6 +494,9 @@
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
                success: function(data,textStatus,jqXHR) {
                    alert(jqXHR.responseText );
+                   //Since the exam possibly has a different slug now, we have to make sure the endpoint is right
+                   //Can't use reverse here because server didn't know slug, so have to form URL manually using JS saved_slug
+                   endpointURL = "/{{course.prefix}}/{{course.suffix}}/exams/" + saved_slug + "/save/";
                    callback();
                },
             });

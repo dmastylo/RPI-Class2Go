@@ -585,7 +585,13 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         #Now set the video associations
         exam_obj.sync_videos_foreignkeys_with_metadata()
         vid_status_obj = exam_obj.image.sync_videos_foreignkeys_with_metadata()
-        vid_status_string = "This exam was successfully associated with the following videos:\n" + \
+        vid_status_string = ""
+        if vid_status_obj['video_slugs_set']:
+            exam_obj.invideo=True
+            exam_obj.image.invideo=True
+            exam_obj.save()
+            exam_obj.image.save()
+            vid_status_string = "This exam was successfully associated with the following videos:\n" + \
                             ", ".join(vid_status_obj['video_slugs_set']) + "\n"
         if vid_status_obj['video_slugs_not_set']:
             vid_status_string += "The following videos WERE NOT automatically associated with this exam:\n" + \
@@ -632,7 +638,13 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             #Now set the video associations
             exam_obj.sync_videos_foreignkeys_with_metadata()
             vid_status_obj = exam_obj.image.sync_videos_foreignkeys_with_metadata()
-            vid_status_string = "This exam was successfully associated with the following videos:\n" + \
+            vid_status_string = ""
+            if vid_status_obj['video_slugs_set']:
+                exam_obj.invideo=True
+                exam_obj.image.invideo=True
+                exam_obj.save()
+                exam_obj.image.save()
+                vid_status_string = "This exam was successfully associated with the following videos:\n" + \
                 ", ".join(vid_status_obj['video_slugs_set']) + "\n\n"
             if vid_status_obj['video_slugs_not_set']:
                 vid_status_string += "The following videos WERE NOT automatically associated with this exam:\n" + \

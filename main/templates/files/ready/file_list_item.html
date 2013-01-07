@@ -2,11 +2,13 @@
         <em class="icon-file"></em>
     </div>
     <div class="course-list-content">
-        <h4 class="pull-left"><a href="{{item.file.url}}">{{item.file.title}}</a></h4>
-        {% if item.file.has_storage %}
-            <div class="pull-right"><a href="{{item.file.dl_link}}" class="btn btn-mini" title="{{item.file.title}}" style="float:left;">
-                <em class="icon-download-alt"></em>{{item.file.get_ext}}</a>
-                <div class="progress progress-success progress-striped" style="visibility:hidden; margin-left:3px;"></div>
-            </div>
-        {% endif %}        
+        {% with file=item.file title=item.file.title %}
+            <h4 class="pull-left"><a href="{{file.file.url}}">{{title}}</a></h4>
+            {% if file.has_storage %}
+                <div class="pull-right"><a href="{{file.dl_link}}" class="btn btn-mini" title="{{title}}" style="float:left;">
+                    <em class="icon-download-alt"></em>{{file.get_ext}}</a>
+                    <div class="progress progress-success progress-striped" style="visibility:hidden; margin-left:3px;"></div>
+                </div>
+            {% endif %}        
+        {% endwith%}
     </div>
