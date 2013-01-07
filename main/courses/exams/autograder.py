@@ -256,13 +256,30 @@ class AutoGrader():
 
     def _parse_interactive(self, response_elem, resp_name, qid):
         """
-        The DB Class interactive grader expects to see a POST with a specific set of elements
-        in the requests.  There are three direct elements:
+        Reads a set of XML parameters that are passed along to a
+        custom grader for the DB Class.  An example:
+
+            <response name="sql1" answertype="dbclass-interactive">
+                <grader_name>SQL_Grader_schroot</grader_name>
+                <select_dict></select_dict>
+                <database-file>sql-movies-query28.db</database-file>
+                <answer-file>movie-query-ans8.txt</answer-file>
+                <parameters>
+                    <qnum>1</qnum>
+                </parameters>
+                <type>db_class</type>
+            </response>
+
+        The DB Class interactive grader expects to see a POST with
+        a specific set of elements in the requests.  There are three
+        direct elements:
             grader_name
             select_dict
             student_input
-        and then an arbitrary set of elements called 'param[X]'.  student_input is filled in
-        by the grader function later; we populate the rest from the XML here.
+
+        and then an arbitrary set of elements called 'param[X]'.  
+        student_input is filled in by the grader function later; we 
+        populate the rest from the XML here.
         """
         grader_post_params = {}
         for response_child in response_elem.childNodes:
