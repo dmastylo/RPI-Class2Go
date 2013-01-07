@@ -138,10 +138,12 @@ var c2gXMLParse = (function() {
                 questionIdx += 1;
                 var questionMeta=document.createElement('question_metadata');
                 var question_id = "";
-                if ($(this).attr('id') != undefined)
+                if ($(this).attr('id') != undefined) {
                     question_id = $(this).attr('id');
-                else
+                }
+                else {
                     question_id = 'problem_'+questionIdx;
+                }
                 $(questionMeta).attr('id', question_id);
                 $(questionMeta).attr('data-report', $(this).attr('data-report'));
                 $(metadataObj).append($(questionMeta));
@@ -294,15 +296,15 @@ var c2gXMLParse = (function() {
                               $(questionObj).attr('data-report', $(node).attr('data-report'));
                               
                               $(node).children().each(function(){ //copy over all children
-                                                      $(questionObj).append($(this));
+                                                      $(questionObj).append($(this).clone());
                                                       });
                               $(questionMeta).append($(questionObj));
                               
                               var answerTextNode = $(node).find('answer-text');
                               var placeholderText = "Enter your query here...";
-                              if ($(answerTextNode).length)
+                              if ($(answerTextNode).length) {
                                   placeholderText = $(answerTextNode).text();
-                              
+                              }
                               var tmpInput = document.createElement('textarea');
                               $(tmpInput).attr('id', probName);
                               $(tmpInput).attr('name', probName);
