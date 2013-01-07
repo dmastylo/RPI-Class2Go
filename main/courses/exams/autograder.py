@@ -345,12 +345,12 @@ class AutoGrader():
             # interpret what we got from the grader
             # class2go just has one float score, coursera used score vs max, convert here
             if 'score' in graded:
-                if graded['score'] == 1:
-                    response['correct'] = True
                 if 'maximum-score' in graded and graded['maximum-score'] != 0:
                     maxscore = float(graded['maximum-score'])
                 else:
                     maxscore = 1.0
+                if float(graded['score']) == maxscore:
+                    response['correct'] = True
                 response['score'] = float(graded['score']) / maxscore
             if 'feedback' in graded:
                 response['feedback'] = graded['feedback']
