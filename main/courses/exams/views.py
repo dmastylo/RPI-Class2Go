@@ -918,7 +918,6 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
 
     exam_rec.complete = False
     exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
-    exam_rec.attempt_number += 1
 
     # append to json_data -- the student input
     try:
