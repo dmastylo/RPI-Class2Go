@@ -88,7 +88,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% include 'exams/videotest.css' %}
     #exam-pane {float: left; position: relative; display: none; width: 800px;}
     {% if exam.exam_type == "survey" and exam.invideo and "/videos" in request.path%}
-    #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 4.3em; right: 1.5em;}
+    #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;}
     {% else %}
     #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;}
     {% endif %}
@@ -702,11 +702,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                }
         );
 
-        function getDialog() {
+        function getDialog(title) {
             var dialogDiv = $('#dialog-message');
             if (dialogDiv.length == 0) {
                 dialogDiv = document.createElement('div');
                 $(dialogDiv).attr('id', 'dialog-message');
+                $(dialogDiv).attr('title',title);
                 $(dialogDiv).append('<p></p>');
                 $(document).append($(dialogDiv));
             }
@@ -718,16 +719,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 document.location = settings.responseText;
             }
             else {
-                var dialogDiv = getDialog();
                 var message = "";
                 var confirmText = "OK";
+                var title="";
 
                 if (__exam_type == "exam")
                     { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
-                      confirmText = "See My Submissions"; }
+                      confirmText = "See My Submissions"; 
+                      title = "Submission complete.";}
                 else if (__exam_type == "survey")
-                    { message = "Thanks!"; }
-                            
+                    { message = "Thanks!";
+                      title= "Survey complete.";}
+                      
+                var dialogDiv = getDialog(title);
+                
                 $(dialogDiv).find('p').text(message);
                         
                 var buttonObj = {};
@@ -747,7 +752,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         examXHR.error(function(xhr, status, msg) {
-            var dialogDiv = getDialog();
+            var dialogDiv = getDialog('');
             $(dialogDiv).find('p').text(msg+": "+xhr.responseText.substr(0,99));
             $(dialogDiv).dialog({modal: true});
         });
