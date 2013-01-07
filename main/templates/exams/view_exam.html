@@ -233,15 +233,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                             userSelections[$(this).attr('name')] = [];
                         }
                         tmpObj.value = $(this).attr('value');
-                        tmpObj.associatedText = $(this).parent().text();
+                        tmpObj.associatedText = $(this).parent().text().substr(0,40);
                         tmpObj.report = $(this).attr('data-report');
-                        tmpObj.questionreport = $(this).closest('.question').attr('data-report');
+                        if ($(this).closest('fieldset').length > 0) {
+                            //inputs enclosed by a <fieldset>, use its data-report attr
+                            tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
+                        } else if ($(this).closest('tr').length > 0) {
+                            //else if it's enclosed by a <tr>, check that elem for the data-report attr
+                            tmpObj.questionreport = $(this).closest('tr').attr('data-report');
+                        }
                         userSelections[$(this).attr('name')].push(tmpObj);
                     } else if (($(this).prop('type') == 'text' || $(this).prop('type') == 'textarea') 
                             && $(this).val() != "") {
                         var tmpObj = {};
                         tmpObj.value = $(this).val();
-                        tmpObj.associatedText = $(this).parent().text();
+                        tmpObj.associatedText = $(this).parent().text().substr(0,40);
                         tmpObj.report = $(this).attr('data-report');
                         tmpObj.questionreport = $(this).closest('.question').attr('data-report');
                         userSelections[$(this).attr('name')]=tmpObj;
@@ -691,7 +697,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.report = $(this).attr('data-report');
-                tmpObj.questionreport = $(this).attr('data-report');
+                if ($(this).closest('.question').length > 0) {
+                    tmpObj.questionreport = $(this).closest('.question').attr('data-report');
+                }
                         
                 userSelections[key] = tmpObj;
             }
@@ -705,7 +713,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 var tmpObj = {};
                 tmpObj.value = $(this).val();
                 tmpObj.report = $(this).attr('data-report');
-                tmpObj.questionreport = $(this).attr('data-report');
+                if ($(this).closest('.question').length > 0) {
+                    tmpObj.questionreport = $(this).closest('.question').attr('data-report');
+                }
                
                 userSelections[key] = tmpObj;
             }
