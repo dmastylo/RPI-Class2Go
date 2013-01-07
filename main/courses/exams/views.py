@@ -891,12 +891,12 @@ def log_attempt(course, exam, student, student_input, human_name, field_name, gr
     be useful for analytics, not scoring or reporting per se.
     """
     examLogRow = ExamRecordFieldLog(course=course,
-	        exam=exam, 
+            exam=exam, 
             student=student, 
             field_name=field_name,
-	        human_name=human_name, 
+            human_name=human_name, 
             value=student_input,
-	        raw_score=graded_obj['score'])
+            raw_score=graded_obj['score'])
     examLogRow.save()
 
 def update_score(course, exam, student, student_input, field_name, graded_obj):
