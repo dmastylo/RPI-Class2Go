@@ -101,7 +101,7 @@ function getCheckedIds() {
     <input type="button" value="New section" onclick="$('#new_section_form').toggle();" class="btn" style="margin-left: 20px;" />
     <a class="btn" style="margin-left: 5px;" href="{% url 'courses.content_sections.views.reorder' common_page_data.course_prefix common_page_data.course_suffix %}">Re-order Sections</a>
     <a class="btn btn-primary" style="margin-left: 30px;" href="{% url 'courses.videos.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">New Video</a>
-    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.exams.views.create_exam' common_page_data.course_prefix common_page_data.course_suffix %}">New ProblemSet / Exercise / Exam / Survey</a>
+    <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.exams.views.create_exam' common_page_data.course_prefix common_page_data.course_suffix %}">New ProblemSet / Exam / Survey</a>
     <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.additional_pages.views.add_section_page' common_page_data.course_prefix common_page_data.course_suffix %}">New Static Page</a>
     <a class="btn btn-primary" style="margin-left: 5px;" href="{% url 'courses.files.views.upload' common_page_data.course_prefix common_page_data.course_suffix %}">New File</a>
     </div>
