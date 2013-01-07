@@ -914,7 +914,7 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
             course=course, 
             exam=exam, 
             student=student,
-            defaults={'score':0.0, 'json_data':{}, 'json_score_data':{}})
+            defaults={'score':0.0, 'json_data':'{}', 'json_score_data':'{}'})
 
     exam_rec.complete = False
     exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
