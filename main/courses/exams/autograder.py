@@ -80,7 +80,7 @@ class AutoGrader():
                 self._parse_mc(resp, resp_name, qid)
             elif type == "numericalresponse":
                 self._parse_num(resp, resp_name, qid)
-            elif type == "dbclass-interactive":
+            elif type == "dbinteractiveresponse":
                 self._parse_interactive(resp, resp_name, qid)
             # more types should follow
             
@@ -281,21 +281,32 @@ class AutoGrader():
         student_input is filled in by the grader function later; we 
         populate the rest from the XML here.
         """
+        response_nodes_found = []
+        required_nodes = ["grader_name", "select_dict", "database-file", "answer-file", "parameters"]
         grader_post_params = {}
         for response_child in response_elem.childNodes:
             if response_child.nodeName == "#text":            # ignore
                 next
             elif response_child.nodeName == "parameters":     # params are special
+                response_nodes_found.append(response_child.nodeName)
                 for pnode in response_child.childNodes:
                     key = "params[%s]" % pnode.nodeName
                     if pnode.childNodes.length:
                         val = pnode.childNodes[0].nodeValue
                         grader_post_params[key] = val
             else:                                             # all else becomes a post param
+                response_nodes_found.append(response_child.nodeName)
                 val = ""
                 if response_child.childNodes.length:
                     val = response_child.childNodes[0].nodeValue
                 grader_post_params[response_child.nodeName] = val
+                
+        for req in required_nodes: 
+            if req not in response_nodes_found:
+                response_node_id = response_elem.getAttribute('name').strip()
+                raise AutoGraderMetadataException("Error in response node \"%s\": A <%s> element is required" 
+                        % (response_node_id, req))
+
         self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params)
 
     def _INTERACTIVE_grader_factory(self, post_params):
