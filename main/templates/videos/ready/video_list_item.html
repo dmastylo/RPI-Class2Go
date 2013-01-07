@@ -6,7 +6,7 @@
         {% with video=item.video %}
             <h4 class="pull-left">
                 <a href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix video.slug %}" title="{{video.description}}">
-                    {{video.title}}</a> ({{video.runtime}})
+                    {{video.title}}</a> {% if video.duration %} ({{video.runtime}}) {% endif %}
             </h4>
             <div class="pull-right">
                 {% if video.has_storage %}
