@@ -913,7 +913,9 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     (exam_rec, created) = ExamRecord.objects.get_or_create(course=course, 
             exam=exam, 
             student=student,
-            score=0.0)
+            score=0.0,
+            json_data={},
+            json_score_data={})
 
     exam_rec.complete = False
     exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
@@ -922,15 +924,15 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     # append to json_data -- the student input
     try:
         field_student_data_obj = json.loads(exam_rec.json_data)
-    except:
-        field_student_data_obj = {}
+    except (TypeError, ValueError) as e:
+        field_student_data_obj = {}  # better to ignore prior bad data than to die
     field_student_data_obj[field_name] = {'value': student_input}
     exam_rec.json_data = json.dumps(field_student_data_obj)
 
     # append to json_score_data -- what the grader came back with
     try:
         field_graded_data_obj = json.loads(exam_rec.json_score_data)
-    except:
+    except (TypeError, ValueError) as e:
         field_graded_data_obj = {}
 
     # we don't want to store the whole feedback, so need to make a deep copy
