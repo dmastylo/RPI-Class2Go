@@ -14,7 +14,7 @@ var c2gXMLParse = (function() {
             return outstring;
          },
                    
-        specialNodes: "multiplechoiceresponse,numericalresponse,stringresponse,regexresponse,optionresponse,solution",
+        specialNodes: "dbinteractiveresponse,multiplechoiceresponse,numericalresponse,stringresponse,regexresponse,optionresponse,solution",
         
         renderPreview: function() {
             $('#staging-area').empty();
@@ -137,7 +137,12 @@ var c2gXMLParse = (function() {
 
                 questionIdx += 1;
                 var questionMeta=document.createElement('question_metadata');
-                $(questionMeta).attr('id', 'problem_'+questionIdx);
+                var question_id = "";
+                if ($(this).attr('id') != undefined)
+                    question_id = $(this).attr('id');
+                else
+                    question_id = 'problem_'+questionIdx;
+                $(questionMeta).attr('id', question_id);
                 $(questionMeta).attr('data-report', $(this).attr('data-report'));
                 $(metadataObj).append($(questionMeta));
                 
@@ -154,7 +159,7 @@ var c2gXMLParse = (function() {
                               
                 var tmpProbDiv = document.createElement('div');
                 $(tmpProbDiv).addClass('question');
-                $(tmpProbDiv).attr('id', 'problem_'+questionIdx);
+                $(tmpProbDiv).attr('id', question_id);
                 $(tmpProbDiv).attr('data-report', $(this).attr('data-report'));
                               
                 //$('#staging-area').append($(tmpProbDiv));
@@ -277,6 +282,36 @@ var c2gXMLParse = (function() {
                             $(nodeParent).append($(tmpInput));
 
                             break;
+                              
+                        case 'dbinteractiveresponse':
+                              
+                              var probName =  'q' + questionIdx + idx_suffix;
+                              
+                              var questionObj = document.createElement('response');
+                              $(questionObj).attr('name', probName);
+                              $(questionObj).attr('answertype', nodeName);
+                              $(questionObj).attr('answer',$(node).attr('answer'));
+                              $(questionObj).attr('data-report', $(node).attr('data-report'));
+                              
+                              $(node).children().each(function(){ //copy over all children
+                                                      $(questionObj).append($(this));
+                                                      });
+                              $(questionMeta).append($(questionObj));
+                              
+                              var answerTextNode = $(node).find('answer-text');
+                              var placeholderText = "Enter your query here...";
+                              if ($(answerTextNode).length)
+                                  placeholderText = $(answerTextNode).text();
+                              
+                              var tmpInput = document.createElement('textarea');
+                              $(tmpInput).attr('id', probName);
+                              $(tmpInput).attr('name', probName);
+                              $(tmpInput).attr('placeholder', placeholderText);
+                              $(tmpInput).attr('data-report', $(node).attr('data-report'));
+                            
+                              $(nodeParent).append($(tmpInput));
+                              
+                              break;
 
                         case 'optionresponse':
 
