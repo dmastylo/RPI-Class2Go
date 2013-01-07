@@ -764,7 +764,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField("Youtube Video ID", max_length=255, null=True, blank=True)
-    duration = models.IntegerField(null=True)
+    duration = models.IntegerField(null=True, blank=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     file = models.FileField(upload_to=get_file_path)
     handle = models.CharField(max_length=255, null=True, db_index=True)
