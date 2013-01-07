@@ -22,6 +22,18 @@ var c2gXMLParse = (function() {
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
         },
 
+        copyContentsToEl: function(fromEl, toEl) {
+            $(fromEl).contents().each(function() {
+                //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
+                if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
+                    $(toEl).append($(this).text());
+                }
+                else { //for DOM nodes that are elements
+                    $(toEl).append($(this).clone());
+                }
+            });
+        },
+                   
         renderMarkup: function(sourceEl, targetEl) {
 
             if (typeof targetEl == "undefined" || targetEl == "") {
@@ -131,6 +143,15 @@ var c2gXMLParse = (function() {
             // Add video metadata (problem:time mappings for in-video exams)
             $(metadataObj).append($(videoNodes));
 
+            // Add preamble nodes
+            $(myDOM).find('preamble').each(function(){
+                var preambleDiv = document.createElement('div');
+                $(preambleDiv).addClass("preamble");
+                $(preambleDiv).attr('id','problemSetPreamble');
+                c2gXMLParse.copyContentsToEl($(this),$(preambleDiv));
+                $(targetEl).append($(preambleDiv));
+            });
+                   
             //Build up a DOM object corresponding to the answer key
             var answerkeyObj = document.createElement('answerkey');
             problemNodes.each(function () {
@@ -373,6 +394,15 @@ var c2gXMLParse = (function() {
         
             }); // end each problem
       
+            // Add 'postamble' nodes
+            $(myDOM).find('postamble').each(function(){
+                var postambleDiv = document.createElement('div');
+                $(postambleDiv).addClass("postamble");
+                $(postambleDiv).attr('id','problemSetPostamble');
+                c2gXMLParse.copyContentsToEl($(this),$(postambleDiv));
+                $(targetEl).append($(postambleDiv));
+            });
+                   
             editor.setValue($(targetEl).html());
 
             metadata_editor.setValue($(outerMetadataObj).html());
