@@ -991,6 +991,7 @@ def exam_feedback(request, course_prefix, course_suffix, exam_slug):
                 student_input = v['value']
                 feedback[prob] = autograder.grade(prob, student_input)
         except AutoGraderGradingException as e:
+            logger.error(e)
             return HttpResponse(e, status=500)
         if 'questionreport' in v:
             human_name = v['questionreport']

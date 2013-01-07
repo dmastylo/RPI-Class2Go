@@ -307,15 +307,16 @@ class AutoGrader():
             response['feedback'] = ""
 
             # call remote grader
-            grader_hostname = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
-            grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
+            grader_url = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
             post_params['student_input'] = submission
             grader_timeout = 5    # seconds
             try:
                 post_data = urllib.urlencode(post_params)
                 grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
-            except urllib2.URLError:
-                raise AutoGraderGradingException("interactive grader connection problem")
+            except urllib2.HTTPError as e:
+                raise AutoGraderGradingException("interactive grader HTTP error (%d)" % e.code)
+            except urllib2.URLError as e:
+                raise AutoGraderGradingException("interactive grader connection error (%d)" % e.code)
             graded_result = grader_conn.read()
             if graded_result == "ERROR":
                 raise AutoGraderGradingException("Interactive grader returned \"ERROR\"")
