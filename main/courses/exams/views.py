@@ -883,21 +883,39 @@ def validate_row(row):
 
 
 def log_attempt(course, exam, student, student_input, human_name, field_name, graded_obj):
-    examLogRow = ExamRecordFieldLog(course=course, 
-            exam=exam, 
+    """
+    ExamRecordFieldLog stores one record (row) for every attempt
+    at something that can be graded problem-by-problem, currently
+    interactive exercises and in-video (formative) exercises.  It
+    is meant to have more info than the ExamRecord table, but to
+    be useful for analytics, not scoring or reporting per se.
+    """
+    examLogRow = ExamRecordFieldLog(course=course,
+	        exam=exam, 
             student=student, 
             field_name=field_name,
-            human_name=human_name,
+	        human_name=human_name, 
             value=student_input,
-            raw_score=graded_obj['score'])
+	        raw_score=graded_obj['score'])
     examLogRow.save()
 
-
 def update_score(course, exam, student, student_input, field_name, graded_obj):
-    (exam_rec, created) = ExamRecord.objects.get_or_create(course=course, exam=exam, student=student)
+    """
+    The ExamRecord table stores the cumulative score for this problem
+    set, exercise, etc.  Update this table for things graded
+    problem-by-problem (interactive exercises, in-video exercises)
+    with the score for this problem.
+
+    By convention these types of exercises are never complete, ie.
+    there is never a final score.  Score here is more of a running
+    tally of plus and minus points accrued.
+    """
+    (exam_rec, created) = ExamRecord.objects.get_or_create(course=course, 
+            exam=exam, 
+            student=student)
 
     exam_rec.complete = False
-    exam_rec.score = graded_obj['score']
+    exam_rec.score = exam_rec.score + graded_obj['score']
     exam_rec.attempt_number += 1
 
     # append to json_data -- the student input
@@ -930,10 +948,17 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
 @auth_view_wrapper
 def exam_feedback(request, course_prefix, course_suffix, exam_slug):
     """
-    For all problems submitted, do three things:
-      1. call the autograder
+    This is the endpoint that will be hit from an AJAX call from
+    the front-end when the users pushes the "Check Answer" button
+    on an interactive or in-video exercise.  For all problems
+    submitted, do three things:
+
+      1. instantiate and call the autograder
       2. write a log entry storing the attempt
       3. update the score table with the latest score
+
+    While this will score and report results back for multiple
+    problems, that isn't typical.
     """
     course = request.common_page_data['course']
     try:
@@ -967,9 +992,10 @@ def exam_feedback(request, course_prefix, course_suffix, exam_slug):
                 feedback[prob] = autograder.grade(prob, student_input)
         except AutoGraderGradingException as e:
             return HttpResponse(e, status=500)
-        human_name = ""
         if 'questionreport' in v:
             human_name = v['questionreport']
+        else:
+            human_name = ""
         log_attempt(course, exam, request.user, student_input, human_name, prob, feedback[prob])
         update_score(course, exam, request.user, request.body, prob, feedback[prob])
 
