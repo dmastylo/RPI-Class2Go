@@ -910,12 +910,11 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     there is never a final score.  Score here is more of a running
     tally of plus and minus points accrued.
     """
-    (exam_rec, created) = ExamRecord.objects.get_or_create(course=course, 
+    (exam_rec, created) = ExamRecord.objects.get_or_create(
+            course=course, 
             exam=exam, 
             student=student,
-            score=0.0,
-            json_data={},
-            json_score_data={})
+            defaults={'score':0.0, 'json_data':{}, 'json_score_data':{}})
 
     exam_rec.complete = False
     exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
