@@ -316,7 +316,7 @@ class AutoGrader():
             except urllib2.HTTPError as e:
                 raise AutoGraderGradingException("interactive grader HTTP error (%d)" % e.code)
             except urllib2.URLError as e:
-                raise AutoGraderGradingException("interactive grader connection error (%d)" % e.code)
+                raise AutoGraderGradingException("interactive grader connection error (%d)" % e.args)
             graded_result = grader_conn.read()
             if graded_result == "ERROR":
                 raise AutoGraderGradingException("Interactive grader returned \"ERROR\"")
