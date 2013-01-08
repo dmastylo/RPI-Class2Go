@@ -64,6 +64,10 @@
     #description{width:150px; height:150px;}
     .warning{color:red;margin-right:5px;}
     #xml-import-label{font-size:22px;font-weight:bolder;}
+    div.question textarea { width:70%; height:100px; }
+    div.preamble {margin-bottom: 2em; }
+    div.postamble {margin-top: 2em; }
+
 
 </style>
 
@@ -416,6 +420,7 @@ age: 20,
                         editor.setValue(style_html(editor.getValue(), {'max_char':80}));
                         metadata_editor.setValue(style_html(metadata_editor.getValue(), {'max_char':80}));
                         __xml_saved=true;
+                        c2gXMLParse.renderPreview();
                         $( this ).dialog( "close" );
                         }
                   },
