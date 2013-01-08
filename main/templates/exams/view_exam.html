@@ -79,6 +79,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
 
+    #exam-pane {float: left; position: relative; width: 95%;}
+    #exam-pane .question {border-bottom-left-radius: 0; border-bottom-right-radius: 0;}
+    #exam-pane .exam-navigation {background-color: #ddcf99; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; bottom: 0; margin-bottom: -1em; padding: 2px 0; position: absolute; width: 100%;}
+
     .correct {color: #090;}
     .incorrect {color: #900;}
     </style>
@@ -89,9 +93,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% include 'exams/videotest.css' %}
     #exam-pane {float: left; position: relative; display: none; width: 800px;}
     {% if exam.exam_type == "survey" and exam.invideo and "/videos" in request.path%}
-    #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;}
+    /* #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;} */
+    #exam-pane .exam-navigation .continue-video-btn, #exam-pane .exam-navigation #survey-submit {float: right; margin-right: 2px;}
     {% else %}
-    #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;}
+    /* #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;} */
+    #exam-pane .exam-navigation .continue-video-btn, #exam-pane .exam-navigation #survey-submit {float: right; margin-right: 2px;}
     {% endif %}
     #problemset-nav {display: none;}
     </style>
@@ -322,6 +328,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(explArea).addClass('explanation');
                 }
                 $(explArea).empty();
+                //console.log($(explArea));
+                $(explArea).show();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
                     if ($(this).text() == 'Explanation') {
@@ -342,8 +350,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(target).addClass('explanation');
                 }
                 $(target).empty();
+                //console.log($(target));
+                $(target).show();
                 $('#' + assocQID + ' .quick-check').before($(target));
-                return target
+                return target;
             }
 
             if (__exam_type == "interactive_exercise") {
@@ -567,6 +577,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(explArea).addClass('explanation');
         }
         $(explArea).empty();
+        $(explArea).show();
         $(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
