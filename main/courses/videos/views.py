@@ -132,7 +132,6 @@ def view(request, course_prefix, course_suffix, slug):
         exam.live_datetime = video.live_datetime    # needed so video shows up
         question_times = ""
 
-    # change from 'videos/view.html' to 'exams/view_exam.html'
     return render_to_response('exams/view_exam.html', 
                               {
                                'common_page_data':    common_page_data, 

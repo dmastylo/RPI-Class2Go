@@ -49,7 +49,7 @@ default_attributes \
         "ttl" => 300
     },
     "grader" => {
-        "endpoint" => "nnnnnnnnnnnnnnnnnnnn.us-west-2.elb.amazonaws.com"
+        "endpoint" => "http://xxxxxxxxxxxxxxxxxxxxx/yyyyyyyyyyyy"
     },
     "piazza" => {
         "endpoint" => "https://piazza.com/basic_lti",

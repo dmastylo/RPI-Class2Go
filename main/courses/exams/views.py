@@ -9,6 +9,7 @@ import datetime
 import csv
 import HTMLParser
 import json
+import copy
 from django.db.models import Sum
 import urllib2, urlparse
 from xml.dom.minidom import parseString
@@ -21,7 +22,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata
+from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -122,23 +123,6 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
                                                        'allow_submit':True, 'too_many_attempts':too_many_attempts},
                               RequestContext(request))
 
-@require_POST
-@auth_view_wrapper
-def show_quick_check(request, course_prefix, course_suffix, exam_slug):
-    course = request.common_page_data['course']
-    parser = HTMLParser.HTMLParser()
-    user_answer_data = parser.unescape(request.POST['user-answer-data'])
- 
-    try:
-        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
-    except Exam.DoesNotExist:
-        raise Http404
-
-    return render_to_response('exams/quickcheck.html', {'common_page_data':request.common_page_data, 'exam':exam, 'user_answer_data':user_answer_data, 'videotest':True}, RequestContext(request))
-
-def show_invideo_quiz(request, course_prefix, course_suffix, exam_slug):
-    return render_to_response('exams/videotest.html', {'common_page_data':request.common_page_data}, RequestContext(request))
-
 @auth_view_wrapper
 def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exam"):
     course = request.common_page_data['course']
@@ -215,8 +199,6 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
     except ExamRecordScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
         raw_score = None
         scores_json = "{}"
-
-
     
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False}, RequestContext(request))
 
@@ -912,54 +894,84 @@ def validate_row(row):
     return (True, (username, field_name, score))
 
 
+def log_attempt(course, exam, student, student_input, human_name, field_name, graded_obj):
+    """
+    ExamRecordFieldLog stores one record (row) for every attempt
+    at something that can be graded problem-by-problem, currently
+    interactive exercises and in-video (formative) exercises.  It
+    is meant to have more info than the ExamRecord table, but to
+    be useful for analytics, not scoring or reporting per se.
+    """
+    examLogRow = ExamRecordFieldLog(course=course,
+            exam=exam, 
+            student=student, 
+            field_name=field_name,
+            human_name=human_name, 
+            value=student_input,
+            raw_score=graded_obj['score'])
+    examLogRow.save()
 
+def update_score(course, exam, student, student_input, field_name, graded_obj):
+    """
+    The ExamRecord table stores the cumulative score for this problem
+    set, exercise, etc.  Update this table for things graded
+    problem-by-problem (interactive exercises, in-video exercises)
+    with the score for this problem.
 
-# Test values for interactive exercises
-canned_feedback = {}
-canned_feedback['wrong'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"select * from movie","score":0,"explanation":" <br><font style=\"color:red; font-weight:bold;\">Incorrect<\/font><br><br>Your Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>101<\/td><td>Gone with the Wind<\/td><td>1939<\/td><td>Victor Fleming<\/td><\/tr><tr><td>102<\/td><td>Star Wars<\/td><td>1977<\/td><td>George Lucas<\/td><\/tr><tr><td>103<\/td><td>The Sound of Music<\/td><td>1965<\/td><td>Robert Wise<\/td><\/tr><tr><td>104<\/td><td>E.T.<\/td><td>1982<\/td><td>Steven Spielberg<\/td><\/tr><tr><td>105<\/td><td>Titanic<\/td><td>1997<\/td><td>James Cameron<\/td><\/tr><tr><td>106<\/td><td>Snow White<\/td><td>1937<\/td><td>&lt;NULL&gt;<\/td><\/tr><tr><td>107<\/td><td>Avatar<\/td><td>2009<\/td><td>James Cameron<\/td><\/tr><tr><td>108<\/td><td>Raiders of the Lost Ark<\/td><td>1981<\/td><td>Steven Spielberg<\/td><\/tr><\/table> <br>Expected Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>E.T.<\/td><\/tr><tr><td>Raiders of the Lost Ark<\/td><\/tr><\/table>"}]}'
-canned_feedback['correct'] = r'{"score":1,"maximum-score":1,"feedback":[{"user_answer":"select title from movie where director=\"Steven Spielberg\";","score":1,"explanation":" <br><font style=\"color:green; font-weight:bold;\">Correct<\/font><br><br>Your Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>E.T.<\/td><\/tr><tr><td>Raiders of the Lost Ark<\/td><\/tr><\/table> <br>Expected Query Result: <table border=\"1\" style=\"font-size:90%; padding: 1px;border-spacing: 0px; border-collapse: separate\"><tr><td>E.T.<\/td><\/tr><tr><td>Raiders of the Lost Ark<\/td><\/tr><\/table>"}]}'
-canned_feedback['right'] = canned_feedback['correct']
-canned_feedback['help'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"help","score":0,"explanation":"You are in localhost debugging mode.<br>Try \"<tt>right</tt>\" or \"<tt>wrong</tt>\""}]}'
-canned_feedback['error'] = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"error","score":0,"explanation":"You are in localhost debugging mode.<br>Did not send a well-formatted request."}]}'
-
-
-def save_feedback(course, exam, student, student_input, field_name, graded_obj):
-    (exam_rec, created) = ExamRecord.objects.get_or_create(course=course, exam=exam, student=student)
+    By convention these types of exercises are never complete, ie.
+    there is never a final score.  Score here is more of a running
+    tally of plus and minus points accrued.
+    """
+    (exam_rec, created) = ExamRecord.objects.get_or_create(
+            course=course, 
+            exam=exam, 
+            student=student,
+            defaults={'score':0.0, 'json_data':'{}', 'json_score_data':'{}'})
 
     exam_rec.complete = False
-    exam_rec.score = 0
-    exam_rec.attempt_number += 1
+    exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
 
     # append to json_data -- the student input
     try:
         field_student_data_obj = json.loads(exam_rec.json_data)
-    except:
-        field_student_data_obj = {}
+    except (TypeError, ValueError) as e:
+        field_student_data_obj = {}  # better to ignore prior bad data than to die
     field_student_data_obj[field_name] = {'value': student_input}
     exam_rec.json_data = json.dumps(field_student_data_obj)
 
     # append to json_score_data -- what the grader came back with
     try:
         field_graded_data_obj = json.loads(exam_rec.json_score_data)
-    except:
+    except (TypeError, ValueError) as e:
         field_graded_data_obj = {}
-    field_graded_data_obj[field_name] = graded_obj
-    exam_rec.json_score_data = json.dumps(field_graded_data_obj)
 
+    # we don't want to store the whole feedback, so need to make a deep copy
+    smaller_graded = copy.deepcopy(graded_obj)
+    if 'feedback' in smaller_graded:
+        del smaller_graded['feedback'] 
+    field_graded_data_obj[field_name] = smaller_graded
+    exam_rec.json_score_data = json.dumps(field_graded_data_obj)
     exam_rec.save()
 
     (exam_score_rec, created) = ExamRecordScore.objects.get_or_create(record=exam_rec)
     exam_score_rec.save()
 
-
+ 
 @require_POST
 @auth_view_wrapper
-def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_slug):
+def exam_feedback(request, course_prefix, course_suffix, exam_slug):
     """
-    Proxies request to the exercise grader so we can both handle the request
-    without CORS, and (more importantly) store the answer for later.
+    This is the endpoint that will be hit from an AJAX call from
+    the front-end when the users pushes the "Check Answer" button
+    on an interactive or in-video exercise.  For all problems
+    submitted, do three things:
 
-    Expects the ID of the question to be in a query parameter
+      1. instantiate and call the autograder
+      2. write a log entry storing the attempt
+      3. update the score table with the latest score
+
+    While this will score and report results back for multiple
+    problems, that isn't typical.
     """
     course = request.common_page_data['course']
     try:
@@ -967,56 +979,40 @@ def interactive_exercise_feedback(request, course_prefix, course_suffix, exam_sl
     except Exam.DoesNotExist:
         raise Http404
 
-    # the question ID is in the query string, "unknown" if not provided
-    qid = request.GET.get('id', 'unknown')
+    submissions = json.loads(request.POST['json_data'])
 
-    grader_hostname = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
-    try:
-        parsed_body=urlparse.parse_qs(request.body)
-        student_input=parsed_body['student_input'][0]
-    except:
-        student_input='error'
-
-    if grader_hostname == 'localhost':
-        graded_raw = canned_feedback['help']
-        if student_input in canned_feedback.keys():
-            graded_raw = canned_feedback[student_input]
-    else:
-        grader_url = "http://%s/AJAXPostHandler.php" % grader_hostname
-        grader_data = request.body
-        grader_timeout = 5    # seconds
+    autograder = None
+    if exam.autograde:
         try:
-            response = urllib2.urlopen(grader_url, grader_data, grader_timeout)
-        except urllib2.URLError, e:
-            return HttpResponse("Error in the interactive grader backend, please try again later.",
-                    status=500)
-        graded_raw = response.read()
+            autograder = AutoGrader(exam.xml_metadata)
+        except Exception as e:
+            return HttpResponseBadRequest(unicode(e))
+    else:
+        autograder = AutoGrader("<null></null>", default_return=True) #create a null autograder that always returns the "True" object
+    if not autograder:
+        return Http500("Could not create autograder")
 
-    graded_obj=json.loads(graded_raw)
-    save_feedback(course, exam, request.user, student_input, qid, graded_obj)
+    feedback = {}
+    for prob, v in submissions.iteritems():
+        if prob == "__metadata__":    # shouldn't happen, being careful
+            next
+        try:
+            if isinstance(v,list):    # multiple choice case
+                student_input = map(lambda li: li['value'], v)
+                feedback[prob] = autograder.grade(prob, student_input)
+            else:                     # single answer case
+                student_input = v['value']
+                feedback[prob] = autograder.grade(prob, student_input)
+        except AutoGraderGradingException as e:
+            logger.error(e)
+            return HttpResponse(e, status=500)
+        if 'questionreport' in v:
+            human_name = v['questionreport']
+        else:
+            human_name = ""
+        log_attempt(course, exam, request.user, student_input, human_name, prob, feedback[prob])
+        update_score(course, exam, request.user, request.body, prob, feedback[prob])
 
-    response = HttpResponse(graded_raw)
-    return response
-
-    
-@require_POST
-@auth_view_wrapper
-def invideo_feedback(request, course_prefix, course_suffix, exam_slug):
-    """
-    Store results from invideo formative exams.  Problem ID in "id" query param.
-    """
-    course = request.common_page_data['course']
-    try:
-        exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
-    except Exam.DoesNotExist:
-        raise Http404
-
-    # the question ID is in the query string, "unknown" if not provided
-    qid = request.GET.get('id', 'unknown')
-
-    # TODO -- video 
-    save_feedback(course, exam, request.user, request.body, qid, 'result')
-
-    response = HttpResponse()  # TODO -- return anything?
-    return response
+    feedback['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
+    return HttpResponse(json.dumps(feedback))
 
