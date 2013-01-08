@@ -227,7 +227,7 @@
             $(continueVideoBtn).attr('value', 'Continue Video');
             $(continueVideoBtn).addClass('btn');
             $(continueVideoBtn).addClass('continue-video-btn');
-            $('#exam-pane').append($(continueVideoBtn));
+            $('#exam-pane .exam-navigation').append($(continueVideoBtn));
             //$(continueVideoBtn).click(removeExamStage);
 
             var currentQuestionId = "";

@@ -126,18 +126,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {{ exam.html_content }}
         </form>
 
-    {% if single_question %}
-    <div id="problemset-nav">
-        <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
-        <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
-    </div>
-    {% endif %}
+        <div class="exam-navigation">
+            {% if single_question %}
+            <div id="problemset-nav">
+                <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
+                <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
+            </div>
+            {% endif %}
 
-    {% if not videotest %} 
-        <input class="btn" type="submit" value="Submit" />
-    {% elif exam.exam_type == "survey" and exam.invideo %}
-        <input class="btn" id="survey-submit" type="submit" value="Submit" />
-    {% endif %}
+            {% if not videotest %} 
+                <input class="btn" type="submit" value="Submit" />
+            {% elif exam.exam_type == "survey" and exam.invideo %}
+                <input class="btn" id="survey-submit" type="submit" value="Submit" />
+            {% endif %}
+        </div>
+
     </div>
     {% if videotest %}
         <div id="demoplayer"></div>
@@ -611,7 +614,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     window.showCorrections = function (correxObj) {
         //This function marks the user answer correct or wrong and then
-        //shows the question level explainations as well as relevant choice-level explanations
+        //shows the question level explanations as well as relevant choice-level explanations
                       
         for (member in correxObj) {
             if (member != "__metadata__") {
