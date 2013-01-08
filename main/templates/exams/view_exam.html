@@ -121,13 +121,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <noscript>
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
     </noscript>
+
     <div id="exam-pane">
         <form>
-    {{ exam.html_content }}
+        {{ exam.html_content }}
         </form>
 
         <div class="exam-navigation">
             {% if single_question %}
+            {% comment %} Only for formative/one-question-at-a-time {% endcomment %}
             <div id="problemset-nav">
                 <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
                 <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
@@ -135,13 +137,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             {% endif %}
 
             {% if not videotest %} 
+                {% comment %} Regular exam/problem set submit button, when no video is present {% endcomment %}
                 <input class="btn" type="submit" value="Submit" />
             {% elif exam.exam_type == "survey" and exam.invideo %}
+                {% comment %} Only for in-video surveys, provide special-cased submit button {% endcomment %}
                 <input class="btn" id="survey-submit" type="submit" value="Submit" />
             {% endif %}
         </div>
+    </div> <!-- END #exam-pane -->
 
-    </div>
     {% if videotest %}
         <div id="demoplayer"></div>
         <div id="slideIndex"></div>
@@ -163,6 +167,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
 
     
+    /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
 
     {% if single_question %}
@@ -203,7 +208,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('.question-nav').click(showQuestion);
         
         {% if exam.invideo or exam.exam_type == "interactive_exercise" %}
-
+        {% comment %} Immediate feedback only needed for in-video and interactive exercises {% endcomment %}
         var hideButton = function () {
             var assocQ = $(this).closest('.question');
             var assocQID = $(assocQ).attr('id');
@@ -417,6 +422,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         {% endif %}
     {% endif %}
 
+    {% comment %}
+    SUBMISSION_RETURN_URL tells us where to go after user is done with the exam 
+    (i.e. Nothing to do with exam rendering) 
+    {% endcomment %}
     {% if exam.html_content != "" and "/videos" not in request.path %} {# not viewing in a video context #}
         {% if exam.exam_type == "survey" %}
             SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
@@ -476,7 +485,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('input[type|="checkbox"]').removeAttr('checked');
         $('input[type|="radio"]').removeAttr('checked');
 
-        // just wiped all data 
+        // calling repopulateForm without an arg just wipes all data and returns 
         if (!jsonStr) {
             return;
         }
@@ -578,7 +587,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var createInlineExp = function (targetEl) {
             var tmpInlineExpl = document.createElement('span');
             $(tmpInlineExpl).addClass('inline-explanation');
-            $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+            $(tmpInlineExpl).attr('id', $(targetEl).find('input:first').attr('id') + '-expl');
             $(targetEl).append($(tmpInlineExpl));
 
             return $(tmpInlineExpl);
@@ -605,6 +614,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
                             $(inlineExpl).addClass('correct');
                         }
+                        $(inlineExpl).empty();
                         $(inlineExpl).append($(this).find('explanation').text());
                     }
                 });
@@ -627,24 +637,33 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(formEl).attr('type') == 'radio') {
                     var curq = correxObj[member];
                     for (correctChoice in curq.correct_choices) {
-                        $(formEl).filter('input[value|="' + correctChoice + '"]')
-                                .after('<span class="correct"> Yes! </span>');
+                        var rightChoiceObj = $(formEl).filter('input[value|="' + correctChoice + '"]');
+                        if (rightChoiceObj.siblings('span.feedback').length == 0) {
+                            rightChoiceObj.after('<span class="feedback correct"> Yes! </span>');
+                        } else {
+                            rightChoiceObj.siblings('span.feedback').text(' Yes! ');
+                        }
                     }
                     for (wrongChoice in curq.wrong_choices) {
                       //if (curq.wrong_choices[wrongChoice] == "fn")
                       //      $(formEl).filter('input[value|="' + wrongChoice + '"]')
-                      //          .after('<span class="incorrect"> Should be selected. </span>');
+                      //          .after('<span class="feedback incorrect"> Should be selected. </span>');
                       //else
-                        if (curq.wrong_choices[wrongChoice] == "fp")
-                            $(formEl).filter('input[value|="' + wrongChoice + '"]')
-                                .after('<span class="incorrect"> No. </span>');
+                        if (curq.wrong_choices[wrongChoice] == "fp") {
+                            var wrongChoiceObj = $(formEl).filter('input[value|="' + wrongChoice + '"]');
+                            if (wrongChoiceObj.siblings('span.feedback').length == 0) {
+                                wrongChoiceObj.after('<span class="feedback incorrect"> No. </span>');
+                            } else {
+                                wrongChoiceObj.siblings('span.feedback').text(' No. ');
+                            }
+                        }
                     }
                 }
                 else {
                     if (correxObj[member].correct == true) {
-                        $(formEl).after('<span class="correct"> Yes! </span>');
+                        $(formEl).after('<span class="feedback correct"> Yes! </span>');
                     } else {
-                        $(formEl).after('<span class="incorrect"> No. </span>');
+                        $(formEl).after('<span class="feedback incorrect"> No. </span>');
                     }
                 }
             }
@@ -819,7 +838,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     {% endif %}
                       
-    });
+    }); /* END document.ready function that executes when page loads */
     
 </script>
 {% if videotest %}
