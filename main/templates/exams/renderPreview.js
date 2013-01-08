@@ -50,7 +50,7 @@ var c2gXMLParse = (function() {
             try {
                 var myDOM = $.parseXML(sourceXML);
             } catch (e) {
-                alert('Your XML is invalid');
+                alert('Your XML has invalid syntax.  You should be able to resolve this by copy-and-pasting your XML into a validator such as http://www.w3schools.com/xml/xml_validator.asp ');
                 console.log(e.message);
                 return;
             }
