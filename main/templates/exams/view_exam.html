@@ -233,7 +233,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                             userSelections[$(this).attr('name')] = [];
                         }
                         tmpObj.value = $(this).attr('value');
-                        tmpObj.associatedText = $(this).parent().text().substr(0,40);
+                        tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
                         tmpObj.report = $(this).attr('data-report');
                         if ($(this).closest('fieldset').length > 0) {
                             //inputs enclosed by a <fieldset>, use its data-report attr
@@ -247,7 +247,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                             && $(this).val() != "") {
                         var tmpObj = {};
                         tmpObj.value = $(this).val();
-                        tmpObj.associatedText = $(this).parent().text().substr(0,40);
+                        tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
                         tmpObj.report = $(this).attr('data-report');
                         tmpObj.questionreport = $(this).closest('.question').attr('data-report');
                         userSelections[$(this).attr('name')]=tmpObj;
