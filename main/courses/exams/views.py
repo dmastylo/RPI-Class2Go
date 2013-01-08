@@ -922,11 +922,21 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     there is never a final score.  Score here is more of a running
     tally of plus and minus points accrued.
     """
-    (exam_rec, created) = ExamRecord.objects.get_or_create(
-            course=course, 
-            exam=exam, 
-            student=student,
-            defaults={'score':0.0, 'json_data':'{}', 'json_score_data':'{}'})
+    exam_rec_queryset = ExamRecord.objects.\
+            filter(course=course, exam=exam, student=student, complete=False).\
+            order_by('-last_updated')   # descending by update date so first is latest
+    if len(exam_rec_queryset) == 0:
+        # no prior incomplete exam record found, create it
+        exam_rec = ExamRecord(course=course, exam=exam, student=student,
+                score=0.0, json_data='{}', json_score_data='{}')
+    elif len(exam_rec_queryset) == 1:
+        # exactly one found, this is the one we will update
+        exam_rec = exam_rec_queryset[0]
+    else:
+        # >1 found, take the first (latest updated) and delete the rest
+        exam_rec_list = list(exam_rec_queryset)
+        exam_rec = exam_rec_list.pop(0)
+        map(ExamRecord.delete, exam_rec_list)
 
     exam_rec.complete = False
     exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
