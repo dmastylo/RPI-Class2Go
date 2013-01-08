@@ -136,7 +136,7 @@ to make it less Stanford-specific.  Maybe you can help with that?
 
 If you're interested, your the first step, just like contributing,
 is to stand up a development environment on your own laptop and try
-it out.  We have people this demo sized Class2Go up and running
+it out.  We have people who got this demo-sized Class2Go up and running
 pretty quickly on their local machine.
 
 Send us mail at <c2g-contact@class.stanford.edu> and we can give
