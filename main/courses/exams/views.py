@@ -557,11 +557,6 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         except ValueError:
             return HttpResponseBadRequest("A non-numeric resubmission penalty (" + resubmission_penalty  + ") was provided")
 
-    #if parent and parent[:4] != 'none':
-    #    parent_type, parent = parent.split(',')
-    #else:
-    #    parent_type, parent = None, None
-
     #create or edit the Exam
     if create_or_edit == "create":
         if Exam.objects.filter(course=course, slug=slug, is_deleted=False).exists():
@@ -576,12 +571,8 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         exam_obj.save()
         exam_obj.create_ready_instance()        
 
+        # Set parent/child relationships
         create_contentgroup_entries_from_post(request, 'parent', exam_obj.image, 'exam', display_style='list')
-
-        #if parent_type:
-        #    parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
-        #    content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
-        #    ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
 
         #Now set the video associations
         exam_obj.sync_videos_foreignkeys_with_metadata()
@@ -627,15 +618,9 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.save()
             exam_obj.commit()
 
-            if parent_type:
-                parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
-                content_group_parent = parent_ref.contentgroup_set.all()
-                if content_group_parent:
-                    content_group_groupid = content_group_parent[0].group_id
-                else:
-                    content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
-                ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
-        
+            # Set parent/chlid relationships for this exam
+            create_contentgroup_entries_from_post(request, 'parent', exam_obj.image, 'exam', display_style='list')
+
             #Now set the video associations
             exam_obj.sync_videos_foreignkeys_with_metadata()
             vid_status_obj = exam_obj.image.sync_videos_foreignkeys_with_metadata()
