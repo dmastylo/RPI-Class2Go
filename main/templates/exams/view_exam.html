@@ -314,6 +314,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(explArea).addClass('explanation');
                 }
                 $(explArea).empty();
+                $(explArea).show();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
                     if ($(this).text() == 'Explanation') {
@@ -334,6 +335,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(target).addClass('explanation');
                 }
                 $(target).empty();
+                $(target).show();
                 $('#' + assocQID + ' .quick-check').before($(target));
                 return target
             }
@@ -555,6 +557,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(explArea).addClass('explanation');
         }
         $(explArea).empty();
+        $(explArea).show();
         $(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
