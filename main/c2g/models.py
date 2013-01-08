@@ -242,7 +242,6 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             outcomes = self.outcomes,
             faq = self.faq,
             logo = self.logo,
-            logo_handle = self.logo_handle,
             preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
@@ -281,8 +280,6 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             ready_instance.faq = self.faq
         if not clone_fields or 'logo' in clone_fields:
             ready_instance.logo = self.logo
-        if not clone_fields or 'logo_handle' in clone_fields:
-            ready_instance.logo_handle = self.logo_handle
 
         ready_instance.save()
 
@@ -318,8 +315,6 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             self.faq = ready_instance.faq
         if not clone_fields or 'logo' in clone_fields:
             self.logo = ready_instance.logo
-        if not clone_fields or 'logo_handle' in clone_fields:
-            self.logo_handle = ready_instance.logo_handle
 
         self.save()
 
