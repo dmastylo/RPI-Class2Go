@@ -738,6 +738,7 @@ def view_csv_grades(request, course_prefix, course_suffix, exam_slug):
 
     could_not_parse = ""
 
+    file_content = False
     for s in graded_students: #yes, there is sql in a loop here.  We'll optimize later
         #print(s)
         score_obj = ExamScore.objects.get(course=course, exam=exam, student=s['student'])
@@ -745,8 +746,10 @@ def view_csv_grades(request, course_prefix, course_suffix, exam_slug):
         for field in subscores:
             outstring = '"%s","%s","%s"\n' % (s['student__username'], field.field_name, str(field.subscore))
             outfile.write(outstring)
-
-    outfile.write("\n")
+            file_content = True
+            
+    if not file_content:
+        outfile.write("\n")
 
     #write to S3
     secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
