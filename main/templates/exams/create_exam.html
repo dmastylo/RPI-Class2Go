@@ -68,7 +68,7 @@
 </style>
 
 <div class="well create-exam-form">
-    <h2>Create a new Exam / ProblemSet / Exercise / Survey</h2>
+    <h2>Create a new Exam / ProblemSet / Survey</h2>
 
     
     <div class="control-group">
@@ -81,7 +81,7 @@
             <select id="assessment_type" name="assessment_type">
                 <option value="formative">Formative Problem Set</option>
                 <option value="summative">Summative Problem Set</option>
-                <option value="interactive">Interactive Exercise</option>
+                <option value="interactive">External Grader</option>
                 <option value="exam-autograde">Exam (auto-graded)</option>
                 <option value="exam-csv">Exam (csv-graded)</option>
                 <option value="survey">Survey</option>
@@ -204,70 +204,70 @@
     <fieldset>
         <label for="name" id="xml-import-label">Import your XML here.  This will overwrite the HTML and XML Metadata editors.</label>
         <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> 
-            <problemset data-report="EXAMPLE" type="survey" title="problemset1" url-identifier="test343">
-                <!-- possible types are: "formative" / "summative" / "interactive" / "exam-autograde" / "exam-csv" / "survey" -->
-                <description>This is the problem set description.</description>
-                <dates due-date="12/29/2012 00:00" grace-period="12/29/2012 00:00" hard-deadline="12/29/2012 00:00" />
-                <grading late-penalty="10" num-submissions="9999" resubmission-penalty="10" />
-                <section section="Problem set templates" parent="Example formative multiple choice (checkbox)" />
-                <problem data-report="Apple Competitor Question">
-                    <p>
-                    A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
-                        Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
-                    <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
-                    </p>
-                    <p>Handy numbers: $$R = 8.314\ {\rm J/mole\ K}\ \ \ \ \ \ F = 96500\ {\rm C/mole}\ \ \ \ \  k_B =  1.38\times 10^{-23}\ {\rm J/K} = 8.62\times 10^{-5}\ {\rm eV/K}\ \ \ \ \ \hbar = 1.055 \times 10^{-34}\ {\rm J\ s} = 6.58 \times 10^{-16}\ {\rm eV\ s}\\ m = 9.11 \times 10^{-31} {\rm kg}\ \ \ \ \ 1\ {\rm eV} = 1.602 \times 10^{-19}\ {\rm J}$$</p>
-                    
-                    <p>The pythagorean theorem: \[ a^2 + b^2 = c^2 \]</p>
-                    
-                    <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse data-report="Apple Competitors" correct-points="10" wrong-points="-2">
-                        <choicegroup type="MultipleChoice">
-                            <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
-                            <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
-                            <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
-                        </choicegroup>
-                    </multiplechoiceresponse>
-                    <solution>
-                        <div class="detailed-solution">
-                            <p>Explanation</p>
-                            <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks. </p>
-                        </div>
-                    </solution>
-                </problem>
-                <problem data-report="JSON-Multiple-Choice">
-                    <p>
-                     Which of the following is NOT a valid JSON object?
-                    </p>
-                    <multiplechoiceresponse data-report="Valid/Invalid JSON objects">
-                        <choicegroup type="MultipleChoice">
-                            <choice correct="true" name="a" data-report="Missing comma">
-                                <text><![CDATA[
+<problemset data-report="EXAMPLE" type="survey" title="problemset1" url-identifier="test343">
+    <!-- possible types are: "formative" / "summative" / "interactive" / "exam-autograde" / "exam-csv" / "survey" -->
+    <description>This is the problem set description.</description>
+    <dates due-date="12/29/2012 00:00" grace-period="12/29/2012 00:00" hard-deadline="12/29/2012 00:00" />
+    <grading late-penalty="10" num-submissions="9999" resubmission-penalty="10" />
+    <section section="Problem set templates" parent="Example formative multiple choice (checkbox)" />
+    <problem data-report="Apple Competitor Question">
+        <p>
+        A multiple choice problem presents radio buttons or checkboxes for student input. If a question has exactly <b>one</b> correct choice, radio buttons will be presented, and students can only select a single choice.  Otherwise checkboxes will be presented and students can select zero-or-more choices.
+            Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
+        <p> One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
+        </p>
+        <p>Handy numbers: $$R = 8.314\ {\rm J/mole\ K}\ \ \ \ \ \ F = 96500\ {\rm C/mole}\ \ \ \ \  k_B =  1.38\times 10^{-23}\ {\rm J/K} = 8.62\times 10^{-5}\ {\rm eV/K}\ \ \ \ \ \hbar = 1.055 \times 10^{-34}\ {\rm J\ s} = 6.58 \times 10^{-16}\ {\rm eV\ s}\\ m = 9.11 \times 10^{-31} {\rm kg}\ \ \ \ \ 1\ {\rm eV} = 1.602 \times 10^{-19}\ {\rm J}$$</p>
+        
+        <p>The pythagorean theorem: \[ a^2 + b^2 = c^2 \]</p>
+        
+        <p>What Apple device competed with the portable CD player?</p>
+        <multiplechoiceresponse data-report="Apple Competitors" correct-points="10" wrong-points="-2">
+            <choicegroup type="MultipleChoice">
+                <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+            </choicegroup>
+        </multiplechoiceresponse>
+        <solution>
+            <div class="detailed-solution">
+                <p>Explanation</p>
+                <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks. </p>
+            </div>
+        </solution>
+    </problem>
+    <problem data-report="JSON-Multiple-Choice">
+        <p>
+         Which of the following is NOT a valid JSON object?
+        </p>
+        <multiplechoiceresponse data-report="Valid/Invalid JSON objects">
+            <choicegroup type="MultipleChoice">
+                <choice correct="true" name="a" data-report="Missing comma">
+                    <text><![CDATA[
 <pre>
 { "name": "Smiley",
 "age": 20,
 "phone": "888-123-4567"
 "email": "smiley@xyz.com",
 "happy": true }</pre>
-                        ]]></text>
-                                <explanation>check commas</explanation>
-                            </choice>
-                            <choice correct="true" name="b" data-report="Missing quotes">
-                                <text><![CDATA[
+            ]]></text>
+                    <explanation>check commas</explanation>
+                </choice>
+                <choice correct="true" name="b" data-report="Missing quotes">
+                    <text><![CDATA[
 <pre>
 { "name": "Smiley",
-  age: 20,
+age: 20,
 "phone": "888-123-4567"
 "email": "smiley@xyz.com",
 "happy": true }</pre>
-                                    ]]></text>
-                                <explanation>check commas</explanation>
-                            </choice>
-                            <choice correct="false" name="c" data-report="OK choice1">
-                                <text><![CDATA[
+                        ]]></text>
+                    <explanation>check commas</explanation>
+                </choice>
+                <choice correct="false" name="c" data-report="OK choice1">
+                    <text><![CDATA[
 <pre>
 { "name": "Smiley",
 "age": 20,
@@ -275,112 +275,112 @@
 "email": "smiley@xyz.com",
 "happy": true }
 </pre>
-                                ]]></text>
-                                <explanation>correctly formatted</explanation>
-                            </choice>
-                       </choicegroup>
-                    </multiplechoiceresponse>
-                    <solution>
-                        <div class="detailed-solution">
-                            <p>Explanation</p>
-                            <p>In JSON objects, all labels (property names) must be quoted, and all label-value pairs must be separated by commas. Values in label-value pairs can be numbers, quoted strings, true, false, null, objects, or arrays. Objects and arrays may be empty. </p>
-                        </div>
-                    </solution>
-                </problem>
-                <problem data-report="Short-answer1">
-                    <p>
-                    A numerical response problem accepts a line of text input from the
-                    student, and evaluates the input for correctness based on its
-                    numerical value.
-                    </p>
-                    
-                    <p>
-                    The answer is correct if it is within a specified numerical tolerance
-                    of the expected answer.
-                    </p>
-                    
-                    
-                    <p>Enter the numerical value of Pi:
-                    <numericalresponse answer="3.14159" data-report="Value of Pi" correct-points="1.5" wrong-points="-.25">
-                        <responseparam type="tolerance" default=".02" />
-                        <textline />
-                    </numericalresponse>
-                    </p>
-                    <p>Enter the approximate value of 502*9:
-                    <numericalresponse answer="4518" data-report="502*9">
-                        <responseparam type="tolerance" default="15%"/>
-                        <textline />
-                    </numericalresponse>
-                    </p>
-                    
-                    <p>Enter the number of fingers on a human hand:
-                    <numericalresponse answer="5" data-report="number of fingers on a hand">
-                        <textline />
-                    </numericalresponse>
-                    </p>
-                    
-                    <p>What Apple device competed with the portable CD player?</p>
-                    <multiplechoiceresponse data-report="Apple Competitors">
-                        <choicegroup type="MultipleChoice">
-                            <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
-                            <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
-                            <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
-                            <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
-                        </choicegroup>
-                    </multiplechoiceresponse>
-                    
-                    <solution>
-                        <div class="detailed-solution">
-                            <p>Explanation</p>
-                            <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
-                            <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
-                            <p>If you look at your hand, you can count that you have five fingers.</p>
-                        </div>
-                    </solution>
-                </problem>
-                <problem data-report="Short-answer2">
-                    <p>
-                    A numerical response problem accepts a line of text input from the
-                    student, and evaluates the input for correctness based on its
-                    numerical value.
-                    </p>
-                    
-                    <p>
-                    The answer is correct if it is within a specified numerical tolerance
-                    of the expected answer.
-                    </p>
-                    
-                    
-                    <p>Enter the numerical value of Pi:
-                    <numericalresponse data-report="Value of Pi" answer="3.14159">
-                        <responseparam type="tolerance" default=".02" />
-                        <textline />
-                    </numericalresponse>
-                    </p>
-                    <p>Enter the approximate value of 502*9:
-                    <numericalresponse data-report="value of 502*9" answer="4518">
-                        <responseparam type="tolerance" default="15%"/>
-                        <textline />
-                    </numericalresponse>
-                    </p>
-                    
-                    <p>Enter the number of fingers on a human hand:
-                    <numericalresponse data-report="number of finers on a hand" answer="5">
-                        <textline />
-                    </numericalresponse>
-                    </p>
-                    <solution>
-                        <div class="detailed-solution">
-                            <p>Explanation</p>
-                            <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
-                            <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
-                            <p>If you look at your hand, you can count that you have five fingers.</p>
-                        </div>
-                    </solution>
-                </problem>
-            </problemset>
+                    ]]></text>
+                    <explanation>correctly formatted</explanation>
+                </choice>
+           </choicegroup>
+        </multiplechoiceresponse>
+        <solution>
+            <div class="detailed-solution">
+                <p>Explanation</p>
+                <p>In JSON objects, all labels (property names) must be quoted, and all label-value pairs must be separated by commas. Values in label-value pairs can be numbers, quoted strings, true, false, null, objects, or arrays. Objects and arrays may be empty. </p>
+            </div>
+        </solution>
+    </problem>
+    <problem data-report="Short-answer1">
+        <p>
+        A numerical response problem accepts a line of text input from the
+        student, and evaluates the input for correctness based on its
+        numerical value.
+        </p>
+        
+        <p>
+        The answer is correct if it is within a specified numerical tolerance
+        of the expected answer.
+        </p>
+        
+        
+        <p>Enter the numerical value of Pi:
+        <numericalresponse answer="3.14159" data-report="Value of Pi" correct-points="1.5" wrong-points="-.25">
+            <responseparam type="tolerance" default=".02" />
+            <textline />
+        </numericalresponse>
+        </p>
+        <p>Enter the approximate value of 502*9:
+        <numericalresponse answer="4518" data-report="502*9">
+            <responseparam type="tolerance" default="15%"/>
+            <textline />
+        </numericalresponse>
+        </p>
+        
+        <p>Enter the number of fingers on a human hand:
+        <numericalresponse answer="5" data-report="number of fingers on a hand">
+            <textline />
+        </numericalresponse>
+        </p>
+        
+        <p>What Apple device competed with the portable CD player?</p>
+        <multiplechoiceresponse data-report="Apple Competitors">
+            <choicegroup type="MultipleChoice">
+                <choice correct="false" name="ipad" data-report="iPad"><text>The iPad</text><explanation>Try again</explanation></choice>
+                <choice correct="false" name="napster" data-report="Napster"><text>Napster</text><explanation>Try again</explanation></choice>
+                <choice correct="true" name="ipod" data-report="iPod"><text>The iPod</text><explanation>This is right!</explanation></choice>
+                <choice correct="false" name="peeler" data-report="Vegetable Peeler"><text>The vegetable peeler</text><explanation>Try again</explanation></choice>
+                <choice correct="false" name="android" data-report="Android"><text>Android</text><explanation>Try again</explanation></choice>
+                <choice correct="false" name="beatles" data-report="The Beatles"><text>The Beatles</text><explanation>Try again</explanation></choice>
+            </choicegroup>
+        </multiplechoiceresponse>
+        
+        <solution>
+            <div class="detailed-solution">
+                <p>Explanation</p>
+                <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                <p>If you look at your hand, you can count that you have five fingers.</p>
+            </div>
+        </solution>
+    </problem>
+    <problem data-report="Short-answer2">
+        <p>
+        A numerical response problem accepts a line of text input from the
+        student, and evaluates the input for correctness based on its
+        numerical value.
+        </p>
+        
+        <p>
+        The answer is correct if it is within a specified numerical tolerance
+        of the expected answer.
+        </p>
+        
+        
+        <p>Enter the numerical value of Pi:
+        <numericalresponse data-report="Value of Pi" answer="3.14159">
+            <responseparam type="tolerance" default=".02" />
+            <textline />
+        </numericalresponse>
+        </p>
+        <p>Enter the approximate value of 502*9:
+        <numericalresponse data-report="value of 502*9" answer="4518">
+            <responseparam type="tolerance" default="15%"/>
+            <textline />
+        </numericalresponse>
+        </p>
+        
+        <p>Enter the number of fingers on a human hand:
+        <numericalresponse data-report="number of finers on a hand" answer="5">
+            <textline />
+        </numericalresponse>
+        </p>
+        <solution>
+            <div class="detailed-solution">
+                <p>Explanation</p>
+                <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+                <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+                <p>If you look at your hand, you can count that you have five fingers.</p>
+            </div>
+        </solution>
+    </problem>
+</problemset>
         </textarea> <!-- End Example Template -->
     </fieldset>
     </form>
