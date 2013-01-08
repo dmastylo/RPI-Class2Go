@@ -1,8 +1,11 @@
 import re, collections
 import urllib,urllib2
 import json
+import logging
 from django.conf import settings
 from xml.dom.minidom import parseString
+
+logger = logging.getLogger(__name__)
 
 class AutoGrader():
     """
@@ -339,19 +342,25 @@ class AutoGrader():
             post_params['student_input'] = submission
             grader_timeout = 5    # seconds
             try:
+                logger.info("External grader call: %s" % str(post_params))
                 post_data = urllib.urlencode(post_params)
                 grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
             except urllib2.HTTPError as e:
-                raise AutoGraderGradingException("interactive grader HTTP error (%d)" % e.code)
+                raise AutoGraderGradingException("Interactive grader HTTP error (%d)" % e.code)
             except urllib2.URLError as e:
-                raise AutoGraderGradingException("interactive grader connection error (%d)" % e.args)
-            graded_result = grader_conn.read()
+                raise AutoGraderGradingException("Interactive grader connection error (%d)" % e.args)
+            try:
+                graded_result = grader_conn.read()
+            except (IOError,OSError) as e:
+                raise AutoGraderGradingException("Interactive grader read error: %s", str(e))
             if graded_result == "ERROR":
-                raise AutoGraderGradingException("Interactive grader returned \"ERROR\"")
+                raise AutoGraderGradingException("Interactive grader internal problem (returned \"%s\")" % graded_result)
             try:
                 graded = json.loads(graded_result)
-            except:
-                raise AutoGraderGradingException("Error parsing interactive grader result: %s" % graded_result)
+            except ValueError as e:
+                raise AutoGraderGradingException("Error parsing interactive grader result: %s" % str(graded_result))
+            except TypeError as e:
+                raise AutoGraderGradingException("Unexpected type in interactive grader: %s" % str(graded_result))
 
             # interpret what we got from the grader
             # class2go just has one float score, coursera used score vs max, convert here
