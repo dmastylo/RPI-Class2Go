@@ -79,6 +79,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
 
+    div.question textarea { width:70%; height:100px; }
+    div.preamble {margin-bottom: 2em; }
+    div.postamble {margin-top: 2em; }
+
     .correct {color: #090;}
     .incorrect {color: #900;}
     </style>
@@ -161,6 +165,26 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     
     $(document).ready(function () {
+                      
+                      
+        /********** Add ordinal numbering if it doesn't already exist *********/
+        var addNumberToQuestionDiv = function(elem, num) {
+            var numberingDiv = $(elem).find('h3.questionNumber');
+            if (numberingDiv.length == 0){
+              $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
+            }
+        };
+        var psetQuestions = $('div.question');
+        if (psetQuestions.length > 1) {
+            var qQumx = 1;
+            $(psetQuestions).each(function () {
+                                       addNumberToQuestionDiv(this,qQumx);
+                                       qQumx = qQumx + 1;}
+            );
+        }
+                      
+        /************************** end ordinal *******************************/
+                      
 
     {% if single_question %}
         $('.question').not(':first').hide();
@@ -834,4 +858,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% endif %} 
 </script>
 {% endif %}
+
+
 {% endblock addl_scripts %}
