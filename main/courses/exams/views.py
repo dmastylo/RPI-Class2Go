@@ -922,7 +922,6 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     there is never a final score.  Score here is more of a running
     tally of plus and minus points accrued.
     """
-    import ipdb; ipdb.set_trace()
     exam_rec_queryset = ExamRecord.objects.\
             filter(course=course, exam=exam, student=student, complete=False).\
             order_by('-last_updated')   # descending by update date so first is latest
