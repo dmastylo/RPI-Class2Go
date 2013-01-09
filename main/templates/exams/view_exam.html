@@ -78,6 +78,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
+    #saveWorkBtn {margin-left: .5em; margin-right: .5em;}
 
     .correct {color: #090;}
     .incorrect {color: #900;}
@@ -462,7 +463,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $(returnToListLink).after($(userNote));
         $(userNote).hide();
     {% endif %}
+                      
     $('#nojswarn').remove();
+                      
+    /***************** Save Work (not submitting) *******************/
+                      
+                      {% if "/videos/" not in request.path %}
+                      var saveWorkBtn = document.createElement('button');
+                      $(saveWorkBtn).text('Save')
+                                    .addClass('btn')
+                                    .attr('id','saveWorkBtn');
+                      var submitBtn = $('input[type|="submit"]').not('#login_button');
+                      submitBtn.after($(saveWorkBtn));
+                      
+                      {% endif %}
+                      
+                      
+    /***************** End Save Work ********************************/
                       
     var allFieldsets = $('fieldset');
                       
@@ -670,7 +687,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
         }
     });
-  {% endif %}
+    {% endif %}
                       
     $('input[type=submit]').not('#login_button').click(function () {
         var userSelections = {};
