@@ -1,6 +1,12 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block course_page_title %}Creation Form{% endblock course_page_title %}
+{% block course_page_title %}
+{% if edit_mode %}
+    Edit
+{% else %}
+    Creation
+{% endif %} 
+Form{% endblock course_page_title %}
 {% block mode_switcher %}{% endblock mode_switcher %}
 
 {% block addl_head_scripts %}
@@ -72,7 +78,14 @@
 </style>
 
 <div class="well create-exam-form">
-    <h2>Create a new Exam / ProblemSet / Survey</h2>
+    <h2>
+    {% if edit_mode %}
+        Edit an 
+    {% else %}    
+        Create a new
+    {% endif %}
+    Exam / ProblemSet / Survey</h2>
+
 
     
     <div class="control-group">
