@@ -349,7 +349,7 @@ def get_contentgroup_data(course):
 def get_group_item_data(group_item, selfref=False):
     ctype   = group_item.get_content_type()
     level   = group_item.level
-    display = group_item.display_style or 'button'
+    display = group_item.display_style or 'list'
     target  = getattr(group_item, ctype)
     cgid    = target.id
     if not selfref:
@@ -360,7 +360,7 @@ def get_children_by_display_style(key, level1_items, level2_items, user=None):
     children = get_children(key, level1_items, level2_items, user)
     tagged_children = {}
     for child in children:
-        display_style = child.get('display', 'button')
+        display_style = child.get('display', 'list')
         if not tagged_children.has_key(display_style):
             tagged_children[display_style] = [child]
         else:

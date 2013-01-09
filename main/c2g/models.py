@@ -2197,7 +2197,7 @@ class ContentGroupManager(models.Manager):
 class ContentGroup(models.Model):
     group_id        = models.IntegerField(db_index=True, null=True, blank=True)
     level           = models.IntegerField(db_index=True)
-    display_style   = models.CharField(max_length=32, null=True, blank=True)
+    display_style   = models.CharField(max_length=32, default='list', blank=True)
 
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
     course          = models.ForeignKey(Course)
@@ -2252,7 +2252,7 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
-    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
         """Add obj_ref having type tag to the ContentGroup table.
 
         Returns the ContentGroup entry id for the resulting child item.
