@@ -2074,6 +2074,7 @@ class ExamScore(TimestampMixin, models.Model):
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
     score = models.FloatField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
+    csv_imported = models.BooleanField(default=False)
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
     
     def __unicode__(self):
@@ -2116,6 +2117,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     """
     record = models.OneToOneField(ExamRecord, db_index=True)
     raw_score = models.FloatField(null=True, blank=True) # this is the raw score of the entire record
+    csv_imported = models.BooleanField(default=False)
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):

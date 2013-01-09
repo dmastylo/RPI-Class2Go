@@ -833,7 +833,7 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
                     db_hits += 3
                 
                 #Create the new ExamRecordScore
-                ers = ExamRecordScore(record_id=exam_record_ptr['last_submission_id'], raw_score=total_score)
+                ers = ExamRecordScore(record_id=exam_record_ptr['last_submission_id'], raw_score=total_score, csv_imported=True)
                 ers.save()
                 db_hits += 1
                         
@@ -850,6 +850,7 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
                                          
             #Set score for ExamScore
             user_score.score = total_score
+            user_score.csv_imported = True
             user_score.save()
             db_hits += 1
         
