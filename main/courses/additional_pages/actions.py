@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 
 from c2g.models import *
 from courses.common_page_data import get_common_page_data
-from courses.actions import auth_is_course_admin_view_wrapper
+from courses.actions import auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 
 
 @require_POST
@@ -34,14 +34,6 @@ def add(request):
     if request.POST.get("section_id") != "":
         section = ContentSection.objects.get(id=request.POST.get("section_id"))
 
-    parent_type,parent_id = None,None
-    parent_type = request.POST.get('parent_id')
-    if parent_type and parent_type[:4] != 'none':
-        parent_type,parent_id = request.POST.get("parent_id").split(',')
-        parent_id = long(parent_id)
-    else:
-        parent_type, parent_id = None,None
-
     if request.POST.get("menu_slug") != "":
         index = len(AdditionalPage.objects.filter(course=common_page_data['course'],menu_slug=request.POST.get("menu_slug")))
     else:
@@ -65,20 +57,14 @@ def add(request):
     draft_page = AdditionalPage(course=common_page_data['draft_course'], menu_slug=menu_slug, section=section, title=request.POST.get("title"), slug=request.POST.get("slug"), index=index, mode='draft')
     draft_page.save()
     draft_page.create_ready_instance()
-    if parent_type != None and parent_type != "none":
-        parent_ref = AdditionalPage.objects.get(id=parent_id).image
-        # FIXME: We assume that the parent is an AdditionalPage regardless of parent_type; this is by the spec, but against my nature
-        content_group_groupid = ContentGroup.add_parent(parent_ref.course, parent_type, parent_ref)
-        ContentGroup.add_child(content_group_groupid, 'additional_page', draft_page.image, display_style="button")
-    
+
+    create_contentgroup_entries_from_post(request, 'parent_id', draft_page.image, 'additional_page', display_style='list')
+
     if request.POST.get("menu_slug") == "":
         return redirect('courses.views.course_materials', course_prefix, course_suffix)
     else:
         return redirect(request.META['HTTP_REFERER'])
 
-
-        
-    
 @require_POST
 @auth_is_course_admin_view_wrapper
 def save(request):
@@ -121,6 +107,7 @@ def save(request):
         page.image.slug = request.POST.get("slug")
         page.image.save()
 
+        create_contentgroup_entries_from_post(request, 'parent', page.image, 'additional_page')
 
         if request.POST.get("commit") == '1':
             page.commit()

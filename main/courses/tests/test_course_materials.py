@@ -5,7 +5,8 @@ from django.core.urlresolvers import reverse
 from c2g.models import File as FileModel
 from c2g.models import Course as CourseModel
 from test_harness.test_base import AuthenticatedTestBase
-
+from django.core.files.base import ContentFile
+from django.db.models.fields.files import FieldFile, FileField
 
 class CourseMaterialsPageAndContentsTest(AuthenticatedTestBase):
     course_name="Natural Language Processing"
@@ -34,6 +35,12 @@ class CourseMaterialsPageAndContentsTest(AuthenticatedTestBase):
         self.poorfile.save()
         self.poorfile.create_ready_instance()
         self.poorfile.image.save()
+	
+        self.poorfile.file.save("NAMEME", ContentFile("hello world"), save=False)
+        self.poorfile.save()
+        self.poorfile.image.file.save("NAMEME", ContentFile("hello world"), save=False)
+        self.poorfile.image.save()
+
 
     def tearDown(self):
         FileModel.objects.filter(title="XXXDELETEMETESTXXX").delete()

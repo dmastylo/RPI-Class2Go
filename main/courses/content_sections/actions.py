@@ -125,7 +125,9 @@ def get_children(request, section_id, contentgroup_parents_only=False):
         item    = child['item']
         typetag = child['type']
         if contentgroup_parents_only:
-            if item.image.id in l2_kids.get(typetag, []):
+            if item.mode != u'ready':
+                item = item.image
+            if item.id in l2_kids.get(typetag, []):
                 continue
         children.append((typetag, item.image.id, item.title))
     return HttpResponse(json.dumps(children), mimetype='application/json')
