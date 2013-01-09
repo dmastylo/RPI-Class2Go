@@ -66,23 +66,22 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     h3 {clear:both;}
     div.question, div.subquestion {float:left; width:95%;}
     div.problem, div.problem {float:left; width:95%;}
-    #problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
+    #problemset-nav {float: left; padding: 0 0 1em 0; }
     #next-question {float: right;}
     #prev-question {float: left;}
     label pre {margin-left:30px;}
 
-    .quick-check {clear: both; display: block; margin-top: 1em;}
-    .hide-button {clear: both; display: block; margin-top: 1em;}
     .explanation {background: #fff; border-radius: 3px; margin: 1em; border: 1px solid black; padding: 1em;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
 
-    #exam-pane {float: left; position: relative; width: 95%;}
-    #exam-pane .question {border-bottom-left-radius: 0; border-bottom-right-radius: 0;}
-    #exam-pane .exam-navigation {background-color: #ddcf99; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; bottom: 0; margin-bottom: -1em; padding: 2px 0; position: absolute; width: 100%;}
+    #exam-pane {float: left; position: relative; width: 100%;}
+    #exam-pane .exam-navigation {padding: 2px 0; width: 100%;}
     div.question textarea { width:70%; height:100px; }
+    div.question .per-question-btns {background-color: #ddcf99; border-radius: 4px; float: left; margin-top: 1em; padding: 5px; }
+    div.question .per-question-btns input {float: left;}
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
 
@@ -201,6 +200,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% if single_question %}
         $('.question').not(':first').hide();
+
+        // Don't show Prev/Next question buttons when only one problem
+        if ($('.question').length == 1) {
+            $('#problemset-nav').hide();
+        }
+
         var localQuestionIdx = 0;
 
         var adjustQuestionIdx = function (newIdx) {
@@ -373,7 +378,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 }
                 $(target).empty();
                 $(target).show();
-                $('#' + assocQID + ' .quick-check').before($(target));
+                $('#' + assocQID + ' .per-question-btns').before($(target));
                 return target;
             }
 
@@ -430,24 +435,31 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         };
                       
         $('.question').each(function (idx, el) {
-            var tmpBtn = document.createElement('input');
-            $(tmpBtn).attr('type','button');
-            $(tmpBtn).attr('id','quickCheck_' + idx);
-            $(tmpBtn).addClass('btn').addClass('quick-check');
-            $(tmpBtn).attr('value', 'Check Answers');
-            $(this).append($(tmpBtn));
+
+            // create div to hold Check/Hide buttons
+            var perQButtonDiv = document.createElement('div');
+            $(perQButtonDiv).attr('id', 'btns-' + idx);
+            $(perQButtonDiv).addClass('per-question-btns');
+            $(this).append($(perQButtonDiv));
+
+            // create Check Answers button
+            var checkBtn = document.createElement('input');
+            $(checkBtn).attr('type','button');
+            $(checkBtn).attr('id','quickCheck_' + idx);
+            $(checkBtn).addClass('btn').addClass('quick-check');
+            $(checkBtn).attr('value', 'Check Answers');
+            $(perQButtonDiv).append($(checkBtn));
+
+            // create Hide Answers button
+            var hideBtn = document.createElement('input');
+            $(hideBtn).attr('type','button');
+            $(hideBtn).attr('id','hideAnswers_' + idx);
+            $(hideBtn).addClass('btn').addClass('hide-button');
+            $(hideBtn).attr('value', 'Hide Answers');
+            $(perQButtonDiv).append($(hideBtn));
         });
 
         $('.quick-check').click(quickCheck);
-
-        $('.question').each(function (idx, el) {
-            var tmpBtn = document.createElement('input');
-            $(tmpBtn).attr('type','button');
-            $(tmpBtn).attr('id','hideAnswers_' + idx);
-            $(tmpBtn).addClass('btn').addClass('hide-button');
-            $(tmpBtn).attr('value', 'Hide Answers');
-            $(this).append($(tmpBtn));
-        });
 
         $('.hide-button').click(hideButton);
         {% endif %}
