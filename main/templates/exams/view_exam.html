@@ -602,7 +602,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var createInlineExp = function (targetEl) {
             var tmpInlineExpl = document.createElement('span');
             $(tmpInlineExpl).addClass('inline-explanation');
-            $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+            $(tmpInlineExpl).attr('id', $(targetEl).find('input:first').attr('id') + '-expl');
             $(targetEl).append($(tmpInlineExpl));
 
             return $(tmpInlineExpl);
@@ -629,6 +629,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
                             $(inlineExpl).addClass('correct');
                         }
+                        $(inlineExpl).empty();
                         $(inlineExpl).append($(this).find('explanation').text());
                     }
                 });
@@ -651,24 +652,41 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(formEl).attr('type') == 'radio') {
                     var curq = correxObj[member];
                     for (correctChoice in curq.correct_choices) {
-                        $(formEl).filter('input[value|="' + correctChoice + '"]')
-                                .after('<span class="correct"> Yes! </span>');
+                        var rightChoiceObj = $(formEl).filter('input[value|="' + correctChoice + '"]');
+                        if (rightChoiceObj.siblings('span.feedback').length == 0) {
+                            rightChoiceObj.after('<span class="feedback correct"> &#10004; </span>');
+                        } else {
+                            rightChoiceObj.siblings('span.feedback').html(' &#10004; ');
+                        }
                     }
                     for (wrongChoice in curq.wrong_choices) {
                       //if (curq.wrong_choices[wrongChoice] == "fn")
                       //      $(formEl).filter('input[value|="' + wrongChoice + '"]')
                       //          .after('<span class="incorrect"> Should be selected. </span>');
                       //else
-                        if (curq.wrong_choices[wrongChoice] == "fp")
-                            $(formEl).filter('input[value|="' + wrongChoice + '"]')
-                                .after('<span class="incorrect"> No. </span>');
+                        if (curq.wrong_choices[wrongChoice] == "fp") {
+                            var wrongChoiceObj = $(formEl).filter('input[value|="' + wrongChoice + '"]');
+                            if (wrongChoiceObj.siblings('span.feedback').length == 0) {
+                                wrongChoiceObj.after('<span class="feedback incorrect"> &#10006; </span>');
+                            } else {
+                                wrongChoiceObj.siblings('span.feedback').html(' &#10006; ');
+                            }
+                        }
                     }
                 }
                 else {
                     if (correxObj[member].correct == true) {
-                        $(formEl).after('<span class="correct"> Yes! </span>');
+                        if ($(formEl).siblings('span.feedback').length == 0) {
+                            $(formEl).after('<span class="feedback correct"> &#10004; </span>');
+                        } else {
+                            $(formEl).siblings('span.feedback:first').html(' &#10004; ');
+                        }
                     } else {
-                        $(formEl).after('<span class="incorrect"> No. </span>');
+                        if ($(formEl).siblings('span.feedback').length == 0) {
+                            $(formEl).after('<span class="feedback incorrect"> &#10006; </span>');
+                        } else {
+                            $(formEl).siblings('span.feedback:first').html(' &#10006; ');
+                        }
                     }
                 }
             }
