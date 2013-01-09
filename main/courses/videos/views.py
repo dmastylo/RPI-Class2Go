@@ -14,7 +14,6 @@ from courses.videos.forms import *
 from courses.views import get_full_contentsection_list
 from courses.forms import *
 
-from xml.dom.minidom import parseString
 
 @auth_view_wrapper
 def list(request, course_prefix, course_suffix):
@@ -113,10 +112,7 @@ def view(request, course_prefix, course_suffix, slug):
 
     if video.exam:
         try:
-            #exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
             exam = video.exam
-            display_single = exam.display_single
-            invideo = exam.invideo
             video_obj = videos_in_exam_metadata(exam.xml_metadata, times_for_video_slug=video.slug)
             question_times = video_obj['question_times']
             print json.dumps(question_times)

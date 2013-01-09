@@ -1,10 +1,8 @@
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.shortcuts import render_to_response
-from django.template import Context, loader
 from django.template import RequestContext
 from c2g.models import *
 from courses.course_materials import get_course_materials
-from courses.common_page_data import get_common_page_data
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
@@ -90,9 +88,22 @@ def main(request, course_prefix, course_suffix):
             context_instance=RequestContext(request))
 
 @auth_view_wrapper
-def course_materials(request, course_prefix, course_suffix):
+def course_materials(request, course_prefix, course_suffix, section_id=None):
 
-    section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
+    if section_id:
+        #If an instructor switches to edit view from a single section's materials page,
+        #just redirect to display all sections, since section_id is for viewing sections in ready mode
+        if request.common_page_data['course_mode'] == 'draft':
+            return redirect('courses.views.course_materials', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
+
+        #Makes sure section_id is for a ready mode section
+        try:
+            section = ContentSection.objects.getByCourse(course=request.common_page_data['course']).get(pk=section_id)
+        except ContentSection.DoesNotExist:
+            raise Http404
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True, SECTION=section)
+    else:
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
 
     form = None
     if request.common_page_data['course_mode'] == "draft":
@@ -119,44 +130,39 @@ def unenroll(request, course_prefix, course_suffix):
 def get_full_contentsection_list(course, filter_children=True):
     """Return a list of ContentSections with material and a list of all material for this course."""
 
-    def no_child_filter(t=None, i=None):
-        return True
-
     level2_items = {}                            # level2_items gets filled lazily
-    def working_child_filter(t, i):
-        if len(level2_items) == 0:
-            for cg2 in ContentGroup.objects.filter(course=course).filter(level=2):
-                cg2_t = cg2.get_content_type()
-                level2_items.setdefault(cg2_t, []).append(getattr(cg2, cg2_t).id)
+    def filter_level2_contentgroup_entries(t, i):
         if level2_items.has_key(t): return i not in level2_items[t]
         else:                       return True
 
-    desired_item = working_child_filter
-    if not filter_children:
-        desired_item = no_child_filter
+    desired_item = lambda t,i: True
+    if filter_children:
+        desired_item = filter_level2_contentgroup_entries
+        for cg2 in ContentGroup.objects.filter(course=course).filter(level=2):
+            cg2_t = cg2.get_content_type()
+            level2_items.setdefault(cg2_t, []).append(getattr(cg2, cg2_t).id)
 
     tagged_object_lists = {}
     for tag, cls in ContentGroup.groupable_types.iteritems():
         tagged_object_lists[tag] = cls.objects.getByCourse(course=course)
     
-    full_index_list = []
+    full_index_list = {}
     full_contentsection_list=[]
 
     for contentsection in ContentSection.objects.getByCourse(course=course):
-    
         index_list = []
         cs_id      = contentsection.id
         for tag in ContentGroup.groupable_types.keys():
-            for t in tagged_object_lists[tag].filter(section_id=cs_id):
-                t_id = t.id
-                if desired_item(tag, t_id):
-                    if tag != 'file':
-                        index_list.append((tag, t.index, t_id, cs_id, t.slug, t.title))
+            for obj in tagged_object_lists[tag].filter(section_id=cs_id):
+                if desired_item(tag, obj.id):
+                    if tag == 'file':
+                        index_list.append({ 'type': tag, 'ref': obj, 'icon': obj.get_icon_type(), })
                     else:
-                        icon_type = t.get_icon_type()
-                        index_list.append((tag, t.index, t_id, cs_id, t.file.url, t.title, icon_type))
+                        index_list.append({ 'type': tag, 'ref': obj, 'icon': None, })
 
-        full_index_list.append(sorted(index_list, key = index))
+        index_list = sorted(index_list, cmp=lambda x,y: -1 if x['ref'].index < y['ref'].index else +1)
+        # NB: B/c of for loops above, index_list is sorted by index, then by type tag
+        full_index_list[cs_id] = index_list
         if index_list:                           # don't show empty sections
             full_contentsection_list.append(contentsection)
     return full_contentsection_list, full_index_list

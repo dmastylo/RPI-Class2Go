@@ -80,6 +80,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .correct {color: #090;}
     #saveWorkBtn {margin-left: .5em; margin-right: .5em;}
 
+    div.question textarea { width:70%; height:100px; }
+    div.preamble {margin-bottom: 2em; }
+    div.postamble {margin-top: 2em; }
+
     .correct {color: #090;}
     .incorrect {color: #900;}
     </style>
@@ -162,6 +166,26 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     
     $(document).ready(function () {
+                      
+                      
+        /********** Add ordinal numbering if it doesn't already exist *********/
+        var addNumberToQuestionDiv = function(elem, num) {
+            var numberingDiv = $(elem).find('h3.questionNumber');
+            if (numberingDiv.length == 0){
+              $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
+            }
+        };
+        var psetQuestions = $('div.question');
+        if (psetQuestions.length > 1) {
+            var qQumx = 1;
+            $(psetQuestions).each(function () {
+                                       addNumberToQuestionDiv(this,qQumx);
+                                       qQumx = qQumx + 1;}
+            );
+        }
+                      
+        /************************** end ordinal *******************************/
+                      
 
     {% if single_question %}
         $('.question').not(':first').hide();
@@ -234,7 +258,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                             userSelections[$(this).attr('name')] = [];
                         }
                         tmpObj.value = $(this).attr('value');
-                        tmpObj.associatedText = $(this).parent().text().substr(0,40);
+                        tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
                         tmpObj.report = $(this).attr('data-report');
                         if ($(this).closest('fieldset').length > 0) {
                             //inputs enclosed by a <fieldset>, use its data-report attr
@@ -248,7 +272,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                             && $(this).val() != "") {
                         var tmpObj = {};
                         tmpObj.value = $(this).val();
-                        tmpObj.associatedText = $(this).parent().text().substr(0,40);
+                        tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
                         tmpObj.report = $(this).attr('data-report');
                         tmpObj.questionreport = $(this).closest('.question').attr('data-report');
                         userSelections[$(this).attr('name')]=tmpObj;
@@ -315,6 +339,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(explArea).addClass('explanation');
                 }
                 $(explArea).empty();
+                $(explArea).show();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
                     if ($(this).text() == 'Explanation') {
@@ -335,6 +360,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(target).addClass('explanation');
                 }
                 $(target).empty();
+                $(target).show();
                 $('#' + assocQID + ' .quick-check').before($(target));
                 return target
             }
@@ -572,6 +598,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(explArea).addClass('explanation');
         }
         $(explArea).empty();
+        $(explArea).show();
         $(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
@@ -592,7 +619,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var createInlineExp = function (targetEl) {
             var tmpInlineExpl = document.createElement('span');
             $(tmpInlineExpl).addClass('inline-explanation');
-            $(tmpInlineExpl).attr('id', $(this).attr('id') + '-expl');
+            $(tmpInlineExpl).attr('id', $(targetEl).find('input:first').attr('id') + '-expl');
             $(targetEl).append($(tmpInlineExpl));
 
             return $(tmpInlineExpl);
@@ -619,6 +646,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
                             $(inlineExpl).addClass('correct');
                         }
+                        $(inlineExpl).empty();
                         $(inlineExpl).append($(this).find('explanation').text());
                     }
                 });
@@ -641,24 +669,41 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(formEl).attr('type') == 'radio') {
                     var curq = correxObj[member];
                     for (correctChoice in curq.correct_choices) {
-                        $(formEl).filter('input[value|="' + correctChoice + '"]')
-                                .after('<span class="correct"> Yes! </span>');
+                        var rightChoiceObj = $(formEl).filter('input[value|="' + correctChoice + '"]');
+                        if (rightChoiceObj.siblings('span.feedback').length == 0) {
+                            rightChoiceObj.after('<span class="feedback correct"> &#10004; </span>');
+                        } else {
+                            rightChoiceObj.siblings('span.feedback').html(' &#10004; ');
+                        }
                     }
                     for (wrongChoice in curq.wrong_choices) {
                       //if (curq.wrong_choices[wrongChoice] == "fn")
                       //      $(formEl).filter('input[value|="' + wrongChoice + '"]')
                       //          .after('<span class="incorrect"> Should be selected. </span>');
                       //else
-                        if (curq.wrong_choices[wrongChoice] == "fp")
-                            $(formEl).filter('input[value|="' + wrongChoice + '"]')
-                                .after('<span class="incorrect"> No. </span>');
+                        if (curq.wrong_choices[wrongChoice] == "fp") {
+                            var wrongChoiceObj = $(formEl).filter('input[value|="' + wrongChoice + '"]');
+                            if (wrongChoiceObj.siblings('span.feedback').length == 0) {
+                                wrongChoiceObj.after('<span class="feedback incorrect"> &#10006; </span>');
+                            } else {
+                                wrongChoiceObj.siblings('span.feedback').html(' &#10006; ');
+                            }
+                        }
                     }
                 }
                 else {
                     if (correxObj[member].correct == true) {
-                        $(formEl).after('<span class="correct"> Yes! </span>');
+                        if ($(formEl).siblings('span.feedback').length == 0) {
+                            $(formEl).after('<span class="feedback correct"> &#10004; </span>');
+                        } else {
+                            $(formEl).siblings('span.feedback:first').html(' &#10004; ');
+                        }
                     } else {
-                        $(formEl).after('<span class="incorrect"> No. </span>');
+                        if ($(formEl).siblings('span.feedback').length == 0) {
+                            $(formEl).after('<span class="feedback incorrect"> &#10006; </span>');
+                        } else {
+                            $(formEl).siblings('span.feedback:first').html(' &#10006; ');
+                        }
                     }
                 }
             }
@@ -851,4 +896,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% endif %} 
 </script>
 {% endif %}
+
+
 {% endblock addl_scripts %}
