@@ -20,8 +20,23 @@ var c2gXMLParse = (function() {
             $('#staging-area').empty();
             $('#staging-area').append(editor.getValue());
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
+            var psetQuestions = $('#staging-area div.question');
+            if (psetQuestions.length > 1) {
+                var qQumx = 1;
+                $(psetQuestions).each(function () {
+                    c2gXMLParse.addNumberToQuestionDiv(this,qQumx);
+                    qQumx = qQumx + 1;}
+                );
+            }
         },
-
+                   
+        addNumberToQuestionDiv: function(elem, num) {
+            var numberingDiv = $(elem).find('h3.questionNumber');
+            if (numberingDiv.length == 0){
+                $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
+            }
+        },
+                   
         copyContentsToEl: function(fromEl, toEl) {
             $(fromEl).contents().each(function() {
                 //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
@@ -133,8 +148,16 @@ var c2gXMLParse = (function() {
                 }
                 return $(choiceElem).attr('correct').toLowerCase()==='true';
             }
-              
+            var psetDOM = $(myDOM).find('problemset');
+
             var questionIdx = 0;
+            var ordinalNumbers = true;
+            if (psetDOM.length && $(psetDOM).attr('do-not-autonumber') != undefined) {
+                ordinalNumbers = false;
+            }
+            if (problemNodes.length <= 1) { //special case if only 1 problem
+                ordinalNumbers = false;
+            }
                    
             var outerMetadataObj = document.createElement('metadata'); //outermost metadata--won't actually be displayed since we use $.html()
             var metadataObj = document.createElement('exam_metadata');
@@ -184,7 +207,11 @@ var c2gXMLParse = (function() {
                 $(tmpProbDiv).addClass('question');
                 $(tmpProbDiv).attr('id', question_id);
                 $(tmpProbDiv).attr('data-report', $(this).attr('data-report'));
-                              
+                if (ordinalNumbers) {
+                    $(tmpProbDiv).prepend('<h3 class="questionNumber">Question ' + questionIdx +'</h3>');
+                } else {
+                    $(tmpProbDiv).prepend('<h3 class="questionNumber"></h3>');
+                }
                 //$('#staging-area').append($(tmpProbDiv));
                 $(targetEl).append($(tmpProbDiv));
                 

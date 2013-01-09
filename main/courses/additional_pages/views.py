@@ -49,9 +49,33 @@ def main(request, course_prefix, course_suffix, slug):
             object_id = str(page.id),
         )
         visit_log.save()
+
+    contentgroup_info = None      # Empty for view mode
         
     if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft' and common_page_data['view_mode'] == 'edit':
         template = 'additional_pages/edit.html'
+
+        grouppable_page = page.image
+        parent_info = grouppable_page.contentgroup_set.all()
+        if parent_info:           # fill contentgroup_info for edit mode
+            parent_info = parent_info[0]    # not necessarily true, but gets us the group_id
+            group_id    = parent_info.group_id
+            parent_info = ContentGroup.objects.get(group_id=group_id, level=1) # this is the parent for real
+            parent_type = parent_info.get_content_type()
+            parent      = getattr(parent_info, parent_type)
+            parent_id   = parent.id
+            is_child    = False
+            if parent_info.additional_page != grouppable_page.id:
+                is_child  = True
+            child_list  = ContentGroup.objects.filter(group_id=group_id, level=2)
+            contentgroup_info = {
+                                 'contentgroup_parent':   parent_info,
+                                 'contentgroup_children': child_list,
+                                 'parent_type':           parent_type,
+                                 'parent_id':             parent_id,
+                                 'parent':                parent,
+                                 'is_child':              is_child,
+                                }
     else:
         template = 'additional_pages/view.html'
         
@@ -64,9 +88,12 @@ def main(request, course_prefix, course_suffix, slug):
         is_logged_in = 0
 
     return render_to_response(template,
-                              {'common_page_data': common_page_data,
+                              {
+                               'common_page_data': common_page_data,
                                'page': page,
                                'contentsection_list': full_contentsection_list, 
                                'full_index_list': full_index_list,
-                               'is_logged_in': is_logged_in},
+                               'is_logged_in': is_logged_in,
+                               'contentgroup_info': contentgroup_info,
+                              },
                                context_instance=RequestContext(request))
