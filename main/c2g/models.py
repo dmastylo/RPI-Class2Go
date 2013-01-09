@@ -22,6 +22,7 @@ import time
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
@@ -450,7 +451,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         return True
 
     def get_url(self):
-        return 'pages/' + self.slug
+        return reverse("courses.additional_pages.views.main", args=[self.course.prefix, self.course.suffix, self.slug])
 
     def __unicode__(self):
         if self.title:
@@ -1048,7 +1049,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'videos/' + self.slug
+        return reverse("courses.videos.views.view", args=[self.course.prefix, self.course.suffix, self.slug])
         
     def __unicode__(self):
         if self.title:
@@ -1468,7 +1469,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'problemsets/' + self.slug
+        # not using reverse() because problemsets have been removed from urls.py
+        return '/' + self.course.prefix.replace('--', '/') + '/problemsets/' + self.slug
 
     def __unicode__(self):
         return self.title
@@ -1969,7 +1971,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         return self.safe_exam_type()+"_record"
 
     def get_url(self):
-        return self.show_view_name()
+        #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
+        return reverse(self.show_view, args=[self.course.prefix, self.course.suffix, self.slug])
     
     record_view = property(record_view_name)
 
