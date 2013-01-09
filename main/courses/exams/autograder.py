@@ -330,7 +330,33 @@ class AutoGrader():
                 }]
             }
         """
+
         def grader_fn(submission):
+            """Grade an interactive exam by calling a remote grader."""
+
+            def external_grader_request(grader_url, post_params):
+                """Hit external grader endpoint.  TODO: add retry logic, here or in frontend (#1730)."""
+                grader_timeout = 5    # seconds
+                try:
+                    post_data = urllib.urlencode(post_params)
+                    grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
+                except urllib2.HTTPError as e:
+                    raise AutoGraderGradingException("Interactive grader HTTP error (%d)" % e.code)
+                except urllib2.URLError as e:
+                    raise AutoGraderGradingException("Interactive grader connection error (%d)" % e.args)
+
+                try:
+                    graded_result = grader_conn.read()
+                except IOError as e:
+                    raise AutoGraderGradingException("Interactive grader IO error: %s", str(e))
+                except OSError as e:
+                    raise AutoGraderGradingException("Interactive grader OS error: %s", str(e))
+                if graded_result == "ERROR":
+                    raise AutoGraderGradingException("Interactive grader internal problem (returned \"%s\")" % graded_result)
+
+                return graded_result
+
+            # grader_fn() body
             # default responses, to be overriden by what we actually got back
             response = {}
             response['correct'] = False
@@ -340,21 +366,8 @@ class AutoGrader():
             # call remote grader
             grader_url = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
             post_params['student_input'] = submission
-            grader_timeout = 5    # seconds
-            try:
-                logger.info("External grader call: %s" % str(post_params))
-                post_data = urllib.urlencode(post_params)
-                grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
-            except urllib2.HTTPError as e:
-                raise AutoGraderGradingException("Interactive grader HTTP error (%d)" % e.code)
-            except urllib2.URLError as e:
-                raise AutoGraderGradingException("Interactive grader connection error (%d)" % e.args)
-            try:
-                graded_result = grader_conn.read()
-            except (IOError,OSError) as e:
-                raise AutoGraderGradingException("Interactive grader read error: %s", str(e))
-            if graded_result == "ERROR":
-                raise AutoGraderGradingException("Interactive grader internal problem (returned \"%s\")" % graded_result)
+            logger.debug("External grader call: %s" % str(post_params))
+            graded_result = external_grader_request(grader_url, post_params)
             try:
                 graded = json.loads(graded_result)
             except ValueError as e:
