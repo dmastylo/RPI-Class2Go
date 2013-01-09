@@ -294,7 +294,12 @@ def standard_preview_login(request, course_prefix, course_suffix):
         except Video.DoesNotExist:
             video = None
    
-        instructors = Instructor.objects.filter(courseinstructor=request.common_page_data['course'])
+        course_instructors = CourseInstructor.objects.getObjectsByCourse(course=request.common_page_data['course'])
+        
+        instructors = []
+    
+        for ci in course_instructors:
+            instructors.append(ci.instructor)
   
         template_name='previews/default.html'
 
@@ -465,8 +470,12 @@ def ldap_preview_login(request, course_prefix, course_suffix):
             except Video.DoesNotExist:
                 video = None
         
-            instructors = Instructor.objects.filter(courseinstructor=request.common_page_data['course'])
-       
+            course_instructors = CourseInstructor.objects.getObjectsByCourse(course=request.common_page_data['course'])
+            instructors = []
+    
+            for ci in course_instructors:
+                instructors.append(ci.instructor)
+            
             template_name='previews/default.html'
 
             return render_to_response(template_name,

@@ -54,39 +54,16 @@ def main(request, course_prefix, course_suffix, slug):
         template = 'additional_pages/edit.html'
     else:
         template = 'additional_pages/view.html'
-        
-
-        
-#    if slug == 'overview':
-#        
-#        try:
-#            video = Video.objects.getByCourse(course=common_page_data['course']).get(slug='intro')
-#        except Video.DoesNotExist:
-#            video = None
-            
-#        instructors = Instructor.objects.filter(courseinstructor=common_page_data['course'])
-                
-#        return render_to_response(template,{'common_page_data': common_page_data, 
-#                                            'video':video,
-#                                            'instructors':instructors,
-#                                            'course': common_page_data['course'],
-#                                            'page':page},context_instance=RequestContext(request))
-#    else:
-#        return render_to_response(template,{'common_page_data': common_page_data, 'page':page},context_instance=RequestContext(request))
-        
-        
+         
     course = common_page_data['course']
 
-    contentsection_list = ContentSection.objects.getByCourse(course=course)
-    video_list = Video.objects.getByCourse(course=course)
-    pset_list =  ProblemSet.objects.getByCourse(course=course)
-    additional_pages =  AdditionalPage.objects.getSectionPagesByCourse(course=course)
-    file_list = File.objects.getByCourse(course=course)
-    instructor_list = Instructor.objects.filter(courseinstructor=common_page_data['course'])
- 
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, contentsection_list, video_list, pset_list, additional_pages, file_list)
+    course_instructors = CourseInstructor.objects.getByCourse(course=common_page_data['course'])
+    instructor_list = []
     
-    full_index_list.append(instructor_list)
+    for ci in course_instructors:
+        instructor_list.append(ci.instructor)
+ 
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     
     try:
         video = Video.objects.getByCourse(course=common_page_data['course']).get(slug='intro')
@@ -104,6 +81,8 @@ def main(request, course_prefix, course_suffix, slug):
                                'page': page,
                                'contentsection_list': full_contentsection_list, 
                                'full_index_list': full_index_list,
+                               'instructor_list':instructor_list,
+                               'course': course,
                                'is_logged_in': is_logged_in, 'intro_video': video},
                                context_instance=RequestContext(request))
 

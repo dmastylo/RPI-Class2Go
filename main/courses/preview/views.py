@@ -52,8 +52,12 @@ def preview(request, course_prefix, course_suffix):
     except Video.DoesNotExist:
         video = None
         
-    instructors = Instructor.objects.filter(courseinstructor=request.common_page_data['course'])
-       
+    course_instructors = CourseInstructor.objects.getByCourse(course=request.common_page_data['course'])
+    instructors = []
+    
+    for ci in course_instructors:
+        instructors.append(ci.instructor)
+              
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)

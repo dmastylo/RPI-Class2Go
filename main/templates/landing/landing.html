@@ -21,7 +21,11 @@
     </div>
 
 {% block topnav %}
+{% if SITE_NAME_SHORT = 'Stanford' %}
     <div class="top-nav" style="top:4px;">
+{% else %}
+    <div class="top-nav" style="top:24px;">
+{% endif %}    
 {% if user.is_authenticated %}
        <li>
           <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
