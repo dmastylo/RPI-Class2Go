@@ -1,16 +1,22 @@
 {% load listtest %}
 
     {% if is_child == None %} {# we don't need to display the  icon for every child #}
-    <div class="pull-left icon">
-        <em class="icon-pencil"></em>
-    </div>
+        <div class="pull-left icon">
+            <em class="icon-pencil"></em>
+        </div>
     {% endif %}
     
     <div class="course-list-content">
         {% with exam=item.exam %}
+        {% if is_child == None %}
         <h4 class="pull-left rightmargin" >
             <a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a>
         </h4>
+        {% else %}
+        <h5 class="pull-left rightmargin" >
+            <a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a>
+        </h5>
+        {% endif %}
         <span>{{exam.description}}</span>
 
             {% if exam.autograde %}
