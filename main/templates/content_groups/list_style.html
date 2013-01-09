@@ -5,11 +5,12 @@
     <ul class="unstyled">
     {% for child in children %}
         {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
-        <li>
         {% if child.type == 'exam' %}
+            <li style="padding-left: 2em;">
             {% include "exams/ready/exam_list_item.html" with item=child is_child="TRUE" %} 
         {% else %}
-            <strong><a href="{{child.url}}">{{child.title}}</a></strong>{% if item.description %}: {% endif %}{{item.description}}
+            <li>
+            <strong><a href="{{child.url}}">{{child.title}}</a></strong>{% if item.description %}: {{item.description }}{% endif %}
         {% endif %}
         </li>
     {% endfor %}
