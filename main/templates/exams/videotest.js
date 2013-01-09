@@ -204,6 +204,7 @@
                 $('#demoplayer').hide();
                 $('#slideIndex').hide();
                 $('.question').hide();
+                $('.explanation').hide();
             };
 
             var removeExamStage = function() {
