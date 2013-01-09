@@ -23,7 +23,7 @@ them and send us a pull request!
 It is a big step to go from a dev instance to a full-on deployed
 cloud instance.  Instructions for that are forthcoming.
 
-<a id="mac"></a>
+<a name="mac"></a>
 For Mac
 -------------
 
@@ -191,7 +191,7 @@ and edit the DATABASES strings as follows substituting proper values for your sy
 1. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
 
 
-<a id="windows"></a>
+<a name="windows"></a>
 For Windows
 ----------------
 
@@ -262,7 +262,7 @@ Yay. :)
 
 
 
-<a id="linux"></a>
+<a name="linux"></a>
 For Linux
 -----------------
 
@@ -448,7 +448,7 @@ When you want to start working on your project, just do the following:
         python ./manage.py runserver 8100
 
 
-<a id="config"></a>
+<a name="config"></a>
 Configuring Django
 ------------------
 
@@ -470,7 +470,7 @@ We partition our django project settings into two settings files:
 
 
 
-<a id="testdata"></a>
+<a name="testdata"></a>
 Generating Test Data
 -----------------------
 
