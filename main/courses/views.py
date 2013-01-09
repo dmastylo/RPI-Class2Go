@@ -88,9 +88,22 @@ def main(request, course_prefix, course_suffix):
             context_instance=RequestContext(request))
 
 @auth_view_wrapper
-def course_materials(request, course_prefix, course_suffix):
+def course_materials(request, course_prefix, course_suffix, section_id=None):
 
-    section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
+    if section_id:
+        #If an instructor switches to edit view from a single section's materials page,
+        #just redirect to display all sections, since section_id is for viewing sections in ready mode
+        if request.common_page_data['course_mode'] == 'draft':
+            return redirect('courses.views.course_materials', request.common_page_data['course_prefix'], request.common_page_data['course_suffix'])
+
+        #Makes sure section_id is for a ready mode section
+        try:
+            section = ContentSection.objects.getByCourse(course=request.common_page_data['course']).get(pk=section_id)
+        except ContentSection.DoesNotExist:
+            raise Http404
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True, SECTION=section)
+    else:
+        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
 
     form = None
     if request.common_page_data['course_mode'] == "draft":
