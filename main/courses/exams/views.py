@@ -975,10 +975,8 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     # append to json_data -- the student input
     try:
         field_student_data_obj = json.loads(exam_rec.json_data)
-        print exam_rec.json_data
     except (TypeError, ValueError) as e:
         field_student_data_obj = {}  # better to ignore prior bad data than to die
-    print student_input
     field_student_data_obj[field_name] = {'value': json.loads(student_input).get(field_name,{}).get('value',"")}
     exam_rec.json_data = json.dumps(field_student_data_obj)
 
