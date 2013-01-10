@@ -1,12 +1,3 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#     * Rearrange models' order
-#     * Make sure each model has one field with primary_key=True
-# Feel free to rename the models, but don't rename db_table values or field names.
-#
-# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
-# into your database.
-
 #c2g specific comments
 # any table indexes that use only one column here are place here.
 # any table indexes that use multiple columns are placed in a south migration at
@@ -84,10 +75,10 @@ class Deletable(models.Model):
         self.save()
 
         # Delete ContentGroup relationships when items are deleted
-        contentgroup_entries = self.contentgroup_set.all()
-        # Our object may not have a ContentGroup entry, but if it does, it
-        # should have exactly one - the current specification is that objects
-        # can't be in multiple parent/child relationships.
+        # There may be exactly 0 or 1 ContentGroup entry for a given object
+        contentgroup_entries = ()
+        if getattr(self, 'contentgroup_set', None):
+            contentgroup_entries = self.contentgroup_set.all()
         if len(contentgroup_entries) == 1:
             contentgroup_entries[0].delete()
         elif len(contentgroup_entries) > 1:
