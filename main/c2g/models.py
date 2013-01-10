@@ -22,6 +22,7 @@ import time
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
@@ -450,7 +451,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         return True
 
     def get_url(self):
-        return 'pages/' + self.slug
+        return reverse("courses.additional_pages.views.main", args=[self.course.prefix, self.course.suffix, self.slug])
 
     def __unicode__(self):
         if self.title:
@@ -1048,7 +1049,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'videos/' + self.slug
+        return reverse("courses.videos.views.view", args=[self.course.prefix, self.course.suffix, self.slug])
         
     def __unicode__(self):
         if self.title:
@@ -1468,7 +1469,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'problemsets/' + self.slug
+        # not using reverse() because problemsets have been removed from urls.py
+        return '/' + self.course.prefix.replace('--', '/') + '/problemsets/' + self.slug
 
     def __unicode__(self):
         return self.title
@@ -1969,7 +1971,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         return self.safe_exam_type()+"_record"
 
     def get_url(self):
-        return self.show_view_name()
+        #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
+        return reverse(self.show_view, args=[self.course.prefix, self.course.suffix, self.slug])
     
     record_view = property(record_view_name)
 
@@ -2194,7 +2197,7 @@ class ContentGroupManager(models.Manager):
 class ContentGroup(models.Model):
     group_id        = models.IntegerField(db_index=True, null=True, blank=True)
     level           = models.IntegerField(db_index=True)
-    display_style   = models.CharField(max_length=32, null=True, blank=True)
+    display_style   = models.CharField(max_length=32, default='list', blank=True)
 
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
     course          = models.ForeignKey(Course)
@@ -2249,7 +2252,7 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
-    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
         """Add obj_ref having type tag to the ContentGroup table.
 
         Returns the ContentGroup entry id for the resulting child item.
