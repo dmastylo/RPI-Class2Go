@@ -26,7 +26,7 @@
                               val[k] = thumbnailPath + v;
                               }
                               })
-                       thumbManifest[parseInt(key)] = val;
+                       thumbManifest[key.trim()] = val;
                        });
 
                 C2G.videoSetup.slideIndices = thumbManifest;
@@ -49,7 +49,7 @@
         C2G.videoSetup.selectSlide = function (time) {
             nearest = -1;
             for (i in C2G.videoSetup.slideIndices) {
-                var numi = parseInt(i);
+                var numi = parseFloat(i);
                 $(C2G.videoSetup.slideIndices[i].displayDiv).addClass('unselected');
                 $(C2G.videoSetup.slideIndices[i].displayDiv).removeClass('selected');
                 if (numi<=time && numi>nearest) {
@@ -116,14 +116,14 @@
                 }
 
                 for (time in C2G.videoSetup.questions) {
-                    if (!isNaN(parseInt(time))) {
+                    if (!isNaN(parseFloat(time))) {
                         merged.push(time);
                     }
                 }
 
-                var sorted = merged.sort(function(a,b){return parseInt(a)-parseInt(b)});
+                var sorted = merged.sort(function(a,b){return parseFloat(a)-parseFloat(b)});
 
-                var lastTime=-1;
+                var lastTime="-1";
 
                 for (i in sorted) {
                     if (sorted[i] != lastTime) {
@@ -174,7 +174,7 @@
 
             C2G.videoSetup.handleTimeUpdate = function () {
                 //console.log(popcornVideo.currentTime());
-                var timeInSec = Math.floor(window.popcornVideo.currentTime()).toFixed(1);
+                var timeInSec = window.popcornVideo.currentTime().toFixed(1);
                 C2G.videoSetup.selectSlide(timeInSec);
                 /*
                 if ($.inArray(timeInSec, window.slideMap) != -1) {
@@ -287,7 +287,10 @@
                     };
                 };
 
-                window.popcornVideo.cue(cueSecond, showQuestion(questionsToShow));
+                window.popcornVideo.cue(cueSecond, function(){
+                                             C2G.videoSetup.selectSlide(cueSecond);
+                                             showQuestion(questionsToShow)();
+                                        });
 
             }
 
