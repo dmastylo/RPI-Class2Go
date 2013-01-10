@@ -309,3 +309,11 @@
             .then(console.log("DONE!"));
 
         });
+
+        if (video_rec_id) {
+	    window.onbeforeunload = function() {
+		vidTime = Math.floor(window.popcornVideo.currentTime());
+		duration = window.popcornVideo.duration();
+		$.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: video_rec_id, playTime: vidTime, duration: duration, csrfmiddlewaretoken: csrf_token}});
+	    }
+	}
