@@ -396,6 +396,11 @@ class SimpleTest(TestCase):
             my_opener = urllib2.build_opener(FakeGraderHTTPHandler)
             urllib2.install_opener(my_opener)
 
+        def restore_urllib2():
+            default_opener = urllib2.build_opener(urllib2.HTTPDefaultErrorHandler)
+            urllib2.install_opener(default_opener)
+
+
         interactive_xml = """
 <exam_metadata>
 
@@ -452,4 +457,6 @@ class SimpleTest(TestCase):
         fake_remote_grader("""{"score":0, "feedback":[ {"explanation":"score 0, max inferred" }]}""")
         self.assertTrue(ag.grade("q1b", "should_fail"),
                 {'correct': False, 'score': 0, 'feedback': "score 0, max inferred"})
+
+        restore_urllib2()
 
