@@ -955,7 +955,10 @@ def get_or_update_incomplete_examrecord(course, exam, student):
         # exactly one found, this is the one we will update
         exam_rec = exam_rec_queryset[0]
     else:
-        # >1 found, take the first (latest updated) and delete the rest
+        # >1 found, use the latest-updated and delete the rest. Log this as an error
+        # since it is data inconsistency, even if we can clean up the mess now.
+        logger.error("Found %d incomplete exam records for student=%d, exam=%d, course=%d (%s), cleaning up all but the latest-updated"
+               % (len(exam_rec_queryset), student.id, exam.id, course.id, course.handle))
         exam_rec_list = list(exam_rec_queryset)
         exam_rec = exam_rec_list.pop(0)
         map(ExamRecord.delete, exam_rec_list)
@@ -1079,3 +1082,10 @@ def student_save_progress(request, course_prefix, course_suffix, exam_slug):
     exam_rec.save()
     return HttpResponse("OK")
 
+
+
+# SEF -- add back in later to get_or_update_incomplete_examrecord()
+        # >1 found, use the latest-updated and delete the rest. Log this as an error
+        # since it is data inconsistency, even if we can clean up the mess now.
+#         logging.error("Found %d incomplete exam records for student=%d, exam=%d, course=%d (%s), cleaning up all but the latest-updated"
+#                % (len(exam_rec_queryset), student.id, exam.id, course.id, course.handle))
