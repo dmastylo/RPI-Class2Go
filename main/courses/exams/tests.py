@@ -370,12 +370,15 @@ class SimpleTest(TestCase):
 
     def test_interactive_grader_basic(self):
         """
-        Create and use basic interactive autograder
+        Interactive autograder with fake remote endpoint
 
         Uses some XML from a db class interactive exercise, but the actual values
         aren't used since we just fake out the endpoint.
 
-        Method cribbed from http://stackoverflow.com/questions/2276689/how-do-i-unit-test-a-module-that-relies-on-urllib2
+        The trick here is overriding the global method that urllib2 uses to open
+        files.  You have to remember to restore urllib2 to a good state before 
+        finishing though otherwise urllib2 will be horked.  Method cribbed from:
+            http://stackoverflow.com/questions/2276689/how-do-i-unit-test-a-module-that-relies-on-urllib2
         """
         def fake_remote_grader(answer):
             """Helper function for the interactive grader, override the remote
