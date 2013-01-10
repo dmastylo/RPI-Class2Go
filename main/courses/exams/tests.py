@@ -439,27 +439,31 @@ class SimpleTest(TestCase):
 
         ag = AutoGrader(interactive_xml)
 
-        fake_remote_grader("""{"score":0, "maximum-score":1, "feedback":[ {"user_answer":"ignored", "score":0, "explanation":"bummer, try again" }]}""")
-        self.assertTrue(ag.grade("q1b", "should_fail"),
-                {'correct': False, 'score': 0, 'feedback': "bummer, try again"})
+        # the feedback is opaque, so just carry that around
+        fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
+        fbstr = json.dumps(fb)
 
-        fake_remote_grader("""{"score":1, "maximum-score":1, "feedback":[ {"user_answer":"ignored", "score":0, "explanation":"score 1 of 1" }]}""")
-        self.assertTrue(ag.grade("q1b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': "score 1 of 1"})
+        fake_remote_grader('{"score":0, "maximum-score":1, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_fail"),
+                {'correct': False, 'score': 0, 'feedback': fb})
 
-        fake_remote_grader("""{"score":10, "maximum-score":10, "feedback":[ {"user_answer":"ignored", "score":0, "explanation":"score 10 of 10" }]}""")
-        self.assertTrue(ag.grade("q1b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': "score 10 of 10"})
-        self.assertTrue(ag.grade("q2b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': "score 10 of 10"})
+        fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
 
-        fake_remote_grader("""{"score":1, "feedback":[ {"explanation":"score 1, max inferred" }]}""")
-        self.assertTrue(ag.grade("q1b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': "score 1, max inferred"})
+        fake_remote_grader('{"score":10, "maximum-score":10, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
+        self.assertEqual(ag.grade("q2b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
 
-        fake_remote_grader("""{"score":0, "feedback":[ {"explanation":"score 0, max inferred" }]}""")
-        self.assertTrue(ag.grade("q1b", "should_fail"),
-                {'correct': False, 'score': 0, 'feedback': "score 0, max inferred"})
+        fake_remote_grader('{"score":1, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
+
+        fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_fail"),
+                {'correct': False, 'score': 0, 'feedback': fb})
 
         restore_urllib2()
 
