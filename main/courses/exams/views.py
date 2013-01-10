@@ -717,22 +717,27 @@ def view_csv_grades(request, course_prefix, course_suffix, exam_slug):
 
     if exam.mode=="draft":
         exam = exam.image
-    
-    graded_students = ExamScore.objects.filter(course=course, exam=exam).values('student','student__username').distinct()
+
+    # Find the appropriate ExamRecord, for each student. In this case, appropriate
+    # means the last submission prior to the grace_period.
+    exam_record_ptrs = ExamRecord.objects.values('student__username').filter(exam=exam, exam__grace_period__gt=F('time_created')).annotate(last_submission_id=Max('id'))
     fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-grades-"+datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")+".csv"
     outfile = open(FILE_DIR+"/"+fname,"w+")
 
     could_not_parse = ""
 
     file_content = False
-    for s in graded_students: #yes, there is sql in a loop here.  We'll optimize later
-        #print(s)
-        score_obj = ExamScore.objects.get(course=course, exam=exam, student=s['student'])
-        subscores = ExamScoreField.objects.filter(parent=score_obj)
-        for field in subscores:
-            outstring = '"%s","%s","%s"\n' % (s['student__username'], field.field_name, str(field.subscore))
-            outfile.write(outstring)
-            file_content = True
+    for exam_record_ptr in exam_record_ptrs:
+        ers = ExamRecordScore.objects.filter(record_id=exam_record_ptr['last_submission_id'])
+        
+        #The ExamRecordScore will not exist for csv-graded exams if there has not been a csv grade import for this user.
+        if ers:
+            ersfs = ExamRecordScoreField.objects.filter(parent=ers)
+        
+            for ersf in ersfs:
+                outstring = '"%s","%s","%s"\n' % (exam_record_ptr['student__username'], ersf.field_name, str(ersf.subscore))
+                outfile.write(outstring)
+                file_content = True
             
     if not file_content:
         outfile.write("\n")
