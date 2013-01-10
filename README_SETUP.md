@@ -23,7 +23,7 @@ them and send us a pull request!
 It is a big step to go from a dev instance to a full-on deployed
 cloud instance.  Instructions for that are forthcoming.
 
-<a id="mac"></a>
+<a name="mac"></a>
 For Mac
 -------------
 
@@ -191,7 +191,7 @@ and edit the DATABASES strings as follows substituting proper values for your sy
 1. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
 
 
-<a id="windows"></a>
+<a name="windows"></a>
 For Windows
 ----------------
 
@@ -262,15 +262,21 @@ Yay. :)
 
 
 
-<a id="linux"></a>
+<a name="linux"></a>
 For Linux
 -----------------
 
-This assumes you have mysql and python installed, and you've logged
-into mysql and created the c2g database ('create database c2g;').
-These instructions also include info for virtualenvwrapper, which
-contains useful tools for virtualenv. virtualenvwrapper can also
-be installed for Mac (and probably Windows too)
+This assumes you have mysql and python installed.  These instructions
+also include info for virtualenvwrapper, which contains useful tools
+for virtualenv. virtualenvwrapper can also be installed for Mac (and
+probably Windows too).
+
+3. Create the database (perhaps with different username and password):
+        sudo mysql mysql
+        create database c2g;
+        CREATE USER 'c2g_username'@'localhost' IDENTIFIED BY 'c2g_passwd';
+        GRANT ALL PRIVILEGES ON c2g . * TO 'c2g_username'@'localhost';
+        FLUSH PRIVILEGES;
 
 3. Install pip:
 
@@ -288,6 +294,11 @@ be installed for Mac (and probably Windows too)
 
         ls /usr/local/bin/
 
+3. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
+
+        echo $PATH
+    (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
+
 3. Edit login script:
 
         vim .bashrc
@@ -301,7 +312,7 @@ be installed for Mac (and probably Windows too)
         export WORKON_HOME=~/DevEnvs
         export PROJECT_HOME=~/DevProjects
         export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-        export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+        export VIRTUALENVWRAPPER_VIRTUALENV=`which virtualenv`
         source /usr/local/bin/virtualenvwrapper.sh
 
 3. Source login script so env vars take effect:
@@ -311,12 +322,7 @@ be installed for Mac (and probably Windows too)
 
 3. Check out new virtual base directory:
 
-        ls -l DevEnvs/
-
-3. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
-
-        echo $PATH
-    (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
+        ls DevEnvs/
 
 3. Make sure PROJECT_HOME is defined
 
@@ -371,6 +377,10 @@ be installed for Mac (and probably Windows too)
 
         pip install gdata
 
+3. Install numpy for video thumbnailer:
+
+        pip install numpy
+
 3. Install Celery ecosystem
 
         pip install django-celery django-celery-email pytz
@@ -424,7 +434,7 @@ Now you should create the super user
 Yay. :)
 
 
-3. Update settings file and add "static/" for STATIC\_ROOT\_DIR:
+3. Update settings file and change STATIC\_ROOT to "static/":
 
         vim settings.py
 
@@ -448,7 +458,7 @@ When you want to start working on your project, just do the following:
         python ./manage.py runserver 8100
 
 
-<a id="config"></a>
+<a name="config"></a>
 Configuring Django
 ------------------
 
@@ -470,7 +480,7 @@ We partition our django project settings into two settings files:
 
 
 
-<a id="testdata"></a>
+<a name="testdata"></a>
 Generating Test Data
 -----------------------
 

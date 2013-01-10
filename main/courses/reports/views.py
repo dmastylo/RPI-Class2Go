@@ -22,48 +22,41 @@ def main(request, course_prefix, course_suffix):
     
     
     # 1- List all problem sets and videos, since instructors may let something fo non-live then try to get its report. If instructors try to generate a report for something that doesn't have a live instance, we will write that in the report
-    problemsets = ProblemSet.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     videos = Video.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     exams = Exam.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     
     
     # 2- Read a list of all reports for that course that are on the server
     dashboard_reports = list_reports_in_dir("%s/%s/reports/dashboard/" % (course_prefix, course_suffix))
-    course_quizzes_reports = list_reports_in_dir("%s/%s/reports/course_quizzes/" % (course_prefix, course_suffix))
-    problemset_full_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
-    problemset_summ_reports = list_reports_in_dir("%s/%s/reports/problemsets_summary/" % (course_prefix, course_suffix))
     video_full_reports = list_reports_in_dir("%s/%s/reports/videos/" % (course_prefix, course_suffix))
     video_summ_reports = list_reports_in_dir("%s/%s/reports/videos_summary/" % (course_prefix, course_suffix))
     class_rosters = list_reports_in_dir("%s/%s/reports/class_roster/" % (course_prefix, course_suffix))
     
-    #New assessment reports
+    #For new assessment reports
     course_assessment_reports = list_reports_in_dir("%s/%s/reports/course_assessments/" % (course_prefix, course_suffix))
     assessment_full_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
+    assessment_summ_reports = list_reports_in_dir("%s/%s/reports/problemsets_summary/" % (course_prefix, course_suffix))
     
     # 3- Divide ps and video reports into lists of dicts ready for grouped display by object
-    ps_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(problemsets, problemset_full_reports)
-    ps_quiz_summ_reports_list_of_dicts = ClassifyReportsBySlug(problemsets, problemset_summ_reports)
     vd_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_full_reports)
     vd_quiz_summ_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_summ_reports)
     
     assessment_full_reports_list_of_dicts = ClassifyReportsBySlug(exams, assessment_full_reports)
+    assessment_summ_reports_list_of_dicts = ClassifyReportsBySlug(exams, assessment_summ_reports)
     
     
     # 4- Render to response
     return render_to_response('reports/main.html', {
         'common_page_data':request.common_page_data,
         'dashboard_reports': dashboard_reports,
-        'course_quizzes_reports': course_quizzes_reports,
         'class_rosters': class_rosters,
-        'ps_quiz_full_reports': ps_quiz_full_reports_list_of_dicts,
-        'ps_quiz_summ_reports': ps_quiz_summ_reports_list_of_dicts,
         'vd_quiz_full_reports': vd_quiz_full_reports_list_of_dicts,
         'vd_quiz_summ_reports': vd_quiz_summ_reports_list_of_dicts,
         'videos': videos.order_by('title'),
-        'problemsets': problemsets.order_by('title'),
         'course_assessment_reports': course_assessment_reports,
         'exams': exams.order_by('title'),
         'assessment_full_reports': assessment_full_reports_list_of_dicts,
+        'assessment_summ_reports': assessment_summ_reports_list_of_dicts,
     }, context_instance=RequestContext(request))
     
     
@@ -96,23 +89,6 @@ def generate_report(request):
         email_title = "[Class2Go] Dashboard Report for %s" % course_handle_pretty
         req_reports = [{'type': 'dashboard'}]
         
-    elif report_type == 'course_quizzes':
-        email_title = "[Class2Go] Course Quizzes Report for %s" % course_handle_pretty
-        req_reports = [{'type': 'course_quizzes'}]
-        
-    elif report_type == 'problemset_full':
-        slug = request.POST["slug"]
-        email_title = "[Class2Go] Problemset Full Report for %s %s" % (course_handle_pretty, slug)
-        # TODO: Remove the following message  and attachement flag override after report email attachment is fixed
-        attach_reports_to_email = False
-        email_message = "The report has been generated. You can download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
-        req_reports = [{'type': 'problemset_full', 'slug': slug}]
-        
-    elif report_type == 'problemset_summary':
-        slug = request.POST["slug"]
-        email_title = "[Class2Go] Problemset Summary Report for %s %s" % (course_handle_pretty, slug)
-        req_reports = [{'type': 'problemset_summary', 'slug': slug}]
-        
     elif report_type == 'video_full':
         slug = request.POST["slug"]
         email_title = "[Class2Go] Video Full Report for %s %s" % (course_handle_pretty, slug)
@@ -142,6 +118,11 @@ def generate_report(request):
         attach_reports_to_email = False
         email_message = "The report has been generated. You can download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
         req_reports = [{'type': 'assessment_full', 'slug': slug}]
+    
+    elif report_type == 'assessment_summary':
+        slug = request.POST["slug"]
+        email_title = "[Class2Go] Assessment Summary Report for %s %s" % (course_handle_pretty, slug)
+        req_reports = [{'type': 'assessment_summary', 'slug': slug}]
     
     generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     

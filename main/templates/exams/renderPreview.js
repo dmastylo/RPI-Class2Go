@@ -14,14 +14,41 @@ var c2gXMLParse = (function() {
             return outstring;
          },
                    
-        specialNodes: "multiplechoiceresponse,numericalresponse,stringresponse,regexresponse,optionresponse,solution",
+        specialNodes: "dbinteractiveresponse,multiplechoiceresponse,numericalresponse,stringresponse,regexresponse,optionresponse,solution",
         
         renderPreview: function() {
             $('#staging-area').empty();
             $('#staging-area').append(editor.getValue());
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
+            var psetQuestions = $('#staging-area div.question');
+            if (psetQuestions.length > 1) {
+                var qQumx = 1;
+                $(psetQuestions).each(function () {
+                    c2gXMLParse.addNumberToQuestionDiv(this,qQumx);
+                    qQumx = qQumx + 1;}
+                );
+            }
         },
-
+                   
+        addNumberToQuestionDiv: function(elem, num) {
+            var numberingDiv = $(elem).find('h3.questionNumber');
+            if (numberingDiv.length == 0){
+                $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
+            }
+        },
+                   
+        copyContentsToEl: function(fromEl, toEl) {
+            $(fromEl).contents().each(function() {
+                //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
+                if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
+                    $(toEl).append($(this).text());
+                }
+                else { //for DOM nodes that are elements
+                    $(toEl).append($(this).clone());
+                }
+            });
+        },
+                   
         renderMarkup: function(sourceEl, targetEl) {
 
             if (typeof targetEl == "undefined" || targetEl == "") {
@@ -38,7 +65,7 @@ var c2gXMLParse = (function() {
             try {
                 var myDOM = $.parseXML(sourceXML);
             } catch (e) {
-                alert('Your XML is invalid');
+                alert('Your XML has invalid syntax.  You should be able to resolve this by copy-and-pasting your XML into a validator such as http://www.w3schools.com/xml/xml_validator.asp ');
                 console.log(e.message);
                 return;
             }
@@ -121,8 +148,16 @@ var c2gXMLParse = (function() {
                 }
                 return $(choiceElem).attr('correct').toLowerCase()==='true';
             }
-              
+            var psetDOM = $(myDOM).find('problemset');
+
             var questionIdx = 0;
+            var ordinalNumbers = true;
+            if (psetDOM.length && $(psetDOM).attr('do-not-autonumber') != undefined) {
+                ordinalNumbers = false;
+            }
+            if (problemNodes.length <= 1) { //special case if only 1 problem
+                ordinalNumbers = false;
+            }
                    
             var outerMetadataObj = document.createElement('metadata'); //outermost metadata--won't actually be displayed since we use $.html()
             var metadataObj = document.createElement('exam_metadata');
@@ -131,13 +166,29 @@ var c2gXMLParse = (function() {
             // Add video metadata (problem:time mappings for in-video exams)
             $(metadataObj).append($(videoNodes));
 
+            // Add preamble nodes
+            $(myDOM).find('preamble').each(function(){
+                var preambleDiv = document.createElement('div');
+                $(preambleDiv).addClass("preamble");
+                $(preambleDiv).attr('id','problemSetPreamble');
+                c2gXMLParse.copyContentsToEl($(this),$(preambleDiv));
+                $(targetEl).append($(preambleDiv));
+            });
+                   
             //Build up a DOM object corresponding to the answer key
             var answerkeyObj = document.createElement('answerkey');
             problemNodes.each(function () {
 
                 questionIdx += 1;
                 var questionMeta=document.createElement('question_metadata');
-                $(questionMeta).attr('id', 'problem_'+questionIdx);
+                var question_id = "";
+                if ($(this).attr('id') != undefined) {
+                    question_id = $(this).attr('id');
+                }
+                else {
+                    question_id = 'problem_'+questionIdx;
+                }
+                $(questionMeta).attr('id', question_id);
                 $(questionMeta).attr('data-report', $(this).attr('data-report'));
                 $(metadataObj).append($(questionMeta));
                 
@@ -154,9 +205,13 @@ var c2gXMLParse = (function() {
                               
                 var tmpProbDiv = document.createElement('div');
                 $(tmpProbDiv).addClass('question');
-                $(tmpProbDiv).attr('id', 'problem_'+questionIdx);
+                $(tmpProbDiv).attr('id', question_id);
                 $(tmpProbDiv).attr('data-report', $(this).attr('data-report'));
-                              
+                if (ordinalNumbers) {
+                    $(tmpProbDiv).prepend('<h3 class="questionNumber">Question ' + questionIdx +'</h3>');
+                } else {
+                    $(tmpProbDiv).prepend('<h3 class="questionNumber"></h3>');
+                }
                 //$('#staging-area').append($(tmpProbDiv));
                 $(targetEl).append($(tmpProbDiv));
                 
@@ -277,6 +332,36 @@ var c2gXMLParse = (function() {
                             $(nodeParent).append($(tmpInput));
 
                             break;
+                              
+                        case 'dbinteractiveresponse':
+                              
+                              var probName =  'q' + questionIdx + idx_suffix;
+                              
+                              var questionObj = document.createElement('response');
+                              $(questionObj).attr('name', probName);
+                              $(questionObj).attr('answertype', nodeName);
+                              $(questionObj).attr('answer',$(node).attr('answer'));
+                              $(questionObj).attr('data-report', $(node).attr('data-report'));
+                              
+                              $(node).children().each(function(){ //copy over all children
+                                                      $(questionObj).append($(this).clone());
+                                                      });
+                              $(questionMeta).append($(questionObj));
+                              
+                              var answerTextNode = $(node).find('answer-text');
+                              var placeholderText = "Enter your query here...";
+                              if ($(answerTextNode).length) {
+                                  placeholderText = $(answerTextNode).text();
+                              }
+                              var tmpInput = document.createElement('textarea');
+                              $(tmpInput).attr('id', probName);
+                              $(tmpInput).attr('name', probName);
+                              $(tmpInput).attr('placeholder', placeholderText);
+                              $(tmpInput).attr('data-report', $(node).attr('data-report'));
+                            
+                              $(nodeParent).append($(tmpInput));
+                              
+                              break;
 
                         case 'optionresponse':
 
@@ -336,6 +421,15 @@ var c2gXMLParse = (function() {
         
             }); // end each problem
       
+            // Add 'postamble' nodes
+            $(myDOM).find('postamble').each(function(){
+                var postambleDiv = document.createElement('div');
+                $(postambleDiv).addClass("postamble");
+                $(postambleDiv).attr('id','problemSetPostamble');
+                c2gXMLParse.copyContentsToEl($(this),$(postambleDiv));
+                $(targetEl).append($(postambleDiv));
+            });
+                   
             editor.setValue($(targetEl).html());
 
             metadata_editor.setValue($(outerMetadataObj).html());

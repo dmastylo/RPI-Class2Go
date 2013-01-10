@@ -40,9 +40,7 @@ There are some principles that have guided our project:
 * **Portable**. Valuable course content shouldn't be tied to any
     one platform. Documents are already portable; the videos are
     outside our system (on YouTube) and the assets themselves can
-    be repurposed as faculty see fit.  And our exercises and problem
-    sets, instead of being trapped in a proprietary database, are
-    in the Khan Academy format, so they can be used elsewhere.
+    be repurposed as faculty see fit.  
 
 * **Interoperable**. We don't want to build or maintain more than we
     have to. See the section below for a list of all the shoulders
@@ -89,8 +87,7 @@ Leveraging Others
 Thanks to all the projects we are relying on to make this work. Some
 commercial, some open source. But a ton of good stuff.
 
-* [YouTube] [yt] for video
-* [Khan Academy] [ka] for their HTML-based exercise framework
+* [YouTube] [yt] and [Popcorn.js] [pop] for video
 * [Piazza] [pz] for forums
 * [MySQL] [mys] is our database
 * The massive [Python] [p] [Django] [dj] ecosystem: eg. South, Registration
@@ -99,7 +96,7 @@ commercial, some open source. But a ton of good stuff.
 * [Github] [gh] for source code management and issues
 
   [yt]:   http://www.youtube.com/
-  [ka]:   http://www.khanacademy.org/
+  [pop]:  http://www.popcornjs.org/
   [pz]:   http://www.piazza.com/
   [mys]:  http://www.mysql.org/
   [p]:    http://www.python.org/
@@ -139,7 +136,7 @@ to make it less Stanford-specific.  Maybe you can help with that?
 
 If you're interested, your the first step, just like contributing,
 is to stand up a development environment on your own laptop and try
-it out.  We have people this demo sized Class2Go up and running
+it out.  We have people who got this demo-sized Class2Go up and running
 pretty quickly on their local machine.
 
 Send us mail at <c2g-contact@class.stanford.edu> and we can give

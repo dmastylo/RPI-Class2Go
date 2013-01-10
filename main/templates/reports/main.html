@@ -10,9 +10,9 @@
         <div class="tabbable span12">  
             <ul class="nav nav-tabs" style='font-size: 10pt;'>  
                 <li class="active"><a href="#dashboard" data-toggle="tab">Course Dashboard</a></li>
-                <li><a href="#all_assessment_summary" data-toggle="tab">Combined Summary of all Assessments</a><li>
-                <li><a href="#assessment_student_data" data-toggle="tab">Assessment Student Data</a><li>
-                <li><a href="#psets_summary" data-toggle="tab">Problem set Summary</a></li>
+                <li><a href="#all_assessment_summary" data-toggle="tab">Combined Summary of all Assessments</a></li>
+                <li><a href="#assessment_student_data" data-toggle="tab">Assessment Student Data</a></li>
+                <li><a href="#assessment_summary" data-toggle="tab">Assessment Summary</a></li>
                 <li><a href="#videos_full" data-toggle="tab">Video Student Data</a></li>
                 <li><a href="#videos_summary" data-toggle="tab">Video Summary</a></li>
                 <li><a href="#class_roster" data-toggle="tab">Class Roster</a></li>
@@ -56,26 +56,6 @@
                     </table>
                 </div>                
                 
-                
-                <div id="all_quiz_summary" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new course quizzes summary</h3>
-                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
-                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
-                        <input type="submit" class='btn' value="Generate new course quizzes summary" style="margin-left: 10px;" />
-                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
-                        <input type="hidden" name="type" value="course_quizzes" />
-                        {% csrf_token %}
-                    </form>
-                    <h3>Available course quizzes summaries</h3>
-                    <table class="table table-striped" style="width: 600px;">
-                        {% for rep in course_quizzes_reports %}
-                            <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'course_quizzes' rep.s3_name %}">{{ rep.name }}</a></td></tr>
-                        {% empty %}
-                            <tr><td style="width: 600px;">No course quizzes reports available at the moment.</td></tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                
                 <div id="assessment_student_data" class="tab-pane" style="padding-left: 10px;">
                     <h3>Generate new assessment full report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
@@ -99,26 +79,26 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No full reports available for this problem set.</label>
+                            <label style="margin-left: 40px;">No full reports available for this assessment.</label>
                         {% endif %}
                     {% endfor %}
                 </div>                
                 
-                <div id="psets_summary" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new problem set summary report</h3>
+                <div id="assessment_summary" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new assessment summary report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
-                        <label for="video" style='display: inline;'>Problem set</label>
+                        <label for="video" style='display: inline;'>Assessment</label>
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
-                            {% for ps in problemsets %}<option value="{{ps.slug}}">{{ps.title}}</option>{% endfor%}
+                            {% for exam in exams %}<option value="{{exam.slug}}">{{exam.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new problem set summary report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new assessment summary report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
-                        <input type="hidden" name="type" value="problemset_summary" />
+                        <input type="hidden" name="type" value="assessment_summary" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available problem set summary reports</h3>
-                    {% for ps in ps_quiz_summ_reports %}
+                    <h3>Available assessment summary reports</h3>
+                    {% for ps in assessment_summ_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
                         {% if ps.reports|length > 0 %}
                             <table class="table table-striped" style="margin-left: 40px;width: 600px;">
@@ -127,7 +107,7 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No summary reports available for this problem set.</label>
+                            <label style="margin-left: 40px;">No summary reports available for this assessment.</label>
                         {% endif %}
                     {% endfor %}
                 </div>

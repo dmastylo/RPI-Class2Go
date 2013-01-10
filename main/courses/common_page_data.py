@@ -1,4 +1,4 @@
-from c2g.models import Course, AdditionalPage
+from c2g.models import Course, ContentSection, AdditionalPage
 from django.contrib.auth.models import User, Group
 import datetime
 import logging
@@ -63,6 +63,11 @@ def get_common_page_data(request, prefix, suffix):
     for page in AdditionalPage.objects.getByCourseAndMenuSlug(course=course, menu_slug='course_info').all():
         if view_mode == 'edit' or page.description:
             course_info_pages.append(page)
+
+    content_sections = None
+    if course_mode == 'ready':
+        #Get list of non-empty content sections for course materials dropdown menu
+        content_sections = [s for s in ContentSection.objects.getByCourse(course) if s.countChildren() > 0]
     
     current_datetime = datetime.datetime.now()
     effective_current_datetime = current_datetime
@@ -80,6 +85,7 @@ def get_common_page_data(request, prefix, suffix):
         'is_course_member':is_course_member,
         'view_mode': view_mode,
         'course_info_pages':course_info_pages,
+        'content_sections':content_sections,
         'view_mode': view_mode,
         'current_datetime':current_datetime,
         'effective_current_datetime':effective_current_datetime,

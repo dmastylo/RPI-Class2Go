@@ -22,9 +22,10 @@ import time
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
+from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import Avg, Count, Max, StdDev
+from django.db.models import Max
+from django.db.models.signals import post_save
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
@@ -450,7 +451,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         return True
 
     def get_url(self):
-        return 'pages/' + self.slug
+        return reverse("courses.additional_pages.views.main", args=[self.course.prefix, self.course.suffix, self.slug])
 
     def __unicode__(self):
         if self.title:
@@ -501,6 +502,16 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         self.image = ready_instance
         self.save()
 
+    def commit(self):
+        img = self.image
+        img.course=self.course.image
+        img.section=self.section.image
+        img.title=self.title
+        img.index = self.index
+        img.handle = self.handle
+        img.live_datetime = self.live_datetime
+        img.save()
+    
     def has_storage(self):
         """Return True if we have a copy of this file on our storage."""
         return self.file.storage.exists(self.file.name)
@@ -754,7 +765,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     description = models.TextField(blank=True)
     type = models.CharField(max_length=30, default="youtube")
     url = models.CharField("Youtube Video ID", max_length=255, null=True, blank=True)
-    duration = models.IntegerField(null=True)
+    duration = models.IntegerField(null=True, blank=True)
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     file = models.FileField(upload_to=get_file_path)
     handle = models.CharField(max_length=255, null=True, db_index=True)
@@ -1038,7 +1049,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'videos/' + self.slug
+        return reverse("courses.videos.views.view", args=[self.course.prefix, self.course.suffix, self.slug])
         
     def __unicode__(self):
         if self.title:
@@ -1458,7 +1469,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'problemsets/' + self.slug
+        # not using reverse() because problemsets have been removed from urls.py
+        return '/' + self.course.prefix.replace('--', '/') + '/problemsets/' + self.slug
 
     def __unicode__(self):
         return self.title
@@ -1959,7 +1971,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         return self.safe_exam_type()+"_record"
 
     def get_url(self):
-        return self.show_view_name()
+        #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
+        return reverse(self.show_view, args=[self.course.prefix, self.course.suffix, self.slug])
     
     record_view = property(record_view_name)
 
@@ -2064,6 +2077,7 @@ class ExamScore(TimestampMixin, models.Model):
     exam = models.ForeignKey(Exam, db_index=True)
     student = models.ForeignKey(User, db_index=True)
     score = models.FloatField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
+    csv_imported = models.BooleanField(default=False)
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
     
     def __unicode__(self):
@@ -2106,6 +2120,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     """
     record = models.OneToOneField(ExamRecord, db_index=True)
     raw_score = models.FloatField(null=True, blank=True) # this is the raw score of the entire record
+    csv_imported = models.BooleanField(default=False)
     #subscores are in ExamRecordScoreField
     
     def __unicode__(self):
@@ -2160,17 +2175,29 @@ class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)
 
+
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course).order_by('group_id','level')
+
+    def getByFieldnameAndId(self, fieldname, fieldid):
+        """Use the type tag (video, etc.) and id to dereference an entry.
+        
+        Returns the ContentGroup entry for this item."""
+        # TODO: cache this
+        this = ContentGroup.groupable_types[fieldname].objects.get(id=fieldid)
+        retset = this.contentgroup_set.get()
+        if len(retset) == 1:
+            return retset[0]
+        else: return retset
+
     def getChildrenByGroupId(self, group_id):
         return self.filter(level=2, group_id=group_id).order_by('display_style')
 
 class ContentGroup(models.Model):
     group_id        = models.IntegerField(db_index=True, null=True, blank=True)
     level           = models.IntegerField(db_index=True)
-    display_style   = models.CharField(max_length=32, null=True, blank=True)
-    #content_type_tag= models.CharField(max_length=32, null=True, blank=True)
+    display_style   = models.CharField(max_length=32, default='list', blank=True)
 
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
     course          = models.ForeignKey(Course)
@@ -2200,11 +2227,15 @@ class ContentGroup(models.Model):
         becomes linear, and then we win.
         """
         info = {}
-        cls = thisclass.groupable_types.get('tag', False)
+        cls = thisclass.groupable_types.get(tag, False)
         if not cls:
             return info
         obj = cls.objects.get(id=id)
-        cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
+
+        try:
+            cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
+        except ContentGroup.DoesNotExist:
+            return info
         for cgo in cgobjs:
             cttag = cgo.get_content_type()
             cgref = getattr(cgo, cttag)
@@ -2212,6 +2243,7 @@ class ContentGroup(models.Model):
                 continue
             if cgo.level == 1:
                 info['__parent'] = cgref
+                info['__parent_tag'] = cttag
             else:
                 info.setdefault('__children', []).append(cgref)
             info.setdefault(cttag, []).append(cgref)
@@ -2220,7 +2252,7 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
-    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
         """Add obj_ref having type tag to the ContentGroup table.
 
         Returns the ContentGroup entry id for the resulting child item.
@@ -2236,38 +2268,63 @@ class ContentGroup(models.Model):
         # Technically there's no reason to restrict the ContentGroups
         # to two levels of hierarchy, but the UI design is harder for
         # more level (and as of this iteration the spec says two)
-        cgref         = None
         if tag not in thisclass.groupable_types.keys():
             raise ValueError, "ContentGroup "+str(tag)+" an invalid object type tag."
         content_group = ContentGroup.objects.filter(group_id=group_id)
         if not content_group:
             raise ValueError, "ContentGroup "+str(group_id)+" does not exist."
-        try:
-            cgref = obj_ref.contentgroup_set.get()
-        except ContentGroup.DoesNotExist:
+        cgref = obj_ref.contentgroup_set.all()
+        if not cgref:
             # it's not in the table, so add it
             new_item = ContentGroup(course=content_group[0].course, level=2, group_id=group_id, display_style=display_style)
             setattr(new_item, tag, obj_ref)
             new_item.save()
             return new_item.id
         else:
+            cgref = cgref[0]
             # it is in the table, so do something reasonable:
             for entry in content_group:
                 if getattr(entry, tag, False) == obj_ref:
                     # If this child is in this group already, return this group
-                    # But if this child is a parent of this group, make it a child first
                     if entry.level == 1:
-                        entry.level = 2
-                        entry.save()
+                        # It is an error to make a parent into a child of its own group
+                        # Instead, make a new group, then reassign_membership 
+                        raise ValueError, "ContentGroup "+str(entry.id)+" is the parent of group "+str(group_id)
+                    entry.display_style = display_style
+                    entry.save()
                     return entry.id
-            # We have a reference to it, but it's not in content_group
-            # TODO: Decide: If cgref was previously a parent and we reassign
-            #       it, what happnes to its (old) children?
+            # We have a reference to it, but it's not in content_group, so reassign it
             if content_group and cgref:
-                cgref.group_id = group_id
-                cgref.level = 2
-                cgref.save()
-            return cgref.id
+                new_group_id = thisclass.reassign_membership(cgref, content_group.get(level=1))
+            return new_group_id
+
+    @classmethod
+    def reassign_membership(thisclass, contentgroup, new_parent_cg):
+        """Reassign a ContentGroup entry from its current parent to another.
+
+        If a parent is reassigned in this way, also reassign all of its child
+        items.
+
+        Arguments:
+        contentgroup: the ContentGroup entry to be made into a child
+        new_parent_cg: the ContentGroup entry to which parent_cg should be reassigned
+
+        Returns:
+        new_parent_cg.group_id
+        """
+        new_group_id = new_parent_cg.group_id
+        if contentgroup.level == 2:
+            contentgroup.group_id = new_parent_cg.group_id
+            contentgroup.save()
+        else:
+            children = ContentGroup.objects.filter(level=2, group_id=contentgroup.group_id)
+            contentgroup.group_id = new_group_id
+            contentgroup.level = 2
+            for child in children:
+                child.group_id = new_group_id
+                child.save()
+            contentgroup.save()
+        return new_group_id
 
     @classmethod
     def add_parent(thisclass, course_ref, tag, obj_ref):

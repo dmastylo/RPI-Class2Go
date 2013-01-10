@@ -1,25 +1,33 @@
 from c2g.models import *
 import datetime
-from django.db.models import Count, Max, Q, F
+from django.db.models import Count, Max
 from django.db import connection
 
 
-def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False, exam_types=[]):
+def get_course_materials(common_page_data, get_video_content=False, get_pset_content=False, get_additional_page_content = False, get_file_content=False, get_exam_content=False, exam_types=[], SECTION=None):
     COURSE  = common_page_data['course']
     REQUEST = common_page_data['request']
     USER    = REQUEST.user
     section_structures = []
     if USER.is_authenticated():
-        sections = ContentSection.objects.getByCourse(course=COURSE)
-        pages = AdditionalPage.objects.getByCourse(course=COURSE)
-        files = File.objects.getByCourse(course=COURSE)
-        exams = Exam.objects.getByCourse(course=COURSE)
+        if SECTION:
+            pages = AdditionalPage.objects.getBySection(section=SECTION)
+            files = File.objects.getBySection(section=SECTION)
+            exams = Exam.objects.getBySection(section=SECTION)
+        else:
+            sections = ContentSection.objects.getByCourse(course=COURSE)
+            pages = AdditionalPage.objects.getByCourse(course=COURSE)
+            files = File.objects.getByCourse(course=COURSE)
+            exams = Exam.objects.getByCourse(course=COURSE)
         if exam_types:
             exams = exams.filter(exam_type__in=exam_types)
         l1items, l2items = get_contentgroup_data(COURSE)
 
         if get_video_content:
-            videos = Video.objects.getByCourse(course=COURSE)
+            if SECTION:
+                videos = Video.objects.getBySection(section=SECTION)
+            else:
+                videos = Video.objects.getByCourse(course=COURSE)
             if videos:
                 video_list = []
                 for video in videos:
@@ -27,12 +35,14 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                 videoToExs = VideoToExercise.objects.values('video').filter(video__in=video_list, is_deleted=0).annotate(dcount=Count('video'))
                     
                 if common_page_data['course_mode'] == 'ready':
-                    video_recs = VideoActivity.objects.filter(course=COURSE, student=USER)
-                    video_downloads = VideoDownload.objects.values('video').filter(course=COURSE, student=USER).annotate(dcount=Count('video'))
+                    video_recs = VideoActivity.objects.filter(course=COURSE, student=USER, video__in=video_list)
+                    video_downloads = VideoDownload.objects.values('video').filter(course=COURSE, student=USER, video__in=video_list).annotate(dcount=Count('video'))
 
         if get_pset_content:
-            
-            problem_sets = ProblemSet.objects.getByCourse(course=COURSE)
+            if SECTION:
+                problem_sets = ProblemSet.objects.getBySection(section=SECTION)
+            else:
+                problem_sets = ProblemSet.objects.getByCourse(course=COURSE)
             if problem_sets:
                 problem_set_list = []
                 for problem_set in problem_sets:
@@ -151,6 +161,8 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         score_list.append(score_item)
 
         index = 0
+        if SECTION:
+            sections = [SECTION]
         for section in sections:
             section_dict = {'section':section, 'items':[]}
 
@@ -292,7 +304,10 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                         section_dict['items'].append(item)
 
             if get_exam_content:
-                user_records = ExamRecord.objects.filter(course=COURSE, student=USER, complete=True).order_by('time_created')
+                if SECTION:
+                    user_records = ExamRecord.objects.filter(course=COURSE, exam__section=section, student=USER, complete=True).order_by('time_created')
+                else:
+                    user_records = ExamRecord.objects.filter(course=COURSE, student=USER, complete=True).order_by('time_created')
                 for exam in exams:
                     key = ('exam', exam.id)
                     if exam.section_id == section.id and not l2items.has_key(key):
@@ -334,7 +349,7 @@ def get_contentgroup_data(course):
 def get_group_item_data(group_item, selfref=False):
     ctype   = group_item.get_content_type()
     level   = group_item.level
-    display = group_item.display_style or 'button'
+    display = group_item.display_style or 'list'
     target  = getattr(group_item, ctype)
     cgid    = target.id
     if not selfref:
@@ -345,7 +360,7 @@ def get_children_by_display_style(key, level1_items, level2_items, user=None):
     children = get_children(key, level1_items, level2_items, user)
     tagged_children = {}
     for child in children:
-        display_style = child.get('display', 'button')
+        display_style = child.get('display', 'list')
         if not tagged_children.has_key(display_style):
             tagged_children[display_style] = [child]
         else:
