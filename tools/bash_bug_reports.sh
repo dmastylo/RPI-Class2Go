@@ -23,7 +23,7 @@ function buglist-by-dev {
         sprintparam="-M $1"
     fi
 
-    for a in jbau wescott jrbl sefk shalinguyen dcadams halawa kluo jinpa ; do
+    for a in jbau wescott jrbl sefk dcadams kluo jinpa ividya; do
         for p in P0 P1; do
             echo "**** $a ($p) ****"
             ghi list -q -s open -l $p -u $a -q $sprintparam | grep -v '\[3-Done\]'

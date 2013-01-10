@@ -1,0 +1,28 @@
+{% load url from future %}
+
+{% if children %} {# needed because this template is called directly #}
+    {# <div class="button-tray" style="display: block; clear: both"> #}
+    <div class="button-tray" style="display: block; clear:both; width:800px;">
+    <h3 style="clear: none;">Additional Content for {{video.title}}</h3>
+    <ul class="unstyled course-list">
+    {% for child in children %}
+        {% with contentgroup=child.self %}
+        {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
+        <li class="course-list-item {{ stripecolor }}">
+        {% if contentgroup.display_style == 'button' %}
+        <span style="float: left;"><strong><a href="{{child.url}}">{{child.title}}</a></strong></span>
+        <span style="float: right;">
+            <a href="{{child.url}}">
+                <button class="btn btn-mini" title="Download {{child.type}} {{child.name}}">
+                    <em class="icon-download-alt">&nbsp;</em>{{child.ext}}
+                </button>
+                </a></span>
+        {% else %}
+            <span style="float: left;"><strong><a href="{{child.url}}">{{child.title}}</a></strong>{% if child.ref.description %}: {{child.ref.description}}{% endif %}</span>
+        {% endif %}
+        </li>
+        {% endwith %}
+    {% endfor %}
+    </ul>
+    </div>
+{% endif %}

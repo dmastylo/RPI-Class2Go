@@ -1,12 +1,3 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#     * Rearrange models' order
-#     * Make sure each model has one field with primary_key=True
-# Feel free to rename the models, but don't rename db_table values or field names.
-#
-# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
-# into your database.
-
 #c2g specific comments
 # any table indexes that use only one column here are place here.
 # any table indexes that use multiple columns are placed in a south migration at
@@ -22,6 +13,7 @@ import time
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
@@ -83,10 +75,10 @@ class Deletable(models.Model):
         self.save()
 
         # Delete ContentGroup relationships when items are deleted
-        contentgroup_entries = self.contentgroup_set.all()
-        # Our object may not have a ContentGroup entry, but if it does, it
-        # should have exactly one - the current specification is that objects
-        # can't be in multiple parent/child relationships.
+        # There may be exactly 0 or 1 ContentGroup entry for a given object
+        contentgroup_entries = ()
+        if getattr(self, 'contentgroup_set', None):
+            contentgroup_entries = self.contentgroup_set.all()
         if len(contentgroup_entries) == 1:
             contentgroup_entries[0].delete()
         elif len(contentgroup_entries) > 1:
@@ -173,10 +165,10 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
                 
     def has_problem_sets(self):
         if self.mode == 'draft':
-            return ProblemSet.objects.filter(course=self, is_deleted=0).exists()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="problemset").exists()
         else:
             now = datetime.now()
-            return ProblemSet.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="problemset", live_datetime__lt=now).exists()
         
     def has_videos(self):
         if self.mode == 'draft':
@@ -450,7 +442,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         return True
 
     def get_url(self):
-        return 'pages/' + self.slug
+        return reverse("courses.additional_pages.views.main", args=[self.course.prefix, self.course.suffix, self.slug])
 
     def __unicode__(self):
         if self.title:
@@ -1048,7 +1040,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'videos/' + self.slug
+        return reverse("courses.videos.views.view", args=[self.course.prefix, self.course.suffix, self.slug])
         
     def __unicode__(self):
         if self.title:
@@ -1468,7 +1460,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'problemsets/' + self.slug
+        # not using reverse() because problemsets have been removed from urls.py
+        return '/' + self.course.prefix.replace('--', '/') + '/problemsets/' + self.slug
 
     def __unicode__(self):
         return self.title
@@ -1969,7 +1962,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         return self.safe_exam_type()+"_record"
 
     def get_url(self):
-        return self.show_view_name()
+        #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
+        return reverse(self.show_view, args=[self.course.prefix, self.course.suffix, self.slug])
     
     record_view = property(record_view_name)
 
@@ -2194,7 +2188,7 @@ class ContentGroupManager(models.Manager):
 class ContentGroup(models.Model):
     group_id        = models.IntegerField(db_index=True, null=True, blank=True)
     level           = models.IntegerField(db_index=True)
-    display_style   = models.CharField(max_length=32, null=True, blank=True)
+    display_style   = models.CharField(max_length=32, default='list', blank=True)
 
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
     course          = models.ForeignKey(Course)
@@ -2249,7 +2243,7 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
-    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
         """Add obj_ref having type tag to the ContentGroup table.
 
         Returns the ContentGroup entry id for the resulting child item.
