@@ -439,6 +439,9 @@ class SimpleTest(TestCase):
 
         ag = AutoGrader(interactive_xml)
 
+        self.assertEqual(ag.points_possible, 2.0)
+        self.assertEqual(len(ag.grader_functions), 2)
+
         # the feedback is opaque, so just carry that around
         fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
         fbstr = json.dumps(fb)
