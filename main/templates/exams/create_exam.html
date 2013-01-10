@@ -1,6 +1,12 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block course_page_title %}Creation Form{% endblock course_page_title %}
+{% block course_page_title %}
+{% if edit_mode %}
+    Edit
+{% else %}
+    Creation
+{% endif %} 
+Form{% endblock course_page_title %}
 {% block mode_switcher %}{% endblock mode_switcher %}
 
 {% block addl_head_scripts %}
@@ -64,11 +70,22 @@
     #description{width:150px; height:150px;}
     .warning{color:red;margin-right:5px;}
     #xml-import-label{font-size:22px;font-weight:bolder;}
+    div.question textarea { width:70%; height:100px; }
+    div.preamble {margin-bottom: 2em; }
+    div.postamble {margin-top: 2em; }
+
 
 </style>
 
 <div class="well create-exam-form">
-    <h2>Create a new Exam / ProblemSet / Survey</h2>
+    <h2>
+    {% if edit_mode %}
+        Edit an 
+    {% else %}    
+        Create a new
+    {% endif %}
+    Exam / ProblemSet / Survey</h2>
+
 
     
     <div class="control-group">
@@ -416,6 +433,7 @@ age: 20,
                         editor.setValue(style_html(editor.getValue(), {'max_char':80}));
                         metadata_editor.setValue(style_html(metadata_editor.getValue(), {'max_char':80}));
                         __xml_saved=true;
+                        c2gXMLParse.renderPreview();
                         $( this ).dialog( "close" );
                         }
                   },

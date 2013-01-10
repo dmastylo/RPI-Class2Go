@@ -166,9 +166,9 @@
             window.popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
 
             C2G.checkSubmitStatus = function () {
-                if ($('#survey-submit').length && $('.question:last').css('display') == "block") {
+                if ($('#submit-button').length && $('.question:last').css('display') == "block") {
                     $('.continue-video-btn').hide();
-                    $('#survey-submit').show();
+                    $('#submit-button').show();
                 }
             };
 
@@ -204,6 +204,7 @@
                 $('#demoplayer').hide();
                 $('#slideIndex').hide();
                 $('.question').hide();
+                $('.explanation').hide();
             };
 
             var removeExamStage = function() {

@@ -4,13 +4,13 @@
     {% for child in children %}
         <div class="btn-group" style="float: left;">
             <a href="{{child.url}}">
-                {% if child.name %}
+                {% if child.name %} {# indicates a file #}
                     <button class="btn btn-mini" title="{{child.type}}: {{child.title}}">
                         <em class="icon-download-alt">&nbsp;</em>{{child.ext}}
                     </button>
                 {% else %}
-                    <button class="btn btn-mini icon" title="{{child.title}}">
-                        <em class="icon-download-alt">&nbsp;</em>{{child.type}}
+                    <button class="btn btn-mini icon" title="{{child.type}}">
+                        <em class="icon-download-alt">&nbsp;</em>{{child.title}}
                     </button>
                 {% endif %}
             </a>

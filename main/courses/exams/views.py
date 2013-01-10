@@ -9,8 +9,8 @@ import datetime
 import csv
 import HTMLParser
 import json
+from django.db.models import Sum, Max, F
 import copy
-from django.db.models import Sum
 import urllib2, urlparse
 from xml.dom.minidom import parseString
 
@@ -30,7 +30,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.core.validators import validate_slug, ValidationError
 from django.core.exceptions import MultipleObjectsReturned
-from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
+from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -89,13 +89,16 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
+    incomplete_record = get_or_update_incomplete_examrecord(course, exam, request.user)
+
     too_many_attempts = exam.max_attempts_exceeded(request.user)
     
     #self.metadata_xml = xml #The XML metadata for the entire problem set.
     metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
     questions = metadata_dom.getElementsByTagName('video')
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
+                              'json_pre_pop':incomplete_record.json_data,
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':False,
                               'allow_submit':True, 'too_many_attempts':too_many_attempts,
                               'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
@@ -253,7 +256,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
         exam = exam.image
 
     submitters = ExamRecord.objects.filter(exam=exam, complete=True, time_created__lt=exam.grace_period).values('student').distinct()
-    fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-"+datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")+".csv"
+    fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-"+datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")+".csv"
     outfile = open(FILE_DIR+"/"+fname,"w+")
 
     could_not_parse = ""
@@ -317,7 +320,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
     json_obj=json.loads(postdata)
 
-    if exam.past_all_deadlines():
+    if exam.mode == "ready" and exam.past_all_deadlines():
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
                                       datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
 
@@ -455,7 +458,6 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     assessment_type = request.POST.get('assessment_type','')
     section=request.POST.get('section','')
     invideo_val=request.POST.get('invideo','')
-    parent=request.POST.get('parent','none,none')
     
     if invideo_val and invideo_val == "true":
         invideo = True
@@ -558,11 +560,6 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         except ValueError:
             return HttpResponseBadRequest("A non-numeric resubmission penalty (" + resubmission_penalty  + ") was provided")
 
-    if parent and parent[:4] != 'none':
-        parent_type, parent = parent.split(',')
-    else:
-        parent_type, parent = None, None
-
     #create or edit the Exam
     if create_or_edit == "create":
         if Exam.objects.filter(course=course, slug=slug, is_deleted=False).exists():
@@ -577,10 +574,8 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         exam_obj.save()
         exam_obj.create_ready_instance()        
 
-        if parent_type:
-            parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
-            content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
-            ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
+        # Set parent/child relationships
+        create_contentgroup_entries_from_post(request, 'parent', exam_obj.image, 'exam', display_style='list')
 
         #Now set the video associations
         exam_obj.sync_videos_foreignkeys_with_metadata()
@@ -626,15 +621,9 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.save()
             exam_obj.commit()
 
-            if parent_type:
-                parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent)).image
-                content_group_parent = parent_ref.contentgroup_set.all()
-                if content_group_parent:
-                    content_group_groupid = content_group_parent[0].group_id
-                else:
-                    content_group_groupid = ContentGroup.add_parent(exam_obj.image.course, parent_type, parent_ref.image)
-                ContentGroup.add_child(content_group_groupid, 'exam', exam_obj.image, display_style='list')
-        
+            # Set parent/chlid relationships for this exam
+            create_contentgroup_entries_from_post(request, 'parent', exam_obj.image, 'exam', display_style='list')
+
             #Now set the video associations
             exam_obj.sync_videos_foreignkeys_with_metadata()
             vid_status_obj = exam_obj.image.sync_videos_foreignkeys_with_metadata()
@@ -731,22 +720,30 @@ def view_csv_grades(request, course_prefix, course_suffix, exam_slug):
 
     if exam.mode=="draft":
         exam = exam.image
-    
-    graded_students = ExamScore.objects.filter(course=course, exam=exam).values('student','student__username').distinct()
-    fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-grades-"+datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")+".csv"
+
+    # Find the appropriate ExamRecord, for each student. In this case, appropriate
+    # means the last submission prior to the grace_period.
+    exam_record_ptrs = ExamRecord.objects.values('student__username').filter(exam=exam, exam__grace_period__gt=F('time_created')).annotate(last_submission_id=Max('id'))
+    fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-grades-"+datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")+".csv"
     outfile = open(FILE_DIR+"/"+fname,"w+")
 
     could_not_parse = ""
 
-    for s in graded_students: #yes, there is sql in a loop here.  We'll optimize later
-        #print(s)
-        score_obj = ExamScore.objects.get(course=course, exam=exam, student=s['student'])
-        subscores = ExamScoreField.objects.filter(parent=score_obj)
-        for field in subscores:
-            outstring = '"%s","%s","%s"\n' % (s['student__username'], field.field_name, str(field.subscore))
-            outfile.write(outstring)
-
-    outfile.write("\n")
+    file_content = False
+    for exam_record_ptr in exam_record_ptrs:
+        ers = ExamRecordScore.objects.filter(record_id=exam_record_ptr['last_submission_id'])
+        
+        #The ExamRecordScore will not exist for csv-graded exams if there has not been a csv grade import for this user.
+        if ers:
+            ersfs = ExamRecordScoreField.objects.filter(parent=ers)
+        
+            for ersf in ersfs:
+                outstring = '"%s","%s","%s"\n' % (exam_record_ptr['student__username'], ersf.field_name, str(ersf.subscore))
+                outfile.write(outstring)
+                file_content = True
+            
+    if not file_content:
+        outfile.write("\n")
 
     #write to S3
     secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
@@ -810,6 +807,10 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
                     if good_count % 100 == 0:
                         print str(good_count)
 
+    # Find the appropriate ExamRecord, for each student, to update. In this case, appropriate
+    # means the last submission prior to the grace_period.
+    exam_record_ptrs = ExamRecord.objects.values('student__username').filter(exam=exam, exam__grace_period__gt=F('time_created')).annotate(last_submission_id=Max('id'))
+
     student_count = 0
     for username, record in exam_scores.iteritems():
         try:
@@ -817,26 +818,51 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
             user_score, created = ExamScore.objects.get_or_create(course=course, exam=exam, student=user)
             db_hits += 2
             
-            if not created:
-                #yes, we delete them all to start.  Uploading a CSV replaces the grades for this student on this exam
-                #we do this to allow batched SQL later
-                ExamScoreField.objects.filter(parent=user_score).delete()
-                db_hits += 1
+            #Total score for this user
+            total_score = sum(map(lambda r:r['score'], record['fields']))
+            if total_score != record['total']:
+                bad_rows.append(username + ": total does not match sum of subscores.  Sum:" + str(total_score) + " Total:" + str(record['total']))
+                logger.error(username + ": total does not match sum of subscores.  Sum:" + str(total_score) + " Total:" + str(record['total']))
+            total_score = max(record['total'],0) #0 is the floor score
             
-            field_objs = map(lambda f:ExamScoreField(parent=user_score, field_name=f['name'], subscore=f['score']), record['fields'])
-            ExamScoreField.objects.bulk_create(field_objs)
-            db_hits += 1
-
-            total_1 = sum(map(lambda r:r['score'], record['fields']))
-            if total_1 != record['total']:
-                bad_rows.append(username + ": total does not match sum of subscores.  Sum:" + str(total_1) + " Total:" + str(record['total']))
-                logger.error(username + ": total does not match sum of subscores.  Sum:" + str(total_1) + " Total:" + str(record['total']))
-            user_score.score = max(record['total'],0) #0 is the floor score
+            #Find the ExamRecord for this user
+            for exam_record_ptr in exam_record_ptrs:
+                if exam_record_ptr['student__username'] == username:
+                    break
+                else:
+                   exam_record_ptr = None
+            
+            if exam_record_ptr:
+                if not created:
+                    #Delete the ExamRecordScore, ExamRecordScoreFields and ExamRecordScoreFieldChoices
+                    ExamRecordScoreFieldChoice.objects.filter(parent__parent__record_id=exam_record_ptr['last_submission_id']).delete()
+                    ExamRecordScoreField.objects.filter(parent__record_id=exam_record_ptr['last_submission_id']).delete()
+                    ExamRecordScore.objects.filter(record_id=exam_record_ptr['last_submission_id']).delete()
+                    db_hits += 3
+                
+                #Create the new ExamRecordScore
+                ers = ExamRecordScore(record_id=exam_record_ptr['last_submission_id'], raw_score=total_score, csv_imported=True)
+                ers.save()
+                db_hits += 1
+                        
+                #Create the new ExamRecordscoreFields
+                field_objs = map(lambda f:ExamRecordScoreField(parent=ers, field_name=f['name'], subscore=f['score']), record['fields']) 
+                ExamRecordScoreField.objects.bulk_create(field_objs)
+                db_hits += 1
+                                         
+                #Update score for ExamRecord
+                er = ExamRecord.objects.get(id=exam_record_ptr['last_submission_id'])
+                er.score = total_score
+                er.save()
+                db_hits += 1
+                                         
+            #Set score for ExamScore
+            user_score.score = total_score
+            user_score.csv_imported = True
             user_score.save()
             db_hits += 1
         
             student_count += 1
-
             if student_count % 100 == 0:
                 print str(student_count)
         
@@ -885,11 +911,11 @@ def validate_row(row):
         return (False, "Field name is empty string")
 
     try:
-        score = int(score_str)
+        score = float(score_str)
         if score > 10000 or score < -10000:
             return (False, "The score must be between -10000 and 10000")
     except ValueError:
-        return (False, "Score cannot be converted to integer")
+        return (False, "Score cannot be converted to floating point")
 
     return (True, (username, field_name, score))
 
@@ -911,6 +937,30 @@ def log_attempt(course, exam, student, student_input, human_name, field_name, gr
             raw_score=graded_obj['score'])
     examLogRow.save()
 
+
+def get_or_update_incomplete_examrecord(course, exam, student):
+    """Helper function that mimics get_or_update.  Creates or gets an incomplete
+       examrecord for the student on exam, but deletes everything but the most
+       recent if more than 1 incomplete record is found
+    """
+    exam_rec_queryset = ExamRecord.objects.\
+    filter(course=course, exam=exam, student=student, complete=False).\
+    order_by('-last_updated')   # descending by update date so first is latest
+
+    if len(exam_rec_queryset) == 0:
+        # no prior incomplete exam record found, create it
+        exam_rec = ExamRecord(course=course, exam=exam, student=student, complete=False,
+                              score=0.0, json_data='{}', json_score_data='{}')
+    elif len(exam_rec_queryset) == 1:
+        # exactly one found, this is the one we will update
+        exam_rec = exam_rec_queryset[0]
+    else:
+        # >1 found, take the first (latest updated) and delete the rest
+        exam_rec_list = list(exam_rec_queryset)
+        exam_rec = exam_rec_list.pop(0)
+        map(ExamRecord.delete, exam_rec_list)
+    return exam_rec
+
 def update_score(course, exam, student, student_input, field_name, graded_obj):
     """
     The ExamRecord table stores the cumulative score for this problem
@@ -922,21 +972,7 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     there is never a final score.  Score here is more of a running
     tally of plus and minus points accrued.
     """
-    exam_rec_queryset = ExamRecord.objects.\
-            filter(course=course, exam=exam, student=student, complete=False).\
-            order_by('-last_updated')   # descending by update date so first is latest
-    if len(exam_rec_queryset) == 0:
-        # no prior incomplete exam record found, create it
-        exam_rec = ExamRecord(course=course, exam=exam, student=student,
-                score=0.0, json_data='{}', json_score_data='{}')
-    elif len(exam_rec_queryset) == 1:
-        # exactly one found, this is the one we will update
-        exam_rec = exam_rec_queryset[0]
-    else:
-        # >1 found, take the first (latest updated) and delete the rest
-        exam_rec_list = list(exam_rec_queryset)
-        exam_rec = exam_rec_list.pop(0)
-        map(ExamRecord.delete, exam_rec_list)
+    exam_rec = get_or_update_incomplete_examrecord(course, exam, student)
 
     exam_rec.complete = False
     exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
@@ -946,7 +982,7 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
         field_student_data_obj = json.loads(exam_rec.json_data)
     except (TypeError, ValueError) as e:
         field_student_data_obj = {}  # better to ignore prior bad data than to die
-    field_student_data_obj[field_name] = {'value': student_input}
+    field_student_data_obj[field_name] = {'value': json.loads(student_input).get(field_name,{}).get('value',"")}
     exam_rec.json_data = json.dumps(field_student_data_obj)
 
     # append to json_score_data -- what the grader came back with
@@ -1021,10 +1057,27 @@ def exam_feedback(request, course_prefix, course_suffix, exam_slug):
         else:
             human_name = ""
         log_attempt(course, exam, request.user, student_input, human_name, prob, feedback[prob])
-        update_score(course, exam, request.user, request.body, prob, feedback[prob])
+        update_score(course, exam, request.user, request.POST.get('json_data','{}'), prob, feedback[prob])
 
     feedback['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
     return HttpResponse(json.dumps(feedback))
+
+@require_POST
+@auth_view_wrapper
+def student_save_progress(request, course_prefix, course_suffix, exam_slug):
+    """This is the endpoint for the "Save" button in the exam.  It just
+       saves what they did, without any grading activity
+    """
+    course = request.common_page_data['course']
+    try:
+        exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    exam_rec = get_or_update_incomplete_examrecord(course, exam, request.user)
+    exam_rec.json_data = request.POST.get('json_data',"{}")
+    exam_rec.save()
+    return HttpResponse("OK")
 
 
 
