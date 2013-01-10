@@ -89,13 +89,16 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
+    incomplete_record = get_or_update_incomplete_examrecord(course, exam, request.user)
+
     too_many_attempts = exam.max_attempts_exceeded(request.user)
     
     #self.metadata_xml = xml #The XML metadata for the entire problem set.
     metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
     questions = metadata_dom.getElementsByTagName('video')
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'json_pre_pop':"{}",
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
+                              'json_pre_pop':incomplete_record.json_data,
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':False,
                               'allow_submit':True, 'too_many_attempts':too_many_attempts,
                               'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
@@ -317,7 +320,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
     json_obj=json.loads(postdata)
 
-    if exam.past_all_deadlines():
+    if exam.mode == "ready" and exam.past_all_deadlines():
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
                                       datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
 
@@ -929,6 +932,30 @@ def log_attempt(course, exam, student, student_input, human_name, field_name, gr
             raw_score=graded_obj['score'])
     examLogRow.save()
 
+
+def get_or_update_incomplete_examrecord(course, exam, student):
+    """Helper function that mimics get_or_update.  Creates or gets an incomplete
+       examrecord for the student on exam, but deletes everything but the most
+       recent if more than 1 incomplete record is found
+    """
+    exam_rec_queryset = ExamRecord.objects.\
+    filter(course=course, exam=exam, student=student, complete=False).\
+    order_by('-last_updated')   # descending by update date so first is latest
+
+    if len(exam_rec_queryset) == 0:
+        # no prior incomplete exam record found, create it
+        exam_rec = ExamRecord(course=course, exam=exam, student=student, complete=False,
+                              score=0.0, json_data='{}', json_score_data='{}')
+    elif len(exam_rec_queryset) == 1:
+        # exactly one found, this is the one we will update
+        exam_rec = exam_rec_queryset[0]
+    else:
+        # >1 found, take the first (latest updated) and delete the rest
+        exam_rec_list = list(exam_rec_queryset)
+        exam_rec = exam_rec_list.pop(0)
+        map(ExamRecord.delete, exam_rec_list)
+    return exam_rec
+
 def update_score(course, exam, student, student_input, field_name, graded_obj):
     """
     The ExamRecord table stores the cumulative score for this problem
@@ -940,21 +967,7 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     there is never a final score.  Score here is more of a running
     tally of plus and minus points accrued.
     """
-    exam_rec_queryset = ExamRecord.objects.\
-            filter(course=course, exam=exam, student=student, complete=False).\
-            order_by('-last_updated')   # descending by update date so first is latest
-    if len(exam_rec_queryset) == 0:
-        # no prior incomplete exam record found, create it
-        exam_rec = ExamRecord(course=course, exam=exam, student=student,
-                score=0.0, json_data='{}', json_score_data='{}')
-    elif len(exam_rec_queryset) == 1:
-        # exactly one found, this is the one we will update
-        exam_rec = exam_rec_queryset[0]
-    else:
-        # >1 found, take the first (latest updated) and delete the rest
-        exam_rec_list = list(exam_rec_queryset)
-        exam_rec = exam_rec_list.pop(0)
-        map(ExamRecord.delete, exam_rec_list)
+    exam_rec = get_or_update_incomplete_examrecord(course, exam, student)
 
     exam_rec.complete = False
     exam_rec.score = float(exam_rec.score) + float(graded_obj['score'])
@@ -962,9 +975,11 @@ def update_score(course, exam, student, student_input, field_name, graded_obj):
     # append to json_data -- the student input
     try:
         field_student_data_obj = json.loads(exam_rec.json_data)
+        print exam_rec.json_data
     except (TypeError, ValueError) as e:
         field_student_data_obj = {}  # better to ignore prior bad data than to die
-    field_student_data_obj[field_name] = {'value': student_input}
+    print student_input
+    field_student_data_obj[field_name] = {'value': json.loads(student_input).get(field_name,{}).get('value',"")}
     exam_rec.json_data = json.dumps(field_student_data_obj)
 
     # append to json_score_data -- what the grader came back with
@@ -1039,8 +1054,25 @@ def exam_feedback(request, course_prefix, course_suffix, exam_slug):
         else:
             human_name = ""
         log_attempt(course, exam, request.user, student_input, human_name, prob, feedback[prob])
-        update_score(course, exam, request.user, request.body, prob, feedback[prob])
+        update_score(course, exam, request.user, request.POST.get('json_data','{}'), prob, feedback[prob])
 
     feedback['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
     return HttpResponse(json.dumps(feedback))
+
+@require_POST
+@auth_view_wrapper
+def student_save_progress(request, course_prefix, course_suffix, exam_slug):
+    """This is the endpoint for the "Save" button in the exam.  It just
+       saves what they did, without any grading activity
+    """
+    course = request.common_page_data['course']
+    try:
+        exam = Exam.objects.get(course = course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    exam_rec = get_or_update_incomplete_examrecord(course, exam, request.user)
+    exam_rec.json_data = request.POST.get('json_data',"{}")
+    exam_rec.save()
+    return HttpResponse("OK")
 
