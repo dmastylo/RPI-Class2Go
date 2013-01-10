@@ -166,9 +166,17 @@
             window.popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
 
             C2G.checkSubmitStatus = function () {
-                if ($('#submit-button').length && $('.question:last').css('display') == "block") {
-                    $('.continue-video-btn').hide();
-                    $('#submit-button').show();
+                //Only show submit button on surveys, otherwise keep continue-video-btn, hide submit btn
+                if (__exam_type == "survey") { 
+                    if ($('#submit-button').length && $('.question:last').css('display') == "block") {
+                        $('.continue-video-btn').hide();
+                        $('#submit-button').show();
+                    } else {
+                        $('.continue-video-btn').show();
+                        $('#submit-button').hide();
+                    }
+                } else {
+                    $('#submit-button').hide();
                 }
             };
 
@@ -210,7 +218,7 @@
             var removeExamStage = function() {
                 $('#slideIndex').show();
                 //$('.question').hide();
-                $('#exam-pane').fadeTo('slow', '0', 
+                $('#exam-pane').fadeTo('fast', '0', 
                     function () {
                         $('#exam-pane').hide();
                         $('#demoplayer').css('position', 'static');
@@ -245,7 +253,7 @@
                         console.log("Now currentQuestionId...");
                         console.log(currentQuestionId);
                         $(curQ).next().show(0, C2G.checkSubmitStatus);
-                        $('#exam-pane').fadeTo('slow', 1.0);
+                        $('#exam-pane').fadeTo('fast', 1.0);
                         console.log("questionArray[questionArray.length - 1]...");
                         console.log(questionArray[questionArray.length - 1]);
                         if (currentQuestionId == questionArray[questionArray.length - 1]) {
@@ -283,14 +291,11 @@
                         } 
                         $('#' + firstQuestionId).show(0, C2G.checkSubmitStatus);
                         currentQuestionId = firstQuestionId;
-                        $('#exam-pane').fadeTo('slow', 1.0);
+                        $('#exam-pane').fadeTo('fast', 1.0);
                     };
                 };
 
-                window.popcornVideo.cue(cueSecond, function(){
-                                             C2G.videoSetup.selectSlide(cueSecond);
-                                             showQuestion(questionsToShow)();
-                                        });
+                window.popcornVideo.cue(cueSecond, showQuestion(questionsToShow));
 
             }
 
