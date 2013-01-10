@@ -80,7 +80,8 @@
                 tempDiv.appendChild(slideImg);
                 tempDiv.onclick=(function (time) {return function(evt) {
                     //player.seekTo(time);
-                    window.popcornVideo.play(time);
+                    window.popcornVideo.play();
+                    window.popcornVideo.currentTime(time)
                     //thumbSet.selectSlide(time);
                     C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
@@ -100,7 +101,8 @@
 
                 tempDiv.onclick=(function (time) {return function(evt) {
                                     //player.seekTo(time-0.5);
-                                    window.popcornVideo.play(time-0.5);
+                                    window.popcornVideo.play();
+                                    window.popcornVideo.currentTime(time-0.5);
                                     //thumbSet.selectSlide(time);
                                     C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
@@ -211,6 +213,7 @@
                 $('#demoplayer').css('z-index', '-1');
                 $('#demoplayer').hide();
                 $('#slideIndex').hide();
+                $('.button-tray').hide();
                 $('.question').hide();
                 $('.explanation').hide();
             };
@@ -224,6 +227,7 @@
                         $('#demoplayer').css('position', 'static');
                         $('#demoplayer').css('z-index', '1');
                         $('#demoplayer').show();
+                        $('.button-tray').show();
                     });
                 window.popcornVideo.play();
             };
