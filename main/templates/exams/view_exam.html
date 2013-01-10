@@ -138,7 +138,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     </div>
     {% endif %}
 
-    <input class="btn" id="submit-button" type="submit" value="Submit" />
+    <input class="btn" id="submit-button" type="submit" value="Submit Answers" />
 
     </div>
     {% if videotest %}
@@ -498,29 +498,40 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     /********* Save Work Button (not submitting as complete) ********/
                       
-                      {% if not videotest and editable %}
-                      var saveWorkBtn = document.createElement('button');
-                      $(saveWorkBtn).text('Save Answers')
-                                    .addClass('btn')
-                                    .attr('id','saveWorkBtn');
-                      var submitBtn = $('#submit-button');
-                      submitBtn.after($(saveWorkBtn));
-                      
-                      $(saveWorkBtn).click(function () {
-                          var fieldCollection = $('#exam-pane').find('input,textarea');
-                          var userSelections = window.collectUserAnswers(fieldCollection);
-                      
-                          window.myData = JSON.stringify(userSelections);
-                      
-                          var examXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
-                                           {   csrfmiddlewaretoken: "{{ csrf_token }}",
-                                           json_data:JSON.stringify(userSelections),
-                                           onpage:$(location).attr('href')
-                                        });
-                      });
-                      
-                      {% endif %}
-                      
+    {% if not videotest and editable %}
+    var saveWorkBtn = document.createElement('button');
+    $(saveWorkBtn).text('Save Answers')
+                  .addClass('btn')
+                  .attr('id','saveWorkBtn');
+    var submitBtn = $('#submit-button');
+    submitBtn.after($(saveWorkBtn));
+
+    $(saveWorkBtn).click(function () {
+      var fieldCollection = $('#exam-pane').find('input,textarea');
+      var userSelections = window.collectUserAnswers(fieldCollection);
+
+      window.myData = JSON.stringify(userSelections);
+
+      var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
+                       {   csrfmiddlewaretoken: "{{ csrf_token }}",
+                           json_data:JSON.stringify(userSelections),
+                           onpage:$(location).attr('href')
+                       });
+                       
+      saveXHR.error(function(xhr, status, msg) {
+                     var dialogDiv = window.getDialog('Error');
+                     $(dialogDiv).find('p').text("Your answers could not be saved!  "
+                                            + msg + ": "+xhr.responseText.substr(0,99));
+                     $(dialogDiv).dialog({ modal: true,
+                                           buttons: {'Close':function(){$(this).dialog("close");}}
+                                         });
+      });
+
+    });
+
+
+    {% endif %}
+
                       
     /***************** End Save Work ********************************/
                       
@@ -751,6 +762,18 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     });
     {% endif %}
                       
+    window.getDialog = function(title) {
+        var dialogDiv = $('#dialog-message');
+        if (dialogDiv.length == 0) {
+            dialogDiv = document.createElement('div');
+            $(dialogDiv).attr('id', 'dialog-message');
+            $(dialogDiv).attr('title',title);
+            $(dialogDiv).append('<p></p>');
+            $(document).append($(dialogDiv));
+        }
+        return dialogDiv;
+    };
+                      
     $('#submit-button').click(function () {
         var fieldCollection = $('#exam-pane').find('input,textarea');
         var userSelections = window.collectUserAnswers(fieldCollection);
@@ -763,18 +786,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                    onpage:$(location).attr('href')
                }
         );
-
-        function getDialog(title) {
-            var dialogDiv = $('#dialog-message');
-            if (dialogDiv.length == 0) {
-                dialogDiv = document.createElement('div');
-                $(dialogDiv).attr('id', 'dialog-message');
-                $(dialogDiv).attr('title',title);
-                $(dialogDiv).append('<p></p>');
-                $(document).append($(dialogDiv));
-            }
-            return dialogDiv;
-        }
 
         examXHR.success(function (evt, xhr, settings) {
             if (__autograde) {
@@ -793,7 +804,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     { message = "Thanks!";
                       title= "Survey complete.";}
                       
-                var dialogDiv = getDialog(title);
+                var dialogDiv = window.getDialog(title);
                 
                 $(dialogDiv).find('p').text(message);
                         
@@ -814,7 +825,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         examXHR.error(function(xhr, status, msg) {
-            var dialogDiv = getDialog('');
+            var dialogDiv = window.getDialog('');
             $(dialogDiv).find('p').text(msg+": "+xhr.responseText.substr(0,99));
             $(dialogDiv).dialog({modal: true});
         });
