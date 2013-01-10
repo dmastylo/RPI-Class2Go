@@ -165,10 +165,10 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
                 
     def has_problem_sets(self):
         if self.mode == 'draft':
-            return ProblemSet.objects.filter(course=self, is_deleted=0).exists()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="problemset").exists()
         else:
             now = datetime.now()
-            return ProblemSet.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="problemset", live_datetime__lt=now).exists()
         
     def has_videos(self):
         if self.mode == 'draft':
