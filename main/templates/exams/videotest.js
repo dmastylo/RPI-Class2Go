@@ -26,7 +26,7 @@
                               val[k] = thumbnailPath + v;
                               }
                               })
-                       thumbManifest[parseInt(key)] = val;
+                       thumbManifest[key.trim()] = val;
                        });
 
                 C2G.videoSetup.slideIndices = thumbManifest;
@@ -49,7 +49,7 @@
         C2G.videoSetup.selectSlide = function (time) {
             nearest = -1;
             for (i in C2G.videoSetup.slideIndices) {
-                var numi = parseInt(i);
+                var numi = parseFloat(i);
                 $(C2G.videoSetup.slideIndices[i].displayDiv).addClass('unselected');
                 $(C2G.videoSetup.slideIndices[i].displayDiv).removeClass('selected');
                 if (numi<=time && numi>nearest) {
@@ -80,7 +80,8 @@
                 tempDiv.appendChild(slideImg);
                 tempDiv.onclick=(function (time) {return function(evt) {
                     //player.seekTo(time);
-                    window.popcornVideo.play(time);
+                    window.popcornVideo.play();
+                    window.popcornVideo.currentTime(time)
                     //thumbSet.selectSlide(time);
                     C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
@@ -100,7 +101,8 @@
 
                 tempDiv.onclick=(function (time) {return function(evt) {
                                     //player.seekTo(time-0.5);
-                                    window.popcornVideo.play(time-0.5);
+                                    window.popcornVideo.play();
+                                    window.popcornVideo.currentTime(time-0.5);
                                     //thumbSet.selectSlide(time);
                                     C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
@@ -116,14 +118,14 @@
                 }
 
                 for (time in C2G.videoSetup.questions) {
-                    if (!isNaN(parseInt(time))) {
+                    if (!isNaN(parseFloat(time))) {
                         merged.push(time);
                     }
                 }
 
-                var sorted = merged.sort(function(a,b){return parseInt(a)-parseInt(b)});
+                var sorted = merged.sort(function(a,b){return parseFloat(a)-parseFloat(b)});
 
-                var lastTime=-1;
+                var lastTime="-1";
 
                 for (i in sorted) {
                     if (sorted[i] != lastTime) {
@@ -166,15 +168,23 @@
             window.popcornVideo = Popcorn.youtube("#demoplayer", videoURL);
 
             C2G.checkSubmitStatus = function () {
-                if ($('#submit-button').length && $('.question:last').css('display') == "block") {
-                    $('.continue-video-btn').hide();
-                    $('#submit-button').show();
+                //Only show submit button on surveys, otherwise keep continue-video-btn, hide submit btn
+                if (__exam_type == "survey") { 
+                    if ($('#submit-button').length && $('.question:last').css('display') == "block") {
+                        $('.continue-video-btn').hide();
+                        $('#submit-button').show();
+                    } else {
+                        $('.continue-video-btn').show();
+                        $('#submit-button').hide();
+                    }
+                } else {
+                    $('#submit-button').hide();
                 }
             };
 
             C2G.videoSetup.handleTimeUpdate = function () {
                 //console.log(popcornVideo.currentTime());
-                var timeInSec = Math.floor(window.popcornVideo.currentTime()).toFixed(1);
+                var timeInSec = window.popcornVideo.currentTime().toFixed(1);
                 C2G.videoSetup.selectSlide(timeInSec);
                 /*
                 if ($.inArray(timeInSec, window.slideMap) != -1) {
@@ -203,6 +213,7 @@
                 $('#demoplayer').css('z-index', '-1');
                 $('#demoplayer').hide();
                 $('#slideIndex').hide();
+                $('.button-tray').hide();
                 $('.question').hide();
                 $('.explanation').hide();
             };
@@ -210,12 +221,13 @@
             var removeExamStage = function() {
                 $('#slideIndex').show();
                 //$('.question').hide();
-                $('#exam-pane').fadeTo('slow', '0', 
+                $('#exam-pane').fadeTo('fast', '0', 
                     function () {
                         $('#exam-pane').hide();
                         $('#demoplayer').css('position', 'static');
                         $('#demoplayer').css('z-index', '1');
                         $('#demoplayer').show();
+                        $('.button-tray').show();
                     });
                 window.popcornVideo.play();
             };
@@ -245,7 +257,7 @@
                         console.log("Now currentQuestionId...");
                         console.log(currentQuestionId);
                         $(curQ).next().show(0, C2G.checkSubmitStatus);
-                        $('#exam-pane').fadeTo('slow', 1.0);
+                        $('#exam-pane').fadeTo('fast', 1.0);
                         console.log("questionArray[questionArray.length - 1]...");
                         console.log(questionArray[questionArray.length - 1]);
                         if (currentQuestionId == questionArray[questionArray.length - 1]) {
@@ -283,7 +295,7 @@
                         } 
                         $('#' + firstQuestionId).show(0, C2G.checkSubmitStatus);
                         currentQuestionId = firstQuestionId;
-                        $('#exam-pane').fadeTo('slow', 1.0);
+                        $('#exam-pane').fadeTo('fast', 1.0);
                     };
                 };
 
