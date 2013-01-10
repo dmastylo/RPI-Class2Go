@@ -5,10 +5,13 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 import random
+import re
+import urllib,urllib2
 from django.test import TestCase
+from django.conf import settings
 from courses.exams.autograder import *
 from sets import Set
-
+from StringIO import StringIO
 
 class SimpleTest(TestCase):
     def test_multiple_choice_factory_normal(self):
@@ -332,4 +335,138 @@ class SimpleTest(TestCase):
         self.assertEqual(agf.grade('q4d',"3.5"), {'correct':False,'score':-23})
         self.assertFalse(agf.grade('q4d',"3.0")['correct'])
         self.assertFalse(agf.grade('randomDNE',"33")['correct']) #This is the actual test
+
+
+    def test_interactive_grader_required_elements(self):
+        """Interactive grader requires some XML elements"""
+
+        valid_xml="""
+<exam_metadata>
+    <question_metadata id="q1" data-report="q1">
+        <solution></solution>
+        <response name="q1b" answertype="dbinteractiveresponse">
+            <grader_name>SQL_Grader_schroot</grader_name>
+            <database-file>sql-social-query2.db</database-file>
+            <answer-file>sql-social-query-ans2.txt</answer-file>
+            <select_dict></select_dict>
+            <parameters>
+                <qnum>1</qnum>
+                <answer-text>Enter your SQL query here</answer-text>
+            </parameters>
+        </response>
+    </question_metadata>
+</exam_metadata>"""
+
+        elements = ["database-file", "parameters", "select_dict", "answer-file"]
+        for elem in elements:
+            open_tag = "<" + elem + ">"
+            close_tag = "</" + elem + ">"
+            # re.S flag so the regexp can match newlines between elements
+            partial_xml = re.sub("%s.*%s" % (open_tag, close_tag), "", valid_xml, flags=re.S)
+            with self.assertRaisesRegexp(AutoGraderMetadataException,
+                    ".*A <%s> element is required" % elem):
+                AutoGrader(partial_xml)
+
+
+    def test_interactive_grader_basic(self):
+        """
+        Interactive autograder with fake remote endpoint
+
+        Uses some XML from a db class interactive exercise, but the actual values
+        aren't used since we just fake out the endpoint.
+
+        The trick here is overriding the global method that urllib2 uses to open
+        files.  You have to remember to restore urllib2 to a good state before 
+        finishing though otherwise urllib2 will be horked.  Method cribbed from:
+            http://stackoverflow.com/questions/2276689/how-do-i-unit-test-a-module-that-relies-on-urllib2
+        """
+        def fake_remote_grader(answer):
+            """Helper function for the interactive grader, override the remote
+            grader to return the answer string provided."""
+
+            def fake_remote_grader(req):
+                grader_endpoint = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
+                if req.get_full_url() == grader_endpoint:
+                    resp = urllib2.addinfourl(StringIO(answer), "", req.get_full_url())
+                    resp.code = 200
+                    resp.msg = ""
+                    return resp
+
+            class FakeGraderHTTPHandler(urllib2.HTTPHandler):
+                def http_open(self, req):
+                    return fake_remote_grader(req)
+
+            my_opener = urllib2.build_opener(FakeGraderHTTPHandler)
+            urllib2.install_opener(my_opener)
+
+        def restore_urllib2():
+            default_opener = urllib2.build_opener(urllib2.HTTPDefaultErrorHandler)
+            urllib2.install_opener(default_opener)
+
+
+        interactive_xml = """
+<exam_metadata>
+
+    <question_metadata id="q1" data-report="q1">
+        <solution></solution>
+        <response name="q1b" answertype="dbinteractiveresponse">
+            <grader_name>SQL_Grader_schroot</grader_name>
+            <database-file>sql-social-query2.db</database-file>
+            <answer-file>sql-social-query-ans2.txt</answer-file>
+            <select_dict></select_dict>
+            <parameters>
+                <qnum>1</qnum>
+                <answer-text>Enter your SQL query here</answer-text>
+            </parameters>
+        </response>
+    </question_metadata>
+
+    <question_metadata id="q2" data-report="q2">
+        <solution></solution>
+        <response name="q2b" answertype="dbinteractiveresponse">
+            <grader_name>SQL_Grader_schroot</grader_name>
+            <database-file>sql-social-query2.db</database-file>
+            <answer-file>sql-social-query-ans2.txt</answer-file>
+            <select_dict></select_dict>
+            <parameters>
+                <qnum>2</qnum>
+                <answer-text>Enter your SQL query here</answer-text>
+            </parameters>
+        </response>
+    </question_metadata>
+
+</exam_metadata>"""
+
+        ag = AutoGrader(interactive_xml)
+
+        self.assertEqual(ag.points_possible, 2.0)
+        self.assertEqual(len(ag.grader_functions), 2)
+
+        # the feedback is opaque, so just carry that around
+        fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
+        fbstr = json.dumps(fb)
+
+        fake_remote_grader('{"score":0, "maximum-score":1, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_fail"),
+                {'correct': False, 'score': 0, 'feedback': fb})
+
+        fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
+
+        fake_remote_grader('{"score":10, "maximum-score":10, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
+        self.assertEqual(ag.grade("q2b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
+
+        fake_remote_grader('{"score":1, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_succeed"),
+                {'correct': True, 'score': 1, 'feedback': fb})
+
+        fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", "should_fail"),
+                {'correct': False, 'score': 0, 'feedback': fb})
+
+        restore_urllib2()
 

@@ -310,6 +310,7 @@ class AutoGrader():
                 raise AutoGraderMetadataException("Error in response node \"%s\": A <%s> element is required" 
                         % (response_node_id, req))
 
+        self.points_possible += 1.0 ## DB exercises are worth 1 point, hardcoded
         self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params)
 
     def _INTERACTIVE_grader_factory(self, post_params):

@@ -3,20 +3,24 @@
 {% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
 
 {% block exam_link_class %}
-{% if "exam" in exam.exam_type %}class="active"{% endif %}
+{% if "exam" in exam.exam_type and not videotest %}class="active"{% endif %}
 {% endblock exam_link_class %}
 
 {% block problemsets_link_class %}
-{% if "problemset" in exam.exam_type %}class="active"{% endif %}
+{% if "problemset" in exam.exam_type and not videotest %}class="active"{% endif %}
 {% endblock problemsets_link_class %}
 
 {% block survey_link_class %}
-{% if "survey" in exam.exam_type %}class="active"{% endif %}
+{% if "survey" in exam.exam_type and not videotest %}class="active"{% endif %}
 {% endblock survey_link_class %}
 
 {% block interactive_exercise_link_class %}
-{% if "interactive_exercise" in exam.exam_type %}class="active"{% endif %}
+{% if "interactive_exercise" in exam.exam_type and not videotest %}class="active"{% endif %}
 {% endblock interactive_exercise_link_class %}
+
+{% block videos_link_class %}
+{% if videotest %}class="active"{% endif %}
+{% endblock videos_link_class %}
 
 {% block l_column_content %}
 {% if videotest %}
@@ -46,7 +50,7 @@
 {% endblock addl_head_scripts %}
 
 {% block m_column_content %}
-{% if videotest %}<div id="c2g_layout_m_column" class="khan-template" style="margin-left: 25%">{% endif %}
+{% if videotest %}<div id="c2g_layout_m_column" class="span9">{% endif %}
 <div class="alert alert-error" id="nojswarn">
 You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
 </div>
@@ -78,6 +82,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
+    #saveWorkBtn {margin-left: .5em; margin-right: .5em;}
 
     div.question textarea { width:70%; height:100px; }
     div.preamble {margin-bottom: 2em; }
@@ -92,11 +97,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <style>
     {% include 'exams/videotest.css' %}
     #exam-pane {float: left; position: relative; display: none; width: 800px;}
-    {% if exam.exam_type == "survey" and exam.invideo and "/videos" in request.path%}
-    #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;}
-    {% else %}
-    #exam-pane .continue-video-btn, #exam-pane #survey-submit {position: absolute; bottom: 3em; right: 1.5em;}
-    {% endif %}
+    #exam-pane .continue-video-btn, #exam-pane #submit-button {position: absolute; bottom: 3em; right: 1.5em;}
     #problemset-nav {display: none;}
     </style>
 
@@ -137,11 +138,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     </div>
     {% endif %}
 
-    {% if not videotest %} 
-        <input class="btn" type="submit" value="Submit" />
-    {% elif exam.exam_type == "survey" and exam.invideo %}
-        <input class="btn" id="survey-submit" type="submit" value="Submit" />
-    {% endif %}
+    <input class="btn" id="submit-button" type="submit" value="Submit Answers" />
+
     </div>
     {% if videotest %}
         <div id="demoplayer"></div>
@@ -186,6 +184,42 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         /************************** end ordinal *******************************/
                       
 
+        window.collectUserAnswers = function (inputCollection) {
+            var userSelections = {};
+            $(inputCollection).each(function () {
+                var name = $(this).attr('name');
+                var key = (name != undefined) ? name.trim() : "";
+                if (($(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio')
+                     && $(this).get(0).checked == true) {
+                    var tmpObj = {};
+                    if (!userSelections[key]) {
+                        userSelections[key] = [];
+                    }
+                    tmpObj.value = $(this).attr('value');
+                    tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
+                    tmpObj.report = $(this).attr('data-report');
+                    if ($(this).closest('fieldset').length > 0) {
+                        //inputs enclosed by a <fieldset>, use its data-report attr
+                        tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
+                    } else if ($(this).closest('tr').length > 0) {
+                        //else if it's enclosed by a <tr>, check that elem for the data-report attr
+                        tmpObj.questionreport = $(this).closest('tr').attr('data-report');
+                    }
+                    userSelections[key].push(tmpObj);
+                } else if (($(this).prop('type') == 'text' || $(this).prop('type') == 'textarea')
+                     && $(this).val() != "") {
+                    var tmpObj = {};
+                    tmpObj.value = $(this).val();
+                    tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
+                    tmpObj.report = $(this).attr('data-report');
+                    tmpObj.questionreport = $(this).closest('.question').attr('data-report');
+                    userSelections[key]=tmpObj;
+                }
+            });
+            return userSelections;
+        };
+
+                      
     {% if single_question %}
         $('.question').not(':first').hide();
         var localQuestionIdx = 0;
@@ -246,38 +280,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             });
 
             var checkBtn = $(this);
-            var collectUserAnswers = function () {
-                var userSelections = {};
-                inputCollection = $(checkBtn).closest('.question').find('input,textarea');
-                $(inputCollection).each(function () {
-                    if (($(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio') 
-                            && $(this).get(0).checked == true) {
-                        var tmpObj = {};
-                        if (!userSelections[$(this).attr('name')]) {
-                            userSelections[$(this).attr('name')] = [];
-                        }
-                        tmpObj.value = $(this).attr('value');
-                        tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
-                        tmpObj.report = $(this).attr('data-report');
-                        if ($(this).closest('fieldset').length > 0) {
-                            //inputs enclosed by a <fieldset>, use its data-report attr
-                            tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
-                        } else if ($(this).closest('tr').length > 0) {
-                            //else if it's enclosed by a <tr>, check that elem for the data-report attr
-                            tmpObj.questionreport = $(this).closest('tr').attr('data-report');
-                        }
-                        userSelections[$(this).attr('name')].push(tmpObj);
-                    } else if (($(this).prop('type') == 'text' || $(this).prop('type') == 'textarea') 
-                            && $(this).val() != "") {
-                        var tmpObj = {};
-                        tmpObj.value = $(this).val();
-                        tmpObj.associatedText = $(this).parent().text().trim().substr(0,40);
-                        tmpObj.report = $(this).attr('data-report');
-                        tmpObj.questionreport = $(this).closest('.question').attr('data-report');
-                        userSelections[$(this).attr('name')]=tmpObj;
-                    }
-                });
-                return userSelections;
+            var getAllUserAnswers = function () {
+                var inputCollection = $(checkBtn).closest('.question').find('input,textarea');
+                return window.collectUserAnswers(inputCollection);
             };
 
             var displayMetaData = function (data, userData) {
@@ -386,7 +391,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 };
 
                 feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-                var postData = {'json_data': JSON.stringify(collectUserAnswers())};
+                var postData = {'json_data': JSON.stringify(getAllUserAnswers())};
                 $.ajax({
                     url: feedback_url,
                     type: "POST",
@@ -405,7 +410,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 };
 
                 feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
-                var postData = {'json_data': JSON.stringify(collectUserAnswers())};
+                var postData = {'json_data': JSON.stringify(getAllUserAnswers())};
                 $.ajax({
                     url: feedback_url, 
                     type: "POST",
@@ -475,7 +480,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
             
-        var submitBtn = $('input[type|="submit"]').not('#login_button');
+        var submitBtn = $('#submit-button');
         submitBtn.after($(returnToListCont));
         $(returnToListCont).append($(returnToListLink));
         if (!submitBtn.hasClass('btn')) {
@@ -488,7 +493,47 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $(returnToListLink).after($(userNote));
         $(userNote).hide();
     {% endif %}
+                      
     $('#nojswarn').remove();
+                      
+    /********* Save Work Button (not submitting as complete) ********/
+                      
+    {% if not videotest and editable %}
+    var saveWorkBtn = document.createElement('button');
+    $(saveWorkBtn).text('Save Answers')
+                  .addClass('btn')
+                  .attr('id','saveWorkBtn');
+    var submitBtn = $('#submit-button');
+    submitBtn.after($(saveWorkBtn));
+
+    $(saveWorkBtn).click(function () {
+      var fieldCollection = $('#exam-pane').find('input,textarea');
+      var userSelections = window.collectUserAnswers(fieldCollection);
+
+      window.myData = JSON.stringify(userSelections);
+
+      var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
+                       {   csrfmiddlewaretoken: "{{ csrf_token }}",
+                           json_data:JSON.stringify(userSelections),
+                           onpage:$(location).attr('href')
+                       });
+                       
+      saveXHR.error(function(xhr, status, msg) {
+                     var dialogDiv = window.getDialog('Error');
+                     $(dialogDiv).find('p').text("Your answers could not be saved!  "
+                                            + msg + ": "+xhr.responseText.substr(0,99));
+                     $(dialogDiv).dialog({ modal: true,
+                                           buttons: {'Close':function(){$(this).dialog("close");}}
+                                         });
+      });
+
+    });
+
+
+    {% endif %}
+
+                      
+    /***************** End Save Work ********************************/
                       
     var allFieldsets = $('fieldset');
                       
@@ -549,7 +594,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $('#main-content textarea').attr('disabled','disabled');
 
             // hide submit button
-            var submitBtn = $('input[type|="submit"]').not('#login_button');
+            var submitBtn = $('#submit-button');
             submitBtn.addClass('btn btn-spaced');
             submitBtn.hide();
 
@@ -715,56 +760,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
         }
     });
-  {% endif %}
+    {% endif %}
                       
-    $('input[type=submit]').not('#login_button').click(function () {
-        var userSelections = {};
-        $('#exam-pane input').each(function () {
-            var name = $(this).attr('name');
-            var key = (name != undefined) ? name.trim() : "";
-                    
-            if (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && $(this).get(0).checked == true) {
-                if (!userSelections[key]) {
-                    userSelections[key] = [];
-                }
-                //console.log(userSelections);
-                var tmpObj = {};
-                tmpObj.value = $(this).attr('value');
-                $(this).parent().find('span').remove();
-                tmpObj.associatedText = $(this).parent().text();
-                tmpObj.report = $(this).attr('data-report');
-                if ($(this).closest('fieldset').length > 0) //inputs enclosed by a <fieldset>, use its data-report attr
-                   tmpObj.questionreport = $(this).closest('fieldset').attr('data-report');
-                else if ($(this).closest('tr').length > 0) //else if it's enclosed by a <tr>, check that elem for the data-report attr
-                    tmpObj.questionreport = $(this).closest('tr').attr('data-report');
-                userSelections[key].push(tmpObj);
-            } else if (($(this).attr('type') == 'text') && $(this).val() != "") {
-                var tmpObj = {};
-                tmpObj.value = $(this).val();
-                tmpObj.report = $(this).attr('data-report');
-                if ($(this).closest('.question').length > 0) {
-                    tmpObj.questionreport = $(this).closest('.question').attr('data-report');
-                }
-                        
-                userSelections[key] = tmpObj;
-            }
-        });
-        $('textarea').each(function () {
-                           
-            var name = $(this).attr('name');
-            var key = (name != undefined) ? name.trim() : "";
-                           
-            if ($(this).val() != "") {
-                var tmpObj = {};
-                tmpObj.value = $(this).val();
-                tmpObj.report = $(this).attr('data-report');
-                if ($(this).closest('.question').length > 0) {
-                    tmpObj.questionreport = $(this).closest('.question').attr('data-report');
-                }
-               
-                userSelections[key] = tmpObj;
-            }
-        });
+    window.getDialog = function(title) {
+        var dialogDiv = $('#dialog-message');
+        if (dialogDiv.length == 0) {
+            dialogDiv = document.createElement('div');
+            $(dialogDiv).attr('id', 'dialog-message');
+            $(dialogDiv).attr('title',title);
+            $(dialogDiv).append('<p></p>');
+            $(document).append($(dialogDiv));
+        }
+        return dialogDiv;
+    };
+                      
+    $('#submit-button').click(function () {
+        var fieldCollection = $('#exam-pane').find('input,textarea');
+        var userSelections = window.collectUserAnswers(fieldCollection);
 
         window.myData = JSON.stringify(userSelections);
 
@@ -774,18 +786,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                    onpage:$(location).attr('href')
                }
         );
-
-        function getDialog(title) {
-            var dialogDiv = $('#dialog-message');
-            if (dialogDiv.length == 0) {
-                dialogDiv = document.createElement('div');
-                $(dialogDiv).attr('id', 'dialog-message');
-                $(dialogDiv).attr('title',title);
-                $(dialogDiv).append('<p></p>');
-                $(document).append($(dialogDiv));
-            }
-            return dialogDiv;
-        }
 
         examXHR.success(function (evt, xhr, settings) {
             if (__autograde) {
@@ -804,7 +804,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     { message = "Thanks!";
                       title= "Survey complete.";}
                       
-                var dialogDiv = getDialog(title);
+                var dialogDiv = window.getDialog(title);
                 
                 $(dialogDiv).find('p').text(message);
                         
@@ -825,7 +825,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         examXHR.error(function(xhr, status, msg) {
-            var dialogDiv = getDialog('');
+            var dialogDiv = window.getDialog('');
             $(dialogDiv).find('p').text(msg+": "+xhr.responseText.substr(0,99));
             $(dialogDiv).dialog({modal: true});
         });
@@ -853,8 +853,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
-    $('input[type|="submit"]').not('#login_button').attr('disabled','disabled');
-    $("#reEnableForm").remove();
+    $('#submit-button').attr('disabled','disabled');
+    $('#reEnableForm').remove();
     $('#main-content input').not('.question-nav').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
 
