@@ -1,6 +1,8 @@
-    <div class="pull-left icon">
-        <em class="icon-book"></em>
-    </div>
+    {% if is_child == None %} {# we don't need to display the icon for every child #}
+        <div class="pull-left icon">
+            <em class="icon-book"></em>
+        </div>
+    {% endif %}
     <div class="course-list-content">
         {% with page=item.additional_page %}
         <h4 class="pull-left">
