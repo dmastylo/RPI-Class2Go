@@ -7,7 +7,7 @@
     {% elif "exams" in request.path %}
         Exams | {{common_page_data.course.title}}
     {% elif "problemsets" in request.path %}
-        Problem Sets | {{common_page_data.course.title}}
+        Quizzes | {{common_page_data.course.title}}
     {% else %}
         Interactive Exercises | {{common_page_data.course.title}}
     {% endif %}
@@ -20,7 +20,7 @@
     {% elif "exams" in request.path %}
         Exams (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
     {% elif "problemsets" in request.path %}
-        Problem Sets (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+        Quizzes (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
     {% else %}
         Interactive Exercises (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
     {% endif %}
