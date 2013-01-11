@@ -25,7 +25,7 @@ def upload(request):
             new_file.save()
             new_file.create_ready_instance()
 
-            create_contentgroup_entries_from_post(request, 'parent', new_file.image, 'file', request.POST.get('display_style'))
+            create_contentgroup_entries_from_post(request, 'parent', new_file.image, 'file', request.POST.get('display_style','list'))
 
             return redirect('courses.views.course_materials', course_prefix, course_suffix)
     else:
@@ -61,9 +61,9 @@ def edit(request):
             else:
                 parent_type, parent_id = None, None
             if parent_type:
-                parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent_id)).image
+                parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent_id))
                 content_group_groupid = ContentGroup.add_parent(file.image.course, parent_type, parent_ref.image)
-                ContentGroup.add_child(content_group_groupid, 'file', file.image, display_style=request.POST.get('display_style'))
+                ContentGroup.add_child(content_group_groupid, 'file', file.image, display_style=request.POST.get('display_style','list'))
             else: #file should have no parents, so delete its place in a contentgroup if it's a child
                 try:
                     cgobj = file.image.contentgroup_set.get()
@@ -81,7 +81,7 @@ def edit(request):
     if not parent:
         parent_val = "none,none"
     else:
-        parent_val = "%s,%d" % (cg_info['__parent_tag'], parent.id)
+        parent_val = "%s,%d" % (cg_info['__parent_tag'], parent.image.id)
 
     return render(request, 'files/upload.html',
                   {'file':file,
