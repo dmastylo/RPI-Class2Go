@@ -195,13 +195,9 @@ var c2gXMLParse = (function() {
                               
                             
                 //Grab question level solutions
-                var solnObj = document.createElement('solution');
-                $(this).find('solution').find('p').each(function() {
-                    var tempP = document.createElement('p');
-                    $(tempP).text($(this).text());
-                    $(solnObj).append($(tempP));
+                $(this).find('solution').each(function() {
+                    $(questionMeta).append($(this));
                 });
-                $(questionMeta).append($(solnObj));
                               
                 var tmpProbDiv = document.createElement('div');
                 $(tmpProbDiv).addClass('question');
@@ -263,9 +259,9 @@ var c2gXMLParse = (function() {
                                 $(choiceObj).attr('value',$(this).attr('name'));
                                 $(choiceObj).attr('data-report', $(this).attr('data-report'));
                                 $(questionObj).append($(choiceObj));
-                                var explanationObj = document.createElement('explanation');
-                                $(explanationObj).append($(this).find('explanation').text());
-                                $(choiceObj).append($(explanationObj));
+                                $(this).find('explanation').each(function(){
+                                                                   $(choiceObj).append($(this).clone());
+                                                                });
                                 //Add to Answer object
                                 if (isChoiceCorrect(this)) {
                                     $(choiceObj).attr('correct','true');
