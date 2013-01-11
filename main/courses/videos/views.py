@@ -6,12 +6,11 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import RequestContext
 
-from c2g.models import ContentGroup, ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise, videos_in_exam_metadata
+from c2g.models import ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise, videos_in_exam_metadata
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials, get_children, get_contentgroup_data
 from courses.videos.forms import *
-from courses.views import get_full_contentsection_list
 from courses.forms import *
 
 
@@ -340,10 +339,6 @@ def save_exercises(request):
     if request.method != 'POST':
         return redirect(request.META['HTTP_REFERER'])
 
-    course_prefix = request.POST['course_prefix']
-    course_suffix = request.POST['course_suffix']
-    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
- 
     #don't catch video DoesNotExist here because we want some tangible error action to happen if
     #the video id changes in form submission, like mailing us
     video = Video.objects.get(id=request.POST['video_id'])

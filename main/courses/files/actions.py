@@ -39,6 +39,7 @@ def upload(request):
                     'form':             form, } )
 
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def edit(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -92,6 +93,7 @@ def edit(request):
                   })
 
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def delete_file(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))

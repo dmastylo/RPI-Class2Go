@@ -97,33 +97,39 @@ def create_contentgroup_entries_from_post(request, postparam, ready_obj, ready_o
 @require_POST
 @auth_can_switch_mode_view_wrapper
 def switch_mode(request):
-    
-    common_page_data = request.common_page_data
     request.session['course_mode'] = request.POST.get('to_mode')
     return redirect(request.META['HTTP_REFERER'])
 
 def always_switch_mode(view):
+    """Check whether we're in draft mode, and if we're not, switch to it."""
+    # Sadly the wrapper name is a bit of a misnomer, should be 'always_draft_mode'
+    wrapped_function_path = '.'.join((view.__module__, view.__name__))
     @wraps(view)
     def do_mode_switch(request, *args, **kw):
+        current_mode = request.session.get('course_mode', 'unknown state')
+        if current_mode == 'draft':
+            print "DEBUG: no switch for %s, already 'draft'" % (wrapped_function_path)
+            return view(request, *args, **kw)
+        print "DEBUG: switching mode for %s, from '%s' to 'draft'" % (wrapped_function_path, current_mode)
         request.session['course_mode'] = 'draft'
-        course_prefix = kw.get('course_prefix', None) or request.POST.get('course_prefix') or request.common_page_data.get('course_prefix')
-        course_suffix = kw.get('course_suffix', None) or request.POST.get('course_suffix') or request.common_page_data.get('course_suffix')
+        course_prefix = kw.get('course_prefix', None) or request.POST.get('course_prefix', None) or request.common_page_data.get('course_prefix', '')
+        course_suffix = kw.get('course_suffix', None) or request.POST.get('course_suffix', None) or request.common_page_data.get('course_suffix', '')
+        if course_prefix == '' or course_suffix == '':
+            print "WARNING: empty course_prefix or course_suffix in view decorator always_switch_mode, wrapping %s." % wrapped_function_path
         request.common_page_data = get_common_page_data(request, course_prefix, course_suffix)
         return view(request, *args, **kw)
     return do_mode_switch
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # not strictly necessary, but good for consistency
 def add_section(request):
-    course_prefix = request.POST.get("course_prefix")
-    course_suffix = request.POST.get("course_suffix")
     common_page_data = request.common_page_data
 
     index = len(ContentSection.objects.filter(course=common_page_data['course']))
 
     draft_section = ContentSection(course=common_page_data['draft_course'], title=request.POST.get("title"), index=index, mode='draft')
     draft_section.save()
-
     draft_section.create_ready_instance()
 
     return redirect(request.META['HTTP_REFERER'])
