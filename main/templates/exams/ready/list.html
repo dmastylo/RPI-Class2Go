@@ -4,7 +4,7 @@
 
 {% block title %}
 {% if "exam" in reverse_show %}Exams{% endif %}
-{% if "problemset" in reverse_show %}Problem Sets{% endif %}
+{% if "problemset" in reverse_show %}Quizzes{% endif %}
 {% if "survey" in reverse_show %}Surveys{% endif %}
 {% if "interactive_exercise" in reverse_show %}Interactive Exercises{% endif %}
  | {{common_page_data.course.title}}
@@ -13,7 +13,7 @@
 
 {% block course_page_title %}
 {% if "exam" in reverse_show %}Exams{% endif %}
-{% if "problemset" in reverse_show %}Problem Sets{% endif %}
+{% if "problemset" in reverse_show %}Quizzes{% endif %}
 {% if "survey" in reverse_show %}Surveys{% endif %}
 {% if "interactive_exercise" in reverse_show %}Interactive Exercises{% endif %}
  (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
