@@ -60,6 +60,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     This exam will go live on {{ exam.live_datetime }} PST.
 
+{% elif too_recent %}
+    
+    <h3>You've completed this activity (or one of its variants) too recently ({{last_record.last_updated}}).
+        There must be a {{exam.minutes_btw_attempts}} minute wait after that time.</h3>
     
 {% else %}
 
