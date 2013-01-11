@@ -78,8 +78,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane label input {float: left; margin-right: 1em;}
     #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
     h3 {clear:both;}
-    div.question, div.subquestion {float:left; width:95%;}
-    div.problem, div.problem {float:left; width:95%;}
+        div.question, div.subquestion {float:left; width:95%;position:relative;}
+        div.problem, div.problem {float:left; width:95%;position:relative;}
     #problemset-nav {float: left; padding: 0 0 1em 0; }
     #next-question {float: right;}
     #prev-question {float: left;}
@@ -101,6 +101,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
 
+    .questionNumLabelDiv {
+        position: absolute;
+        left: 0px;
+        top: -10px;
+        width: 97%;
+        text-align: center;
+    }
+    .questionNumLabel {
+        background: white;
+        padding: 2px;
+        border: 1px solid #DDCF99;
+        font-size: 14px;
+    }
+        
     .correct {color: #090;}
     .incorrect {color: #900;}
     </style>
@@ -201,11 +215,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
               $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
             }
         };
+        var addQuestionDivLabel = function(elem, num, total) {
+            $(elem).prepend('<div class="questionNumLabelDiv"><span class="questionNumLabel">' +
+                            num + ' of ' + total +
+                            '</span></div');
+        };
         var psetQuestions = $('div.question');
         if (psetQuestions.length > 1) {
             var qQumx = 1;
             $(psetQuestions).each(function () {
-                                       addNumberToQuestionDiv(this,qQumx);
+                                       addNumberToQuestionDiv(this, qQumx);
+                                       addQuestionDivLabel(this, qQumx, psetQuestions.length);
                                        qQumx = qQumx + 1;}
             );
         }
