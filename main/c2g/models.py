@@ -1662,6 +1662,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
                          ('interactive_exercise', 'interactive_exercise'),
                          )
     
+    Exam_HUMAN_TYPES = {'exam':'Exam',
+                        'problemset':'Quiz',
+                        'survey':'Survey',
+                        'interactive_exercise':'Interactive Exercises',
+                       }
+    
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -1682,6 +1688,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     invideo = models.BooleanField(default=False)
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
+    minutes_btw_attempts = models.IntegerField(default=0)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
     #there is a function from assessment_type => (invideo, exam_type, display_single, grade_single, autograde) that we don't want to write inverse for
     #so we just store it
@@ -1756,6 +1763,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
+            minutes_btw_attempts = self.minutes_btw_attempts,
             assessment_type = self.assessment_type,
         )
         ready_instance.save()
@@ -1813,6 +1821,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.timed = self.timed
         if not clone_fields or 'minutesallowed' in clone_fields:
             ready_instance.minutesallowed = self.minutesallowed
+        if not clone_fields or 'minutes_btw_attempts' in clone_fields:
+            ready_instance.minutes_btw_attempts = self.minutes_btw_attempts
         if not clone_fields or 'assessment_type' in clone_fields:
             ready_instance.assessment_type = self.assessment_type
         
@@ -1868,6 +1878,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.timed = ready_instance.timed 
         if not clone_fields or 'minutesallowed' in clone_fields:
             self.minutesallowed = ready_instance.minutesallowed
+        if not clone_fields or 'minutes_btw_attempts' in clone_fields:
+            self.minutes_btw_attempts = ready_instance.minutes_btw_attempts
         if not clone_fields or 'assessment_type' in clone_fields:
             self.assessment_type = ready_instance.assessment_type
 
@@ -1923,6 +1935,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         if self.minutesallowed != self.image.minutesallowed:
             return False
+        if self.minutes_btw_attempts != self.image.minutes_btw_attempts:
+            return False
         if self.assessment_type != self.image.assessment_type:
             return False
 
@@ -1960,6 +1974,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
 
     def record_view_name(self):
         return self.safe_exam_type()+"_record"
+
+    def get_human_type(self):
+        return self.Exam_HUMAN_TYPES[self.safe_exam_type()]
 
     def get_url(self):
         #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
