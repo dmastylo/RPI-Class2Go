@@ -458,6 +458,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
         $('.question').each(function (idx, el) {
 
+            // append clearing div to question to "fix" weird Check/Hide
+            // placement issues  
+            var clearingDiv = document.createElement('div');
+            $(clearingDiv).addClass('clearing-div');
+            $(this).append($(clearingDiv));
+
             // create div to hold Check/Hide buttons
             var perQButtonDiv = document.createElement('div');
             $(perQButtonDiv).attr('id', 'btns-' + idx);
@@ -479,6 +485,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(hideBtn).addClass('btn').addClass('hide-button');
             $(hideBtn).attr('value', 'Hide Answers');
             $(perQButtonDiv).append($(hideBtn));
+
         });
 
         $('.quick-check').click(quickCheck);
