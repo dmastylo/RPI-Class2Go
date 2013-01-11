@@ -7,6 +7,26 @@
 
 {% block course_page_title %}{{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
+{% block addl_head_scripts %}
+<style type="text/css" media="screen">
+    #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    #edit-container{
+        position:relative;
+        height:450px;
+    }
+    
+    textarea.proxy {
+        display: none;
+    }
+</style>
+{% endblock addl_head_scripts %}
+
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% if page.is_synced %}
@@ -39,15 +59,7 @@
         {% else %}
             <input type='hidden' name='title' value='Overview' />
         {% endifnotequal %}
-        <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
-        <div class="control-group">
-            <div class="controls">
-                <textarea name="description" class="tinymce">
-                    {% autoescape off %}{{page.description}}{% endautoescape %}
-                </textarea>
-            </div>
-        </div>
-        
+                
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
             <label class="control-label">URL identifier</label>
@@ -77,6 +89,15 @@
         {% else %}
             <input type='hidden' name='parent' value='overview' />
         {% endifnotequal %}
+            
+        <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
+        <textarea class="proxy" id="ace_proxy" name="description">{{page.description|safe}}</textarea>
+        <label class="control-label">Page HTML</label>
+        <div id="edit-container">
+            <div id="editor"></div>
+        </div>
+
+
 
         {% csrf_token %}
         <input type="hidden" name="page_id" value="{{page.id}}" />
@@ -99,6 +120,7 @@
     </form>
     <script type="text/javascript">
         function Save(commit, revert) {
+            $("#ace_proxy").html(editor.getValue());
             if (commit) $("#commit").val(1);
             if (revert) $("#revert").val(1);
             
@@ -143,5 +165,15 @@ $('#id_slug').focus(function() {
             }
         });
     });
+</script>
+
+
+<script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setValue($('#ace_proxy').val());
+    editor.setTheme("ace/theme/eclipse");
+    editor.getSession().setMode("ace/mode/html");
+    editor.getSession().setUseWrapMode(true);
 </script>
 {% endblock addl_scripts %}
