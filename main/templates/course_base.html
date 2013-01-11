@@ -48,7 +48,7 @@
                 </li>
                 {% if common_page_data.course.has_problem_sets %}
                 <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-                    <a href="{% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
+                    <a href=" {% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">Quizzes</a>
                 </li>
                 {% endif %}
                 {% if common_page_data.course.has_videos %}
