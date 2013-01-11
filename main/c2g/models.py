@@ -1662,6 +1662,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
                          ('interactive_exercise', 'interactive_exercise'),
                          )
     
+    Exam_HUMAN_TYPES = {'exam':'Exam',
+                        'problemset':'Quiz',
+                        'survey':'Survey',
+                        'interactive_exercise':'Interactive Exercises',
+                       }
+    
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -1968,6 +1974,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
 
     def record_view_name(self):
         return self.safe_exam_type()+"_record"
+
+    def get_human_type(self):
+        return self.Exam_HUMAN_TYPES[self.safe_exam_type()]
 
     def get_url(self):
         #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
