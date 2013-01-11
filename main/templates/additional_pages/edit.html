@@ -132,7 +132,7 @@
     
     <script type="text/javascript">
         function Save(commit, revert) {
-            $("#ace_proxy").html(editor.getValue());
+            $("#ace_proxy").val(editor.getValue());
             if (commit) $("#commit").val(1);
             if (revert) $("#revert").val(1);
             
