@@ -115,7 +115,6 @@ def view(request, course_prefix, course_suffix, slug):
             exam = video.exam
             video_obj = videos_in_exam_metadata(exam.xml_metadata, times_for_video_slug=video.slug)
             question_times = video_obj['question_times']
-            print json.dumps(question_times)
 
         except Exam.DoesNotExist:
             raise Http404

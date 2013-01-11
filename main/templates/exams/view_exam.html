@@ -50,7 +50,7 @@
 {% endblock addl_head_scripts %}
 
 {% block m_column_content %}
-{% if videotest %}<div id="c2g_layout_m_column" class="khan-template" style="margin-left: 25%">{% endif %}
+{% if videotest %}<div id="c2g_layout_m_column" class="span9">{% endif %}
 <div class="alert alert-error" id="nojswarn">
 You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
 </div>
@@ -70,21 +70,24 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     h3 {clear:both;}
     div.question, div.subquestion {float:left; width:95%;}
     div.problem, div.problem {float:left; width:95%;}
-    #problemset-nav {float: left; padding: 0 0 1em 0; width: 97%;}
+    #problemset-nav {float: left; padding: 0 0 1em 0; }
     #next-question {float: right;}
     #prev-question {float: left;}
     label pre {margin-left:30px;}
 
-    .quick-check {clear: both; display: block; margin-top: 1em;}
-    .hide-button {clear: both; display: block; margin-top: 1em;}
-    .explanation {background: #fff; border-radius: 3px; margin: 1em; border: 1px solid black; padding: 1em;}
+    .explanation {background: #fff; border: 1px solid black; border-radius: 3px; clear: both; margin: 1em; padding: 1em;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
-    #saveWorkBtn {margin-left: .5em; margin-right: .5em;}
+    #saveWorkBtn {margin-right: .5em;}
 
+    #exam-pane {float: left; position: relative; width: 100%;}
+    #exam-pane .exam-navigation {padding: 2px 0; width: 100%;}
+    #exam-pane .exam-navigation .btn {margin-right: .5em;}
     div.question textarea { width:70%; height:100px; }
+    div.question .per-question-btns {background-color: #ddcf99; border-radius: 4px; float: left; margin: 1em 0; padding: 5px; }
+    div.question .per-question-btns input {float: left;}
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
 
@@ -97,7 +100,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <style>
     {% include 'exams/videotest.css' %}
     #exam-pane {float: left; position: relative; display: none; width: 800px;}
-    #exam-pane .continue-video-btn, #exam-pane #submit-button {position: absolute; bottom: 3em; right: 1.5em;}
+    /* #exam-pane .continue-video-btn, #exam-pane #submit-button {position: absolute; bottom: 3em; right: 1.5em;} */
+    #exam-pane .continue-video-btn, #exam-pane #submit-button {float: right; margin-right: 2px;}
     #problemset-nav {display: none;}
     </style>
 
@@ -126,21 +130,35 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <noscript>
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
     </noscript>
+
     <div id="exam-pane">
         <form>
-    {{ exam.html_content }}
+        {{ exam.html_content }}
         </form>
 
-    {% if single_question %}
-    <div id="problemset-nav">
-        <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
-        <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
-    </div>
-    {% endif %}
+        <div class="exam-navigation">
+            {% if single_question %}
+            {% comment %} Only for formative/one-question-at-a-time {% endcomment %}
+            <div id="problemset-nav">
+                <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
+                <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
+            </div>
+            {% endif %}
 
-    <input class="btn" id="submit-button" type="submit" value="Submit Answers" />
+            {% comment %}
+            {##% if not videotest %} 
+                {##% comment %} Regular exam/problem set submit button, when no video is present {##% endcomment %}
+                <input class="btn" type="submit" value="Submit" />
+            {##% elif exam.exam_type == "survey" and exam.invideo %}
+                {##% comment %} Only for in-video surveys, provide special-cased submit button {##% endcomment %}
+                <input class="btn" id="survey-submit" type="submit" value="Submit" />
+            {##% endif %}
+            {% endcomment %}
+            <input class="btn" id="submit-button" type="submit" value="Submit Answers" />
+        </div>
 
-    </div>
+
+    </div> <!-- END #exam-pane -->
     {% if videotest %}
         <div id="demoplayer"></div>
         <div id="slideIndex"></div>
@@ -162,6 +180,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
 
     
+    /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
                       
                       
@@ -222,6 +241,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     {% if single_question %}
         $('.question').not(':first').hide();
+
+        // Don't show Prev/Next question buttons when only one problem
+        if ($('.question').length == 1) {
+            $('#problemset-nav').hide();
+        }
+
         var localQuestionIdx = 0;
 
         var adjustQuestionIdx = function (newIdx) {
@@ -258,7 +283,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('.question-nav').click(showQuestion);
         
         {% if exam.invideo or exam.exam_type == "interactive_exercise" %}
-
+        {% comment %} Immediate feedback only needed for in-video and interactive exercises {% endcomment %}
         var hideButton = function () {
             var assocQ = $(this).closest('.question');
             var assocQID = $(assocQ).attr('id');
@@ -365,8 +390,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 }
                 $(target).empty();
                 $(target).show();
-                $('#' + assocQID + ' .quick-check').before($(target));
-                return target
+                $('#' + assocQID + ' .per-question-btns').before($(target));
+                return target;
             }
 
             if (__exam_type == "interactive_exercise") {
@@ -422,29 +447,40 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         };
                       
         $('.question').each(function (idx, el) {
-            var tmpBtn = document.createElement('input');
-            $(tmpBtn).attr('type','button');
-            $(tmpBtn).attr('id','quickCheck_' + idx);
-            $(tmpBtn).addClass('btn').addClass('quick-check');
-            $(tmpBtn).attr('value', 'Check Answers');
-            $(this).append($(tmpBtn));
+
+            // create div to hold Check/Hide buttons
+            var perQButtonDiv = document.createElement('div');
+            $(perQButtonDiv).attr('id', 'btns-' + idx);
+            $(perQButtonDiv).addClass('per-question-btns');
+            $(this).append($(perQButtonDiv));
+
+            // create Check Answers button
+            var checkBtn = document.createElement('input');
+            $(checkBtn).attr('type','button');
+            $(checkBtn).attr('id','quickCheck_' + idx);
+            $(checkBtn).addClass('btn').addClass('quick-check');
+            $(checkBtn).attr('value', 'Check Answers');
+            $(perQButtonDiv).append($(checkBtn));
+
+            // create Hide Answers button
+            var hideBtn = document.createElement('input');
+            $(hideBtn).attr('type','button');
+            $(hideBtn).attr('id','hideAnswers_' + idx);
+            $(hideBtn).addClass('btn').addClass('hide-button');
+            $(hideBtn).attr('value', 'Hide Answers');
+            $(perQButtonDiv).append($(hideBtn));
         });
 
         $('.quick-check').click(quickCheck);
-
-        $('.question').each(function (idx, el) {
-            var tmpBtn = document.createElement('input');
-            $(tmpBtn).attr('type','button');
-            $(tmpBtn).attr('id','hideAnswers_' + idx);
-            $(tmpBtn).addClass('btn').addClass('hide-button');
-            $(tmpBtn).attr('value', 'Hide Answers');
-            $(this).append($(tmpBtn));
-        });
 
         $('.hide-button').click(hideButton);
         {% endif %}
     {% endif %}
 
+    {% comment %}
+    SUBMISSION_RETURN_URL tells us where to go after user is done with the exam 
+    (i.e. Nothing to do with exam rendering) 
+    {% endcomment %}
     {% if exam.html_content != "" and "/videos" not in request.path %} {# not viewing in a video context #}
         {% if exam.exam_type == "survey" %}
             SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
@@ -544,7 +580,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('input[type|="checkbox"]').removeAttr('checked');
         $('input[type|="radio"]').removeAttr('checked');
 
-        // just wiped all data 
+        // calling repopulateForm without an arg just wipes all data and returns 
         if (!jsonStr) {
             return;
         }
@@ -684,7 +720,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     window.showCorrections = function (correxObj) {
         //This function marks the user answer correct or wrong and then
-        //shows the question level explainations as well as relevant choice-level explanations
+        //shows the question level explanations as well as relevant choice-level explanations
                       
         for (member in correxObj) {
             if (member != "__metadata__") {
@@ -707,7 +743,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     for (wrongChoice in curq.wrong_choices) {
                       //if (curq.wrong_choices[wrongChoice] == "fn")
                       //      $(formEl).filter('input[value|="' + wrongChoice + '"]')
-                      //          .after('<span class="incorrect"> Should be selected. </span>');
+                      //          .after('<span class="feedback incorrect"> Should be selected. </span>');
                       //else
                         if (curq.wrong_choices[wrongChoice] == "fp") {
                             var wrongChoiceObj = $(formEl).filter('input[value|="' + wrongChoice + '"]');
@@ -861,16 +897,19 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     {% endif %}
                       
-    });
+    }); /* END document.ready function that executes when page loads */
     
 </script>
 {% if videotest %}
 <script>
-        var videoURL = 'http://www.youtube.com/embed/{% if video.mode == 'draft' %}{{video.url}}{% else %}{{video.image.url}}{% endif %}?autoplay=0&wmode=transparent&fs=0&rel=0&modestbranding=1&showinfo=0&start=0&enablejsapi=1&disablekb=1&amp;';
+        var videoURL = 'http://www.youtube.com/embed/{% if video.mode == 'draft' %}{{video.url}}{% else %}{{video.image.url}}{% endif %}?autoplay=0&wmode=transparent&fs=0&rel=0&modestbranding=1&showinfo=0&start={% if video_rec %}{{video_rec.start_seconds}}{% else %}0{% endif %}&enablejsapi=1&disablekb=1&amp;';
         var thumbnailPath = "http://{{common_page_data.aws_storage_bucket_name}}.s3-website-us-west-2.amazonaws.com/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/videos/{% if video.mode == 'draft' %}{{video.id}}{% else %}{{video.image.id}}{% endif %}/jpegs/";
 
         // questionTimes from parsed XML metadata 
         var questionTimes = JSON.parse('{{question_times|escapejs}}');
+
+	var video_rec_id = {{ video_rec.id }}
+	var csrf_token = '{{ csrf_token }}'
 {% include 'exams/videotest.js' %}
 {% if not video.url %}
     $('#demoplayer').hide();

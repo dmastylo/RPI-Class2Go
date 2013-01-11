@@ -31,8 +31,11 @@ class Command(BaseCommand):
 
     option_list = (
         # Main options
-        make_option("-c", "--class", dest="handle",
-                    help="restrict to course, identified by handle, eg \"cs144--Fall2012\""),
+        make_option("-c", "--class", dest="class",
+            help="restrict to class name, any term eg \"cs144\""),
+        make_option("-t", "--term", dest="term",
+            help="restrict to term, any class eg \"Fall2012\""),
+
         make_option("-q", "--quiet", dest="quiet", action="store_true",
                     help="don't print helpful warnings or summary info (still prints video names)"), 
     ) + BaseCommand.option_list
@@ -76,18 +79,24 @@ class Command(BaseCommand):
                 return "%s %s %s" % (self.prefix, self.suffix, self.slug)
 
 
-        def searchDatabase(limitHandle=None):
+        def searchDatabase(limitClass=None, limitTerm=None):
             """
-            Search the database and return the set of FoundVideo
-            objects that we should consider when looking for problems.
-            Optionally limit to one course identified by handle
-            (eg. "nlp--Fall2012")
+            Search the database and return the set of FoundVideo objects that we should
+            consider when looking for problems. Optionally limit by course or by term
+            (or both).  Limits are case insensitive.
             """
-            if limitHandle is None:
-                videosInDB = Video.objects.filter(is_deleted=0,mode="draft")
+            if limitClass != None and limitTerm != None:
+                limit = "%s--%s" %(limitClass, limitTerm)
+                videosInDB = Video.objects.filter(is_deleted=0,mode="draft", course__handle__iexact=limit)
+            elif limitClass != None:
+                limit = "%s--" % limitClass
+                videosInDB = Video.objects.filter(is_deleted=0,mode="draft", course__handle__istartswith=limit)
+            elif limitTerm != None:
+                limit = "--%s" % limitTerm
+                videosInDB = Video.objects.filter(is_deleted=0,mode="draft", course__handle__iendswith=limit)
             else:
-                videosInDB = Video.objects.filter(is_deleted=0,mode="draft",
-                               course__handle=limitHandle)
+                videosInDB = Video.objects.filter(is_deleted=0,mode="draft")
+
             foundVideos=set([])
             for v in videosInDB:
                 fv = FoundVideo(v.course.prefix, v.course.suffix, v.id, v.slug, v.file)
@@ -96,7 +105,7 @@ class Command(BaseCommand):
             return foundVideos
 
 
-        def searchStorage(awsKey, awsSecret, awsBucket, limitHandle=None):
+        def searchStorage(awsKey, awsSecret, awsBucket, limitClass=None, limitTerm=None):
             """
             Search the S3 storage bucket to see what videos are.  Returns a bunch of sets
             for what's found in there:
@@ -104,8 +113,7 @@ class Command(BaseCommand):
                manifests -- proxy for existence of thumbnails
                small -- small size 
                large -- large / normal size 
-            FoundVideo objects.  Optionally limit to one course identified by handle
-            (eg. "nlp--Fall2012")
+            FoundVideo objects.  Optionally limit by course name, term, or both.
 
             Contents of S3 look like this: 
                nlp/Fall2012/videos/39/intro.m4v
@@ -125,11 +133,7 @@ class Command(BaseCommand):
             else:
                 conn=boto.connect_s3(awsKey, awsSecret)
                 bucket_conn=conn.get_bucket(awsBucket)
-                if limitHandle is None:
-                    store_contents_s3=bucket_conn.list()
-                else:
-                    limitPath=limitHandle.replace("==", "/")  # db--Winter2013 to db/Winter2013
-                    store_contents_s3=bucket_conn.list(limitPath)
+                store_contents_s3=bucket_conn.list()
                 store_contents=map(lambda x: x.name, store_contents_s3)
 
             def filterStoragePaths(paths, regexp):
@@ -142,8 +146,14 @@ class Command(BaseCommand):
                 for store_entry in store_contents:
                     match = path_regexp.match(store_entry)
                     if match:
-                        fv = FoundVideo(prefix=match.group(1), suffix=match.group(2),
-                                video_id=match.group(3), file=match.group(4))
+                        fv = FoundVideo(prefix=match.group(1),
+                                        suffix=match.group(2),
+                                        video_id=match.group(3),
+                                        file=match.group(4))
+                        if limitClass and limitClass.lower() != fv.prefix.lower():
+                            next
+                        if limitTerm and limitTerm.lower() != fv.suffix.lower():
+                            next
                         foundSet.add(fv)
                 return foundSet
 
@@ -162,7 +172,7 @@ class Command(BaseCommand):
 
         ## MAIN
 
-        dbVideoSet=searchDatabase(options['handle'])
+        dbVideoSet=searchDatabase(options['class'], options['term'])
         if not options['quiet']: 
             print "Videos found in database: %d " % len(dbVideoSet)
 
@@ -171,7 +181,7 @@ class Command(BaseCommand):
         awsBucket=getattr(settings, 'AWS_STORAGE_BUCKET_NAME')
 
         (storeVideoSet, storeManifestSet, storeSmallSet, storeLargeSet) = \
-                searchStorage(awsKey, awsSecret, awsBucket, options['handle'])
+                searchStorage(awsKey, awsSecret, awsBucket, options['class'], options['term'])
         if not options['quiet']: 
             print "Bucket: " + awsBucket
             print "\tvideos found: %d" % len(storeVideoSet)
