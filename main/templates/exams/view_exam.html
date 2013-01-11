@@ -78,8 +78,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane label input {float: left; margin-right: 1em;}
     #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
     h3 {clear:both;}
-        div.question, div.subquestion {float:left; width:95%;position:relative;}
-        div.problem, div.problem {float:left; width:95%;position:relative;}
+    div.question, div.subquestion {float:left; width:95%; position:relative;}
+    div.problem, div.problem {float:left; width:95%; position:relative;}
     #problemset-nav {float: left; padding: 0 0 1em 0; }
     #next-question {float: right;}
     #prev-question {float: left;}
@@ -218,7 +218,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var addQuestionDivLabel = function(elem, num, total) {
             $(elem).prepend('<div class="questionNumLabelDiv"><span class="questionNumLabel">' +
                             num + ' of ' + total +
-                            '</span></div');
+                            '</span></div>');
         };
         var psetQuestions = $('div.question');
         if (psetQuestions.length > 1) {
