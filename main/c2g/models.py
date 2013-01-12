@@ -1665,7 +1665,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     Exam_HUMAN_TYPES = {'exam':'Exam',
                         'problemset':'Quiz',
                         'survey':'Survey',
-                        'interactive_exercise':'Interactive Exercises',
+                        'interactive_exercise':'Interactive Exercise',
                        }
     
     course = models.ForeignKey(Course, db_index=True)
