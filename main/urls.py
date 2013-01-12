@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^contactus$', 'c2g.views.contactus'),
     url(r'^faq$', 'c2g.views.faq'),
     url(r'^test_xml$', 'courses.exams.views.show_test_xml'),
+    url(r'^hiring/?$', 'courses.landing.views.hiring'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
 

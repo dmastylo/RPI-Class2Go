@@ -80,6 +80,11 @@ var c2gXMLParse = (function() {
                 var psetDOM = $(myDOM).find('problemset');
                  
                 if (psetDOM.length) {
+                   if ($(psetDOM).attr('invideo') != undefined) {
+                       $('input#invideo_id')[0].checked=true;
+                   } else {
+                       $('input#invideo_id')[0].checked=false;
+                   }
                    
                    setValIfDef($('input#exam_title'), $(psetDOM).attr('title'));
                    setValIfDef($('input#exam_slug'), $(psetDOM).attr('url-identifier'));
