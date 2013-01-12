@@ -342,7 +342,7 @@
                 window.popcornVideo.cue(cueSecond, C2G.videoSetup.questionController.execute_closure(cueSecond));
                 //We then set up a cue point 1 second after the original cue point
                 //when the original cue point is re-enabled.
-                window.popcornVideo.cue(parseFloat(cueSecond)+1, C2G.videoSetup.questionController.enable_closure(cueSecond));
+                window.popcornVideo.cue(parseFloat(cueSecond)+.5, C2G.videoSetup.questionController.enable_closure(cueSecond));
             }
                           
 
