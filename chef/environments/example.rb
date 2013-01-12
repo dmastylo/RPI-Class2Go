@@ -37,6 +37,16 @@ default_attributes \
             "git_branch" => "origin/master"
         }
     },
+    "redirects" => {
+        "dbclassorg" => {
+            "from" => "db-class.org",
+            "to" => "class2go.stanford.edu/db"
+        },
+        "dbclasscom" => {
+            "from" => "db-class.com",
+            "to" => "class2go.stanford.edu/db"
+        },
+    }
     "util" => {
         "celery_database" => "/opt/class2go/celery/celerydb.sqlite",
         "celery_timeout" => "7200",
