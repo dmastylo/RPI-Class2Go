@@ -46,7 +46,7 @@ default_attributes \
             "from" => "db-class.com",
             "to" => "class2go.stanford.edu/db"
         },
-    }
+    },
     "util" => {
         "celery_database" => "/opt/class2go/celery/celerydb.sqlite",
         "celery_timeout" => "7200",
