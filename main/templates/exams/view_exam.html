@@ -86,6 +86,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     label pre {margin-left:30px;}
 
     .explanation {background: #fff; border: 1px solid black; border-radius: 3px; clear: both; margin: 1em; padding: 1em;}
+    .explanation .toggle-expl {cursor: pointer;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
@@ -436,11 +437,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(explArea).show();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
-                    if ($(this).text() == 'Explanation') {
-                        $(explArea).append('<h4>' + $(this).text() + '</h4>');
-                    } else {
+                    //if ($(this).text() == 'Explanation') {
+                    //    $(explArea).append('<h4>' + $(this).text() + '</h4>');
+                    //} else {
                         $(explArea).append($(this));
-                    }
+                    //}
                 });
 
                 $('#' + checkBtnID).attr('value','Hide Answers');
@@ -452,8 +453,31 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     target = document.createElement('div');
                     $(target).attr('id', assocQID + '-expl');
                     $(target).addClass('explanation');
+
+                    var toggleLink = document.createElement('a');
+                    $(toggleLink).text("Show Explanation");
+                    $(toggleLink).addClass('toggle-expl');
+                    $(toggleLink).attr('id', assocQID + '-toggle-expl');
+                    $(toggleLink).attr('data-status', 'Show');  // hook for later i18n
+                    $(toggleLink).attr('title', 'Click to Show Explanation');
+                    $(target).append($(toggleLink));
+
+                    var contentDiv = document.createElement('div');
+                    $(contentDiv).addClass('expl-content');
+                    $(contentDiv).attr('id', assocQID + '-expl-content');
+                    $(contentDiv).css('display', 'none');
+                    $(target).append($(contentDiv));
+
+                    $(toggleLink).click(function () {
+                        var myStatus = $(this).attr('data-status');
+                        var newStatus = (myStatus == "Show") ? "Hide" : "Show";
+                        $(this).attr('data-status', newStatus);
+                        $(this).text(newStatus + ' Explanation');
+                        $(this).attr('title', 'Click to ' + newStatus + ' Explanation');
+                        $(this).siblings('div.expl-content').toggle();                       
+                    });
                 }
-                $(target).empty();
+                $(target).find('.expl-content').empty();
                 $(target).show();
                 $('#' + assocQID + ' .per-question-btns').before($(target));
                 return target;
@@ -466,7 +490,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     var response = $.parseJSON(data);
                     for (var k in response) {
                         if (k != "__metadata__") {
-                            $(explArea).append(response[k].feedback[0].explanation);
+                            $(explArea).find('.expl-content').append(response[k].feedback[0].explanation);
                         }
                     }
                 };
@@ -736,17 +760,40 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             explArea = document.createElement('div');
             $(explArea).attr('id', assocQID + '-expl');
             $(explArea).addClass('explanation');
+
+            var toggleLink = document.createElement('a');
+            $(toggleLink).text("Show Explanation");
+            $(toggleLink).addClass('toggle-expl');
+            $(toggleLink).attr('id', assocQID + '-toggle-expl');
+            $(toggleLink).attr('data-status', 'Show');  // hook for later i18n
+            $(toggleLink).attr('title', 'Click to Show Explanation');
+            $(explArea).append($(toggleLink));
+
+            var contentDiv = document.createElement('div');
+            $(contentDiv).addClass('expl-content');
+            $(contentDiv).attr('id', assocQID + '-expl-content');
+            $(contentDiv).css('display', 'none');
+            $(explArea).append($(contentDiv));
+
+            $(toggleLink).click(function () {
+                var myStatus = $(this).attr('data-status');
+                var newStatus = (myStatus == "Show") ? "Hide" : "Show";
+                $(this).attr('data-status', newStatus);
+                $(this).text(newStatus + ' Explanation');
+                $(this).attr('title', 'Click to ' + newStatus + ' Explanation');
+                $(this).siblings('div.expl-content').toggle();                       
+            });
         }
-        $(explArea).empty();
+        $(explArea).find('expl-content').empty();
         $(explArea).show();
-        $(explArea).append("<h4>Explanation</h4>");
+        //$(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
             if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
-                $(explArea).append($(this).text());
+                $(explArea).find('.expl-content').append($(this).text());
             }
             else { //for DOM nodes that are elements
-                $(explArea).append($(this).clone());
+                $(explArea).find('.expl-content').append($(this).clone());
             }
         });
         $('div.question#' + assocQID ).append($(explArea));
