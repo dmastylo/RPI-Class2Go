@@ -96,7 +96,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .exam-navigation {padding: 2px 0; width: 100%;}
     #exam-pane .exam-navigation .btn {margin-right: .5em;}
     div.question textarea { width:70%; height:100px; }
-    div.question .per-question-btns {background-color: #ddcf99; border-radius: 4px; float: left; margin: 1em 0; padding: 5px; }
+    div.question .per-question-btns {border: 2px solid #ddcf99; border-radius: 4px; float: left; margin: 1em 0; padding: 5px; }
     div.question .per-question-btns input {float: left;}
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
@@ -245,12 +245,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     userSelections[key]=tmpObj;
                 }
             });
+            console.log(userSelections);
             return userSelections;
         };
 
                       
     {% if single_question %}
         $('.question').not(':first').hide();
+        $('#prev-question').attr('disabled', 'disabled');
 
         // Don't show Prev/Next question buttons when only one problem
         if ($('.question').length == 1) {
@@ -261,17 +263,24 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         var adjustQuestionIdx = function (newIdx) {
             // right now, just accept neg number as moving back 1,
-            // pos number moving forward 1
+            // pos number moving forward 1 (i.e. no increments > 1 allowed)
             if (newIdx > 0) {
                 localQuestionIdx += 1;
             } else if (newIdx < 0) {
                 localQuestionIdx -= 1;
             }
 
-            if (localQuestionIdx > ($('.question').length - 1)) {
-                localQuestionIdx = 0;
-            } else if (localQuestionIdx < 0) {
+            if (localQuestionIdx >= ($('.question').length - 1)) {
+                // no longer cycle through; stop at last question
+                $('#next-question').attr('disabled', 'disabled');
                 localQuestionIdx = $('.question').length - 1;
+            } else if (localQuestionIdx <= 0) {
+                // no longer cycle through; stop at first question
+                $('#prev-question').attr('disabled', 'disabled');
+                localQuestionIdx = 0;
+            } else {
+                $('#next-question').removeAttr('disabled');
+                $('#prev-question').removeAttr('disabled');
             }
 
             return localQuestionIdx;
@@ -287,6 +296,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $('.question').hide();
             $('.inline-explanation').remove();
             $('.explanation').remove();
+            $('.hide-button').attr('disabled', 'disabled');
             $('.question').eq(newQIdx).show();
         };
 
@@ -299,6 +309,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             var assocQID = $(assocQ).attr('id');
             $('#' + assocQID + '-expl').empty().remove();
             $('#' + assocQID).find('.inline-explanation').remove();
+            $(this).attr('disabled', 'disabled');
             return;
         } 
 
@@ -454,6 +465,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 });
             }
 
+            $(this).siblings('.hide-button').removeAttr('disabled');
+
         };
                       
         $('.question').each(function (idx, el) {
@@ -484,6 +497,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(hideBtn).attr('id','hideAnswers_' + idx);
             $(hideBtn).addClass('btn').addClass('hide-button');
             $(hideBtn).attr('value', 'Hide Answers');
+            $(hideBtn).attr('disabled', 'disabled');
             $(perQButtonDiv).append($(hideBtn));
 
         });
@@ -828,6 +842,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     };
                       
     $('#submit-button').click(function () {
+
+        var userProceed = confirm("This will submit the entire problem set. OK?");
+
+        if (!userProceed) return;
+
         var fieldCollection = $('#exam-pane').find('input,textarea');
         var userSelections = window.collectUserAnswers(fieldCollection);
 
