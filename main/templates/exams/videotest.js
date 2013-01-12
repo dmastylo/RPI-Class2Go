@@ -216,6 +216,7 @@
                 $('.button-tray').hide();
                 $('.question').hide();
                 $('.explanation').hide();
+                $('.hide-button').attr('disabled', 'disabled');
             };
 
             var removeExamStage = function() {
