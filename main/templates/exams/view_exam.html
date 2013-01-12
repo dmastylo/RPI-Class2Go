@@ -234,10 +234,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
 
         window.collectUserAnswers = function (inputCollection) {
+            var returnObj = {};
             var userSelections = {};
+            var uniqueFormElements = {}; // object of named form elements
+            var totalUniqueFormEls = 0;
             $(inputCollection).each(function () {
                 var name = $(this).attr('name');
                 var key = (name != undefined) ? name.trim() : "";
+                // keep track of number of inputs with same name
+                // for possible later use 
+                if (key != "" && uniqueFormElements[key] == undefined) {
+                    uniqueFormElements[key] = 1;
+                    totalUniqueFormEls += 1;
+                } else {
+                    uniqueFormElements[key] += 1;
+                }
                 if (($(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio')
                      && $(this).get(0).checked == true) {
                     var tmpObj = {};
@@ -265,7 +276,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     userSelections[key]=tmpObj;
                 }
             });
-            return userSelections;
+
+            returnObj.userSelections = userSelections;
+            returnObj.uniqueFormElements = uniqueFormElements;
+
+            var userSelLength = 0;
+            for (el in userSelections) {
+                userSelLength += 1;
+            }
+
+            returnObj.userSelLength = userSelLength;
+            returnObj.answeredAll = (userSelLength == totalUniqueFormEls);
+
+            return returnObj;
+
         };
 
                       
@@ -347,7 +371,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             var checkBtn = $(this);
             var getAllUserAnswers = function () {
                 var inputCollection = $(checkBtn).closest('.question').find('input,textarea');
-                return window.collectUserAnswers(inputCollection);
+                var userAnswersObj = window.collectUserAnswers(inputCollection);
+                return userAnswersObj.userSelections;
             };
 
             var displayMetaData = function (data, userData) {
@@ -594,7 +619,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     $(saveWorkBtn).click(function () {
       var fieldCollection = $('#exam-pane').find('input,textarea');
-      var userSelections = window.collectUserAnswers(fieldCollection);
+      var userAnswerObj = window.collectUserAnswers(fieldCollection);
+      var userSelections = userAnswerObj.userSelections; 
 
       window.myData = JSON.stringify(userSelections);
 
@@ -862,12 +888,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     $('#submit-button').click(function () {
 
-        var userProceed = confirm("This will submit the entire problem set. OK?");
-
-        if (!userProceed) return;
-
         var fieldCollection = $('#exam-pane').find('input,textarea');
-        var userSelections = window.collectUserAnswers(fieldCollection);
+        var userAnswerObj = window.collectUserAnswers(fieldCollection);
+
+        if (!userAnswerObj.answeredAll) {
+            var userProceed = confirm("This will submit the entire problem set and you haven't answered all questions. Still submit?");
+            if (!userProceed) return;
+        } 
+
+        var userSelections = userAnswerObj.userSelections; 
 
         window.myData = JSON.stringify(userSelections);
 
