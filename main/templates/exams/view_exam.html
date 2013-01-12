@@ -1041,7 +1041,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 	var video_rec_id = {{ video_rec.id }}
 	var csrf_token = '{{ csrf_token }}'
-{% include 'exams/videotest.js' %}
+    {% include 'exams/videotest.js' %} 
 {% if not video.url %}
     $('#demoplayer').hide();
     $('.question').eq(0).show();
