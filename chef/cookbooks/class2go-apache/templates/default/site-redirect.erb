@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+    ServerName <%= @hostname_from %>
+    Redirect / http://<%= @hostname_to %>
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName <%= @hostname_from %>
+    Redirect / https://<%= @hostname_to %>
+</VirtualHost>
+
