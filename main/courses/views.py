@@ -14,6 +14,7 @@ from courses.actions import auth_view_wrapper
 
 from c2g.models import CurrentTermMap
 import settings
+import datetime
 
 
 def index(item): # define a index function for list items
@@ -65,15 +66,18 @@ def main(request, course_prefix, course_suffix):
     else:
         many_announcements = False
     
+    course = common_page_data['course']
+    
     if request.user.is_authenticated():
         is_logged_in = 1
         news_list = common_page_data['ready_course'].newsevent_set.all().order_by('-time_created')[0:5]
+        assignment_dictionaries = get_upcoming_exams(course, request.user)
     else:
         is_logged_in = 0
         news_list = []
+        assignment_dictionaries = []
 
-    course = common_page_data['course']
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course)    
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
              'announcement_list':   announcement_list,
@@ -83,9 +87,26 @@ def main(request, course_prefix, course_suffix):
              'video_list':          Video.objects.getByCourse(course=course),
              'pset_list':           ProblemSet.objects.getByCourse(course=course),
              'full_index_list':     full_index_list,
-             'is_logged_in':        is_logged_in
+             'is_logged_in':        is_logged_in, 
+             'assignments':         assignment_dictionaries
              },
             context_instance=RequestContext(request))
+
+def get_upcoming_exams(course, student):
+  end_date = datetime.date.today() + datetime.timedelta(weeks=2)
+  exams = Exam.objects.filter(
+    course=course, is_deleted=0#, 
+    #due_date__gte = datetime.date.today() #,
+    #due_date__lte = end_date
+    ).order_by('due_date')
+  dictionaries = list()
+  for exam in exams: 
+    assignment_dictionary = dict()
+    assignment_dictionary['assignment'] = exam
+    assignment_dictionary['attempted'] = exam.attempted(student)
+    dictionaries.append(assignment_dictionary)
+  return dictionaries
+
 
 @auth_view_wrapper
 def course_materials(request, course_prefix, course_suffix, section_id=None):

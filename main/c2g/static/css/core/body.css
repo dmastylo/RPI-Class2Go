@@ -45,6 +45,25 @@ a:hover {color:#820000;}
     float:left;
     display:block;
 }
+
+.upcoming {
+  padding:10px 0;background:#f8f7ea;
+}
+.upcoming h4 {
+  margin-left: 5px;
+  text-align:center;
+}
+.upcoming table {
+  margin:5px;
+}
+.upcoming table th { 
+  text-decoration:underline;
+  text-align:left;
+}
+.upcoming table td { 
+  padding:2px;
+}
+
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
 .btn-spaced {margin-right:5px;}

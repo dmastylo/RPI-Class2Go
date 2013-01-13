@@ -1711,6 +1711,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         return self.num_of_student_records(student) >= self.submissions_permitted
     
+    def attempted(self, student):
+      return self.num_of_student_records(student) > 0 
+    
     def past_due(self):
         if self.due_date and (datetime.now() > self.grace_period):
             return True
