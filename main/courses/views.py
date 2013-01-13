@@ -96,9 +96,10 @@ def main(request, course_prefix, course_suffix):
 def get_upcoming_exams(course, student):
   end_date = datetime.date.today() + datetime.timedelta(weeks=2)
   exams = Exam.objects.filter(
-    course=course, is_deleted=0#, 
-    #due_date__gte = datetime.date.today() #,
-    #due_date__lte = end_date
+    course=course, is_deleted=0, 
+    #mode="ready",
+    due_date__gte = datetime.date.today(),
+    due_date__lte = end_date
     ).order_by('due_date')
   dictionaries = list()
   for exam in exams: 
