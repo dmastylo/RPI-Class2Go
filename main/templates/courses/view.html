@@ -23,7 +23,7 @@
 
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span9">
+<div id="c2g_layout_m_column" class="span6">
     <h3 class="section-title pull-left">Recent Announcements</h3>
     <div class="pull-right">
         {% if many_announcements %}
@@ -50,6 +50,9 @@
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
+{% block r_column_content %}
+    {% include "right_nav.html" %}
+{% endblock r_column_content %}
 
 {% if common_page_data.is_course_admin %}
     {% include "controls/tinymce.html" %}
