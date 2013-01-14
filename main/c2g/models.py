@@ -2404,6 +2404,57 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
+    def reassign_parent_child_sections(thisclass, tag, id, new_section_id):
+        """When updating parent's content section, make children follow it."""
+        def do_content_section_update(obj, new_section_ref):
+            # NB: ContentGroup objects are all ready-mode instances of a thing.
+            # TODO: Of course the nicer thing here would be to iterate over
+            # the children in the view, calling 
+            # "child.commit(('section', new_section))" and have the commit
+            # function just know how to iterate a set of tuples and DTRT with
+            # individual updates. But until we have that, we're doing this.
+            print "DEBUG", obj.id, "in", obj.section, "going to", new_section_ref
+            obj.section = new_section_ref
+            obj.save()
+            if hasattr(obj, 'image'):
+                if new_section_ref:
+                    obj.image.section = new_section_ref.image
+                else:
+                    obj.image.section = new_section_ref
+                obj.image.save()
+        group_parent = None
+        cginfo = thisclass.groupinfo_by_id(tag, id)
+        if new_section_id != "null":
+            new_section_ref = ContentSection.objects.get(id=new_section_id)
+        else:
+            print "DEBUG going to null"
+            new_section_ref = None
+        this_object = ContentGroup.groupable_types[tag].objects.get(id=id)
+        this_group_entry  = this_object.contentgroup_set.all()
+        if this_group_entry: 
+            this_group_entry = this_group_entry[0]
+        if new_section_ref and new_section_ref.mode != "ready":
+            new_section_ref = new_section_ref.image
+        if cginfo.has_key('__parent'):
+            group_parent = cginfo['__parent']
+        else:
+            return False               # No-op if no ContentGroup relationship
+        if group_parent.section and new_section_ref and new_section_ref.id == group_parent.section.id:
+            return False               # No-op if this CG is already in that section
+        if this_object.id != this_group_entry.id:
+            # A child moved to a different section gets promoted (becomes a parent)
+            do_content_section_update(this_object, new_section_ref)
+            this_group_entry.group_id = this_group_entry.id
+            this_group_entry.level = 1
+            this_group_entry.save()
+            return True
+        # Otherwise "normal" case of group w/ parents and children getting moved
+        do_content_section_update(group_parent, new_section_ref)
+        for child in cginfo['__children']:
+            do_content_section_update(child, new_section_ref)
+        return True
+
+    @classmethod
     def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
         """Add obj_ref having type tag to the ContentGroup table.
 

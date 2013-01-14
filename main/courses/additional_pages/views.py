@@ -51,6 +51,7 @@ def main(request, course_prefix, course_suffix, slug):
         visit_log.save()
 
     contentgroup_info = None      # Empty for view mode
+    sections    = ContentSection.objects.getByCourse(course=common_page_data['course'])
         
     if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft':
         template = 'additional_pages/edit.html'
@@ -73,9 +74,10 @@ def main(request, course_prefix, course_suffix, slug):
 
     return render_to_response(template,
                               {
-                               'common_page_data': common_page_data,
-                               'page': page,
-                               'ready_section': ready_section,
-                               'contentgroup_info': contentgroup_info,
+                               'common_page_data':    common_page_data,
+                               'page':                page,
+                               'ready_section':       ready_section,
+                               'contentgroup_info':   contentgroup_info,
+                               'sections':            sections,
                               },
                                context_instance=RequestContext(request))
