@@ -16,6 +16,7 @@
                 <li><a href="#videos_full" data-toggle="tab">Video Student Data</a></li>
                 <li><a href="#videos_summary" data-toggle="tab">Video Summary</a></li>
                 <li><a href="#class_roster" data-toggle="tab">Class Roster</a></li>
+                <li><a href="#survey_summary" data-toggle="tab">Survey Summary</a><li>
             </ul>
             <div class="tab-content">
                 <div id="dashboard" class="tab-pane active" style="padding-left: 10px;">
@@ -188,6 +189,35 @@
                         <label style="margin-left: 40px;">No class roster has been generated yet for this course.</label>
                     {% endif %}
                 </div>
+                
+                <div id="survey_summary" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new survey summary report</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <label for="video" style='display: inline;'>Surveys</label>
+                        <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
+                            {% for survey in surveys %}<option value="{{survey.slug}}">{{survey.title}}</option>{% endfor%}
+                        </select>
+                        <input type="submit" class='btn' value="Generate new survey summary report" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="survey_summary" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available summary survey reports</h3>
+                    {% for ps in survey_summ_reports %}
+                        <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
+                        {% if ps.reports|length > 0 %}
+                            <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+                                {% for rep in ps.reports %}
+                                    <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'survey_summary' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                                {% endfor %}
+                            </table>
+                        {% else %}
+                            <label style="margin-left: 40px;">No summary reports available for this survey.</label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
                 
             </div>
         </div>
