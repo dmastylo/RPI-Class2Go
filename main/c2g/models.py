@@ -2439,7 +2439,8 @@ class ContentGroup(models.Model):
         return s+')'
 
     def __unicode__(self):
-        return unicode(self.group_id)
+        level_string = "parent" if self.level==1 else "child"
+        return "%s:%s:%s" % (level_string, self.get_content_type(), self.get_content().title)
     
     class Meta:
         db_table = u'c2g_content_group'
