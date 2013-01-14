@@ -15,7 +15,7 @@
 						{% if attempted %}
 							<td><span class="complete">&#10004;</span></td>
 						{% else %}
-							<td></td>
+							<td><span class="icon-check-empty"></span></td>
 						{% endif %}
 							<td><a href="{% url assignment.show_view common_page_data.course_prefix common_page_data.course_suffix assignment.slug %}"><span>{{assignment.title}}</span></a></td>
 							<td>{{ assignment.due_date|date:"M d, P" }}</td>
