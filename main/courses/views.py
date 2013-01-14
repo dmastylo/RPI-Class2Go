@@ -154,6 +154,7 @@ def get_full_contentsection_list(course, filter_children=True):
         cs_id      = contentsection.id
         for tag in ContentGroup.groupable_types.keys():
             for obj in tagged_object_lists[tag].filter(section_id=cs_id):
+                ContentGroup.has_children(obj)
                 if desired_item(tag, obj.id):
                     if tag == 'file':
                         index_list.append({ 'type': tag, 'ref': obj, 'icon': obj.get_icon_type(), })
