@@ -146,11 +146,9 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
                     
                 report = gen_survey_summary_report(ready_course, survey, save_to_s3=True)
                 report['type'] = rr['type']
-                if report:
-                    reports.append(report)
-                    logger.info("Survey summary report for course %s assessment %s generated successfully for user %s." % (course_handle, slug, username))
-                else:
-                    logger.info("Failed to generate survey summary report for course %s assessment %s for user %s." % (course_handle, slug, username))
+                
+                reports.append(report)
+                logger.info("Survey summary report for course %s assessment %s generated successfully for user %s." % (course_handle, slug, username))
             
     # Email Generated Reports
     staff_email = ready_course.contact

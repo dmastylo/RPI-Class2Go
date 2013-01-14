@@ -351,47 +351,53 @@ def get_survey_data(ready_survey, get_visits = False):
     
     for exam_record in exam_records:
         json_row = exam_record.json_data
+        
         try:
             data = json.loads(json_row)
             
+        except ValueError:
+            errors +=1
+            
+        else:
             for question in data.keys():
                 answer = None
                 question_report = None
                 
-                if type(data[question]) is dict and data[question].get('value', True):
+                if type(data[question]) is dict and data[question].get('value', False):
                     #Single answer
                     
-                    if data[question].get('report', True):
-                        answer = data[question].get('report')
-                    else:
-                        answer = data[question].get('value')
+                    answer = data[question].get('value')
                     
-                    if data[question].get('questionreport', True):
-                        question_report =  data[question].get('questionreport')
-                        question_reports[question] = question_report
-                    
+                    if data[question].get('report', False):
+                        question_report =  data[question].get('report')   
+                    elif data[question].get('questionreport', False):
+                        question_report =  str(question) + " : " + data[question].get('questionreport')
+                    else:    
+                        question_report = question
+                        
+                    question_reports[question] = question_report
                     tally = store_answer(tally, question, answer)
             
                 else:
                     #Multiple answers
                     
-                    list_of_dicts = data[question]
-                    for multi_answer_dict in list_of_dicts:
+                    list_of_dicts = data[question]    
+                    for multi_answer_dict in list_of_dicts:                      
                         
-                        if type(multi_answer_dict) is dict and multi_answer_dict.get('value', True):
-                            if multi_answer_dict.get('report', True):
+                        if type(multi_answer_dict) is dict and multi_answer_dict.get('value', False):
+                            
+                            if multi_answer_dict.get('report', False):
                                 answer = multi_answer_dict.get('report')
                             else:
                                 answer = multi_answer_dict.get('value')
                                 
-                        if multi_answer_dict.get('questionreport', True):
+                        if multi_answer_dict.get('questionreport', False):
                             question_report = multi_answer_dict.get('questionreport')
-                            question_reports[question] = question_report
-                                                        
+                        else:
+                            question_report = question 
+                        
+                        question_reports[question] = question_report
                         tally = store_answer(tally, question, answer)
-            
-        except ValueError:
-            errors +=1
     
     return tally, errors, question_reports
     
