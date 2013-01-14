@@ -156,7 +156,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
     </noscript>
 
-    <div id="exam-pane">
+    <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
         <form>
         {{ exam.html_content }}
         </form>
@@ -340,7 +340,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $('.question').hide();
             $('.inline-explanation').remove();
             $('.explanation').remove();
-            $('.hide-button').attr('disabled', 'disabled');
+            $('.toggle-explanation').attr('disabled', 'disabled');
+            $('.toggle-explanation').attr('data-status', 'Show');
+            $('.toggle-explanation').val('Show Explanation');
             $('.question').eq(newQIdx).show();
         };
 
@@ -348,13 +350,30 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         
         {% if exam.invideo or exam.exam_type == "interactive_exercise" %}
         {% comment %} Immediate feedback only needed for in-video and interactive exercises {% endcomment %}
-        var hideButton = function () {
+        var toggleExplanation = function () {
             var assocQ = $(this).closest('.question');
+
+            console.group('explanation status');
+            console.log($(assocQ).find('.explanation').css('display'));
+            $(assocQ).find('.explanation').toggle();
+            console.log($(assocQ).find('.explanation').css('display'));
+            console.groupEnd();
+            
+            if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
+                $(this).attr('data-status', 'Hide');
+                $(this).val('Hide Explanation');
+            } else {
+                $(this).attr('data-status', 'Show');
+                $(this).val('Show Explanation');
+            } 
+    
+            /*
             var assocQID = $(assocQ).attr('id');
             $('#' + assocQID + '-expl').empty().remove();
             $('#' + assocQID).find('.inline-explanation').remove();
             $(this).attr('disabled', 'disabled');
             return;
+            */
         } 
 
         var quickCheck = function () {
@@ -432,13 +451,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 });
 
                 var explArea = $('#' + assocQID + '-expl');
+                console.group("Explanation Area stuff");
+                console.log(explArea.length);
                 if (explArea.length == 0) {
                     explArea = document.createElement('div');
                     $(explArea).attr('id', assocQID + '-expl');
                     $(explArea).addClass('explanation');
                 }
                 $(explArea).empty();
-                $(explArea).show();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
                     //if ($(this).text() == 'Explanation') {
@@ -447,6 +467,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         $(explArea).append($(this));
                     //}
                 });
+                console.groupEnd();
 
                 $('#' + checkBtnID).attr('value','Hide Answers');
             };
@@ -462,6 +483,13 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(target).show();
                 $('#' + assocQID + ' .per-question-btns').before($(target));
                 return target;
+            }
+
+            // for use in any "Check Answer" exercise
+            var resetButtonText = function (buttonId) {
+                return function (xhr, status) {
+                    $('#' + buttonId).val('Check Answer');
+                }
             }
 
             if (__exam_type == "interactive_exercise") {
@@ -485,13 +513,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     return;
                 };
 
-                var resetButton = function (buttonId) {
-                    return function (xhr, status) {
-                        $('#' + buttonId).val('Check Answer');
-                    }
-                }
-
-
                 feedback_url = "{% url 'courses.exams.views.exam_feedback' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
                 var postData = {'json_data': JSON.stringify(getAllUserAnswers())};
                 $.ajax({
@@ -500,7 +521,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     data: postData,
                     success: HTMLAnswerSuccess,
                     error: HTMLAnswerError,
-                    complete: resetButton($(this).attr('id'))
+                    complete: resetButtonText($(this).attr('id'))
                 });
 
             } else {    // INVIDEO CASE
@@ -518,11 +539,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     url: feedback_url, 
                     type: "POST",
                     data: postData,
-                    success: InvideoFeedbackSuccess
+                    success: InvideoFeedbackSuccess,
+                    complete: resetButtonText($(this).attr('id'))
                 });
             }
 
-            $(this).siblings('.hide-button').removeAttr('disabled');
+            $(this).siblings('.toggle-explanation').removeAttr('disabled');
 
         };
                       
@@ -552,22 +574,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
             $(perQButtonDiv).append($(checkBtn));
 
-            // create Hide Answers button for non-interactive exams
+            // create Show/Hide Explanation button for non-interactive exams
             if (__exam_type != "interactive_exercise") {
-                var hideBtn = document.createElement('input');
-                $(hideBtn).attr('type','button');
-                $(hideBtn).attr('id','hideAnswers_' + idx);
-                $(hideBtn).addClass('btn').addClass('hide-button');
-                $(hideBtn).attr('value', 'Hide Answers');
-                $(hideBtn).attr('disabled', 'disabled');
-                $(perQButtonDiv).append($(hideBtn));
+                var toggleExplBtn = document.createElement('input');
+                $(toggleExplBtn).attr('type','button');
+                $(toggleExplBtn).attr('id','toggleExplanation_' + idx);
+                $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
+                $(toggleExplBtn).attr('data-status', 'Show');
+                $(toggleExplBtn).attr('value', 'Show Explanation');
+                $(toggleExplBtn).attr('disabled', 'disabled');
+                $(perQButtonDiv).append($(toggleExplBtn));
             }
 
         });
 
         $('.quick-check').click(quickCheck);
 
-        $('.hide-button').click(hideButton);
+        $('.toggle-explanation').click(toggleExplanation);
         {% endif %}
     {% endif %}
 
@@ -755,40 +778,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             explArea = document.createElement('div');
             $(explArea).attr('id', assocQID + '-expl');
             $(explArea).addClass('explanation');
-
-            var toggleLink = document.createElement('a');
-            $(toggleLink).text("Show Explanation");
-            $(toggleLink).addClass('toggle-expl');
-            $(toggleLink).attr('id', assocQID + '-toggle-expl');
-            $(toggleLink).attr('data-status', 'Show');  // hook for later i18n
-            $(toggleLink).attr('title', 'Click to Show Explanation');
-            $(explArea).append($(toggleLink));
-
-            var contentDiv = document.createElement('div');
-            $(contentDiv).addClass('expl-content');
-            $(contentDiv).attr('id', assocQID + '-expl-content');
-            $(contentDiv).css('display', 'none');
-            $(explArea).append($(contentDiv));
-
-            $(toggleLink).click(function () {
-                var myStatus = $(this).attr('data-status');
-                var newStatus = (myStatus == "Show") ? "Hide" : "Show";
-                $(this).attr('data-status', newStatus);
-                $(this).text(newStatus + ' Explanation');
-                $(this).attr('title', 'Click to ' + newStatus + ' Explanation');
-                $(this).siblings('div.expl-content').toggle();                       
-            });
         }
-        $(explArea).find('.expl-content').empty();
-        $(explArea).show();
+        $(explArea).empty();
+        if ($('#' + assocQID + ' .toggle-explanation').length == 0) {
+            $(explArea).show();
+        } else {
+            $(explArea).hide();
+            $('#' + assocQID + ' .toggle-explanation').attr('data-status', 'Show');
+            $('#' + assocQID + ' .toggle-explanation').val("Show explanation");
+        }
         //$(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
             if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
-                $(explArea).find('.expl-content').append($(this).text());
+                $(explArea).append($(this).text());
             }
             else { //for DOM nodes that are elements
-                $(explArea).find('.expl-content').append($(this).clone());
+                $(explArea).append($(this).clone());
             }
         });
         $('div.question#' + assocQID ).append($(explArea));
