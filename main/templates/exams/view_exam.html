@@ -198,7 +198,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 {% block addl_scripts %}
     {% if videotest %}
-        <script src="http://cdn.popcornjs.org/code/dist/popcorn-complete.min.js"></script>
+     <script src="{{STATIC_URL}}/js/popcorn/popcorn-ie8.min.js"></script>
     {% endif %}
 <script>
     var __exam_type = "{{exam.exam_type}}";
