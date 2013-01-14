@@ -2,7 +2,7 @@
 	{% if is_logged_in %}
 		{% if assignments %}
 			<div id="right_nav" class="upcoming well nav">
-				<h4>Upcoming Assignments</h4>
+				<h4>Upcoming Due Dates</h4>
 				<table>
 					<thead>
 						<th></th>
@@ -13,9 +13,9 @@
 					{% with assignment=assignment_dictionary.assignment attempted=assignment_dictionary.attempted %}
 					<tr>
 						{% if attempted %}
-							<td><em class="icon-check"></em></td>
+							<td><span class="complete">&#10004;</span></td>
 						{% else %}
-							<td><em class="icon-check-empty"></em></td>
+							<td></td>
 						{% endif %}
 							<td><a href="{% url assignment.show_view common_page_data.course_prefix common_page_data.course_suffix assignment.slug %}"><span>{{assignment.title}}</span></a></td>
 							<td>{{ assignment.due_date|date:"M d, P" }}</td>
