@@ -60,4 +60,17 @@ template "class.pem" do
     mode 00644
 end
 
+directory "/etc/shibboleth/metadata" do
+    owner "_shibd"
+    group "_shibd"
+    mode 00755
+    action :create
+end
 
+cookbook_file "/etc/shibboleth/metadata/Stanford-metadata.xml" do
+    source "Stanford-metadata.xml"
+    mode 00644
+    owner "_shibd"
+    group "_shibd"
+    action :create
+end

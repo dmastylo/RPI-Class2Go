@@ -4,7 +4,7 @@
 }
 #slideIndex {
   display: block;
-  height: 135px;
+  height: 140px;
   /*width: 100%;*/
   width: 800px;
   border-top: 1px solid black;
@@ -23,8 +23,8 @@
 div.divInIndex  {
     position: relative;
     display: inline-block;
-    height: 100px;
-    width: 153px;
+    height: 110px;
+    width: 170px;
     margin: 10px;
     border: 1px solid black;
 }
@@ -33,8 +33,8 @@ div.divInIndex img {
     position: absolute;
     left: 0px;
     top: 0px;
-    height: 90px;
-    width: 143px;
+    height: 100px;
+    width: 160px;
     margin: 5px;
     display: inline-block;
     z-index: 1;
@@ -46,4 +46,15 @@ div.divInIndex img {
 
 #slideIndex .selected{
   background:red;
+}
+
+.thumbnailTime {
+  font-size: 10pt;
+  position:absolute;
+  top: 2px;
+  right: 2px;
+  border: 1px solid black;
+  background: white;
+  padding: 1px;
+  z-index: 2;
 }

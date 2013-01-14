@@ -1,6 +1,8 @@
-    <div class="pull-left icon">
-        <em class="icon-file"></em>
-    </div>
+    {% if is_child == None %} {# we don't need to display the icon for every child #}
+        <div class="pull-left icon">
+            <em class="icon-file"></em>
+        </div>
+    {% endif %}
     <div class="course-list-content">
         {% with file=item.file title=item.file.title %}
             <h4 class="pull-left"><a href="{{file.file.url}}">{{title}}</a></h4>

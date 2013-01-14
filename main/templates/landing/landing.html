@@ -51,6 +51,15 @@
                 <p>We don't want to build or maintain more than we have to. We're standing on the shoulders of developments from Piazza, YouTube, MySQL, Python Django, Amazon AWS, Opscode, Github, and Popcorn.js.</p>
             </div>
         </div>
+        {%  if hiring %}
+        <div class="row-fluid">
+            <div align=center>
+                <h3>
+                    Did we mention that <strong><a href="hiring">We're Hiring!</a></strong>
+                </h3>
+            </div>
+        </div>
+        {%  endif %}
     </div>
 </div>
 <div>
@@ -110,6 +119,10 @@
     </div>
 </div>
 
+{% if hiring %}
+<a href="hiring"><img src="{{ STATIC_URL }}graphics/core/hiring_ribbon.gif" border="0" width="150" height="150" style="position:absolute; right:0px; top:0px; margin:0px; padding:0px"></a>
+{% endif %}
+
 <!--facebook-->
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
@@ -132,4 +145,5 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
   })();
 </script>
+
 {% endblock m_column_content %}

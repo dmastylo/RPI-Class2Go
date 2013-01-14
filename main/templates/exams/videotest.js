@@ -4,8 +4,20 @@
         // Define Namespace
         var C2G = window.C2G || {};
         C2G.videoSetup = {};
-
         // Key methods
+
+        C2G.videoSetup.getMS = function(seconds) {
+            var sign = (seconds>=0) ? "" : "-" ;
+            seconds=Math.abs(seconds);
+            var M = Math.floor(seconds / 60);
+            var S = Math.floor(seconds % 60);
+            var Mstring = "" + M;
+            var Sstring = "" + S;
+            
+            if (S < 10) Sstring = "0"+Sstring;
+            return sign + Mstring + ":" + Sstring;
+        };
+
         C2G.videoSetup.fetchThumbs = function () {
 
             // set up deferred object for proper chaining of function calls
@@ -62,6 +74,8 @@
                 $(selected).addClass('selected');
                 $(selected).removeClass('unselected');
                 $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width()));
+            } else {
+                $("#slideIndex div:first-child").addClass("selected");
             }
         };
 
@@ -79,17 +93,16 @@
                 C2G.videoSetup.slideIndices[idxTime].displayDiv = tempDiv;
                 tempDiv.appendChild(slideImg);
                 tempDiv.onclick=(function (time) {return function(evt) {
-                    //player.seekTo(time);
                     window.popcornVideo.play();
                     window.popcornVideo.currentTime(time)
-                    //thumbSet.selectSlide(time);
                     C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
+                $(tempDiv).append('<div class="thumbnailTime">'+C2G.videoSetup.getMS(idxTime)+'</div>');
                 $('#slideIndex').append(tempDiv);
                 return tempDiv;
 
             };
-
+ 
             var addQuizSlide = function (idxTime) {
                 var indexDiv = document.getElementById('slideIndex');
                 var tempDiv = document.createElement('div');
@@ -98,17 +111,17 @@
                 slideImg.src = '/static/graphics/core/question.png';
                 $(slideImg).attr('alt', 'Go to quiz at section ' + idxTime);
                 tempDiv.appendChild(slideImg);
-
                 tempDiv.onclick=(function (time) {return function(evt) {
-                                    //player.seekTo(time-0.5);
-                                    window.popcornVideo.play();
-                                    window.popcornVideo.currentTime(time-0.5);
-                                    //thumbSet.selectSlide(time);
+                                 //window.popcornVideo.pause();
+                                    window.popcornVideo.currentTime(time);
                                     C2G.videoSetup.selectSlide(time);
+                                    C2G.videoSetup.questionController.execute(time);
                 };})(idxTime);
+                $(tempDiv).append('<div class="thumbnailTime">'+C2G.videoSetup.getMS(idxTime)+'</div>');
                 $('#slideIndex').append(tempDiv);
                 return tempDiv;
             };
+  
 
             var setupNavPanel = function (){
                 var merged = Array();
@@ -216,6 +229,7 @@
                 $('.button-tray').hide();
                 $('.question').hide();
                 $('.explanation').hide();
+                $('.hide-button').attr('disabled', 'disabled');
             };
 
             var removeExamStage = function() {
@@ -272,48 +286,82 @@
             };
                           
             C2G.videoSetup.questions={};
+            C2G.videoSetup.showQuestion = function (questionsToShow, time) {
+                return function () {
+                    //flip-flop action here. There are 2 ways to get into showQuestion()
+                    //The problematic one is when people click the thumbnail.
+                    //That makes the time of the video exactly what the cue point is, so
+                    //the cue event might fire after we close the question and resume the
+                    //video and try to showQuestion() again.  To prevent this second showQuestion(),
+                    //we tell the controller to disable showQuestion() the first time around.
+                    C2G.videoSetup.questionController.disable(time);
+                    setExamStage();
+                    var firstQuestionId = "";
+                    if ($.isArray(questionsToShow)) {
+                        firstQuestionId = questionsToShow[0];
+                        if (questionsToShow.length > 1) {
+                            configureExamButton("multi-question", questionsToShow);
+                        } else {
+                            configureExamButton();
+                        }
+                    } else {
+                        firstQuestionId = questionsToShow;
+                        configureExamButton();
+                    }
+                    $('#' + firstQuestionId).show(0, C2G.checkSubmitStatus);
+                    currentQuestionId = firstQuestionId;
+                    $('#exam-pane').fadeTo('fast', 1.0);
+                };
+            };
+              
+                          
+            C2G.videoSetup.questionController = {
+                dispFns : {},
+                disabledFns : {},
+                install : function(time, fn) { this.dispFns[time] = fn;},
+                disable : function(time) { this.disabledFns[time] = true; },
+                enable : function(time) { delete this.disabledFns[time];},
+                execute : function (time) {
+                            console.log("exec:"+time);
+                            if (!this.disabledFns.hasOwnProperty(time) &&
+                                 this.dispFns.hasOwnProperty(time)) {
+                                     console.log("ran");
+                                     return this.dispFns[time]();
+                            }
+                },
+                execute_closure: function(time) { return function() { C2G.videoSetup.questionController.execute(time);}},
+                enable_closure: function(time) { return function() { C2G.videoSetup.questionController.enable(time);}}
+
+            };
+                          
                           
             for (q in questionTimes) {
-                
                 var cueSecond = q.split('_')[1];
                 var questionsToShow = questionTimes[q];
                 C2G.videoSetup.questions[cueSecond] = true;
-                var showQuestion = function (questionsToShow) {
-                    return function () {
-                        setExamStage();
-                        var firstQuestionId = "";
-                        if ($.isArray(questionsToShow)) {
-                            firstQuestionId = questionsToShow[0];
-                            if (questionsToShow.length > 1) {
-                                configureExamButton("multi-question", questionsToShow);
-                            } else {
-                                configureExamButton();
-                            }
-                        } else {
-                            firstQuestionId = questionsToShow;
-                            configureExamButton();
-                        } 
-                        $('#' + firstQuestionId).show(0, C2G.checkSubmitStatus);
-                        currentQuestionId = firstQuestionId;
-                        $('#exam-pane').fadeTo('fast', 1.0);
-                    };
-                };
-
-                window.popcornVideo.cue(cueSecond, showQuestion(questionsToShow));
-
+                C2G.videoSetup.questionController.install(cueSecond, C2G.videoSetup.showQuestion(questionsToShow, cueSecond));
+                window.popcornVideo.cue(cueSecond, C2G.videoSetup.questionController.execute_closure(cueSecond));
+                //We then set up a cue point 1 second after the original cue point
+                //when the original cue point is re-enabled.
+                window.popcornVideo.cue(parseFloat(cueSecond)+.5, C2G.videoSetup.questionController.enable_closure(cueSecond));
             }
+                          
 
             $.when(C2G.videoSetup.fetchThumbs())
             .then(C2G.videoSetup.displayThumbs)
             .then(C2G.videoSetup.cueThumbs)
             .then(console.log("DONE!"));
+                          
+            
 
         });
 
+       
+
         if (video_rec_id) {
-	    window.onbeforeunload = function() {
-		vidTime = Math.floor(window.popcornVideo.currentTime());
-		duration = window.popcornVideo.duration();
-		$.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: video_rec_id, playTime: vidTime, duration: duration, csrfmiddlewaretoken: csrf_token}});
+            window.onbeforeunload = function() {
+            vidTime = Math.floor(window.popcornVideo.currentTime());
+            duration = window.popcornVideo.duration();
+            $.ajax({type:"POST", url: "/videos/save/", async:false, data: {videoRec: video_rec_id, playTime: vidTime, duration: duration, csrfmiddlewaretoken: csrf_token}});
+            }
 	    }
-	}

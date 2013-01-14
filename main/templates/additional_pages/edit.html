@@ -7,6 +7,27 @@
 
 {% block course_page_title %}{{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
+{% block addl_head_scripts %}
+<style type="text/css" media="screen">
+    #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    #edit-container{
+        position:relative;
+        height:450px;
+    }
+    
+    textarea.proxy {
+        display: none;
+    }
+    
+</style>
+{% endblock addl_head_scripts %}
+
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% if page.is_synced %}
@@ -39,15 +60,7 @@
         {% else %}
             <input type='hidden' name='title' value='Overview' />
         {% endifnotequal %}
-        <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
-        <div class="control-group">
-            <div class="controls">
-                <textarea name="description" class="tinymce">
-                    {% autoescape off %}{{page.description}}{% endautoescape %}
-                </textarea>
-            </div>
-        </div>
-        
+                
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
             <label class="control-label">URL identifier</label>
@@ -74,9 +87,21 @@
                 </select>
             </div>
         </div>
-        {% else %}
-            <input type='hidden' name='parent' value='overview' />
         {% endifnotequal %}
+            
+        
+        <textarea class="proxy" id="ace_proxy" name="description">{{page.description|safe}}</textarea>
+        <label class="control-label">Page HTML</label>
+            <div class="control-group">
+                <input type="button" id="tinymce-entry-btn" class="btn" value="Open WYSIWYG Editor" title="Click to open WYSIWYG Editor" />
+            </div>
+        <div id="edit-container">
+            <div id="editor"></div>
+        </div>
+
+       
+
+
 
         {% csrf_token %}
         <input type="hidden" name="page_id" value="{{page.id}}" />
@@ -97,8 +122,15 @@
             {% endifnotequal %}
         </div>
     </form>
+    
+    <div id="dialog-form" title="WYSIWYG Editor">
+        <label for="name" id="xml-import-label"><p>Use this Editor to Create your HTML.</p><p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p></label>
+        <textarea class="tinymce" name="tinymce-entry" id="tinymce-entry" class="text ui-widget-content ui-corner-all"></textarea>
+    </div>
+    
     <script type="text/javascript">
         function Save(commit, revert) {
+            $("#ace_proxy").val(editor.getValue());
             if (commit) $("#commit").val(1);
             if (revert) $("#revert").val(1);
             
@@ -143,5 +175,43 @@ $('#id_slug').focus(function() {
             }
         });
     });
+</script>
+
+
+<script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
+<script src="{{STATIC_URL}}js/core/beautify-html.js"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setValue($('#ace_proxy').val());
+    editor.setTheme("ace/theme/eclipse");
+    editor.getSession().setMode("ace/mode/html");
+    editor.getSession().setUseWrapMode(true);
+    
+    $( "#dialog-form" ).dialog({
+       autoOpen: false,
+       height: 600,
+       width: "80%",
+       modal: true,
+       buttons: [{
+                     text:"Write to HTML",
+                     id:"import-html-button",
+                     click: function() {
+                             editor.setValue(style_html($('#tinymce-entry').val(), {'max_char':80}));
+                             $(this).dialog("close");
+                     }
+                 },
+                 {
+                     text:"Cancel",
+                     click: function() {
+                             $(this).dialog("close");
+                     }
+                 }]
+    });
+    
+    $('#tinymce-entry-btn').click(function() {
+                              $("#tinymce-entry").val(editor.getValue());
+                              $("#dialog-form").dialog( "open" );
+                            });
+
 </script>
 {% endblock addl_scripts %}

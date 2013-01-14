@@ -78,14 +78,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane label input {float: left; margin-right: 1em;}
     #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
     h3 {clear:both;}
-    div.question, div.subquestion {float:left; width:95%;}
-    div.problem, div.problem {float:left; width:95%;}
+    div.question, div.subquestion {float:left; width:95%; position:relative;}
+    div.problem, div.problem {float:left; width:95%; position:relative;}
     #problemset-nav {float: left; padding: 0 0 1em 0; }
     #next-question {float: right;}
     #prev-question {float: left;}
     label pre {margin-left:30px;}
 
     .explanation {background: #fff; border: 1px solid black; border-radius: 3px; clear: both; margin: 1em; padding: 1em;}
+    .explanation .toggle-expl {cursor: pointer;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
     #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
@@ -96,11 +97,25 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .exam-navigation {padding: 2px 0; width: 100%;}
     #exam-pane .exam-navigation .btn {margin-right: .5em;}
     div.question textarea { width:70%; height:100px; }
-    div.question .per-question-btns {background-color: #ddcf99; border-radius: 4px; float: left; margin: 1em 0; padding: 5px; }
+    div.question .per-question-btns {border: 2px solid #ddcf99; border-radius: 4px; float: left; margin: 1em 0; padding: 5px; }
     div.question .per-question-btns input {float: left;}
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
 
+    .questionNumLabelDiv {
+        position: absolute;
+        left: 0px;
+        top: -10px;
+        width: 97%;
+        text-align: center;
+    }
+    .questionNumLabel {
+        background: white;
+        padding: 2px;
+        border: 1px solid #DDCF99;
+        font-size: 14px;
+    }
+        
     .correct {color: #090;}
     .incorrect {color: #900;}
     </style>
@@ -201,11 +216,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
               $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
             }
         };
+        var addQuestionDivLabel = function(elem, num, total) {
+            $(elem).prepend('<div class="questionNumLabelDiv"><span class="questionNumLabel">' +
+                            num + ' of ' + total +
+                            '</span></div>');
+        };
         var psetQuestions = $('div.question');
         if (psetQuestions.length > 1) {
             var qQumx = 1;
             $(psetQuestions).each(function () {
-                                       addNumberToQuestionDiv(this,qQumx);
+                                       addNumberToQuestionDiv(this, qQumx);
+                                       addQuestionDivLabel(this, qQumx, psetQuestions.length);
                                        qQumx = qQumx + 1;}
             );
         }
@@ -214,10 +235,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
 
         window.collectUserAnswers = function (inputCollection) {
+            var returnObj = {};
             var userSelections = {};
+            var uniqueFormElements = {}; // object of named form elements
+            var totalUniqueFormEls = 0;
             $(inputCollection).each(function () {
                 var name = $(this).attr('name');
                 var key = (name != undefined) ? name.trim() : "";
+                // keep track of number of inputs with same name
+                // for possible later use 
+                if (key != "" && uniqueFormElements[key] == undefined) {
+                    uniqueFormElements[key] = 1;
+                    totalUniqueFormEls += 1;
+                } else {
+                    uniqueFormElements[key] += 1;
+                }
                 if (($(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio')
                      && $(this).get(0).checked == true) {
                     var tmpObj = {};
@@ -245,12 +277,26 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     userSelections[key]=tmpObj;
                 }
             });
-            return userSelections;
+
+            returnObj.userSelections = userSelections;
+            returnObj.uniqueFormElements = uniqueFormElements;
+
+            var userSelLength = 0;
+            for (el in userSelections) {
+                userSelLength += 1;
+            }
+
+            returnObj.userSelLength = userSelLength;
+            returnObj.answeredAll = (userSelLength == totalUniqueFormEls);
+
+            return returnObj;
+
         };
 
                       
     {% if single_question %}
         $('.question').not(':first').hide();
+        $('#prev-question').attr('disabled', 'disabled');
 
         // Don't show Prev/Next question buttons when only one problem
         if ($('.question').length == 1) {
@@ -261,17 +307,24 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         var adjustQuestionIdx = function (newIdx) {
             // right now, just accept neg number as moving back 1,
-            // pos number moving forward 1
+            // pos number moving forward 1 (i.e. no increments > 1 allowed)
             if (newIdx > 0) {
                 localQuestionIdx += 1;
             } else if (newIdx < 0) {
                 localQuestionIdx -= 1;
             }
 
-            if (localQuestionIdx > ($('.question').length - 1)) {
-                localQuestionIdx = 0;
-            } else if (localQuestionIdx < 0) {
+            if (localQuestionIdx >= ($('.question').length - 1)) {
+                // no longer cycle through; stop at last question
+                $('#next-question').attr('disabled', 'disabled');
                 localQuestionIdx = $('.question').length - 1;
+            } else if (localQuestionIdx <= 0) {
+                // no longer cycle through; stop at first question
+                $('#prev-question').attr('disabled', 'disabled');
+                localQuestionIdx = 0;
+            } else {
+                $('#next-question').removeAttr('disabled');
+                $('#prev-question').removeAttr('disabled');
             }
 
             return localQuestionIdx;
@@ -287,6 +340,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $('.question').hide();
             $('.inline-explanation').remove();
             $('.explanation').remove();
+            $('.hide-button').attr('disabled', 'disabled');
             $('.question').eq(newQIdx).show();
         };
 
@@ -299,6 +353,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             var assocQID = $(assocQ).attr('id');
             $('#' + assocQID + '-expl').empty().remove();
             $('#' + assocQID).find('.inline-explanation').remove();
+            $(this).attr('disabled', 'disabled');
             return;
         } 
 
@@ -317,7 +372,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             var checkBtn = $(this);
             var getAllUserAnswers = function () {
                 var inputCollection = $(checkBtn).closest('.question').find('input,textarea');
-                return window.collectUserAnswers(inputCollection);
+                var userAnswersObj = window.collectUserAnswers(inputCollection);
+                return userAnswersObj.userSelections;
             };
 
             var displayMetaData = function (data, userData) {
@@ -381,11 +437,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(explArea).show();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
-                    if ($(this).text() == 'Explanation') {
-                        $(explArea).append('<h4>' + $(this).text() + '</h4>');
-                    } else {
+                    //if ($(this).text() == 'Explanation') {
+                    //    $(explArea).append('<h4>' + $(this).text() + '</h4>');
+                    //} else {
                         $(explArea).append($(this));
-                    }
+                    //}
                 });
 
                 $('#' + checkBtnID).attr('value','Hide Answers');
@@ -397,8 +453,31 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     target = document.createElement('div');
                     $(target).attr('id', assocQID + '-expl');
                     $(target).addClass('explanation');
+
+                    var toggleLink = document.createElement('a');
+                    $(toggleLink).text("Show Explanation");
+                    $(toggleLink).addClass('toggle-expl');
+                    $(toggleLink).attr('id', assocQID + '-toggle-expl');
+                    $(toggleLink).attr('data-status', 'Show');  // hook for later i18n
+                    $(toggleLink).attr('title', 'Click to Show Explanation');
+                    $(target).append($(toggleLink));
+
+                    var contentDiv = document.createElement('div');
+                    $(contentDiv).addClass('expl-content');
+                    $(contentDiv).attr('id', assocQID + '-expl-content');
+                    $(contentDiv).css('display', 'none');
+                    $(target).append($(contentDiv));
+
+                    $(toggleLink).click(function () {
+                        var myStatus = $(this).attr('data-status');
+                        var newStatus = (myStatus == "Show") ? "Hide" : "Show";
+                        $(this).attr('data-status', newStatus);
+                        $(this).text(newStatus + ' Explanation');
+                        $(this).attr('title', 'Click to ' + newStatus + ' Explanation');
+                        $(this).siblings('div.expl-content').toggle();                       
+                    });
                 }
-                $(target).empty();
+                $(target).find('.expl-content').empty();
                 $(target).show();
                 $('#' + assocQID + ' .per-question-btns').before($(target));
                 return target;
@@ -411,7 +490,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     var response = $.parseJSON(data);
                     for (var k in response) {
                         if (k != "__metadata__") {
-                            $(explArea).append(response[k].feedback[0].explanation);
+                            $(explArea).find('.expl-content').append(response[k].feedback[0].explanation);
                         }
                     }
                 };
@@ -454,9 +533,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 });
             }
 
+            $(this).siblings('.hide-button').removeAttr('disabled');
+
         };
                       
         $('.question').each(function (idx, el) {
+
+            // append clearing div to question to "fix" weird Check/Hide
+            // placement issues  
+            var clearingDiv = document.createElement('div');
+            $(clearingDiv).addClass('clearing-div');
+            $(this).append($(clearingDiv));
 
             // create div to hold Check/Hide buttons
             var perQButtonDiv = document.createElement('div');
@@ -478,7 +565,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(hideBtn).attr('id','hideAnswers_' + idx);
             $(hideBtn).addClass('btn').addClass('hide-button');
             $(hideBtn).attr('value', 'Hide Answers');
+            $(hideBtn).attr('disabled', 'disabled');
             $(perQButtonDiv).append($(hideBtn));
+
         });
 
         $('.quick-check').click(quickCheck);
@@ -554,7 +643,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     $(saveWorkBtn).click(function () {
       var fieldCollection = $('#exam-pane').find('input,textarea');
-      var userSelections = window.collectUserAnswers(fieldCollection);
+      var userAnswerObj = window.collectUserAnswers(fieldCollection);
+      var userSelections = userAnswerObj.userSelections; 
 
       window.myData = JSON.stringify(userSelections);
 
@@ -670,17 +760,40 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             explArea = document.createElement('div');
             $(explArea).attr('id', assocQID + '-expl');
             $(explArea).addClass('explanation');
+
+            var toggleLink = document.createElement('a');
+            $(toggleLink).text("Show Explanation");
+            $(toggleLink).addClass('toggle-expl');
+            $(toggleLink).attr('id', assocQID + '-toggle-expl');
+            $(toggleLink).attr('data-status', 'Show');  // hook for later i18n
+            $(toggleLink).attr('title', 'Click to Show Explanation');
+            $(explArea).append($(toggleLink));
+
+            var contentDiv = document.createElement('div');
+            $(contentDiv).addClass('expl-content');
+            $(contentDiv).attr('id', assocQID + '-expl-content');
+            $(contentDiv).css('display', 'none');
+            $(explArea).append($(contentDiv));
+
+            $(toggleLink).click(function () {
+                var myStatus = $(this).attr('data-status');
+                var newStatus = (myStatus == "Show") ? "Hide" : "Show";
+                $(this).attr('data-status', newStatus);
+                $(this).text(newStatus + ' Explanation');
+                $(this).attr('title', 'Click to ' + newStatus + ' Explanation');
+                $(this).siblings('div.expl-content').toggle();                       
+            });
         }
-        $(explArea).empty();
+        $(explArea).find('.expl-content').empty();
         $(explArea).show();
-        $(explArea).append("<h4>Explanation</h4>");
+        //$(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
             if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
-                $(explArea).append($(this).text());
+                $(explArea).find('.expl-content').append($(this).text());
             }
             else { //for DOM nodes that are elements
-                $(explArea).append($(this).clone());
+                $(explArea).find('.expl-content').append($(this).clone());
             }
         });
         $('div.question#' + assocQID ).append($(explArea));
@@ -821,8 +934,16 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     };
                       
     $('#submit-button').click(function () {
+
         var fieldCollection = $('#exam-pane').find('input,textarea');
-        var userSelections = window.collectUserAnswers(fieldCollection);
+        var userAnswerObj = window.collectUserAnswers(fieldCollection);
+
+        if (!userAnswerObj.answeredAll) {
+            var userProceed = confirm("This will submit the entire {{ exam.get_human_type }} and you haven't answered all questions. Still submit?");
+            if (!userProceed) return;
+        } 
+
+        var userSelections = userAnswerObj.userSelections; 
 
         window.myData = JSON.stringify(userSelections);
 
@@ -920,7 +1041,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 	var video_rec_id = {{ video_rec.id }}
 	var csrf_token = '{{ csrf_token }}'
-{% include 'exams/videotest.js' %}
+    {% include 'exams/videotest.js' %} 
 {% if not video.url %}
     $('#demoplayer').hide();
     $('.question').eq(0).show();
