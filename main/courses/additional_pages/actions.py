@@ -107,7 +107,7 @@ def save(request):
         page.image.slug = request.POST.get("slug")
         page.image.save()
 
-        create_contentgroup_entries_from_post(request, 'parent', page.image, 'additional_page')
+        create_contentgroup_entries_from_post(request, 'parent', page.image, 'additional_page', display_style='list')
 
         if request.POST.get("commit") == '1':
             page.commit()
