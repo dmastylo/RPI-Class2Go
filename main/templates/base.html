@@ -84,6 +84,7 @@
             </div>
             {% block topnav %}
             <div class="top-nav">
+                <ul class="unstyled">
             {% if user.is_authenticated %}
                 <li>
                     <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
@@ -103,6 +104,7 @@
                 {% endif %}
             {% endif %}
                 <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><em class="icon-reorder"></em></a></li>
+                </ul>
             </div>
             {% endblock topnav %}
         </div>
