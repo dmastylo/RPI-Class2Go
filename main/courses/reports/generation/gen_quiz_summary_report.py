@@ -118,6 +118,28 @@ def gen_assessment_summary_report(ready_course, exam, save_to_s3=False):
     report_content = rw.writeout()
     return {'name': report_name, 'content': report_content, 'path': s3_filepath}
 
+def gen_survey_summary_report(ready_course, survey, save_to_s3=False):
+    
+    ### 1- Compose the report file name and instantiate the report writer object
+    dt = datetime.now()
+    course_prefix = ready_course.handle.split('--')[0]
+    course_suffix = ready_course.handle.split('--')[1]
+    
+    report_name = "%02d_%02d_%02d__%02d_%02d_%02d-%s.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, survey.slug)
+    s3_filepath = "%s/%s/reports/survey_summary/%s" % (course_prefix, course_suffix, report_name)
+    
+    rw = C2GReportWriter(save_to_s3, s3_filepath)
+    
+    ### 2- Write the Report Title
+    rw.write(content = ["Survey Summary for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
+    
+    ### 3- Write survey report
+    WriteSurveySummaryReportContent(survey, rw, full=False)
+    
+    ### 4- Proceed to write out and return
+    report_content = rw.writeout()
+    return {'name': report_name, 'content': report_content, 'path': s3_filepath}
+
 
 def WriteQuizSummaryReportContent(ready_quiz, rw, full=False):
     ### 1- Get the quiz data
@@ -241,3 +263,33 @@ def WriteAssessmentSummaryReportContent(ready_exam, rw, full=False):
         
     rw.write([""])
 
+
+def WriteSurveySummaryReportContent(ready_survey, rw, full=False):
+    
+    ### 1- Get the survey data
+    tally, errors, question_reports = get_survey_data(ready_survey)
+    
+    ### 2- Write the title line
+    rw.write([ready_survey.title])
+    
+    ### 3- Write the content
+    for question, responses in tally.iteritems():
+        
+        if question_reports and (question in question_reports):
+            content = ["question: " + question, question_reports[question]]
+        else:
+            content = ["question: " + question]
+        
+        rw.write(content)
+        for response, count in responses.iteritems():
+            if response != '+total+':
+                content = [response, count]
+                rw.write(content, indent = 1)
+        content = []
+        content = ['Total', "", str(responses['+total+'])]
+        rw.write(content, nl = 1)
+        
+    content = []
+    content = [str(errors) + " errors found in parsing the data"]
+    rw.write(content)
+    rw.write([""])

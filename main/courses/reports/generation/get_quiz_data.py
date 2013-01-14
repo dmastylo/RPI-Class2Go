@@ -2,7 +2,7 @@ from c2g.models import *
 from operator import itemgetter
 import json
 import re
-from django.db.models import Count
+from django.db.models import Count, Avg
 
 mean = lambda k: sum(k)/len(k)
 
@@ -336,6 +336,88 @@ def get_full_assessment_data(ready_exam, get_visits = False):
     
     return student_scores, student_field_scores
     
+def get_survey_data(ready_survey, get_visits = False):
+    
+    errors = 0
+    
+    #List of responses, with count, for each question
+    tally = {}
+    
+    #Report friendly questions
+    question_reports = {}
+    
+    #Get all the submissions for this survey
+    exam_records = ExamRecord.objects.filter(exam=ready_survey)
+    
+    for exam_record in exam_records:
+        json_row = exam_record.json_data
+        
+        try:
+            data = json.loads(json_row)
+            
+        except ValueError:
+            errors +=1
+            
+        else:
+            for question in data.keys():
+                answer = None
+                question_report = None
+                
+                if type(data[question]) is dict and data[question].get('value', False):
+                    #Single answer
+                    
+                    answer = data[question].get('value')
+                    
+                    if data[question].get('report', False):
+                        question_report =  data[question].get('report')   
+                    elif data[question].get('questionreport', False):
+                        question_report =  str(question) + " : " + data[question].get('questionreport')
+                    else:    
+                        question_report = question
+                        
+                    question_reports[question] = question_report
+                    tally = store_answer(tally, question, answer)
+            
+                else:
+                    #Multiple answers
+                    
+                    list_of_dicts = data[question]    
+                    for multi_answer_dict in list_of_dicts:                      
+                        
+                        if type(multi_answer_dict) is dict and multi_answer_dict.get('value', False):
+                            
+                            if multi_answer_dict.get('report', False):
+                                answer = multi_answer_dict.get('report')
+                            else:
+                                answer = multi_answer_dict.get('value')
+                                
+                        if multi_answer_dict.get('questionreport', False):
+                            question_report = multi_answer_dict.get('questionreport')
+                        else:
+                            question_report = question 
+                        
+                        question_reports[question] = question_report
+                        tally = store_answer(tally, question, answer)
+    
+    return tally, errors, question_reports
+    
+    
+def store_answer(tally, question, answer):
+
+    if question in tally:
+        tally[question]['+total+'] += 1
+    else:
+        tally[question] = {}
+        tally[question]['+total+'] = 1
+
+    if answer and answer not in tally[question]:
+        tally[question][answer] = {}
+        tally[question][answer] = 1                    
+    elif answer:
+        tally[question][answer] += 1
+        
+    return tally
+
 
 def compute_score_summative(first_correct_attempt_number, first_correct_attempt_time_created, resubmission_penalty, submissions_permitted, grace_deadline, partial_credit_deadline, late_penalty):
     if (first_correct_attempt_number > submissions_permitted):
