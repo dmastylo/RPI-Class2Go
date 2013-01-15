@@ -81,15 +81,15 @@
                     {% if not page.section_id %}
                         <option value="null" selected>** No content section **</option>
                     {% else %}
-                        <option value="null">** No content section **</option>
+                        {% for section in sections %}
+                            {% if page.section_id and page.section_id == section.id %}
+                                <option value="{{section.id}}" selected>{{section.title}}</option>
+                            {% else %}
+                                <option value="{{section.id}}">{{section.title}}</option>
+                            {% endif %}
+                        {% endfor %}
+                        {# <option value="null">** No content section **</option> #} {# not confident this works right #}
                     {% endif %}
-                    {% for section in sections %}
-                        {% if page.section_id and page.section_id == section.id %}
-                            <option value="{{section.id}}" selected>{{section.title}}</option>
-                        {% else %}
-                            <option value="{{section.id}}">{{section.title}}</option>
-                        {% endif %}
-                    {% endfor %}
                 </select>
             </div>
         </div>
@@ -184,6 +184,11 @@ $('#id_slug').focus(function() {
             $('#parent_id_group').css('display', 'none');
         } else {
             $('#parent_id_group').css('display', 'inline');
+            {% if contentgroup_info.parent_id != page.image.id %}  /* FIXME: using template substitutions in js is evil. better to seed a data structure. */
+                pelement.html('<option value="{{contentgroup_info.parent_type}},{{contentgroup_info.parent_id}}" selected>{{contentgroup_info.parent.title}}</option>');
+            {% else %}
+                pelement.html('');
+            {% endif %}
             pelement.append('<option value="none,none">(this is a top level page)</option>');
             jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
                 for (var i=0; i < data.length; i++) {

@@ -64,7 +64,6 @@ def main(request, course_prefix, course_suffix, slug):
         # from Django templates
         contentgroup_info['PARENT'] = contentgroup_info['__parent']
         contentgroup_info['PARENT_TAG'] = contentgroup_info['__parent_tag']
-
     else:
         template = 'additional_pages/view.html'
         
