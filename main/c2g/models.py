@@ -533,7 +533,8 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 url = storecache_hit['url']
             else:
                 CacheStat.report('miss', 'file_store')
-                url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+                url_raw = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+                url = remove_querystring(url_raw)  # TODO: preserve when we have longer timeouts
                 storecache_val = {'url':url}
                 storecache.set(storecache_key, storecache_val)
         return url
@@ -1000,10 +1001,11 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 return ""
             if is_storage_local():
                 # FileSystemStorage returns a path, not a url
-                loc=get_site_url() + self.file.storage.url(videoname)
+                loc_raw = get_site_url() + self.file.storage.url(videoname)
             else:
-                loc=self.file.storage.url_monkeypatched(videoname,
+                loc_raw = self.file.storage.url_monkeypatched(videoname,
                     response_headers={'response-content-disposition': 'attachment'})
+            loc = remove_querystring(loc)  # TODO - preserve query strings when we have longer timeouts
             storecach_val = {'size':self.file.size, 'url':loc }
             storecache.set(storecache_key, storecache_val)
             return loc
