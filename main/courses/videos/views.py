@@ -99,7 +99,6 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec.save()
         
     course = common_page_data['course']
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course, filter_children=True)
 
     if request.user.is_authenticated():
         is_logged_in = 1
@@ -134,8 +133,6 @@ def view(request, course_prefix, course_suffix, slug):
                                'video_rec':           video_rec, 
                                'prev_slug':           prev_slug, 
                                'next_slug':           next_slug, 
-                               'contentsection_list': full_contentsection_list, 
-                               'full_index_list':     full_index_list,
                                'is_logged_in':        is_logged_in,
                                'downloadable_content':downloadable_content,
                                'json_pre_pop':"{}",

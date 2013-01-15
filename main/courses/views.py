@@ -73,16 +73,13 @@ def main(request, course_prefix, course_suffix):
         news_list = []
 
     course = common_page_data['course']
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
              'news_list':           news_list,
-             'contentsection_list': full_contentsection_list,
              'video_list':          Video.objects.getByCourse(course=course),
              'pset_list':           ProblemSet.objects.getByCourse(course=course),
-             'full_index_list':     full_index_list,
              'is_logged_in':        is_logged_in
              },
             context_instance=RequestContext(request))

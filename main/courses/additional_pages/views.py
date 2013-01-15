@@ -80,7 +80,6 @@ def main(request, course_prefix, course_suffix, slug):
         template = 'additional_pages/view.html'
         
     course = common_page_data['course']
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
 
     if request.user.is_authenticated():
         is_logged_in = 1
@@ -91,8 +90,6 @@ def main(request, course_prefix, course_suffix, slug):
                               {
                                'common_page_data': common_page_data,
                                'page': page,
-                               'contentsection_list': full_contentsection_list, 
-                               'full_index_list': full_index_list,
                                'is_logged_in': is_logged_in,
                                'contentgroup_info': contentgroup_info,
                               },
