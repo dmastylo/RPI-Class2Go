@@ -1,19 +1,18 @@
-#c2g specific comments
-# any table indexes that use only one column here are place here.
-# any table indexes that use multiple columns are placed in a south migration at
-# <location to be inserted>
-
-from datetime import datetime
+from datetime import datetime, timedelta
 from hashlib import md5
 import os
 import re
 import sys
 import time
+import logging
+from urlparse import urlparse, urlunparse
+from django.core.cache import cache, get_cache
 
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
@@ -22,6 +21,7 @@ from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
 from xml.dom.minidom import parseString
 
+logger = logging.getLogger(__name__)
 
 RE_S3_PATH_FILENAME_SPLIT = re.compile('(?P<path>.+)\/(?P<filename>.*)$')
 
@@ -34,6 +34,17 @@ def get_file_path(instance, filename):
         return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
     if isinstance(instance, File):
         return os.path.join(str(parts[0]), str(parts[1]), 'files', filename)
+
+
+def remove_querystring(url):
+    """
+    remove_querystring("http://www.example.com:8080/salad?foo=bar#93")
+    'http://www.example.com:8080/salad'
+    """
+    sp = urlparse(url)
+    com = (sp.scheme, sp.netloc, sp.path, '', '', '')
+    return urlunparse(com)
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -508,14 +519,24 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return self.file.storage.exists(self.file.name)
 
     def dl_link(self):
-        # File
         filename = self.file.name
         if not self.file.storage.exists(filename):
             return ""
         if is_storage_local():
             url = get_site_url() + self.file.storage.url(filename)
         else:
-            url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+            storecache = get_cache("file_store")
+            storecache_key = filename.replace(' ','%20')   # memcache can't handle spaces in cache key
+            storecache_hit = storecache.get(storecache_key)
+            if storecache_hit:
+                CacheStat.report('hit', 'file_store')
+                url = storecache_hit['url']
+            else:
+                CacheStat.report('miss', 'file_store')
+                url_raw = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+                url = remove_querystring(url_raw)  # TODO: preserve when we have longer timeouts
+                storecache_val = {'url':url}
+                storecache.set(storecache_key, storecache_val)
         return url
         
     def get_ext(self):
@@ -562,6 +583,7 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     class Meta:
         db_table = u'c2g_files'
+
 
 class AnnouncementManager(models.Manager):
     def getByCourse(self, course):
@@ -747,6 +769,7 @@ class VideoManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
+
 
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -965,19 +988,35 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def dl_link(self):
         """Return fully-qualified download URL for this video, or empty string."""
-        # Video
-        videoname = self.file.name
-        if not self.file.storage.exists(videoname):
-            return ""
-        if is_storage_local():
-            # FileSystemStorage returns a path, not a url
-            return get_site_url() + self.file.storage.url(videoname)
+        storecache = get_cache("video_store")
+        storecache_key = video.file.name.replace(' ','%20')
+        storecache_hit = storecache.get(storecache_key)
+        if storecache_hit:
+            CacheStat.report('hit', 'video_store')
+            return storecache_hit['url']
         else:
-            return self.file.storage.url_monkeypatched(videoname, response_headers={'response-content-disposition': 'attachment'})
+            CacheStat.report('miss', 'video_store')
+            videoname = self.file.name
+            if not self.file.storage.exists(videoname):
+                return ""
+            if is_storage_local():
+                # FileSystemStorage returns a path, not a url
+                loc_raw = get_site_url() + self.file.storage.url(videoname)
+            else:
+                loc_raw = self.file.storage.url_monkeypatched(videoname,
+                    response_headers={'response-content-disposition': 'attachment'})
+            loc = remove_querystring(loc_raw)  # TODO - preserve query strings when we have longer timeouts
+            storecach_val = {'size':self.file.size, 'url':loc }
+            storecache.set(storecache_key, storecache_val)
+            return loc
+
 
     def dl_links_all(self):
-        """Return list of fully-qualified download URLs for video variants."""
-        # Video
+        """
+        Return list of tuples fully-qualified download URLs for video variants.
+        Tuples of the form: (size_tag, URL, size, description)
+        """
+
         myname  = self.file.name
         mystore = self.file.storage
         if is_storage_local():
@@ -986,16 +1025,47 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return [('large', get_site_url() + mystore.url(myname), self.file.size, '')]
         else:
             # XXX: very S3 specific
-            urlof   = mystore.url_monkeypatched
+            urlof = mystore.url_monkeypatched
             basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
             names = []
             for size in sorted(video_resize_options):
                 checkfor = basepath+'/'+size+'/'+filename
-                gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
-                if gotback:
-                    names.append((size, urlof(checkfor, response_headers={'response-content-disposition': 'attachment'}), gotback[0].size, video_resize_options[size][3]))
+                storecache = get_cache('video_store')
+                storecache_key = checkfor.replace(' ','%20')  # memcache can't handle spaces in cache key
+                storecache_hit = storecache.get(storecache_key)
+                if storecache_hit:
+                    CacheStat.report('hit', 'video_store')
+                    if storecache_hit['size'] > 0:
+                        # print "found %s in cache (%s, %d, %s)"\
+                        #      % (size, storecache_hit['url'], storecache_hit['size'], storecache_hit['desc'])
+                        names.append((size, storecache_hit['url'], storecache_hit['size'], storecache_hit['desc']))
+                    else:
+                        # print "found %s in cache (NEG)" % size
+                        pass
+
+                else:
+                    CacheStat.report('miss', 'video_store')
+                    gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
+                    if gotback:
+                        filesize=gotback[0].size
+                        fileurl=remove_querystring(urlof(checkfor,
+                                response_headers={'response-content-disposition': 'attachment'}))
+                        filedesc=video_resize_options[size][3]
+                        names.append((size, fileurl, filesize, filedesc))
+                        # positive cache
+                        # print "add %s in cache (%s, %d, %s)" % (size, fileurl, filesize, filedesc)
+                        storecache_val = {'size':filesize, 'url':fileurl, 'desc':filedesc}
+                        storecache.set(storecache_key, storecache_val)
+                    else:
+                        # negative cache
+                        # print "add %s in cache (NEG)" % (size)
+                        storecache_val = {'size':0 }
+                        storecache.set(storecache_key, storecache_val)
+
             if not names:
-                names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
+                fileurl=remove_querystring(urlof(myname,
+                                response_headers={'response-content-disposition': 'attachment'}))
+                names = [('large', fileurl, self.file.size, '')]
             return names
 
     def ret_url(self):
@@ -1050,7 +1120,42 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     class Meta:
         db_table = u'c2g_videos'
-        
+
+
+class CacheStat():
+    """
+    Gather and report counter-based stats for our simple caches.
+       report('hit', 'video-cache') or
+       report('miss', 'files-cache')
+    Note a latent bug in here.  a cache that never gets a hit will build 
+    up misses.  That's OK.
+    """
+    lastReportTime = datetime.now()
+    count = {}
+    count['hit'] = {}
+    count['miss'] = {}
+    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 120)
+    reportingInterval = timedelta(seconds=reportingIntervalSec)
+
+    @classmethod
+    def report(cls, type, cache):
+        if cache not in cls.count[type]:
+            cls.count[type][cache] = 0
+        cls.count[type][cache] += 1
+
+        # stat interval expired: print and zero out counts
+        if datetime.now() - cls.lastReportTime > cls.reportingInterval:
+            cls.lastReportTime = datetime.now()
+            for c in cls.count['hit']:   # report on anything that has a hit
+                if c not in cls.count['miss']:
+                    cls.count['miss'][c] = 0
+                rate = float(cls.count['hit'][c]) / float(cls.count['miss'][c] + cls.count['hit'][c]) * 100.0
+                logger.info("cachestats for %s: hits %d, misses %d, rate %2.1f"
+                            % (c, cls.count['hit'][c], cls.count['miss'][c], rate))
+                cls.count['hit'][c] = 0
+                cls.count['miss'][c] = 0
+
+
 class VideoViewTraces(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     video = models.ForeignKey(Video, db_index=True)
