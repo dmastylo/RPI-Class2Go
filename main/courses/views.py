@@ -109,10 +109,11 @@ def leftnav(request, course_prefix, course_suffix):
     course = request.common_page_data['course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('left_nav.html',
-                              {'common_page_data':   request.common_page_data,
+                              {
+                              'PREFIX':              course_prefix,
+                              'SUFFIX':              course_suffix,
                               'contentsection_list': full_contentsection_list,
                               'full_index_list':     full_index_list,
-                              'is_logged_in':        True, #setting to True to get consistent, ok to show anon users links
                               },
                               context_instance=RequestContext(request))
 
@@ -144,9 +145,9 @@ def get_full_contentsection_list(course, filter_children=True):
     desired_item = lambda t,i: True
     if filter_children:
         desired_item = filter_level2_contentgroup_entries
-        for cg2 in ContentGroup.objects.filter(course=course).filter(level=2):
+        for cg2 in ContentGroup.objects.filter(course=course, level=2):
             cg2_t = cg2.get_content_type()
-            level2_items.setdefault(cg2_t, []).append(getattr(cg2, cg2_t).id)
+            level2_items.setdefault(cg2_t, set([])).add(getattr(cg2, cg2_t).id)
 
     tagged_object_lists = {}
     for tag, cls in ContentGroup.groupable_types.iteritems():
@@ -159,7 +160,7 @@ def get_full_contentsection_list(course, filter_children=True):
         index_list = []
         cs_id      = contentsection.id
         for tag in ContentGroup.groupable_types.keys():
-            for obj in tagged_object_lists[tag].filter(section_id=cs_id):
+            for obj in [o for o in tagged_object_lists[tag] if o.section_id == cs_id]:
                 if desired_item(tag, obj.id):
                     if tag == 'file':
                         index_list.append({ 'type': tag, 'ref': obj, 'icon': obj.get_icon_type(), })
