@@ -164,7 +164,7 @@ except NameError:
 try:
     FILE_CACHE_TIME
 except NameError:
-    FILE_CACHE_TIME = 60*60*4    # 40 hours -- files never chang
+    FILE_CACHE_TIME = 60*60*4    # 4 hours -- files never chang
 
 try:
     VIDEO_CACHE_TIME
