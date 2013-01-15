@@ -1127,6 +1127,8 @@ class CacheStat():
     Gather and report counter-based stats for our simple caches.
        report('hit', 'video-cache') or
        report('miss', 'files-cache')
+    Note a latent bug in here.  a cache that never gets a hit will build 
+    up misses.  That's OK.
     """
     lastReportTime = datetime.now()
     count = {}
@@ -1141,17 +1143,17 @@ class CacheStat():
             cls.count[type][cache] = 0
         cls.count[type][cache] += 1
 
+        # stat interval expired: print and zero out counts
         if datetime.now() - cls.lastReportTime > cls.reportingInterval:
             cls.lastReportTime = datetime.now()
             for c in cls.count['hit']:   # report on anything that has a hit
                 if c not in cls.count['miss']:
                     cls.count['miss'][c] = 0
                 rate = float(cls.count['hit'][c]) / float(cls.count['miss'][c] + cls.count['hit'][c]) * 100.0
-                print("cachestats for %s: hits %d, misses %d, rate %2.1f"
+                logger.info("cachestats for %s: hits %d, misses %d, rate %2.1f"
                             % (c, cls.count['hit'][c], cls.count['miss'][c], rate))
                 cls.count['hit'][c] = 0
                 cls.count['miss'][c] = 0
-            # latent bug: cache that never gets a hit will build up misses, OK
 
 
 class VideoViewTraces(TimestampMixin, models.Model):
