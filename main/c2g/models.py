@@ -526,7 +526,7 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             url = get_site_url() + self.file.storage.url(filename)
         else:
             storecache = get_cache("file_store")
-            storecache_key = filename.replace(' ','%20')
+            storecache_key = filename.replace(' ','%20')   # memcache can't handle spaces in cache key
             storecache_hit = storecache.get(storecache_key)
             if storecache_hit:
                 CacheStat.report('hit', 'file_store')
@@ -1005,7 +1005,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             else:
                 loc_raw = self.file.storage.url_monkeypatched(videoname,
                     response_headers={'response-content-disposition': 'attachment'})
-            loc = remove_querystring(loc)  # TODO - preserve query strings when we have longer timeouts
+            loc = remove_querystring(loc_raw)  # TODO - preserve query strings when we have longer timeouts
             storecach_val = {'size':self.file.size, 'url':loc }
             storecache.set(storecache_key, storecache_val)
             return loc
@@ -1028,7 +1028,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             for size in sorted(video_resize_options):
                 checkfor = basepath+'/'+size+'/'+filename
                 storecache = get_cache('video_store')
-                storecache_key = checkfor.replace(' ','%20')
+                storecache_key = checkfor.replace(' ','%20')  # memcache can't handle spaces in cache key
                 storecache_hit = storecache.get(storecache_key)
                 if storecache_hit:
                     CacheStat.report('hit', 'video_store')
@@ -1060,7 +1060,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                         storecache.set(storecache_key, storecache_val)
 
             if not names:
-                names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
+                fileurl=remove_querystring(urlof(myname,
+                                response_headers={'response-content-disposition': 'attachment'}))
+                names = [('large', fileurl, self.file.size, '')]
             return names
 
     def ret_url(self):
