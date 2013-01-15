@@ -67,10 +67,8 @@ def main(request, course_prefix, course_suffix):
     
     if request.user.is_authenticated():
         is_logged_in = 1
-        news_list = common_page_data['ready_course'].newsevent_set.all().order_by('-time_created')[0:5]
     else:
         is_logged_in = 0
-        news_list = []
 
     course = common_page_data['course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
@@ -78,10 +76,7 @@ def main(request, course_prefix, course_suffix):
             {'common_page_data':    common_page_data,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
-             'news_list':           news_list,
              'contentsection_list': full_contentsection_list,
-             'video_list':          Video.objects.getByCourse(course=course),
-             'pset_list':           ProblemSet.objects.getByCourse(course=course),
              'full_index_list':     full_index_list,
              'is_logged_in':        is_logged_in
              },
