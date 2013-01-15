@@ -1,7 +1,6 @@
 {% load url from future %}
 {% load template_utils %}
 
-<div id="c2g_layout_l_column" class="span3">
     <div id="left-nav" class="well tight nav" role="navigation" aria-labelledby="sidebar-nav-heading-0">
         {% for content_section in contentsection_list %}
             {% with contentsection_id=content_section.id %}
@@ -72,7 +71,11 @@
                                     {% ifequal item_title exam.title %}
                                         <li class="current"><a href="{% url ref.show_view common_page_data.course_prefix common_page_data.course_suffix ref.slug %}" title="Exam"><em class="icon-pencil"></em><span>{{item_title}}</span></a></li>
                                     {% else %}
+                                        {% if item.ref.has_child_exams %}
+                                        <li><a href="{% url ref.list_view common_page_data.course_prefix common_page_data.course_suffix %}#hashtag_{{ ref.slug }}" title="Exam"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
+                                        {% else %}
                                         <li><a href="{% url ref.show_view common_page_data.course_prefix common_page_data.course_suffix ref.slug %}" title="Exam"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
+                                        {% endif %}
                                     {% endifequal %}
                                 {% else %}
                                     <li><em class="icon-book"></em> <span>{{item_title}}</span></li>
@@ -102,4 +105,3 @@
             {% endif %}
         </ul>
     </div>
-</div>

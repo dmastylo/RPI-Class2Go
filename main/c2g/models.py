@@ -1982,6 +1982,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
         return reverse(self.show_view, args=[self.course.prefix, self.course.suffix, self.slug])
     
+    def has_child_exams(self):
+        return ContentGroup.has_children(self, types=['exam'])
+    
     record_view = property(record_view_name)
 
     def sync_videos_foreignkeys_with_metadata(self):
@@ -2426,6 +2429,34 @@ class ContentGroup(models.Model):
             if getattr(self, keyword, False):
                 return keyword
         return None
+    
+    
+    @classmethod
+    def get_tag_from_classname(thisclass, classname):
+        """Reverse dictionary lookup.  Obviously O(n)"""
+        for keyword in ContentGroup.groupable_types.keys():
+            if ContentGroup.groupable_types[keyword]==classname:
+                return keyword
+        return None
+
+    
+    @classmethod
+    def has_children(thisclass, obj, types=list(groupable_types.keys())):
+        """
+            Does obj (File, Exam, etc) have children?  types is a kwarg that
+            restricts the search to the types in the argument of type list.  
+            Will return true if any children of type found in types exist.
+            
+        """
+        groupinfo = thisclass.groupinfo_by_id(thisclass.get_tag_from_classname(obj.__class__), obj.id)
+        if not groupinfo:
+            return False
+        if obj != groupinfo.get('__parent', None): #can't have children if obj itself is a child (for now)
+            return False
+        for t in types:
+            if filter(lambda li: li != obj, groupinfo.get(t, [])):
+                return True
+        return False
 
     def __repr__(self):
         s = "ContentGroup(group_id=" + str(self.group_id) + ", "

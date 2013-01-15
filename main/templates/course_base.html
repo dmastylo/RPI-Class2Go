@@ -25,7 +25,8 @@
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
                         {% endfor %}
                         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Manage pages ...</a></li>
+			    <li class="divider"></li>
+                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">Manage pages</a></li>
                         {% endif %}
                     </ul>
                 </li>
@@ -38,22 +39,25 @@
 		      {% for section in common_page_data.content_sections %}
 		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
 		      {% endfor %}
+		      <li class="divider"></li>
 		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Show all</a></li>
 		    </ul>
 		    {% endif %}
                 </li>
 		{% endif %}
-                <li {% block forums_link_class %}{% endblock forums_link_class %}>
-                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
+                {% if common_page_data.course.has_videos %}
+                <li {% block videos_link_class %}{% endblock videos_link_class %}>
+                    <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
                 </li>
+                {% endif %}
                 {% if common_page_data.course.has_problem_sets %}
                 <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
                     <a href=" {% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">Quizzes</a>
                 </li>
                 {% endif %}
-                {% if common_page_data.course.has_videos %}
-                <li {% block videos_link_class %}{% endblock videos_link_class %}>
-                    <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
+                {% if common_page_data.course.has_interactive_exercises %}
+                <li {% block interactive_exercise_link_class %}{% endblock interactive_exercise_link_class %}>
+                    <a href="{% url 'interactive_exercise_list' common_page_data.course_prefix common_page_data.course_suffix %}">Interactive Exercises</a>
                 </li>
                 {% endif %}
                 {% if common_page_data.course.has_exams %}
@@ -66,11 +70,9 @@
                     <a href="{% url 'survey_list' common_page_data.course_prefix common_page_data.course_suffix %}">Surveys</a>
                 </li>
                 {% endif %}
-                {% if common_page_data.course.has_interactive_exercises %}
-                <li {% block interactive_exercise_link_class %}{% endblock interactive_exercise_link_class %}>
-                    <a href="{% url 'interactive_exercise_list' common_page_data.course_prefix common_page_data.course_suffix %}">Interactive Exercises</a>
+                <li {% block forums_link_class %}{% endblock forums_link_class %}>
+                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
                 </li>
-                {% endif %}
                 {% if user.is_authenticated %}
                 <li class="visible-phone">
                     <a href="/accounts/profile">My Account</a>
@@ -127,7 +129,7 @@
 {% block course_notification %}{% endblock course_notification %}
 
 <div id="main-content" class="container-fluid body-content" role="main">
-    <div class="row-fluid">
+    <div id="main-column-container" class="row-fluid">
         {% block l_column_content %}{% endblock %}
         
         {% block m_column_content %}{% endblock %}

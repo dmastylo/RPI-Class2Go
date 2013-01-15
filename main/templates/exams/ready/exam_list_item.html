@@ -5,9 +5,9 @@
             <em class="icon-pencil"></em>
         </div>
     {% endif %}
-    
-    <div class="course-list-content">
-        {% with exam=item.exam %}
+
+    {% with exam=item.exam %}
+    <div class="course-list-content" id="hashtag_{{exam.slug}}">
         <h4 class="pull-left rightmargin" >
             <a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a>
         </h4>
