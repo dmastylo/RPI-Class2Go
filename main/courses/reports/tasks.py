@@ -131,6 +131,24 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
                     logger.info("Failed to generate assessment summary report for course %s assessment %s for user %s." % (course_handle, slug, username))
                             
 
+        elif rr['type'] == 'survey_summary':
+            if (not 'slug' in rr) or (not rr['slug']):
+                logger.info("Missing slug -- Failed to generate survey summary report")
+            else:
+                slug = rr['slug']
+                logger.info("User %s requested to generate survey summary report for course %s survey slug %s." % (username, course_handle, slug))
+                
+                # If instructors ask for a report for a survey that doesn't have a live instance, pass the draft instance instead. The report generators will handle this special case
+                try:
+                    survey = Exam.objects.get(course=ready_course, slug=slug)
+                except Exam.DoesNotExist:
+                    survey = Exam.objects.get(course=ready_course.image, slug=slug)
+                    
+                report = gen_survey_summary_report(ready_course, survey, save_to_s3=True)
+                report['type'] = rr['type']
+                
+                reports.append(report)
+                logger.info("Survey summary report for course %s assessment %s generated successfully for user %s." % (course_handle, slug, username))
             
     # Email Generated Reports
     staff_email = ready_course.contact
