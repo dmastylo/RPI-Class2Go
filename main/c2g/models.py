@@ -1012,8 +1012,11 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
 
     def dl_links_all(self):
-        """Return list of fully-qualified download URLs for video variants."""
-        # Video
+        """
+        Return list of tuples fully-qualified download URLs for video variants.
+        Tuples of the form: (size_tag, URL, size, description)
+        """
+
         myname  = self.file.name
         mystore = self.file.storage
         if is_storage_local():
@@ -1033,9 +1036,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 if storecache_hit:
                     CacheStat.report('hit', 'video_store')
                     if storecache_hit['size'] > 0:
-                        # print "found %s in cache (%d, %s, %s)"\
-                        #      % (size, storecache_hit['size'], storecache_hit['url'], storecache_hit['desc'])
-                        names.append((size, storecache_hit['size'], storecache_hit['url'], storecache_hit['desc']))
+                        # print "found %s in cache (%s, %d, %s)"\
+                        #      % (size, storecache_hit['url'], storecache_hit['size'], storecache_hit['desc'])
+                        names.append((size, storecache_hit['url'], storecache_hit['size'], storecache_hit['desc']))
                     else:
                         # print "found %s in cache (NEG)" % size
                         pass
@@ -1048,9 +1051,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                         fileurl=remove_querystring(urlof(checkfor,
                                 response_headers={'response-content-disposition': 'attachment'}))
                         filedesc=video_resize_options[size][3]
-                        names.append((size,  filesize, fileurl, filedesc))
+                        names.append((size, fileurl, filesize, filedesc))
                         # positive cache
-                        # print "add %s in cache (%d, %s, %s)" % (size, filesize, fileurl, filedesc)
+                        # print "add %s in cache (%s, %d, %s)" % (size, fileurl, filesize, filedesc)
                         storecache_val = {'size':filesize, 'url':fileurl, 'desc':filedesc}
                         storecache.set(storecache_key, storecache_val)
                     else:
