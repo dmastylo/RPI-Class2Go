@@ -47,7 +47,7 @@ a:hover {color:#820000;}
 }
 
 .upcoming {
-  padding:10px 3px;
+  padding:10px 10px;
   background:#f8f7ea;
 }
 .upcoming h4 {
@@ -62,7 +62,7 @@ a:hover {color:#820000;}
   text-align:left;
 }
 .upcoming table td { 
-  padding:2px;
+  padding:4px;
 }
 .complete { 
   color:#090;
