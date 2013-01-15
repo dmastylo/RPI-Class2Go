@@ -41,9 +41,11 @@ def remove_querystring(url):
     remove_querystring("http://www.example.com:8080/salad?foo=bar#93")
     'http://www.example.com:8080/salad'
     """
-    sp = urlparse(url)
-    com = (sp.scheme, sp.netloc, sp.path, '', '', '')
-    return urlunparse(com)
+    split = urlparse(url)
+    combined = (split.scheme, split.netloc, split.path, '', '', '')
+    print("split = %s" % split)
+    print("combined = %s" % combined)
+    return urlunparse(combined)
 
 
 class TimestampMixin(models.Model):
@@ -516,23 +518,32 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     
     def has_storage(self):
         """Return True if we have a copy of this file on our storage."""
-        return self.file.storage.exists(self.file.name)
+        if self.dl_link() == "":
+            return False
+        else:
+            return True
 
     def dl_link(self):
         filename = self.file.name
-        if not self.file.storage.exists(filename):
-            return ""
         if is_storage_local():
             url = get_site_url() + self.file.storage.url(filename)
         else:
             storecache = get_cache("file_store")
-            storecache_key = filename.replace(' ','%20')   # memcache can't handle spaces in cache key
+            storecache_key = filename.replace(' ','%20')[-240:]   # memcache no spaces in cache key, char limit
             storecache_hit = storecache.get(storecache_key)
             if storecache_hit:
                 CacheStat.report('hit', 'file_store')
-                url = storecache_hit['url']
+                if 'url' in storecache_hit:
+                    return storecache_hit['url']
+                else:
+                    return ""
             else:
                 CacheStat.report('miss', 'file_store')
+                if not self.file.storage.exists(filename):
+                    # negative cache
+                    storecache_val = {'size':0}
+                    storecache.set(storecache_key, storecache_val)
+                    return ""
                 url_raw = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
                 url = remove_querystring(url_raw)  # TODO: preserve when we have longer timeouts
                 storecache_val = {'url':url}
@@ -984,20 +995,29 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def has_storage(self):
         """Return True if we have a copy of this video on our storage."""
-        return self.file.storage.exists(self.file.name)
+        if self.dl_link() == "":
+            return False
+        else:
+            return True
 
     def dl_link(self):
         """Return fully-qualified download URL for this video, or empty string."""
         storecache = get_cache("video_store")
-        storecache_key = video.file.name.replace(' ','%20')
+        storecache_key = self.file.name.replace(' ','%20')[-240:]   # memcache no spaces in cache key, char limit
         storecache_hit = storecache.get(storecache_key)
         if storecache_hit:
             CacheStat.report('hit', 'video_store')
-            return storecache_hit['url']
+            if 'url' in storecache_hit:
+                return storecache_hit['url']
+            else:
+                return ""
         else:
             CacheStat.report('miss', 'video_store')
             videoname = self.file.name
             if not self.file.storage.exists(videoname):
+                # negative cache
+                storecache_val = {'size':0}
+                storecache.set(storecache_key, storecache_val)
                 return ""
             if is_storage_local():
                 # FileSystemStorage returns a path, not a url
@@ -1006,7 +1026,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 loc_raw = self.file.storage.url_monkeypatched(videoname,
                     response_headers={'response-content-disposition': 'attachment'})
             loc = remove_querystring(loc_raw)  # TODO - preserve query strings when we have longer timeouts
-            storecach_val = {'size':self.file.size, 'url':loc }
+            storecache_val = {'size':self.file.size, 'url':loc }
             storecache.set(storecache_key, storecache_val)
             return loc
 
@@ -1031,7 +1051,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             for size in sorted(video_resize_options):
                 checkfor = basepath+'/'+size+'/'+filename
                 storecache = get_cache('video_store')
-                storecache_key = checkfor.replace(' ','%20')  # memcache can't handle spaces in cache key
+                storecache_key = checkfor.replace(' ','%20')[-240:]  # memcache no spaces in cache key, char limit
                 storecache_hit = storecache.get(storecache_key)
                 if storecache_hit:
                     CacheStat.report('hit', 'video_store')
@@ -1146,7 +1166,9 @@ class CacheStat():
         # stat interval expired: print and zero out counts
         if datetime.now() - cls.lastReportTime > cls.reportingInterval:
             cls.lastReportTime = datetime.now()
-            for c in cls.count['hit']:   # report on anything that has a hit
+            for c in cls.count['hit']:
+                if cls.count['hit'][c] == 0:
+                    next
                 if c not in cls.count['miss']:
                     cls.count['miss'][c] = 0
                 rate = float(cls.count['hit'][c]) / float(cls.count['miss'][c] + cls.count['hit'][c]) * 100.0
