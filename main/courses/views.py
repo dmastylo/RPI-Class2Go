@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.cache import cache_page
 
 from courses.forms import *
 
@@ -103,7 +104,7 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
 
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
 
-@auth_view_wrapper
+@cache_page(60*60*8)
 def leftnav(request, course_prefix, course_suffix):
     course = request.common_page_data['course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
@@ -111,7 +112,7 @@ def leftnav(request, course_prefix, course_suffix):
                               {'common_page_data':   request.common_page_data,
                               'contentsection_list': full_contentsection_list,
                               'full_index_list':     full_index_list,
-                              'is_logged_in':        request.user.is_authenticated(),
+                              'is_logged_in':        True, #setting to True to get consistent, ok to show anon users links
                               },
                               context_instance=RequestContext(request))
 
