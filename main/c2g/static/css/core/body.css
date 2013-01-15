@@ -63,6 +63,7 @@ a:hover {color:#820000;}
 }
 .upcoming table td { 
   padding:4px;
+  border:0px;
 }
 .complete { 
   color:#090;

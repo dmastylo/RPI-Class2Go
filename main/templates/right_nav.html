@@ -8,7 +8,7 @@
 						<th></th>
 						<th>Assignment</th>
 						<th>Due Date</th>
-						<thead>
+					</thead>
     			{% for assignment_dictionary in assignments %}
 					{% with assignment=assignment_dictionary.assignment attempted=assignment_dictionary.attempted %}
 					<tr>
@@ -18,7 +18,7 @@
 							<td></td>
 						{% endif %}
 							<td><a href="{% url assignment.show_view common_page_data.course_prefix common_page_data.course_suffix assignment.slug %}"><span>{{assignment.title}}</span></a></td>
-							<td>{{ assignment.due_date|date:"M d, P" }} PST</td>
+							<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} PST</td>
 					</tr>
 					{% endwith %}
 				{% endfor %}
