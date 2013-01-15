@@ -104,7 +104,7 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
 
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
 
-@cache_page(60*60*8)
+@cache_page(60*20)
 def leftnav(request, course_prefix, course_suffix):
     course = request.common_page_data['course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
