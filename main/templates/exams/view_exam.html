@@ -156,7 +156,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
     </noscript>
 
-    <div id="exam-pane">
+    <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
         <form>
         {{ exam.html_content }}
         </form>
@@ -293,6 +293,22 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         };
 
+        // Need toggleExplanation in single question format and when summative exams are submitted
+        // i.e. submission summary/record page needs to have toggle-able explanation
+        var toggleExplanation = function () {
+            var assocQ = $(this).closest('.question');
+
+            $(assocQ).find('.explanation').toggle();
+            
+            if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
+                $(this).attr('data-status', 'Hide');
+                $(this).val('Hide Explanation');
+            } else {
+                $(this).attr('data-status', 'Show');
+                $(this).val('Show Explanation');
+            } 
+    
+        }; 
                       
     {% if single_question %}
         $('.question').not(':first').hide();
@@ -340,24 +356,23 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $('.question').hide();
             $('.inline-explanation').remove();
             $('.explanation').remove();
-            $('.hide-button').attr('disabled', 'disabled');
+            $('.toggle-explanation').attr('disabled', 'disabled');
+            $('.toggle-explanation').attr('data-status', 'Show');
+            $('.toggle-explanation').val('Show Explanation');
             $('.question').eq(newQIdx).show();
         };
 
         $('.question-nav').click(showQuestion);
         
+
         {% if exam.invideo or exam.exam_type == "interactive_exercise" %}
         {% comment %} Immediate feedback only needed for in-video and interactive exercises {% endcomment %}
-        var hideButton = function () {
-            var assocQ = $(this).closest('.question');
-            var assocQID = $(assocQ).attr('id');
-            $('#' + assocQID + '-expl').empty().remove();
-            $('#' + assocQID).find('.inline-explanation').remove();
-            $(this).attr('disabled', 'disabled');
-            return;
-        } 
 
         var quickCheck = function () {
+            if ($(this).hasClass('quick-check')) {
+                $(this).val('Checking...');
+            }
+
             var checkBtnID = $(this).attr('id');
             var assocQ = $(this).closest('.question');
             var assocQID = $(assocQ).attr('id');
@@ -434,7 +449,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     $(explArea).addClass('explanation');
                 }
                 $(explArea).empty();
-                $(explArea).show();
                 $('#' + assocQID + ' .quick-check').before($(explArea));
                 $(mySolution).children().each(function () {
                     //if ($(this).text() == 'Explanation') {
@@ -447,59 +461,43 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $('#' + checkBtnID).attr('value','Hide Answers');
             };
 
-            var getAndClearExplArea = function () {
-                var target = $('#' + assocQID + '-expl');
+            var getResultsArea = function () {
+                var target = $('#' + assocQID + '-results');
                 if (target.length == 0) {
                     target = document.createElement('div');
-                    $(target).attr('id', assocQID + '-expl');
-                    $(target).addClass('explanation');
-
-                    var toggleLink = document.createElement('a');
-                    $(toggleLink).text("Show Explanation");
-                    $(toggleLink).addClass('toggle-expl');
-                    $(toggleLink).attr('id', assocQID + '-toggle-expl');
-                    $(toggleLink).attr('data-status', 'Show');  // hook for later i18n
-                    $(toggleLink).attr('title', 'Click to Show Explanation');
-                    $(target).append($(toggleLink));
-
-                    var contentDiv = document.createElement('div');
-                    $(contentDiv).addClass('expl-content');
-                    $(contentDiv).attr('id', assocQID + '-expl-content');
-                    $(contentDiv).css('display', 'none');
-                    $(target).append($(contentDiv));
-
-                    $(toggleLink).click(function () {
-                        var myStatus = $(this).attr('data-status');
-                        var newStatus = (myStatus == "Show") ? "Hide" : "Show";
-                        $(this).attr('data-status', newStatus);
-                        $(this).text(newStatus + ' Explanation');
-                        $(this).attr('title', 'Click to ' + newStatus + ' Explanation');
-                        $(this).siblings('div.expl-content').toggle();                       
-                    });
+                    $(target).attr('id', assocQID + '-results');
+                    $(target).addClass('interactive-results');
                 }
-                $(target).find('.expl-content').empty();
+                $(target).empty();
                 $(target).show();
                 $('#' + assocQID + ' .per-question-btns').before($(target));
                 return target;
             }
 
+            // for use in any "Check Answer" exercise
+            var resetButtonText = function (buttonId) {
+                return function (xhr, status) {
+                    $('#' + buttonId).val('Check Answer');
+                }
+            }
+
             if (__exam_type == "interactive_exercise") {
 
                 var HTMLAnswerSuccess  = function (data, msg, xhr) {
-                    var explArea = getAndClearExplArea();
+                    var resultsArea = getResultsArea();
                     var response = $.parseJSON(data);
                     for (var k in response) {
                         if (k != "__metadata__") {
-                            $(explArea).find('.expl-content').append(response[k].feedback[0].explanation);
+                            $(resultsArea).append(response[k].feedback[0].explanation);
                         }
                     }
                 };
 
                 var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
-                    var explArea = getAndClearExplArea();
-                    $(explArea).append("There was an error contacting the grader service, try again later.");
+                    var resultsArea = getResultsArea();
+                    $(resultsArea).append("There was an error contacting the grader service, try again later.");
                     if (textStatus != "null") {
-                        $(explArea).append("   (" + textStatus + ")");
+                        $(resultsArea).append("   (" + textStatus + ")");
                     }
                     return;
                 };
@@ -511,7 +509,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     type: "POST",
                     data: postData,
                     success: HTMLAnswerSuccess,
-                    error: HTMLAnswerError
+                    error: HTMLAnswerError,
+                    complete: resetButtonText($(this).attr('id'))
                 });
 
             } else {    // INVIDEO CASE
@@ -529,11 +528,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     url: feedback_url, 
                     type: "POST",
                     data: postData,
-                    success: InvideoFeedbackSuccess
+                    success: InvideoFeedbackSuccess,
+                    complete: resetButtonText($(this).attr('id'))
                 });
             }
 
-            $(this).siblings('.hide-button').removeAttr('disabled');
+            $(this).siblings('.toggle-explanation').removeAttr('disabled');
 
         };
                       
@@ -556,23 +556,30 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(checkBtn).attr('type','button');
             $(checkBtn).attr('id','quickCheck_' + idx);
             $(checkBtn).addClass('btn').addClass('quick-check');
-            $(checkBtn).attr('value', 'Check Answers');
+            if (__exam_type == "interactive_exercise") {
+                $(checkBtn).attr('value', 'Check Answer');
+            } else {
+                $(checkBtn).attr('value', 'Check Answers');
+            }
             $(perQButtonDiv).append($(checkBtn));
 
-            // create Hide Answers button
-            var hideBtn = document.createElement('input');
-            $(hideBtn).attr('type','button');
-            $(hideBtn).attr('id','hideAnswers_' + idx);
-            $(hideBtn).addClass('btn').addClass('hide-button');
-            $(hideBtn).attr('value', 'Hide Answers');
-            $(hideBtn).attr('disabled', 'disabled');
-            $(perQButtonDiv).append($(hideBtn));
+            // create Show/Hide Explanation button for non-interactive exams
+            if (__exam_type != "interactive_exercise") {
+                var toggleExplBtn = document.createElement('input');
+                $(toggleExplBtn).attr('type','button');
+                $(toggleExplBtn).attr('id','toggleExplanation_' + idx);
+                $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
+                $(toggleExplBtn).attr('data-status', 'Show');
+                $(toggleExplBtn).attr('value', 'Show Explanation');
+                $(toggleExplBtn).attr('disabled', 'disabled');
+                $(perQButtonDiv).append($(toggleExplBtn));
+            }
 
         });
 
         $('.quick-check').click(quickCheck);
 
-        $('.hide-button').click(hideButton);
+        $('.toggle-explanation').click(toggleExplanation);
         {% endif %}
     {% endif %}
 
@@ -760,43 +767,32 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             explArea = document.createElement('div');
             $(explArea).attr('id', assocQID + '-expl');
             $(explArea).addClass('explanation');
-
-            var toggleLink = document.createElement('a');
-            $(toggleLink).text("Show Explanation");
-            $(toggleLink).addClass('toggle-expl');
-            $(toggleLink).attr('id', assocQID + '-toggle-expl');
-            $(toggleLink).attr('data-status', 'Show');  // hook for later i18n
-            $(toggleLink).attr('title', 'Click to Show Explanation');
-            $(explArea).append($(toggleLink));
-
-            var contentDiv = document.createElement('div');
-            $(contentDiv).addClass('expl-content');
-            $(contentDiv).attr('id', assocQID + '-expl-content');
-            $(contentDiv).css('display', 'none');
-            $(explArea).append($(contentDiv));
-
-            $(toggleLink).click(function () {
-                var myStatus = $(this).attr('data-status');
-                var newStatus = (myStatus == "Show") ? "Hide" : "Show";
-                $(this).attr('data-status', newStatus);
-                $(this).text(newStatus + ' Explanation');
-                $(this).attr('title', 'Click to ' + newStatus + ' Explanation');
-                $(this).siblings('div.expl-content').toggle();                       
-            });
         }
-        $(explArea).find('.expl-content').empty();
-        $(explArea).show();
+        $(explArea).empty();
+        if ($('#' + assocQID + ' .toggle-explanation').length == 0) {
+            var toggleExplBtn = document.createElement('input');
+            $(toggleExplBtn).attr('type','button');
+            //$(toggleExplBtn).attr('id','toggleExplanation_' + idx);
+            $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
+            $(toggleExplBtn).attr('data-status', 'Show');
+            $(toggleExplBtn).attr('value', 'Show Explanation');
+            $(toggleExplBtn).click(toggleExplanation);
+        }
+        $(explArea).hide();
+        $('#' + assocQID + ' .toggle-explanation').attr('data-status', 'Show');
+        $('#' + assocQID + ' .toggle-explanation').val("Show explanation");
         //$(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
             if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
-                $(explArea).find('.expl-content').append($(this).text());
+                $(explArea).append($(this).text());
             }
             else { //for DOM nodes that are elements
-                $(explArea).find('.expl-content').append($(this).clone());
+                $(explArea).append($(this).clone());
             }
         });
         $('div.question#' + assocQID ).append($(explArea));
+        $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
     };
 
     window.displayChoiceExplanations = function(questionMD) {
@@ -1022,7 +1018,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');
     $('#reEnableForm').remove();
-    $('#main-content input').not('.question-nav').attr('disabled','disabled');
+    $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
 
                       
