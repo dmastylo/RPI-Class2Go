@@ -328,7 +328,11 @@ def parse_val(v):
         return v
     else:
         try:
-           return(v['value'], v['report'])
+           if v.get('report', False):
+               report = v.get('report')
+           else:
+               report = ""
+           return(v['value'], report)
         except TypeError, AttributeError:
             return str(v)
 
