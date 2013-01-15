@@ -28,6 +28,8 @@ urlpatterns = patterns('',
     url(r'^test_xml$', 'courses.exams.views.show_test_xml'),
     url(r'^hiring/?$', 'courses.landing.views.hiring'),
 
+    url(r'^maint$', 'c2g.views.maintenance'),
+
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
 
     # general exam stuff--These endpoints are hidden from student users and do not have to be named (i.e. aliased for each exam subtype)

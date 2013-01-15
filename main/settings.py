@@ -159,7 +159,7 @@ ROOT_URLCONF = 'urls'
 try:
     LOCAL_CACHE_LOCATION
 except NameError:
-    LOCAL_CACHE_LOCATION = "/opt/class2go/cache"
+    LOCAL_CACHE_LOCATION = "/opt/class2go"
 
 try:
     FILE_CACHE_TIME
@@ -175,7 +175,7 @@ except NameError:
 CACHES = {
     'file_store': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': LOCAL_CACHE_LOCATION + "-file",
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-file",
         'TIMEOUT': FILE_CACHE_TIME,
         'OPTIONS': {
             'MAX_ENTRIES': 10000
@@ -183,15 +183,23 @@ CACHES = {
     },
     'video_store': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': LOCAL_CACHE_LOCATION + "-video",
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-video",
         'TIMEOUT': VIDEO_CACHE_TIME,
         'OPTIONS': {
             'MAX_ENTRIES': 10000
         }
     },
+    'view_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-view",
+        'TIMEOUT': 3600,
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000
+            }
+    },
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': LOCAL_CACHE_LOCATION + "-unused",
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-default",
         'TIMEOUT': 3600,
         'OPTIONS': {
             'MAX_ENTRIES': 10000

@@ -942,7 +942,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var fieldCollection = $('#exam-pane').find('input,textarea');
         var userAnswerObj = window.collectUserAnswers(fieldCollection);
 
-        if (!userAnswerObj.answeredAll) {
+        if (__exam_type != "survey" && !userAnswerObj.answeredAll) {
             var userProceed = confirm("This will submit the entire {{ exam.get_human_type }} and you haven't answered all questions. Still submit?");
             if (!userProceed) return;
         } 
