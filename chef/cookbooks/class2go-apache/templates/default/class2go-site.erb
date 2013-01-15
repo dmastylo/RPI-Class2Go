@@ -37,7 +37,7 @@
         require valid-user
     </Location>
 
-    WSGIDaemonProcess <%= @appname %> threads=15 maximum-requests=10000 python-path=/home/ubuntu/<%= @appname %>/main
+    WSGIDaemonProcess <%= @appname %> processes=<%= @node['cpu']['total'] %> threads=15 maximum-requests=10000 python-path=/home/ubuntu/<%= @appname %>/main
     WSGIProcessGroup <%= @appname %>
 
     ErrorLog ${APACHE_LOG_DIR}/<%= @appname %>-error.log

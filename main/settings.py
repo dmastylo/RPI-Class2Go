@@ -189,9 +189,17 @@ CACHES = {
             'MAX_ENTRIES': 10000
         }
     },
+    'view_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-view",
+        'TIMEOUT': 3600,
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000
+            }
+    },
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-unused",
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-default",
         'TIMEOUT': 3600,
         'OPTIONS': {
             'MAX_ENTRIES': 10000
