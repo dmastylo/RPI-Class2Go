@@ -25,7 +25,8 @@
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
                         {% endfor %}
                         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Manage pages ...</a></li>
+			    <li class="divider"></li>
+                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">Manage pages</a></li>
                         {% endif %}
                     </ul>
                 </li>
@@ -38,6 +39,7 @@
 		      {% for section in common_page_data.content_sections %}
 		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
 		      {% endfor %}
+		      <li class="divider"></li>
 		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Show all</a></li>
 		    </ul>
 		    {% endif %}
