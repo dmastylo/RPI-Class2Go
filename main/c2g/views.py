@@ -36,6 +36,9 @@ def home(request):
 def healthcheck(request):
     return HttpResponse("I'm alive!")
 
+def maintenance(request):
+    return render_to_response('landing/static_landing.html',{},RequestContext(request))
+
 def throw500(request):
     raise Exception('Testing the exception--http500 mechanism')
 
