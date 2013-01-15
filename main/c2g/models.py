@@ -1,19 +1,20 @@
-#c2g specific comments
 # any table indexes that use only one column here are place here.
 # any table indexes that use multiple columns are placed in a south migration at
 # <location to be inserted>
 
-from datetime import datetime
+from datetime import datetime,timedelta
 from hashlib import md5
 import os
 import re
 import sys
 import time
+from urlparse import urlparse, urlunparse
 
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
@@ -34,6 +35,17 @@ def get_file_path(instance, filename):
         return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
     if isinstance(instance, File):
         return os.path.join(str(parts[0]), str(parts[1]), 'files', filename)
+
+
+def remove_querystring(url):
+    """
+    remove_querystring("http://www.example.com:8080/salad?foo=bar#93")
+    'http://www.example.com:8080/salad'
+    """
+    sp = urlparse(url)
+    com = (sp.scheme, sp.netloc, sp.path, '', '', '')
+    return urlunparse(com)
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -563,6 +575,16 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     class Meta:
         db_table = u'c2g_files'
 
+
+class FileStoreCache(models.Model):
+    file = models.ForeignKey(File, db_index=True)
+    size = models.IntegerField(blank=True)
+    store_url = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        db_table = u'c2g_file_store_cache'
+
+
 class AnnouncementManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course,is_deleted=0).order_by('-time_created')
@@ -747,6 +769,7 @@ class VideoManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
+
 
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -965,15 +988,27 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def dl_link(self):
         """Return fully-qualified download URL for this video, or empty string."""
-        # Video
-        videoname = self.file.name
-        if not self.file.storage.exists(videoname):
-            return ""
-        if is_storage_local():
-            # FileSystemStorage returns a path, not a url
-            return get_site_url() + self.file.storage.url(videoname)
+        storecache_hits = VideoStoreCache.lookup(video=self, version="original")
+        if len(storecache_hits) == 0:
+            videoname = self.file.name
+            if not self.file.storage.exists(videoname):
+                return ""
+            if is_storage_local():
+                # FileSystemStorage returns a path, not a url
+                loc=get_site_url() + self.file.storage.url(videoname)
+            else:
+                loc=self.file.storage.url_monkeypatched(videoname,
+                    response_headers={'response-content-disposition': 'attachment'})
+            storecache_new = VideoStoreCache(video=self, version="original",
+                                             size=self.file.size, store_url=loc)
+            storecache_new.save()
+            return loc
+        elif len(storecache_hits) == 1:
+            return storecache_hits[0].store_url
         else:
-            return self.file.storage.url_monkeypatched(videoname, response_headers={'response-content-disposition': 'attachment'})
+            logger.error("found >1 store location for video %s" % self)
+            return storecache_hits[0].store_url
+
 
     def dl_links_all(self):
         """Return list of fully-qualified download URLs for video variants."""
@@ -985,17 +1020,38 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             print "DEBUG: Multiple download links don't work on local sites yet, sorry." 
             return [('large', get_site_url() + mystore.url(myname), self.file.size, '')]
         else:
-            # XXX: very S3 specific
-            urlof   = mystore.url_monkeypatched
-            basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
-            names = []
-            for size in sorted(video_resize_options):
-                checkfor = basepath+'/'+size+'/'+filename
-                gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
-                if gotback:
-                    names.append((size, urlof(checkfor, response_headers={'response-content-disposition': 'attachment'}), gotback[0].size, video_resize_options[size][3]))
-            if not names:
-                names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
+            storecache_hits = VideoStoreCache.lookup(video=self, not_version="original")
+            if len(storecache_hits) > 0:
+                # cache hit, put into correct list format. Make sure to handle negative case.
+                names = [(hit.version, hit.size, hit.store_url, hit.desc)
+                         for hit in storecache_hits
+                         if (hit.size is not None and hit.size > 0)]
+            else:
+                # cache miss, get values and cache insert
+                # XXX: very S3 specific
+                urlof   = mystore.url_monkeypatched
+                basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
+                names = []
+                for size in sorted(video_resize_options):
+                    checkfor = basepath+'/'+size+'/'+filename
+                    gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
+                    if gotback:
+                        filesize=gotback[0].size
+                        fileurl=remove_querystring(urlof(checkfor,
+                                response_headers={'response-content-disposition': 'attachment'}))
+                        filedesc=video_resize_options[size][3]
+                        names.append((size,  filesize, fileurl, filedesc))
+                        # positive caching
+                        storecache = VideoStoreCache(video=self, version=size,
+                                size=filesize, store_url=fileurl, desc=filedesc)
+                        storecache.save()
+                    else:
+                        # negative caching
+                        storecache = VideoStoreCache(video=self, version=size)
+                        storecache.save()
+
+                if not names:
+                    names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
             return names
 
     def ret_url(self):
@@ -1050,7 +1106,45 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     class Meta:
         db_table = u'c2g_videos'
-        
+
+
+class VideoStoreCache(TimestampMixin, models.Model):
+    """
+    version == "original" for the original asset, other sizes (large, small, etc.) for others.
+    """
+    video = models.ForeignKey(Video, db_index=True)
+    version = models.CharField(max_length=30, db_index=True)
+    size = models.IntegerField(blank=True, null=True)
+    store_url = models.CharField(max_length=255, blank=True, null=True)
+    desc = models.CharField(max_length=30, blank=True, null=True)
+
+    @classmethod
+    def lookup(self, video, version = None, not_version = None):
+        """
+        Look for cached values for this video.  Must specify either version or not_version.
+        """
+        dbcache_valid_sec = getattr(settings, "DBCACHE_EXPIRE", 60*60*24*2)
+        if version != None:
+            hits_qs = self.objects.filter(video=video, version=version).order_by("time_created")
+        elif not_version != None:
+            hits_qs = self.objects.filter(video=video).exclude(version=not_version).order_by("time_created")
+        else:
+            raise ValueError("either version or not_version required")
+        if len(hits_qs) and datetime.now() - hits_qs[0].time_created > timedelta(dbcache_valid_sec):
+            # cache is too old to be useful, clear and return empty
+            self.clear(video)
+            return QuerySet()
+        return hits_qs
+
+    @classmethod
+    def clear(self, video):
+        hits_qs = self.objects.filter(video=video)
+        hits_qs.delete()
+
+    class Meta:
+        db_table = u'c2g_video_store_cache'
+
+
 class VideoViewTraces(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     video = models.ForeignKey(Video, db_index=True)
