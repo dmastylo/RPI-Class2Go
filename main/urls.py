@@ -143,6 +143,9 @@ urlpatterns = patterns('',
         'courses.views.course_materials',
         name='course_materials_by_section'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/admin/?', 'courses.admin_views.admin'),
+                       
+                       
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/leftnav/?$', 'courses.views.leftnav'),
 
     url(r'^switch_mode', 'courses.actions.switch_mode'),
     url(r'^add_section', 'courses.actions.add_section'),
@@ -247,8 +250,7 @@ urlpatterns = patterns('',
     #Content Sharing
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/?$', 'courses.content_sections.views.copy_content_form'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/send/?$', 'courses.content_sections.views.copy_content'),
-                      
-
+                                             
     # Landing Page
     url(r'^/?$', 'courses.landing.views.landing'),
 

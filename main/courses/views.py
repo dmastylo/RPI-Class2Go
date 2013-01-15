@@ -115,16 +115,11 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
 def leftnav(request, course_prefix, course_suffix):
     course = request.common_page_data['course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
-    return render_to_response('courses/view.html',
+    return render_to_response('left_nav.html',
                               {'common_page_data':   request.common_page_data,
-                              'announcement_list':   announcement_list,
-                              'many_announcements':  many_announcements,
-                              'news_list':           news_list,
                               'contentsection_list': full_contentsection_list,
-                              'video_list':          Video.objects.getByCourse(course=course),
-                              'pset_list':           ProblemSet.objects.getByCourse(course=course),
                               'full_index_list':     full_index_list,
-                              'is_logged_in':        is_logged_in
+                              'is_logged_in':        request.user.is_authenticated(),
                               },
                               context_instance=RequestContext(request))
 
