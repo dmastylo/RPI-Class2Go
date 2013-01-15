@@ -1,14 +1,12 @@
-# any table indexes that use only one column here are place here.
-# any table indexes that use multiple columns are placed in a south migration at
-# <location to be inserted>
-
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from hashlib import md5
 import os
 import re
 import sys
 import time
+import logging
 from urlparse import urlparse, urlunparse
+from django.core.cache import cache, get_cache
 
 from django import forms
 from django.contrib.auth.models import Group, User
@@ -23,6 +21,7 @@ from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
 from xml.dom.minidom import parseString
 
+logger = logging.getLogger(__name__)
 
 RE_S3_PATH_FILENAME_SPLIT = re.compile('(?P<path>.+)\/(?P<filename>.*)$')
 
@@ -520,14 +519,23 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return self.file.storage.exists(self.file.name)
 
     def dl_link(self):
-        # File
         filename = self.file.name
         if not self.file.storage.exists(filename):
             return ""
         if is_storage_local():
             url = get_site_url() + self.file.storage.url(filename)
         else:
-            url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+            storecache = get_cache("file_store")
+            storecache_key = filename.replace(' ','%20')
+            storecache_hit = storecache.get(storecache_key)
+            if storecache_hit:
+                CacheStat.report('hit', 'file_store')
+                url = storecache_hit['url']
+            else:
+                CacheStat.report('miss', 'file_store')
+                url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+                storecache_val = {'url':url}
+                storecache.set(storecache_key, storecache_val)
         return url
         
     def get_ext(self):
@@ -574,15 +582,6 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     class Meta:
         db_table = u'c2g_files'
-
-
-class FileStoreCache(models.Model):
-    file = models.ForeignKey(File, db_index=True)
-    size = models.IntegerField(blank=True)
-    store_url = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        db_table = u'c2g_file_store_cache'
 
 
 class AnnouncementManager(models.Manager):
@@ -988,8 +987,14 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def dl_link(self):
         """Return fully-qualified download URL for this video, or empty string."""
-        storecache_hits = VideoStoreCache.lookup(video=self, version="original")
-        if len(storecache_hits) == 0:
+        storecache = get_cache("video_store")
+        storecache_key = video.file.name.replace(' ','%20')
+        storecache_hit = storecache.get(storecache_key)
+        if storecache_hit:
+            CacheStat.report('hit', 'video_store')
+            return storecache_hit['url']
+        else:
+            CacheStat.report('miss', 'video_store')
             videoname = self.file.name
             if not self.file.storage.exists(videoname):
                 return ""
@@ -999,15 +1004,9 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             else:
                 loc=self.file.storage.url_monkeypatched(videoname,
                     response_headers={'response-content-disposition': 'attachment'})
-            storecache_new = VideoStoreCache(video=self, version="original",
-                                             size=self.file.size, store_url=loc)
-            storecache_new.save()
+            storecach_val = {'size':self.file.size, 'url':loc }
+            storecache.set(storecache_key, storecache_val)
             return loc
-        elif len(storecache_hits) == 1:
-            return storecache_hits[0].store_url
-        else:
-            logger.error("found >1 store location for video %s" % self)
-            return storecache_hits[0].store_url
 
 
     def dl_links_all(self):
@@ -1020,20 +1019,27 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             print "DEBUG: Multiple download links don't work on local sites yet, sorry." 
             return [('large', get_site_url() + mystore.url(myname), self.file.size, '')]
         else:
-            storecache_hits = VideoStoreCache.lookup(video=self, not_version="original")
-            if len(storecache_hits) > 0:
-                # cache hit, put into correct list format. Make sure to handle negative case.
-                names = [(hit.version, hit.size, hit.store_url, hit.desc)
-                         for hit in storecache_hits
-                         if (hit.size is not None and hit.size > 0)]
-            else:
-                # cache miss, get values and cache insert
-                # XXX: very S3 specific
-                urlof   = mystore.url_monkeypatched
-                basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
-                names = []
-                for size in sorted(video_resize_options):
-                    checkfor = basepath+'/'+size+'/'+filename
+            # XXX: very S3 specific
+            urlof = mystore.url_monkeypatched
+            basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
+            names = []
+            for size in sorted(video_resize_options):
+                checkfor = basepath+'/'+size+'/'+filename
+                storecache = get_cache('video_store')
+                storecache_key = checkfor.replace(' ','%20')
+                storecache_hit = storecache.get(storecache_key)
+                if storecache_hit:
+                    CacheStat.report('hit', 'video_store')
+                    if storecache_hit['size'] > 0:
+                        # print "found %s in cache (%d, %s, %s)"\
+                        #      % (size, storecache_hit['size'], storecache_hit['url'], storecache_hit['desc'])
+                        names.append((size, storecache_hit['size'], storecache_hit['url'], storecache_hit['desc']))
+                    else:
+                        # print "found %s in cache (NEG)" % size
+                        pass
+
+                else:
+                    CacheStat.report('miss', 'video_store')
                     gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
                     if gotback:
                         filesize=gotback[0].size
@@ -1041,17 +1047,18 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                                 response_headers={'response-content-disposition': 'attachment'}))
                         filedesc=video_resize_options[size][3]
                         names.append((size,  filesize, fileurl, filedesc))
-                        # positive caching
-                        storecache = VideoStoreCache(video=self, version=size,
-                                size=filesize, store_url=fileurl, desc=filedesc)
-                        storecache.save()
+                        # positive cache
+                        # print "add %s in cache (%d, %s, %s)" % (size, filesize, fileurl, filedesc)
+                        storecache_val = {'size':filesize, 'url':fileurl, 'desc':filedesc}
+                        storecache.set(storecache_key, storecache_val)
                     else:
-                        # negative caching
-                        storecache = VideoStoreCache(video=self, version=size)
-                        storecache.save()
+                        # negative cache
+                        # print "add %s in cache (NEG)" % (size)
+                        storecache_val = {'size':0 }
+                        storecache.set(storecache_key, storecache_val)
 
-                if not names:
-                    names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
+            if not names:
+                names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
             return names
 
     def ret_url(self):
@@ -1108,41 +1115,36 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         db_table = u'c2g_videos'
 
 
-class VideoStoreCache(TimestampMixin, models.Model):
+class CacheStat():
     """
-    version == "original" for the original asset, other sizes (large, small, etc.) for others.
+    Gather and report counter-based stats for our simple caches.
+       report('hit', 'video-cache') or
+       report('miss', 'files-cache')
     """
-    video = models.ForeignKey(Video, db_index=True)
-    version = models.CharField(max_length=30, db_index=True)
-    size = models.IntegerField(blank=True, null=True)
-    store_url = models.CharField(max_length=255, blank=True, null=True)
-    desc = models.CharField(max_length=30, blank=True, null=True)
+    lastReportTime = datetime.now()
+    count = {}
+    count['hit'] = {}
+    count['miss'] = {}
+    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 120)
+    reportingInterval = timedelta(seconds=reportingIntervalSec)
 
     @classmethod
-    def lookup(self, video, version = None, not_version = None):
-        """
-        Look for cached values for this video.  Must specify either version or not_version.
-        """
-        dbcache_valid_sec = getattr(settings, "DBCACHE_EXPIRE", 60*60*24*2)
-        if version != None:
-            hits_qs = self.objects.filter(video=video, version=version).order_by("time_created")
-        elif not_version != None:
-            hits_qs = self.objects.filter(video=video).exclude(version=not_version).order_by("time_created")
-        else:
-            raise ValueError("either version or not_version required")
-        if len(hits_qs) and datetime.now() - hits_qs[0].time_created > timedelta(dbcache_valid_sec):
-            # cache is too old to be useful, clear and return empty
-            self.clear(video)
-            return QuerySet()
-        return hits_qs
+    def report(cls, type, cache):
+        if cache not in cls.count[type]:
+            cls.count[type][cache] = 0
+        cls.count[type][cache] += 1
 
-    @classmethod
-    def clear(self, video):
-        hits_qs = self.objects.filter(video=video)
-        hits_qs.delete()
-
-    class Meta:
-        db_table = u'c2g_video_store_cache'
+        if datetime.now() - cls.lastReportTime > cls.reportingInterval:
+            cls.lastReportTime = datetime.now()
+            for c in cls.count['hit']:   # report on anything that has a hit
+                if c not in cls.count['miss']:
+                    cls.count['miss'][c] = 0
+                rate = float(cls.count['hit'][c]) / float(cls.count['miss'][c] + cls.count['hit'][c]) * 100.0
+                print("cachestats for %s: hits %d, misses %d, rate %2.1f"
+                            % (c, cls.count['hit'][c], cls.count['miss'][c], rate))
+                cls.count['hit'][c] = 0
+                cls.count['miss'][c] = 0
+            # latent bug: cache that never gets a hit will build up misses, OK
 
 
 class VideoViewTraces(TimestampMixin, models.Model):
