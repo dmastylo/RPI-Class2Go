@@ -67,19 +67,14 @@ def main(request, course_prefix, course_suffix):
     
     if request.user.is_authenticated():
         is_logged_in = 1
-        news_list = common_page_data['ready_course'].newsevent_set.all().order_by('-time_created')[0:5]
     else:
         is_logged_in = 0
-        news_list = []
 
     course = common_page_data['course']
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
-             'news_list':           news_list,
-             'video_list':          Video.objects.getByCourse(course=course),
-             'pset_list':           ProblemSet.objects.getByCourse(course=course),
              'is_logged_in':        is_logged_in
              },
             context_instance=RequestContext(request))
