@@ -43,8 +43,6 @@ def remove_querystring(url):
     """
     split = urlparse(url)
     combined = (split.scheme, split.netloc, split.path, '', '', '')
-    print("split = %s" % split)
-    print("combined = %s" % combined)
     return urlunparse(combined)
 
 
