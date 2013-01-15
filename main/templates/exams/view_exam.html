@@ -293,6 +293,22 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         };
 
+        // Need toggleExplanation in single question format and when summative exams are submitted
+        // i.e. submission summary/record page needs to have toggle-able explanation
+        var toggleExplanation = function () {
+            var assocQ = $(this).closest('.question');
+
+            $(assocQ).find('.explanation').toggle();
+            
+            if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
+                $(this).attr('data-status', 'Hide');
+                $(this).val('Hide Explanation');
+            } else {
+                $(this).attr('data-status', 'Show');
+                $(this).val('Show Explanation');
+            } 
+    
+        } 
                       
     {% if single_question %}
         $('.question').not(':first').hide();
@@ -348,33 +364,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $('.question-nav').click(showQuestion);
         
+
         {% if exam.invideo or exam.exam_type == "interactive_exercise" %}
         {% comment %} Immediate feedback only needed for in-video and interactive exercises {% endcomment %}
-        var toggleExplanation = function () {
-            var assocQ = $(this).closest('.question');
-
-            console.group('explanation status');
-            console.log($(assocQ).find('.explanation').css('display'));
-            $(assocQ).find('.explanation').toggle();
-            console.log($(assocQ).find('.explanation').css('display'));
-            console.groupEnd();
-            
-            if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
-                $(this).attr('data-status', 'Hide');
-                $(this).val('Hide Explanation');
-            } else {
-                $(this).attr('data-status', 'Show');
-                $(this).val('Show Explanation');
-            } 
-    
-            /*
-            var assocQID = $(assocQ).attr('id');
-            $('#' + assocQID + '-expl').empty().remove();
-            $('#' + assocQID).find('.inline-explanation').remove();
-            $(this).attr('disabled', 'disabled');
-            return;
-            */
-        } 
 
         var quickCheck = function () {
             if ($(this).hasClass('quick-check')) {
@@ -451,8 +443,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 });
 
                 var explArea = $('#' + assocQID + '-expl');
-                console.group("Explanation Area stuff");
-                console.log(explArea.length);
                 if (explArea.length == 0) {
                     explArea = document.createElement('div');
                     $(explArea).attr('id', assocQID + '-expl');
@@ -467,7 +457,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         $(explArea).append($(this));
                     //}
                 });
-                console.groupEnd();
 
                 $('#' + checkBtnID).attr('value','Hide Answers');
             };
@@ -781,12 +770,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         }
         $(explArea).empty();
         if ($('#' + assocQID + ' .toggle-explanation').length == 0) {
-            $(explArea).show();
-        } else {
-            $(explArea).hide();
-            $('#' + assocQID + ' .toggle-explanation').attr('data-status', 'Show');
-            $('#' + assocQID + ' .toggle-explanation').val("Show explanation");
+            var toggleExplBtn = document.createElement('input');
+            $(toggleExplBtn).attr('type','button');
+            //$(toggleExplBtn).attr('id','toggleExplanation_' + idx);
+            $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
+            $(toggleExplBtn).attr('data-status', 'Show');
+            $(toggleExplBtn).attr('value', 'Show Explanation');
+            $(toggleExplBtn).click(toggleExplanation);
         }
+        $(explArea).hide();
+        $('#' + assocQID + ' .toggle-explanation').attr('data-status', 'Show');
+        $('#' + assocQID + ' .toggle-explanation').val("Show explanation");
         //$(explArea).append("<h4>Explanation</h4>");
         $(mySolution).contents().each(function(){
             //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
@@ -798,6 +792,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             }
         });
         $('div.question#' + assocQID ).append($(explArea));
+        $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
     };
 
     window.displayChoiceExplanations = function(questionMD) {
@@ -1023,7 +1018,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');
     $('#reEnableForm').remove();
-    $('#main-content input').not('.question-nav').attr('disabled','disabled');
+    $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
 
                       
