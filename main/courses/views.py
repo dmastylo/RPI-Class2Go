@@ -73,16 +73,13 @@ def main(request, course_prefix, course_suffix):
         news_list = []
 
     course = common_page_data['course']
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
              'news_list':           news_list,
-             'contentsection_list': full_contentsection_list,
              'video_list':          Video.objects.getByCourse(course=course),
              'pset_list':           ProblemSet.objects.getByCourse(course=course),
-             'full_index_list':     full_index_list,
              'is_logged_in':        is_logged_in
              },
             context_instance=RequestContext(request))
@@ -110,6 +107,19 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
         form = LiveDateForm()
 
     return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
+
+@auth_view_wrapper
+def leftnav(request, course_prefix, course_suffix):
+    course = request.common_page_data['course']
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
+    return render_to_response('left_nav.html',
+                              {'common_page_data':   request.common_page_data,
+                              'contentsection_list': full_contentsection_list,
+                              'full_index_list':     full_index_list,
+                              'is_logged_in':        request.user.is_authenticated(),
+                              },
+                              context_instance=RequestContext(request))
+
 
 @auth_view_wrapper
 @require_POST

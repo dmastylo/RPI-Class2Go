@@ -24,7 +24,9 @@
 
 {% block l_column_content %}
 {% if videotest %}
-    {% include "left_nav.html" %}
+ <div id="c2g_layout_l_column" class="span3">
+     <!--Skeleton Div to be filled in by leftnav ajax -->
+ </div>
 {% endif %}
 {% endblock l_column_content %}
 
@@ -198,7 +200,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
 {% block addl_scripts %}
     {% if videotest %}
-     <script src="{{STATIC_URL}}/js/popcorn/popcorn-ie8.min.js"></script>
+     <script src="{{STATIC_URL}}js/popcorn/popcorn-ie8.min.js"></script>
     {% endif %}
 <script>
     var __exam_type = "{{exam.exam_type}}";
@@ -207,6 +209,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     
     /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
+                      
+        {% if videotest %}
+
+        $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
+                        
+        {% endif %}
                       
                       
         /********** Add ordinal numbering if it doesn't already exist *********/
@@ -1020,7 +1028,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     $('#reEnableForm').remove();
     $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
-
                       
     {% endif %}
                       
