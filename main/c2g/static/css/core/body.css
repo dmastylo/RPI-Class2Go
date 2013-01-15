@@ -47,7 +47,8 @@ a:hover {color:#820000;}
 }
 
 .upcoming {
-  padding:10px 0;background:#f8f7ea;
+  padding:10px 3px;
+  background:#f8f7ea;
 }
 .upcoming h4 {
   margin-left: 5px;
