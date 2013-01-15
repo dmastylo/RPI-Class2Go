@@ -192,7 +192,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': LOCAL_CACHE_LOCATION + "-unused",
-        'TIMEOUT': LOCAL_CACHE_TIME,
+        'TIMEOUT': 3600,
         'OPTIONS': {
             'MAX_ENTRIES': 10000
         }
