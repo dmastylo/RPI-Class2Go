@@ -94,12 +94,12 @@
                 </li>
                 <li class="hidden-phone"><span>Welcome <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
             {% else %}
-                {% if common_page_data.ready_course.institution_only %}
                 <li class="hidden-phone">
-                    <a id="login_button" class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Login</a>
+                {% with login_course=common_page_data.ready_course login_link_id="login_button" login_link_class="btn" link_text="Login" %}
+                    {% include "registration/login_link.html" %}
+                {% endwith %}
                 </li>
-                {% else %}
-                <li class="hidden-phone"><a id="login_button" class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Login</a></li>
+                {% if not common_page_data.ready_course.institution_only %}
                 <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
                 {% endif %}
             {% endif %}
@@ -137,44 +137,6 @@
         
     </div>
     {% include "footer.html" %}
-    {% if reenable_modal %}
-    <!-- Commenting out the modal login per #447 for now
-    <div id="login-modal" class="modal fade">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal">x</a>
-            <h3>Login</h3>
-        </div>
-        <form action="{% url 'auth_login' %}" method="POST" class="form-horizontal">
-        <div class="modal-body">
-            <div class="alert alert-info">
-                <em class="icon-info-sign"></em>New to Stanford Online? <strong><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Register here</a></strong>.
-            </div>
-            <fieldset>
-                <div class="control-group">
-                    <label for="login_username" class="control-label">Username:</label>
-                    <div class="controls">
-                        <input type="text" name="username" id="login_username" />
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label for="login_password" class="control-label">Password:</label>
-                    <div class="controls">
-                        <input type="password" name="password" id="login_password" />
-                    </div>
-                </div>
-                {% csrf_token %}
-            </fieldset>
-        </div>
-        <div class="modal-footer">
-            <a href="{% url 'auth_password_reset' %}">Forgot my username or password</a> &nbsp;
-	    <input type="hidden" name="next" value="{{request.path}}" />
-            <input type='submit' class="btn btn-primary" value="Login" />
-        </div>
-        </form>
-    </div>
-    -->
-    {% endif %}
-
     {% block bottom_scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
