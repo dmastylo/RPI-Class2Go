@@ -1152,7 +1152,7 @@ class CacheStat():
     count = {}
     count['hit'] = {}
     count['miss'] = {}
-    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 120)
+    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 60*60)
     reportingInterval = timedelta(seconds=reportingIntervalSec)
 
     @classmethod
