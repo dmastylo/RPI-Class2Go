@@ -106,7 +106,7 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
 
 @cache_page(60*60, cache="view_store")
 def leftnav(request, course_prefix, course_suffix):
-    course = request.common_page_data['course']
+    course = request.common_page_data['ready_course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('left_nav.html',
                               {
