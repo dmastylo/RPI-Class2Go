@@ -102,9 +102,27 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
     questions = metadata_dom.getElementsByTagName('video')
 
+    ready_section = exam.section
+    if ready_section and ready_section.mode == "draft":
+        ready_section = ready_section.image
+
+    #Get the slug of the parent exam of all variations, which we need to highlight in the left navbar
+    try:
+        cginfo = ContentGroup.groupinfo_by_id('exam', exam.id)
+        parent_tag = cginfo.get('__parent_tag', '')
+        parent = cginfo.get('__parent', None)
+        if parent_tag != 'exam':
+            slug_for_leftnav = exam.slug
+        elif not parent:
+            slug_for_leftnav = exam.slug
+        else:
+            slug_for_leftnav = parent.slug
+    except ContentGroup.DoesNotExist:
+        slug_for_leftnav = exam.slug
+
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
                               'json_pre_pop':incomplete_record.json_data, 'too_recent':too_recent,
-                              'last_record':last_record, 
+                              'last_record':last_record, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav,
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':False,
                               'allow_submit':True, 'too_many_attempts':too_many_attempts,
                               'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
@@ -185,7 +203,27 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
         score_fields = {}
         scores_json = "{}"
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'score':score, 'allow_submit':False}, RequestContext(request))
+    ready_section = exam.section
+    if ready_section and ready_section.mode == "draft":
+        ready_section = ready_section.image
+
+    #Get the slug of the parent exam of all variations, which we need to highlight in the left navbar
+    try:
+        cginfo = ContentGroup.groupinfo_by_id('exam', exam.id)
+        parent_tag = cginfo.get('__parent_tag', '')
+        parent = cginfo.get('__parent', None)
+        if parent_tag != 'exam':
+            slug_for_leftnav = exam.slug
+        elif not parent:
+            slug_for_leftnav = exam.slug
+        else:
+            slug_for_leftnav = parent.slug
+    except ContentGroup.DoesNotExist:
+        slug_for_leftnav = exam.slug
+
+
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'score':score, 'allow_submit':False,
+                               'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav}, RequestContext(request))
 
 
 @auth_view_wrapper
@@ -225,8 +263,28 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
     except ExamRecordScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
         raw_score = None
         scores_json = "{}"
-    
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False}, RequestContext(request))
+
+    ready_section = exam.section
+    if ready_section and ready_section.mode == "draft":
+        ready_section = ready_section.image
+
+    #Get the slug of the parent exam of all variations, which we need to highlight in the left navbar
+    try:
+        cginfo = ContentGroup.groupinfo_by_id('exam', exam.id)
+        parent_tag = cginfo.get('__parent_tag', '')
+        parent = cginfo.get('__parent', None)
+        if parent_tag != 'exam':
+            slug_for_leftnav = exam.slug
+        elif not parent:
+            slug_for_leftnav = exam.slug
+        else:
+            slug_for_leftnav = parent.slug
+    except ContentGroup.DoesNotExist:
+        slug_for_leftnav = exam.slug
+
+
+
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav}, RequestContext(request))
 
 
 

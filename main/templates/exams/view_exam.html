@@ -23,11 +23,9 @@
 {% endblock videos_link_class %}
 
 {% block l_column_content %}
-{% if videotest %}
  <div id="c2g_layout_l_column" class="span3">
      <!--Skeleton Div to be filled in by leftnav ajax -->
  </div>
-{% endif %}
 {% endblock l_column_content %}
 
 {% block addl_head_scripts %}
@@ -52,7 +50,7 @@
 {% endblock addl_head_scripts %}
 
 {% block m_column_content %}
-{% if videotest %}<div id="c2g_layout_m_column" class="span9">{% endif %}
+<div id="c2g_layout_m_column" class="span9">
 <div class="alert alert-error" id="nojswarn">
 You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
 </div>
@@ -195,7 +193,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% endif %}
 
 {% endautoescape %}
-{% if videotest %}</div>{% endif %}
+</div>
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
@@ -212,8 +210,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
         {% if videotest %}
 
-        $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
-                        
+        $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
+                function() {
+                    $("#sidebar-nav-{{ ready_section.id }}").removeClass("collapse");
+                    $("#leftnav-li-video-{{ video.slug}}").addClass("current");
+                }
+        );
+        {% else %}
+        $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
+                 function() {
+                    $("#sidebar-nav-{{ ready_section.id }}").removeClass("collapse");
+                    $("#leftnav-li-exam-{{ slug_for_leftnav }}").addClass("current");
+                }
+        );
+        
         {% endif %}
                       
                       
