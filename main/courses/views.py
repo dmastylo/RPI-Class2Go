@@ -83,6 +83,10 @@ def main(request, course_prefix, course_suffix):
 @auth_view_wrapper
 def course_materials(request, course_prefix, course_suffix, section_id=None):
 
+    #Vars used for single section nav
+    prev_section = None
+    next_section = None
+
     if section_id:
         #If an instructor switches to edit view from a single section's materials page,
         #just redirect to display all sections, since section_id is for viewing sections in ready mode
@@ -105,16 +109,10 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
 
         if cur_index > 0:
             prev_section = sections[cur_index-1]
-        else:
-            prev_section = None
         if cur_index < len(sections) - 1:
             next_section = sections[cur_index+1]
-        else:
-            next_section = None
     else:
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
-        prev_section = None
-        next_section = None
 
     form = None
     if request.common_page_data['course_mode'] == "draft":
