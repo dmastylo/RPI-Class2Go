@@ -1161,17 +1161,17 @@ class CacheStat():
             cls.count[type][cache] = 0
         cls.count[type][cache] += 1
 
-        # stat interval expired: print and zero out counts
+        # stat interval expired: print and zero out counts for any cache that's had a hit
         if datetime.now() - cls.lastReportTime > cls.reportingInterval:
             cls.lastReportTime = datetime.now()
             for c in cls.count['hit']:
-                if cls.count['hit'][c] == 0:
-                    next
-                if c not in cls.count['miss']:
-                    cls.count['miss'][c] = 0
-                rate = float(cls.count['hit'][c]) / float(cls.count['miss'][c] + cls.count['hit'][c]) * 100.0
-                logger.info("cachestats for %s: hits %d, misses %d, rate %2.1f"
-                            % (c, cls.count['hit'][c], cls.count['miss'][c], rate))
+                try:
+                    rate = float(cls.count['hit'][c]) / float(cls.count['miss'][c] + cls.count['hit'][c]) * 100.0
+                    rate_str = ", rate %2.1f" % rate
+                except ZeroDivisionError, KeyError:
+                    rate_str = ""
+                logger.info("cachestats for %s: hits %d, misses %d%s" 
+                        % (c, cls.count['hit'][c], cls.count['miss'][c], rate_str))
                 cls.count['hit'][c] = 0
                 cls.count['miss'][c] = 0
 
