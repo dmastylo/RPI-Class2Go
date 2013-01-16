@@ -1,9 +1,6 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+# -*- coding: utf-8 -*-
+# per http://www.python.org/peps/pep-0263.html
 
-Replace this with more appropriate tests for your application.
-"""
 import random
 import re
 import urllib,urllib2
@@ -337,6 +334,8 @@ class SimpleTest(TestCase):
         self.assertFalse(agf.grade('randomDNE',"33")['correct']) #This is the actual test
 
 
+    ### INTERACTIVE AUTOGRADER ###
+
     def test_interactive_grader_required_elements(self):
         """Interactive grader requires some XML elements"""
 
@@ -368,9 +367,35 @@ class SimpleTest(TestCase):
                 AutoGrader(partial_xml)
 
 
+    # Helper Methods
+
+    def fake_remote_grader(self, answer):
+        """Helper function for the interactive grader, override the remote
+        grader to return the answer string provided."""
+
+        def fake_remote_grader(req):
+            grader_endpoint = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
+            if req.get_full_url() == grader_endpoint:
+                resp = urllib2.addinfourl(StringIO(answer), "", req.get_full_url())
+                resp.code = 200
+                resp.msg = ""
+                return resp
+
+        class FakeGraderHTTPHandler(urllib2.HTTPHandler):
+            def http_open(self, req):
+                return fake_remote_grader(req)
+
+        my_opener = urllib2.build_opener(FakeGraderHTTPHandler)
+        urllib2.install_opener(my_opener)
+
+    def restore_urllib2(self):
+        default_opener = urllib2.build_opener(urllib2.HTTPDefaultErrorHandler)
+        urllib2.install_opener(default_opener)
+
+
     def test_interactive_grader_basic(self):
         """
-        Interactive autograder with fake remote endpoint
+        Interactive autograder with fake remote endpoint (basic)
 
         Uses some XML from a db class interactive exercise, but the actual values
         aren't used since we just fake out the endpoint.
@@ -380,29 +405,6 @@ class SimpleTest(TestCase):
         finishing though otherwise urllib2 will be horked.  Method cribbed from:
             http://stackoverflow.com/questions/2276689/how-do-i-unit-test-a-module-that-relies-on-urllib2
         """
-        def fake_remote_grader(answer):
-            """Helper function for the interactive grader, override the remote
-            grader to return the answer string provided."""
-
-            def fake_remote_grader(req):
-                grader_endpoint = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
-                if req.get_full_url() == grader_endpoint:
-                    resp = urllib2.addinfourl(StringIO(answer), "", req.get_full_url())
-                    resp.code = 200
-                    resp.msg = ""
-                    return resp
-
-            class FakeGraderHTTPHandler(urllib2.HTTPHandler):
-                def http_open(self, req):
-                    return fake_remote_grader(req)
-
-            my_opener = urllib2.build_opener(FakeGraderHTTPHandler)
-            urllib2.install_opener(my_opener)
-
-        def restore_urllib2():
-            default_opener = urllib2.build_opener(urllib2.HTTPDefaultErrorHandler)
-            urllib2.install_opener(default_opener)
-
 
         interactive_xml = """
 <exam_metadata>
@@ -446,27 +448,66 @@ class SimpleTest(TestCase):
         fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
         fbstr = json.dumps(fb)
 
-        fake_remote_grader('{"score":0, "maximum-score":1, "feedback":%s}' %fbstr)
+        self.fake_remote_grader('{"score":0, "maximum-score":1, "feedback":%s}' %fbstr)
         self.assertEqual(ag.grade("q1b", "should_fail"),
                 {'correct': False, 'score': 0, 'feedback': fb})
 
-        fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' %fbstr)
+        self.fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' %fbstr)
         self.assertEqual(ag.grade("q1b", "should_succeed"),
                 {'correct': True, 'score': 1, 'feedback': fb})
 
-        fake_remote_grader('{"score":10, "maximum-score":10, "feedback":%s}' %fbstr)
+        self.fake_remote_grader('{"score":10, "maximum-score":10, "feedback":%s}' %fbstr)
         self.assertEqual(ag.grade("q1b", "should_succeed"),
                 {'correct': True, 'score': 1, 'feedback': fb})
         self.assertEqual(ag.grade("q2b", "should_succeed"),
                 {'correct': True, 'score': 1, 'feedback': fb})
 
-        fake_remote_grader('{"score":1, "feedback":%s}' %fbstr)
+        self.fake_remote_grader('{"score":1, "feedback":%s}' %fbstr)
         self.assertEqual(ag.grade("q1b", "should_succeed"),
                 {'correct': True, 'score': 1, 'feedback': fb})
 
-        fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
+        self.fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
         self.assertEqual(ag.grade("q1b", "should_fail"),
                 {'correct': False, 'score': 0, 'feedback': fb})
 
-        restore_urllib2()
+        self.restore_urllib2()
 
+
+    def test_interactive_grader_unicode(self):
+        """
+        Interactive autograder with fake remote endpoint (unicode)
+        """
+
+        interactive_xml = """
+<exam_metadata>
+    <question_metadata id="q1" data-report="q1">
+        <solution></solution>
+        <response name="q1b" answertype="dbinteractiveresponse">
+            <grader_name>SQL_Grader_schroot</grader_name>
+            <database-file>sql-social-query2.db</database-file>
+            <answer-file>sql-social-query-ans2.txt</answer-file>
+            <select_dict></select_dict>
+            <parameters>
+                <qnum>1</qnum>
+                <answer-text>Enter your SQL query here</answer-text>
+            </parameters>
+        </response>
+    </question_metadata>
+</exam_metadata>"""
+        ag = AutoGrader(interactive_xml)
+
+        ascii_string = "ascii test string"
+        unicode_string = u'娱乐资讯请点击'    # "click infotainment" from china.com homepage
+
+        fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
+        fbstr = json.dumps(fb)
+
+        self.fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", ascii_string),
+            {'correct': False, 'score': 0, 'feedback': fb})
+
+        self.fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
+        self.assertEqual(ag.grade("q1b", unicode_string),
+            {'correct': False, 'score': 0, 'feedback': fb})
+
+        self.restore_urllib2()
