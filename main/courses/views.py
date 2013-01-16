@@ -95,14 +95,32 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
         except ContentSection.DoesNotExist:
             raise Http404
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True, SECTION=section)
+
+        #Get prev/next nav links
+        sections = [s for s in ContentSection.objects.getByCourse(course=request.common_page_data['course']) if s.countChildren() > 0]
+        for index, item in enumerate(sections):
+            if item == section:
+                cur_index = index
+                break
+
+        if cur_index > 0:
+            prev_section = sections[cur_index-1]
+        else:
+            prev_section = None
+        if cur_index < len(sections) - 1:
+            next_section = sections[cur_index+1]
+        else:
+            next_section = None
     else:
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
+        prev_section = None
+        next_section = None
 
     form = None
     if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
 
-    return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
+    return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form, 'prev_section':prev_section, 'next_section':next_section}, context_instance=RequestContext(request))
 
 @cache_page(60*60, cache="view_store")
 def leftnav(request, course_prefix, course_suffix):
