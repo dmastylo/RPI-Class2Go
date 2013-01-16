@@ -80,8 +80,8 @@
                 <select name="parent" id="parent_id">
                     <!-- Filled by prefill_children() -->
                     {% if contentgroup_info %}
-                        {% if contentgroup_info.parent_id != page.image.id %}
-                            <option value="{{contentgroup_info.parent_type}},{{contentgroup_info.parent_id}}" selected>{{contentgroup_info.parent.title}}</option>
+                        {% if contentgroup_info.PARENT.id != page.image.id %}
+                            <option value="{{contentgroup_info.PARENT_TAG}},{{contentgroup_info.PARENT.id}}" selected>{{contentgroup_info.PARENT.title}}</option>
                         {% endif %}
                     {% endif %}
                 </select>
@@ -163,7 +163,7 @@ $('#id_slug').focus(function() {
             for (var i=0; i < data.length; i++) {
                 if ((data[i][0] == 'video') || (data[i][0] == 'exam') || (data[i][0] == 'additional_page')) {
                     {% if contentgroup_info %}
-                    if ((data[i][2] != "{{contentgroup_info.parent.title}}") && (data[i][2] != "{{page.title}}")) {
+                    if ((data[i][2] != "{{contentgroup_info.PARENT.title}}") && (data[i][2] != "{{page.title}}")) {
                         pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
                     }
                     {% else %}
