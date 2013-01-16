@@ -6,7 +6,7 @@ import sys
 import time
 import logging
 from urlparse import urlparse, urlunparse
-from django.core.cache import cache, get_cache
+from django.core.cache import get_cache
 
 from django import forms
 from django.contrib.auth.models import Group, User
@@ -143,7 +143,6 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             return self.title + " | Mode: " + self.mode
         else:
             return "No Title" + " | Mode: " + self.mode
-
     
     def _get_prefix(self):
         return self.handle.split("--")[0]
@@ -369,10 +368,6 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         db_table = u'c2g_content_sections'
 
 class AdditionalPageManager(models.Manager):
-    def getByCourseAndMenuSlug(self, course, menu_slug):
-        # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
-        return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
-
     def getByCourse(self, course):
         # Additional pages displayed under sections have a live_datetime effect.
         if course.mode == 'draft':
