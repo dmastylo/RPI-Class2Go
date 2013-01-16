@@ -1,29 +1,17 @@
-<div id="c2g_layout_r_column" class="span3">
-	{% if is_logged_in %}
-		{% if assignments %}
-			<div id="right_nav" class="upcoming well nav">
-				<h4>Upcoming Due Dates</h4>
-				<table class="table table-condensed">
-					<thead>
-						<th></th>
-						<th>Assignment</th>
-						<th>Due Date</th>
-					</thead>
-    			{% for assignment_dictionary in assignments %}
-					{% with assignment=assignment_dictionary.assignment attempted=assignment_dictionary.attempted %}
-					<tr>
-						{% if attempted %}
-							<td><span class="complete">&#10004;</span></td>
-						{% else %}
-							<td></td>
-						{% endif %}
-							<td><a href="{% url assignment.show_view common_page_data.course_prefix common_page_data.course_suffix assignment.slug %}"><span>{{assignment.title}}</span></a></td>
-							<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} PST</td>
-					</tr>
-					{% endwith %}
-				{% endfor %}
-				</table>
-			</div>
-		{% endif %}
-	{% endif %}
-</div>
+{% if assignments %}
+	<div id="right_nav" class="upcoming well nav">
+		<h4>Upcoming Due Dates</h4>
+		<table class="table table-condensed">
+			<thead>
+				<th>Assignment</th>
+				<th>Due Date</th>
+			</thead>
+  			{% for assignment in assignments %}
+			<tr>
+					<td><a href="{% url assignment.show_view common_page_data.course_prefix common_page_data.course_suffix assignment.slug %}"><span>{{assignment.title}}</span></a></td>
+					<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} PST</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% endif %}

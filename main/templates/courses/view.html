@@ -50,8 +50,11 @@
 {% endblock m_column_content %}
 
 {% block addl_scripts %}
+
 {% block r_column_content %}
-    {% include "right_nav.html" %}
+<div id="c2g_layout_r_column" class="span3">
+    <!--Skeleton Div to be filled in by rightnav ajax -->
+</div>
 {% endblock r_column_content %}
 
 {% if common_page_data.is_course_admin %}
@@ -61,7 +64,7 @@
 <script>
 $(document).ready(function(){
     $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
-
+    $("#c2g_layout_r_column").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
 });
 </script>
 {% endblock addl_scripts %}

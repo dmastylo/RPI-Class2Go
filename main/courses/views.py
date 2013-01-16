@@ -72,11 +72,9 @@ def main(request, course_prefix, course_suffix):
     if request.user.is_authenticated():
         is_logged_in = 1
         news_list = common_page_data['ready_course'].newsevent_set.all().order_by('-time_created')[0:5]
-        assignment_dictionaries = get_upcoming_exams(course, request.user)
     else:
         is_logged_in = 0
         news_list = []
-        assignment_dictionaries = []
 
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)    
     return render_to_response('courses/view.html',
@@ -88,27 +86,21 @@ def main(request, course_prefix, course_suffix):
              'video_list':          Video.objects.getByCourse(course=course),
              'pset_list':           ProblemSet.objects.getByCourse(course=course),
              'full_index_list':     full_index_list,
-             'is_logged_in':        is_logged_in, 
-             'assignments':         assignment_dictionaries
+             'is_logged_in':        is_logged_in
              },
             context_instance=RequestContext(request))
 
-def get_upcoming_exams(course, student):
+def get_upcoming_exams(course):
   end_date = datetime.date.today() + datetime.timedelta(weeks=2)
   exams = Exam.objects.filter(
     course=course, 
     mode='ready',
     is_deleted=0,
     due_date__gte = datetime.date.today(),
-    due_date__lte = end_date
+    due_date__lte = end_date, 
+    live_datetime__lte = datetime.date.today()
     ).order_by('due_date')
-  dictionaries = list()
-  for exam in exams: 
-    assignment_dictionary = dict()
-    assignment_dictionary['assignment'] = exam
-    assignment_dictionary['attempted'] = exam.attempted(student)
-    dictionaries.append(assignment_dictionary)
-  return dictionaries
+  return exams
 
 
 @auth_view_wrapper
@@ -146,6 +138,16 @@ def leftnav(request, course_prefix, course_suffix):
                               'is_logged_in':        True, #setting to True to get consistent, ok to show anon users links
                               },
                               context_instance=RequestContext(request))
+
+
+def rightnav(request, course_prefix, course_suffix):
+  course = request.common_page_data['course']
+  exams = get_upcoming_exams(course)
+  return render_to_response('right_nav.html',
+                            {'common_page_data':   request.common_page_data,
+                            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
+                            },
+                            context_instance=RequestContext(request))
 
 
 @auth_view_wrapper
