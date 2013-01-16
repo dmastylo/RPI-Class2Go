@@ -101,7 +101,7 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True, SECTION=section)
 
         #Get prev/next nav links
-        sections = [s for s in ContentSection.objects.getByCourse(course=request.common_page_data['course']) if s.countChildren() > 0]
+        sections = request.common_page_data['content_sections']
         for index, item in enumerate(sections):
             if item == section:
                 cur_index = index
