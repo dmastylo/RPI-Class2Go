@@ -140,6 +140,7 @@ def leftnav(request, course_prefix, course_suffix):
                               context_instance=RequestContext(request))
 
 
+@cache_page(60*60, cache="view_store")
 def rightnav(request, course_prefix, course_suffix):
   course = request.common_page_data['course']
   exams = get_upcoming_exams(course)
