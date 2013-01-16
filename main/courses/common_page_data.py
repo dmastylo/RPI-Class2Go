@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from database import AWS_STORAGE_BUCKET_NAME
@@ -56,40 +55,31 @@ def get_common_page_data(request, prefix, suffix):
         course_mode = 'draft'
         course = draft_course
         
-    # View mode
-    if course_mode == 'draft':
-        view_mode = 'edit'
-        if request.GET.get('view_mode') and request.GET.get('view_mode') == 'preview':
-            view_mode = 'view'
-    else:
-        view_mode = 'view'
-    
     # Course info pages
-    course_info_page_handle = course_handle + '_course_info_pages'
+    course_info_page_handle = course_handle + '_' + course_mode + '_course_info_pages'
     course_info_pages = CACHE.get(course_info_page_handle)
     if course_info_pages:
-        CacheStat.report('hit', CACHE_STORE)
+        #CacheStat.report('hit', CACHE_STORE)
+        pass # TODO: After #1905, fix call above and remove this pass
     else:
-        CacheStat.report('miss', CACHE_STORE)
+        #CacheStat.report('miss', CACHE_STORE)
         course_info_pages = AdditionalPage.objects.filter(course=course,is_deleted=0,menu_slug='course_info').order_by('index')
         CACHE.set(course_info_page_handle, course_info_pages)
-    if view_mode != 'edit':
+    if course_mode == 'ready':
         course_info_pages = [page for page in course_info_pages if page.description]
 
     # Get list of non-empty content sections for course materials dropdown menu
     content_sections = None
     if course_mode == 'ready':
-        content_section_page_handle = course_handle + '_nonempty_content_sections'
+        content_section_page_handle = course_handle + 'ready' +'_nonempty_content_sections'
         content_sections = CACHE.get(content_section_page_handle)
         if content_sections:
-            CacheStat.report('hit', CACHE_STORE)
+            #CacheStat.report('hit', CACHE_STORE)
+            pass # TODO: After #1905, fix above call and remove this pass
         else:
-            CacheStat.report('miss', CACHE_STORE)
+            #CacheStat.report('miss', CACHE_STORE)
             content_sections = [s for s in ContentSection.objects.getByCourse(course) if s.countChildren() > 0]
             CACHE.set(content_section_page_handle, content_sections)
-    
-    current_datetime = datetime.datetime.now()
-    effective_current_datetime = current_datetime
     
     page_data = {
         'request': request,
@@ -98,17 +88,15 @@ def get_common_page_data(request, prefix, suffix):
         'draft_course': draft_course,
         'course_prefix':prefix,
         'course_suffix':suffix,
-        'course_mode':course_mode,
-        'can_switch_mode':can_switch_mode,
-        'is_course_admin':is_course_admin,
-        'is_course_member':is_course_member,
-        'view_mode': view_mode,
         'course_info_pages':course_info_pages,
         'content_sections':content_sections,
-        'view_mode': view_mode,
-        'current_datetime':current_datetime,
-        'effective_current_datetime':effective_current_datetime,
         'aws_storage_bucket_name':AWS_STORAGE_BUCKET_NAME,
+        # These are the parameters that prevent caching page_data in its
+        # entirety, based only on course
+        'course_mode':     course_mode,
+        'can_switch_mode': can_switch_mode,
+        'is_course_admin': is_course_admin,
+        'is_course_member':is_course_member,
     }
 
     return page_data
