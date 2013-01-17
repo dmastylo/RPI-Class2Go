@@ -67,25 +67,15 @@ def main(request, course_prefix, course_suffix):
     else:
         many_announcements = False
     
-    course = common_page_data['course']
-    
     if request.user.is_authenticated():
         is_logged_in = 1
-        news_list = common_page_data['ready_course'].newsevent_set.all().order_by('-time_created')[0:5]
     else:
         is_logged_in = 0
-        news_list = []
 
-    full_contentsection_list, full_index_list = get_full_contentsection_list(course)    
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
-             'news_list':           news_list,
-             'contentsection_list': full_contentsection_list,
-             'video_list':          Video.objects.getByCourse(course=course),
-             'pset_list':           ProblemSet.objects.getByCourse(course=course),
-             'full_index_list':     full_index_list,
              'is_logged_in':        is_logged_in
              },
             context_instance=RequestContext(request))
@@ -161,6 +151,7 @@ def leftnav(request, course_prefix, course_suffix):
 def rightnav(request, course_prefix, course_suffix):
   course = request.common_page_data['course']
   exams = get_upcoming_exams(course)
+  exams = [exam for exam in exams if not exam.is_child()]
   return render_to_response('right_nav.html',
                             {'common_page_data':   request.common_page_data,
                             'assignments':        exams, #setting to True to get consistent, ok to show anon users links
