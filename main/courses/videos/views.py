@@ -76,6 +76,10 @@ def view(request, course_prefix, course_suffix, slug):
             cur_index = index
             break
 
+    ready_section = video.section
+    if ready_section and ready_section.mode == "draft":
+        ready_section = ready_section.image
+
     #code safety
     next_slug = None
     prev_slug = None
@@ -99,11 +103,6 @@ def view(request, course_prefix, course_suffix, slug):
         video_rec.save()
         
     course = common_page_data['course']
-
-    if request.user.is_authenticated():
-        is_logged_in = 1
-    else:
-        is_logged_in = 0    
 
     key = ('video', video.id)
     l1items, l2items = get_contentgroup_data(course=course)
@@ -129,11 +128,11 @@ def view(request, course_prefix, course_suffix, slug):
     return render_to_response('exams/view_exam.html', 
                               {
                                'common_page_data':    common_page_data, 
-                               'video':               video, 
+                               'video':               video,
+                               'ready_section':       ready_section,
                                'video_rec':           video_rec, 
                                'prev_slug':           prev_slug, 
                                'next_slug':           next_slug, 
-                               'is_logged_in':        is_logged_in,
                                'downloadable_content':downloadable_content,
                                'json_pre_pop':"{}",
                                'scores':"{}",

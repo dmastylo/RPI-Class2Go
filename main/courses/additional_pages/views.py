@@ -52,7 +52,7 @@ def main(request, course_prefix, course_suffix, slug):
 
     contentgroup_info = None      # Empty for view mode
         
-    if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft' and common_page_data['view_mode'] == 'edit':
+    if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft':
         template = 'additional_pages/edit.html'
 
         grouppable_page = page.image
@@ -81,16 +81,15 @@ def main(request, course_prefix, course_suffix, slug):
         
     course = common_page_data['course']
 
-    if request.user.is_authenticated():
-        is_logged_in = 1
-    else:
-        is_logged_in = 0
+    ready_section = page.section
+    if ready_section and ready_section.mode == "draft":
+        ready_section = ready_section.image
 
     return render_to_response(template,
                               {
                                'common_page_data': common_page_data,
                                'page': page,
-                               'is_logged_in': is_logged_in,
+                               'ready_section': ready_section,
                                'contentgroup_info': contentgroup_info,
                               },
                                context_instance=RequestContext(request))

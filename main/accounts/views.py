@@ -46,21 +46,29 @@ def profile(request):
         user_profile = None
         is_student_list = []
 
-    allow_password_change  = True
-    if (not request.user.is_authenticated()) or (request.user.get_profile().institutions.filter(title='Stanford').exists()):
-        allow_password_change = False
+    has_webauth = False
+    if request.user.is_authenticated() and (request.user.get_profile().institutions.filter(title='Stanford').exists()):
+        has_webauth = True
 
     return render_to_response('accounts/profile.html',
                               {'request': request,
                               'courses': courses,
                               'is_student_list': is_student_list,
-                              'show_pwd_change': allow_password_change,},
+                              'has_webauth': has_webauth,},
                               context_instance=RequestContext(request))
 
 def edit(request):
-    uform = EditUserForm(instance=request.user)
-    pform = EditProfileForm(instance=request.user.get_profile())
-    return render_to_response('accounts/edit.html', {'request':request, 'uform':uform, 'pform':pform}, context_instance=RequestContext(request))
+    uform = None
+    pform = None
+    if request.user.is_authenticated():
+        uform = EditUserForm(instance=request.user)
+        pform = EditProfileForm(instance=request.user.get_profile())
+    
+    has_webauth = False
+    if request.user.is_authenticated() and (request.user.get_profile().institutions.filter(title='Stanford').exists()):
+        has_webauth = True
+
+    return render_to_response('accounts/edit.html', {'request':request, 'uform':uform, 'pform':pform, 'has_webauth': has_webauth,}, context_instance=RequestContext(request))
 
 @csrf_protect
 def save_edits(request):

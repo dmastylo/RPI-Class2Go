@@ -1,0 +1,5 @@
+{% if login_course.institution_only %}
+<a id="{{ login_link_id }}" class="{{ login_link_class }}" {{ addl_attrs }} href="{% url 'shib_login' %}?next={{ request.get_full_path }}">{{ link_text }}</a>
+{% else %}
+<a id="{{ login_link_id }}" class="{{ login_link_class }}" {{ addl_attrs }} href="{% url 'auth_login' %}?next={{ request.get_full_path }}">{{ link_text }}</a>
+{% endif %}
