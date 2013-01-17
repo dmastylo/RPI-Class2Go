@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# by Eric Chu and Justin Foster
+
 import sys
 import time
 import re
