@@ -47,12 +47,16 @@
         
         <p style="text-wrap:none;">
               <a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a>
-              {% if show_pwd_change %}
-              <a href="{% url 'auth_password_change' %}" class="btn">Change Password</a>
+              {% if not has_webauth %}
+              <a href="{% url 'auth_password_change' %}" class="btn">Change Class2Go Password</a>
               {% endif %}
         </p>
     {% else %}
-    <h4> Please <a href="{% url 'auth_login' %}?next={{ request.path }}">log in</a> to view your profile </h4>
+    <h3> Please login to see profile information: </h3>
+    <p>
+    <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Stanford WebAuth</a>
+    <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Class2Go Login (Public course students)</a>
+    </p>
     {% endif %}
 
 </div>

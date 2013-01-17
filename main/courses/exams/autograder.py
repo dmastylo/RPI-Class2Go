@@ -2,8 +2,12 @@ import re, collections
 import urllib,urllib2
 import json
 import logging
+
 from django.conf import settings
+from django.utils import encoding
+
 from xml.dom.minidom import parseString
+
 
 logger = logging.getLogger(__name__)
 
@@ -364,10 +368,13 @@ class AutoGrader():
             response['score'] = 0
             response['feedback'] = ""
 
+            # external grader can't handle unicode (see #1904) so just flatten to ascii
+            ascii_submission = encoding.smart_str(submission, encoding='ascii', errors='ignore')
+            post_params['student_input'] = ascii_submission
+
             # call remote grader
-            grader_url = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
-            post_params['student_input'] = submission
             logger.debug("External grader call: %s" % str(post_params))
+            grader_url = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
             graded_result = external_grader_request(grader_url, post_params)
             try:
                 graded = json.loads(graded_result)

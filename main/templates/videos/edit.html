@@ -56,8 +56,11 @@
 	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
 	</div>
       </form>
-  {% else %}
-    <h4>Please <a data-toggle="modal" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">log in</a> to edit videos.</h4>
+  {% else %} {# This is technically unreachable due to admin decorator, but doing this just to be complete #}
+    <h4>Please {% with login_course=common_page_data.course login_link_id="login_link" link_text="log in" %}
+        {% include "registration/login_link.html" %}
+        {% endwith %}
+        to edit video.</h4>
   {% endif %}
 
 {% endblock m_column_content %}

@@ -13,8 +13,15 @@
         {% empty %}
             <p style='margin: 20px;'>No content to display.</p>
         {% endfor %}
-    {% else %}
-        <h4>Please <a data-toggle="modal" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">log in</a> to see course materials.</h4>
+        {% if section_structures|length == 1 %}
+            {% if prev_section %}<a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix prev_section.id %}" class="btn pull-left">&larr; {{ prev_section.title }}</a>{% endif %}
+            {% if next_section %}<a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix next_section.id %}" class="btn pull-right">{{ next_section.title }} &rarr;</a>{% endif %}
+        {% endif %}
+    {% else %} {# This is technically unreachable due to admin decorator, but doing this just to be complete #}
+    <h4>Please {% with login_course=common_page_data.course login_link_id="login_link" link_text="log in" %}
+        {% include "registration/login_link.html" %}
+        {% endwith %}
+        to see course materials.</h4>
     {% endif %}
 </div>
 {% endblock m_column_content %}

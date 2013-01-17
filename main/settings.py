@@ -197,6 +197,14 @@ CACHES = {
             'MAX_ENTRIES': 10000
             }
     },
+    'course_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-course",
+        'TIMEOUT': 7200,
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+            }
+    },
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': LOCAL_CACHE_LOCATION + "/cache-default",

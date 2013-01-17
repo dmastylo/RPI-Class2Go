@@ -30,7 +30,7 @@ def upload(request):
             return redirect('courses.views.course_materials', course_prefix, course_suffix)
     else:
         form = FileUploadForm(course=common_page_data['course'])
-        reverseview = 'courses.files.actions.upload'
+    reverseview = 'courses.files.actions.upload'
 
     return render(request, 'files/upload.html',
             {'reverseview':reverseview,
