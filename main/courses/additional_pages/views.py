@@ -52,7 +52,7 @@ def main(request, course_prefix, course_suffix, slug):
 
     contentgroup_info = None      # Empty for view mode
         
-    if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft' and common_page_data['view_mode'] == 'edit':
+    if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft':
         template = 'additional_pages/edit.html'
 
         grouppable_page = page.image
