@@ -1,0 +1,105 @@
+
+<!DOCTYPE html">
+<head>
+<meta charset="UTF-8" />
+<title>Quiz Created in Text</title>
+<link rel="stylesheet" href="quiz.css" type="text/css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+    processEscapes: true
+  }
+});
+
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  //close all the content divs on page load
+  $('.response').hide();
+  
+  // toggle slide
+  $(".selection").click(function(){
+    // by calling sibling, we can use same div for all demos
+    $(this).siblings('.response').slideToggle();
+  });
+});
+</script>
+</head>
+
+<body>
+$\newcommand{\ones}{\mathbf 1}$
+
+<fieldset>
+
+  <legend>This is a problem</legend>
+  
+    <span class="description"><p>Consider the problem of 1 + 1....<p/><p/> What do you get when you add the two numbers together?</p></span>
+    <ul>
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">1</a></div>
+    <div class="response"><span class="wrong">Incorrect. </span></div>
+  </li>
+  
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">2</a></div>
+    <div class="response"><span class="right">Correct! </span></div>
+  </li>
+  
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">3</a></div>
+    <div class="response"><span class="wrong">Incorrect. </span></div>
+  </li>
+  </ul>
+    
+    <span class="description"><p>What if you multiply them?</p></span>
+    <ul>
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">1</a></div>
+    <div class="response"><span class="right">Correct! </span></div>
+  </li>
+  
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">2</a></div>
+    <div class="response"><span class="wrong">Incorrect. </span></div>
+  </li>
+  
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">3</a></div>
+    <div class="response"><span class="wrong">Incorrect. </span></div>
+  </li>
+  </ul>
+    
+    <span class="description"><p><p/></p></span>
+    <ul></ul>
+    
+  
+</fieldset><br/>
+
+<fieldset>
+
+  <legend>This is another problem</legend>
+  
+    <span class="description"><p>Consider something really hard....<p/><p/> It has an answer!</p></span>
+    <ul>
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">True.</a></div>
+    <div class="response"><span class="right">Correct! </span></div>
+  </li>
+  
+  <li class="choice">
+    <div class="selection"><a href="#" onclick="return false">False.</a></div>
+    <div class="response"><span class="wrong">Incorrect. </span></div>
+  </li>
+  </ul>
+    
+  
+</fieldset><br/>
+
+<div id="footer">
+  Last updated at 2013-01-13 16:58:39 PST.
+</div>
+</body> </html>

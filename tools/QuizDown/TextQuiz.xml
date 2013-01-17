@@ -1,0 +1,15 @@
+<problemset data-report="quiz_created_in_tex" title="Quiz Created in Text" type="formative" url-identifier="quiz_created_in_tex">
+  <problem>
+    <p>Consider the problem of 1 + 1....</p>
+    <p></p>
+    <p> What do you get when you add the two numbers together?<multiplechoiceresponse><choicegroup type="MultipleChoice"><choice name="1" correct="false"><text>1</text><explanation></explanation></choice><choice name="2" correct="true"><text>2</text><explanation></explanation></choice><choice name="3" correct="false"><text>3</text><explanation></explanation></choice></choicegroup></multiplechoiceresponse></p>
+    <p>What if you multiply them?<multiplechoiceresponse><choicegroup type="MultipleChoice"><choice name="1" correct="true"><text>1</text><explanation></explanation></choice><choice name="2" correct="false"><text>2</text><explanation></explanation></choice><choice name="3" correct="false"><text>3</text><explanation></explanation></choice></choicegroup></multiplechoiceresponse></p>
+    <p></p>
+    <p><multiplechoiceresponse><choicegroup type="MultipleChoice"/></multiplechoiceresponse></p>
+  </problem>
+  <problem>
+    <p>Consider something really hard....</p>
+    <p></p>
+    <p> It has an answer!<multiplechoiceresponse><choicegroup type="MultipleChoice"><choice name="true" correct="true"><text>True.</text><explanation></explanation></choice><choice name="false" correct="false"><text>False.</text><explanation></explanation></choice></choicegroup></multiplechoiceresponse></p>
+  </problem>
+</problemset>
