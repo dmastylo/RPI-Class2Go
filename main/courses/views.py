@@ -83,6 +83,10 @@ def main(request, course_prefix, course_suffix):
 @auth_view_wrapper
 def course_materials(request, course_prefix, course_suffix, section_id=None):
 
+    #Vars used for single section nav
+    prev_section = None
+    next_section = None
+
     if section_id:
         #If an instructor switches to edit view from a single section's materials page,
         #just redirect to display all sections, since section_id is for viewing sections in ready mode
@@ -95,6 +99,18 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
         except ContentSection.DoesNotExist:
             raise Http404
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True, SECTION=section)
+
+        #Get prev/next nav links
+        sections = request.common_page_data['content_sections']
+        for index, item in enumerate(sections):
+            if item == section:
+                cur_index = index
+                break
+
+        if cur_index > 0:
+            prev_section = sections[cur_index-1]
+        if cur_index < len(sections) - 1:
+            next_section = sections[cur_index+1]
     else:
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
 
@@ -102,7 +118,7 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
     if request.common_page_data['course_mode'] == "draft":
         form = LiveDateForm()
 
-    return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form}, context_instance=RequestContext(request))
+    return render_to_response('courses/'+request.common_page_data['course_mode']+'/course_materials.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'context':'course_materials', 'form':form, 'prev_section':prev_section, 'next_section':next_section}, context_instance=RequestContext(request))
 
 @cache_page(60*60, cache="view_store")
 def leftnav(request, course_prefix, course_suffix):
