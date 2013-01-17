@@ -77,7 +77,7 @@
         <div class="control-group">
             <label class="control-label">Section</label>
             <div class="controls">
-                <select name="section" id="section_id" onChange="prefill_children();">
+                <select name="section" id="section_id" {% if not page.section_id %}disabled="disabled"{% endif %}>
                     {% if not page.section_id %}
                         <option value="null" selected>** No content section **</option>
                     {% else %}
@@ -88,7 +88,6 @@
                                 <option value="{{section.id}}">{{section.title}}</option>
                             {% endif %}
                         {% endfor %}
-                        {# <option value="null">** No content section **</option> #} {# not confident this works right #}
                     {% endif %}
                 </select>
             </div>
@@ -176,6 +175,7 @@ $('#id_slug').focus(function() {
 </script>
 <script type="text/javascript">
     // force our handler to fire when the page first loads, in addition to onChange
+    $('#section_id').change(prefill_children());
     $("#parent_id").ready(prefill_children());
     function prefill_children() {
         var id = $('#section_id').val(); 

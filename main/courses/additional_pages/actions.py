@@ -100,10 +100,12 @@ def save(request):
 
         new_section = request.POST.get("section")
         old_section = page.section
-        if new_section == "null":
+        if new_section == "null":                # Topbar pages
             page.section = None
+            page.menu_slug = "course_info"       # normal pages
         else:
             page.section = ContentSection.objects.get(id=new_section)
+            page.menu_slug = None
 
         page.title = request.POST.get("title")
         page.description = request.POST.get("description")
