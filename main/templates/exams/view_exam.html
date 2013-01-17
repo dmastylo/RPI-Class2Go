@@ -1,6 +1,9 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
+
+{% block title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %} | Stanford Online{% endblock %}
+
+{% block course_page_title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %}{% endblock course_page_title %}
 
 {% block exam_link_class %}
 {% if "exam" in exam.exam_type and not videotest %}class="active"{% endif %}
