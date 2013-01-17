@@ -1140,35 +1140,40 @@ class CacheStat():
     Gather and report counter-based stats for our simple caches.
        report('hit', 'video-cache') or
        report('miss', 'files-cache')
-    Note a latent bug in here.  a cache that never gets a hit will build 
-    up misses.  That's OK.
     """
     lastReportTime = datetime.now()
-    count = {}
-    count['hit'] = {}
-    count['miss'] = {}
-    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 60*60)
+    count = {} 
+    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 60*60)   # hourly
     reportingInterval = timedelta(seconds=reportingIntervalSec)
 
     @classmethod
-    def report(cls, type, cache):
-        if cache not in cls.count[type]:
-            cls.count[type][cache] = 0
-        cls.count[type][cache] += 1
+    def report(cls, op, cache):
+        if op not in ['hit', 'miss']:
+            logger.error("cachestat invalid operation, expected hit or miss")
+            return
+        if cache not in cls.count:
+            cls.count[cache] = {}
+        if op not in cls.count[cache]:
+            cls.count[cache][op] = 0
+        cls.count[cache][op] += 1
 
-        # stat interval expired: print and zero out counts for any cache that's had a hit
+        # stat interval expired: print stats and zero out counter
         if datetime.now() - cls.lastReportTime > cls.reportingInterval:
+            for c in cls.count:
+                hit = 0
+                if 'hit' in cls.count[c]:
+                    hit = cls.count[c]['hit']
+                miss = 0
+                if 'miss' in cls.count[c]:
+                    miss = cls.count[c]['miss']
+                if hit + miss == 0:
+                    logger.info("cache stats for %s: hits %d, misses %d" % (c, hit, miss))
+                else:
+                    rate = float(hit) / float(hit + miss) * 100.0
+                    logger.info("cache stats for %s: hits %d, misses %d, rate %2.1f" % (c, hit, miss, rate))
+
             cls.lastReportTime = datetime.now()
-            for c in cls.count['hit']:
-                try:
-                    rate = float(cls.count['hit'][c]) / float(cls.count['miss'][c] + cls.count['hit'][c]) * 100.0
-                    rate_str = ", rate %2.1f" % rate
-                except ZeroDivisionError, KeyError:
-                    rate_str = ""
-                logger.info("cachestats for %s: hits %d, misses %d%s" 
-                        % (c, cls.count['hit'][c], cls.count['miss'][c], rate_str))
-                cls.count['hit'][c] = 0
-                cls.count['miss'][c] = 0
+            cls.count = {}      # zero out the counts
 
 
 class VideoViewTraces(TimestampMixin, models.Model):
