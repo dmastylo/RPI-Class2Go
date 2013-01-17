@@ -440,6 +440,8 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -637,6 +639,8 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -957,6 +961,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 ready_videoToEx.image.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         prod_instance = self.image
         if self.exercises_changed() == True:
             return False
@@ -1422,6 +1428,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
 
     def is_synced(self):
+        if not self.image:
+            return False
         image = self.image
         if self.exercises_changed() == True:
             return False
@@ -2006,9 +2014,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         self.save()
     
     def is_synced(self):
-        
+        if not self.image:
+            return False        
         prod_instance = self.image
-        
         if self.section != prod_instance.section.image:
             return False
         if self.title != prod_instance.title:
