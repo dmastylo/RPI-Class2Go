@@ -37,7 +37,7 @@
 		    {% if common_page_data.course_mode = 'ready' %}
 		    <ul class="dropdown-menu">
 		      {% for section in common_page_data.content_sections %}
-		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
+                  <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
 		      {% endfor %}
 		      <li class="divider"></li>
 		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Show all</a></li>
