@@ -1,12 +1,10 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+
 {% block course_page_title %}
-{% if edit_mode %}
-    Edit
-{% else %}
-    Creation
-{% endif %} 
-Form{% endblock course_page_title %}
+{% if edit_mode %} Edit {% else %} Creation {% endif %} Form
+{% endblock course_page_title %}
+
 {% block mode_switcher %}{% endblock mode_switcher %}
 
 {% block addl_head_scripts %}
@@ -114,11 +112,19 @@ Form{% endblock course_page_title %}
             <label for="id_section" class="control-label">Section:</label>
             <select id="id_section">
                 {% for section in sections %}
-                <option value="{{section.id}}">{{section.title}}</option>
+                    {% if exam_section.id == section.id %}
+                        <option value="{{section.id}}" selected>{{section.title}}</option>
+                    {% else %}
+                        <option value="{{section.id}}">{{section.title}}</option>
+                    {% endif %}
                 {% endfor %}
             </select>
+
             <label for="parent_id" class="control-label">Parent:</label>
-            <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
+            <select name="parent" id="parent_id">
+                <!-- filled in by prefill_children() -->
+            </select>
+
             <label for"invideo_toggle" class="control-label">In-Video?</label>
             <input name="invideo" id="invideo_id" type="checkbox" />
 
@@ -176,33 +182,6 @@ Form{% endblock course_page_title %}
         
     </div>
     
-<!--  Non-tabbed version
-    <div class="control-group">
-        <div class="row-fluid">
-            <div class="span6">
-                <h4>Edit Exam HTML below:</h4>
-                <textarea id="ace_proxy" style="display:none"></textarea>
-                <div id="container">
-                    <div id="editor"></div>
-                </div>
-                <br />
-                <h4>Edit Exam MetaData below:</h4>
-                <textarea id="ace_metadata_proxy" style="display:none"></textarea>
-                <div id="container">
-                    <div id="metadata_editor"></div>
-                </div>
-                
-            </div>
-            <div class="span6">
-                <div id="preview-pane">
-                    <h4>Preview Exam HTML</h4>
-                    <div id="staging-area"></div>
-                </div>
-            </div>
-        </div>
-
-    </div>  --> <!-- end of "control-group" -->
-
     <div class="control-group">
         <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
 
@@ -586,21 +565,26 @@ age: 20,
       });
     </script>
 <script type="text/javascript">
-    $('#id_section').change(function() { prefill_children($('#parent_id')[0]) });
-    $('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
-    function prefill_children(element) {
+    $('#id_section').change(function() { prefill_children() });
+    $('#id_section').ready(function() { prefill_children() });
+    function prefill_children() {
         var id = $('#id_section').val(); //.val() more cross browser than .value
         var pelement = $('#parent_id');
         pelement.html('<option value="none,none">(this is a top level item)</option>');
-        return jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
-                       for (var i=0; i < data.length; i++) {
-                       // For the moment we filter out objects of other types, per the spec.
-                       // FIXME: in the future we should have information about what can be children of what in
-                       //        just one place, not everywhere it's implemented. Cf. add_section_page.html
-                           if ((data[i][0] === 'video') || (data[i][0] === 'exam')) {
-                               pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
-                           }
-                       }
+        jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+            for (var i=0; i < data.length; i++) {
+                // For the moment we filter out objects of other types, per the spec.
+                if ((data[i][0] === 'video') || (data[i][0] === 'exam')) {
+                    /* Let's not offer to set the parent to be oneself */
+                    if (data[i][2] != "{{exam_title}}") {
+                        pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                    }
+                }
+            }
+            {% if parent_val %}
+                var parent_val = '{{parent_val|escapejs}}';
+                $('select#parent_id').val(parent_val);
+            {% endif %}
         });
     }
     </script>
