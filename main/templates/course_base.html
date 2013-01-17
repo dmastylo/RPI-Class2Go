@@ -81,8 +81,16 @@
                     <a href="{% url 'auth_logout' %}">Logout</a>
                 </li>
                 {% else %}
-                    <li class="visible-phone"><a id="login_button" data-toggle="modal" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Login</a></li>
-                    <li class="visible-phone"><a href="{% url 'registration_register' %}">Register</a></li>
+                    <li class="visible-phone">
+                        {% with login_course=common_page_data.course login_link_id="phone_login" login_link_class="" link_text="Login" %}
+                        {% include "registration/login_link.html" %}
+                        {% endwith %}
+                    </li>
+                    {% if not common_page_data.course.institution_only %}
+                    <li class="visible-phone">
+                        <a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Register</a>
+                    </li>
+                    {% endif %}
                 {% endif %}
                 {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                     {% if common_page_data.course_mode == 'draft' %}

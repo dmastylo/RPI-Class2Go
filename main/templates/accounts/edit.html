@@ -17,7 +17,11 @@
             <input type="submit" value="Save Changes" class="btn" />
         </form>
     {% else %}
-        <h4> Please <a data-toggle="modal" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">log in</a> to see profile information </h4>
+    <h3> Please login to see profile information: </h3>
+    <p>
+    <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Stanford WebAuth</a>
+    <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Class2Go Login (Public course students)</a>
+    </p>
     {% endif %}
 </div>
 {% endblock m_column_content %}
