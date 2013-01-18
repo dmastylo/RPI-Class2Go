@@ -9,6 +9,7 @@ from courses.actions import auth_is_course_admin_view_wrapper
 from courses.reports.tasks import generate_and_email_reports
 from storages.backends.s3boto import S3BotoStorage
 from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
+from courses.reports.generation.gen_in_line_reports import *
 
 secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
 re_prog = re.compile(r'([\d]{4})_([\d]{2})_([\d]{2})__([\d]{2})_([\d]{2})_([\d]{2})')
@@ -180,3 +181,50 @@ def get_report_date(rep_name):
     
 def get_slug_from_report_name(rep_name):
     return rep_name[21:-4]
+
+
+@auth_is_course_admin_view_wrapper    
+def generate_in_line_report(request, course_prefix, course_suffix):
+    
+    if request.POST.get("report_name", False): 
+        report_name = request.POST["report_name"]
+    else:
+        report_name = ""
+    
+    course = request.common_page_data['ready_course']
+    
+    report_label = None
+    report_data = {}
+    headings = {}
+    column1 = {}
+    column2 = {}
+    column3 = {}
+    column4 = {}
+    column5 = {}
+    column6 = {}
+    
+    we_have_data = False
+    if report_name == 'interactive_quizzes_summary':
+        report_data = gen_spec_in_line_report(report_name, course)
+        if report_data:
+            report_label = "Interactive Quizzes Summary"
+            headings = report_data['headings']
+            column1 = report_data['exam_titles']
+            column2 = report_data['count_lt_34']
+            column3 = report_data['count_gt_34']
+            column4 = report_data['count_gt_67']
+            we_have_data = True
+
+    return render_to_response('reports/in_line.html', {
+        'common_page_data':request.common_page_data,
+        'we_have_data':we_have_data,
+        'report_label':report_label,
+        'headings':headings,
+        'column1':column1,
+        'column2':column2,
+        'column3':column3,
+        'column4':column4,
+        'column5':column5,
+        'column6':column6,
+    }, context_instance=RequestContext(request))
+    

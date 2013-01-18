@@ -1,0 +1,70 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block title %}Reports | {{ common_page_data.course.title }}{% endblock title %}
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column">
+    <h3 class="section-headline">In-line Course Reports</h3>
+    <div class="container">  
+    <div class="row">  
+
+      <form action="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+         <label for="report" style='display: inline;'>Report</label>
+         <select name="report_name" style="margin-left: 10px;" style="margin-left: 10px;">             
+             <option value="interactive_quizzes_summary">interactive quizzes summary</option>
+         </select>
+         <input type="submit" class='btn' value="Generate report" style="margin-left: 10px;" />
+         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+         <input type="hidden" name="type" value="assessment_full" />
+         {% csrf_token %}
+      </form>
+
+      {% if we_have_data %}
+          {{ report_label }}
+          <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+          <tr>
+          {% for heading in headings %}
+              <td>{{heading}}</td>
+          {% endfor %}
+          </tr>
+          {% for title in column1 %}
+                  <tr>
+                  <td>{{title.title}}</td>
+                  {% for key, val in column2.items %}
+                      {% ifequal key title.title %}
+                          <td>{{val}}</td>
+                      {% endifequal %}
+                  {% endfor %}
+                  {% for key, val in column3.items %}
+                      {% ifequal key title.title %}
+                          <td>{{val}}</td>
+                      {% endifequal %}
+                  {% endfor %}                  
+                  {% for key, val in column4.items %}
+                      {% ifequal key title.title %}
+                          <td>{{val}}</td>
+                      {% endifequal %}
+                  {% endfor %}
+                  {% for key, val in column5.items %}
+                      {% ifequal key title.title %}
+                          <td>{{val}}</td>
+                      {% endifequal %}
+                  {% endfor %}                  
+                  {% for key, val in column6.items %}
+                      {% ifequal key title.title %}
+                          <td>{{val}}</td>
+                      {% endifequal %}
+                  {% endfor %}        
+                  </tr>
+          {% endfor %}
+          </table>        
+          
+      {% endif %}
+
+
+    </div>
+    </div>
+</div>
+
+
+{% endblock m_column_content %}
