@@ -7,4 +7,4 @@ coverage-report
 .noseids
 chromedriver.log*
 selenium-server.log*
-
+db-dumps
