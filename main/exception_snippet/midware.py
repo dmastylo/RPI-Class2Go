@@ -1,6 +1,8 @@
 import socket, sys, traceback, datetime, re
 from django.core.mail import send_mail
+from django import http
 from django.shortcuts import Http404, render
+from django.template import Context, RequestContext, loader
 import settings
 mailto_list = getattr(settings, 'ERROR_SNIPPET_EMAILS', [])
 from_addr = getattr(settings, 'DEFAULT_FROM_EMAIL', "admin@localhost")
@@ -26,6 +28,7 @@ class error_ping(object):
         u = request.user
         if u.is_authenticated() and \
         (u.userprofile.is_instructor_list() or u.userprofile.is_tas_list()):
-            return render(request, "500_staff.html")
+            t = loader.get_template("500_staff.html") #cribbed from django-core/views/defaults.py
+            return http.HttpResponseServerError(t.render(Context({})))
 
         return None
