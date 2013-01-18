@@ -287,6 +287,8 @@ class ContentSectionManager(models.Manager):
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
+    subtitle = models.CharField(max_length=255, null=True, blank=True)
+    slug = models.SlugField(max_length=255, null=True, blank=True)
     objects = ContentSectionManager()
 
     def create_ready_instance(self):
@@ -294,6 +296,8 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             course=self.course.image,
             title=self.title,
             index=self.index,
+            subtitle=self.subtitle,
+            slug=self.slug,
             mode='ready',
             image=self,
         )
@@ -309,6 +313,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             ready_instance.title = self.title
         if not clone_fields or 'index' in clone_fields:
             ready_instance.index = self.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            ready_instance.subtitle = self.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            ready_instance.slug = self.slug
 
         ready_instance.save()
 
@@ -320,6 +328,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.title = ready_instance.title
         if not clone_fields or 'index' in clone_fields:
             self.index = ready_instance.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            self.subtitle = ready_instance.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = ready_instance.slug
 
         self.save()
 
@@ -440,6 +452,8 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -637,6 +651,8 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -957,6 +973,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 ready_videoToEx.image.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         prod_instance = self.image
         if self.exercises_changed() == True:
             return False
@@ -1160,12 +1178,8 @@ class CacheStat():
         # stat interval expired: print stats and zero out counter
         if datetime.now() - cls.lastReportTime > cls.reportingInterval:
             for c in cls.count:
-                hit = 0
-                if 'hit' in cls.count[c]:
-                    hit = cls.count[c]['hit']
-                miss = 0
-                if 'miss' in cls.count[c]:
-                    miss = cls.count[c]['miss']
+                hit = cls.count[c].get('hit', 0)
+                miss = cls.count[c].get('miss', 0)
                 if hit + miss == 0:
                     logger.info("cache stats for %s: hits %d, misses %d" % (c, hit, miss))
                 else:
@@ -1427,6 +1441,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
 
     def is_synced(self):
+        if not self.image:
+            return False
         image = self.image
         if self.exercises_changed() == True:
             return False
@@ -2011,9 +2027,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         self.save()
     
     def is_synced(self):
-        
+        if not self.image:
+            return False        
         prod_instance = self.image
-        
         if self.section != prod_instance.section.image:
             return False
         if self.title != prod_instance.title:

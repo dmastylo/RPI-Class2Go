@@ -23,6 +23,17 @@ padding-left:7px;
 margin-right:50px;
 }
 
+.leftnav-subtitle {
+    display:block;
+    font-size:12px;
+    color:#999999;
+    margin-top:-5px;
+}
+
+.leftnav-title {
+    display:block;
+}
+
 
 a {color:#820000;}
 a:hover {color:#820000;}
@@ -487,6 +498,7 @@ small.date {
     padding-right:20px;
     display:block;
     margin-right:15px;
+    padding-bottom:0px;
 }
 
 /* Thumbnails

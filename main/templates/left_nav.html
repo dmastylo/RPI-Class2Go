@@ -5,8 +5,12 @@
         {% for content_section in contentsection_list %}
             {% with contentsection_id=content_section.id %}
                 <div class="accordion-group">
-                      <h3 id="sidebar-nav-heading-{{ contentsection_id }}" class="nav-header collapsed" data-toggle="collapse" data-target="#sidebar-nav-{{ contentsection_id }}" data-parent="#left-nav">{{content_section.title}}</h3>
+                    <h3 id="sidebar-nav-heading-{{ contentsection_id }}" class="nav-header" data-toggle="collapse" data-target="#sidebar-nav-{{ contentsection_id }}" data-parent="#left-nav"><span class="leftnav-title">{{content_section.title}}</span>
+                        </h3>
                             <ul class="nav nav-list collapse" id="sidebar-nav-{{ contentsection_id }}">
+                            {% if content_section.subtitle %}
+                                <li><span class="leftnav-subtitle">{{ content_section.subtitle }}</span></li>
+                            {% endif %}
                             {% for item in full_index_list|byKey:contentsection_id %}
                                 {% with item_type=item.type item_title=item.ref.title ref=item.ref %}
                                     {% if item_type == 'video' %} 
@@ -37,3 +41,4 @@
             <li><a href="/accounts/profile">My profile</a></li>
         </ul>
     </div>
+
