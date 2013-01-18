@@ -117,7 +117,7 @@ var c2gXMLParse = (function() {
                           //select if that's the case
                            if ($(this).text() && $(sectionDOM).attr('section') &&  $(this).text().trim() == $(sectionDOM).attr('section').trim()) {
                               setValIfDef($('select#id_section'), $(this).val());
-                              prefill_children($('#parent_id')[0]).success(prepop_children);
+                              prefill_children().success(prepop_children);
                            }
                        });
 

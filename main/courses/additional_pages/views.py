@@ -55,32 +55,18 @@ def main(request, course_prefix, course_suffix, slug):
     if common_page_data['is_course_admin'] and common_page_data['course_mode'] == 'draft':
         template = 'additional_pages/edit.html'
 
-        grouppable_page = page.image
-        parent_info = grouppable_page.contentgroup_set.all()
-        if parent_info:           # fill contentgroup_info for edit mode
-            parent_info = parent_info[0]    # not necessarily true, but gets us the group_id
-            group_id    = parent_info.group_id
-            parent_info = ContentGroup.objects.get(group_id=group_id, level=1) # this is the parent for real
-            parent_type = parent_info.get_content_type()
-            parent      = getattr(parent_info, parent_type)
-            parent_id   = parent.id
-            is_child    = False
-            if parent_info.additional_page != grouppable_page.id:
-                is_child  = True
-            child_list  = ContentGroup.objects.filter(group_id=group_id, level=2)
-            contentgroup_info = {
-                                 'contentgroup_parent':   parent_info,
-                                 'contentgroup_children': child_list,
-                                 'parent_type':           parent_type,
-                                 'parent_id':             parent_id,
-                                 'parent':                parent,
-                                 'is_child':              is_child,
-                                }
+        groupable_page = page
+        if page.mode != 'ready':
+            groupable_page = page.image
+        contentgroup_info = ContentGroup.groupinfo_by_id('additional_page', groupable_page.id)
+        # Oh, so it turns out you can't dereference variables starting with _
+        # from Django templates
+        contentgroup_info['PARENT'] = contentgroup_info['__parent']
+        contentgroup_info['PARENT_TAG'] = contentgroup_info['__parent_tag']
+
     else:
         template = 'additional_pages/view.html'
         
-    course = common_page_data['course']
-
     ready_section = page.section
     if ready_section and ready_section.mode == "draft":
         ready_section = ready_section.image
