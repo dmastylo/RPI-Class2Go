@@ -165,9 +165,9 @@ def get_full_contentsection_list(course, filter_children=True):
     desired_item = lambda t,i: True
     if filter_children:
         desired_item = filter_level2_contentgroup_entries
-        #use list() to make the query eager.  That makes it 1 SELECT
-        #instead of hundreds.
-        cg2_list = list(ContentGroup.objects.filter(course=course, level=2))
+        # There's some django magic about using QuerySet in this position that
+        # make 1 query instead of hundreds
+        cg2_list = ContentGroup.objects.filter(course=course, level=2)
         for cg2 in cg2_list:
             cg2_t = cg2.get_content_type()
             #Using a pattern where we access the foreignkey ids directly from the
