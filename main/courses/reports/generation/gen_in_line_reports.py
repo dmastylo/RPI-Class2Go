@@ -1,5 +1,5 @@
 from c2g.models import Exam, ExamRecord
-from django.db.models import Count, F
+from django.db.models import Count
 from datetime import datetime
 
 def gen_spec_in_line_report(report_name, course):
