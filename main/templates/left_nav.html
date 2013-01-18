@@ -14,7 +14,7 @@
                                     {% elif item_type == 'additional_page' %}
                                          <li id="leftnav-li-page-{{ref.slug}}"><a href="{% url 'courses.additional_pages.views.main' PREFIX SUFFIX ref.slug %}" title="Page"><em class="icon-book"></em> <span>{{item_title}}</span></a></li>
                                     {% elif item_type == 'exam' %}
-                                             {% if item.ref.has_child_exams %}
+                                             {% if item.is_parent %}
                                                 <li id="leftnav-li-exam-{{ref.slug}}"><a href="{% url ref.list_view PREFIX SUFFIX %}#hashtag_{{ref.slug}}" title="Exam"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
                                              {% else %}
                                                 <li id="leftnav-li-exam-{{ref.slug}}"><a href="{% url ref.show_view PREFIX SUFFIX ref.slug %}" title="Exam"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
