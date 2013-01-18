@@ -70,3 +70,16 @@ package "lynx-cur" do
     action :install
 end
 
+# perms on /mnt can change on startup
+cookbook_file "/etc/init/update-mnt-perms.conf" do
+    owner "root"
+    group "root"
+    mode 00644
+    action :create
+end
+
+execute "start update-mnt-perms" do
+    user "root"
+    action :run
+end
+
