@@ -41,6 +41,7 @@ def rename(request):
         
     section = ContentSection.objects.get(id=request.POST.get("section_id"))
     section.title = request.POST.get("title")
+    section.subtitle = request.POST.get("subtitle")
     section.save()
     section.commit()
     

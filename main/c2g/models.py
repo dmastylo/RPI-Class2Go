@@ -287,6 +287,8 @@ class ContentSectionManager(models.Manager):
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
+    subtitle = models.CharField(max_length=255, null=True, blank=True)
+    slug = models.SlugField(max_length=255, null=True, blank=True)
     objects = ContentSectionManager()
 
     def create_ready_instance(self):
@@ -294,6 +296,8 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             course=self.course.image,
             title=self.title,
             index=self.index,
+            subtitle=self.subtitle,
+            slug=self.slug,
             mode='ready',
             image=self,
         )
@@ -309,6 +313,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             ready_instance.title = self.title
         if not clone_fields or 'index' in clone_fields:
             ready_instance.index = self.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            ready_instance.subtitle = self.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            ready_instance.slug = self.slug
 
         ready_instance.save()
 
@@ -320,6 +328,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.title = ready_instance.title
         if not clone_fields or 'index' in clone_fields:
             self.index = ready_instance.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            self.subtitle = ready_instance.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = ready_instance.slug
 
         self.save()
 

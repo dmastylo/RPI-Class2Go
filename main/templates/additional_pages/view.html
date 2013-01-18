@@ -47,7 +47,9 @@
     $(document).ready(function(){
                         $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
                             function() {
-                                $("#sidebar-nav-{{ ready_section.id }}").removeClass("collapse");
+                                c2g.installLeftNavChevron();
+                                $("#sidebar-nav-heading-{{ ready_section.id }}").removeClass("collapsed").addClass("expanded");
+                                $("#sidebar-nav-{{ ready_section.id }}").addClass("in collapse");
                                 $("#leftnav-li-page-{{ page.slug}}").addClass("current");
                         });
                       });

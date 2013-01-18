@@ -1,6 +1,9 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block course_page_title %}{{exam.title}}{% endblock course_page_title %}
+
+{% block title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %} | Stanford Online{% endblock %}
+
+{% block course_page_title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %}{% endblock course_page_title %}
 
 {% block exam_link_class %}
 {% if "exam" in exam.exam_type and not videotest %}class="active"{% endif %}
@@ -212,14 +215,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
                 function() {
-                    $("#sidebar-nav-{{ ready_section.id }}").removeClass("collapse");
+                    c2g.installLeftNavChevron();
+                    $("#sidebar-nav-heading-{{ ready_section.id }}").removeClass("collapsed").addClass("expanded");
+                    $("#sidebar-nav-{{ ready_section.id }}").addClass("in");
                     $("#leftnav-li-video-{{ video.slug}}").addClass("current");
                 }
         );
+                      
         {% else %}
+                      
         $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
                  function() {
-                    $("#sidebar-nav-{{ ready_section.id }}").removeClass("collapse");
+                    c2g.installLeftNavChevron();
+                    $("#sidebar-nav-heading-{{ ready_section.id }}").removeClass("collapsed").addClass("expanded");
+                    $("#sidebar-nav-{{ ready_section.id }}").addClass("in");
                     $("#leftnav-li-exam-{{ slug_for_leftnav }}").addClass("current");
                 }
         );
