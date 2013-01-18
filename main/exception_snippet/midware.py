@@ -1,6 +1,6 @@
 import socket, sys, traceback, datetime, re
 from django.core.mail import send_mail
-from django.shortcuts import Http404
+from django.shortcuts import Http404, render
 import settings
 mailto_list = getattr(settings, 'ERROR_SNIPPET_EMAILS', [])
 from_addr = getattr(settings, 'DEFAULT_FROM_EMAIL', "admin@localhost")
@@ -22,4 +22,10 @@ class error_ping(object):
         email_msg = "User: %s\nTime: %s\nUser-agent: %s\nFile path %s:%d\nLine text: %s\n" % (username, datestring, user_agent, path, lineno,  text)
         send_mail(email_subj, email_msg, from_addr, mailto_list)
         del tb
+    
+        u = request.user
+        if u.is_authenticated() and \
+        (u.userprofile.is_instructor_list() or u.userprofile.is_tas_list()):
+            return render(request, "500_staff.html")
+
         return None
