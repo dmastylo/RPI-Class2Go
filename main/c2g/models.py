@@ -1166,12 +1166,8 @@ class CacheStat():
         # stat interval expired: print stats and zero out counter
         if datetime.now() - cls.lastReportTime > cls.reportingInterval:
             for c in cls.count:
-                hit = 0
-                if 'hit' in cls.count[c]:
-                    hit = cls.count[c]['hit']
-                miss = 0
-                if 'miss' in cls.count[c]:
-                    miss = cls.count[c]['miss']
+                hit = cls.count[c].get('hit', 0)
+                miss = cls.count[c].get('miss', 0)
                 if hit + miss == 0:
                     logger.info("cache stats for %s: hits %d, misses %d" % (c, hit, miss))
                 else:
