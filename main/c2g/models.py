@@ -2555,8 +2555,11 @@ class ContentGroup(models.Model):
 
     def get_content_id(self):
         """Return the id of the object to which this ContentGroup entry refers"""
-        tag = self.get_content_type()
-        return getattr(self, tag+'_id')
+        for keyword in ContentGroup.groupable_types.keys():
+            tmp = getattr(self, keyword+'_id', False)
+            if tmp:
+                return tmp
+        return None
 
     def get_content_type(self):
         """This is linear in the number of content types supported for grouping
@@ -2567,7 +2570,7 @@ class ContentGroup(models.Model):
               Compromise is to use django cache table
         """
         for keyword in ContentGroup.groupable_types.keys():
-            if getattr(self, keyword, False):
+            if getattr(self, keyword+'_id', False):
                 return keyword
         return None
     
