@@ -1,5 +1,8 @@
 <!-- section -->
 <h3 class="course-section-heading">{{section_structure.section.title}}</h3>
+{% if section_structure.section.subtitle %}
+<h4 class="course-section-sub-heading">{{section_structure.section.subtitle}}</h4>
+{% endif %}
 <div class="course-section">
 <ul class="unstyled course-list">
 {% for item in section_structure.items %}
