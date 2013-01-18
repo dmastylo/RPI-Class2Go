@@ -782,9 +782,19 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported}
 
+    groupable_exam = exam
+    if exam.mode != 'ready':
+        groupable_exam = exam.image
+    cg_info = ContentGroup.groupinfo_by_id('exam', groupable_exam.id)
+    parent = cg_info.get('__parent', None)
+    parent_val = "none,none"
+    if parent:
+        parent_val = "%s,%d" % (cg_info['__parent_tag'], parent.image.id)
+
     return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'returnURL':returnURL,
-                                                         'course':course, 'sections':sections,
-                                                         'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug },
+                                                         'course':course, 'sections':sections, 'parent_val': parent_val,
+                                                         'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug,
+                                                         'exam_section':exam.section, 'exam_title':exam.title, },
                                                         RequestContext(request))
 
 
