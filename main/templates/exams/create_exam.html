@@ -409,6 +409,11 @@ age: 20,
 <script src="{{STATIC_URL}}js/core/beautify-html.js"></script>
 
 <script>
+	$('#due_date').focusout(function() {
+			var due = $('#due_date').val(); 
+			$('#grace_period').val(due); 
+			$('#hard_deadline').val(due); 				
+	})
     $('#myTab a').click(function (e) {
                         e.preventDefault();
                         $(this).tab('show');
