@@ -2,6 +2,7 @@ import re, collections
 import urllib,urllib2
 import json
 import logging
+from datetime import datetime
 
 from django.conf import settings
 from django.utils import encoding
@@ -341,14 +342,18 @@ class AutoGrader():
 
             def external_grader_request(grader_url, post_params):
                 """Hit external grader endpoint.  TODO: add retry logic, here or in frontend (#1730)."""
-                grader_timeout = 5    # seconds
+                grader_timeout = 45    # seconds
                 try:
                     post_data = urllib.urlencode(post_params)
+                    time_before = datetime.now()
                     grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
+                    time_after = datetime.now()
+                    duration = time_after - time_before  # timedelta
+                    logger.info("interactive grader returned in %s " % str(duration))
                 except urllib2.HTTPError as e:
-                    raise AutoGraderGradingException("Interactive grader HTTP error (%d)" % e.code)
+                    raise AutoGraderGradingException("Interactive grader HTTP error: %s" % str(e))
                 except urllib2.URLError as e:
-                    raise AutoGraderGradingException("Interactive grader connection error (%d)" % e.args)
+                    raise AutoGraderGradingException("Interactive grader connection error: %s" % str(e))
 
                 try:
                     graded_result = grader_conn.read()
