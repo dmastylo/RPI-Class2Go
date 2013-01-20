@@ -1871,7 +1871,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
            the regexp are rough, but should not have any false negatives.  (at
            worst we load mathjax when we don't need it.
         """
-        if re.search(r"\$\$.*\$\$", self.html_content) or re.search(r"\\\[.*\\\]", self.html_content):
+        if re.search(r"\$\$.*\$\$", self.html_content, re.DOTALL) or re.search(r"\\\[.*\\\]", self.html_content, re.DOTALL):
             return True
         return False
         
