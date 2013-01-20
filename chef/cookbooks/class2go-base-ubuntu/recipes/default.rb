@@ -7,13 +7,26 @@ execute "start hostname" do
     action :run
 end
 
+# Set up terminal for ubuntu user
+cookbook_file "/home/ubuntu/.bashrc" do
+    source "dot-bashrc"
+    owner "ubuntu"
+    group "ubuntu"
+    mode 00644
+end
+
 template "/home/ubuntu/.bash_aliases" do
     source "bash_aliases.erb"
     owner "ubuntu"
     group "ubuntu"
-    mode "0644"
+    mode 00644
 end
 
+package "mosh" do
+    action :install
+end
+
+# git!
 package "git" do
     action :install
 end
@@ -69,4 +82,26 @@ end
 package "lynx-cur" do
     action :install
 end
+
+# perms on /mnt can change on startup
+cookbook_file "/etc/init.d/update-mnt-perms" do
+    owner "root"
+    group "root"
+    mode 00755
+    action :create
+end
+
+link "/etc/rc2.d/S80update-mnt-perms" do
+    to "../init.d/update-mnt-perms"
+    owner "root"
+    link_type :symbolic
+    group "root"
+    action :create
+end
+
+execute "/etc/init.d/update-mnt-perms" do
+    user "root"
+    action :run
+end
+
 
