@@ -17,7 +17,7 @@ class Migration(SchemaMigration):
             ('email', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('biography', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('photo', self.gf('django.db.models.fields.files.FileField')(max_length=100, blank=True)),
-            ('photo_handle', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, db_index=True)),
+            ('handle', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, db_index=True)),
         ))
         db.send_create_signal('c2g', ['Instructor'])
 
@@ -56,10 +56,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True),
                       keep_default=False)
 
-        # Adding field 'Course.logo_handle'
-        db.add_column(u'c2g_courses', 'logo_handle',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, db_index=True),
-                      keep_default=False)
 
 
     def backwards(self, orm):
@@ -83,9 +79,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Course.logo'
         db.delete_column(u'c2g_courses', 'logo')
-
-        # Deleting field 'Course.logo_handle'
-        db.delete_column(u'c2g_courses', 'logo_handle')
 
 
     models = {
@@ -300,7 +293,7 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'photo': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'blank': 'True'}),
-            'photo_handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
+            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.listemail': {

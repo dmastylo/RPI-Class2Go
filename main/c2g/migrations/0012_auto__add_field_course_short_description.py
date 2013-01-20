@@ -113,7 +113,6 @@ class Migration(SchemaMigration):
             'list_publicly': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'logo': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True'}),
-            'logo_handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'outcomes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'piazza_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -232,7 +231,7 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'photo': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'blank': 'True'}),
-            'photo_handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
+            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.listemail': {
