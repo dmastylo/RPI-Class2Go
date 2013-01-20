@@ -135,7 +135,7 @@ def save_video_progress(request):
     playTime = request.POST['playTime']
     videoRec = VideoActivity.objects.get(id=videoRecId)
     if not videoRec.video.duration:
-        duration = request.POST['duration']
+        duration = request.POST.get('duration')
         video = Video.objects.get(id=videoRec.video_id)
         if duration: #this is going to be some string that looks like a float
             video.duration = int(float(duration)) #type conversion first to float then to int
@@ -257,9 +257,10 @@ def upload(request):
             # are easily associated with the video by putting them all in the same directory.
             new_video.file = None
             new_video.save()
+            new_video.create_ready_instance()
             new_video.file = form.cleaned_data['file']
             new_video.save()
-            new_video.create_ready_instance()
+            new_video.commit()
             #print new_video.file.url
 
             

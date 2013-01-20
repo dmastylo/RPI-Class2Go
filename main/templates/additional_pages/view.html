@@ -4,12 +4,33 @@
 
 
 {% block course_info_link_class %}{% if page.menu_slug %} active{% endif %}{% endblock course_info_link_class %}
-{% block course_materials_link_class %}{% if not page.menu_slug %}class="active"{% endif %}{% endblock course_materials_link_class %}
+{% block course_materials_link_class %}{% if not page.menu_slug %} active{% endif %}{% endblock course_materials_link_class %}
 
 {% block course_page_title %} {{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
+{% block addl_head_scripts %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+                       tex2jax: {inlineMath: [['$$','$$']],
+                       displayMath: [['\\[','\\]']]}
+                       });
+    </script>
+{% if request.is_secure %}
+<script type="text/javascript"
+    src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+{% else %}
+<script type="text/javascript"
+    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+
+{% endif %}
+{% endblock addl_head_scripts %}
+
 {% block l_column_content %}
-    {% include "left_nav.html" %}
+<div id="c2g_layout_l_column" class="span3">
+    <!--Skeleton Div to be filled in by leftnav ajax -->
+</div>
 {% endblock l_column_content %}
 
 {% block m_column_content %}
@@ -76,3 +97,17 @@
     {% endifequal %}
 </div>
 {% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script>
+    $(document).ready(function(){
+                        $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
+                            function() {
+                                c2g.installLeftNavChevron();
+                                $("#sidebar-nav-heading-{{ ready_section.id }}").removeClass("collapsed").addClass("expanded");
+                                $("#sidebar-nav-{{ ready_section.id }}").addClass("in collapse");
+                                $("#leftnav-li-page-{{ page.slug}}").addClass("current");
+                        });
+                      });
+</script>
+{% endblock %}

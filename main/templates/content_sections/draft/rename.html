@@ -12,6 +12,10 @@
             <div class="controls">
                 <input name="title" class="span12" type="text" value="{{section.title}}" />
             </div>
+            <label>Sub-title:</label>
+            <div class="controls">
+                <input name="subtitle" class="span12" type="text" value="{{section.subtitle|default_if_none:''}}" />
+            </div>
         </div>
         {% csrf_token %}
         <input type="hidden" name="section_id" value="{{section.id}}" />

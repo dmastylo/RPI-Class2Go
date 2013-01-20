@@ -46,6 +46,9 @@ urlpatterns = patterns('',
     url(r'^contactus$', 'c2g.views.contactus'),
     url(r'^faq$', 'c2g.views.faq'),
     url(r'^test_xml$', 'courses.exams.views.show_test_xml'),
+    url(r'^hiring/?$', 'courses.landing.views.hiring'),
+
+    url(r'^maint$', 'c2g.views.maintenance'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
 
@@ -60,6 +63,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/all_submissions_to_grade/?$', 'courses.exams.views.view_submissions_to_grade'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/post_csv_grades/?$', 'courses.exams.views.post_csv_grades'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/get_csv_grades/?$', 'courses.exams.views.view_csv_grades'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/save_student_progress/?$', 'courses.exams.views.student_save_progress'),
 
     #The rest of these URLs end up in the location bar of student users.  We should alias them for each exam subtype so that students do not get
     #confused.  Would love to make this DRY, because it's very repetitive, but I don't know how.
@@ -158,7 +162,13 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/materials/?$',
         'courses.views.course_materials',
         name='course_materials'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/materials/(?P<section_id>[0-9]+)/?$',
+        'courses.views.course_materials',
+        name='course_materials_by_section'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/admin/?', 'courses.admin_views.admin'),
+                       
+                       
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/leftnav/?$', 'courses.views.leftnav'),
 
     url(r'^switch_mode', 'courses.actions.switch_mode'),
     url(r'^add_section', 'courses.actions.add_section'),
@@ -263,8 +273,7 @@ urlpatterns = patterns('',
     #Content Sharing
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/?$', 'courses.content_sections.views.copy_content_form'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/send/?$', 'courses.content_sections.views.copy_content'),
-                      
-
+                                             
     # Landing Page
     url(r'^/?$', 'courses.landing.views.landing'),
 
@@ -280,6 +289,9 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/browse_reports/?$', 'courses.reports.views.main'),
     url(r'^generate_report$', 'courses.reports.views.generate_report'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/reports/(?P<report_subfolder>[a-zA-Z0-9_-]+)/(?P<report_name>.+)$', 'courses.reports.views.download_report'),
+    
+    #In-line Reports
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/generate_in_line_report/?$', 'courses.reports.views.generate_in_line_report'),
     
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),

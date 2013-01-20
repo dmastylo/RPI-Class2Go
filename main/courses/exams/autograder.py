@@ -2,8 +2,13 @@ import re, collections
 import urllib,urllib2
 import json
 import logging
+from datetime import datetime
+
 from django.conf import settings
+from django.utils import encoding
+
 from xml.dom.minidom import parseString
+
 
 logger = logging.getLogger(__name__)
 
@@ -310,6 +315,7 @@ class AutoGrader():
                 raise AutoGraderMetadataException("Error in response node \"%s\": A <%s> element is required" 
                         % (response_node_id, req))
 
+        self.points_possible += 1.0 ## DB exercises are worth 1 point, hardcoded
         self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params)
 
     def _INTERACTIVE_grader_factory(self, post_params):
@@ -336,14 +342,18 @@ class AutoGrader():
 
             def external_grader_request(grader_url, post_params):
                 """Hit external grader endpoint.  TODO: add retry logic, here or in frontend (#1730)."""
-                grader_timeout = 5    # seconds
+                grader_timeout = 45    # seconds
                 try:
                     post_data = urllib.urlencode(post_params)
+                    time_before = datetime.now()
                     grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
+                    time_after = datetime.now()
+                    duration = time_after - time_before  # timedelta
+                    logger.info("interactive grader returned in %s " % str(duration))
                 except urllib2.HTTPError as e:
-                    raise AutoGraderGradingException("Interactive grader HTTP error (%d)" % e.code)
+                    raise AutoGraderGradingException("Interactive grader HTTP error: %s" % str(e))
                 except urllib2.URLError as e:
-                    raise AutoGraderGradingException("Interactive grader connection error (%d)" % e.args)
+                    raise AutoGraderGradingException("Interactive grader connection error: %s" % str(e))
 
                 try:
                     graded_result = grader_conn.read()
@@ -363,10 +373,13 @@ class AutoGrader():
             response['score'] = 0
             response['feedback'] = ""
 
+            # external grader can't handle unicode (see #1904) so just flatten to ascii
+            ascii_submission = encoding.smart_str(submission, encoding='ascii', errors='ignore')
+            post_params['student_input'] = ascii_submission
+
             # call remote grader
-            grader_url = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
-            post_params['student_input'] = submission
             logger.debug("External grader call: %s" % str(post_params))
+            grader_url = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
             graded_result = external_grader_request(grader_url, post_params)
             try:
                 graded = json.loads(graded_result)

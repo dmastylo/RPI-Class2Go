@@ -31,7 +31,7 @@ class C2GReportWriter:
         try:
             self.csv_writer.writerow(padded_content)
         except UnicodeEncodeError:
-            logger.info("Failed to write row for file {0} due to unicode encode error.".format(s3_filepath))
+            logger.info("Failed to write row for file {0} due to unicode encode error.".format(self.s3_filepath))
             
         for i in range(nl): self.csv_writer.writerow([""])
         

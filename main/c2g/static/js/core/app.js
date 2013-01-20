@@ -1,13 +1,18 @@
 (function(document, undefined) {
 
-  $('.nav-list.collapse').on("hidden shown", function(e){
-    $(this).prev().toggleClass("expanded", (e.type === "shown"))
-  });
 
     var $document = $(document);
 
     window.c2g = window.c2g || {};
 
+ 
+    c2g.installLeftNavChevron = function () {
+         $('.nav-list.collapse').on("hidden shown", function(e){
+                                $(this).prev().toggleClass("expanded", (e.type === "shown"))
+                                });
+
+    };
+ 
     c2g.createModal = function(options) {
       var opts = options || {}, // confirmText, hideCancel, body, title
         $modal,

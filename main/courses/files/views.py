@@ -38,7 +38,7 @@ def edit(request, course_prefix, course_suffix, file_id):
     if not parent:
         parent_val = "none,none"
     else:
-        parent_val = "%s,%d" % (cg_info['__parent_tag'], parent.id)
+        parent_val = "%s,%d" % (cg_info['__parent_tag'], parent.image.id)
     return render(request, 'files/upload.html',
             {'file':file,
              'parent_val':parent_val,

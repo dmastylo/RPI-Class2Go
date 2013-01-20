@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Work on Class2Go{% endblock title %}
+{% load url from future %}
+
+{% block bodytag %}
+<body class="home" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+{% endblock bodytag %}
+
+{% block m_column_content %}
+
+<style>
+    li                { margin-top:10px; }
+    p.applybutton     { margin-top:20px; margin-bottom:20px; text-align:center }
+    h1.title          { text-align:center; }
+</style>
+
+<div class="hero-unit">
+    <div class="container">
+        <div class="span9">
+            <h1>Join Our Dev Team</h1>
+
+            <h2>We Get Paid to Build Open Source Software</h2>
+
+            <p> We began building Class2Go this past summer and now now have hordes of
+                students taking Stanford classes for free.
+            </p>
+
+            <p> Our stack is modern and sane:
+                Python/Django and MySQL on the backend, Bootstrap, jQuery, Popcorn (and others) on the frontend.
+                We bring up machines quickly in AWS with Chef.
+            </p>
+
+            <p> All our source is on
+                <strong><a href="https://github.com/Stanford-Online/class2go">GitHub</a></strong>.
+                Our <strong><a href="https://github.com/Stanford-Online/class2go/issues">bug list</a></strong>
+                is there too.
+                It's fun to work in a small team that can move fast &mdash;
+                we ship weekly (at least!).
+                And the Stanford campus is a cool place to work.
+            </p>
+        </div>
+        <div class="span3">
+            <img src="{{ STATIC_URL }}graphics/core/c2g_sticker.png">
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="row">
+
+        <div class="span6 well jobdesc">
+            <h1 class="title">Front-End Engineer</h1>
+
+            <p class="applybutton"><a class="btn btn-large btn-primary" href="http://recruit.trovix.com/jobhostmaster/jobhost/ViewJobPostDetails.do?action=viewDetails&accountId=de85ad313f8598db1c42b567a3df24a00497ba22&jobId=50643&displayLogo=true&jobSource=Company+Website">Apply Now</a></p>
+
+            <p> Bring more client-side savvy to our site by developing in 80% Javascript and 20% Python.
+                Use modern toolkits (e.g. backbone, require, underscore...)
+                to make our site functional, beautiful, and engaging.
+            </p>
+
+
+            <ul>
+                <li> Three years experience working on a production website, commercial or open source.
+                    <strong>Point us to your code!</strong>
+                </li>
+
+                <li> <strong>JavaScript</strong>, at least three years hands-on experience.  Adept at using modern web frameworks to create rich interactive sites.  Experience with jQuery and bootstrap are required.
+                </li>
+
+                <li> Comfortable developing software with a distributed team.  You love git.
+                </li>
+
+                <li> As a full-stack engineer, you know how all things really work:
+                     protocols, Internet infrastructure, browser internals, etc.
+                </li>
+
+            </ul>
+
+        </div>
+
+        <div class="span6 well jobdesc">
+            <h1 class="title">DevOps and Release</h1>
+
+            <p class="applybutton"><a class="btn btn-large btn-primary" href="http://recruit.trovix.com/jobhostmaster/jobhost/ViewJobPostDetails.do?action=viewDetails&accountId=de85ad313f8598db1c42b567a3df24a00497ba22&jobId=50644&displayLogo=true&jobSource=Company+Website">Apply Now</a></p>
+
+            <p> This engineer should be passionate about reliable and scalable cloud systems.
+                Do you know the right way to build things, but never gotten the chance to do it right?
+            </p>
+
+            <p> They will also be the team's release engineer.
+                We need someone to set up code management and process for a codebase used by universities across the
+                world.
+            </p>
+
+            <p> We are looking for three skills:
+            </p>
+
+            <ol>
+                <li><strong>Operations</strong>: proven ability to operate production cloud systems.
+                    You've lived in the Amazon stack.
+                    You have an informed opinion  about Puppet v. Chef (we use chef).
+                </li>
+
+                <li><strong>Release</strong>: you live and breathe git. You eat merge conflicts for breakfast.
+                </li>
+
+                <li><strong>Development</strong>: why do something again when you can automate it?
+                    Python is our tool of choice, but you should be super comfortable at the Unix command line.
+                </li>
+            </ol>
+
+
+        </div>
+
+    </div>
+</div>
+
+<div>
+    <div class="container" style="margin-top:30px;margin-bottom:0;">
+        <div style="width:315px;margin:0 auto;">
+            <div class="social-btn facebook"><div class="fb-like" data-href="http://class2go.standford.edu" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
+            <div class="social-btn twitter"><a href="https://twitter.com/StanfordC2G" class="twitter-follow-button" data-show-count="false">Follow @StanfordC2G</a></div>
+            <div class="social-btn google"><div class="g-plusone" data-size="medium" data-annotation="none"></div></div>
+        </div>
+    </div>
+</div>
+
+<!--facebook-->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=195512500520406";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<!--twitter-->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+<!--google plus-->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+{% endblock m_column_content %}

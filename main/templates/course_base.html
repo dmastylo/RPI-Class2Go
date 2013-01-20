@@ -25,25 +25,39 @@
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
                         {% endfor %}
                         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">&nbsp;&nbsp; - Manage pages ...</a></li>
+			    <li class="divider"></li>
+                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">Manage pages</a></li>
                         {% endif %}
                     </ul>
                 </li>
                 {% endif %}
-                <li {% block course_materials_link_class %}{% endblock course_materials_link_class %}>
-                    <a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Course Materials</a>
+		{% if common_page_data.course_mode = 'draft' or common_page_data.content_sections|length > 0 %}
+		<li {% if common_page_data.course_mode = 'ready' %}class="dropdown{% endif %}{% block course_materials_link_class %}{% endblock course_materials_link_class %}{% if common_page_data.course_mode = 'ready' %}"{% endif %}>
+		    <a href={% if common_page_data.course_mode = 'draft' %}"{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}"{% else %}"#" class="dropdown-toggle" data-toggle="dropdown"{% endif %}>Course Materials{% if common_page_data.course_mode = 'ready' %}<em class="caret"></em>{% endif %}</a>
+		    {% if common_page_data.course_mode = 'ready' %}
+		    <ul class="dropdown-menu">
+		      {% for section in common_page_data.content_sections %}
+                  <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
+		      {% endfor %}
+		      <li class="divider"></li>
+		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Show all</a></li>
+		    </ul>
+		    {% endif %}
                 </li>
-                <li {% block forums_link_class %}{% endblock forums_link_class %}>
-                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
-                </li>
-                {% if common_page_data.course.has_problem_sets %}
-                <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-                    <a href="{% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">Problem Sets</a>
-                </li>
-                {% endif %}
+		{% endif %}
                 {% if common_page_data.course.has_videos %}
                 <li {% block videos_link_class %}{% endblock videos_link_class %}>
                     <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
+                </li>
+                {% endif %}
+                {% if common_page_data.course.has_problem_sets %}
+                <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
+                    <a href=" {% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">Quizzes</a>
+                </li>
+                {% endif %}
+                {% if common_page_data.course.has_interactive_exercises %}
+                <li {% block interactive_exercise_link_class %}{% endblock interactive_exercise_link_class %}>
+                    <a href="{% url 'interactive_exercise_list' common_page_data.course_prefix common_page_data.course_suffix %}">Interactive Exercises</a>
                 </li>
                 {% endif %}
                 {% if common_page_data.course.has_exams %}
@@ -56,11 +70,9 @@
                     <a href="{% url 'survey_list' common_page_data.course_prefix common_page_data.course_suffix %}">Surveys</a>
                 </li>
                 {% endif %}
-                {% if common_page_data.course.has_interactive_exercises %}
-                <li {% block interactive_exercise_link_class %}{% endblock interactive_exercise_link_class %}>
-                    <a href="{% url 'interactive_exercise_list' common_page_data.course_prefix common_page_data.course_suffix %}">Interactive Exercises</a>
+                <li {% block forums_link_class %}{% endblock forums_link_class %}>
+                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
                 </li>
-                {% endif %}
                 {% if user.is_authenticated %}
                 <li class="visible-phone">
                     <a href="/accounts/profile">My Account</a>
@@ -69,6 +81,7 @@
                     <a href="{% url 'auth_logout' %}">Logout</a>
                 </li>
                 {% else %}
+
                     <li class="visible-phone"><a id="login_button" data-toggle="modal" href="{% url 'default_login' %}?next={{ request.get_full_path }}">Login</a></li>
                     <li class="visible-phone"><a href="{% url 'registration_register' %}">Register</a></li>
                 {% endif %}
@@ -79,6 +92,7 @@
                             <ul class="dropdown-menu">
                               <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">Email Course Members</a></li>
                               <li><a href="{% url 'courses.reports.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Reports</a></li>
+                              <li><a href="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}">In-line Reports</a></li>
                                 {% if common_page_data.course.share_to.exists %}
                               <li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">Copy Content To Other Course</a></li>
                                 {% endif %}
@@ -117,7 +131,7 @@
 {% block course_notification %}{% endblock course_notification %}
 
 <div id="main-content" class="container-fluid body-content" role="main">
-    <div class="row-fluid">
+    <div id="main-column-container" class="row-fluid">
         {% block l_column_content %}{% endblock %}
         
         {% block m_column_content %}{% endblock %}

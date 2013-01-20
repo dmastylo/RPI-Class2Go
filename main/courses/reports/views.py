@@ -9,6 +9,7 @@ from courses.actions import auth_is_course_admin_view_wrapper
 from courses.reports.tasks import generate_and_email_reports
 from storages.backends.s3boto import S3BotoStorage
 from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
+from courses.reports.generation.gen_in_line_reports import *
 
 secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
 re_prog = re.compile(r'([\d]{4})_([\d]{2})_([\d]{2})__([\d]{2})_([\d]{2})_([\d]{2})')
@@ -24,7 +25,7 @@ def main(request, course_prefix, course_suffix):
     # 1- List all problem sets and videos, since instructors may let something fo non-live then try to get its report. If instructors try to generate a report for something that doesn't have a live instance, we will write that in the report
     videos = Video.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
     exams = Exam.objects.getByCourse(course=course.image).order_by('-live_datetime', 'title')
-    
+    surveys = exams.filter(exam_type='survey')
     
     # 2- Read a list of all reports for that course that are on the server
     dashboard_reports = list_reports_in_dir("%s/%s/reports/dashboard/" % (course_prefix, course_suffix))
@@ -36,6 +37,7 @@ def main(request, course_prefix, course_suffix):
     course_assessment_reports = list_reports_in_dir("%s/%s/reports/course_assessments/" % (course_prefix, course_suffix))
     assessment_full_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
     assessment_summ_reports = list_reports_in_dir("%s/%s/reports/problemsets_summary/" % (course_prefix, course_suffix))
+    survey_summ_reports = list_reports_in_dir("%s/%s/reports/survey_summary/" % (course_prefix, course_suffix))
     
     # 3- Divide ps and video reports into lists of dicts ready for grouped display by object
     vd_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_full_reports)
@@ -43,6 +45,7 @@ def main(request, course_prefix, course_suffix):
     
     assessment_full_reports_list_of_dicts = ClassifyReportsBySlug(exams, assessment_full_reports)
     assessment_summ_reports_list_of_dicts = ClassifyReportsBySlug(exams, assessment_summ_reports)
+    survey_summ_reports_list_of_dicts = ClassifyReportsBySlug(surveys, survey_summ_reports)
     
     
     # 4- Render to response
@@ -57,6 +60,8 @@ def main(request, course_prefix, course_suffix):
         'exams': exams.order_by('title'),
         'assessment_full_reports': assessment_full_reports_list_of_dicts,
         'assessment_summ_reports': assessment_summ_reports_list_of_dicts,
+        'survey_summ_reports': survey_summ_reports_list_of_dicts,
+        'surveys': surveys.order_by('title'),
     }, context_instance=RequestContext(request))
     
     
@@ -123,6 +128,11 @@ def generate_report(request):
         slug = request.POST["slug"]
         email_title = "[Class2Go] Assessment Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'assessment_summary', 'slug': slug}]
+        
+    elif report_type == 'survey_summary':
+        slug = request.POST["slug"]
+        email_title = "[Class2Go] Survey Summary Report for %s %s" % (course_handle_pretty, slug)
+        req_reports = [{'type': 'survey_summary', 'slug': slug}]
     
     generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
@@ -171,3 +181,50 @@ def get_report_date(rep_name):
     
 def get_slug_from_report_name(rep_name):
     return rep_name[21:-4]
+
+
+@auth_is_course_admin_view_wrapper    
+def generate_in_line_report(request, course_prefix, course_suffix):
+    
+    if request.POST.get("report_name", False): 
+        report_name = request.POST["report_name"]
+    else:
+        report_name = ""
+    
+    course = request.common_page_data['ready_course']
+    
+    report_label = None
+    report_data = {}
+    headings = {}
+    column1 = {}
+    column2 = {}
+    column3 = {}
+    column4 = {}
+    column5 = {}
+    column6 = {}
+    
+    we_have_data = False
+    if report_name == 'interactive_quizzes_summary':
+        report_data = gen_spec_in_line_report(report_name, course)
+        if report_data:
+            report_label = "Interactive Quizzes Summary"
+            headings = report_data['headings']
+            column1 = report_data['exam_titles']
+            column2 = report_data['count_lt_34']
+            column3 = report_data['count_gt_34']
+            column4 = report_data['count_gt_67']
+            we_have_data = True
+
+    return render_to_response('reports/in_line.html', {
+        'common_page_data':request.common_page_data,
+        'we_have_data':we_have_data,
+        'report_label':report_label,
+        'headings':headings,
+        'column1':column1,
+        'column2':column2,
+        'column3':column3,
+        'column4':column4,
+        'column5':column5,
+        'column6':column6,
+    }, context_instance=RequestContext(request))
+    

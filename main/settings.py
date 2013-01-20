@@ -156,6 +156,69 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'urls'
 
 
+### CACHING ###
+# config info here: see https://docs.djangoproject.com/en/dev/topics/cache
+
+try:
+    LOCAL_CACHE_LOCATION
+except NameError:
+    LOCAL_CACHE_LOCATION = "/opt/class2go"
+
+try:
+    FILE_CACHE_TIME
+except NameError:
+    FILE_CACHE_TIME = 60*60*4    # 4 hours -- files never chang
+
+try:
+    VIDEO_CACHE_TIME
+except NameError:
+    VIDEO_CACHE_TIME = 60*30     # 30 min -- careful of negative caching
+
+
+CACHES = {
+    'file_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-file",
+        'TIMEOUT': FILE_CACHE_TIME,
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000
+        }
+    },
+    'video_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-video",
+        'TIMEOUT': VIDEO_CACHE_TIME,
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000
+        }
+    },
+    'view_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-view",
+        'TIMEOUT': 3600,
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000
+            }
+    },
+    'course_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-course",
+        'TIMEOUT': 7200,
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+            }
+    },
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-default",
+        'TIMEOUT': 3600,
+        'OPTIONS': {
+            'MAX_ENTRIES': 10000
+        }
+    },
+}
+
+
 thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
     thispath+'/templates'
@@ -389,7 +452,7 @@ CELERY_QUEUES = {
 
 CELERY_ROUTES = {'kelvinator.tasks.kelvinate': {'queue': APP+'-long', 'routing_key': APP+'-long'},
                  'kelvinator.tasks.resize':    {'queue': APP+'-long', 'routing_key': APP+'-long'},
-                 'celerytest.tasks.echo_-long': {'queue': APP+'-long', 'routing_key': APP+'-long'},
+                 'celerytest.tasks.echo_long': {'queue': APP+'-long', 'routing_key': APP+'-long'},
                 }
 
 # Testing related settings

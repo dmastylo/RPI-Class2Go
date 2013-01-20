@@ -11,7 +11,7 @@ if File.exists?("/etc/apache2/conf.d/servername")
     end
 end
 
-# create all of our apps
+### Create Class2Go Main Apps ###
 
 node["apps"].keys.each do |app|
 
@@ -34,6 +34,33 @@ node["apps"].keys.each do |app|
     end
 
 end
+
+### Redirectors ###
+
+if node.has_key?("redirects")
+    node["redirects"].keys.each do |app|
+
+        redir_apache_conf="#{app}-redirect"
+        template "/etc/apache2/sites-available/#{redir_apache_conf}" do
+            source "site-redirect.erb"
+            owner "root"
+            group "root"
+            variables({
+                :hostname_from => node["redirects"][app]["from"],
+                :hostname_to => node["redirects"][app]["to"]
+            })
+            mode 00644
+        end
+
+        execute "a2ensite #{redir_apache_conf}" do
+            user "root"
+            action :run
+        end
+
+    end
+end
+
+### Turn off apache default site ###
 
 execute "a2dissite default" do
     user "root"

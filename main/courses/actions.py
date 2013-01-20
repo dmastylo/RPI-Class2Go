@@ -67,14 +67,14 @@ def auth_is_staff_view_wrapper(view):
            raise Http404
     return inner                
 
-def create_contentgroup_entries_from_post(request, postparam, ready_obj, ready_obj_tag, display_style="button"):
+def create_contentgroup_entries_from_post(request, postparam, ready_obj, ready_obj_tag, display_style="list"):
     """Given a post, ready object and parenting info, add ContentGroups
 
     request: a django request object with POST parameters we can extract parent info from
     postparam: the parameter in the POST we expect to find parent info in
     ready_obj: The ready-mode object reference to be added to the ContentGroup table
     ready_obj_tag: The text description, in the style of ContentGroup.groupable_types, of ready_obj
-    display_style: how the child should be displayed (optional, defaults to 'button')
+    display_style: how the child should be displayed (optional, defaults to 'list')
     """
     parent_tag, parent_id = None,None
     parent_tag = request.POST.get(postparam)

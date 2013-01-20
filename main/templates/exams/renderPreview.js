@@ -80,6 +80,11 @@ var c2gXMLParse = (function() {
                 var psetDOM = $(myDOM).find('problemset');
                  
                 if (psetDOM.length) {
+                   if ($(psetDOM).attr('invideo') != undefined) {
+                       $('input#invideo_id')[0].checked=true;
+                   } else {
+                       $('input#invideo_id')[0].checked=false;
+                   }
                    
                    setValIfDef($('input#exam_title'), $(psetDOM).attr('title'));
                    setValIfDef($('input#exam_slug'), $(psetDOM).attr('url-identifier'));
@@ -112,7 +117,7 @@ var c2gXMLParse = (function() {
                           //select if that's the case
                            if ($(this).text() && $(sectionDOM).attr('section') &&  $(this).text().trim() == $(sectionDOM).attr('section').trim()) {
                               setValIfDef($('select#id_section'), $(this).val());
-                              prefill_children($('#parent_id')[0]).success(prepop_children);
+                              prefill_children().success(prepop_children);
                            }
                        });
 
@@ -195,13 +200,9 @@ var c2gXMLParse = (function() {
                               
                             
                 //Grab question level solutions
-                var solnObj = document.createElement('solution');
-                $(this).find('solution').find('p').each(function() {
-                    var tempP = document.createElement('p');
-                    $(tempP).text($(this).text());
-                    $(solnObj).append($(tempP));
+                $(this).find('solution').each(function() {
+                    $(questionMeta).append($(this));
                 });
-                $(questionMeta).append($(solnObj));
                               
                 var tmpProbDiv = document.createElement('div');
                 $(tmpProbDiv).addClass('question');
@@ -263,9 +264,9 @@ var c2gXMLParse = (function() {
                                 $(choiceObj).attr('value',$(this).attr('name'));
                                 $(choiceObj).attr('data-report', $(this).attr('data-report'));
                                 $(questionObj).append($(choiceObj));
-                                var explanationObj = document.createElement('explanation');
-                                $(explanationObj).append($(this).find('explanation').text());
-                                $(choiceObj).append($(explanationObj));
+                                $(this).find('explanation').each(function(){
+                                                                   $(choiceObj).append($(this).clone());
+                                                                });
                                 //Add to Answer object
                                 if (isChoiceCorrect(this)) {
                                     $(choiceObj).attr('correct','true');

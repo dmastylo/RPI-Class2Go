@@ -1,27 +1,18 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#     * Rearrange models' order
-#     * Make sure each model has one field with primary_key=True
-# Feel free to rename the models, but don't rename db_table values or field names.
-#
-# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
-# into your database.
-
-#c2g specific comments
-# any table indexes that use only one column here are place here.
-# any table indexes that use multiple columns are placed in a south migration at
-# <location to be inserted>
-
-from datetime import datetime
+from datetime import datetime, timedelta
 from hashlib import md5
 import os
 import re
 import sys
 import time
+import logging
+from urlparse import urlparse, urlunparse
+from django.core.cache import get_cache
 
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
@@ -30,6 +21,7 @@ from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
 from xml.dom.minidom import parseString
 
+logger = logging.getLogger(__name__)
 
 RE_S3_PATH_FILENAME_SPLIT = re.compile('(?P<path>.+)\/(?P<filename>.*)$')
 
@@ -42,6 +34,17 @@ def get_file_path(instance, filename):
         return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
     if isinstance(instance, File):
         return os.path.join(str(parts[0]), str(parts[1]), 'files', filename)
+
+
+def remove_querystring(url):
+    """
+    remove_querystring("http://www.example.com:8080/salad?foo=bar#93")
+    'http://www.example.com:8080/salad'
+    """
+    split = urlparse(url)
+    combined = (split.scheme, split.netloc, split.path, '', '', '')
+    return urlunparse(combined)
+
 
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -83,10 +86,10 @@ class Deletable(models.Model):
         self.save()
 
         # Delete ContentGroup relationships when items are deleted
-        contentgroup_entries = self.contentgroup_set.all()
-        # Our object may not have a ContentGroup entry, but if it does, it
-        # should have exactly one - the current specification is that objects
-        # can't be in multiple parent/child relationships.
+        # There may be exactly 0 or 1 ContentGroup entry for a given object
+        contentgroup_entries = ()
+        if getattr(self, 'contentgroup_set', None):
+            contentgroup_entries = self.contentgroup_set.all()
         if len(contentgroup_entries) == 1:
             contentgroup_entries[0].delete()
         elif len(contentgroup_entries) > 1:
@@ -154,7 +157,6 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             return self.title + " | Mode: " + self.mode
         else:
             return "No Title" + " | Mode: " + self.mode
-
     
     def _get_prefix(self):
         return self.handle.split("--")[0]
@@ -187,10 +189,10 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
                 
     def has_problem_sets(self):
         if self.mode == 'draft':
-            return ProblemSet.objects.filter(course=self, is_deleted=0).exists()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="problemset").exists()
         else:
             now = datetime.now()
-            return ProblemSet.objects.filter(course=self, is_deleted=0, live_datetime__lt=now).exists()
+            return Exam.objects.filter(course=self, is_deleted=0, exam_type="problemset", live_datetime__lt=now).exists()
         
     def has_videos(self):
         if self.mode == 'draft':
@@ -329,6 +331,8 @@ class ContentSectionManager(models.Manager):
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
+    subtitle = models.CharField(max_length=255, null=True, blank=True)
+    slug = models.SlugField(max_length=255, null=True, blank=True)
     objects = ContentSectionManager()
 
     def create_ready_instance(self):
@@ -336,6 +340,8 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             course=self.course.image,
             title=self.title,
             index=self.index,
+            subtitle=self.subtitle,
+            slug=self.slug,
             mode='ready',
             image=self,
         )
@@ -351,6 +357,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             ready_instance.title = self.title
         if not clone_fields or 'index' in clone_fields:
             ready_instance.index = self.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            ready_instance.subtitle = self.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            ready_instance.slug = self.slug
 
         ready_instance.save()
 
@@ -362,6 +372,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.title = ready_instance.title
         if not clone_fields or 'index' in clone_fields:
             self.index = ready_instance.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            self.subtitle = ready_instance.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = ready_instance.slug
 
         self.save()
 
@@ -410,10 +424,6 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         db_table = u'c2g_content_sections'
 
 class AdditionalPageManager(models.Manager):
-    def getByCourseAndMenuSlug(self, course, menu_slug):
-        # This method does not check live_datetime. Additional pages to display under menus have no live_datetime effect.
-        return self.filter(course=course,is_deleted=0,menu_slug=menu_slug).order_by('index')
-
     def getByCourse(self, course):
         # Additional pages displayed under sections have a live_datetime effect.
         if course.mode == 'draft':
@@ -486,6 +496,8 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -494,7 +506,7 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         return True
 
     def get_url(self):
-        return 'pages/' + self.slug
+        return reverse("courses.additional_pages.views.main", args=[self.course.prefix, self.course.suffix, self.slug])
 
     def __unicode__(self):
         if self.title:
@@ -557,17 +569,36 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     
     def has_storage(self):
         """Return True if we have a copy of this file on our storage."""
-        return self.file.storage.exists(self.file.name)
+        if self.dl_link() == "":
+            return False
+        else:
+            return True
 
     def dl_link(self):
-        # File
         filename = self.file.name
-        if not self.file.storage.exists(filename):
-            return ""
         if is_storage_local():
             url = get_site_url() + self.file.storage.url(filename)
         else:
-            url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+            storecache = get_cache("file_store")
+            storecache_key = filename.replace(' ','%20')[-240:]   # memcache no spaces in cache key, char limit
+            storecache_hit = storecache.get(storecache_key)
+            if storecache_hit:
+                CacheStat.report('hit', 'file_store')
+                if 'url' in storecache_hit:
+                    return storecache_hit['url']
+                else:
+                    return ""
+            else:
+                CacheStat.report('miss', 'file_store')
+                if not self.file.storage.exists(filename):
+                    # negative cache
+                    storecache_val = {'size':0}
+                    storecache.set(storecache_key, storecache_val)
+                    return ""
+                url_raw = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
+                url = remove_querystring(url_raw)  # TODO: preserve when we have longer timeouts
+                storecache_val = {'url':url}
+                storecache.set(storecache_key, storecache_val)
         return url
         
     def get_ext(self):
@@ -614,6 +645,7 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     class Meta:
         db_table = u'c2g_files'
+
 
 class AnnouncementManager(models.Manager):
     def getByCourse(self, course):
@@ -663,6 +695,8 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -799,6 +833,7 @@ class VideoManager(models.Manager):
         else:
             now = datetime.now()
             return self.filter(section=section, is_deleted=0, live_datetime__lt=now).order_by('index')
+
 
 class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -982,6 +1017,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 ready_videoToEx.image.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         prod_instance = self.image
         if self.exercises_changed() == True:
             return False
@@ -1013,23 +1050,48 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     def has_storage(self):
         """Return True if we have a copy of this video on our storage."""
-        return self.file.storage.exists(self.file.name)
+        if self.dl_link() == "":
+            return False
+        else:
+            return True
 
     def dl_link(self):
         """Return fully-qualified download URL for this video, or empty string."""
-        # Video
-        videoname = self.file.name
-        if not self.file.storage.exists(videoname):
-            return ""
-        if is_storage_local():
-            # FileSystemStorage returns a path, not a url
-            return get_site_url() + self.file.storage.url(videoname)
+        storecache = get_cache("video_store")
+        storecache_key = self.file.name.replace(' ','%20')[-240:]   # memcache no spaces in cache key, char limit
+        storecache_hit = storecache.get(storecache_key)
+        if storecache_hit:
+            CacheStat.report('hit', 'video_store')
+            if 'url' in storecache_hit:
+                return storecache_hit['url']
+            else:
+                return ""
         else:
-            return self.file.storage.url_monkeypatched(videoname, response_headers={'response-content-disposition': 'attachment'})
+            CacheStat.report('miss', 'video_store')
+            videoname = self.file.name
+            if not self.file.storage.exists(videoname):
+                # negative cache
+                storecache_val = {'size':0}
+                storecache.set(storecache_key, storecache_val)
+                return ""
+            if is_storage_local():
+                # FileSystemStorage returns a path, not a url
+                loc_raw = get_site_url() + self.file.storage.url(videoname)
+            else:
+                loc_raw = self.file.storage.url_monkeypatched(videoname,
+                    response_headers={'response-content-disposition': 'attachment'})
+            loc = remove_querystring(loc_raw)  # TODO - preserve query strings when we have longer timeouts
+            storecache_val = {'size':self.file.size, 'url':loc }
+            storecache.set(storecache_key, storecache_val)
+            return loc
+
 
     def dl_links_all(self):
-        """Return list of fully-qualified download URLs for video variants."""
-        # Video
+        """
+        Return list of tuples fully-qualified download URLs for video variants.
+        Tuples of the form: (size_tag, URL, size, description)
+        """
+
         myname  = self.file.name
         mystore = self.file.storage
         if is_storage_local():
@@ -1038,16 +1100,47 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
             return [('large', get_site_url() + mystore.url(myname), self.file.size, '')]
         else:
             # XXX: very S3 specific
-            urlof   = mystore.url_monkeypatched
+            urlof = mystore.url_monkeypatched
             basepath, filename = RE_S3_PATH_FILENAME_SPLIT.match(myname).groups()
             names = []
             for size in sorted(video_resize_options):
                 checkfor = basepath+'/'+size+'/'+filename
-                gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
-                if gotback:
-                    names.append((size, urlof(checkfor, response_headers={'response-content-disposition': 'attachment'}), gotback[0].size, video_resize_options[size][3]))
+                storecache = get_cache('video_store')
+                storecache_key = checkfor.replace(' ','%20')[-240:]  # memcache no spaces in cache key, char limit
+                storecache_hit = storecache.get(storecache_key)
+                if storecache_hit:
+                    CacheStat.report('hit', 'video_store')
+                    if storecache_hit['size'] > 0:
+                        # print "found %s in cache (%s, %d, %s)"\
+                        #      % (size, storecache_hit['url'], storecache_hit['size'], storecache_hit['desc'])
+                        names.append((size, storecache_hit['url'], storecache_hit['size'], storecache_hit['desc']))
+                    else:
+                        # print "found %s in cache (NEG)" % size
+                        pass
+
+                else:
+                    CacheStat.report('miss', 'video_store')
+                    gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
+                    if gotback:
+                        filesize=gotback[0].size
+                        fileurl=remove_querystring(urlof(checkfor,
+                                response_headers={'response-content-disposition': 'attachment'}))
+                        filedesc=video_resize_options[size][3]
+                        names.append((size, fileurl, filesize, filedesc))
+                        # positive cache
+                        # print "add %s in cache (%s, %d, %s)" % (size, fileurl, filesize, filedesc)
+                        storecache_val = {'size':filesize, 'url':fileurl, 'desc':filedesc}
+                        storecache.set(storecache_key, storecache_val)
+                    else:
+                        # negative cache
+                        # print "add %s in cache (NEG)" % (size)
+                        storecache_val = {'size':0 }
+                        storecache.set(storecache_key, storecache_val)
+
             if not names:
-                names = [('large', urlof(myname, response_headers={'response-content-disposition': 'attachment'}), self.file.size, '')]
+                fileurl=remove_querystring(urlof(myname,
+                                response_headers={'response-content-disposition': 'attachment'}))
+                names = [('large', fileurl, self.file.size, '')]
             return names
 
     def ret_url(self):
@@ -1092,7 +1185,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'videos/' + self.slug
+        return reverse("courses.videos.views.view", args=[self.course.prefix, self.course.suffix, self.slug])
         
     def __unicode__(self):
         if self.title:
@@ -1102,7 +1195,45 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
     class Meta:
         db_table = u'c2g_videos'
-        
+
+
+class CacheStat():
+    """
+    Gather and report counter-based stats for our simple caches.
+       report('hit', 'video-cache') or
+       report('miss', 'files-cache')
+    """
+    lastReportTime = datetime.now()
+    count = {} 
+    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 60*60)   # hourly
+    reportingInterval = timedelta(seconds=reportingIntervalSec)
+
+    @classmethod
+    def report(cls, op, cache):
+        if op not in ['hit', 'miss']:
+            logger.error("cachestat invalid operation, expected hit or miss")
+            return
+        if cache not in cls.count:
+            cls.count[cache] = {}
+        if op not in cls.count[cache]:
+            cls.count[cache][op] = 0
+        cls.count[cache][op] += 1
+
+        # stat interval expired: print stats and zero out counter
+        if datetime.now() - cls.lastReportTime > cls.reportingInterval:
+            for c in cls.count:
+                hit = cls.count[c].get('hit', 0)
+                miss = cls.count[c].get('miss', 0)
+                if hit + miss == 0:
+                    logger.info("cache stats for %s: hits %d, misses %d" % (c, hit, miss))
+                else:
+                    rate = float(hit) / float(hit + miss) * 100.0
+                    logger.info("cache stats for %s: hits %d, misses %d, rate %2.1f" % (c, hit, miss, rate))
+
+            cls.lastReportTime = datetime.now()
+            cls.count = {}      # zero out the counts
+
+
 class VideoViewTraces(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     video = models.ForeignKey(Video, db_index=True)
@@ -1354,6 +1485,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
 
     def is_synced(self):
+        if not self.image:
+            return False
         image = self.image
         if self.exercises_changed() == True:
             return False
@@ -1512,7 +1645,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         return False
 
     def get_url(self):
-        return 'problemsets/' + self.slug
+        # not using reverse() because problemsets have been removed from urls.py
+        return '/' + self.course.prefix.replace('--', '/') + '/problemsets/' + self.slug
 
     def __unicode__(self):
         return self.title
@@ -1713,6 +1847,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
                          ('interactive_exercise', 'interactive_exercise'),
                          )
     
+    Exam_HUMAN_TYPES = {'exam':'Exam',
+                        'problemset':'Quiz',
+                        'survey':'Survey',
+                        'interactive_exercise':'Interactive Exercise',
+                       }
+    
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -1733,6 +1873,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     invideo = models.BooleanField(default=False)
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
+    minutes_btw_attempts = models.IntegerField(default=0)
     exam_type = models.CharField(max_length=32, default="exam", choices=EXAM_TYPE_CHOICES)
     #there is a function from assessment_type => (invideo, exam_type, display_single, grade_single, autograde) that we don't want to write inverse for
     #so we just store it
@@ -1807,6 +1948,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
+            minutes_btw_attempts = self.minutes_btw_attempts,
             assessment_type = self.assessment_type,
         )
         ready_instance.save()
@@ -1864,6 +2006,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.timed = self.timed
         if not clone_fields or 'minutesallowed' in clone_fields:
             ready_instance.minutesallowed = self.minutesallowed
+        if not clone_fields or 'minutes_btw_attempts' in clone_fields:
+            ready_instance.minutes_btw_attempts = self.minutes_btw_attempts
         if not clone_fields or 'assessment_type' in clone_fields:
             ready_instance.assessment_type = self.assessment_type
         
@@ -1919,15 +2063,17 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.timed = ready_instance.timed 
         if not clone_fields or 'minutesallowed' in clone_fields:
             self.minutesallowed = ready_instance.minutesallowed
+        if not clone_fields or 'minutes_btw_attempts' in clone_fields:
+            self.minutes_btw_attempts = ready_instance.minutes_btw_attempts
         if not clone_fields or 'assessment_type' in clone_fields:
             self.assessment_type = ready_instance.assessment_type
 
         self.save()
     
     def is_synced(self):
-        
+        if not self.image:
+            return False        
         prod_instance = self.image
-        
         if self.section != prod_instance.section.image:
             return False
         if self.title != prod_instance.title:
@@ -1974,6 +2120,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         if self.minutesallowed != self.image.minutesallowed:
             return False
+        if self.minutes_btw_attempts != self.image.minutes_btw_attempts:
+            return False
         if self.assessment_type != self.image.assessment_type:
             return False
 
@@ -2012,8 +2160,15 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     def record_view_name(self):
         return self.safe_exam_type()+"_record"
 
+    def get_human_type(self):
+        return self.Exam_HUMAN_TYPES[self.safe_exam_type()]
+
     def get_url(self):
-        return self.show_view_name()
+        #return '/' + self.course.handle.replace('--', '/') + '/surveys/' + self.slug
+        return reverse(self.show_view, args=[self.course.prefix, self.course.suffix, self.slug])
+    
+    def has_child_exams(self):
+        return ContentGroup.has_children(self, types=['exam'])
     
     record_view = property(record_view_name)
 
@@ -2275,7 +2430,7 @@ class ContentGroupManager(models.Manager):
 class ContentGroup(models.Model):
     group_id        = models.IntegerField(db_index=True, null=True, blank=True)
     level           = models.IntegerField(db_index=True)
-    display_style   = models.CharField(max_length=32, null=True, blank=True)
+    display_style   = models.CharField(max_length=32, default='list', blank=True)
 
     additional_page = models.ForeignKey(AdditionalPage, null=True, blank=True)
     course          = models.ForeignKey(Course)
@@ -2330,7 +2485,7 @@ class ContentGroup(models.Model):
         return info
 
     @classmethod
-    def add_child(thisclass, group_id, tag, obj_ref, display_style='button'):
+    def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
         """Add obj_ref having type tag to the ContentGroup table.
 
         Returns the ContentGroup entry id for the resulting child item.
@@ -2481,8 +2636,11 @@ class ContentGroup(models.Model):
 
     def get_content_id(self):
         """Return the id of the object to which this ContentGroup entry refers"""
-        tag = self.get_content_type()
-        return getattr(self, tag+'_id')
+        for keyword in ContentGroup.groupable_types.keys():
+            tmp = getattr(self, keyword+'_id', False)
+            if tmp:
+                return tmp
+        return None
 
     def get_content_type(self):
         """This is linear in the number of content types supported for grouping
@@ -2493,9 +2651,37 @@ class ContentGroup(models.Model):
               Compromise is to use django cache table
         """
         for keyword in ContentGroup.groupable_types.keys():
-            if getattr(self, keyword, False):
+            if getattr(self, keyword+'_id', False):
                 return keyword
         return None
+    
+    
+    @classmethod
+    def get_tag_from_classname(thisclass, classname):
+        """Reverse dictionary lookup.  Obviously O(n)"""
+        for keyword in ContentGroup.groupable_types.keys():
+            if ContentGroup.groupable_types[keyword]==classname:
+                return keyword
+        return None
+
+    
+    @classmethod
+    def has_children(thisclass, obj, types=list(groupable_types.keys())):
+        """
+            Does obj (File, Exam, etc) have children?  types is a kwarg that
+            restricts the search to the types in the argument of type list.  
+            Will return true if any children of type found in types exist.
+            
+        """
+        groupinfo = thisclass.groupinfo_by_id(thisclass.get_tag_from_classname(obj.__class__), obj.id)
+        if not groupinfo:
+            return False
+        if obj != groupinfo.get('__parent', None): #can't have children if obj itself is a child (for now)
+            return False
+        for t in types:
+            if filter(lambda li: li != obj, groupinfo.get(t, [])):
+                return True
+        return False
 
     def __repr__(self):
         s = "ContentGroup(group_id=" + str(self.group_id) + ", "
@@ -2509,7 +2695,8 @@ class ContentGroup(models.Model):
         return s+')'
 
     def __unicode__(self):
-        return unicode(self.group_id)
+        level_string = "parent" if self.level==1 else "child"
+        return "%s:%s:%s" % (level_string, self.get_content_type(), self.get_content().title)
     
     class Meta:
         db_table = u'c2g_content_group'
