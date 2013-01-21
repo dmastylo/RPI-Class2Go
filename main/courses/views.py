@@ -149,7 +149,7 @@ def leftnav(request, course_prefix, course_suffix):
 
 @cache_page(60*60, cache="view_store")
 def rightnav(request, course_prefix, course_suffix):
-  course = request.common_page_data['course']
+  course = request.common_page_data['ready_course']
   exams = get_upcoming_exams(course)
   exams = [exam for exam in exams if not exam.is_child()]
   return render_to_response('right_nav.html',
