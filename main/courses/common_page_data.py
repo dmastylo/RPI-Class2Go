@@ -59,10 +59,9 @@ def get_common_page_data(request, prefix, suffix):
     course_info_page_handle = course_handle + '_' + course_mode + '_course_info_pages'
     course_info_pages = CACHE.get(course_info_page_handle)
     if course_info_pages:
-        #CacheStat.report('hit', CACHE_STORE)
-        pass # TODO: After #1905, fix call above and remove this pass
+        CacheStat.report('hit', CACHE_STORE)
     else:
-        #CacheStat.report('miss', CACHE_STORE)
+        CacheStat.report('miss', CACHE_STORE)
         course_info_pages = AdditionalPage.objects.filter(course=course,is_deleted=0,menu_slug='course_info').order_by('index')
         CACHE.set(course_info_page_handle, course_info_pages)
     if course_mode == 'ready':
@@ -74,10 +73,9 @@ def get_common_page_data(request, prefix, suffix):
         content_section_page_handle = course_handle + 'ready' +'_nonempty_content_sections'
         content_sections = CACHE.get(content_section_page_handle)
         if content_sections:
-            #CacheStat.report('hit', CACHE_STORE)
-            pass # TODO: After #1905, fix above call and remove this pass
+            CacheStat.report('hit', CACHE_STORE)
         else:
-            #CacheStat.report('miss', CACHE_STORE)
+            CacheStat.report('miss', CACHE_STORE)
             content_sections = [s for s in ContentSection.objects.getByCourse(course) if s.countChildren() > 0]
             CACHE.set(content_section_page_handle, content_sections)
     
