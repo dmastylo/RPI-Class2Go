@@ -17,7 +17,6 @@ run_list(
     "recipe[class2go-deploy]",
     "recipe[class2go-logging]",
     "recipe[class2go-ops-dns]",
-    "recipe[scalyr-agent]",
     "recipe[class2go-database-config]",
     "recipe[s3cmd]",
     "recipe[class2go-util-kelvinator]",
