@@ -2,18 +2,25 @@ package "openjdk-6-jre" do
     action :install
 end
 
-# TODO: only get installer if there isn't one there already
-file "/opt/scalyrAgentInstaller.sh" do
-    action :delete
+if not File.directory? "/opt/scalyrAgent"
+    file "/opt/scalyrAgentInstaller.sh" do
+        action :delete
+    end
+
+    execute  "wget https://log.scalyr.com/binaries/scalyrAgentInstaller.sh" do
+        cwd "/opt"
+        action :run
+    end
+
+    execute "bash ./scalyrAgentInstaller.sh" do
+        cwd "/opt"
+        action :run
+    end
 end
 
-execute  "wget https://log.scalyr.com/binaries/scalyrAgentInstaller.sh" do
-    cwd "/opt"
-    action :run
-end
-
-execute "bash ./scalyrAgentInstaller.sh" do
-    cwd "/opt"
+# the Scalyr installer leaves this directory owned by 501:staff for some reason,
+# this is the workaround.
+execute "chown -R root:root /opt/scalyrAgent" do
     action :run
 end
 
@@ -32,7 +39,20 @@ execute "bash agent.sh install_rcinit" do
     action :run
 end
 
-execute "service scalyr-agent start" do
+# the Scalyr "rcinit" script doesn't create a runlevel 2 startup entry
+# this is the workaround.
+link "/etc/rc2.d/S98scalyr-agent" do
+    to "../init.d/scalyr-agent"
+    action :create
+end
+
+file "/etc/rc2.d/K55scalyr-agent" do
+    action :delete
+end
+
+# start the service, if it doesn't start, don't fail the overall install 
+execute "service scalyr-agent --no-interactive start" do
+    returns [0, 1] 
     action :run
 end
 
