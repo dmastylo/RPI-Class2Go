@@ -1,0 +1,50 @@
+# Ports to listen on. Specify -1 to disable a given protocol.
+OpenTSDB.Listen=4242
+GraphitePlainText.Listen=2003
+GraphitePickle.Listen=2004
+
+# Normally, the relay daemon will accept events from any machine that can reach it on the
+# network. If you only want programs on this machine to be able to send events to the relay,
+# set the localhostOnly flag.
+# 
+# localhostOnly=true
+
+# Use this section to specify attributes for inclusion in every event uploaded.
+# You can use these attributes to distinguish data centers, hosts, or other
+# subsystems. Note that Scalyr Logs will by default provide a serverHost
+# attribute based on this server's hostname. You may use any attribute names
+# you like; the examples below are merely examples.
+# 
+# attr.zone=us-east-1a
+# attr.serverHost=frontend1
+
+# Use this parameter to specify a regex whitelist for metric names.
+# Only metrics whose name matches the whitelist are forwarded to Scalyr.
+MetricFilter=.*
+# MetricFilter=.*thread-states.*|.*gc.*
+
+# Set Verbose=true to echo all data points to stdout. WARNING: this can be bulky!
+Verbose=false
+
+# Set logThreshold to a value other than 3 to control the amount of internal logging
+# generated. Smaller numbers generate more logging. 3 is the default.
+# 
+# logThreshold=3
+
+# At the specified interval, we emit a line to stdout indicating how many events
+# have been forwarded to Scalyr. Set to -1 to disable this output.
+StatsIntervalMs=60000
+
+# Amount of RAM to use to buffer events for uploading to the Scalyr server. You
+# should not normally have to adjust it. If your data volume is high (more than 1000
+# data points / second), you might need a larger value to avoid occasional
+# data loss due to ephemeral connectivity problems. If this happens, stdout will
+# contain notices of buffer overflow.
+# 
+# If you do increase MaxBufferBytes, you may also need to increase the Java heap
+# size, as specified in run.sh.
+MaxBufferBytes=41943040
+
+# Insert your Write Logs key here -- see log.scalyr.com/keys.
+WriteLogs=<%= @node['scalyr']['write_key'] %>
+

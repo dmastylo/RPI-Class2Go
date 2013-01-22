@@ -1,0 +1,66 @@
+// NOTE: after making changes to this file, you may need to restart the agent to pick up the
+// changes:
+// 
+// scalyrAgent/agent.sh stop
+// scalyrAgent/agent.sh start
+
+{
+  logcopier_config: {
+    // This section lists the log files which the Scalyr Agent should monitor.
+    // The "directories" list should have one entry for each log directory.
+    // Note that if you have more than one directory, they must be separated by commas.
+    directories: [
+      {
+        // Absolute path to the log directory.
+        path: "/var/log/apache2",
+
+        // Name of the log file(s) in this directory. This should be a regular expression, or you
+        // can list several regular expressions to match different types of files.
+        match_expressions: [".*\\.log"],
+      
+        // Attributes to be applied to the messages imported from this log. You should always
+        // include a "source" attribute identifying the type/format of data in this log. Scalyr
+        // uses the source attribute to determine which parsing rules to apply.
+        default_attributes: {source: "apacheLogs"}
+      }
+    ]
+  },
+
+  // Uncomment and change these settings as need to override the defaults. In most cases
+  // you won't need to touch these settings.
+  
+  // Minimum interval, in milliseconds, between scans of the file system to find new log entries to upload.
+  // 
+  // "logcopier.scanIntervalTimeMillis": 5000,
+
+  // If the last line in a file does not end with a line break, the agent will wait this many milliseconds
+  // before uploading it. This is to avoid uploading an incomplete line.
+  // 
+  // "logcopier.implicitLineEndThresholdMillis": 5000,
+
+  // Size of the buffer used to read log files. The agent will upload at most this much data, per file,
+  // per logcopier.scanIntervalTimeMillis.
+  // 
+  // "logcopier.bufferSize": 10000000,
+
+  // Maximum backlog size (in bytes) per log file. If the amount of new text in a log file exceeds
+  // this length, we discard the older text in order to catch up quickly. Should always be at least
+  // as large as logcopier.bufferSize.
+  // 
+  // "logcopier.maxCatchupBytes": 10000000,
+
+  // Normally, when a new directory is added to the agent configurtion, we ignore the existing log messages
+  // and begin uploading only new messages. To override this behavior, set logcopier.skipLogsOnNewDirectory
+  // to false. Note that even with logcopier.skipLogsOnNewDirectory set to false, at most
+  // logcopier.maxCatchupBytes old data per file will be uploaded.
+  // 
+  // "logcopier.skipLogsOnNewDirectory": true,
+
+  // The agent creates small "checkpoint" files to track which log files and bytes have been sent to Scalyr.
+  // This prevents messages from being re-sent after the agent restarts. The logcopier.stateFileDirectory
+  // parameter specifies the location where these checkpoint files will be stored. You may wish to customize
+  // it (probably with an absolute pathname) to store the checkpoint files in a location other than the
+  // agent installation directory.
+  // 
+  "logcopier.stateFileDirectory": "checkpoints"
+}
