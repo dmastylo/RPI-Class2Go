@@ -33,6 +33,11 @@ def add_announcement(request):
     
     if request.POST.get("commit") == '1':
         announcement.commit()
+
+    if request.POST.get("email"):
+        request.session['email_subject'] = announcement.title
+        request.session['email_message'] = announcement.description
+        return redirect('courses.email_members.views.email_members', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     
     return redirect(request.META['HTTP_REFERER'])
     
@@ -57,7 +62,7 @@ def save_announcement(request):
         
     if request.POST.get("revert") == '1':
         announcement.revert()
-    
+
     return redirect('courses.announcements.views.list', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     
 @require_POST

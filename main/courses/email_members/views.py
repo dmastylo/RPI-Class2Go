@@ -44,6 +44,10 @@ def email_members(request, course_prefix, course_suffix):
     error_msg=""
     success_msg=""
     form = EmailForm()
+    if request.session.get('email_subject') or request.session.get('email_message'):
+        form = EmailForm({'subject': request.session['email_subject'], 'message': request.session['email_message']})
+        del request.session['email_subject']
+        del request.session['email_message']
     if request.method == "POST":
         form = EmailForm(data=request.POST)
         if form.is_valid():
