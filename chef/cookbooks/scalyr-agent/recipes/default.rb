@@ -39,8 +39,11 @@ execute "bash agent.sh install_rcinit" do
     action :run
 end
 
-# the Scalyr "rcinit" script doesn't create a runlevel 2 startup entry
-# this is the workaround.
+# Two workarounds here:
+# 1. the Scalyr "rcinit" script doesn't create a runlevel 2 startup entry
+# 2. typically rcX.d scripts should just be symlinks to init.d scripts, so
+#    linking to a script elsewhere is really weird. But this was the only
+#    way to get their init script to survive a reboot.
 link "/etc/rc2.d/S98scalyr-agent" do
     to "/opt/scalyrAgent/agent.sh"
     action :create
