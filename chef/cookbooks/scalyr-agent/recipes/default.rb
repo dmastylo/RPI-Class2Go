@@ -42,7 +42,7 @@ end
 # the Scalyr "rcinit" script doesn't create a runlevel 2 startup entry
 # this is the workaround.
 link "/etc/rc2.d/S98scalyr-agent" do
-    to "../init.d/scalyr-agent"
+    to "/opt/scalyrAgent/agent.sh"
     action :create
 end
 
