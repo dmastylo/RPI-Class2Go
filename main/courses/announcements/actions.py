@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, redirect
 from django.template import Context, loader
@@ -37,6 +38,7 @@ def add_announcement(request):
     if request.POST.get("email"):
         request.session['email_subject'] = announcement.title
         request.session['email_message'] = announcement.description
+        messages.add_message(request, messages.SUCCESS, 'Your announcement is published! Now send it to the students.')
         return redirect('courses.email_members.views.email_members', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     
     return redirect(request.META['HTTP_REFERER'])
