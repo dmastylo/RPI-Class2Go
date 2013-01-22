@@ -2,12 +2,17 @@ package "openjdk-6-jre" do
     action :install
 end
 
-cookbook_file "/opt/scalyrAgentInstaller.sh" do
-    mode 00755
-    action :create
+# TODO: only get installer if there isn't one there already
+file "/opt/scalyrAgentInstaller.sh" do
+    action :delete
 end
 
-execute "bash scalyrAgentInstaller.sh" do
+execute  "wget https://log.scalyr.com/binaries/scalyrAgentInstaller.sh" do
+    cwd "/opt"
+    action :run
+end
+
+execute "bash ./scalyrAgentInstaller.sh" do
     cwd "/opt"
     action :run
 end
