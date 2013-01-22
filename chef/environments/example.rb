@@ -66,6 +66,9 @@ default_attributes \
         "key" => "hhhhhhhhhhhh",
         "secret" => "ggggggggggggggg"
     },
+    "scalyr" => {
+        "write_key" => "1234567890"
+    },
     "google" => {
         "yt_service_developer_key" => "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "google_client_id" => "nnnnnnnnnnnn.apps.googleusercontent.com",
