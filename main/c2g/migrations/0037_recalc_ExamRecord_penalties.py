@@ -16,7 +16,7 @@ class Migration(DataMigration):
         c = 0
         for i in xrange(0, count, batch):
             print "Searching %d" % i
-            for er in qset[i:i+batch]:
+            for er in qset[i:i+batch].select_related('examrecordscore','exam'):
                 # convert complete exams with scores which are either late or are re-attempts
                 try:
                     if er.examrecordscore and isinstance(er.examrecordscore.raw_score, (int, float)):
