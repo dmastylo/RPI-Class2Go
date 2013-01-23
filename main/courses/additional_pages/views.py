@@ -62,8 +62,9 @@ def main(request, course_prefix, course_suffix, slug):
         contentgroup_info = ContentGroup.groupinfo_by_id('additional_page', groupable_page.id)
         # Oh, so it turns out you can't dereference variables starting with _
         # from Django templates
-        contentgroup_info['PARENT'] = contentgroup_info['__parent']
-        contentgroup_info['PARENT_TAG'] = contentgroup_info['__parent_tag']
+        if contentgroup_info:
+            contentgroup_info['PARENT'] = contentgroup_info['__parent']
+            contentgroup_info['PARENT_TAG'] = contentgroup_info['__parent_tag']
     else:
         template = 'additional_pages/view.html'
         
