@@ -512,12 +512,12 @@ def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, 
     """Helper function to factor out resubmission and late penalty calculations, 
        so I can write a few unit tests for it
     """
-    resubmission_discount = pow(max(0,(100.0 - resubmission_penalty)/100.0), (attempt_number - 1))
+    resubmission_discount = pow(max(0.0, (100.0 - resubmission_penalty)/100.0), (attempt_number - 1))
     score = raw_score * resubmission_discount
-    late_discount = max(0,100.0 - late_penalty)/100.0
+    late_discount = max(0.0, 100.0 - late_penalty)/100.0
     if is_late:
         score *= late_discount
-    return max(score, 0)
+    return max(score, 0.0)
 
 @require_POST
 @auth_is_course_admin_view_wrapper
