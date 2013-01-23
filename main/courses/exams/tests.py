@@ -7,6 +7,7 @@ import urllib,urllib2
 from django.test import TestCase
 from django.conf import settings
 from courses.exams.autograder import *
+from courses.exams.views import compute_penalties
 from sets import Set
 from StringIO import StringIO
 
@@ -332,6 +333,32 @@ class SimpleTest(TestCase):
         self.assertEqual(agf.grade('q4d',"3.5"), {'correct':False,'score':-23})
         self.assertFalse(agf.grade('q4d',"3.0")['correct'])
         self.assertFalse(agf.grade('randomDNE',"33")['correct']) #This is the actual test
+
+    
+    def test_resubmission_and_late_penalty(self):
+        """Unit test for the discount function """
+        def float_compare(a, b, tolerance=0.001):
+            print "(%f, %f)" % (a,b)
+            return  b * (1-tolerance) <= a and a <= b * (1+tolerance)
+        
+        #Only resub penalty
+        self.assertTrue(float_compare(compute_penalties(100, 1, 0, False, 0), 100))
+        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, False, 0), 100.0))
+        self.assertTrue(float_compare(compute_penalties(100.0, 2, 15, False, 0), 85.0))
+        self.assertTrue(float_compare(compute_penalties(100.0, 3, 15, False, 0), 72.25))
+        self.assertTrue(float_compare(compute_penalties(100.0, 3, 150, False, 0), 0))
+        #Only late penalty
+        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, True, 50), 50.0))
+        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, False, 50), 100.0))
+        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, True, 150), 0))
+        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, False, 150), 100.0))
+        #Both penalties
+        self.assertTrue(float_compare(compute_penalties(100.0, 2, 15, True, 50), 42.5))
+        self.assertTrue(float_compare(compute_penalties(100.0, 3, 15, True, 50), 36.125))
+        self.assertTrue(float_compare(compute_penalties(100.0, 3, 15, True, 150), 0))
+        self.assertTrue(float_compare(compute_penalties(100.0, 3, 150, True, 50), 0))
+
+
 
 
     ### INTERACTIVE AUTOGRADER ###
