@@ -1555,3 +1555,4 @@ ul.icons li .icon-large:before {
 .icon-user-md:before {
   content: "\f200";
 }
+.alert .alert-special-note {font-style: italic;}
