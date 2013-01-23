@@ -30,7 +30,7 @@ class error_ping(object):
         del tb
     
         u = request.user
-        if not settings.DEBUG and u.is_authenticated() and (u.userprofile.is_instructor_list() or u.userprofile.is_tas_list()):
+        if not settings.DEBUG and u.is_authenticated() and (u.userprofile.is_instructor_list() or u.userprofile.is_tas_list() or u.userprofile.is_readonly_tas_list()):
             #if on production
             #want to return a different 500 msg for course staff.
             #but because we return a response instead of None, django's
