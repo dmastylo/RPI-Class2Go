@@ -2399,7 +2399,10 @@ class ContentGroup(models.Model):
                 info['__parent_tag'] = cttag
             else:
                 info['__children'].append(cgref)
-            info[cttag] = info.get(cttag, []).append(cgref)
+            if info.has_key(cttag):
+                info[cttag].append(cgref)
+            else:
+                info[cttag] = [cgref]
         return info
 
     @classmethod
