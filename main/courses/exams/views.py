@@ -260,7 +260,7 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
             score_fields[s.field_name] = s.subscore
         scores_json = json.dumps(score_fields)
 
-    except ExamRecordScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
+    except ExamRecordScore.DoesNotExist, ExamRecordScore.MultipleObjectsReturned:
         raw_score = None
         scores_json = "{}"
 

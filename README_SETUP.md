@@ -272,6 +272,7 @@ for virtualenv. virtualenvwrapper can also be installed for Mac (and
 probably Windows too).
 
 3. Create the database (perhaps with different username and password):
+
         sudo mysql mysql
         create database c2g;
         CREATE USER 'c2g_username'@'localhost' IDENTIFIED BY 'c2g_passwd';

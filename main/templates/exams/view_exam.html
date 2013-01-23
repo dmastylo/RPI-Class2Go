@@ -957,13 +957,16 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     };
                       
     $('#submit-button').click(function () {
-
+        $('#submit-button').attr('disabled','disabled');
         var fieldCollection = $('#exam-pane').find('input,textarea');
         var userAnswerObj = window.collectUserAnswers(fieldCollection);
 
         if (__exam_type != "survey" && !userAnswerObj.answeredAll) {
             var userProceed = confirm("This will submit the entire {{ exam.get_human_type }} and you haven't answered all questions. Still submit?");
-            if (!userProceed) return;
+            if (!userProceed) {
+                $('#submit-button').removeAttr('disabled');
+                return;
+            }
         } 
 
         var userSelections = userAnswerObj.userSelections; 
@@ -978,6 +981,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         );
 
         examXHR.success(function (evt, xhr, settings) {
+            $('#submit-button').removeAttr('disabled');
             if (__autograde) {
                 document.location = settings.responseText;
             }
@@ -1015,6 +1019,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         examXHR.error(function(xhr, status, msg) {
+            $('#submit-button').removeAttr('disabled');
             var dialogDiv = window.getDialog('');
             $(dialogDiv).find('p').text(msg+": "+xhr.responseText.substr(0,99));
             $(dialogDiv).dialog({modal: true});

@@ -11,7 +11,7 @@ CELERYD_MULTI="$CELERYD_CHDIR/manage.py celeryd_multi"
 CELERYCTL="$CELERYD_CHDIR/manage.py celeryctl"
 
 # Extra arguments to celeryd
-CELERYD_OPTS="-Q:<%= @appname %>-default <%= @appname %>-default -c:<%= @appname %>-default <%= @node['util']['celery_concurrency'] %> -Q:<%= @appname %>-long <%= @appname %>-long -c:<%= @appname %>-long 1 --time-limit=<%= @node['util']['celery_timeout'] %>"
+CELERYD_OPTS="-Q:<%= @appname %>-default <%= @appname %>-default -c:<%= @appname %>-default <%= @node['util']['celery_concurrency'] %> -Q:<%= @appname %>-long <%= @appname %>-long -c:<%= @appname %>-long <%= @node['cpu']['total'] %> --time-limit=<%= @node['util']['celery_timeout'] %>"
 
 # Name of the celery config module.
 CELERY_CONFIG_MODULE="celeryconfig"

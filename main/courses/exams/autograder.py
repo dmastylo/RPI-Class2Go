@@ -315,10 +315,11 @@ class AutoGrader():
                 raise AutoGraderMetadataException("Error in response node \"%s\": A <%s> element is required" 
                         % (response_node_id, req))
 
+        grader_name = grader_post_params['grader_name'] if 'grader_name' in grader_post_params else "Unknown"
         self.points_possible += 1.0 ## DB exercises are worth 1 point, hardcoded
-        self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params)
+        self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params, grader_name)
 
-    def _INTERACTIVE_grader_factory(self, post_params):
+    def _INTERACTIVE_grader_factory(self, post_params, grader_name):
         """
         Factory function for an interactive grader.  The signature of the grader_fn is
 
@@ -349,7 +350,7 @@ class AutoGrader():
                     grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
                     time_after = datetime.now()
                     duration = time_after - time_before  # timedelta
-                    logger.info("interactive grader returned in %s " % str(duration))
+                    logger.info("interactive grader \"%s\" returned in %s" % (grader_name, str(duration)))
                 except urllib2.HTTPError as e:
                     raise AutoGraderGradingException("Interactive grader HTTP error: %s" % str(e))
                 except urllib2.URLError as e:
