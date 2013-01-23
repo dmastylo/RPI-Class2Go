@@ -9,24 +9,25 @@ class Migration(DataMigration):
     def forwards(self, orm):
         "Write your forwards methods here."
         # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-        batch = 100
-        qset = orm['c2g.ExamRecord'].objects.filter(models.Q(attempt_number__gt=1) | models.Q(late=True), complete=True)
-        count = qset.count()
-        print "Total Exam Records: %d" % count
         c = 0
-        for i in xrange(0, count, batch):
-            print "Searching %d" % i
-            for er in qset[i:i+batch]:
-                # convert complete exams with scores which are either late or are re-attempts
-                try:
-                    if er.examrecordscore and isinstance(er.examrecordscore.raw_score, (int, float)):
-                        er.score = compute_penalties(er.examrecordscore.raw_score, er.attempt_number, er.exam.resubmission_penalty, er.late, er.exam.late_penalty)
-                        er.save()
-                        c += 1
-                except orm['c2g.ExamRecordScore'].DoesNotExist:
-                    #If there is no ExamRecordScore, there's now raw score and we pass
-                    pass
-        print "Exam Records Converted: %d" % c
+        for exam in orm['c2g.Exam'].objects.all():
+            batch = 50
+            qset = orm['c2g.ExamRecord'].objects.filter(models.Q(attempt_number__gt=1) | models.Q(late=True), complete=True, exam=exam)
+            count = qset.count()
+            print "Exam Records to search for this exam: %d" % count
+            for i in xrange(0, count, batch):
+                print "Searching %d ExamRecords" % i
+                for er in qset[i:i+batch].select_related('examrecordscore'):
+                    # convert complete exams with scores which are either late or are re-attempts
+                    try:
+                        if er.examrecordscore and isinstance(er.examrecordscore.raw_score, (int, float)):
+                            er.score = compute_penalties(er.examrecordscore.raw_score, er.attempt_number, exam.resubmission_penalty, er.late, exam.late_penalty)
+                            er.save()
+                            c += 1
+                    except orm['c2g.ExamRecordScore'].DoesNotExist:
+                        #If there is no ExamRecordScore, there's now raw score and we pass
+                        pass
+            print "Exam Records Converted: %d" % c
 
     def backwards(self, orm):
         "Write your backwards methods here."
