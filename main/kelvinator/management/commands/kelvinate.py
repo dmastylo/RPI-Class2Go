@@ -60,13 +60,6 @@ class Command(BaseCommand):
             print "Video slug \"%s\" doesn't have a file listed in S3 (name=\"default\")" % slug
             return
             
-        # FIXME: after confirming this works, clean these lines up.
-        #where = getattr(settings, 'AWS_ACCESS_KEY_ID', 'local')
-        #if options['force_local']: 
-        #    where='local'
-        #if options['force_remote']:
-        #    where='remote'
-        #if where == 'local':
         if (is_storage_local() or options['force_local']) and not options['force_remote']:
             media_root = getattr(settings, 'MEDIA_ROOT')
             local_path = media_root + "/" + video.file.name
