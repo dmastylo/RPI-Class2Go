@@ -440,7 +440,7 @@ class SimpleTest(TestCase):
         with self.assertRaisesRegexp(AutoGraderMetadataException, '.*<response name="q4d">, your regular expression could not be compiled.*'):
             ag = AutoGrader(xml2)
 
-    def test_regex_metadata_errors(self):
+    def test_regex_responses(self):
         """
             Tests exceptions for regex responses
             """
