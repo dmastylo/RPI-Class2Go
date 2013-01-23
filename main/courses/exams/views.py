@@ -494,15 +494,8 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         #Set penalty inclusive score for ExamRecord
         record.json_score_data = json.dumps(feedback)
         
-        #apply resubmission penalty
-        resubmission_penalty_percent = pow(((100 - exam.resubmission_penalty)/100), (attempt_number -1))
-        total_score = max(total_score * resubmission_penalty_percent, 0)
-        
-        #apply the late penalty
-        if exam.grace_period and exam.late_penalty > 0 and datetime.datetime.now() > exam.grace_period:
-            total_score = max(total_score * ((100 - exam.late_penalty)/100), 0)
-        
-        record.score = total_score
+        #apply penalties
+        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty)
         record.save()
         
         #Set ExamScore.score to max of ExamRecord.score for that student, exam. 
@@ -514,6 +507,17 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     else:
         return HttpResponse("Submission has been saved.")
 
+
+def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty):
+    """Helper function to factor out resubmission and late penalty calculations, 
+       so I can write a few unit tests for it
+    """
+    resubmission_discount = pow(max(0,(100.0 - resubmission_penalty)/100.0), (attempt_number - 1))
+    score = raw_score * resubmission_discount
+    late_discount = max(0,100.0 - late_penalty)/100.0
+    if is_late:
+        score *= late_discount
+    return max(score, 0)
 
 @require_POST
 @auth_is_course_admin_view_wrapper
