@@ -315,7 +315,7 @@ class AutoGrader():
                 raise AutoGraderMetadataException("Error in response node \"%s\": A <%s> element is required" 
                         % (response_node_id, req))
 
-        grader_name = grader_post_params['grader_name'] if 'grader_name' in grader_post_params else None
+        grader_name = grader_post_params['grader_name'] if 'grader_name' in grader_post_params else "Unknown"
         self.points_possible += 1.0 ## DB exercises are worth 1 point, hardcoded
         self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params, grader_name)
 
