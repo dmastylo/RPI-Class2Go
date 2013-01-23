@@ -10,16 +10,16 @@ class Migration(DataMigration):
         "Write your forwards methods here."
         # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
         batch = 100
-        count = orm['c2g.ExamRecord'].objects.all().count()
+        qset = orm['c2g.ExamRecord'].objects.filter(models.Q(attempt_number__gt=1) | models.Q(late=True), complete=True)
+        count = qset.count()
         print "Total Exam Records: %d" % count
         c = 0
         for i in xrange(0, count, batch):
             print "Searching %d" % i
-            for er in orm['c2g.ExamRecord'].objects.all()[i:i+batch]:
+            for er in qset[i:i+batch]:
                 # convert complete exams with scores which are either late or are re-attempts
                 try:
-                    if er.complete and er.examrecordscore and (er.late or er.attempt_number > 1) \
-                        and isinstance(er.examrecordscore.raw_score, (int, float)):
+                    if er.examrecordscore and isinstance(er.examrecordscore.raw_score, (int, float)):
                         er.score = compute_penalties(er.examrecordscore.raw_score, er.attempt_number, er.exam.resubmission_penalty, er.late, er.exam.late_penalty)
                         er.save()
                         c += 1
