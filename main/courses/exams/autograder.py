@@ -90,6 +90,8 @@ class AutoGrader():
                 self._parse_num(resp, resp_name, qid)
             elif type == "dbinteractiveresponse":
                 self._parse_interactive(resp, resp_name, qid)
+            elif type == "regexresponse":
+                self._parse_regex(resp, resp_name, qid)
             # more types should follow
             
     def _validate_resp(self, response_elem, qid):
@@ -259,7 +261,70 @@ class AutoGrader():
                 return {'correct':False, 'score':wrong_pts}
         return grader_fn
                     
+    ########## Regex response section ############
+    
+    def _parse_regex(self, response_elem, resp_name, qid):
+        """
+            Parses each <regexresponse> element and sets up its grader function
+            """
+        
+        answer_str = response_elem.getAttribute("answer")
+        
+        if answer_str == "" :
+            raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
+                
+        search = True
+        if response_elem.getAttribute("match"):
+            search = False #use match, not search
+        
+        flags = 0
+                        
+        children = response_elem.childNodes
+        for node in children:
+            if node.nodeType == node.ELEMENT_NODE and node.nodeName == "responseparam" and node.getAttribute('flag'):
+                flag_name = node.getAttribute("flag").strip()
+                if hasattr(re, flag_name) and isinstance(getattr(re, flag_name), int):
+                    flags |= getattr(re, flag_name)
 
+        try:
+            compiled_fn = re.compile(answer_str, flags)
+        except re.error:
+            raise AutoGraderMetadataException('In <question_medata id="%s">, <response name="%s">, your regular expression could not be compiled' % (qid,resp_name))
+                    
+        correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
+        wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
+
+        self.points_possible += correct_pts
+
+        self.grader_functions[resp_name] = self._REGEX_grader_factory(compiled_fn, search, correct_pts=correct_pts, wrong_pts=wrong_pts)
+
+    def _REGEX_grader_factory(self, compiled_fn, search, correct_pts=1, wrong_pts=0):
+        """
+            Factory function for a numeric grader.  The arguments are a compiled regexp  and 
+            flag 'search', which determines whether to `search` (True) using the regexp or to `match` (False).
+            The signature of the grader_fn is
+            
+            {'correct':boolean, 'score':float} = grader_fn(submission)
+            
+            which returns True if a regexp search or match function (as determined by the `search` argument)
+            returns a match for the answer, else returns False
+            Submission is a string that gets fed into the grader.
+            The return value dict of with keys 'correct' and 'score' (using dict to be future proof).
+            """
+        def grader_fn(submission):
+            try:
+                if search:
+                    result = compiled_fn.search(submission)
+                else:
+                    result = compiled_fn.match(submission)
+            except re.error:
+                raise AutoGraderGradingException("An error occurred when matching your submission to the answer!")
+            if result:
+                return {'correct':True, 'score':correct_pts}
+            else:
+                return {'correct':False, 'score':wrong_pts}
+        return grader_fn
+    
     ########## Interactive Exercise Grader ############
 
     def _parse_interactive(self, response_elem, resp_name, qid):
