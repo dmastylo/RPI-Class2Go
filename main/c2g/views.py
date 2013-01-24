@@ -9,6 +9,7 @@ from courses.actions import auth_view_wrapper
 from django.contrib import messages
 from courses.common_page_data import get_common_page_data
 from c2g.models import Course
+import settings;
 ### C2G Core Views ###
 
 @auth_view_wrapper
@@ -46,16 +47,16 @@ def throw404(request):
     raise Http404
 
 def hc(request):
-    return render_to_response('honor_code.html',{},RequestContext(request))
+    return render_to_response('sites/' + settings.SITE_NAME_SHORT + '/honor_code.html',{},RequestContext(request))
 
 def tos(request):
-    return render_to_response('TOS.html',{},RequestContext(request))
+    return render_to_response('sites/' + settings.SITE_NAME_SHORT + '/TOS.html',{},RequestContext(request))
 
 def privacy(request):
-    return render_to_response('privacy.html',{},RequestContext(request))
+    return render_to_response('sites/' + settings.SITE_NAME_SHORT + '/privacy.html',{},RequestContext(request))
     
 def faq(request):
-    return render_to_response('faq.html',{},context_instance=RequestContext(request))
+    return render_to_response('sites/' + settings.SITE_NAME_SHORT + '/faq.html',{},context_instance=RequestContext(request))
 
 def contactus(request):
     if request.GET.get('pre') and request.GET.get('post'):
@@ -70,7 +71,7 @@ def contactus(request):
         course=None
         staffmail=''
 
-    return render_to_response('contactus.html', 
+    return render_to_response('sites/' + settings.SITE_NAME_SHORT + '/contactus.html', 
                               {'request': request,
                                'course': course,
                                'staffmail' : staffmail,

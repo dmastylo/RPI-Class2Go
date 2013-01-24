@@ -1,0 +1,28 @@
+{% load url from future %}
+
+<div class="row-fluid class2go">
+    <small><a href="http://class2go.stanford.edu">Powered by Class2Go</a></small>
+</div>
+
+<div id="global-footer" class="footer hidden-phone">
+    <div class="container">
+        <div class="row">
+                <div id="bottom-text" class="span11">
+                    <div id="bottom-menu">
+                        <ul class="unstyled">
+                        	<li>CRICOS Code: 00126G</li>
+                        	<li><a href="http://www.uwa.edu.au/campus_map">Campus Map</a></li>
+                        	<li><a href="http://www.uwa.edu.au/contact">Contact UWA</a></li>
+                        	<li><a href="http://www.uwa.edu.au/accessibility">Accessibility</a></li>    
+                            <li><a href="http://www.uwa.edu.au">UWA Home</a></li>
+                            <li><a href="{% url 'c2g.views.tos' %}">Terms of Use</a></li>
+                            <li><a href="{% url 'c2g.views.tos' %}#copyright">Copyright Complaints</a></li>
+                            <li><a href="{% url 'c2g.views.contactus' %}">Technical Support</a></li>
+                        </ul>
+                    </div>
+                    <p class="vcard">&copy; <span class="fn org">The University of Western Australia</span>, <span class="adr"><span class="locality">Crawley</span>, <span class="region">WA</span> <span class="postal-code">6009</span></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

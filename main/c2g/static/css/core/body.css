@@ -223,7 +223,7 @@ body.home {
     display:none;
 }
 .home .hero-header {
-    background:url(/static/graphics/core/bg-hero-header.jpg) no-repeat top center;
+    background:url(../../graphics/core/bg-hero-header.jpg) no-repeat top center;
 }
 .home .hero-header .hero {
     width:520px;
@@ -260,6 +260,7 @@ body.home {
 .home-unit p {
     font-size:16px;
     margin-bottom:1em;
+    margin-right: 20px;
 }
 .home-unit .span5 h3 {
     margin-bottom:0;
@@ -267,6 +268,47 @@ body.home {
 .home-unit a {
     font-weight:bold;
 }
+
+
+/**************
+home unit boxes 
+****************/
+
+.home-unit img {float: left;
+padding-right: 10px;
+height: 286px;
+width: 286px;}
+
+.home-unit a {color: #666; font-weight: normal;}
+
+.home-unit a:hover {text-decoration: none}
+
+.home-unit a h3 {color: #1F5EB7; padding-top: 20px;}
+
+.home-unit-box {padding-top:2px;}
+
+.home-unit-box .row{background-color: #FCFCFC;
+ max-height: 286px;
+border: 1px solid #EEEEEE;
+box-shadow: 0px 1px 2px 0 #999999;
+padding-top: 0px;
+margin-left:0px;
+}
+
+.home-unit .container { min-width: 700px; width: auto;}
+
+.home-unit-box .row:hover {box-shadow: 0px 2px 4px 0 #666;
+cursor: pointer;
+border-color: #efefef;}
+
+
+
+/**************
+end home unit boxes 
+****************/
+
+
+
 .home-examples img {
     border:3px solid #ccc;
     margin-bottom:10px;
@@ -358,11 +400,11 @@ small.date {
 /* Header
 -------------------------------------------------- */
 #global-header {
-    background:#8C1515 url(/static/graphics/core/shadow-header-bg.png) bottom center no-repeat;
+    background:#8C1515 url(../../graphics/core/shadow-header-bg.png) bottom center no-repeat;
     width:100%;
 }
 .stanford-logo {
-    background:transparent url(/static/graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
+    background:transparent url(../../graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
     padding:13px 20px;
     width:198px;
     height:11px;
@@ -483,16 +525,16 @@ small.date {
 }
 
 #left-nav h3.expanded {
-    /*background:url(/static/graphics/core/icon-minus.png) no-repeat right 7px;*/
-    background:url(/static/graphics/core/arrow-open.png) no-repeat right 9px;
+    /*background:url(../../graphics/core/icon-minus.png) no-repeat right 7px;*/
+    background:url(../../graphics/core/arrow-open.png) no-repeat right 9px;
     cursor:pointer;
     padding-right:20px;
     display:block;
     margin-right:15px;
 }
 #left-nav h3 {
-    /*background:url(/static/graphics/core/icon-plus.png) no-repeat right 7px;*/
-    background:url(/static/graphics/core/arrow-close-alt.png) no-repeat right 8px;
+    /*background:url(../../graphics/core/icon-plus.png) no-repeat right 7px;*/
+    background:url(../../graphics/core/arrow-close.png) no-repeat right 8px;
     cursor:pointer;
     padding-right:20px;
     display:block;
@@ -737,7 +779,7 @@ input[type="checkbox"] {
 -------------------------------------------------- */
 
 #global-footer {
-    background:#8C1515 url(/static/graphics/core/shadow-footer-bg.png) top center no-repeat;
+    background:#8C1515 url(../../graphics/core/shadow-footer-bg.png) top center no-repeat;
     width:100%;
 }
 #bottom-logo {
@@ -856,8 +898,8 @@ ul.ui-sortable li:hover {
     */
 @font-face {
     font-family: 'FontAwesome';
-    src: url('//netdna.bootstrapcdn.com/font-awesome/2.0/font//fontawesome-webfont.eot');
-    src: url('//netdna.bootstrapcdn.com/font-awesome/2.0/font//fontawesome-webfont.eot?#iefix') format('embedded-opentype'), url('//netdna.bootstrapcdn.com/font-awesome/2.0/font//fontawesome-webfont.woff') format('woff'), url('//netdna.bootstrapcdn.com/font-awesome/2.0/font//fontawesome-webfont.ttf') format('truetype'), url('//netdna.bootstrapcdn.com/font-awesome/2.0/font//fontawesome-webfont.svg#FontAwesome') format('svg');
+    src: url('http://netdna.bootstrapcdn.com/font-awesome/2.0/font/fontawesome-webfont.eot');
+    src: url('http://netdna.bootstrapcdn.com/font-awesome/2.0/font/fontawesome-webfont.eot?#iefix') format('embedded-opentype'), url('http://netdna.bootstrapcdn.com/font-awesome/2.0/font/fontawesome-webfont.woff') format('woff'), url('http://netdna.bootstrapcdn.com/font-awesome/2.0/font/fontawesome-webfont.ttf') format('truetype'), url('http://netdna.bootstrapcdn.com/font-awesome/2.0/font/fontawesome-webfont.svg#FontAwesome') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -1555,4 +1597,9 @@ ul.icons li .icon-large:before {
 .icon-user-md:before {
   content: "\f200";
 }
+<<<<<<< HEAD
 .alert .alert-special-note {font-style: italic;}
+=======
+
+/* Localized */
+>>>>>>> dglance-restapi

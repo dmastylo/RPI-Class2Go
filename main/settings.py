@@ -75,6 +75,9 @@ TIME_ZONE = 'America/Los_Angeles'
 LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
+SITE_NAME_SHORT = 'Stanford'
+SITE_NAME_LONG = 'Stanford University'
+SITE_TITLE = 'Stanford Class2Go'
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -228,7 +231,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages'
+    'django.contrib.messages.context_processors.messages',
+    'context_processor.context_settings'
 )
 
 INSTALLED_APPS = (
@@ -264,6 +268,7 @@ INSTALLED_APPS = (
                       'db_scripts',
                       'convenience_redirect',
                       'exception_snippet',
+                      'rest_framework'
                        #'reversion',
                       )
 if INSTANCE != "prod":
