@@ -96,13 +96,6 @@ def main(request, course_prefix, course_suffix, slug):
 
     return render_to_response(template,
                               {
-<<<<<<< HEAD
-                               'common_page_data':    common_page_data,
-                               'page':                page,
-                               'ready_section':       ready_section,
-                               'contentgroup_info':   contentgroup_info,
-                               'sections':            sections,
-=======
                                'common_page_data': common_page_data,
                                'page': page,
                                'contentsection_list': full_contentsection_list,
@@ -113,7 +106,7 @@ def main(request, course_prefix, course_suffix, slug):
                                'intro_video': video,
                                'ready_section': ready_section,
                                'contentgroup_info': contentgroup_info,
->>>>>>> dglance-restapi
+                               'sections': sections,
                               },
                                context_instance=RequestContext(request))
 
