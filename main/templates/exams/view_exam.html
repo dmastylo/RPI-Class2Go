@@ -699,11 +699,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                         displayText += xhr.responseText.substr(0,99);
                     }
                      $(dialogDiv).find('p').text(displayText);
-                    if (typeof window.myData != "undefined" && window.myData != "") {
-                        if (typeof localStorage != "undefined") {
+                    if (typeof window.myData != "undefined" && window.myData != "" && typeof localStorage != "undefined") {
                             var storageKey = "{{user.id}}_" + Date.now() + "_{{exam.slug}}";
                             localStorage[storageKey] = window.myData;
-                        }
                     }
                      $(dialogDiv).dialog({ modal: true,
                                            buttons: {'Close':function(){$(this).dialog("close");}}
