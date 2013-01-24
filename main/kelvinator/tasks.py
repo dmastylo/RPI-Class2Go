@@ -16,17 +16,26 @@
 
 import sys
 import os
-from django.core.files.storage import default_storage
-from django.conf import settings
 import subprocess
 import math
 import operator
-from PIL import Image
 import time
-from celery import task
-from utility import *
 import numpy as np
 import shutil
+
+from django.core.files.storage import default_storage
+from django.conf import settings
+from celery import task
+
+from utility import *
+
+# PIL has namespace issues, work around this way. If we can't import, then
+# assume it is because we've already imported Image (not part of PIL) and 
+# we can disregard the collision.
+try:
+    from PIL import Image
+except ImportError:
+    pass
 
     
 ##
