@@ -21,7 +21,7 @@ from django.conf import settings
 import subprocess
 import math
 import operator
-import Image
+from PIL import Image
 import time
 from celery import task
 from utility import *
