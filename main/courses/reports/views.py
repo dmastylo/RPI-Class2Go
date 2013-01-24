@@ -38,9 +38,6 @@ def main(request, course_prefix, course_suffix):
     assessment_full_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
     assessment_summ_reports = list_reports_in_dir("%s/%s/reports/problemsets_summary/" % (course_prefix, course_suffix))
     survey_summ_reports = list_reports_in_dir("%s/%s/reports/survey_summary/" % (course_prefix, course_suffix))
-    
-    #Assessment student scores for on-campus courses only
-    #if course.institution_only == True:
     assessment_student_scores_reports = list_reports_in_dir("%s/%s/reports/assessment_student_scores/" % (course_prefix, course_suffix))
     
     
@@ -144,7 +141,7 @@ def generate_report(request):
         email_title = "[Class2Go] Assessment Student Scores Report for %s" % (course_handle_pretty)
         req_reports = [{'type': 'assessment_student_scores'}]    
     
-    generate_and_email_reports(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
+    generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
     return redirect(request.META.get('HTTP_REFERER', None))
 
