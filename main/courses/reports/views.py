@@ -38,6 +38,8 @@ def main(request, course_prefix, course_suffix):
     assessment_full_reports = list_reports_in_dir("%s/%s/reports/problemsets/" % (course_prefix, course_suffix))
     assessment_summ_reports = list_reports_in_dir("%s/%s/reports/problemsets_summary/" % (course_prefix, course_suffix))
     survey_summ_reports = list_reports_in_dir("%s/%s/reports/survey_summary/" % (course_prefix, course_suffix))
+    assessment_student_scores_reports = list_reports_in_dir("%s/%s/reports/assessment_student_scores/" % (course_prefix, course_suffix))
+    
     
     # 3- Divide ps and video reports into lists of dicts ready for grouped display by object
     vd_quiz_full_reports_list_of_dicts = ClassifyReportsBySlug(videos, video_full_reports)
@@ -62,6 +64,7 @@ def main(request, course_prefix, course_suffix):
         'assessment_summ_reports': assessment_summ_reports_list_of_dicts,
         'survey_summ_reports': survey_summ_reports_list_of_dicts,
         'surveys': surveys.order_by('title'),
+        'assessment_student_scores_reports': assessment_student_scores_reports,
     }, context_instance=RequestContext(request))
     
     
@@ -133,6 +136,10 @@ def generate_report(request):
         slug = request.POST["slug"]
         email_title = "[Class2Go] Survey Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'survey_summary', 'slug': slug}]
+    
+    elif report_type == 'assessment_student_scores':
+        email_title = "[Class2Go] Assessment Student Scores Report for %s" % (course_handle_pretty)
+        req_reports = [{'type': 'assessment_student_scores'}]    
     
     generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
