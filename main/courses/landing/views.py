@@ -14,19 +14,20 @@ def landing(request):
         other rules: superuser - sees all
                      staff - sees all from institution?
     """
-    
 
     if not request.user.is_authenticated():
-        course_list = Course.objects.filter(mode='ready', institution_only = 0)
+        course_list = Course.objects.filter(mode='ready', 
+                institution_only = 0)
     else:
-        course_list = Course.objects.filter(Q(mode='ready', institution_only = 0) | Q(mode='ready', institution__id__in=request.user.get_profile().institutions.all()))
+        course_list = Course.objects.filter(Q(mode='ready', 
+                institution_only = 0) | Q(mode='ready', institution__id__in=request.user.get_profile().institutions.all()))
         
-    maint_override = getattr(settings, 'MAINTENANCE_LANDING_PAGE', False)
-    if maint_override:
-        r = render_to_response('maint.html', {'hiring': hiring}, context_instance=context)
-    else:
-
-        r = render_to_response('landing/landing.html', {'hiring': hiring, 'course_list':course_list, 'display_login': request.GET.__contains__('login')}, context_instance=context)
+    site = getattr(settings, SITE_NAME_SHORT)
+    r = render_to_response("sites/%s/landing.html" % site,
+            {'hiring': hiring, 
+             'course_list':course_list,
+             'display_login': request.GET.__contains__('login')},
+             context_instance=context)
     return r
     
 
