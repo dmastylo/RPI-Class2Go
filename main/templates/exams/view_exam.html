@@ -689,7 +689,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                        });
                        
         saveXHR.error(function(xhr, status, msg) {
-                     var dialogDiv = window.getDialog('Error');
+                     var dialogDiv = window.getDialog(status.toUpperCase());
                      $(dialogDiv).find('p').text("Your answers could not be saved!  "
                                             + msg + ": "+xhr.responseText.substr(0,99));
                      $(dialogDiv).dialog({ modal: true,
@@ -961,6 +961,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(dialogDiv).attr('title',title);
             $(dialogDiv).append('<p></p>');
             $(document).append($(dialogDiv));
+        } else {
+            $('#ui-dialog-title-dialog-message').text(title);
         }
         return dialogDiv;
     };
