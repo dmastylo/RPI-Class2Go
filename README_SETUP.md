@@ -117,6 +117,10 @@ prefix for these.
 
         pip install django-celery django-celery-email pytz
 
+1. RESTful interfaces
+
+        pip install djangorestframework pysimplesoap
+
 1. Install test environment dependencies:
 
         pip install mock nose django_nose django_coverage lxml
