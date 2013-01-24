@@ -35,6 +35,7 @@ from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
+from django.utils import encoding
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_protect
@@ -99,7 +100,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
         too_recent = True
 
     #self.metadata_xml = xml #The XML metadata for the entire problem set.
-    metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
+    metadata_dom = parseString(encoding.smart_str(exam.xml_metadata, encoding='utf-8')) #The DOM corresponding to the XML metadata
     questions = metadata_dom.getElementsByTagName('video')
 
     ready_section = exam.section

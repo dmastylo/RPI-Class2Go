@@ -16,6 +16,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
+from django.utils import encoding
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
@@ -2161,7 +2162,7 @@ def videos_in_exam_metadata(xml, times_for_video_slug=None):
         'question_times' only gets populated in the returned dict if a
         times_for_video_slug argument is specified.
     """
-    metadata_dom = parseString(xml) #The DOM corresponding to the XML metadata
+    metadata_dom = parseString(encoding.smart_str(xml, encoding='utf-8')) #The DOM corresponding to the XML metadata
     video_questions = metadata_dom.getElementsByTagName('video')
     
     question_times = {}

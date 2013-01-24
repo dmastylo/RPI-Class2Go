@@ -444,7 +444,7 @@ class SimpleTest(TestCase):
         """
             Tests exceptions for regex responses
             """
-        xml = r"""
+        xml = ur"""
             <exam_metadata>
                 <question_metadata id="problem_4" data-report="Short-answer2">
                     <response name="q4d" answertype="regexresponse" answer="b" correct-points="139" wrong-points="-23">
@@ -475,13 +475,14 @@ class SimpleTest(TestCase):
                     </response>
                 </question_metadata>
                 <question_metadata id="problem_10" data-report="Short-answer8">
-                    <response name="q10d" answertype="regexresponse" match="true" answer="^\([0-9b&amp;]*\)$" correct-points="139" wrong-points="-23">
+                    <response name="q10d" answertype="regexresponse" match="true" answer="^\([0-9b&amp;是]*\)$" correct-points="139" wrong-points="-23">
                         <responseparam flag="IGNORECASE" />
                         <responseparam flag="MULTILINE" />
+                        <responseparam flag="UNICODE" />
                     </response>
                 </question_metadata>
                 <question_metadata id="problem_11" data-report="Short-answer9">
-                    <response name="q11d" answertype="regexresponse" answer="&quot;&amp;&lt;" correct-points="139" wrong-points="-23">
+                    <response name="q11d" answertype="regexresponse" answer="&quot;&amp;&lt;是" correct-points="139" wrong-points="-23">
                     </response>
                 </question_metadata>
             </exam_metadata>
@@ -537,37 +538,115 @@ class SimpleTest(TestCase):
         self.assertFalse(ag.grade('q8d', r"")['correct'])
 
         #testing with `search`, IGNORECASE and MULTILINE
-        self.assertTrue(ag.grade('q9d', "(5)")['correct'])
-        self.assertTrue(ag.grade('q9d', "(5bb1)\nagb")['correct'])
-        self.assertTrue(ag.grade('q9d', "agb\n(5bb1)")['correct'])
-        self.assertTrue(ag.grade('q9d', "agb\n\n(523B31)")['correct'])
-        self.assertFalse(ag.grade('q9d', r"a\cat")['correct'])
-        self.assertFalse(ag.grade('q9d', "(5c2)")['correct'])
-        self.assertFalse(ag.grade('q9d', "(5C2)")['correct'])
-        self.assertFalse(ag.grade('q9d', "")['correct'])
-        self.assertFalse(ag.grade('q9d', "k(5)")['correct'])
-        self.assertFalse(ag.grade('q9d', "agb\n4(5bb1)")['correct'])
-        self.assertFalse(ag.grade('q9d', "agb\n(523B31)8")['correct'])
+        self.assertTrue(ag.grade('q9d', u"(5)")['correct'])
+        self.assertTrue(ag.grade('q9d', u"(5bb1)\nagb")['correct'])
+        self.assertTrue(ag.grade('q9d', u"agb\n(5bb1)")['correct'])
+        self.assertTrue(ag.grade('q9d', u"agb\n\n(523B31)")['correct'])
+        self.assertFalse(ag.grade('q9d', ur"a\cat")['correct'])
+        self.assertFalse(ag.grade('q9d', u"(5c2)")['correct'])
+        self.assertFalse(ag.grade('q9d', u"(5C2)")['correct'])
+        self.assertFalse(ag.grade('q9d', u"")['correct'])
+        self.assertFalse(ag.grade('q9d', u"k(5)")['correct'])
+        self.assertFalse(ag.grade('q9d', u"agb\n4(5是bb1)")['correct'])
+        self.assertFalse(ag.grade('q9d', u"agb\n(523B31)8")['correct'])
 
-        #testing with `match`, IGNORECASE and MULTILINE
-        self.assertTrue(ag.grade('q10d', "(5)")['correct'])
-        self.assertTrue(ag.grade('q10d', "(5b&)")['correct'])
-        self.assertTrue(ag.grade('q10d', "(5b&b1)\nagb")['correct'])
-        self.assertFalse(ag.grade('q10d', "agb\n(5B&b1)")['correct'])
-        self.assertFalse(ag.grade('q10d', "agb\n\n(523B31)")['correct'])
-        self.assertFalse(ag.grade('q10d', r"a\cat")['correct'])
-        self.assertFalse(ag.grade('q10d', "(5c2)")['correct'])
-        self.assertFalse(ag.grade('q10d', "(5C2)")['correct'])
-        self.assertFalse(ag.grade('q10d', "")['correct'])
-        self.assertFalse(ag.grade('q10d', "k(5)")['correct'])
-        self.assertFalse(ag.grade('q10d', "4(5bb1)\n3")['correct'])
-        self.assertFalse(ag.grade('q10d', "(523B31)8\n3220")['correct'])
+        #testing with `match`, IGNORECASE, UNICODE, MULTILINE
+        self.assertTrue(ag.grade('q10d', u"(5)")['correct'])
+        self.assertTrue(ag.grade('q10d', u"(5是)")['correct'])
+        self.assertTrue(ag.grade('q10d', u"(5b&)")['correct'])
+        self.assertTrue(ag.grade('q10d', u"(5b&b1是)\nagb")['correct'])
+        self.assertFalse(ag.grade('q10d', u"agb\n(5B&b1)")['correct'])
+        self.assertFalse(ag.grade('q10d', u"agb\n\n(523B31)")['correct'])
+        self.assertFalse(ag.grade('q10d', ur"a\cat")['correct'])
+        self.assertFalse(ag.grade('q10d', u"(5c是2)")['correct'])
+        self.assertFalse(ag.grade('q10d', u"(5C2)")['correct'])
+        self.assertFalse(ag.grade('q10d', u"")['correct'])
+        self.assertFalse(ag.grade('q10d', u"k(5是)")['correct'])
+        self.assertFalse(ag.grade('q10d', u"4(5bb1)\n3")['correct'])
+        self.assertFalse(ag.grade('q10d', u"(523B31)8\n3220")['correct'])
 
         #special testing for how to encode invalid characters in the answer attribute
-        self.assertTrue(ag.grade('q11d', '"&<')['correct'])
-        self.assertTrue(ag.grade('q11d', '"&<3')['correct'])
-        self.assertTrue(ag.grade('q11d', '5"&<3')['correct'])
-        self.assertFalse(ag.grade('q11d', '"&famk<3')['correct'])
+        #also test that the scores are not screwed up
+        self.assertEqual(ag.grade('q11d', u'"&<是'), {'correct':True, 'score':139})
+        self.assertEqual(ag.grade('q11d', u'"&<是3'), {'correct':True, 'score':139})
+        self.assertEqual(ag.grade('q11d', u'5"&<是3'), {'correct':True, 'score':139})
+        self.assertEqual(ag.grade('q11d', u'5"&<否3'), {'correct':False, 'score':-23})
+        self.assertEqual(ag.grade('q11d', u'"&fam是k<3'), {'correct':False, 'score':-23})
+    
+    def test_string_metadata_errors(self):
+        """
+        Tests exceptions for string responses
+        """
+        xml1 = r"""
+            <exam_metadata>
+                <question_metadata id="problem_4" data-report="Short-answer2">
+                    <response name="q4d" answertype="stringresponse" correct-points="139" wrong-points="-23">
+                    </response>
+                </question_metadata>
+            </exam_metadata>
+            """
+        xml2 = r"""
+            <exam_metadata>
+                <question_metadata id="problem_5" data-report="Short-answer3">
+                    <response name="q4e" answertype="stringresponse" answer="" correct-points="139" wrong-points="-23">
+                    </response>
+                </question_metadata>
+            </exam_metadata>
+            """
+        
+        with self.assertRaisesRegexp(AutoGraderMetadataException, '.*<response name="q4d"> has no specified answer.*'):
+            ag = AutoGrader(xml1)
+
+        with self.assertRaisesRegexp(AutoGraderMetadataException, '.*<response name="q4e"> has no specified answer.*'):
+            ag = AutoGrader(xml2)
+
+    def test_string_responses(self):
+        """
+            Tests exceptions for regex responses
+            """
+        xml = ur"""
+            <exam_metadata>
+                <question_metadata id="problem_4" data-report="Short-answer2">
+                    <response name="q4d" answertype="stringresponse" answer="¡TheRightAnswer是!" correct-points="139" wrong-points="-23">
+                    </response>
+                </question_metadata>
+                <question_metadata id="problem_5" data-report="Short-answer3">
+                    <response name="q5d" answertype="stringresponse" answer="    ¡TheRightAnswer是!  " correct-points="139" wrong-points="-23">
+                    </response>
+                </question_metadata>
+                <question_metadata id="problem_6" data-report="Short-answer4">
+                    <response name="q6d" answertype="stringresponse" answer="¡TheRightAnswer是!" ignorecase="true" correct-points="139" wrong-points="-23">
+                    </response>
+                </question_metadata>
+                <question_metadata id="problem_7" data-report="Short-answer5">
+                    <response name="q7d" answertype="stringresponse" answer="    ¡TheRightAnswer是!  " ignorecase="true" correct-points="139" wrong-points="-23">
+                    </response>
+                </question_metadata>
+            </exam_metadata>
+            """
+        ag = AutoGrader(xml)
+        #basic test, including unicode
+        self.assertEqual(ag.grade("q4d", u"¡TheRightAnswer是!"),         {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q4d", u"    ¡TheRightAnswer是!  "),  {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q4d", u"¡therightanswer是!"),         {'correct':False, 'score':-23})
+        self.assertEqual(ag.grade("q4d", u"TheWrongAnswer是!"),          {'correct':False, 'score':-23})
+        #testing strip() in answer xml, including unicode
+        self.assertEqual(ag.grade("q5d", u"¡TheRightAnswer是!"),         {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q5d", u"    ¡TheRightAnswer是!  "),  {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q5d", u"¡therightanswer是!"),         {'correct':False, 'score':-23})
+        self.assertEqual(ag.grade("q5d", u"TheWrongAnswer是!"),          {'correct':False, 'score':-23})
+        #case-insensitive test, including unicode
+        self.assertEqual(ag.grade("q6d", u"¡TheRightAnswer是!"),         {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q6d", u"    ¡TheRightAnswer是!  "),  {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q6d", u"¡therightanswer是!"),         {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q6d", u"TheWrongAnswer是!"),          {'correct':False, 'score':-23})
+        #case insensitive testing strip() in answer xml, including unicode
+        self.assertEqual(ag.grade("q7d", u"¡TheRightAnswer是!"),         {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q7d", u"    ¡TheRightAnswer是!  "),  {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q7d", u"¡therightanswer是!"),         {'correct':True, 'score':139})
+        self.assertEqual(ag.grade("q7d", u"TheWrongAnswer是!"),          {'correct':False, 'score':-23})
+
+    
 
     ### INTERACTIVE AUTOGRADER ###
 
