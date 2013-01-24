@@ -29,6 +29,13 @@ MAINTENANCE_LANDING_PAGE = False
 #    "stage" or "prod" for something in produciton -- are you sure you want to do that?
 INSTANCE="dev"
 
+# Information about this site. Note that the short name here is used to
+# build paths to site assets, so is specific and case-sensitive.
+SITE_ID = 1
+SITE_NAME_SHORT = 'Stanford'
+SITE_NAME_LONG = 'Stanford University'
+SITE_TITLE = 'Stanford Class2Go'
+
 # Put your name and email address here, so Django serious errors can come to you
 # the trailing comma after the list is important so Python correctly interprets 
 # this as a list of lists
