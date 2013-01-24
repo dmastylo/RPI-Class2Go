@@ -8,15 +8,84 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Instructor'
+        db.create_table(u'c2g_instructor', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+            ('name', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('email', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('biography', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('photo', self.gf('django.db.models.fields.files.FileField')(max_length=100, blank=True)),
+            ('handle', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, db_index=True)),
+        ))
+        db.send_create_signal('c2g', ['Instructor'])
+
+        # Adding model 'CourseInstructor'
+        db.create_table(u'c2g_course_instructor', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
+            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
+            ('instructor', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Instructor'])),
+        ))
+        db.send_create_signal('c2g', ['CourseInstructor'])
+
         # Adding field 'Course.short_description'
         db.add_column(u'c2g_courses', 'short_description',
                       self.gf('django.db.models.fields.TextField')(default='', blank=True),
                       keep_default=False)
 
+        # Adding field 'Course.prerequisites'
+        db.add_column(u'c2g_courses', 'prerequisites',
+                      self.gf('django.db.models.fields.TextField')(default='', blank=True),
+                      keep_default=False)
+
+        # Adding field 'Course.accompanying_materials'
+        db.add_column(u'c2g_courses', 'accompanying_materials',
+                      self.gf('django.db.models.fields.TextField')(default='', blank=True),
+                      keep_default=False)
+
+        # Adding field 'Course.outcomes'
+        db.add_column(u'c2g_courses', 'outcomes',
+                      self.gf('django.db.models.fields.TextField')(default='', blank=True),
+                      keep_default=False)
+
+        # Adding field 'Course.faq'
+        db.add_column(u'c2g_courses', 'faq',
+                      self.gf('django.db.models.fields.TextField')(default='', blank=True),
+                      keep_default=False)
+
+        # Adding field 'Course.logo'
+        db.add_column(u'c2g_courses', 'logo',
+                      self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
+        # Deleting model 'Instructor'
+        db.delete_table(u'c2g_instructor')
+
+        # Deleting model 'CourseInstructor'
+        db.delete_table(u'c2g_course_instructor')
+
         # Deleting field 'Course.short_description'
         db.delete_column(u'c2g_courses', 'short_description')
+
+        # Deleting field 'Course.prerequisites'
+        db.delete_column(u'c2g_courses', 'prerequisites')
+
+        # Deleting field 'Course.accompanying_materials'
+        db.delete_column(u'c2g_courses', 'accompanying_materials')
+
+        # Deleting field 'Course.outcomes'
+        db.delete_column(u'c2g_courses', 'outcomes')
+
+        # Deleting field 'Course.faq'
+        db.delete_column(u'c2g_courses', 'faq')
+
+        # Deleting field 'Course.logo'
+        db.delete_column(u'c2g_courses', 'logo')
 
 
     models = {
@@ -81,6 +150,19 @@ class Migration(SchemaMigration):
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
+        'c2g.contentgroup': {
+            'Meta': {'object_name': 'ContentGroup', 'db_table': "u'c2g_content_group'"},
+            'additional_page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.AdditionalPage']", 'null': 'True', 'blank': 'True'}),
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'display_style': ('django.db.models.fields.CharField', [], {'default': "'list'", 'max_length': '32', 'blank': 'True'}),
+            'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']", 'null': 'True', 'blank': 'True'}),
+            'file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.File']", 'null': 'True', 'blank': 'True'}),
+            'group_id': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'level': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
+            'problemSet': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ProblemSet']", 'null': 'True', 'blank': 'True'}),
+            'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Video']", 'null': 'True', 'blank': 'True'})
+        },
         'c2g.contentsection': {
             'Meta': {'object_name': 'ContentSection', 'db_table': "u'c2g_content_sections'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
@@ -91,6 +173,8 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'subtitle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
@@ -149,6 +233,14 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
+        'c2g.currenttermmap': {
+            'Meta': {'object_name': 'CurrentTermMap'},
+            'course_prefix': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '64', 'db_index': 'True'}),
+            'course_suffix': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
         'c2g.emailaddr': {
             'Meta': {'object_name': 'EmailAddr'},
             'addr': ('django.db.models.fields.EmailField', [], {'max_length': '128'}),
@@ -159,31 +251,127 @@ class Migration(SchemaMigration):
         },
         'c2g.exam': {
             'Meta': {'object_name': 'Exam'},
+            'assessment_type': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
+            'autograde': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'display_single': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'due_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'exam_type': ('django.db.models.fields.CharField', [], {'default': "'exam'", 'max_length': '32'}),
             'grace_period': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'grade_single': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'html_content': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.Exam']"}),
+            'index': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'invideo': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_deleted': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'late_penalty': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'minutes_btw_attempts': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'minutesallowed': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'partial_credit_deadline': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'resubmission_penalty': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ContentSection']", 'null': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'null': 'True'}),
+            'submissions_permitted': ('django.db.models.fields.IntegerField', [], {'default': '999', 'null': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+            'timed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'total_score': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'xml_imported': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'xml_metadata': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
         },
         'c2g.examrecord': {
             'Meta': {'object_name': 'ExamRecord'},
+            'attempt_number': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'complete': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'json_data': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'json_score_data': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'score': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'late': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'onpage': ('django.db.models.fields.CharField', [], {'max_length': '512', 'null': 'True', 'blank': 'True'}),
+            'score': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'c2g.examrecordfieldlog': {
+            'Meta': {'object_name': 'ExamRecordFieldLog'},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']"}),
+            'field_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'human_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'max_score': ('django.db.models.fields.FloatField', [], {'default': '0', 'blank': 'True'}),
+            'raw_score': ('django.db.models.fields.FloatField', [], {'default': '0', 'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'value': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
+        },
+        'c2g.examrecordscore': {
+            'Meta': {'object_name': 'ExamRecordScore'},
+            'csv_imported': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'raw_score': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'record': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['c2g.ExamRecord']", 'unique': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'c2g.examrecordscorefield': {
+            'Meta': {'object_name': 'ExamRecordScoreField'},
+            'associated_text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'comments': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'correct': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'field_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'human_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ExamRecordScore']"}),
+            'subscore': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'value': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
+        },
+        'c2g.examrecordscorefieldchoice': {
+            'Meta': {'object_name': 'ExamRecordScoreFieldChoice'},
+            'associated_text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'choice_value': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'correct': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'human_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ExamRecordScoreField']"}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'c2g.examscore': {
+            'Meta': {'unique_together': "(('exam', 'student'),)", 'object_name': 'ExamScore'},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'csv_imported': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'score': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'c2g.examscorefield': {
+            'Meta': {'object_name': 'ExamScoreField'},
+            'associated_text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'comments': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'correct': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'field_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'human_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ExamScore']"}),
+            'subscore': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'value': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
         },
         'c2g.exercise': {
             'Meta': {'object_name': 'Exercise', 'db_table': "u'c2g_exercises'"},
@@ -227,11 +415,11 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Instructor'},
             'biography': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'email': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'photo': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'blank': 'True'}),
-            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.listemail': {
@@ -331,6 +519,14 @@ class Migration(SchemaMigration):
             'number': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'problemSet': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ProblemSet']"})
         },
+        'c2g.studentexamstart': {
+            'Meta': {'object_name': 'StudentExamStart'},
+            'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
         'c2g.studentsection': {
             'Meta': {'object_name': 'StudentSection', 'db_table': "u'c2g_sections'"},
             'capacity': ('django.db.models.fields.IntegerField', [], {'default': '999'}),
@@ -370,7 +566,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Video', 'db_table': "u'c2g_videos'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'duration': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'duration': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']", 'null': 'True', 'blank': 'True'}),
             'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -391,7 +588,17 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'VideoActivity', 'db_table': "u'c2g_video_activity'"},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'max_end_seconds': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'start_seconds': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Video']"})
+        },
+        'c2g.videodownload': {
+            'Meta': {'object_name': 'VideoDownload', 'db_table': "u'c2g_video_download'"},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'download_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'format': ('django.db.models.fields.CharField', [], {'max_length': '35', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Video']"})
         },

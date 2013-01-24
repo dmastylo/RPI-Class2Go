@@ -7,6 +7,11 @@ import djcelery
 from database import *
 import monkeypatch
 
+# fix "hash collision" error, 
+# see http://jaredforsyth.com/blog/2010/apr/28/accessinit-hash-collision-3-both-1-and-1/
+import sys
+import PIL.Image
+sys.modules['Image'] = PIL.Image
 
 #ADDED FOR url tag future
 django.template.add_to_builtins('django.templatetags.future')
