@@ -75,6 +75,27 @@
 
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
+            <label class="control-label">Section</label>
+            <div class="controls">
+                <select name="section" id="section_id" {% if not page.section_id %}disabled="disabled"{% else %}onChange="prefill_children();"{% endif %}>
+                    {% if not page.section_id %}
+                        <option value="null" selected>** No content section **</option>
+                    {% else %}
+                        {% for section in sections %}
+                            {% if page.section_id and page.section_id == section.id %}
+                                <option value="{{section.id}}" selected>{{section.title}}</option>
+                            {% else %}
+                                <option value="{{section.id}}">{{section.title}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+        </div>
+        {% endifnotequal %}
+
+        {% ifnotequal page.slug 'overview' %}
+        <div class="control-group" id="parent_id_group">
             <label class="control-label">Item Parent</label>
             <div class="controls">
                 <select name="parent" id="parent_id">
@@ -154,27 +175,37 @@ $('#id_slug').focus(function() {
 </script>
 <script type="text/javascript">
     // force our handler to fire when the page first loads, in addition to onChange
-    $("#parent_id").ready(
+    $("#parent_id").ready(prefill_children());
     function prefill_children() {
-        var id = {{ page.section_id }}; /* FIXME: using template substitutions in js is evil. better to seed a data structure. */
+        var id = $('#section_id').val(); 
         var pelement = $("#parent_id");
-        pelement.append('<option value="none,none">(this is a top level page)</option>');
-        jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
-            for (var i=0; i < data.length; i++) {
-                if ((data[i][0] == 'video') || (data[i][0] == 'exam') || (data[i][0] == 'additional_page')) {
-                    {% if contentgroup_info %}
-                    if ((data[i][2] != "{{contentgroup_info.PARENT.title}}") && (data[i][2] != "{{page.title}}")) {
-                        pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+        if (id === "null") {
+            $('#parent_id_group').css('display', 'none');
+        } else {
+            $('#parent_id_group').css('display', 'inline');
+            {% if contentgroup_info.PARENT.id != page.image.id %}  /* FIXME: using template substitutions in js is evil. better to seed a data structure. */
+                pelement.html('<option value="{{contentgroup_info.PARENT_TAG}},{{contentgroup_info.PARENT.id}}" selected>{{contentgroup_info.PARENT.title}}</option>');
+            {% else %}
+                pelement.html('');
+            {% endif %}
+            pelement.append('<option value="none,none">(this is a top level page)</option>');
+            jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
+                for (var i=0; i < data.length; i++) {
+                    if ((data[i][0] == 'video') || (data[i][0] == 'exam') || (data[i][0] == 'additional_page')) {
+                        {% if contentgroup_info %} 
+                            if ((data[i][2] != "{{contentgroup_info.PARENT.title}}") && (data[i][2] != "{{page.title}}")) {
+                                pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                            }
+                        {% else %}
+                            if (data[i][2] != "{{page.title}}") {
+                                pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
+                            }
+                        {% endif %}
                     }
-                    {% else %}
-                    if (data[i][2] != "{{page.title}}") {
-                        pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
-                    }
-                    {% endif %}
                 }
-            }
-        });
-    });
+            });
+        }
+    }
 </script>
 
 
