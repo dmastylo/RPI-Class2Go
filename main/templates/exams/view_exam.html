@@ -676,26 +676,44 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     submitBtn.after($(saveWorkBtn));
 
     $(saveWorkBtn).click(function () {
-      var fieldCollection = $('#exam-pane').find('input,textarea');
-      var userAnswerObj = window.collectUserAnswers(fieldCollection);
-      var userSelections = userAnswerObj.userSelections; 
+        var fieldCollection = $('#exam-pane').find('input,textarea');
+        var userAnswerObj = window.collectUserAnswers(fieldCollection);
+        var userSelections = userAnswerObj.userSelections; 
 
-      window.myData = JSON.stringify(userSelections);
+        window.myData = JSON.stringify(userSelections);
 
-      var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
+        var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                        {   csrfmiddlewaretoken: "{{ csrf_token }}",
                            json_data:JSON.stringify(userSelections),
                            onpage:$(location).attr('href')
                        });
                        
-      saveXHR.error(function(xhr, status, msg) {
+        saveXHR.error(function(xhr, status, msg) {
                      var dialogDiv = window.getDialog('Error');
                      $(dialogDiv).find('p').text("Your answers could not be saved!  "
                                             + msg + ": "+xhr.responseText.substr(0,99));
                      $(dialogDiv).dialog({ modal: true,
                                            buttons: {'Close':function(){$(this).dialog("close");}}
                                          });
-      });
+        });
+
+        saveXHR.success(function(status, msg, xhr) { 
+                var dialogDiv = window.getDialog(msg.toUpperCase());
+                $(dialogDiv).find('p').text("Your answers have been saved!");
+                console.group("Save answer XHR Obj");
+                for (prop in xhr) {
+                    if (typeof xhr[prop] == "function") {
+                        console.log(prop + ": method (" + typeof xhr[prop] + ")");
+                    } else {
+                        console.log(prop + ": " + xhr[prop] + " (" + typeof xhr[prop] + ")");
+                    }
+                }
+                console.groupEnd();
+
+                $(dialogDiv).dialog({ modal: true,
+                                   buttons: {'Close':function(){$(this).dialog("close");}}
+                                 });
+        });
 
     });
 
