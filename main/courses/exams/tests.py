@@ -602,8 +602,8 @@ class SimpleTest(TestCase):
 
     def test_string_responses(self):
         """
-            Tests exceptions for regex responses
-            """
+            Tests string responses
+        """
         xml = ur"""
             <exam_metadata>
                 <question_metadata id="problem_4" data-report="Short-answer2">
