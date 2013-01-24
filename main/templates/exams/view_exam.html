@@ -690,7 +690,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                        
         saveXHR.error(function(xhr, status, msg) {
                      var dialogDiv = window.getDialog(status.toUpperCase());
-                    console.log(xhr);
                     var displayText = "Your answers could not be saved!";
                     if (typeof msg != "undefined" && msg != "") {
                         displayText += " " + msg;
