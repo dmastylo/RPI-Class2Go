@@ -22,7 +22,7 @@ def landing(request):
         course_list = Course.objects.filter(Q(mode='ready', 
                 institution_only = 0) | Q(mode='ready', institution__id__in=request.user.get_profile().institutions.all()))
         
-    site = getattr(settings, SITE_NAME_SHORT)
+    site = getattr(settings, 'SITE_NAME_SHORT')
     r = render_to_response("sites/%s/landing.html" % site,
             {'hiring': hiring, 
              'course_list':course_list,
