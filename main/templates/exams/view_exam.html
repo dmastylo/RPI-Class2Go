@@ -690,8 +690,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                        
         saveXHR.error(function(xhr, status, msg) {
                      var dialogDiv = window.getDialog(status.toUpperCase());
-                     $(dialogDiv).find('p').text("Your answers could not be saved!  "
-                                            + msg + ": "+xhr.responseText.substr(0,99));
+                    console.log(xhr);
+                    var displayText = "Your answers could not be saved!";
+                    if (typeof msg != "undefined" && msg != "") {
+                        displayText += " " + msg;
+                    }
+                    if (typeof xhr.responseText != "undefined" && xhr.responseText != "") {
+                        displayText += xhr.responseText.substr(0,99);
+                    }
+                     $(dialogDiv).find('p').text(displayText);
+                    if (typeof window.myData != "undefined" && window.myData != "") {
+                        if (typeof localStorage != "undefined") {
+                            var storageKey = "{{user.id}}_" + Date.now() + "_{{exam.slug}}";
+                            localStorage[storageKey] = window.myData;
+                        }
+                    }
                      $(dialogDiv).dialog({ modal: true,
                                            buttons: {'Close':function(){$(this).dialog("close");}}
                                          });
