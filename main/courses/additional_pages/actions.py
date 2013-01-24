@@ -78,6 +78,7 @@ def save(request):
         return redirect('courses.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'])
     
     page = AdditionalPage.objects.get(id=request.POST.get("page_id"))
+    
     if request.POST.get("revert") == '1':
         page.revert()
     else:
@@ -94,9 +95,17 @@ def save(request):
         if len(request.POST.get("title")) == 0:
             return redirectWithError("The title cannot be empty")
 
-                
         if len(request.POST.get("title")) > AdditionalPage._meta.get_field("title").max_length:
             return redirectWithError("The title length was too long")
+
+        new_section = request.POST.get("section")
+        old_section = page.section
+        if new_section == "null":                # Topbar pages
+            page.section = None
+            page.menu_slug = "course_info"       # normal pages
+        else:
+            page.section = ContentSection.objects.get(id=new_section)
+            page.menu_slug = None
 
         page.title = request.POST.get("title")
         page.description = request.POST.get("description")
@@ -112,6 +121,10 @@ def save(request):
         if request.POST.get("commit") == '1':
             page.commit()
             
+        # This has to happen last of all
+        if old_section or new_section != "null":
+            ContentGroup.reassign_parent_child_sections('additional_page', page.image.id, new_section)
+
     return redirect('courses.additional_pages.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'], page.slug)
 
 @require_POST

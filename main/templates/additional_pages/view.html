@@ -1,11 +1,11 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block title %}{{ page.title }} | {{ common_page_data.course.title }}{% endblock title %}
+{% block title %}{{ page.title }} | {{ common_page_data.course_title }}{% endblock title %}
 
 {% block course_info_link_class %}{% if page.menu_slug %} active{% endif %}{% endblock course_info_link_class %}
 {% block course_materials_link_class %}{% if not page.menu_slug %} active{% endif %}{% endblock course_materials_link_class %}
 
-{% block course_page_title %}{{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
+{% block course_page_title %}{{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course_title}}</a>){% endblock course_page_title %}
 
 {% block addl_head_scripts %}
 <script type="text/x-mathjax-config">
