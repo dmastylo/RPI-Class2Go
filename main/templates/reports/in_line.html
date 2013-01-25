@@ -11,11 +11,10 @@
       <form action="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
          <label for="report" style='display: inline;'>Report</label>
          <select name="report_name" style="margin-left: 10px;" style="margin-left: 10px;">             
-             <option value="interactive_quizzes_summary">interactive quizzes summary</option>
+             <option value="quizzes_summary">quizzes summary</option>
          </select>
          <input type="submit" class='btn' value="Generate report" style="margin-left: 10px;" />
          <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
-         <input type="hidden" name="type" value="assessment_full" />
          {% csrf_token %}
       </form>
 

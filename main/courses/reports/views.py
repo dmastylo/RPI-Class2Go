@@ -211,10 +211,10 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     column6 = {}
     
     we_have_data = False
-    if report_name == 'interactive_quizzes_summary':
+    if report_name == 'quizzes_summary':
         report_data = gen_spec_in_line_report(report_name, course)
         if report_data:
-            report_label = "Interactive Quizzes Summary"
+            report_label = "Quizzes Summary"
             headings = report_data['headings']
             column1 = report_data['exam_titles']
             column2 = report_data['count_lt_34']
