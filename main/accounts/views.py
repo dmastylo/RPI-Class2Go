@@ -15,6 +15,7 @@ from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 from django.views.decorators.http import require_POST
 from django.contrib.auth import get_backends, REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, authenticate as auth_authenticate
+from django.contrib.auth.views import login as auth_login_view
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from c2g.models import Course, Institution,Video, Instructor, CourseInstructor
@@ -158,13 +159,12 @@ def default_login(request):
         context = RequestContext(request)
         for key, value in extra_context.items():
             context[key] = callable(value) and value() or value
-        layout = {'m': 800}
         return render_to_response('registration/login.html',
-                            {'form': AuthenticationForm, 'layout': json.dumps(layout), 'next': request.GET.get('next', '/')},
+                            {'form': AuthenticationForm, 'next': request.GET.get('next', '/')},
                             context_instance=context)
     else:
         if settings.SITE_NAME_SHORT == "Stanford":
-            return standard_login(request)
+            return auth_login_view(request)
         else:
             return ldap_login(request, '', '')
 
@@ -245,7 +245,8 @@ def shib_login(request):
     return HttpResponseRedirect(redir_to) 
 
 # login for public courses
-
+# @jbau here (1/25/2013).  I've removed the call to this since it was buggy.
+# Now default_login just uses django.contrib.auth.views.login
 def standard_login(request):
     
     #setup the redirect first: code borrowed from django contrib library

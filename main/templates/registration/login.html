@@ -18,9 +18,6 @@
 <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
 
 {% else %}
-    {% if SITE_NAME_SHORT = 'Stanford' %}
-        <div class="row-fluid"><div class="span3"></div><h3 style="margin-left:330px;" >Stanford students, please log in <a data-toggle="modal" href="{% url 'shib_login' %}?next=/">here</a></h3></div>
-    {% endif %}
  <div class="row-fluid">
  <div class="span3"> </div>
        {% if login_form.errors %}
@@ -30,8 +27,10 @@
        </div>
        {% endif %}
        <div class="well preview-registration span5" style="margin-top:50px;">
-       <h3>Confirm your login name</h3>
-<form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">  
+       <h3>Enter your login information:</h3>
+    
+
+<form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">
 {% csrf_token %}
 
 <table>
