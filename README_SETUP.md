@@ -58,18 +58,11 @@ prefix for these.
 
 1. Install mysql
 
-    Download mysql: dev.mysql.com/downloads/mysql
-    Look for the DMG of the latest 64-bit version (10.6 will work)
+        brew install mysql
 
-    Install the mysql-5.x-osx10.x-x86_64.pkg
-    Install the MySQLStartupItem.pkg
-    Install the MySQL.prefpane
-    – Start MySQL Server
-    – Check Automatically Start on startup
-
-1. Install Sequel Pro (optional)
-    
-    www.sequelpro.com
+    (Optional but useful for looking at the database)
+    Install phpmyadmin (?!) following the directions here:
+    http://www.djangoapp.com/blog/2011/07/24/installing-phpmyadmin-on-mac-os-x-lion/
 
 1. Install pip, a python package manager
 
@@ -79,55 +72,13 @@ prefix for these.
 
         pip install virtualenv
 
-1. Install virtualenvwrapper:
+1. Create the class2go virtual env (if you want)
 
-        sudo pip install virtualenvwrapper
+        virtualenv class2go-venv --no-site-packages
 
-1. Verify installation location of virtualenv and virtualenvwrapper:
-
-        ls /usr/local/bin/
-
-1. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
-
-        echo $PATH
-    (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
-
-1. Edit login script:
-
-        vim .bashrc
-
-1. ...and add the following:
-
-        # virtualenv setup -- use Distribute by default
-        export VIRTUALENV_DISTRIBUTE=true
-
-        # virtualenvwrapper setup
-        export WORKON_HOME=~/class2go-venv
-        export PROJECT_HOME=~/class2go-projects
-        export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-        export VIRTUALENVWRAPPER_VIRTUALENV=`which virtualenv`
-        source /usr/local/bin/virtualenvwrapper.sh
-
-1. Source login script so env vars take effect:
-
-        source ~/.bashrc
-    (Sourcing should auto-create your virtual environment base dir)
-
-1. Check out new virtual base directory:
-
-        ls class2go-venv/
-
-1. Make sure PROJECT_HOME is defined
-
-        echo $PROJECT_HOME
-
-1. Make new project directory:
-
-        mkdir -p $PROJECT_HOME
-
-1. Issue command to set up new project subdirectory and link it to virtual env:
-
-        mkproject class2go
+    This should create the class2go-venv directory under the
+    directory where this README is found.  All our django stuff
+    will happen in there now.
 
 1. Start using the virtual environment that we just created.
 
@@ -149,7 +100,7 @@ prefix for these.
 
         pip install PIL
 
-1. Install South, the database schema migration tool: (this will be inside the virtualenv)
+13. Install South, the database schema migration tool: (this will be inside the virtualenv)
 
         pip install South
 
@@ -161,10 +112,6 @@ prefix for these.
 1. Install GData (2.0.17)
 
         pip install gdata
-
-1. Install numpy
-
-        pip install numpy
 
 1. Install Celery ecosystem
 
@@ -192,7 +139,7 @@ prefix for these.
 
         # TODO: Figure out how to run headless on Mac OSX (see Linux section for starters)
 
-1. Setup the account and database in MySql (Sequel Pro)
+1. Setup the account and database in MySql
 
         create database class2go;
         grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';
