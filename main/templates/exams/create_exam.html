@@ -387,6 +387,19 @@ age: 20,
 <script src="{{STATIC_URL}}js/core/beautify-html.js"></script>
 
 <script>
+	$('#due_date').focusout(function() {
+		//Update the grace period and hard deadline fields if the due date is after the current grace and hard deadlines
+			var due = $('#due_date').val(); 
+			var dueDate = new Date(due); 
+			var grace = $("#grace_period").val(); 
+			var hard = $("#hard_deadline").val(); 
+			if(!grace || ((new Date(grace)) < dueDate)) {
+				$('#grace_period').val(due); 				
+			}
+			if(!hard || ((new Date(hard)) < dueDate)) {
+				$('#hard_deadline').val(due); 				
+			}
+	})
     $('#myTab a').click(function (e) {
                         e.preventDefault();
                         $(this).tab('show');
