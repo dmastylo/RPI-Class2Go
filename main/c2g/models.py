@@ -145,7 +145,8 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     piazza_id = models.IntegerField(null=True, blank=True)
 
     def logo_dl_link(self):
-        if not self.logo.storage.exists(self.logo.name):
+
+        if self.logo.name is None or not self.logo.storage.exists(self.logo.name):
             return ""
         
         url = self.logo.storage.url(self.logo.name)
