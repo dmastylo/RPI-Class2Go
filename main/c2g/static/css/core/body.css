@@ -213,6 +213,10 @@ label.control-label {
   -webkit-border-radius: 0;
 }
 
+.navbar #PacTime {
+  padding: 5px;
+}
+
 
 /* Homepage
 -------------------------------------------------- */
