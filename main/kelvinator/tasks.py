@@ -26,7 +26,8 @@ import shutil
 from django.core.files.storage import default_storage
 from django.conf import settings
 from celery import task
-from PIL import Image
+
+import Image
 
 from utility import *
 
