@@ -21,7 +21,7 @@
     <h3> Please login to see profile information: </h3>
 
 
-    {% if SITE_NAME_SHORT = 'Stanford' %}
+    {% if SITE_NAME_SHORT == 'Stanford' %}
     <p>
     <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Stanford WebAuth</a>
     <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Class2Go Login (Public course students)</a>

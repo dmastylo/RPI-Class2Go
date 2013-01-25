@@ -28,7 +28,7 @@
       {% if not request.session.headless %}
         <div id="global-header">
             <h1 class="stanford-logo">
-            	{% if SITE_NAME_SHORT = 'Stanford' %}
+            	{% if SITE_NAME_SHORT == 'Stanford' %}
                 <a href="http://www.stanford.edu">Stanford University</a>
                 {% else %}
                 <a href="http://www.uwa.edu.au">{{ SITE_NAME_LONG }}</a>
@@ -64,7 +64,7 @@
             <div class="row-fluid" style="position:relative;">
             {% block page_title %}
             <div class="pull-left page-title">
-                {% if SITE_NAME_SHORT = 'Stanford' %}
+                {% if SITE_NAME_SHORT == 'Stanford' %}
                 <img src="{{ STATIC_URL }}graphics/core/top-banner-Stanford.png" alt="Stanford Online">
                 {% endif %}
                 <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
