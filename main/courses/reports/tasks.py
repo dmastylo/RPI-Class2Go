@@ -150,6 +150,15 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
                 reports.append(report)
                 logger.info("Survey summary report for course %s assessment %s generated successfully for user %s." % (course_handle, slug, username))
             
+            
+        elif rr['type'] == 'assessment_student_scores':
+            logger.info("User %s requested to generate assessment student scores report for course %s." % (username, course_handle))
+            report = gen_assessment_student_scores_report(ready_course, save_to_s3=True)
+            report['type'] = rr['type']
+            
+            reports.append(report)
+            logger.info("Assessment student scores report for course %s generated successfully for user %s." % (course_handle, username))            
+            
     # Email Generated Reports
     staff_email = ready_course.contact
     if not staff_email:

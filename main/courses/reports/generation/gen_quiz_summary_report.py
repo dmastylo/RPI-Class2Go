@@ -140,6 +140,28 @@ def gen_survey_summary_report(ready_course, survey, save_to_s3=False):
     report_content = rw.writeout()
     return {'name': report_name, 'content': report_content, 'path': s3_filepath}
 
+def gen_assessment_student_scores_report(ready_course, save_to_s3=False):
+    
+    ### 1- Compose the report file name and instantiate the report writer object
+    dt = datetime.now()
+    course_prefix = ready_course.handle.split('--')[0]
+    course_suffix = ready_course.handle.split('--')[1]
+    
+    report_name = "%02d_%02d_%02d__%02d_%02d_%02d.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+    s3_filepath = "%s/%s/reports/assessment_student_scores/%s" % (course_prefix, course_suffix, report_name)
+    
+    rw = C2GReportWriter(save_to_s3, s3_filepath)
+    
+    ### 2- Write the Report Title
+    rw.write(content = ["Student Scores for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
+    rw.write(content= ["All student scores shown are with all penalties included"])
+    
+    ### 3- Write survey report
+    WriteAssessmentStudentScoresReportContent(ready_course, rw, full=False)
+    
+    ### 4- Proceed to write out and return
+    report_content = rw.writeout()
+    return {'name': report_name, 'content': report_content, 'path': s3_filepath}
 
 def WriteQuizSummaryReportContent(ready_quiz, rw, full=False):
     ### 1- Get the quiz data
@@ -292,4 +314,52 @@ def WriteSurveySummaryReportContent(ready_survey, rw, full=False):
     content = []
     content = [str(errors) + " errors found in parsing the data"]
     rw.write(content)
+    rw.write([""])
+    
+def WriteAssessmentStudentScoresReportContent(ready_course, rw, full=False):
+    
+    ### 1- Get the exams, excluding surveys, and student score data
+    exams, student_scores = get_student_scores(ready_course)
+    
+    ### 2- Construct scores dictionary
+    # scores_dict is a dict of dicts. Each dict represents a row in the report for a
+    # username. All this block does is convert rows from the returned queryset into
+    # columns for the report.
+    # Each dict contains <exam title>:<score> key:value pairs.
+    scores_dict = {}
+    last_username = ""
+    for student_score in student_scores:
+        username = student_score['student__username']
+        if username != last_username:
+            scores_dict[username] = {}
+            scores_dict[username]['username'] = username
+            scores_dict[username]['name'] = student_score['student__first_name'] + " " + student_score['student__last_name']
+        
+        scores_dict[username][student_score['exam__title']] = student_score['score']
+        last_username = username
+    
+    ### 3- Construct column title array and max_scores array and print them.
+    titles = ["", "Title"]
+    max_scores = ["", "Max Score"]
+    for exam in exams:
+        titles += [exam['title']]
+        max_scores += [exam['total_score']]
+    rw.write(titles)
+    rw.write(max_scores)
+    rw.write([""])
+    
+    ### 4- Print the sorted scores_dict matching exam titles as we go.
+    row = []
+    for username, scores in sorted(scores_dict.iteritems()):
+        row += [username]
+        row += [scores['name']]
+        for title in titles:
+            if scores.get(title, False):
+                row += [str(scores.get(title))]
+            elif titles.index(title) not in [0, 1]:
+                row += [""]
+            
+        rw.write(row)
+        row = []  
+        
     rw.write([""])

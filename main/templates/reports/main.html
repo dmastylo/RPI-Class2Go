@@ -17,6 +17,7 @@
                 <li><a href="#videos_summary" data-toggle="tab">Video Summary</a></li>
                 <li><a href="#class_roster" data-toggle="tab">Class Roster</a></li>
                 <li><a href="#survey_summary" data-toggle="tab">Survey Summary</a><li>
+                <li><a href="#assessment_student_scores" data-toggle="tab">Assessment Student Scores</a></li>
             </ul>
             <div class="tab-content">
                 <div id="dashboard" class="tab-pane active" style="padding-left: 10px;">
@@ -218,6 +219,24 @@
                     {% endfor %}
                 </div>
                 
+                <div id="assessment_student_scores" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new assessment student scores</h3>
+                    <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
+                        <input type="submit" class='btn' value="Generate new assessment student scores" style="margin-left: 10px;" />
+                        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+                        <input type="hidden" name="type" value="assessment_student_scores" />
+                        {% csrf_token %}
+                    </form>
+                    <h3>Available assessment student scores</h3>
+                    <table class="table table-striped" style="width: 600px;">
+                        {% for rep in assessment_student_scores_reports %}
+                            <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'assessment_student_scores' rep.s3_name %}">{{ rep.name }}</a></td></tr>
+                        {% empty %}
+                            <tr><td style="width: 600px;">No assessment student scores reports available at the moment.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>                      
                 
             </div>
         </div>

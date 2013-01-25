@@ -2,7 +2,8 @@ from c2g.models import *
 from operator import itemgetter
 import json
 import re
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Q
+from datetime import datetime
 
 mean = lambda k: sum(k)/len(k)
 
@@ -401,6 +402,15 @@ def get_survey_data(ready_survey, get_visits = False):
     
     return tally, errors, question_reports
     
+
+def get_student_scores(ready_course):
+    
+    now = datetime.now()
+    exams = Exam.objects.values('title', 'total_score').filter(~Q(exam_type='survey'), course=ready_course, is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('due_date')
+    student_scores = ExamScore.objects.values('student__username', 'student__first_name', 'student__last_name', 'exam__title', 'score').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=ready_course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now).order_by('student__username', 'exam__partial_credit_deadline')
+    
+    return exams, student_scores
+        
     
 def store_answer(tally, question, answer):
 
