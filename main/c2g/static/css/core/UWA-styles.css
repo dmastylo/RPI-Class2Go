@@ -109,13 +109,13 @@ MENU
         
         
 #c2g_layout_topbar .navbar .navbar-inner {
-        background-image: url("../../graphics/core/bg-nav.png") !important;
+        background-image: url("../../graphics/core/uwa-bg-nav.png") !important;
    }
 
 
 
 .navbar .nav .active > a, .navbar .nav .active > a:hover  {
-        background-image: url("../../graphics/core/bg-nav-selected.png") !important;
+        background-image: url("../../graphics/core/uwa-bg-nav-selected.png") !important;
         color: #000;
    }
 
