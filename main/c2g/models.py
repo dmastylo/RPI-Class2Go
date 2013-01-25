@@ -2378,7 +2378,7 @@ class ContentGroup(models.Model):
         OTOH, if ContentGroup.get_content_type becomes constant-time, this
         becomes linear, and then we win.
         """
-        info = {}
+        info = {'__parent': None, '__parent_tag': '', '__children': [], '__group_id': None, }
         cls = thisclass.groupable_types.get(tag, False)
         if not cls:
             return info
@@ -2387,7 +2387,8 @@ class ContentGroup(models.Model):
         try:
             cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
         except ContentGroup.DoesNotExist:
-            return info
+            return {}
+        info['__group_id'] = cgobjs[0].group_id
         for cgo in cgobjs:
             cttag = cgo.get_content_type()
             cgref = getattr(cgo, cttag)
@@ -2397,11 +2398,47 @@ class ContentGroup(models.Model):
                 info['__parent'] = cgref
                 info['__parent_tag'] = cttag
             else:
-                info.setdefault('__children', []).append(cgref)
-            info.setdefault(cttag, []).append(cgref)
-        if info:
-            info['__group_id'] = cgobjs[0].group_id
+                info['__children'].append(cgref)
+            if info.has_key(cttag):
+                info[cttag].append(cgref)
+            else:
+                info[cttag] = [cgref]
         return info
+
+    @classmethod
+    def reassign_parent_child_sections(thisclass, tag, id, new_section_id):
+        """When updating parent's content section, make children follow it."""
+        def do_content_section_update(obj, new_section_ref):
+            # NB: ContentGroup objects are all ready-mode instances of a thing.
+            obj.section = new_section_ref
+            obj.save()
+            if hasattr(obj, 'image'):
+                if new_section_ref != None:      # can't take .image() of None
+                    obj.image.section = new_section_ref.image
+                else:
+                    obj.image.section = new_section_ref
+                obj.image.save()
+        group_parent = None
+        cginfo = thisclass.groupinfo_by_id(tag, id)
+        if new_section_id == "null":
+            new_section_ref = None
+        else:
+            new_section_ref = ContentSection.objects.get(id=new_section_id)
+        if new_section_ref and new_section_ref.mode != "ready":
+            new_section_ref = new_section_ref.image
+        # * Get the parent information if it's available...
+        group_parent = cginfo['__parent']
+        # * ...but if it's not, this call should no-op
+        if not group_parent:
+            return False
+        # * If this CG is already in new_section, this call should no-op
+        if group_parent.section and new_section_ref and new_section_ref.id == group_parent.section.id:
+            return False
+        # * Otherwise "normal" case of group w/ parents and children getting moved
+        do_content_section_update(group_parent, new_section_ref)
+        for child in cginfo['__children']:
+            do_content_section_update(child, new_section_ref)
+        return True
 
     @classmethod
     def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
