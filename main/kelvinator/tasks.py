@@ -26,18 +26,10 @@ import shutil
 from django.core.files.storage import default_storage
 from django.conf import settings
 from celery import task
+from PIL import Image
 
 from utility import *
 
-# PIL has namespace issues, work around this way. If we can't import, then
-# assume it is because we've already imported Image (not part of PIL) and 
-# we can disregard the collision.
-try:
-    from PIL import Image
-except ImportError:
-    pass
-
-    
 ##
 ##  KELVINATOR
 ##
