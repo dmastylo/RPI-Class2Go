@@ -38,6 +38,8 @@ class SeleniumTestBase(LiveServerTestCase):
         # fetch the page and make sure it loads and we have a user entry field
         browser.get('%s%s' % (self.live_server_url, self.login_path))
 
+        print(self.live_server_url)
+
         WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_id('id_username'))
 
         # now that we have the page, fill out the form
@@ -51,7 +53,7 @@ class SeleniumTestBase(LiveServerTestCase):
         inputEle.submit()
 
         # wait at most 10 seconds or until we see evidence of login
-        WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//span[contains(text(), "Welcome")]'))
+        WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//p[contains(text(), "Welcome")]'))
 
 
 class StudentBase(SeleniumTestBase):
