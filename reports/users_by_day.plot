@@ -3,8 +3,7 @@ set xdata time
 set timefmt "%Y-%m-%d"
 
 # -- time range must be in same format as data file
-# set xrange ["2012-09-01":"2012-"]
-# set yrange [0:50]
+set xrange ["2012-12-01":]
 
 set key inside left top vertical
 # set grid
