@@ -1,4 +1,4 @@
-from c2g.models import Exam, ExamRecord, ExamScore
+from c2g.models import Exam, ExamScore
 from django.db.models import Count, Q
 from datetime import datetime
 
