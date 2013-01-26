@@ -35,6 +35,7 @@ from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
+from django.utils import encoding
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_protect
@@ -98,10 +99,6 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     if last_record and (datetime.datetime.now() - last_record.last_updated) < datetime.timedelta(minutes=exam.minutes_btw_attempts):
         too_recent = True
 
-    #self.metadata_xml = xml #The XML metadata for the entire problem set.
-    metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
-    questions = metadata_dom.getElementsByTagName('video')
-
     ready_section = exam.section
     if ready_section and ready_section.mode == "draft":
         ready_section = ready_section.image
@@ -125,7 +122,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
                               'last_record':last_record, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav,
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':False,
                               'allow_submit':True, 'too_many_attempts':too_many_attempts,
-                              'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
+                              'exam':exam,}, RequestContext(request))
 
 def last_completed_record(exam, student, include_contentgroup=False):
     """Helper function to get the last completed record of this exam.
