@@ -301,11 +301,9 @@ urlpatterns = patterns('',
 # when testing we get a warning about favicon, silence it by mapping to
 # the location of the file
 if settings.DEBUG and settings.SITE_NAME_SHORT and settings.SITE_NAME_SHORT == 'UWA':
+    site=setting.SITE_NAME_SHORT.lower()
     urlpatterns += patterns('', 
-        url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': settings.STATIC_URL+'graphics/core/uwa-favicon.ico'}),
-    )
-elif settings.SITE_NAME_SHORT and settings.SITE_NAME_SHORT == 'Stanford':
-    urlpatterns += patterns('',
-        url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': settings.STATIC_URL+'graphics/core/stanford-favicon.ico'}),
+        url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', 
+            {'url': settings.STATIC_URL+'graphics/core/%s-favicon.ico' % site})
     )
    
