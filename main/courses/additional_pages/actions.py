@@ -99,7 +99,7 @@ def save(request):
 
         new_section = request.POST.get("section")
         old_section = page.section
-        if new_section == "null":                # Topbar pages
+        if new_section is None or new_section == "null":                # Topbar pages
             page.section = None
             page.menu_slug = "course_info"       # normal pages
         else:
@@ -144,7 +144,7 @@ def save(request):
     
                    
         # This has to happen last of all
-        if old_section or new_section != "null":
+        if (old_section != None or new_section != None) and (old_section or new_section != "null"):
             ContentGroup.reassign_parent_child_sections('additional_page', page.image.id, new_section)
 
     return redirect('courses.additional_pages.views.main', common_page_data['course_prefix'],common_page_data['course_suffix'], page.slug)
