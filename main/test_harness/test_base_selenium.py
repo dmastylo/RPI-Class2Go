@@ -53,7 +53,7 @@ class SeleniumTestBase(LiveServerTestCase):
         inputEle.submit()
 
         # wait at most 10 seconds or until we see evidence of login
-        WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//p[contains(text(), "Welcome")]'))
+        WebDriverWait(browser, 10).until(lambda browser : browser.find_element_by_xpath('//span[contains(text(), "Welcome")]'))
 
 
 class StudentBase(SeleniumTestBase):
