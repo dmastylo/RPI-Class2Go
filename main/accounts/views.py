@@ -275,7 +275,7 @@ def standard_login(request):
                               {'form': form, 'layout': json.dumps(layout)},
                               context_instance=context)
 
-
+@upgrade_to_https_and_downgrade_upon_redirect
 def standard_preview_login(request, course_prefix, course_suffix):
     
     # check if username exists to find out what type of user 
@@ -303,7 +303,7 @@ def standard_preview_login(request, course_prefix, course_suffix):
         except Video.DoesNotExist:
             video = None
    
-        course_instructors = CourseInstructor.objects.getObjectsByCourse(course=request.common_page_data['course'])
+        course_instructors = CourseInstructor.objects.getByCourse(course=request.common_page_data['course'])
         
         instructors = []
     

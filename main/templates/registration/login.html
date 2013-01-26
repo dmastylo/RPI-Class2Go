@@ -29,8 +29,11 @@
        <div class="well preview-registration span5" style="margin-top:50px;">
        <h3>Enter your login information:</h3>
     
-
+{% if SITE_NAME_SHORT == 'Stanford' %}
+<form method="post" action="{% url 'auth_login' %}?next={{ next }}" class="form-vertical">
+{% else %}
 <form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">
+{% endif %}
 {% csrf_token %}
 
 <table>
