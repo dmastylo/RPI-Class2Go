@@ -25,6 +25,7 @@ from registration.forms import RegistrationFormUniqueEmail
 from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError, MultipleObjectsReturned
 from django.http import HttpResponseBadRequest
+from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 import random
