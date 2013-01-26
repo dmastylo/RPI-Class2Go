@@ -480,7 +480,7 @@ def ldap_preview_login(request, course_prefix, course_suffix):
             except Video.DoesNotExist:
                 video = None
         
-            course_instructors = CourseInstructor.objects.getObjectsByCourse(course=request.common_page_data['course'])
+            course_instructors = CourseInstructor.objects.getByCourse(course=request.common_page_data['course'])
             instructors = []
     
             for ci in course_instructors:
