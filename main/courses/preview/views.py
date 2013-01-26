@@ -61,12 +61,13 @@ def preview(request, course_prefix, course_suffix):
     form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
     login_form = AuthenticationForm(request)
     context = RequestContext(request)
-    template_name='previews/default.html'
-    # class_template='previews/'+request.common_page_data['course'].handle+'.html'
 
- 
-    #if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
-    #    template_name=class_template
+    # default template, unless there is one in the soruce tree, then use that
+    template_name='previews/default.html'
+    class_template='previews/'+request.common_page_data['course'].handle+'.html'
+    if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
+        template_name=class_template
+
     return render_to_response(template_name,
                               {'form': form,
                                'login_form': login_form,
