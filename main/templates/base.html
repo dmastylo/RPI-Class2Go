@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/{{ SITE_NAME_SHORT }}-styles.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
     <!--[if IE 7]>
@@ -19,7 +20,7 @@
     {% endblock top_scripts %}
     {% block addl_stylesheets %}{% endblock addl_stylesheets %}
     {% block addl_head_scripts %}{% endblock addl_head_scripts %}
-    <title>{% block title %}Stanford Online{% endblock %}</title>
+    <title>{% block title %}{{ SITE_TITLE }}{% endblock %}</title>
 </head>
 
 {% block bodytag %}<body>{% endblock bodytag %}
@@ -27,7 +28,11 @@
       {% if not request.session.headless %}
         <div id="global-header">
             <h1 class="stanford-logo">
+            	{% if SITE_NAME_SHORT == 'Stanford' %}
                 <a href="http://www.stanford.edu">Stanford University</a>
+                {% else %}
+                <a href="http://www.uwa.edu.au">{{ SITE_NAME_LONG }}</a>
+                {% endif %}
             </h1>
             <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
         </div>
@@ -59,7 +64,9 @@
             <div class="row-fluid" style="position:relative;">
             {% block page_title %}
             <div class="pull-left page-title">
+                {% if SITE_NAME_SHORT == 'Stanford' %}
                 <img src="{{ STATIC_URL }}graphics/core/top-banner-Stanford.png" alt="Stanford Online">
+                {% endif %}
                 <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
             </div>
             {% endblock page_title %}
@@ -95,9 +102,14 @@
                 <li class="hidden-phone"><span>Welcome <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
             {% else %}
                 <li class="hidden-phone">
-                {% with login_course=common_page_data.ready_course login_link_id="login_button" login_link_class="btn" link_text="Login" %}
-                    {% include "registration/login_link.html" %}
-                {% endwith %}
+                	{% if SITE_NAME_SHORT == 'Stanford' %}
+                        {% with login_course=common_page_data.ready_course login_link_id="login_button" login_link_class="btn" link_text="Login" %}
+                            {% include "registration/login_link.html" %}
+                        {% endwith %}
+                    {% else %}
+                    <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">Login</a>
+                	{% endif %}
+
                 </li>
                 {% if not common_page_data.ready_course.institution_only %}
                 <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
@@ -136,7 +148,11 @@
         {% endblock content %}
         
     </div>
-    {% include "footer.html" %}
+
+    {% with "sites/"|add:SITE_NAME_SHORT|add:"/footer.html" as footer_include %}
+    {% include  footer_include  %}
+    {% endwith %}
+
     {% block bottom_scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>

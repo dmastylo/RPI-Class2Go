@@ -7,12 +7,10 @@ import djcelery
 from database import *
 import monkeypatch
 
-
 #ADDED FOR url tag future
 django.template.add_to_builtins('django.templatetags.future')
 #Added for celery
 djcelery.setup_loader()
-
 
 # the INSTANCE should be "prod" or "stage" or something like that
 # if it hasn't been set then get the user name
@@ -74,7 +72,22 @@ TIME_ZONE = 'America/Los_Angeles'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-SITE_ID = 1
+
+# These site variables are used for display in the product and can 
+# drive any conditional changes (display, etc).
+# Override all four in your database.py file, otherwise they will 
+# default back to Stanford.
+try:
+    SITE_ID
+    SITE_NAME_SHORT
+    SITE_NAME_LONG
+    SITE_TITLE
+except NameError:
+    SITE_ID = 1
+    SITE_NAME_SHORT = 'Stanford'
+    SITE_NAME_LONG = 'Stanford University'
+    SITE_TITLE = 'Stanford Class2Go'
+
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -228,7 +241,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages'
+    'django.contrib.messages.context_processors.messages',
+    'context_processor.context_settings'
 )
 
 INSTALLED_APPS = (
@@ -264,6 +278,7 @@ INSTALLED_APPS = (
                       'db_scripts',
                       'convenience_redirect',
                       'exception_snippet',
+                      'rest_framework'
                        #'reversion',
                       )
 if INSTANCE != "prod":

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}{{ SITE_TITLE }} | Available Courses {% endblock title %}
+
+
+{% load url from future %}
+
+{% block bodytag %}
+<body class="home">
+{% endblock bodytag %}
+
+
+
+{% block topcontent %}
+    <div class="row-fluid hero-header">
+         <div class="container">
+            <div class="row hero">
+                <h1>Class2Go</h1>
+                <h2>Take Online Classes. <strong>Anywhere.</strong></h2>
+            </div>
+         </div>
+    </div>
+
+{% block topnav %}
+{% if SITE_NAME_SHORT == 'Stanford' %}
+    <div class="top-nav" style="top:4px;">
+{% else %}
+    <div class="top-nav" style="top:24px;">
+{% endif %}    
+{% if user.is_authenticated %}
+       <li>
+          <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
+              <input type="submit" id="login_button" class="btn logout hidden-phone" value="Logout" />
+              {% csrf_token %}
+          </form>
+       </li>
+       <li class="hidden-phone"><span>Welcome <strong><a style="color:white;" href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
+{% else %}
+       <li class="hidden-phone"><a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}" >Login</a></li>
+       <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
+{% endif %}
+       <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><em class="icon-reorder"></em></a></li>
+    </div>
+{% endblock topnav %}
+
+{% endblock topcontent %}
+  
+
+{% block m_column_content %}
+<div class="home-unit home-primary" style="background:#fff">
+    <div class="container">        
+        <div class="row">
+            <h3>Welcome to Class2Go! The open platform for online learning.</h3>
+         	<br />
+         	{% for course in course_list %}
+         	
+         	{% if forloop.counter == 1  or not forloop.counter|divisibleby:"2"  %}
+         	<div class="sixcol">
+			<div class="home-unit">
+				{% if course.institution_only = 1 %}
+				<div id="badge"><img src=" {{ STATIC_URL }}graphics/core/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
+   			    {% endif %}
+   			    <div class="innercontainer">
+    				<a href="{% url 'courses.views.main' course.prefix course.suffix %}">
+    	 			<div class="home-unit-box"> 
+        				<div class="row">
+	        				<img src="{{ course.logo_dl_link }}">
+            				<h3>{{ course.title }}</h3>
+            				<p><strong>Course starts {{ course.term }} {{ course.year }}  </strong></p>
+            			<!--  	<p>{% autoescape off %}{{course.short_description}}{% endautoescape %}</p>
+        			-->	</div>
+        			</div>
+       				</a>
+    			</div>
+			</div>
+			</div>
+			{% endif %}
+			{% if forloop.counter|divisibleby:"2"  %}
+			<div class="sixcol last">
+			<div class="home-unit">
+				{% if course.institution_only = 1 %}
+				<div id="badge"><img src=" {{ STATIC_URL }}graphics/core/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
+   			    {% endif %}
+   			    <div class="innercontainer">
+    				<a href="{% url 'courses.views.main' course.prefix course.suffix %}">
+    	 			<div class="home-unit-box"> 
+        				<div class="row">
+	        				<img src="{{ course.logo_dl_link }}">
+            				<h3>{{ course.title }}</h3>
+            				<p><strong>Course starts {{ course.term }} {{ course.year }} </strong></p>
+            			<!--  	<p>{% autoescape off %}{{course.short_description}}{% endautoescape %}</p>
+        			-->	</div>
+        			</div>
+       				</a>
+    			</div>
+			</div>
+			</div>
+			{% endif %}
+			{% endfor %}
+
+
+        </div>
+    </div>
+</div>
+
+    <div class="container" style="margin-top:30px;margin-bottom:0;">
+        <div style="width:315px;margin:0 auto;">
+         {% if SITE_NAME_SHORT == 'Stanford' %}
+            <div class="social-btn facebook"><div class="fb-like" data-href="http://class2go.standford.edu" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
+
+            <div class="social-btn twitter"><a href="https://twitter.com/StanfordC2G" class="twitter-follow-button" data-show-count="false">Follow @StanfordC2G</a></div>
+            <div class="social-btn google"><div class="g-plusone" data-size="medium" data-annotation="none"></div></div>
+        {% else %}
+            <div class="social-btn facebook"><div class="fb-like" data-href="http://www.class2go.uwa.edu.au" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
+            <div class="social-btn google"><div class="g-plusone" data-size="medium" data-annotation="none"></div></div>
+        
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+<!--facebook-->
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=195512500520406";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<!--twitter-->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+<!--google plus-->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+{% endblock m_column_content %}

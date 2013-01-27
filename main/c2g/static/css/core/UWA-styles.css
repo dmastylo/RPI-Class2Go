@@ -1,0 +1,269 @@
+
+/**************
+home unit boxes
+****************/
+
+.home-unit img {float: left;
+    padding-right: 10px;
+    height: 286px;
+    width: 286px;}
+
+.home-unit a {color: #666; font-weight: normal;}
+
+.home-unit a:hover {text-decoration: none}
+
+.home-unit a h3 {color: #1F5EB7; padding-top: 20px;}
+
+.home-unit-box {padding-top:2px;}
+
+.home-unit-box .row{background-color: #FCFCFC;
+    max-height: 286px;
+    border: 1px solid #EEEEEE;
+    box-shadow: 0px 1px 2px 0 #999999;
+    padding-top: 0px;
+    margin-left:0px;
+}
+
+.home-unit .container { min-width: 700px; width: auto;}
+
+.home-unit-box .row:hover {box-shadow: 0px 2px 4px 0 #666;
+    cursor: pointer;
+    border-color: #efefef;}
+
+
+
+/**************
+end home unit boxes
+****************/
+
+a {color:#1F5EB7;}
+a:hover {color:#1F5EB7;}
+
+
+#global-header {border-top: 3px solid #7AC4D9;
+	background: #000000;
+	padding-bottom:10px;
+	box-shadow: 1px 1px 5px 1px #666666;
+	overflow:hidden}
+
+.stanford-logo {
+    background-image: url(../../graphics/core/uwa-logo.gif);
+    background-repeat: no-repeat;
+    background-size: auto auto;
+    display: block;
+    height: 40px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-bottom: 13px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 13px;
+    text-indent: -999px;
+    width: 198px;
+    float: left;}
+
+.tagline {
+    float: right;
+    margin-top: 37px;
+    padding-right: 20px;
+}
+
+.top-nav {
+    
+    top: -52px;
+}
+
+.top-nav li .btn {background-color: #666;
+	font-weight:normal;
+	box-shadow:none;
+	text-shadow: none;}
+
+
+.top-nav li .btn:hover {
+  opacity: 0.9;
+  background: #666;}
+
+.home .hero-header {
+    background-image: url("../../graphics/core/Winthrop-Hall-Yellow-for-Lightbox.png");
+    padding-bottom: 40px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0;    }
+    
+body.home {
+   background-color: #fff;
+   }
+   
+   
+.home-unit {
+	padding-top: 0px;}
+   
+   
+   
+.class2go a {
+	background-color: #E2E2E2;}
+        
+ /*******
+MENU
+********/
+        
+        
+#c2g_layout_topbar .navbar .navbar-inner {
+        background-image: url("../../graphics/core/uwa-bg-nav.png") !important;
+   }
+
+
+
+.navbar .nav .active > a, .navbar .nav .active > a:hover  {
+        background-image: url("../../graphics/core/uwa-bg-nav-selected.png") !important;
+        color: #000;
+   }
+
+
+.navbar .nav > li > a {text-shadow: none;
+color: #000;}        
+
+ul.nav li.dropdown:hover ul.dropdown-menu,
+  .navbar .nav li.dropdown.open ul.dropdown-menu,
+  .navbar .nav li.dropdown:hover .dropdown-toggle,
+  .navbar .nav li.dropdown.open .dropdown-toggle {
+    background:#efefef;
+    
+  }
+
+
+/*********
+ACCORDION
+*********/
+
+
+.well.tight {
+    background-color: #E8F4F9;}
+    
+    .well {border-color: #89CBE5;}
+    
+    .nav-list .divider {
+    background-color: #89CBE5;
+    border-bottom: none;
+}
+
+
+/********
+UNITS _MOVED TO BODY.CSS
+*********/
+
+.home-unit img {height:186px; width:186px;}
+.home-unit-box {width: 100%;}
+
+.mainrow {min-width: 700px;}
+
+.row .sixcol {
+margin-right: 3.8%;
+float: left;
+min-height: 1px;
+width: 48%;}
+
+
+.last {
+margin-right: 0px !important;
+}
+
+
+.home-unit .row {margin-left:0px !important;}
+
+.front {}
+
+
+**************
+Instructor  boxes 
+****************/
+
+.instructor-box {
+}
+
+.instructor-box .row {
+	background-color: #FCFCFC;
+	border: 1px solid #EEEEEE;
+	box-shadow: 0px 1px 2px 0 #999999;
+	padding-top: 0px;
+	margin-left:0px;
+}
+
+.instructor-box img {
+	float: left;
+	position: relative;
+	padding-right: 10px;
+	height: 200px;
+	width: 120px;
+}
+
+
+.instructor-box p {
+	padding-top:2px; 
+	font-size:1em;
+	margin: 5px;
+}
+
+
+
+
+
+
+/**************
+end Instructor  boxes 
+****************/
+
+
+
+/*********
+BADGE
+*********/
+
+#badge { 
+   position: absolute;
+    right: -18px;
+    top: -8px;
+  }
+
+#badge img{height: auto;
+  width: auto;}
+  
+  .home-unit {position:relative}
+  
+  .mainrow {min-width: 800px !important;}
+
+
+
+
+/* ============================= */
+/* ! Layout for mobile version   */
+/* ============================= */
+
+@media handheld, only screen and (max-width: 900px) {
+
+	body {
+		
+	}
+	
+.home-unit a p {font-size: 14px;
+line-height: 16px;}
+
+}
+
+
+
+   
+/**********
+FOOTER
+***********/   
+   
+   #global-footer {
+    background:url(../../graphics/core/footer-hp-bgrepeat.jpg) repeat-x;}
+    
+    .footer ul a {color: #666;}
+    
+    .footer .vcard {
+    clear: left;
+    color: #666;
+    font-size: 11px;
+}

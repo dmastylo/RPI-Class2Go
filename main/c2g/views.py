@@ -1,14 +1,17 @@
+from datetime import datetime
+
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
-from datetime import datetime
-from models import Course
+from django.conf import settings
+from django.contrib import messages
+
 from courses.actions import is_member_of_course
 from courses.actions import auth_view_wrapper
-from django.contrib import messages
 from courses.common_page_data import get_common_page_data
-from c2g.models import Course
+from models import Course
+
 ### C2G Core Views ###
 
 @auth_view_wrapper
@@ -46,16 +49,20 @@ def throw404(request):
     raise Http404
 
 def hc(request):
-    return render_to_response('honor_code.html',{},RequestContext(request))
+    site = getattr(settings, 'SITE_NAME_SHORT')
+    return render_to_response('sites/%s/honor_code.html' % site,{},RequestContext(request))
 
 def tos(request):
-    return render_to_response('TOS.html',{},RequestContext(request))
+    site = getattr(settings, 'SITE_NAME_SHORT')
+    return render_to_response('sites/%s/TOS.html' % site,{},RequestContext(request))
 
 def privacy(request):
-    return render_to_response('privacy.html',{},RequestContext(request))
+    site = getattr(settings, 'SITE_NAME_SHORT')
+    return render_to_response('sites/%s/privacy.html' % site,{},RequestContext(request))
     
 def faq(request):
-    return render_to_response('faq.html',{},context_instance=RequestContext(request))
+    site = getattr(settings, 'SITE_NAME_SHORT')
+    return render_to_response('sites/%s/faq.html' % site,{},context_instance=RequestContext(request))
 
 def contactus(request):
     if request.GET.get('pre') and request.GET.get('post'):
@@ -70,7 +77,8 @@ def contactus(request):
         course=None
         staffmail=''
 
-    return render_to_response('contactus.html', 
+    site = getattr(settings, 'SITE_NAME_SHORT')
+    return render_to_response('sites/%s/contactus.html' % site,
                               {'request': request,
                                'course': course,
                                'staffmail' : staffmail,
