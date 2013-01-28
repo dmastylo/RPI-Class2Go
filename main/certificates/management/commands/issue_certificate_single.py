@@ -44,9 +44,17 @@ class Command(BaseCommand):
             raise CommandError("Can't run both local and remote.")
         course_handle = args[0].strip()
         username      = args[1].strip()
-
+        if len(username) == 0:
+            return
+        
         # Working object memoization
-        course = Course.objects.get(handle=course_handle, mode='ready')
+        if len(course_handle) == 0:
+            raise CommandError("Bad course handle: '%s'" % course_handle)
+        try:
+            course = Course.objects.get(handle=course_handle, mode='ready')
+        except:
+            raise CommandError("Bad course handle or could not retrieve course '%d'" % course_handle)
+
         certificate_info = CourseCertificate.objects.get(course=course, type=options['cert_type'])
         user = User.objects.get(username=username)
         profile = UserProfile.objects.get(user=user)
