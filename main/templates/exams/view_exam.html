@@ -77,7 +77,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% else %}
 
     <style>
-    #exam-pane label {clear: both; display: block;}
+    #exam-pane label {clear: both; display: block; width:100%;}
     #exam-pane label input {float: left; margin-right: 1em;}
     #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
     h3 {clear:both;}
@@ -676,26 +676,45 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     submitBtn.after($(saveWorkBtn));
 
     $(saveWorkBtn).click(function () {
-      var fieldCollection = $('#exam-pane').find('input,textarea');
-      var userAnswerObj = window.collectUserAnswers(fieldCollection);
-      var userSelections = userAnswerObj.userSelections; 
+        var fieldCollection = $('#exam-pane').find('input,textarea');
+        var userAnswerObj = window.collectUserAnswers(fieldCollection);
+        var userSelections = userAnswerObj.userSelections; 
 
-      window.myData = JSON.stringify(userSelections);
+        window.myData = JSON.stringify(userSelections);
 
-      var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
+        var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                        {   csrfmiddlewaretoken: "{{ csrf_token }}",
                            json_data:JSON.stringify(userSelections),
                            onpage:$(location).attr('href')
                        });
                        
-      saveXHR.error(function(xhr, status, msg) {
-                     var dialogDiv = window.getDialog('Error');
-                     $(dialogDiv).find('p').text("Your answers could not be saved!  "
-                                            + msg + ": "+xhr.responseText.substr(0,99));
+        saveXHR.error(function(xhr, status, msg) {
+                    var dialogDiv = window.getDialog(status.toUpperCase());
+                    var displayText = "Your answers could not be saved!";
+                    if (typeof msg != "undefined" && msg != "") {
+                        displayText += " " + msg;
+                    }
+                    if (typeof xhr.responseText != "undefined" && xhr.responseText != "") {
+                        displayText += xhr.responseText.substr(0,99);
+                    }
+                     $(dialogDiv).find('p').text(displayText);
+                    if (typeof window.myData != "undefined" && window.myData != "" && typeof localStorage != "undefined") {
+                            var storageKey = "{{user.id}}_" + Date.now() + "_{{exam.slug}}";
+                            localStorage[storageKey] = window.myData;
+                    }
                      $(dialogDiv).dialog({ modal: true,
                                            buttons: {'Close':function(){$(this).dialog("close");}}
                                          });
-      });
+        });
+
+        saveXHR.success(function(status, msg, xhr) { 
+                var dialogDiv = window.getDialog(msg.toUpperCase());
+                $(dialogDiv).find('p').text("Your answers have been saved, but not submitted!");
+
+                $(dialogDiv).dialog({ modal: true,
+                                   buttons: {'Close':function(){$(this).dialog("close");}}
+                                 });
+        });
 
     });
 
@@ -952,6 +971,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(dialogDiv).attr('title',title);
             $(dialogDiv).append('<p></p>');
             $(document).append($(dialogDiv));
+        } else {
+            $('#ui-dialog-title-dialog-message').text(title);
         }
         return dialogDiv;
     };

@@ -67,17 +67,46 @@ def main(request, course_prefix, course_suffix, slug):
             contentgroup_info['PARENT_TAG'] = contentgroup_info['__parent_tag']
     else:
         template = 'additional_pages/view.html'
-        
+
+         
+    course = common_page_data['course']
+
+    course_instructors = CourseInstructor.objects.getByCourse(course=common_page_data['course'])
+    instructor_list = []
+    
+    for ci in course_instructors:
+        instructor_list.append(ci.instructor)
+ 
+    full_contentsection_list, full_index_list = get_full_contentsection_list(course)
+    
+    try:
+        video = Video.objects.getByCourse(course=common_page_data['course']).get(slug='intro')
+    except Video.DoesNotExist:
+        video = None
+
+
+    if request.user.is_authenticated():
+        is_logged_in = 1
+    else:
+        is_logged_in = 0
+
     ready_section = page.section
     if ready_section and ready_section.mode == "draft":
         ready_section = ready_section.image
 
     return render_to_response(template,
                               {
-                               'common_page_data':    common_page_data,
-                               'page':                page,
-                               'ready_section':       ready_section,
-                               'contentgroup_info':   contentgroup_info,
-                               'sections':            sections,
+                               'common_page_data': common_page_data,
+                               'page': page,
+                               'contentsection_list': full_contentsection_list,
+                               'full_index_list': full_index_list,
+                               'instructor_list':instructor_list,
+                               'course': course,
+                               'is_logged_in': is_logged_in, 
+                               'intro_video': video,
+                               'ready_section': ready_section,
+                               'contentgroup_info': contentgroup_info,
+                               'sections': sections,
                               },
                                context_instance=RequestContext(request))
+

@@ -1,0 +1,25 @@
+{% if assignments %}
+	<div id="right_nav" class="upcoming well nav">
+		<h4>Upcoming Due Dates</h4>
+		<table class="table table-condensed">
+			<thead>
+				<th>Assignment</th>
+				<th>Due Date</th>
+			</thead>
+  			{% for assignment in assignments %}
+			<tr>
+					<td>
+                        {% if assignment.has_child_exams %}
+                            <a href="{% url assignment.list_view common_page_data.course_prefix common_page_data.course_suffix %}#hashtag_{{assignment.slug}}">
+                        {% else %}
+                            <a href="{% url assignment.show_view common_page_data.course_prefix common_page_data.course_suffix assignment.slug %}">
+                        {% endif %}
+                            <span>{{assignment.title}}</span>
+                            </a>
+                    </td>
+					<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} PST</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% endif %}

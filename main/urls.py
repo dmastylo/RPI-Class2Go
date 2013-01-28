@@ -1,5 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.simple import redirect_to
+from django.conf import settings
+from rest import views
 
 import settings
 
@@ -17,6 +19,24 @@ urlpatterns = patterns('',
     url(r'^_throw500$', 'c2g.views.throw500'),
     url(r'^_throw404$', 'c2g.views.throw404'),
 
+    # REST Class2Go API
+    url(r'^rest/login', 'rest.views.rest_login'),
+    url(r'^rest/problemactivities', views.ProblemActivities.as_view()),
+    url(r'^rest/courses', views.CourseList.as_view()),
+    url(r'^rest/announcements', views.AnnouncementList.as_view()),                                              
+    url(r'^rest/psets', views.ProblemSetList.as_view()),                                              
+    url(r'^rest/psettoexercise', views.ProblemSetToExerciseList.as_view()),  
+    url(r'^rest/exercise', views.ExerciseList.as_view()),  
+    url(r'^rest/contentsection', views.ContentSectionList.as_view()),  
+    url(r'^rest/videotoexercise', views.VideoToExerciseList.as_view()),  
+    url(r'^rest/videoactivities', views.VideoActivities.as_view()),
+    url(r'^rest/files', views.FilesList.as_view()),                         
+    url(r'^rest/video', views.VideoList.as_view()),  
+    url(r'^rest/exams', views.ExamList.as_view()),
+    url(r'^rest/examrecords', views.ExamRecordList.as_view()),
+    url(r'^rest/examscores', views.ExamScoreList.as_view()),
+    url(r'^rest/examscorefields', views.ExamScoreFieldList.as_view()),
+                    
     #Testing messages
     url(r'^_test_messages$', 'c2g.views.test_messages'),
 
@@ -97,6 +117,7 @@ urlpatterns = patterns('',
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
    
+    url(r'^default-login/?$', 'accounts.views.default_login', name='default_login'),
     #shibboleth login
     url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
                        
@@ -148,6 +169,7 @@ urlpatterns = patterns('',
                        
                        
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/leftnav/?$', 'courses.views.leftnav'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/rightnav/?$', 'courses.views.rightnav'),
 
     url(r'^switch_mode', 'courses.actions.switch_mode'),
     url(r'^add_section', 'courses.actions.add_section'),
@@ -259,8 +281,8 @@ urlpatterns = patterns('',
     #Preview
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview/$', 'courses.preview.views.preview'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_reg/$', 'courses.preview.views.preview_reg'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'courses.preview.views.preview_login'),
-    
+    # url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'courses.preview.views.preview_login'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'accounts.views.default_preview_login'),
     #Email
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),             
     
@@ -279,8 +301,10 @@ urlpatterns = patterns('',
 
 # when testing we get a warning about favicon, silence it by mapping to
 # the location of the file
-if settings.DEBUG:
+if settings.DEBUG and settings.SITE_NAME_SHORT:
+    site=settings.SITE_NAME_SHORT.lower()
     urlpatterns += patterns('', 
-        url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': settings.STATIC_URL+'graphics/core/favicon.ico'}),
+        url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', 
+            {'url': settings.STATIC_URL+'graphics/core/%s-favicon.ico' % site})
     )
    

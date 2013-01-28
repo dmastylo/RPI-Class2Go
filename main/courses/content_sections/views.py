@@ -70,7 +70,7 @@ def copy_content(request, course_prefix, course_suffix):
         return redirect('courses.content_sections.views.copy_content_form', course_prefix, course_suffix)
 
     if not request.user in list(to_course.get_all_course_admins()):
-        messages.add_message(request, messages.ERROR, 'Sorry, you are not a staff member of the destination course.  Please contact Stanford Online support to request that privilege.')
+        messages.add_message(request, messages.ERROR, 'Sorry, you are not a staff member of the destination course.  Please contact support staff to request that privilege.')
         return redirect('courses.content_sections.views.copy_content_form', course_prefix, course_suffix)
 
     #privileges are okay, do the copy

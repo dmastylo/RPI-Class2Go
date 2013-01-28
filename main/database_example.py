@@ -29,6 +29,13 @@ MAINTENANCE_LANDING_PAGE = False
 #    "stage" or "prod" for something in produciton -- are you sure you want to do that?
 INSTANCE="dev"
 
+# Information about this site. Note that the short name here is used to
+# build paths to site assets, so is specific and case-sensitive.
+SITE_ID = 1
+SITE_NAME_SHORT = 'Stanford'
+SITE_NAME_LONG = 'Stanford University'
+SITE_TITLE = 'Stanford Class2Go'
+
 # Put your name and email address here, so Django serious errors can come to you
 # the trailing comma after the list is important so Python correctly interprets 
 # this as a list of lists
@@ -39,24 +46,40 @@ ADMINS = (
 # EMAIL ERROR PINGS
 ERROR_SNIPPET_EMAILS = ['YOURNAME@stanford.edu',]
 
-
-# For using S3 Storage, specify these with real settings
+#########
+# S3 Storage configuration. Read both stanzas so you understand what these do.
+#########
+# For using S3 Storage, specify these with real settings. The ACCESS virables
+# are used for authorization to S3 and should be kept secret.
 AWS_ACCESS_KEY_ID = 'AAAAAAAAAAAAAAAAAAAA'
 AWS_SECRET_ACCESS_KEY = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
-AWS_STORAGE_BUCKET_NAME = 'dev-c2g'
-AWS_SECURE_STORAGE_BUCKET_NAME = 'dev-secure-c2g' # Optional. If not defined here, it will be composed from the AWS_STORAGE_BUCKET_NAME in settings.py
-
-# To use Local Storage.  You still need to define these three all to 'local'
-# and specify where you want those local files written
+##
+# There are three buckets: STORAGE, SECURE_STORAGE, and RELEASE. STORAGE is
+# used for storing public assets and instructor-uploaded material, such as
+# downloadable files. SECURE_STORAGE should be configured with a more limited
+# set of permissions (allowing download by instructors and not the general
+# public), and is used for distributing things like student performance
+# reports. RELEASE should be configured with the most limited set of
+# permissions, only allowing dowload only from your production (and optionally
+# developer) credentials. It is used for the distribution of materials used in
+# release and deployment, like custom binaries, secondary authorization tokens,
+# etc.
+AWS_STORAGE_BUCKET_NAME = 'my-dev-bucket'
+AWS_SECURE_STORAGE_BUCKET_NAME = 'my-secure-dev-bucket'
+AWS_RELEASE_BUCKET_NAME = 'my-release-dev-bucket'
+# For using Local btorage, set all of these variables to 'local'. You also
+# must specify where you want files locally written (see MEDIA_ROOT, below)
+##
 # AWS_ACCESS_KEY_ID = 'local'
 # AWS_SECRET_ACCESS_KEY = 'local'
 # AWS_STORAGE_BUCKET_NAME = 'local'
-# Celery must run for file uploads to work properly and video resizing to take place, etc.
-# If you have the above values set to 'local', then set this value to True:
-# CELERY_ALWAYS_EAGER = False
 # AWS_SECURE_STORAGE_BUCKET_NAME = 'local'
+# AWS_RELEASE_BUCKET_NAME = 'local'
 # MEDIA_ROOT = '/opt/class2go/uploads'
 
+#########
+# Celery configuration
+#########
 # Celery must run for file uploads to work properly and video resizing to take place, etc.
 # If you have the above values set to 'local', then set this value to True:
 # CELERY_ALWAYS_EAGER = False

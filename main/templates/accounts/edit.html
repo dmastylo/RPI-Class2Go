@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Stanford Online | Edit Profile{% endblock title %}
+{% block title %}{{ SITE_TITLE }} | Edit Profile{% endblock title %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
@@ -17,11 +17,19 @@
             <input type="submit" value="Save Changes" class="btn" />
         </form>
     {% else %}
+
     <h3> Please login to see profile information: </h3>
+
+
+    {% if SITE_NAME_SHORT == 'Stanford' %}
     <p>
     <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Stanford WebAuth</a>
     <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Class2Go Login (Public course students)</a>
     </p>
+    {% else %}
+        <h4> Please <a data-toggle="modal" href="{% url 'default_login' %}?next={{ request.get_full_path }}">log in</a> to see profile information</h4>
+    {% endif %}
+
     {% endif %}
 </div>
 {% endblock m_column_content %}

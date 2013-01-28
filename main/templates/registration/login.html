@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load url from future %}
-{% block title %}Login | Stanford Online{% endblock title %}
-
+{% block title %}{{ SITE_TITLE }} | Register{% endblock title %}
+{% block topnav %} {% endblock topnav %}
+{% block navbar %} {% endblock navbar %}
 {% block m_column_content %}
 
 {% if form.errors %}
@@ -17,8 +18,22 @@
 <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
 
 {% else %}
-
-<form method="post" action="{% url 'auth_login' %}?next={{ next }}" class="form-vertical">  
+ <div class="row-fluid">
+ <div class="span3"> </div>
+       {% if login_form.errors %}
+       <div class="alert alert-error">
+         <button class="close" data-dismiss="alert">×</button>
+         Uh-oh.  We couldn't find username and password you entered.  Try again?
+       </div>
+       {% endif %}
+       <div class="well preview-registration span5" style="margin-top:50px;">
+       <h3>Enter your login information:</h3>
+    
+{% if SITE_NAME_SHORT == 'Stanford' %}
+<form method="post" action="{% url 'auth_login' %}?next={{ next }}" class="form-vertical">
+{% else %}
+<form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">
+{% endif %}
 {% csrf_token %}
 
 <table>
@@ -40,7 +55,7 @@
 <input type="hidden" name="next" value="{{ next }}" />
 {% endif %}
 </form>
-
+</div></div>
 {% endif %}
 {% endblock %}
  

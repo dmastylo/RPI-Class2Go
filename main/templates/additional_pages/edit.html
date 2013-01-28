@@ -60,7 +60,46 @@
         {% else %}
             <input type='hidden' name='title' value='Overview' />
         {% endifnotequal %}
+
+        
+       
+        {% ifequal page.slug 'overview' %}
+            
+        <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
+            
+        <div class="control-group">
+            <div class="controls">
                 
+                <h3>Prerequisites</h3>
+                
+                <textarea name="prerequisites" class="tinymce">
+                    {% autoescape off %}{{course.prerequisites}}{% endautoescape %}
+                </textarea>
+                
+                <h3>FAQ</h3>
+                
+                <textarea name="faq" class="tinymce">
+                    {% autoescape off %}{{course.faq}}{% endautoescape %}
+                </textarea>
+                
+                 <h3>Accompanying Materials</h3>
+                
+                <textarea name="accompanying_materials" class="tinymce">
+                    {% autoescape off %}{{course.accompanying_materials}}{% endautoescape %}
+                </textarea>
+                
+                 <h3>Outcomes</h3>
+                
+                <textarea name="outcomes" class="tinymce">
+                    {% autoescape off %}{{course.outcomes}}{% endautoescape %}
+                </textarea>
+                
+            </div>
+        </div>
+    
+
+        {% endifequal %}
+
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
             <label class="control-label">URL identifier</label>
@@ -77,7 +116,7 @@
         <div class="control-group">
             <label class="control-label">Section</label>
             <div class="controls">
-                <select name="section" id="section_id" {% if not page.section_id %}disabled="disabled"{% else %}onChange="prefill_children();"{% endif %}>
+                <select name="section" id="section_id" {% if page.section_id %}onChange="prefill_children();"{% endif %}>
                     {% if not page.section_id %}
                         <option value="null" selected>** No content section **</option>
                     {% else %}
@@ -92,6 +131,8 @@
                 </select>
             </div>
         </div>
+        {% else %}
+        <input type="hidden" name="section" value="null" />
         {% endifnotequal %}
 
         {% ifnotequal page.slug 'overview' %}
@@ -111,8 +152,14 @@
         {% endifnotequal %}
             
         
+        {% ifequal page.slug 'overview' %}
+            <textarea class="proxy" id="ace_proxy" name="description">{{course.description|safe}}</textarea>
+            <h3>Course Description</h3>
+            
+        {% else %}
         <textarea class="proxy" id="ace_proxy" name="description">{{page.description|safe}}</textarea>
         <label class="control-label">Page HTML</label>
+        {% endifequal %}
             <div class="control-group">
                 <input type="button" id="tinymce-entry-btn" class="btn" value="Open WYSIWYG Editor" title="Click to open WYSIWYG Editor" />
             </div>

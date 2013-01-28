@@ -15,6 +15,8 @@ from courses.actions import auth_view_wrapper
 
 from c2g.models import CurrentTermMap
 import settings, logging
+import datetime
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +62,7 @@ def main(request, course_prefix, course_suffix):
                 redir = 'https://'+request.get_host()+redir
             return redirect(redir)
 
-    
+    course = common_page_data['course']
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
         many_announcements = True
@@ -73,14 +75,27 @@ def main(request, course_prefix, course_suffix):
     else:
         is_logged_in = 0
 
-    course = common_page_data['course']
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
+             'course':              course,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
              'is_logged_in':        is_logged_in
              },
             context_instance=RequestContext(request))
+
+def get_upcoming_exams(course):
+  end_date = datetime.date.today() + datetime.timedelta(weeks=2)
+  exams = Exam.objects.filter(
+    course=course, 
+    mode='ready',
+    is_deleted=0,
+    due_date__gte = datetime.date.today(),
+    due_date__lte = end_date, 
+    live_datetime__lte = datetime.date.today()
+    ).order_by('due_date')
+  return exams
+
 
 @auth_view_wrapper
 def course_materials(request, course_prefix, course_suffix, section_id=None):
@@ -134,6 +149,19 @@ def leftnav(request, course_prefix, course_suffix):
                               'full_index_list':     full_index_list,
                               },
                               context_instance=RequestContext(request))
+
+
+@cache_page(60*60, cache="view_store")
+def rightnav(request, course_prefix, course_suffix):
+  course = request.common_page_data['ready_course']
+  exams = get_upcoming_exams(course)
+  exams = [exam for exam in exams if not exam.is_child()]
+  return render_to_response('right_nav.html',
+                            {'common_page_data':   request.common_page_data,
+                            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
+                            },
+                            context_instance=RequestContext(request))
+
 
 @auth_view_wrapper
 @require_POST

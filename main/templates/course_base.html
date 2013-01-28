@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{common_page_data.course.title}} | Stanford Online{% endblock %}
+{% block title %}{{ SITE_TITLE }} | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 
 {% block page_title %}
@@ -82,9 +82,13 @@
                 </li>
                 {% else %}
                     <li class="visible-phone">
-                        {% with login_course=common_page_data.course login_link_id="phone_login" login_link_class="" link_text="Login" %}
-                        {% include "registration/login_link.html" %}
-                        {% endwith %}
+                        {% if SITE_NAME_SHORT == 'Stanford' %}
+                            {% with login_course=common_page_data.course login_link_id="phone_login" login_link_class="" link_text="Login" %}
+                                {% include "registration/login_link.html" %}
+                            {% endwith %}
+                        {% else %}
+                        <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">Login</a>
+                        {% endif %}
                     </li>
                     {% if not common_page_data.course.institution_only %}
                     <li class="visible-phone">

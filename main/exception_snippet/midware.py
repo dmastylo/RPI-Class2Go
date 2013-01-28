@@ -46,6 +46,7 @@ class error_ping(object):
                 }
             )
             
-            return render(request, '500_staff.html')
+            site = getattr(settings, SITE_SHORT_NAME)
+            return render(request, 'sites/%s/500_staff.html' % site)
                 
         return None

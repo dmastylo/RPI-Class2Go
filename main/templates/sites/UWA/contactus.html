@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% block title %} {{SITE_TITLE}} | Contact Us {% endblock title %}
+{% block navbar %} {% endblock navbar %}
+
+{% block m_column_content %}
+
+{% if SITE_NAME_SHORT == 'UWA' %}
+<div class="row-fluid">
+    <div class="span11">
+        <center><h2>How to reach UWA Class2Go</h2></center>
+        <p></p>
+        <h3>For most issues, we recommend posting on the discussion forum rather than sending email.  </h3><p></p>
+        
+        {% if staffmail %}
+        <p>For {{course.title}} course staff email <a href="mailto:{{staffmail}}">{{staffmail}}</a> Course staff may not be able to respond to all queries individually - please consider posting on the discussion forum.</p>
+        {% endif %}
+        <p>For general information email us at <a href="mailto:contact@class2go.uwa.edu.au">contact@class2go.uwa.edu.au</a></p>
+        <p>For copyright concerns email us at <a href="mailto:copyright@class2go.uwa.edu.au">copyright@class2go.uwa.edu.au</a></p>
+        <p>For bug reports email us at <a href="mailto:bugs@class2go.uwa.edu.au">bugs@class2go.uwa.edu.au</a></p>
+        <p>For suggestions email us at <a href="mailto:suggestions@class2go.uwa.edu.au">suggestions@class2go.uwa.edu.au</a></p>
+        <p>For technical support email us at <a href="mailto:techsupport@class2go.uwa.edu.au">techsupport@class2go.uwa.edu.au</a></p>
+        <p>For disability-related questions email us at <a href="mailto:accessibility@class2go.uwa.edu.au">accessibility@class2go.uwa.edu.au</a></p>
+        <p>For questions about privacy-related issues email us at <a href="mailto:privacy@class2go.uwa.edu.au">privacy@class2go.uwa.edu.au</a></p>
+   </div>
+</div>
+{% else %}
+<div class="row-fluid">
+    <div class="span8">
+        <center><h2>How to reach Stanford Online</h2></center>
+        <p></p>
+        <h3>For most issues, we recommend posting on the discussion forum rather than sending email.  </h3><p></p>
+        
+        {% if staffmail %}
+        <p>For {{course.title}} course staff email <a href="mailto:{{staffmail}}">{{staffmail}}</a> Course staff may not be able to respond to all queries individually - please consider posting on the discussion forum.</p>
+        {% endif %}
+        <p>For general information email us at <a href="mailto:contact@class2go.uwa.edu.au">contact@class2go.uwa.edu.au</a></p>
+        <p>For copyright concerns email us at <a href="mailto:copyright@class2go.uwa.edu.au">copyright@class2go.uwa.edu.au</a></p>
+        <p>For bug reports email us at <a href="mailto:bugs@class2go.uwa.edu.au">bugs@class2go.uwa.edu.au</a></p>
+        <p>For suggestions email us at <a href="mailto:suggestions@class2go.uwa.edu.au">suggestions@class2go.uwa.edu.au</a></p>
+        <p>For technical support email us at <a href="mailto:techsupport@class2go.uwa.edu.au">techsupport@class2go.uwa.edu.au</a></p>
+        <p>For disability-related questions email us at <a href="mailto:accessibility@class2go.uwa.edu.au">accessibility@class2go.uwa.edu.au</a></p>
+        <p>For questions about privacy-related issues email us at <a href="mailto:privacy@class2go.uwa.edu.au">privacy@class2go.uwa.edu.au</a></p>
+   </div>
+</div>
+{% endif %}
+
+
+{% endblock m_column_content %}

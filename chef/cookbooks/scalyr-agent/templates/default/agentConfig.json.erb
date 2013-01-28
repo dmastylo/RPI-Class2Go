@@ -22,6 +22,21 @@
         // include a "source" attribute identifying the type/format of data in this log. Scalyr
         // uses the source attribute to determine which parsing rules to apply.
         default_attributes: {source: "apacheLogs"}
+      },
+      {
+        path: "/var/log/shibboleth",
+        match_expressions: [".*\\.log"],
+        default_attributes: {source: "shibLogs"}
+      },
+      {
+        path: "/var/log/django",
+        match_expressions: [".*\\.log"],
+        default_attributes: {source: "djangoLogs"}
+      },
+      {
+        path: "/var/log/celery",
+        match_expressions: [".*\\.log"],
+        default_attributes: {source: "celeryLogs"}
       }
     ]
   },

@@ -19,7 +19,10 @@ admin.site.register(Exercise)
 admin.site.register(VideoToExercise)
 admin.site.register(Exam)
 admin.site.register(CurrentTermMap)
+admin.site.register(Instructor)
+admin.site.register(CourseInstructor)
 admin.site.register(ContentGroup)
+
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'gender', 'birth_year', 'education', 'work', 'client_ip_first', 'user_agent_first', 'referrer_first', 'accept_language_first')
