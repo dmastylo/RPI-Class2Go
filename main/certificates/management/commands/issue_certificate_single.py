@@ -42,8 +42,8 @@ class Command(BaseCommand):
             raise CommandError("Wrong number of arguments, %d instead of 2" % len(args))
         if options['force_local'] and options['force_remote']:
             raise CommandError("Can't run both local and remote.")
-        course_handle = args[0]
-        username      = args[1]
+        course_handle = args[0].strip()
+        username      = args[1].strip()
 
         # Working object memoization
         course = Course.objects.get(handle=course_handle, mode='ready')
