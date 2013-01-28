@@ -689,7 +689,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                        });
                        
         saveXHR.error(function(xhr, status, msg) {
-                     var dialogDiv = window.getDialog(status.toUpperCase());
+                    var dialogDiv = window.getDialog(status.toUpperCase());
                     var displayText = "Your answers could not be saved!";
                     if (typeof msg != "undefined" && msg != "") {
                         displayText += " " + msg;
@@ -709,7 +709,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         saveXHR.success(function(status, msg, xhr) { 
                 var dialogDiv = window.getDialog(msg.toUpperCase());
-                $(dialogDiv).find('p').text("Your answers have been saved!");
+                $(dialogDiv).find('p').text("Your answers have been saved, but not submitted!");
 
                 $(dialogDiv).dialog({ modal: true,
                                    buttons: {'Close':function(){$(this).dialog("close");}}
