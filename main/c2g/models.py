@@ -2172,6 +2172,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     def has_child_exams(self):
         return ContentGroup.has_children(self, types=['exam'])
     
+    def is_child(self):
+        return ContentGroup.is_child(self)
+    
     record_view = property(record_view_name)
 
     def sync_videos_foreignkeys_with_metadata(self):
@@ -2722,6 +2725,12 @@ class ContentGroup(models.Model):
                 return True
         return False
 
+    
+    @classmethod
+    def is_child(thisclass, obj):
+        """ Is obj a child? """
+        return obj.contentgroup_set.all().filter(level=2).exists()
+    
     def __repr__(self):
         s = "ContentGroup(group_id=" + str(self.group_id) + ", "
         s += 'course=' + str(self.course.id) + ', ' 
