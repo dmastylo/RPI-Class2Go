@@ -62,7 +62,7 @@ def main(request, course_prefix, course_suffix):
                 redir = 'https://'+request.get_host()+redir
             return redirect(redir)
 
-    
+    course = common_page_data['course']
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
         many_announcements = True
@@ -77,6 +77,7 @@ def main(request, course_prefix, course_suffix):
 
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
+             'course':              course,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
              'is_logged_in':        is_logged_in
