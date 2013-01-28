@@ -403,7 +403,7 @@ width: auto;
   .home .home-unit {
     padding:20px;
   }
-  .home .computernetworking,.home .solarcells {
+  .home .databases, .home .computernetworking, .home .solarcells {
     background:#fff;
     padding:20px;
   }
