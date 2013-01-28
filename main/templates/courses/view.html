@@ -1,6 +1,6 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block title %}{{ common_page_data.course.title }} | Stanford Online{% endblock title %}
+{% block title %}{{ SITE_TITLE }} | {{ common_page_data.course.title }}{% endblock title %}
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
 {% block course_notification %}
@@ -23,7 +23,7 @@
 
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span9">
+<div id="c2g_layout_m_column" class="span6">
     <h3 class="section-title pull-left">Recent Announcements</h3>
     <div class="pull-right">
         {% if many_announcements %}
@@ -51,16 +51,22 @@
 
 {% block addl_scripts %}
 
+{% block r_column_content %}
+<div id="c2g_layout_r_column" class="span3">
+    <!--Skeleton Div to be filled in by rightnav ajax -->
+</div>
+{% endblock r_column_content %}
+
 {% if common_page_data.is_course_admin %}
     {% include "controls/tinymce.html" %}
 {% endif %}
 
 <script>
 $(document).ready(function(){
-                  $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
+    $("#c2g_layout_r_column").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
+    $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
                                                  c2g.installLeftNavChevron();
                                                  });
-
 });
 </script>
 {% endblock addl_scripts %}

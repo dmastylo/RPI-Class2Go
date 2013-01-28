@@ -1,11 +1,12 @@
 {% extends "course_base.html" %}
 {% load url from future %}
-{% block title %}{{ page.title }} | {{ common_page_data.course_title }}{% endblock title %}
+{% block title %} {{SITE_TITLE}} | {{ common_page_data.course.title }} | {{ page.title }} {% endblock title %}
+
 
 {% block course_info_link_class %}{% if page.menu_slug %} active{% endif %}{% endblock course_info_link_class %}
 {% block course_materials_link_class %}{% if not page.menu_slug %} active{% endif %}{% endblock course_materials_link_class %}
 
-{% block course_page_title %}{{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course_title}}</a>){% endblock course_page_title %}
+{% block course_page_title %} {{page.title}} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
 {% block addl_head_scripts %}
 <script type="text/x-mathjax-config">
@@ -34,11 +35,59 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    {% ifnotequal page.description '' %}
-        {% autoescape off %}{{page.description}}{% endautoescape %}
-    {% else %}
-        <p>No content has been added to this page yet.</p>
-    {% endifnotequal %}
+	{% ifequal page.title 'Overview' %}
+	
+        {% if intro_video or course.description or course.prerequisites or course.faq or course.outcomes or course.accompanying_materials or instructor_list %}
+            <h3>Course Information</h3>
+             {% ifnotequal intro_video None %}
+            <iframe width="710" height="430" src="https://www.youtube.com/embed/{{intro_video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+            <br/>
+             {% endifnotequal %}
+            <h3>Course Term: {{ common_page_data.course.term }} {{ common_page_data.course.year }}</h3>
+            <p>{% autoescape off %}{{course.description}}{% endautoescape %}</p>
+            {% ifnotequal common_page_data.course.prerequisites '' %}
+            <h3>Prerequisites</h3>	
+            <p>{% autoescape off %}{{common_page_data.course.prerequisites}}{% endautoescape %}</p>
+            {% endifnotequal %}
+
+            {% ifnotequal common_page_data.course.faq '' %}
+            <h3>FAQ</h3>	
+            <p>{% autoescape off %}{{common_page_data.course.faq}}{% endautoescape %}</p>
+            {% endifnotequal %}
+
+            {% ifnotequal common_page_data.course.outcomes '' %}
+            <h3>Outcomes</h3>	
+            <p>{% autoescape off %}{{common_page_data.course.outcomes}}{% endautoescape %}</p>
+            {% endifnotequal %}
+
+            {% ifnotequal common_page_data.course.accompanying_materials '' %}
+            <h3>Accompanying Material</h3>	
+            <p>{% autoescape off %}{{common_page_data.course.accompanying_materials}}{% endautoescape %}</p>
+            {% endifnotequal %}
+
+
+            <h3>Biographies</h3>
+
+            {% for instructor in instructor_list %}
+                    <h3>{{ instructor.name }}</h3>
+                <div>
+                    <div style="float: left; margin-right: 20px;">
+                        <img style="width:200px;height:220px;" src="{{instructor.photo_dl_link}}">
+                    </div>
+                    <p>{{instructor.biography}}</p>
+                </div>
+
+            {% endfor %}
+        {% endif %}
+	
+	
+	{% else %}
+        {% ifnotequal page.description '' %}
+            {% autoescape off %}{{page.description}}{% endautoescape %}
+        {% else %}
+            <p>No content has been added to this page yet.</p>
+        {% endifnotequal %}
+    {% endifequal %}
 </div>
 {% endblock m_column_content %}
 

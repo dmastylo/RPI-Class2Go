@@ -19,9 +19,9 @@
         {% endif %}
     {% else %} {# This is technically unreachable due to admin decorator, but doing this just to be complete #}
     <h4>Please {% with login_course=common_page_data.course login_link_id="login_link" link_text="log in" %}
-        {% include "registration/login_link.html" %}
-        {% endwith %}
-        to see course materials.</h4>
+                  {% include "registration/login_link.html" %}
+               {% endwith %}
+      to see course materials.</h4>
     {% endif %}
 </div>
 {% endblock m_column_content %}

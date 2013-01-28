@@ -16,19 +16,21 @@
 
 import sys
 import os
-from django.core.files.storage import default_storage
-from django.conf import settings
 import subprocess
 import math
 import operator
-import Image
 import time
-from celery import task
-from utility import *
 import numpy as np
 import shutil
 
-    
+from django.core.files.storage import default_storage
+from django.conf import settings
+from celery import task
+
+import Image
+
+from utility import *
+
 ##
 ##  KELVINATOR
 ##

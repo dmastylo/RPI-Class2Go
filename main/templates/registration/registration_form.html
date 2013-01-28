@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load url from future %}
-{% block title %}Register | Stanford Online{% endblock title %}
+{% block title %}{{ SITE_TITLE }} | Register{% endblock title %}
 {% block topnav %} {% endblock topnav %}
 {% block navbar %} {% endblock navbar %}
 
@@ -17,7 +17,7 @@
 </div>
 <div class="registration span5">
 	<div class="well">
-        <h2>Register for Stanford Online</h2>
+        <h2>Register for {{ SITE_TITLE }}</h2>
 
 		<form action="{% url 'registration_register' %}" method="post" class="form-horizontal">
             <fieldset>
@@ -25,7 +25,7 @@
             </fieldset>
 		    <div class="form-actions">
                 <p>
-                 {{form.tos}} I agree to Stanford Online's <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>,
+                 {{form.tos}} I agree to {{ SITE_TITLE }}'s <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>,
                 <a href="{% url 'c2g.views.tos' %}#honor" target="_blank" >Honor Code</a>, and <a href="{% url 'c2g.views.tos' %}#privacy" target="_blank">Privacy Policy</a>
 
                 </p>
