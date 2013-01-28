@@ -13,8 +13,8 @@ import certificates.tasks
 
 def notify(cert_type, firstname, lastname, notify_addr, prefix, suffix):
     if not notify_addr or notify_addr == '(none specified)': return False
-    subject = 'Your %s certificate of %s is now available' % (prefix, cert_type)
-    body = "Congratulations %s %s, you have earned a certificate of %s " % (firstname, lastname, cert_type)
+    subject = 'Your %s statement of accomplishment of %s is now available' % (prefix, cert_type)
+    body = "Congratulations %s %s, you have earned a statement of accomplishment of %s " % (firstname, lastname, cert_type)
     body += "in the course %s, section %s.\n" % (prefix, suffix)
     body += "\nYou can download the PDF from your profile page at %s.\n" % (get_site_url()[:-1] + reverse('accounts.views.profile'))
     send_mail(subject, body, "noreply@class.stanford.edu", [ notify_addr, ])
@@ -24,9 +24,10 @@ def notify(cert_type, firstname, lastname, notify_addr, prefix, suffix):
 class Command(BaseCommand):
     args = "<course_handle> <username>"
     help = """ 
-        Issue a certificate of completion for the course referred to by
-        course_handle to the user registered as username. If completion_level
-        is specified, creates that style of certificate of completion.
+        Issue a statement of accomplishment for the course referred to by
+        course_handle to the user registered as username. If type
+        is specified, creates that style of statement (e.g., 'completion' vs.
+        'distinction').
         """
     option_list = ( 
                    make_option('-t', '--type', dest='cert_type', default="completion", help="Specify certificate type to generate"),

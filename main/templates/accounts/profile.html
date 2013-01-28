@@ -38,7 +38,7 @@
                 <table id="courses_table">
                     <tr><th style="padding-right: 15px;">Course title</th><th style="padding-right: 15px;">Enrollment</th>
                         {% for loop in longest_certs %}
-                            <th style="padding-right: 15px;">Download Certificate</th>
+                            <th style="padding-right: 15px;">Statements of Accomplishment</th>
                         {% endfor %}
                     {% for course in courses %}
                         <tr>
@@ -54,7 +54,7 @@
                             </td>
                             {% for certinfo in certifications|byKey:course.id %}
                                 <td style="padding-right: 15px;">
-                                    <a href="{{certinfo.1}}">Certificate of {{certinfo.0}}</a>
+                                    <a href="{{certinfo.1}}">Accomplishment of {{certinfo.0}}</a>
                                 </td>
                             {% endfor %}
                         </tr>
