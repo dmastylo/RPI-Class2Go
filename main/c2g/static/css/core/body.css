@@ -291,11 +291,11 @@ body.home {
     padding:20px 20px 20px 320px;
 }
 .computernetworking {
-    background:url(/static/graphics/core/computer-networking.jpg) no-repeat top left; 
+    background:#fff url(/static/graphics/core/computer-networking.jpg) no-repeat top left; 
     padding:20px 20px 20px 320px;
 }
 .solarcells {
-    background:url(/static/graphics/core/solarcells.jpg) no-repeat top left; 
+    background: #fff url(/static/graphics/core/solarcells.jpg) no-repeat top left; 
     padding:20px 20px 20px 320px;
 }
 .home h3 a {
