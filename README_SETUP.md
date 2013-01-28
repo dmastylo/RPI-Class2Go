@@ -75,28 +75,28 @@ prefix for these.
 
         easy_install pip
 
-1. Install python's virtual env
+1. Install python's virtual env 
 
         pip install virtualenv
 
-1. Install virtualenvwrapper:
+1. Install virtualenvwrapper: (optional)
 
         sudo pip install virtualenvwrapper
 
-1. Verify installation location of virtualenv and virtualenvwrapper:
+    a. Verify installation location of virtualenv and virtualenvwrapper:
 
         ls /usr/local/bin/
 
-1. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
+    a. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
 
         echo $PATH
     (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
 
-1. Edit login script:
+    a. Edit login script:
 
         vim .bashrc
 
-1. ...and add the following:
+    a. ...and add the following:
 
         # virtualenv setup -- use Distribute by default
         export VIRTUALENV_DISTRIBUTE=true
@@ -108,24 +108,24 @@ prefix for these.
         export VIRTUALENVWRAPPER_VIRTUALENV=`which virtualenv`
         source /usr/local/bin/virtualenvwrapper.sh
 
-1. Source login script so env vars take effect:
+    a. Source login script so env vars take effect:
 
         source ~/.bashrc
     (Sourcing should auto-create your virtual environment base dir)
 
-1. Check out new virtual base directory:
+    a. Check out new virtual base directory:
 
         ls class2go-venv/
 
-1. Make sure PROJECT_HOME is defined
+    a. Make sure PROJECT_HOME is defined
 
         echo $PROJECT_HOME
 
-1. Make new project directory:
+    a. Make new project directory:
 
         mkdir -p $PROJECT_HOME
 
-1. Issue command to set up new project subdirectory and link it to virtual env:
+    a. Issue command to set up new project subdirectory and link it to virtual env:
 
         mkproject class2go
 
