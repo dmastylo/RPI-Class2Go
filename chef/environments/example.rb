@@ -17,6 +17,8 @@ default_attributes \
         "database_password" => "dddddddddd",
         # S3
         "storage_bucket" => "stage-c2g",
+        "secure_bucket" => "stage-c2g",
+        "release_bucket" => "qqqqqqqqqqqqqqqq",
         # SES
         "smtp_user" => "eeeeeeeeeeeeeeeeeeee",
         "smtp_password" => "ffffffffffffffffffffffffffffffffffffffffffff"
@@ -65,6 +67,9 @@ default_attributes \
         "endpoint" => "https://piazza.com/basic_lti",
         "key" => "hhhhhhhhhhhh",
         "secret" => "ggggggggggggggg"
+    },
+    "scalyr" => {
+        "write_key" => "1234567890"
     },
     "google" => {
         "yt_service_developer_key" => "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",

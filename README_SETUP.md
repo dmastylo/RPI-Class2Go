@@ -54,6 +54,13 @@ prefix for these.
 1. Install Python (we are expecting 2.7.x):
 
         brew install readline sqlite gdbm
+
+1. If you plan on running in a virtual environment, then you probably 
+want to instally your own python.  But if not, then you already have 
+python on your machine (in /usr/bin/python), in which case you *shouldn't* 
+install another copy of python (in /usr/local/bin/python).  
+But if you want to do it with:
+
         brew install python --universal --framework
 
 1. Install mysql
@@ -116,6 +123,10 @@ prefix for these.
 1. Install Celery ecosystem
 
         pip install django-celery django-celery-email pytz
+
+1. RESTful interfaces
+
+        pip install djangorestframework pysimplesoap
 
 1. Install test environment dependencies:
 
@@ -272,6 +283,7 @@ for virtualenv. virtualenvwrapper can also be installed for Mac (and
 probably Windows too).
 
 3. Create the database (perhaps with different username and password):
+
         sudo mysql mysql
         create database c2g;
         CREATE USER 'c2g_username'@'localhost' IDENTIFIED BY 'c2g_passwd';

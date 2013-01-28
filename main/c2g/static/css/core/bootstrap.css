@@ -1829,19 +1829,25 @@ table {
   border-spacing: 0;
 }
 
+td {
+  padding-right: 10px;
+}
+
+
 .table {
   width: 100%;
   margin-bottom: 20px;
 }
 
-.table th,
-.table td {
+.table th {
   padding: 8px;
   line-height: 20px;
   text-align: left;
   vertical-align: top;
   border-top: 1px solid #dddddd;
 }
+
+
 
 .table th {
   font-weight: bold;
@@ -3771,7 +3777,7 @@ input[type="submit"].btn.btn-mini {
 .nav-header {
   display: block;
   padding: 3px 15px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: bold;
   line-height: 20px;
   color: #999999;

@@ -6,6 +6,14 @@
     </div>
 </div>
 
+{% if section_structure.section.subtitle %}
+<div class="row-fluid">
+    <div class="span12">
+        <h4 class="pull-left">{{section_structure.section.subtitle}}</h4>
+    </div>
+</div>
+{% endif %}
+
 
 {% if section_structure.items|length > 0 %}
 <div class="row-fluid">

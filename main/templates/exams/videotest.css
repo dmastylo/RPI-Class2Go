@@ -49,12 +49,22 @@ div.divInIndex img {
 }
 
 .thumbnailTime {
-  font-size: 10pt;
-  position:absolute;
-  top: 2px;
-  right: 2px;
-  border: 1px solid black;
-  background: white;
-  padding: 1px;
-  z-index: 2;
+    bottom: 2px;
+    background: #333;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 80%;
+    left: 2px;
+    line-height: 1em;
+    opacity: .5;
+    padding: 2px;
+    position: absolute;
+    z-index: 2;
+}
+.cant-watch-video {
+    background-color: #ffc;
+    border: 1px solid #dc9;
+    border-radius: 3px;
+    margin: .5em 0 1em;
+    padding: .3em .5em;
 }

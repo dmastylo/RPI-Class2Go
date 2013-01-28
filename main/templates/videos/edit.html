@@ -56,12 +56,12 @@
 	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
 	</div>
       </form>
-  {% else %} {# This is technically unreachable due to admin decorator, but doing this just to be complete #}
+    {% else %} {# This is technically unreachable due to admin decorator, but doing this just to be complete #}
     <h4>Please {% with login_course=common_page_data.course login_link_id="login_link" link_text="log in" %}
         {% include "registration/login_link.html" %}
         {% endwith %}
         to edit video.</h4>
-  {% endif %}
+    {% endif %}
 
 {% endblock m_column_content %}
 

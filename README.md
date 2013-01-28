@@ -102,7 +102,7 @@ commercial, some open source. But a ton of good stuff.
   [p]:    http://www.python.org/
   [dj]:   http://www.djangoproject.com/
   [a]:    http://aws.amazon.com/
-  [oc]:   http://www.opscode.org/
+  [oc]:   http://www.opscode.com/
   [gh]:   http://www.github.com/
 
 

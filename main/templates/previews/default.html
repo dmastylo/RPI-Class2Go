@@ -4,7 +4,26 @@
 {% block course_description %}
 
 <div class = "span7">
-    <h1>Course Info</h1>
+    <h3>Course Info</h3>
+    {% ifnotequal video None %}
+    	<iframe width="355" height="430" src="https://www.youtube.com/embed/{{video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
+		<br/>
+	{% endifnotequal %}
+
+	<h3>Course starts {{ course.term }} {{ course.year }}</h3>
+	<p>{% autoescape off %}{{course.description}}{% endautoescape %}</p>
+	<h3>Biographies</h3>
+
+	{% for instructor in instructors %}
+       	<h3>{{ instructor.name }}</h3>
+   		<div class="instructor-box">
+			<img  src="{{ instructor.photo_dl_link }}" />
+			<p>{{instructor.biography}}</p>
+		</div>		
+	{% endfor %}
+	
+  
+
 </div>
 
 {% endblock course_description %}

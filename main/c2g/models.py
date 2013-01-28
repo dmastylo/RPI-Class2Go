@@ -16,6 +16,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Max
 from django.db.models.signals import post_save
+from django.utils import encoding
 
 from c2g.util import is_storage_local, get_site_url
 from kelvinator.tasks import sizes as video_resize_options 
@@ -131,12 +132,27 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     preview_only_mode = models.BooleanField(default=True)
     institution_only = models.BooleanField(default=False)
     share_to = models.ManyToManyField("self",symmetrical=False,related_name='share_from',null=True, blank=True)
-
+    short_description = models.TextField(blank=True)
+    prerequisites = models.TextField(blank=True)
+    accompanying_materials = models.TextField(blank=True)
+    outcomes = models.TextField(blank=True)
+    faq = models.TextField(blank=True)
+    logo = models.FileField(upload_to=get_file_path,null=True)
+ 
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
     # Just use epoch seconds to make it unique.
     piazza_id = models.IntegerField(null=True, blank=True)
+
+    def logo_dl_link(self):
+
+        if self.logo.name is None or not self.logo.storage.exists(self.logo.name):
+            return ""
+        
+        url = self.logo.storage.url(self.logo.name)
+        return url
+
 
     def __unicode__(self):
         if self.title:
@@ -225,6 +241,12 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             handle = self.handle,
             institution_only = self.institution_only,
             piazza_id = int(time.mktime(time.gmtime())),
+            short_description = self.short_description,
+            prerequisites = self.prerequisites,
+            accompanying_materials = self.accompanying_materials,
+            outcomes = self.outcomes,
+            faq = self.faq,
+            logo = self.logo,
             preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
@@ -251,6 +273,18 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             ready_instance.calendar_start = self.calendar_start
         if not clone_fields or 'calendar_end' in clone_fields:
             ready_instance.calendar_end = self.calendar_end
+        if not clone_fields or 'short_description' in clone_fields:
+            ready_instance.short_description = self.short_description    
+        if not clone_fields or 'prerequisites' in clone_fields:
+            ready_instance.prerequisites = self.prerequisites    
+        if not clone_fields or 'accompanying_materials' in clone_fields:
+            ready_instance.accompanying_materials = self.accompanying_materials    
+        if not clone_fields or 'outcomes' in clone_fields:
+            ready_instance.outcomes = self.outcomes
+        if not clone_fields or 'faq' in clone_fields:
+            ready_instance.faq = self.faq
+        if not clone_fields or 'logo' in clone_fields:
+            ready_instance.logo = self.logo
 
         ready_instance.save()
 
@@ -274,6 +308,18 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             self.calendar_start = ready_instance.calendar_start
         if not clone_fields or 'calendar_end' in clone_fields:
             self.calendar_end = ready_instance.calendar_end
+        if not clone_fields or 'short_description' in clone_fields:
+            self.short_description = ready_instance.short_description    
+        if not clone_fields or 'prerequisites' in clone_fields:
+            self.prerequisites = ready_instance.prerequisites    
+        if not clone_fields or 'accompanying_materials' in clone_fields:
+            self.accompanying_materials = ready_instance.accompanying_materials    
+        if not clone_fields or 'outcomes' in clone_fields:
+            self.outcomes = ready_instance.outcomes
+        if not clone_fields or 'faq' in clone_fields:
+            self.faq = ready_instance.faq
+        if not clone_fields or 'logo' in clone_fields:
+            self.logo = ready_instance.logo
 
         self.save()
 
@@ -287,6 +333,8 @@ class ContentSectionManager(models.Manager):
 class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
+    subtitle = models.CharField(max_length=255, null=True, blank=True)
+    slug = models.SlugField(max_length=255, null=True, blank=True)
     objects = ContentSectionManager()
 
     def create_ready_instance(self):
@@ -294,6 +342,8 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             course=self.course.image,
             title=self.title,
             index=self.index,
+            subtitle=self.subtitle,
+            slug=self.slug,
             mode='ready',
             image=self,
         )
@@ -309,6 +359,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             ready_instance.title = self.title
         if not clone_fields or 'index' in clone_fields:
             ready_instance.index = self.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            ready_instance.subtitle = self.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            ready_instance.slug = self.slug
 
         ready_instance.save()
 
@@ -320,6 +374,10 @@ class ContentSection(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
             self.title = ready_instance.title
         if not clone_fields or 'index' in clone_fields:
             self.index = ready_instance.index
+        if not clone_fields or 'subtitle' in clone_fields:
+            self.subtitle = ready_instance.subtitle
+        if not clone_fields or 'slug' in clone_fields:
+            self.slug = ready_instance.slug
 
         self.save()
 
@@ -440,6 +498,8 @@ class AdditionalPage(TimestampMixin, Stageable, Sortable, Deletable, models.Mode
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -637,6 +697,8 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
         self.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         if self.title != self.image.title:
             return False
         if self.description != self.image.description:
@@ -957,6 +1019,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 ready_videoToEx.image.save()
 
     def is_synced(self):
+        if not self.image:
+            return False
         prod_instance = self.image
         if self.exercises_changed() == True:
             return False
@@ -1160,12 +1224,8 @@ class CacheStat():
         # stat interval expired: print stats and zero out counter
         if datetime.now() - cls.lastReportTime > cls.reportingInterval:
             for c in cls.count:
-                hit = 0
-                if 'hit' in cls.count[c]:
-                    hit = cls.count[c]['hit']
-                miss = 0
-                if 'miss' in cls.count[c]:
-                    miss = cls.count[c]['miss']
+                hit = cls.count[c].get('hit', 0)
+                miss = cls.count[c].get('miss', 0)
                 if hit + miss == 0:
                     logger.info("cache stats for %s: hits %d, misses %d" % (c, hit, miss))
                 else:
@@ -1427,6 +1487,8 @@ class ProblemSet(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
 
 
     def is_synced(self):
+        if not self.image:
+            return False
         image = self.image
         if self.exercises_changed() == True:
             return False
@@ -1654,29 +1716,29 @@ class VideoToExercise(Deletable, models.Model):
 
 
 class ProblemActivity(TimestampMixin, models.Model):
-     student = models.ForeignKey(User)
-     video_to_exercise = models.ForeignKey(VideoToExercise, null=True)
-     problemset_to_exercise = models.ForeignKey(ProblemSetToExercise, null=True)
-     problem_identifier = models.CharField(max_length=255, blank=True)
-     complete = models.IntegerField(null=True, blank=True)
-     attempt_content = models.TextField(null=True, blank=True)
-     count_hints = models.IntegerField(null=True, blank=True)
-     time_taken = models.IntegerField(null=True, blank=True)
-     attempt_number = models.IntegerField(null=True, blank=True)
-     sha1 = models.TextField(blank=True)
-     seed = models.TextField(blank=True)
-     problem_type = models.TextField(blank=True)
-     review_mode = models.IntegerField(null=True, blank=True)
-     topic_mode = models.IntegerField(null=True, blank=True)
-     casing = models.TextField(blank=True)
-     card = models.TextField(blank=True)
-     cards_done = models.IntegerField(null=True, blank=True)
-     cards_left = models.IntegerField(null=True, blank=True)
-     user_selection_val = models.CharField(max_length=1024, null=True, blank=True)
-     user_choices = models.CharField(max_length=1024, null=True, blank=True)
-     def __unicode__(self):
-            return self.student.username + " " + str(self.time_created)
-     class Meta:
+    student = models.ForeignKey(User)
+    video_to_exercise = models.ForeignKey(VideoToExercise, null=True)
+    problemset_to_exercise = models.ForeignKey(ProblemSetToExercise, null=True)
+    problem_identifier = models.CharField(max_length=255, blank=True)
+    complete = models.IntegerField(null=True, blank=True)
+    attempt_content = models.TextField(null=True, blank=True)
+    count_hints = models.IntegerField(null=True, blank=True)
+    time_taken = models.IntegerField(null=True, blank=True)
+    attempt_number = models.IntegerField(null=True, blank=True)
+    sha1 = models.TextField(blank=True)
+    seed = models.TextField(blank=True)
+    problem_type = models.TextField(blank=True)
+    review_mode = models.IntegerField(null=True, blank=True)
+    topic_mode = models.IntegerField(null=True, blank=True)
+    casing = models.TextField(blank=True)
+    card = models.TextField(blank=True)
+    cards_done = models.IntegerField(null=True, blank=True)
+    cards_left = models.IntegerField(null=True, blank=True)
+    user_selection_val = models.CharField(max_length=1024, null=True, blank=True)
+    user_choices = models.CharField(max_length=1024, null=True, blank=True)
+    def __unicode__(self):
+        return self.student.username + " " + str(self.time_created)
+    class Meta:
         db_table = u'c2g_problem_activity'
 
 class NewsEvent(models.Model):
@@ -1724,7 +1786,7 @@ class EmailAddr(models.Model):
     optout = models.BooleanField(default=False)
     optout_code = models.CharField(max_length=64, default='optout')
     def __unicode__(self):
-       return self.addr
+        return self.addr
 
 def write_optout_code(sender, instance, created, raw, **kwargs):
     if created and not raw:  #create means that a new DB entry is created, raw is set when fixtures are being loaded
@@ -1855,7 +1917,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
            the regexp are rough, but should not have any false negatives.  (at
            worst we load mathjax when we don't need it.
         """
-        if re.search(r"\$\$.*\$\$", self.html_content) or re.search(r"\\\[.*\\\]", self.html_content):
+        if re.search(r"\$\$.*\$\$", self.html_content, re.DOTALL) or re.search(r"\\\[.*\\\]", self.html_content, re.DOTALL):
             return True
         return False
         
@@ -2011,9 +2073,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         self.save()
     
     def is_synced(self):
-        
+        if not self.image:
+            return False        
         prod_instance = self.image
-        
         if self.section != prod_instance.section.image:
             return False
         if self.title != prod_instance.title:
@@ -2148,7 +2210,7 @@ def videos_in_exam_metadata(xml, times_for_video_slug=None):
         'question_times' only gets populated in the returned dict if a
         times_for_video_slug argument is specified.
     """
-    metadata_dom = parseString(xml) #The DOM corresponding to the XML metadata
+    metadata_dom = parseString(encoding.smart_str(xml, encoding='utf-8')) #The DOM corresponding to the XML metadata
     video_questions = metadata_dom.getElementsByTagName('video')
     
     question_times = {}
@@ -2206,6 +2268,43 @@ class ExamRecord(TimestampMixin, models.Model):
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
+    
+class Instructor(TimestampMixin, models.Model):
+    name = models.TextField(blank=True)
+    email = models.TextField(blank=True)
+    biography = models.TextField(blank=True)
+    photo = models.FileField(upload_to=get_file_path, blank=True)
+    handle = models.CharField(max_length=255, null=True, db_index=True)
+    
+    def photo_dl_link(self):
+        if not self.photo.storage.exists(self.photo.name):
+            return ""
+        
+        url = self.photo.storage.url(self.photo.name)
+        return url
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        db_table = u'c2g_instructor'
+
+class GetCourseInstructorByCourse(models.Manager):
+    def getByCourse(self, course):
+        return self.filter(course=course)
+
+
+class CourseInstructor(TimestampMixin,  models.Model):
+    course = models.ForeignKey(Course)
+    instructor = models.ForeignKey(Instructor)
+    objects = GetCourseInstructorByCourse()
+        
+    def __unicode__(self):
+        return self.course.title + "-" + self.instructor.name
+    
+    class Meta:
+        db_table = u'c2g_course_instructor'
+                
 
 class ExamScore(TimestampMixin, models.Model):
     """
@@ -2365,7 +2464,7 @@ class ContentGroup(models.Model):
         OTOH, if ContentGroup.get_content_type becomes constant-time, this
         becomes linear, and then we win.
         """
-        info = {}
+        info = {'__parent': None, '__parent_tag': '', '__children': [], '__group_id': None, }
         cls = thisclass.groupable_types.get(tag, False)
         if not cls:
             return info
@@ -2374,7 +2473,8 @@ class ContentGroup(models.Model):
         try:
             cgobjs = ContentGroup.objects.filter(group_id=obj.contentgroup_set.get().group_id)
         except ContentGroup.DoesNotExist:
-            return info
+            return {}
+        info['__group_id'] = cgobjs[0].group_id
         for cgo in cgobjs:
             cttag = cgo.get_content_type()
             cgref = getattr(cgo, cttag)
@@ -2384,11 +2484,47 @@ class ContentGroup(models.Model):
                 info['__parent'] = cgref
                 info['__parent_tag'] = cttag
             else:
-                info.setdefault('__children', []).append(cgref)
-            info.setdefault(cttag, []).append(cgref)
-        if info:
-            info['__group_id'] = cgobjs[0].group_id
+                info['__children'].append(cgref)
+            if info.has_key(cttag):
+                info[cttag].append(cgref)
+            else:
+                info[cttag] = [cgref]
         return info
+
+    @classmethod
+    def reassign_parent_child_sections(thisclass, tag, id, new_section_id):
+        """When updating parent's content section, make children follow it."""
+        def do_content_section_update(obj, new_section_ref):
+            # NB: ContentGroup objects are all ready-mode instances of a thing.
+            obj.section = new_section_ref
+            obj.save()
+            if hasattr(obj, 'image'):
+                if new_section_ref != None:      # can't take .image() of None
+                    obj.image.section = new_section_ref.image
+                else:
+                    obj.image.section = new_section_ref
+                obj.image.save()
+        group_parent = None
+        cginfo = thisclass.groupinfo_by_id(tag, id)
+        if new_section_id == "null":
+            new_section_ref = None
+        else:
+            new_section_ref = ContentSection.objects.get(id=new_section_id)
+        if new_section_ref and new_section_ref.mode != "ready":
+            new_section_ref = new_section_ref.image
+        # * Get the parent information if it's available...
+        group_parent = cginfo['__parent']
+        # * ...but if it's not, this call should no-op
+        if not group_parent:
+            return False
+        # * If this CG is already in new_section, this call should no-op
+        if group_parent.section and new_section_ref and new_section_ref.id == group_parent.section.id:
+            return False
+        # * Otherwise "normal" case of group w/ parents and children getting moved
+        do_content_section_update(group_parent, new_section_ref)
+        for child in cginfo['__children']:
+            do_content_section_update(child, new_section_ref)
+        return True
 
     @classmethod
     def add_child(thisclass, group_id, tag, obj_ref, display_style='list'):
@@ -2542,8 +2678,11 @@ class ContentGroup(models.Model):
 
     def get_content_id(self):
         """Return the id of the object to which this ContentGroup entry refers"""
-        tag = self.get_content_type()
-        return getattr(self, tag+'_id')
+        for keyword in ContentGroup.groupable_types.keys():
+            tmp = getattr(self, keyword+'_id', False)
+            if tmp:
+                return tmp
+        return None
 
     def get_content_type(self):
         """This is linear in the number of content types supported for grouping
@@ -2554,7 +2693,7 @@ class ContentGroup(models.Model):
               Compromise is to use django cache table
         """
         for keyword in ContentGroup.groupable_types.keys():
-            if getattr(self, keyword, False):
+            if getattr(self, keyword+'_id', False):
                 return keyword
         return None
     

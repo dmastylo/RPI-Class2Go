@@ -203,12 +203,16 @@ class Command(BaseCommand):
         problems = sorted(missingThumbSet.union(missingSmallSet).union(missingLargeSet))
         for p in problems:
             if p in missingThumbSet:
-                print "./manage.py kelvinate " + p.fixup_params()
+                print "./manage.py kelvinate %s     # id=%s file=%s" \
+                        % (p.fixup_params(), p.video_id, p.file)
             if p in missingSmallSet:
-                print "./manage.py resize small " + p.fixup_params()
+                print "./manage.py resize small %s    # id=%s file=%s" \
+                        % (p.fixup_params(), p.video_id, p.file)
             if p in missingLargeSet:
-                print "./manage.py resize large " + p.fixup_params()
+                print "./manage.py resize large %s    # id=%s file=%s" \
+                        % (p.fixup_params(), p.video_id, p.file)
 
         for m in missingVideoSet:
-            print "# missing video file \"%s\" for %s " % (m.file, m.fixup_params())
+            print "# missing video file \"%s\" for %s, id=%s" \
+                    % (m.file, m.fixup_params(), m.video_id)
 

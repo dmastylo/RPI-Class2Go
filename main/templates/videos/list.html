@@ -37,8 +37,8 @@
         {% endfor %}
       </ul>
     {% endfor %}
-  {% else %}{# Will not Fix, this template is obsolete #}
-    <h4>Please <a data-toggle="modal" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">log in</a> to see video list.</h4>
+  {% else %}
+    <h4>Please <a data-toggle="modal" href="{% url 'default_login' %}?next={{ request.get_full_path }}">log in</a> to see video list.</h4>
   {% endif %}
 </div>
 {% endblock m_column_content %}

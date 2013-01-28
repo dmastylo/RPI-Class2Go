@@ -2,6 +2,7 @@ import re, collections
 import urllib,urllib2
 import json
 import logging
+from datetime import datetime
 
 from django.conf import settings
 from django.utils import encoding
@@ -50,7 +51,7 @@ class AutoGrader():
             return tempFn
     
         self.metadata_xml = xml #The XML metadata for the entire problem set.
-        self.metadata_dom = parseString(xml) #The DOM corresponding to the XML metadata
+        self.metadata_dom = parseString(encoding.smart_str(xml, encoding='utf-8')) #The DOM corresponding to the XML metadata
 
         if default_return is None:
             self.grader_functions = {} #This is a dict that is keyed on the "name" of the submission (the input field) whose
@@ -89,6 +90,10 @@ class AutoGrader():
                 self._parse_num(resp, resp_name, qid)
             elif type == "dbinteractiveresponse":
                 self._parse_interactive(resp, resp_name, qid)
+            elif type == "regexresponse":
+                self._parse_regex(resp, resp_name, qid)
+            elif type == "stringresponse":
+                self._parse_string(resp, resp_name, qid)
             # more types should follow
             
     def _validate_resp(self, response_elem, qid):
@@ -170,7 +175,7 @@ class AutoGrader():
         The return value is a dict with keys 'correct' and 'score' (using dict to be future proof)
         'correct_choices' is a dict whose keys are all the correct choices selected by the student.
         'wrong_choices' is a dict whose keys are all the 'wrong' choices for the student, and whose value is either
-            'fp' (false_positive) where the student selected a wrong answer, or 'fn', where the student did not select a right answer.
+        'fp' (false_positive) where the student selected a wrong answer, or 'fn', where the student did not select a right answer.
             
         """
         def grader_fn(submission_iterable):
@@ -197,7 +202,7 @@ class AutoGrader():
 
     def _parse_num(self, response_elem, resp_name, qid):
         """
-        Parses each <numericalresponse> element and sets up its grader function
+        Parses each <response answertype="numericalresponse"> element and sets up its grader function
         """
 
         answer_str = response_elem.getAttribute("answer")
@@ -244,7 +249,7 @@ class AutoGrader():
             
         which returns True if answer-tolerance <= submission <= answer+tolerance, else returns False
         Submission is a string that gets converted to a float.
-        The return value dict of with keys 'correct' and 'score' (using dict to be future proof)
+        The return value is a dict with keys 'correct' and 'score' (using dict to be future proof)
 
         """
         def grader_fn(submission):
@@ -258,7 +263,119 @@ class AutoGrader():
                 return {'correct':False, 'score':wrong_pts}
         return grader_fn
                     
+    ########## Regex response section ############
+    
+    def _parse_regex(self, response_elem, resp_name, qid):
+        """
+        Parses each <response answertype="regexresponse"> element and sets up its grader function
+        """
+        
+        answer_str = response_elem.getAttribute("answer")
+        
+        if answer_str == "" :
+            raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
+                
+        search = True
+        if response_elem.getAttribute("match"):
+            search = False #use match, not search
+        
+        flags = 0
+                        
+        children = response_elem.childNodes
+        for node in children:
+            if node.nodeType == node.ELEMENT_NODE and node.nodeName == "responseparam" and node.getAttribute('flag'):
+                flag_name = node.getAttribute("flag").strip()
+                if hasattr(re, flag_name) and isinstance(getattr(re, flag_name), int):
+                    flags |= getattr(re, flag_name)
 
+        try:
+            compiled_fn = re.compile(answer_str, flags)
+        except re.error:
+            raise AutoGraderMetadataException('In <question_medata id="%s">, <response name="%s">, your regular expression could not be compiled' % (qid,resp_name))
+                    
+        correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
+        wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
+
+        self.points_possible += correct_pts
+
+        self.grader_functions[resp_name] = self._REGEX_grader_factory(compiled_fn, search, correct_pts=correct_pts, wrong_pts=wrong_pts)
+
+    def _REGEX_grader_factory(self, compiled_fn, search, correct_pts=1, wrong_pts=0):
+        """
+            Factory function for a regex grader.  The arguments are a compiled regex  and 
+            flag 'search', which determines whether to `search` (True) using the regex or to `match` (False).
+            The signature of the grader_fn is
+            
+            {'correct':boolean, 'score':float} = grader_fn(submission)
+            
+            which returns True if a regex search or match function (as determined by the `search` argument)
+            returns a match for the answer, else returns False
+            Submission is a string that gets fed into the grader.
+            The return value is a dict with keys 'correct' and 'score' (using dict to be future proof).
+            """
+        def grader_fn(submission):
+            try:
+                if search:
+                    result = compiled_fn.search(submission.strip())
+                else:
+                    result = compiled_fn.match(submission.strip())
+            except re.error:
+                raise AutoGraderGradingException("An error occurred when matching your submission to the answer!")
+            if result:
+                return {'correct':True, 'score':correct_pts}
+            else:
+                return {'correct':False, 'score':wrong_pts}
+        return grader_fn
+
+    ########## string response section ############
+    
+    def _parse_string(self, response_elem, resp_name, qid):
+        """
+        Parses each <response answertype="stringresponse"> element and sets up its grader function
+        """
+        
+        answer_str = response_elem.getAttribute("answer").strip()
+        
+        if answer_str == "" :
+            raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
+        
+        ignorecase = False
+        if response_elem.getAttribute("ignorecase"):
+            ignorecase = True #use match, not search
+                                
+        correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
+        wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
+        
+        self.points_possible += correct_pts
+        
+        self.grader_functions[resp_name] = self._STRING_grader_factory(answer_str, ignorecase, correct_pts=correct_pts, wrong_pts=wrong_pts)
+    
+    def _STRING_grader_factory(self, answer_str, ignorecase, correct_pts=1, wrong_pts=0):
+        """
+            Factory function for a string grader.  The arguments are the answer string answer_str and
+            flag 'ignorecase', which determines whether the match is case insensitive.
+            The signature of the grader_fn is
+            
+            {'correct':boolean, 'score':float} = grader_fn(submission)
+            
+            which returns True if the user submission, stripped of preceding and succeeding whitespace
+            is an exact or a case-insensitive match for the answer_str, depending on the `ignorecase` argument.
+            Returns False otherwise.
+            Submission is a string that gets fed into the grader.
+            The return value is a dict with keys 'correct' and 'score' (using dict to be future proof).
+            """
+        def grader_fn(submission):
+            if ignorecase:
+                result = submission.strip().upper() == answer_str.strip().upper()
+            else:
+                result = submission.strip() == answer_str.strip()
+            if result:
+                return {'correct':True, 'score':correct_pts}
+            else:
+                return {'correct':False, 'score':wrong_pts}
+        return grader_fn
+
+    
     ########## Interactive Exercise Grader ############
 
     def _parse_interactive(self, response_elem, resp_name, qid):
@@ -314,10 +431,11 @@ class AutoGrader():
                 raise AutoGraderMetadataException("Error in response node \"%s\": A <%s> element is required" 
                         % (response_node_id, req))
 
+        grader_name = grader_post_params['grader_name'] if 'grader_name' in grader_post_params else "Unknown"
         self.points_possible += 1.0 ## DB exercises are worth 1 point, hardcoded
-        self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params)
+        self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params, grader_name)
 
-    def _INTERACTIVE_grader_factory(self, post_params):
+    def _INTERACTIVE_grader_factory(self, post_params, grader_name):
         """
         Factory function for an interactive grader.  The signature of the grader_fn is
 
@@ -341,14 +459,18 @@ class AutoGrader():
 
             def external_grader_request(grader_url, post_params):
                 """Hit external grader endpoint.  TODO: add retry logic, here or in frontend (#1730)."""
-                grader_timeout = 5    # seconds
+                grader_timeout = 45    # seconds
                 try:
                     post_data = urllib.urlencode(post_params)
+                    time_before = datetime.now()
                     grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
+                    time_after = datetime.now()
+                    duration = time_after - time_before  # timedelta
+                    logger.info("interactive grader \"%s\" returned in %s" % (grader_name, str(duration)))
                 except urllib2.HTTPError as e:
-                    raise AutoGraderGradingException("Interactive grader HTTP error (%d)" % e.code)
+                    raise AutoGraderGradingException("Interactive grader HTTP error: %s" % str(e))
                 except urllib2.URLError as e:
-                    raise AutoGraderGradingException("Interactive grader connection error (%d)" % e.args)
+                    raise AutoGraderGradingException("Interactive grader connection error: %s" % str(e))
 
                 try:
                     graded_result = grader_conn.read()

@@ -257,9 +257,10 @@ def upload(request):
             # are easily associated with the video by putting them all in the same directory.
             new_video.file = None
             new_video.save()
+            new_video.create_ready_instance()
             new_video.file = form.cleaned_data['file']
             new_video.save()
-            new_video.create_ready_instance()
+            new_video.commit()
             #print new_video.file.url
 
             

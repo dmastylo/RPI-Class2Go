@@ -35,6 +35,7 @@ from django.views.decorators.http import require_POST
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
+from django.utils import encoding
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 from courses.course_materials import get_course_materials
 from django.views.decorators.csrf import csrf_protect
@@ -98,10 +99,6 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     if last_record and (datetime.datetime.now() - last_record.last_updated) < datetime.timedelta(minutes=exam.minutes_btw_attempts):
         too_recent = True
 
-    #self.metadata_xml = xml #The XML metadata for the entire problem set.
-    metadata_dom = parseString(exam.xml_metadata) #The DOM corresponding to the XML metadata
-    questions = metadata_dom.getElementsByTagName('video')
-
     ready_section = exam.section
     if ready_section and ready_section.mode == "draft":
         ready_section = ready_section.image
@@ -125,7 +122,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
                               'last_record':last_record, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav,
                               'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':False,
                               'allow_submit':True, 'too_many_attempts':too_many_attempts,
-                              'exam':exam, 'question_times':exam.xml_metadata}, RequestContext(request))
+                              'exam':exam,}, RequestContext(request))
 
 def last_completed_record(exam, student, include_contentgroup=False):
     """Helper function to get the last completed record of this exam.
@@ -260,7 +257,7 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
             score_fields[s.field_name] = s.subscore
         scores_json = json.dumps(score_fields)
 
-    except ExamRecordScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
+    except ExamRecordScore.DoesNotExist, ExamRecordScore.MultipleObjectsReturned:
         raw_score = None
         scores_json = "{}"
 
@@ -494,15 +491,8 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         #Set penalty inclusive score for ExamRecord
         record.json_score_data = json.dumps(feedback)
         
-        #apply resubmission penalty
-        resubmission_penalty_percent = pow(((100 - exam.resubmission_penalty)/100), (attempt_number -1))
-        total_score = max(total_score * resubmission_penalty_percent, 0)
-        
-        #apply the late penalty
-        if exam.grace_period and exam.late_penalty > 0 and datetime.datetime.now() > exam.grace_period:
-            total_score = max(total_score * ((100 - exam.late_penalty)/100), 0)
-        
-        record.score = total_score
+        #apply penalties
+        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty)
         record.save()
         
         #Set ExamScore.score to max of ExamRecord.score for that student, exam. 
@@ -514,6 +504,17 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     else:
         return HttpResponse("Submission has been saved.")
 
+
+def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty):
+    """Helper function to factor out resubmission and late penalty calculations, 
+       so I can write a few unit tests for it
+    """
+    resubmission_discount = pow(max(0.0, (100.0 - resubmission_penalty)/100.0), (attempt_number - 1))
+    score = raw_score * resubmission_discount
+    late_discount = max(0.0, 100.0 - late_penalty)/100.0
+    if is_late:
+        score *= late_discount
+    return max(score, 0.0)
 
 @require_POST
 @auth_is_course_admin_view_wrapper
@@ -782,9 +783,19 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported}
 
+    groupable_exam = exam
+    if exam.mode != 'ready':
+        groupable_exam = exam.image
+    cg_info = ContentGroup.groupinfo_by_id('exam', groupable_exam.id)
+    parent = cg_info.get('__parent', None)
+    parent_val = "none,none"
+    if parent:
+        parent_val = "%s,%d" % (cg_info['__parent_tag'], parent.image.id)
+
     return render_to_response('exams/create_exam.html', {'common_page_data':request.common_page_data, 'returnURL':returnURL,
-                                                         'course':course, 'sections':sections,
-                                                         'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug },
+                                                         'course':course, 'sections':sections, 'parent_val': parent_val,
+                                                         'edit_mode':True, 'prepop_json':json.dumps(data), 'slug':exam_slug,
+                                                         'exam_section':exam.section, 'exam_title':exam.title, },
                                                         RequestContext(request))
 
 

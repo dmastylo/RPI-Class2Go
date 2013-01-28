@@ -17,7 +17,11 @@
         <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
         <input type="hidden" name="commit" id="commit" value="0" />
         {% csrf_token %}
-        
+
+        <label>
+	  <input type="checkbox" name="email" value="0" />
+	  Email this announcement to the students
+	</label>
         <input type="button" class="btn btn-primary" value="Save and Set to Ready" onclick="SaveAnnouncement('1');" />
         <!-- commenting out Save As Draft button, since it's published right away
         <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement('0');" />

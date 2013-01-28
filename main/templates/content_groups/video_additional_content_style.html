@@ -3,6 +3,9 @@
 {% if children %} {# needed because this template is called directly #}
     {# <div class="button-tray" style="display: block; clear: both"> #}
     <div class="button-tray" style="display: block; clear:both; width:800px;">
+    {% if video.dl_link %}
+    <div class="cant-watch-video">Problems watching the video? <a href="{{video.dl_link}}" title="Download lecture video as mp4">Download it</a></div>
+    {% endif %}
     <h3 style="clear: none;">Additional Content for {{video.title}}</h3>
     <ul class="unstyled course-list">
     {% for child in children %}

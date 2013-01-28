@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+if [ ! -d /mnt ]; then
+    mkdir /mnt
+fi
+
+chmod 1777 /mnt
+

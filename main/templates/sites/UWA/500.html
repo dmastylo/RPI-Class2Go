@@ -1,0 +1,65 @@
+<html>
+    <head>
+        
+        <link rel="stylesheet" href="static/css/core/bootstrap.css" />
+        <link rel="stylesheet" href="static/css/core/responsive.css" />
+        <link rel="stylesheet" href="static/css/core/ui-lightness/jquery-ui-1.8.22.custom.css" />
+        <link rel="stylesheet" href="static/css/core/body.css" />
+        <link rel="stylesheet" href="static/css/core/divs.css" />
+        <!--[if IE 7]>
+         <link rel="stylesheet" href="/static/css/core/font-awesome-ie7.css">
+         <![endif]-->
+        
+        <title>UWA Class2Go - Coming Soon</title>
+        
+    </head>
+    <body>
+        <div id="viewport">
+            <div id="global-header">
+            </div>
+            
+            <div class="container-fluid body-content">
+                
+                <h3>Something went wrong.  Sit tight, someone is working on it.</h3>
+                
+                <p>It seems that there is a a technical problem on our side. We've
+                been notified and will get things fixes ASAP.</p>
+                
+                <p>Sorry about that!</p>
+            </div>
+
+		<div id="global-footer" class="footer hidden-phone">
+			<div class="container">
+				<div class="row">
+					<div id="bottom-text" class="span11">
+						<div id="bottom-menu">
+							<ul class="unstyled">
+								<li>CRICOS Code: 00126G</li>
+								<li><a href="http://www.uwa.edu.au/campus_map">Campus
+										Map</a></li>
+								<li><a href="http://www.uwa.edu.au/contact">Contact UWA</a></li>
+								<li><a href="http://www.uwa.edu.au/accessibility">Accessibility</a></li>
+								<li><a href="http://www.uwa.edu.au">UWA Home</a></li>
+								<li><a href="{% url 'c2g.views.tos' %}">Terms of Use</a></li>
+								<li><a href="{% url 'c2g.views.tos' %}#copyright">Copyright
+										Complaints</a></li>
+								<li><a href="{% url 'c2g.views.contactus' %}">Technical
+										Support</a></li>
+							</ul>
+						</div>
+						<p class="vcard">
+							&copy; <span class="fn org">The University of Western
+								Australia</span>, <span class="adr"><span class="locality">Crawley</span>,
+								<span class="region">WA</span> <span class="postal-code">6009</span></span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+        </div>
+        
+        <script type="text/javascript" src="static/js/core/bootstrap.js"></script>
+        <script type="text/javascript" src="static/js/core/app.js"></script>
+    </body>
+</html>
