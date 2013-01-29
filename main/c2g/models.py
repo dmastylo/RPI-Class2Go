@@ -2408,7 +2408,6 @@ class CurrentTermMap(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
-# Deprecated in favor of ExamScore (complete / incomplete to track state)
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)

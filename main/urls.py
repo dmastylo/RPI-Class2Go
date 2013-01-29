@@ -49,6 +49,9 @@ urlpatterns = patterns('',
     url(r'^hiring/?$', 'courses.landing.views.hiring'),
 
     url(r'^maint$', 'c2g.views.maintenance'),
+                       
+    # Get server epoch
+    url(r'^server_epoch/?$', 'c2g.views.server_epoch'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
 
@@ -64,7 +67,10 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/post_csv_grades/?$', 'courses.exams.views.post_csv_grades'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/get_csv_grades/?$', 'courses.exams.views.view_csv_grades'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/save_student_progress/?$', 'courses.exams.views.student_save_progress'),
-
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/confirm/?$', 'courses.exams.views.confirm', name='confirm_exam_start'),
+                    
+                       
+                       
     #The rest of these URLs end up in the location bar of student users.  We should alias them for each exam subtype so that students do not get
     #confused.  Would love to make this DRY, because it's very repetitive, but I don't know how.
                       
