@@ -121,8 +121,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         
     .correct {color: #090;}
     .incorrect {color: #900;}
-        .timer_container {float:right; padding:2px; font-size:16px; background:white; border-radius: 4px;}
-        .timer_container.fixed { padding:2px; margin:0px; position: fixed; top:10px; right:2%; z-index:11; background:white; border-radius: 4px; border: 1px solid #DDCF99;}
+        .timer_container {float:right; position:relative; right:0px; padding:2px; margin:0px; font-size:16px; background:white; border: 1px solid transparent;}
+        .timer_container.fixed { padding:2px; margin:0px; position: fixed; top:5px; right:5px; z-index:11; background:white; border-radius: 4px; border: 1px solid #DDCF99;}
         
     </style>
 
@@ -147,7 +147,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             <div class="timer_container" id="countdown">
             <b style="color:green">End: {{ endtime|date:"N d, P T" }}. About <span id="timeremaining">00:00:00</span> left</b>
             </div>
-            <br />
+            
         {% else %}
             <h3> <b style="color:red"> Your time on the exam expired at {{ endtime|date:"N d Y, P T" }}. </b></h3><br />
         {% endif %}
@@ -1157,12 +1157,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     
     $("#countdown").scrollspy({
                               max: $('body').height(),
-                              min: $('#countdown').offset().top,
+                              min: $('#countdown').offset().top+2,
                               onEnter: function(element, position) {
-                              $("#countdown").addClass('fixed');
+                                $("#countdown").addClass('fixed');
                               },
                               onLeave: function(element, position) {
-                              $("#countdown").removeClass('fixed');
+                                $("#countdown").removeClass('fixed');
                               }
                       
                       });

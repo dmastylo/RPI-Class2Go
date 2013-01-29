@@ -3,6 +3,10 @@
 {% load listtest %}
 {% block course_page_title %}Submissions on {{exam.title}}{% endblock course_page_title %}
 
+{% block exam_link_class %}
+{% if "exam" in exam.exam_type and not videotest %}class="active"{% endif %}
+{% endblock exam_link_class %}
+
 {% block m_column_content %}
 {% for sub in my_subs %}
 <form method="post" action="snapshot" name="sub_{{sub.id}}">
