@@ -3,6 +3,7 @@ import random
 import string
 import urlparse
 
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.template import Context, loader, RequestContext
