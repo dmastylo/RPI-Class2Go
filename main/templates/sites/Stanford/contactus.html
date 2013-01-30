@@ -13,33 +13,44 @@
         
         {% if staffmail %}
         <dl>
-            <p>For {{course.title}} course staff email <a href="mailto:{{staffmail}}">{{staffmail}}</a> Course staff may not be able to respond to all queries individually - please consider posting on the discussion forum.</p>
+            <dt>For {{course.title}} course staff email:</dt>
+            <dd>
+                <strong><a href="mailto:{{staffmail}}">{{staffmail}}</a></strong>
+                <p style="font-size: smaller;">Course staff may not be able to respond to all queries individually - please consider posting on the discussion forum.</p>
+            </dd>
         </dl>
         {% endif %}
         <dl>
-            <p>For general information email us at <a href="mailto:c2g-contact@class.stanford.edu">c2g-contact@class.stanford.edu</a></p>
+            <dt>For general information email us at:</dt>
+            <dd><strong><a href="mailto:c2g-contact@class.stanford.edu">c2g-contact@class.stanford.edu</a></strong></dd>
         </dl>
         <dl>
-            <p>For copyright concerns email us at <a href="mailto:c2g-copyright@class.stanford.edu">c2g-copyright@class.stanford.edu</a></p>
+            <dt>For copyright concerns email us at:</dt>
+            <dd><strong><a href="mailto:c2g-copyright@class.stanford.edu">c2g-copyright@class.stanford.edu</a></strong></dd>
         </dl>
         <dl>
-            <p>For bug reports email us at <a href="mailto:c2g-bugs@class.stanford.edu">c2g-bugs@class.stanford.edu</a></p>
-            <dd>When submitting a bug report, please include the following in the email body:
+            <dt>For bug reports email us at:</dt>
+            <dd><strong><a href="mailto:c2g-bugs@class.stanford.edu">c2g-bugs@class.stanford.edu</a></strong>
+            <p style="font-size: smaller;">When submitting a bug report, please include the following in the email body:</p>
             <pre>HTTP_USER_AGENT = {{request.META.HTTP_USER_AGENT}}
 
 Previous QUERY_STRING = {{request.META.QUERY_STRING}}</pre></dd>
         </dl>
         <dl>
-            <p>For suggestions email us at <a href="mailto:c2g-suggestions@class.stanford.edu">c2g-suggestions@class.stanford.edu</a></p>
+            <dt>For suggestions email us at:</dt>
+            <dd><strong><a href="mailto:c2g-suggestions@class.stanford.edu">c2g-suggestions@class.stanford.edu</a></strong></dd>
         </dl>
         <dl>
-            <p>For technical support email us at <a href="mailto:c2g-techsupport@class.stanford.edu">c2g-techsupport@class.stanford.edu</a></p>
+            <dt>For technical support email us at:</dt>
+            <dd><strong><a href="mailto:c2g-techsupport@class.stanford.edu">c2g-techsupport@class.stanford.edu</a></strong></dd>
         </dl>
         <dl>
-            <p>For disability-related questions email us at <a href="mailto:c2g-accessibility@class.stanford.edu">c2g-accessibility@class.stanford.edu</a></p>
+            <dt>For disability-related questions email us at:</dt>
+            <dd><strong><a href="mailto:c2g-accessibility@class.stanford.edu">c2g-accessibility@class.stanford.edu</a></strong></dd>
         </dl>
         <dl>
-            <p>For questions about privacy-related issues email us at <a href="mailto:c2g-privacy@class.stanford.edu">c2g-privacy@class.stanford.edu</a></p>
+            <dt>For questions about privacy-related issues email us at:</dt>
+            <dd><strong><a href="mailto:c2g-privacy@class.stanford.edu">c2g-privacy@class.stanford.edu</a></strong></dd>
         </dl>
    </div>
 </div>
