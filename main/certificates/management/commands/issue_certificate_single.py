@@ -54,7 +54,7 @@ class Command(BaseCommand):
         try:
             course = Course.objects.get(handle=course_handle, mode='ready')
         except:
-            raise CommandError("Bad course handle or could not retrieve course '%d'" % course_handle)
+            raise CommandError("Bad course handle or could not retrieve course '%s'" % course_handle)
 
         certificate_info = CourseCertificate.objects.get(course=course, type=options['cert_type'])
         user = User.objects.get(username=username)
