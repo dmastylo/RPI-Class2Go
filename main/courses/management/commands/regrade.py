@@ -53,45 +53,46 @@ class Command(BaseCommand):
         for er in examRecords:
             print "ExamRecord %d, %d of %d" % (er.id, count, len(examRecords))
             count += 1
-#            try:
-            score_before = er.score
-            if score_before == None:
-                score_before = 0.0
-            score_after = 0.0
-            submitted = json.loads(er.json_data)
-            regrade = {}
-            for prob, v in submitted.iteritems():
-                if isinstance(v,list):    # multiple choice case
-                    student_input = map(lambda li: li['value'], v)
-                    regrade[prob] = autograder.grade(prob, student_input)
-                else:                     # single answer case
-                    student_input = v['value']
-                    regrade[prob] = autograder.grade(prob, student_input)
-                if 'feedback' in regrade[prob]:
-                    del regrade[prob]['feedback']   # remove giant feedback field
-                if 'score' in regrade[prob]:
-                    score_after += float(regrade[prob]['score'])
-            
-            s = er.student
-            status_line =  "%d, \"%s\", \"%s\", %s, %s, %s, %0.1f, %0.1f" \
-                    % (er.id, s.first_name, s.last_name, s.username, s.email, 
-                       str(er.time_created), score_before, score_after)
-            if score_before == score_after:
-                print "OK: " + status_line
-                continue
-            regrades += 1
-            print "REGRADE: " + status_line
-            if not options['dryrun']:
-                er.json_score_data = json.dumps(regrade)
-                er.score = score_after
-                er.save()
-                updates += 1
+            try:
+                score_before = er.score
+                if score_before == None:     # scores of 0 come back from model as None
+                    score_before = 0.0       # not sure why but they do
+                score_after = 0.0
+                submitted = json.loads(er.json_data)
+                regrade = {}
+                for prob, v in submitted.iteritems():
+                    if isinstance(v,list):    # multiple choice case
+                        student_input = map(lambda li: li['value'], v)
+                        regrade[prob] = autograder.grade(prob, student_input)
+                    else:                     # single answer case
+                        student_input = v['value']
+                        regrade[prob] = autograder.grade(prob, student_input)
+                    if 'feedback' in regrade[prob]:
+                        del regrade[prob]['feedback']   # remove giant feedback field
+                    if 'score' in regrade[prob]:
+                        score_after += float(regrade[prob]['score'])
+                
+                s = er.student
+                status_line =  "%d, \"%s\", \"%s\", %s, %s, %s, %0.1f, %0.1f" \
+                        % (er.id, s.first_name, s.last_name, s.username, s.email, 
+                           str(er.time_created), score_before, score_after)
+                if score_before == score_after:
+                    print "OK: " + status_line
+                    continue
+                regrades += 1
+                print "REGRADE: " + status_line
+                if not options['dryrun']:
+                    er.json_score_data = json.dumps(regrade)
+                    er.score = score_after
+                    er.save()
+                    updates += 1
 
-            # exception handler around main ExamRecords loop -- just count and skip
-#            except Exception as e:
-#                print "warning: examrecord %d: cannot regrade: %s" % (er.id, str(e))
-#                errors += 1
-#                continue
+            # exception handler around big ExamRecords loop -- trust me, it lines up
+            # this just counts and skips offending rows so we can keep making progress
+            except Exception as e:
+                print "ERROR: examrecord %d: cannot regrade: %s" % (er.id, str(e))
+                errors += 1
+                continue
 
         print
         print "## SUMMARY ##"
