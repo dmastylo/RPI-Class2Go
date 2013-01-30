@@ -278,8 +278,9 @@ INSTALLED_APPS = (
                       'db_scripts',
                       'convenience_redirect',
                       'exception_snippet',
-                      'rest_framework'
+                      'rest_framework',
                        #'reversion',
+                       'certificates',
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
