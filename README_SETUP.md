@@ -128,6 +128,10 @@ But if you want to do it with:
 
         pip install djangorestframework pysimplesoap
 
+1. PDF generation libraries for statements of accomplishment
+       
+        pip install xhtml2pdf
+
 1. Install test environment dependencies:
 
         pip install mock nose django_nose django_coverage lxml
@@ -397,6 +401,10 @@ probably Windows too).
 
         pip install django-celery django-celery-email pytz
 
+3. PDF generation libraries for statements of accomplishment
+
+        pip install xhtml2pdf
+       
 3. Install test environment dependencies:
 
         pip install mock nose django_nose django_coverage lxml
