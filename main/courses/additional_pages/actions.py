@@ -125,7 +125,6 @@ def save(request):
             ready_course = common_page_data['ready_course']
             draft_course = common_page_data['draft_course']
 
-            print(request.POST.get("description"))
 
             draft_course.outcomes = request.POST.get("outcomes")
             draft_course.faq = request.POST.get("faq")
