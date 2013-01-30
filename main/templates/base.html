@@ -125,6 +125,7 @@
                 {% endif %}
             {% endif %}
                 <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><em class="icon-reorder"></em></a></li>
+                <li id="PacTime"><span><strong class="hours">{% now "g" %}</strong>:<strong class="minutes">{% now "i" %}</strong> <strong class="ampm">{% now "A" %}</strong> {% now "T" %}</span></li>
                 </ul>
             </div>
             {% endblock topnav %}
@@ -166,6 +167,40 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
+    <script type="text/javascript">
+        //alert(navigator.userAgent);
+        var changeHour = false;
+        
+        var hours = $('#PacTime .hours').html();
+        var minutes = $('#PacTime .minutes').html();
+        var ampm = $('#PacTime .ampm').html();
+        
+        var changeTime = function changeTime(){
+            minutes++;
+            if (minutes == 60) { minutes = "00"; changeHour = true; }
+            else if (minutes < 10) { minutes = '0' + minutes; }
+            if (changeHour) {
+                hours++; checkTime();
+                if ( hours == 13 ) { hours = 1; }
+                else if (hours == 12 && ampm == 'AM') { ampm = 'PM'; }
+                else if (hours == 12 &&  ampm == 'PM' ) { ampm = 'AM'; }
+                changeHour = false;
+            }
+            $('#PacTime .minutes').html(minutes);
+            $('#PacTime .hours').html(hours);
+            $('#PacTime .ampm').html(ampm);
+        }
+        
+        var checkTime = function checkTime(){
+            return;
+        }
+        
+        $(function(){
+            setInterval(function(){
+                changeTime();
+            }, 60000);
+        });
+    </script>
     {% endblock bottom_scripts %}
     <script type="text/javascript">
       var _gaq = _gaq || [];
