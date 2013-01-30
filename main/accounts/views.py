@@ -29,6 +29,7 @@ from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 from pysimplesoap.client import SoapClient
+from datetime import date
 
 def index(request):
     return HttpResponse("Hello, world. You're at the user index.")
