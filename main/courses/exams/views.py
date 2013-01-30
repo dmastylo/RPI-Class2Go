@@ -1178,10 +1178,3 @@ def student_save_progress(request, course_prefix, course_suffix, exam_slug):
     exam_rec.save()
     return HttpResponse("OK")
 
-
-
-# SEF -- add back in later to get_or_update_incomplete_examrecord()
-        # >1 found, use the latest-updated and delete the rest. Log this as an error
-        # since it is data inconsistency, even if we can clean up the mess now.
-#         logging.error("Found %d incomplete exam records for student=%d, exam=%d, course=%d (%s), cleaning up all but the latest-updated"
-#                % (len(exam_rec_queryset), student.id, exam.id, course.id, course.handle))
