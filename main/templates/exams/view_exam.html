@@ -101,7 +101,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     #exam-pane .exam-navigation .btn {margin-right: .5em;}
     div.question textarea { width:70%; height:100px; }
     div.question .per-question-btns {border: 2px solid #ddcf99; border-radius: 4px; float: left; margin: 1em 0; padding: 5px; }
-    div.question .per-question-btns input {float: left;}
+    div.question .per-question-btns input {float: left; margin-left: 10px;}
+    div.question .per-question-btns input:first-child { margin-left: 0; }
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
 
@@ -563,6 +564,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(this).siblings('.toggle-explanation').removeAttr('disabled');
 
         };
+        
+        var clearQuestion = function() {
+            $(this).parent().siblings('textarea').val('');
+        }
                       
         $('.question').each(function (idx, el) {
 
@@ -589,6 +594,14 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(checkBtn).attr('value', 'Check Answers');
             }
             $(perQButtonDiv).append($(checkBtn));
+            
+            // create Clear Answers button
+            var clearBtn = document.createElement('input');
+            $(clearBtn).attr('type','button');
+            $(clearBtn).attr('id','clear_' + idx);
+            $(clearBtn).addClass('btn').addClass('clear_button');
+            $(clearBtn).attr('value', 'Clear Question');
+            $(perQButtonDiv).append($(clearBtn));
 
             // create Show/Hide Explanation button for non-interactive exams
             if (__exam_type != "interactive_exercise") {
@@ -605,6 +618,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         });
 
         $('.quick-check').click(quickCheck);
+        
+        $('.clear_button').click(clearQuestion);
 
         $('.toggle-explanation').click(toggleExplanation);
         {% endif %}
