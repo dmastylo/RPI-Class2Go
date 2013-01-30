@@ -36,10 +36,10 @@
 
             {% if courses %}
                 <table id="courses_table">
-                    <tr><th style="padding-right: 15px;">Course title</th><th style="padding-right: 15px;">Enrollment</th>
-                        {% for loop in longest_certs %}
+                    <tr><th style="padding-right: 15px;">Title</th><th style="padding-right: 15px;">Enrollment</th>
+                        {% if longest_certs %}
                             <th style="padding-right: 15px;">Statements of Accomplishment</th>
-                        {% endfor %}
+                        {% endif %}
                     {% for course in courses %}
                         <tr>
                             <td style="padding-right: 15px;"><a style="display:inline" href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></td>
@@ -54,7 +54,7 @@
                             </td>
                             {% for certinfo in certifications|byKey:course.id %}
                                 <td style="padding-right: 15px;">
-                                    <a href="{{certinfo.1}}">Accomplishment of {{certinfo.0}}</a>
+                                    <a href="{{certinfo.1}}">{{certinfo.0|uscore2space|title}} Accomplished</a>
                                 </td>
                             {% endfor %}
                         </tr>
