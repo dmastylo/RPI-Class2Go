@@ -566,7 +566,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         };
         
         var clearQuestion = function() {
-            $(this).parent().siblings('textarea').val('');
+            $(this).parent().siblings('textarea, input[type="text"], input[type="radio"], input[type="checkbox"]').val('');
         }
                       
         $('.question').each(function (idx, el) {
