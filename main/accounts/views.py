@@ -42,26 +42,26 @@ def profile(request):
     
     user_profile = None
     is_student_list = []
+    certs_list = {}
+    longest_certlist = 0
     if user.is_authenticated():
         user_profile = user.get_profile()
         is_student_list = user_profile.is_student_list(group_list, courses)
 
+        for cert in user_profile.certificates.all():
+            certinfo = (cert.type, cert.dl_link(user))
+            if certs_list.has_key(cert.course_id):
+                certs_list[cert.course_id].append(certinfo)
+                this_certlist = len(certs_list[cert.course_id])
+                if longest_certlist < this_certlist:
+                    longest_certlist = this_certlist
+            else:
+                certs_list[cert.course_id] = [certinfo]
+                if longest_certlist == 0: longest_certlist = 1
+
     has_webauth = False
     if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
         has_webauth = True
-
-    certs_list = {}
-    longest_certlist = 0
-    for cert in user_profile.certificates.all():
-        certinfo = (cert.type, cert.dl_link(user))
-        if certs_list.has_key(cert.course_id):
-            certs_list[cert.course_id].append(certinfo)
-            this_certlist = len(certs_list[cert.course_id])
-            if longest_certlist < this_certlist:
-                longest_certlist = this_certlist
-        else:
-            certs_list[cert.course_id] = [certinfo]
-            if longest_certlist == 0: longest_certlist = 1
 
     return render_to_response('accounts/profile.html',
                               {
