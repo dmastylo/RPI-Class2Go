@@ -36,7 +36,7 @@ class error_ping(object):
             #but because we return a response instead of None, django's
             #default error handling (including logging and stacktrace email)
             #won't be invoked, so we have to do that manually.
-                
+            
             #cribbing from django/core/handlers/base.py
             logger.error('Internal Server Error: %s', request.path,
                 exc_info=exc_info,
@@ -46,7 +46,7 @@ class error_ping(object):
                 }
             )
             
-            site = getattr(settings, SITE_SHORT_NAME)
+            site = getattr(settings, 'SITE_NAME_SHORT')
             return render(request, 'sites/%s/500_staff.html' % site)
                 
         return None
