@@ -9,3 +9,8 @@ def bykey(d, key_name):
         return d[key_name]
     except KeyError:
         return ''
+
+@register.filter(name='uscore2space')
+def uscore2space(s):
+    """Return s with underscores turned into spaces"""
+    return s.replace('_', ' ')

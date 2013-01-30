@@ -22,6 +22,8 @@ admin.site.register(CurrentTermMap)
 admin.site.register(Instructor)
 admin.site.register(CourseInstructor)
 admin.site.register(ContentGroup)
+admin.site.register(CourseCertificate)
+admin.site.register(CourseStudentList)
 
 
 class ProfileAdmin(admin.ModelAdmin):

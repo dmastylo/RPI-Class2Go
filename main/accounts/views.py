@@ -1,8 +1,7 @@
-# Create your views here.
-#from django import form
-
+import json
+import random
+import string
 import urlparse
-import settings
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -23,43 +22,55 @@ from accounts.forms import *
 from registration import signals
 from registration.forms import RegistrationFormUniqueEmail
 from django.core.validators import validate_email, RegexValidator
-from django.core.exceptions import ValidationError, MultipleObjectsReturned
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseBadRequest
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
-import random
-import os
-import string
-import base64
 from pysimplesoap.client import SoapClient
-import json
 
 def index(request):
     return HttpResponse("Hello, world. You're at the user index.")
 
-
 def profile(request):
     
-    group_list = request.user.groups.all()
+    user = request.user
+    group_list = user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
     
-    if request.user.is_authenticated():
-        user_profile = request.user.get_profile()
+    user_profile = None
+    is_student_list = []
+    if user.is_authenticated():
+        user_profile = user.get_profile()
         is_student_list = user_profile.is_student_list(group_list, courses)
-    else:
-        user_profile = None
-        is_student_list = []
 
     has_webauth = False
-    if request.user.is_authenticated() and (request.user.get_profile().institutions.filter(title='Stanford').exists()):
+    if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
         has_webauth = True
 
+    certs_list = {}
+    longest_certlist = 0
+    for cert in user_profile.certificates.all():
+        certinfo = (cert.type, cert.dl_link(user))
+        if certs_list.has_key(cert.course_id):
+            certs_list[cert.course_id].append(certinfo)
+            this_certlist = len(certs_list[cert.course_id])
+            if longest_certlist < this_certlist:
+                longest_certlist = this_certlist
+        else:
+            certs_list[cert.course_id] = [certinfo]
+            if longest_certlist == 0: longest_certlist = 1
+
     return render_to_response('accounts/profile.html',
-                              {'request': request,
-                              'courses': courses,
-                              'is_student_list': is_student_list,
-                              'has_webauth': has_webauth,},
+                              {
+                                  'request': request,
+                                  'courses': courses,
+                                  'is_student_list': is_student_list,
+                                  'has_webauth': has_webauth,
+                                  'user_profile': user_profile,
+                                  'certifications': certs_list,
+                                  'longest_certs': range(longest_certlist),
+                              },
                               context_instance=RequestContext(request))
 
 def edit(request):
