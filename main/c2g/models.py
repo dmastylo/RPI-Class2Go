@@ -2374,6 +2374,7 @@ class ExamScore(TimestampMixin, models.Model):
     score = models.FloatField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     csv_imported = models.BooleanField(default=False)
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
+    #TODO: Add ForeignKey to which ExamRecord is responsible for this score, per GHI #2029
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.score))
