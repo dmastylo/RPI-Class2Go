@@ -11,3 +11,9 @@ node["apps"].keys.each do |app|
     end
 end
 
+directory "/opt/assets" do
+    owner "root"
+    mode 00777
+    action :create
+end
+

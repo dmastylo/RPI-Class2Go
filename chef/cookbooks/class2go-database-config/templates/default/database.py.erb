@@ -34,7 +34,8 @@ AWS_ACCESS_KEY_ID = '<%= @node[:aws][:access_key] %>'
 AWS_SECRET_ACCESS_KEY = '<%= @node[:aws][:access_secret] %>'
 AWS_STORAGE_BUCKET_NAME = '<%= @node[:aws][:storage_bucket] %>'
 
-MEDIA_ROOT = ''
+# don't use ephemeral storage for mediaroot
+MEDIA_ROOT = '/opt/assets'
 
 # use AWS ephemeral storage
 KELVINATOR_WORKING_DIR = '/mnt'
