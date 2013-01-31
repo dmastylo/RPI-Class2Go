@@ -210,6 +210,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
     
     /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
+                   
+        var unsavedChanges = false; //variable flag to denote chnages have been made on page
                       
         {% if videotest %}
 
@@ -715,7 +717,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                                    buttons: {'Close':function(){$(this).dialog("close");}}
                                  });
         });
-
+        
+        unsavedChanges = false; //clear flag when save button clicked
     });
 
 
@@ -1046,6 +1049,20 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(dialogDiv).dialog({modal: true});
         });
 
+        unsavedChanges = false; //clear flag when submit button clicked
+    });
+    
+    $('input[type="radio"], input[type="checkbox"]').change(function() {
+        unsavedChanges = true; //denote change on radio and checkbox inputs and register unsaved changes
+    });
+    $('textarea, input[type="text"]').keyup(function() {
+        unsavedChanges = true; //denote keystroke and register unsaved changes
+    });
+    
+    $(window).on('beforeunload', function(){
+        if (unsavedChanges) {
+           return 'You have unsaved changes!';
+        }
     });
                       
     // Make sure pre-pop is in a properly-escaped string 
