@@ -8,58 +8,20 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'CourseStudentList'
-        db.create_table('c2g_coursestudentlist', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
-            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
-            ('max_completion_level', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal('c2g', ['CourseStudentList'])
 
-        # Adding M2M table for field members on 'CourseStudentList'
-        db.create_table('c2g_coursestudentlist_members', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('coursestudentlist', models.ForeignKey(orm['c2g.coursestudentlist'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique('c2g_coursestudentlist_members', ['coursestudentlist_id', 'user_id'])
+        # Changing field 'CourseEmail.sender'
+        db.alter_column(u'c2g_course_emails', 'sender_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True))
 
-        # Adding model 'CourseCertificate'
-        db.create_table('c2g_coursecertificate', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
-            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
-            ('assets', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-            ('storage', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-            ('type', self.gf('django.db.models.fields.CharField')(default='completion', max_length=64)),
-        ))
-        db.send_create_signal('c2g', ['CourseCertificate'])
-
-        # Adding M2M table for field certificates on 'UserProfile'
-        db.create_table(u'c2g_user_profiles_certificates', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('userprofile', models.ForeignKey(orm['c2g.userprofile'], null=False)),
-            ('coursecertificate', models.ForeignKey(orm['c2g.coursecertificate'], null=False))
-        ))
-        db.create_unique(u'c2g_user_profiles_certificates', ['userprofile_id', 'coursecertificate_id'])
-
+        # Changing field 'ListEmail.sender'
+        db.alter_column('c2g_listemail', 'sender_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True))
 
     def backwards(self, orm):
-        # Deleting model 'CourseStudentList'
-        db.delete_table('c2g_coursestudentlist')
 
-        # Removing M2M table for field members on 'CourseStudentList'
-        db.delete_table('c2g_coursestudentlist_members')
+        # Changing field 'CourseEmail.sender'
+        db.alter_column(u'c2g_course_emails', 'sender_id', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['auth.User']))
 
-        # Deleting model 'CourseCertificate'
-        db.delete_table('c2g_coursecertificate')
-
-        # Removing M2M table for field certificates on 'UserProfile'
-        db.delete_table('c2g_user_profiles_certificates')
-
+        # Changing field 'ListEmail.sender'
+        db.alter_column('c2g_listemail', 'sender_id', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['auth.User']))
 
     models = {
         'auth.group': {
@@ -203,7 +165,7 @@ class Migration(SchemaMigration):
             'html_message': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'sender': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'sender': ('django.db.models.fields.related.ForeignKey', [], {'default': '1', 'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
             'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'to': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
@@ -422,7 +384,7 @@ class Migration(SchemaMigration):
             'html_message': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'sender': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'sender': ('django.db.models.fields.related.ForeignKey', [], {'default': '1', 'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
             'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'to_list': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.MailingList']"})
