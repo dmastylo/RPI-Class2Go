@@ -89,6 +89,7 @@ class Command(BaseCommand):
                     es = ExamScore.objects.get(exam=exam_obj, student=s)
                     examscore_before = es.score
                 except ExamScore.DoesNotExist:
+                    es = ExamScore(course=er.course, exam=exam_obj, student=s)
                     examscore_before = -1
                 examscore_after = max(examscore_before, score_after)
                 
