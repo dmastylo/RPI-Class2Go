@@ -1814,8 +1814,6 @@ class EditProfileForm(forms.Form):
     last_name = forms.CharField(max_length=30)
     email = forms.CharField(max_length=30)
 
-def get_user1():
-    return User.objects.get(id=1)
 
 class Email(TimestampMixin, models.Model):
     sender = models.ForeignKey(User, default=1, blank=True, null=True)
