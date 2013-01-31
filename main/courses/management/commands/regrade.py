@@ -12,7 +12,7 @@ from courses.exams.views import compute_penalties
 
 class Command(BaseCommand):
     args = "<exam id>"
-    help = "Grade all records for an exam and report ones that are inconsistent"
+    help = "Regrade all results for an exam and report scores that are incorrect. With the -u option update the database."
 
     option_list = (
         make_option("-u", "--update", action="store_false", dest="dryrun", default=True,
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         end = parser.parse("1/1/2038")  # almost the end of unix time
         if 'end_time' in options and options['end_time']:
             end = parser.parse(options['end_time'])
-        #used to be called exam_rec, which was just to confusing with ExamRecords around
+
         exam_obj = Exam.objects.get(id__exact=examid) 
         autograder = AutoGrader(exam_obj.xml_metadata)
 
