@@ -153,10 +153,12 @@ class Migration(SchemaMigration):
         },
         'c2g.course': {
             'Meta': {'object_name': 'Course', 'db_table': "u'c2g_courses'"},
+            'accompanying_materials': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'calendar_end': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'calendar_start': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'contact': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'faq': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.Course']"}),
@@ -167,11 +169,15 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'list_publicly': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'live_datetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'logo': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True'}),
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'outcomes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'piazza_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'prerequisites': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'preview_only_mode': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'readonly_tas_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'readonly_tas_group'", 'to': "orm['auth.Group']"}),
             'share_to': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'share_from'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['c2g.Course']"}),
+            'short_description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'student_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'student_group'", 'to': "orm['auth.Group']"}),
             'syllabus': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'tas_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tas_group'", 'to': "orm['auth.Group']"}),
@@ -201,6 +207,14 @@ class Migration(SchemaMigration):
             'subject': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'to': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
+        },
+        'c2g.courseinstructor': {
+            'Meta': {'object_name': 'CourseInstructor', 'db_table': "u'c2g_course_instructor'"},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'instructor': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Instructor']"}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.coursestudentlist': {
             'Meta': {'object_name': 'CourseStudentList'},
@@ -388,6 +402,17 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.TextField', [], {})
+        },
+        'c2g.instructor': {
+            'Meta': {'object_name': 'Instructor'},
+            'biography': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'email': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'handle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'db_index': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'photo': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'blank': 'True'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.listemail': {
             'Meta': {'object_name': 'ListEmail'},
