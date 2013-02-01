@@ -392,7 +392,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
                 if exam.exam_type == 'survey':
                     outstring = '"%s","%s","%s","%s"\n' % (latest_sub['student__username'], k, vals[1], vals[0])
                 else:
-                    outstring = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, vals[0])
+                    outstring = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, vals)
                 outfile.write(outstring)
         except ValueError:
             could_not_parse += latest_sub['student__username']+ " " #Don't output if the latest submission was erroneous
