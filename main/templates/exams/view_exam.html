@@ -142,7 +142,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
        <h3>This exam was closed on {{ exam.partial_credit_deadline }} PST.  Submissions are disabled. </h3>
     
-    {% elif endtime %}
+    {% endif %}
+    {% if endtime %}
         {% if timeopened < endtime %}
             <div class="timer_container" id="countdown">
             <b style="color:green">End: {{ endtime|date:"N d, P T" }}. About <span id="timeremaining">00:00:00</span> left</b>
@@ -151,8 +152,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         {% else %}
             <h3> <b style="color:red"> Your time on the exam expired at {{ endtime|date:"N d Y, P T" }}. </b></h3><br />
         {% endif %}
-        
-    {% elif too_many_attempts %}
+
+    {% endif %}
+    {% if too_many_attempts %}
     
         <h3>You've made too many attempts. Submissions are disabled.</h3>
 
@@ -1087,6 +1089,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');
+    $('#saveWorkBtn').attr('disabled','disabled');
     $('#reEnableForm').remove();
     $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
