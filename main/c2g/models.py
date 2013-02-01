@@ -5,7 +5,6 @@ import os
 import re
 import sys
 import time
-from urlparse import urlparse, urlunparse
 from xml.dom.minidom import parseString
 
 from django import forms
