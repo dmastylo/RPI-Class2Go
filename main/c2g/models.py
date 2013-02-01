@@ -38,16 +38,6 @@ def get_file_path(instance, filename):
         return os.path.join(str(parts[0]), str(parts[1]), 'files', filename)
 
 
-def remove_querystring(url):
-    """
-    remove_querystring("http://www.example.com:8080/salad?foo=bar#93")
-    'http://www.example.com:8080/salad'
-    """
-    split = urlparse(url)
-    combined = (split.scheme, split.netloc, split.path, '', '', '')
-    return urlunparse(combined)
-
-
 class TimestampMixin(models.Model):
     time_created = models.DateTimeField(auto_now=False, auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True, auto_now_add=True)
