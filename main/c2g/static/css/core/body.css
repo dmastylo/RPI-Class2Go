@@ -65,14 +65,14 @@ a:hover {color:#820000;}
   text-align:center;
 }
 .upcoming table {
-  margin:5px;
+  
 }
 .upcoming table th { 
   text-decoration:underline;
   text-align:left;
 }
-.upcoming table td { 
-  padding:4px;
+.upcoming table td, .upcoming table th { 
+  padding: 4px 6px;
   border:0px;
 }
 .complete { 
@@ -124,7 +124,6 @@ a:hover {color:#820000;}
 .btn [class^="icon-"], .nav-tabs [class^="icon-"], .btn [class*=" icon-"], .nav-tabs [class*=" icon-"] {
     line-height: 18px;
     font-size: 1.1em;
-    margin-right: 4px;
 }
 a:hover [class^="icon-"] {
   text-decoration: none;
@@ -235,10 +234,6 @@ label.control-label {
   border-radius: 0;
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
-}
-
-.navbar #PacTime {
-  padding: 5px;
 }
 
 
@@ -437,8 +432,8 @@ small.date {
     margin-left:10px;
 }
 .top-nav li .btn {
-    padding-left:25px;
-    padding-right:25px;
+    padding-left: 10px;
+    padding-right: 10px;
     background: rgb(100,0,0);
     color:white;
     border:0;

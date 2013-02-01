@@ -1814,8 +1814,9 @@ class EditProfileForm(forms.Form):
     last_name = forms.CharField(max_length=30)
     email = forms.CharField(max_length=30)
 
+
 class Email(TimestampMixin, models.Model):
-    sender = models.ForeignKey(User)
+    sender = models.ForeignKey(User, default=1, blank=True, null=True)
     hash = models.CharField(max_length=128, db_index=True)
     subject = models.CharField(max_length=128, blank=True)
     html_message = models.TextField(null=True, blank=True)    
@@ -2374,6 +2375,7 @@ class ExamScore(TimestampMixin, models.Model):
     score = models.FloatField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     csv_imported = models.BooleanField(default=False)
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
+    #TODO: Add ForeignKey to which ExamRecord is responsible for this score, per GHI #2029
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title + ":" + str(self.score))

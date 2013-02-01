@@ -152,18 +152,13 @@
        
     <div class="well control-group">
         <ul class="nav nav-tabs" id="myTab">
-            <li class="active"><a id="enter-tab" href="#enter-content">Edit</a></li>
-            <li><a id="preview-tab" href="#preview-content">Preview</a></li>
+            <li class="active"><a id="preview-tab" href="#preview-content">Preview</a></li>
+            <li><a id="enter-xml-tab" href="#enter-content-xml">Edit XML Metadata</a></li>
+            <li><a id="enter-html-tab" href="#enter-content-html">Edit HTML</a></li>
         </ul>
 
         <div class="tab-content">
-            <div class="tab-pane active" id="enter-content">
-                <h4>Edit Exam HTML below:</h4>
-                <textarea id="ace_proxy" style="display:none"></textarea>
-                <div class="editor_container" id="editor_container">
-                    <div id="editor"></div>
-                </div>
-                <br />
+            <div class="tab-pane" id="enter-content-xml">
                 <h4>Edit Exam MetaData XML below:</h4>
                 <textarea id="ace_metadata_proxy" style="display:none"></textarea>
                 <div class="editor_container" id="metadata_editor_container">
@@ -171,7 +166,14 @@
                 </div>
                 
             </div>
-            <div class="tab-pane" id="preview-content">
+			<div class="tab-pane" id="enter-content-html">
+				<h4>Edit Exam HTML below:</h4>
+                <textarea id="ace_proxy" style="display:none"></textarea>
+                <div class="editor_container" id="editor_container">
+                    <div id="editor"></div>
+                </div>
+			</div>
+            <div class="tab-pane active" id="preview-content">
                 <div id="preview-pane">
                     <h4>Preview Exam HTML</h4>
                     <div id="staging-area"></div>

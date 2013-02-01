@@ -6,12 +6,13 @@ from dateutil import parser
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from c2g.models import ExamRecord, Exam
+from c2g.models import ExamRecord, Exam, ExamScore
 from courses.exams.autograder import *
+from courses.exams.views import compute_penalties
 
 class Command(BaseCommand):
     args = "<exam id>"
-    help = "Grade all records for an exam and report ones that are inconsistent"
+    help = "Regrade all results for an exam and report scores that are incorrect. With the -u option update the database."
 
     option_list = (
         make_option("-u", "--update", action="store_false", dest="dryrun", default=True,
@@ -38,10 +39,11 @@ class Command(BaseCommand):
         if 'end_time' in options and options['end_time']:
             end = parser.parse(options['end_time'])
 
-        exam_rec = Exam.objects.get(id__exact=examid)
-        autograder = AutoGrader(exam_rec.xml_metadata)
+        exam_obj = Exam.objects.get(id__exact=examid) 
+        autograder = AutoGrader(exam_obj.xml_metadata)
 
         examRecords = ExamRecord.objects\
+                .select_related('examrecordscore', 'student')\
                 .filter(exam_id__exact=examid, complete=True)\
                 .filter(time_created__gt=start)\
                 .filter(time_created__lt=end)
@@ -51,13 +53,18 @@ class Command(BaseCommand):
 
         count = 1
         for er in examRecords:
+            ers = er.examrecordscore
             print "ExamRecord %d, %d of %d" % (er.id, count, len(examRecords))
             count += 1
             try:
                 score_before = er.score
+                rawscore_before = ers.raw_score
                 if score_before == None:     # scores of 0 come back from model as None
                     score_before = 0.0       # not sure why but they do
+                if rawscore_before == None:  # scores of 0 come back from model as None
+                    rawscore_before = 0.0    # not sure why but they do
                 score_after = 0.0
+                rawscore_after = 0.0
                 submitted = json.loads(er.json_data)
                 regrade = {}
                 for prob, v in submitted.iteritems():
@@ -70,22 +77,52 @@ class Command(BaseCommand):
                     if 'feedback' in regrade[prob]:
                         del regrade[prob]['feedback']   # remove giant feedback field
                     if 'score' in regrade[prob]:
-                        score_after += float(regrade[prob]['score'])
-                
+                        rawscore_after += float(regrade[prob]['score'])
+            
+                is_late = er.time_created > exam_obj.grace_period
+                score_after = compute_penalties(rawscore_after, er.attempt_number,
+                                                exam_obj.resubmission_penalty,
+                                                is_late, exam_obj.late_penalty)
                 s = er.student
-                status_line =  "%d, \"%s\", \"%s\", %s, %s, %s, %0.1f, %0.1f" \
+
+                try:
+                    es = ExamScore.objects.get(exam=exam_obj, student=s)
+                    examscore_before = es.score
+                except ExamScore.DoesNotExist:
+                    es = ExamScore(course=er.course, exam=exam_obj, student=s)
+                    examscore_before = -1
+                examscore_after = max(examscore_before, score_after)
+                
+                #raw = raw score, score = with penalties, agg = exam_score, over all attempts
+                status_line =  "%d, \"%s\", \"%s\", %s, %s, %s, raw:%0.1f->%0.1f score:%0.1f->%0.1f agg:%0.1f->%0.1f late:%d->%d" \
                         % (er.id, s.first_name, s.last_name, s.username, s.email, 
-                           str(er.time_created), score_before, score_after)
-                if score_before == score_after:
+                           str(er.time_created), rawscore_before, rawscore_after,
+                           score_before, score_after, examscore_before, examscore_after,
+                           er.late, is_late)
+                        
+                if score_before == score_after and rawscore_before == rawscore_after \
+                   and examscore_before == examscore_after and is_late == er.late :
                     print "OK: " + status_line
                     continue
+
                 regrades += 1
                 print "REGRADE: " + status_line
+
                 if not options['dryrun']:
-                    er.json_score_data = json.dumps(regrade)
-                    er.score = score_after
-                    er.save()
-                    updates += 1
+                    if score_before != score_after or is_late != er.late:
+                        er.json_score_data = json.dumps(regrade)
+                        er.score = score_after
+                        er.late = is_late
+                        er.save()
+                        updates += 1
+                    if rawscore_before != rawscore_after:
+                        ers.raw_score = rawscore_after
+                        ers.save()
+                        updates += 1
+                    if examscore_before != examscore_after:
+                        es.score = examscore_after
+                        es.save()
+                        updates += 1
 
             # exception handler around big ExamRecords loop -- trust me, it lines up
             # this just counts and skips offending rows so we can keep making progress
