@@ -313,8 +313,16 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                     if exam.section_id == section.id and not l2items.has_key(key):
                         exam_user_records = user_records.filter(exam=exam) #might change this to a python list filter if want to trade db access for memory
                         children = get_children_by_display_style(key, l1items, l2items, USER)
+                        try:
+                            scoreobj = ExamScore.objects.filter(course=COURSE, exam=exam, student=USER).latest('time_created')
+                            has_score = True
+                            score = scoreobj.score
+                        except ExamScore.DoesNotExist:
+                            has_score = False
+                            score = 0
                         
-                        item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children, 'records':exam_user_records}
+                        item = {'type':'exam', 'exam':exam, 'index':exam.index, 'children': children,
+                                'records':exam_user_records, 'has_score':has_score, 'score': score}
                         section_dict['items'].append(item)
                         
                         if common_page_data['course_mode'] == 'draft':

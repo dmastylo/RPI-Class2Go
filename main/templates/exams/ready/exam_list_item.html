@@ -57,6 +57,15 @@
                 </span>
             </span>
             </span>
+            {% elif exam.exam_type == "exam" %}
+               <p>
+                {% if item.has_score %}
+                <b><a href="{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Score: {{item.score}}/{{exam.total_score}} </a></b>
+                &nbsp;
+                {% endif %}
+               <a href="{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">
+                  View Submissions</a>
+               </p>
             {% endif %}
             {% if is_child == None %}
                 <p class="deadlines"><strong>Full Credit Deadline:</strong> {{exam.due_date}} PST
