@@ -3,6 +3,10 @@
 {% load listtest %}
 {% block course_page_title %}Submissions on {{exam.title}}{% endblock course_page_title %}
 
+{% block exam_link_class %}
+{% if "exam" in exam.exam_type and not videotest %}class="active"{% endif %}
+{% endblock exam_link_class %}
+
 {% block m_column_content %}
 {% for sub in my_subs %}
 <form method="post" action="snapshot" name="sub_{{sub.id}}">
@@ -46,7 +50,7 @@
     <input type="hidden" name="scores" value="{{score_fields}}" />
 {% endif %}
   {% if sub.json_obj != "__ERROR__" or sub.plain_json_obj != "__ERROR__" %}
-     <input type="submit" name="pre-pop-submit" id="pre-pop-submit" value="See form with this data" />
+     <input type="submit" name="pre-pop-submit" id="pre-pop-submit" value="See exam form with this submission" />
   {% endif %}
 {% csrf_token %}
 </div>

@@ -1,0 +1,76 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+
+{% block title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %} | Stanford Online{% endblock %}
+
+{% block course_page_title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %}{% endblock course_page_title %}
+
+{% block exam_link_class %}
+{% if "exam" in exam.exam_type and not videotest %}class="active"{% endif %}
+{% endblock exam_link_class %}
+
+{% block problemsets_link_class %}
+{% if "problemset" in exam.exam_type and not videotest %}class="active"{% endif %}
+{% endblock problemsets_link_class %}
+
+{% block survey_link_class %}
+{% if "survey" in exam.exam_type and not videotest %}class="active"{% endif %}
+{% endblock survey_link_class %}
+
+{% block interactive_exercise_link_class %}
+{% if "interactive_exercise" in exam.exam_type and not videotest %}class="active"{% endif %}
+{% endblock interactive_exercise_link_class %}
+
+{% block videos_link_class %}
+{% if videotest %}class="active"{% endif %}
+{% endblock videos_link_class %}
+
+{% block l_column_content %}
+<div id="c2g_layout_l_column" class="span3">
+    <!--Skeleton Div to be filled in by leftnav ajax -->
+</div>
+{% endblock l_column_content %}
+
+{% block m_column_content %}
+
+<div id="c2g_layout_m_column" class="span9">
+    <div class="well">
+        <h3>
+           Ready to begin <b>"{{exam.title}}"</b>?
+        </h3>
+        {% if exam.description %}
+        <p>
+        <h4> {{exam.title}} description: </h4>
+        {{exam.description }}
+        </p>
+        {% endif %}
+        <p>
+        You are about to start working on {{exam.title}}.  You will have <b>{{minutesallowed}}</b> minutes, or approximately until <b>{{endtime}} PST</b>, to submit your answers.
+        </p>
+        <p>
+        The system <b>will not</b> automatically submit for you at the end of your time, so make sure to submit yourself.
+        </p>
+        <div>
+            <a class="btn" href="{% url exam.show_view course.prefix course.suffix exam.slug %}?confirm=True">Start Now!</a>
+            <a class="btn" href="{{ request.META.HTTP_REFERER }}">Take me back</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block addl_scripts %}
+
+<script>
+     $(document).ready(function () {
+                                           
+                      $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
+                                                     function() {
+                                                     c2g.installLeftNavChevron();
+                                                     $("#sidebar-nav-heading-{{ ready_section.id }}").removeClass("collapsed").addClass("expanded");
+                                                     $("#sidebar-nav-{{ ready_section.id }}").addClass("in");
+                                                     $("#leftnav-li-exam-{{ slug_for_leftnav }}").addClass("current");
+                                                     }
+                                                     );
+      });
+</script>
+       {% endblock %}

@@ -121,6 +121,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         
     .correct {color: #090;}
     .incorrect {color: #900;}
+        .timer_container {float:right; position:relative; right:0px; padding:2px; margin:0px; font-size:16px; background:white; border: 1px solid transparent;}
+        .timer_container.fixed { padding:2px; margin:0px; position: fixed; top:5px; right:5px; z-index:11; background:white; border-radius: 4px; border: 1px solid #DDCF99;}
+        
     </style>
 
     {% if videotest %}
@@ -139,13 +142,26 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
        <h3>This exam was closed on {{ exam.partial_credit_deadline }} PST.  Submissions are disabled. </h3>
     
-    
-    {% elif too_many_attempts %}
+    {% endif %}
+    {% if endtime %}
+        {% if timeopened < endtime %}
+            <div class="timer_container" id="countdown">
+            <b style="color:green">End: {{ endtime|date:"N d, P T" }}. About <span id="timeremaining">00:00:00</span> left</b>
+            </div>
+            
+        {% else %}
+            <h3> <b style="color:red"> Your time on the exam expired at {{ endtime|date:"N d Y, P T" }}. </b></h3><br />
+        {% endif %}
+
+    {% endif %}
+    {% if too_many_attempts %}
     
         <h3>You've made too many attempts. Submissions are disabled.</h3>
 
     {% endif %}
 
+    
+    
     {% if score %}
     <h4><b style="color:red">Score: {{score}}/{{exam.total_score}}</b></h4>
     {% endif %}
@@ -202,6 +218,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 {% block addl_scripts %}
     {% if videotest %}
      <script src="{{STATIC_URL}}js/popcorn/popcorn-ie8.min.js"></script>
+    {% endif %}
+    {% if exam.timed %}
+    <script src="{{STATIC_URL}}js/core/jquery-scrollspy.js"></script>
     {% endif %}
 <script>
     var __exam_type = "{{exam.exam_type}}";
@@ -1087,11 +1106,72 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');
+    $('#saveWorkBtn').attr('disabled','disabled');
     $('#reEnableForm').remove();
     $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
     $('#main-content textarea').attr('disabled','disabled');
                       
     {% endif %}
+                      
+                      
+    {% if endtime and timeopened < endtime %}
+
+    var getHMS=function(seconds) {
+        var sign = (seconds>=0) ? "" : "-" ;
+        seconds=Math.abs(seconds);
+        var H = Math.floor(seconds / 3600);
+        var M = Math.floor((seconds % 3600) / 60);
+        var S = Math.floor(seconds % 60);
+        var Hstring = "" + H;
+        var Mstring = "" + M;
+        var Sstring = "" + S;
+
+        if (H < 10) Hstring = "0"+Hstring;
+        if (M < 10) Mstring = "0"+Mstring;
+        if (S < 10) Sstring = "0"+Sstring;
+        return sign + Hstring + ":" + Mstring + ":" + Sstring;
+    }
+
+    var endtimeInServerEpoch = {{endtime|date:"U"}};
+    var nowInServerEpoch = {{timeopened|date:"U"}}; //Default value, updated via ajax
+    var secondsleft = endtimeInServerEpoch-nowInServerEpoch;
+    var browserEndTime = (new Date().getTime()/1000) + secondsleft; //more reliable to convert endtime to browser perspective
+    $("#timeremaining").text(getHMS(browserEndTime-new Date().getTime()/1000)); //Update time remaining ASAP
+
+    //Do ajax call to improve back/forward button behavior (it doesn't cache)
+    //Also note this basically synchs the browser with the server once per page load,
+    //Not continuously at some beat.
+    $.ajax("{% url 'c2g.views.server_epoch' %}", {
+         cache:false,
+         success:function(data){
+             nowInServerEpoch=JSON.parse(data);
+             secondsleft = endtimeInServerEpoch-nowInServerEpoch;
+             browserEndTime = (new Date().getTime()/1000) + secondsleft;
+             $("#timeremaining").text(getHMS(browserEndTime-new Date().getTime()/1000)); //Update time remaining ASAP
+         }
+     });
+
+    var setTimeLeft = function() {
+        timeleft = browserEndTime-new Date().getTime()/1000;
+        $("#timeremaining").text(getHMS(timeleft));
+        if (timeleft < 0) $("#timeremaining").css('color','red');
+    }
+    setInterval(setTimeLeft,1000);
+                    
+    $("#countdown").scrollspy({
+                              max: $('body').height(),
+                              min: $('#countdown').offset().top+2,
+                              onEnter: function(element, position) {
+                                $("#countdown").addClass('fixed');
+                              },
+                              onLeave: function(element, position) {
+                                $("#countdown").removeClass('fixed');
+                              }
+                      
+                      });
+    
+    {% endif %}
+                      
                       
     }); /* END document.ready function that executes when page loads */
     

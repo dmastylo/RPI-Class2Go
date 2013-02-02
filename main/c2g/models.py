@@ -5,7 +5,6 @@ import os
 import re
 import sys
 import time
-from urlparse import urlparse, urlunparse
 from xml.dom.minidom import parseString
 
 from django import forms
@@ -2454,7 +2453,6 @@ class CurrentTermMap(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
-# Deprecated in favor of ExamScore (complete / incomplete to track state)
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)

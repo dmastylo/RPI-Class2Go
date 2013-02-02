@@ -16,6 +16,14 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <!--[if lte IE 8]>
         <script type="text/javascript" src="{{ STATIC_URL }}js/core/respond.min.js"></script>
+        
+    <![endif]-->
+    <!--[if IE]>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                alert('Warning: you are using an unsupported browser\nand will be unable to save or submit work!\n\nWe suggest you use either Mozilla Firefox or\nGoogle Chrome.');
+            });
+        </script>
     <![endif]-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
     {% endblock top_scripts %}
