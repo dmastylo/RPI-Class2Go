@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% block title %} {{SITE_TITLE}} | {{ common_page_data.course.title }} | {{ page.title }} {% endblock title %}
 
@@ -38,35 +39,35 @@
 	{% ifequal page.title 'Overview' %}
 	
         {% if intro_video or course.description or course.prerequisites or course.faq or course.outcomes or course.accompanying_materials or instructor_list %}
-            <h3>Course Information</h3>
+            <h3>{% trans 'Course Information' %}</h3>
              {% ifnotequal intro_video None %}
             <iframe width="710" height="430" src="https://www.youtube.com/embed/{{intro_video.url}}?rel=0" frameborder="0" allowfullscreen></iframe>
             <br/>
              {% endifnotequal %}
-            <h3>Course Term: {{ common_page_data.course.term }} {{ common_page_data.course.year }}</h3>
+            <h3>{% trans 'Course Term:' %} {{ common_page_data.course.term }} {{ common_page_data.course.year }}</h3>
             <p>{% autoescape off %}{{course.description}}{% endautoescape %}</p>
             {% ifnotequal common_page_data.course.prerequisites '' %}
-            <h3>Prerequisites</h3>	
+            <h3>{% trans 'Prerequisites' %}</h3>	
             <p>{% autoescape off %}{{common_page_data.course.prerequisites}}{% endautoescape %}</p>
             {% endifnotequal %}
 
             {% ifnotequal common_page_data.course.faq '' %}
-            <h3>FAQ</h3>	
+            <h3>{% trans 'FAQ' %}</h3>	
             <p>{% autoescape off %}{{common_page_data.course.faq}}{% endautoescape %}</p>
             {% endifnotequal %}
 
             {% ifnotequal common_page_data.course.outcomes '' %}
-            <h3>Outcomes</h3>	
+            <h3>{% trans 'Outcomes' %}</h3>	
             <p>{% autoescape off %}{{common_page_data.course.outcomes}}{% endautoescape %}</p>
             {% endifnotequal %}
 
             {% ifnotequal common_page_data.course.accompanying_materials '' %}
-            <h3>Accompanying Material</h3>	
+            <h3>{% trans 'Accompanying Material' %}</h3>	
             <p>{% autoescape off %}{{common_page_data.course.accompanying_materials}}{% endautoescape %}</p>
             {% endifnotequal %}
 
 
-            <h3>Biographies</h3>
+            <h3>{% trans 'Biographies' %}</h3>
 
             {% for instructor in instructor_list %}
                     <h3>{{ instructor.name }}</h3>
@@ -85,7 +86,7 @@
         {% ifnotequal page.description '' %}
             {% autoescape off %}{{page.description}}{% endautoescape %}
         {% else %}
-            <p>No content has been added to this page yet.</p>
+            <p>{% trans 'No content has been added to this page yet.' %}</p>
         {% endifnotequal %}
     {% endifequal %}
 </div>
