@@ -389,10 +389,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
             sub_obj = json.loads(latest_sub['json_data']).iteritems()
             for k,v in sub_obj:
                 vals = parse_val(v)
-                if exam.exam_type == 'survey':
-                    outstring = '"%s","%s","%s","%s"\n' % (latest_sub['student__username'], k, vals[1], vals[0])
-                else:
-                    outstring = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, vals[0])
+                outstring = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, vals)
                 outfile.write(outstring)
         except ValueError:
             could_not_parse += latest_sub['student__username']+ " " #Don't output if the latest submission was erroneous
@@ -423,11 +420,9 @@ def parse_val(v):
     if isinstance(v,list):
         sorted_list = sorted(map(lambda li: li['value'], v))
         return reduce(lambda x,y: x+y+",", sorted_list, "")
-    elif isinstance(v,basestring):
-        return v
     else:
         try:
-           return(v.get('value', ""), v.get('report', ""))
+           return v.get('value', "")
         except TypeError, AttributeError:
             return str(v)
 
