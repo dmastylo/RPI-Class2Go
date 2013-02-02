@@ -5,12 +5,6 @@ import django.template
 import djcelery
 
 from database import *
-
-#Sets the expires parameter in s3 urls to 10 years out.
-#This needs to be above the import monkeypatch line
-#otherwise we lose the 10 year urls.
-AWS_QUERYSTRING_EXPIRE = 3.156e+8
-
 import monkeypatch
 
 #ADDED FOR url tag future
@@ -72,11 +66,11 @@ MANAGERS = ADMINS
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Los_Angeles'
+TIME_ZONE = 'Asia/Bishkek'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 
 # These site variables are used for display in the product and can 
@@ -97,7 +91,7 @@ except NameError:
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = False
+USE_I18N = True
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -114,13 +108,14 @@ USE_L10N = True
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = 'http://localhost/git/' + APP + '-files/uploads/'
+
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/opt/' + APP + '/static/'
+STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -136,6 +131,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '/VertrigoServ/www/git/' + APP + '-files/static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -178,7 +174,7 @@ ROOT_URLCONF = 'urls'
 try:
     LOCAL_CACHE_LOCATION
 except NameError:
-    LOCAL_CACHE_LOCATION = "/opt/class2go"
+    LOCAL_CACHE_LOCATION = '/VertrigoServ/www/git/' + APP + '-files/cache/'
 
 try:
     FILE_CACHE_TIME
@@ -330,6 +326,9 @@ if (AWS_ACCESS_KEY_ID == 'local' or AWS_SECRET_ACCESS_KEY == 'local' or
         # TODO: fail if not defined
         pass
 
+#Sets the expires parameter in s3 urls to 10 years out.
+AWS_QUERYSTRING_EXPIRE = 3.156e+8
+
 #This states that app c2g's UserProfile model is the profile for this site.
 AUTH_PROFILE_MODULE = 'c2g.UserProfile'
 
@@ -419,17 +418,17 @@ except NameError:
 
 # Email Settings
 
-SERVER_EMAIL = 'noreply@class.stanford.edu'
+SERVER_EMAIL = AUCA_SERVER_EMAIL
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
-    DEFAULT_FROM_EMAIL = "noreply@class.stanford.edu" #probably change for production
+    DEFAULT_FROM_EMAIL = AUCA_DEFAULT_FROM_EMAIL
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
-    EMAIL_PORT = 587
-    EMAIL_HOST_USER = SES_SMTP_USER
-    EMAIL_HOST_PASSWORD = SES_SMTP_PASSWD
-    EMAIL_USE_TLS = True
+    EMAIL_PORT = AUCA_EMAIL_PORT
+    EMAIL_HOST = AUCA_EMAIL_HOST
+    EMAIL_HOST_USER = AUCA_EMAIL_HOST_USER
+    EMAIL_HOST_PASSWORD = AUCA_EMAIL_HOST_PASSWORD
+    EMAIL_USE_TLS = AUCA_EMAIL_USE_TLS
 #Otherwise, send email to a file in the logging directory
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
