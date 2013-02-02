@@ -1,14 +1,16 @@
+{% load i18n %}
+
 <div id="new_announcement_div" style='display: none;'>
     <form name="new_announcement_form" action="{% url 'courses.announcements.actions.add_announcement' %}" method="POST" class="form-vertical">
         <div class="control-group">
-            <label>Title</label>
+            <label>{% trans 'Title' %}</label>
             <div class="controls">
                 <input name="title" id="announcement_title" type="text" />
             </div>
         </div>
         <div class="control-group">
-            <label>Description:</label>
-            <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
+            <label>{% trans 'Description:' %}</label>
+            <p><span style='text-decoration: italic; font-weight: bold;'>{% trans 'Note:' %}</span> {% trans 'To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain.' %} <span style='text-decoration: italic; font-weight: bold;'>{% trans 'Always use absolute URLs only' %} (http://.....)</span>.</p>
             <div class="controls">
                 <textarea class="tinymce" style="width:100%;" name="description" id="announcement_description"></textarea>
             </div>
@@ -20,13 +22,13 @@
 
         <label>
 	  <input type="checkbox" name="email" value="0" />
-	  Email this announcement to the students
+	  {% trans 'Email this announcement to the students' %}
 	</label>
-        <input type="button" class="btn btn-primary" value="Save and Set to Ready" onclick="SaveAnnouncement('1');" />
+        <input type="button" class="btn btn-primary" value="{% trans 'Save and Set to Ready' %}" onclick="SaveAnnouncement('1');" />
         <!-- commenting out Save As Draft button, since it's published right away
         <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement('0');" />
         -->
-        <input type="button" class="btn" value="Cancel" onclick="CancelNewAnnouncement()"/>
+        <input type="button" class="btn" value="{% trans 'Cancel' %}" onclick="CancelNewAnnouncement()"/>
     </form>
     <script type="text/javascript">
         function SaveAnnouncement(commit) {
