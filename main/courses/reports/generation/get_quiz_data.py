@@ -1,9 +1,10 @@
-from c2g.models import *
-from operator import itemgetter
 import json
 import re
-from django.db.models import Count, Avg, Q
 from datetime import datetime
+from operator import itemgetter
+
+from c2g.models import *
+from django.db.models import Count, Avg, Q
 
 mean = lambda k: sum(k)/len(k)
 

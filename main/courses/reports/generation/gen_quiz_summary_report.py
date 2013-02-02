@@ -1,11 +1,14 @@
-from c2g.models import *
-from courses.reports.generation.C2GReportWriter import *
-from courses.reports.generation.get_quiz_data import *
 import math
 import json
 
+from c2g.models import *
+from courses.reports.generation.C2GReportWriter import *
+from courses.reports.generation.get_quiz_data import *
+from c2g.readonly import use_readonly_database
+
 mean = lambda k: sum(k)/len(k)
 
+@use_readonly_database
 def gen_course_quizzes_report(ready_course, save_to_s3=False):
     
     ### 1- Compose the report file name and instantiate the report writer object
@@ -40,6 +43,8 @@ def gen_course_quizzes_report(ready_course, save_to_s3=False):
     report_content = rw.writeout()
     return {'name': report_name, 'content': report_content, 'path': s3_filepath}
 
+
+@use_readonly_database
 def gen_quiz_summary_report(ready_course, ready_quiz, save_to_s3=False):
     
     ### 1- Create the S3 file name and report writer object

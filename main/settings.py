@@ -405,8 +405,9 @@ SESSION_COOKIE_AGE = 3*30*24*3600
 
 
 # Database routing
-DATABASE_ROUTERS = ['c2g.routers.CeleryDBRouter',]
-
+DATABASE_ROUTERS = ['c2g.routers.CeleryDBRouter',
+                    'c2g.routers.ReadonlyDBRouter',
+                   ]
 
 # Actually send email
 try:
