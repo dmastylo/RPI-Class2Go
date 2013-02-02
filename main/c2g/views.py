@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 
 from django.http import HttpResponse, Http404
@@ -6,6 +7,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.conf import settings
 from django.contrib import messages
+from django.views.decorators.cache import never_cache
 
 from courses.actions import is_member_of_course
 from courses.actions import auth_view_wrapper
@@ -47,6 +49,10 @@ def throw500(request):
 
 def throw404(request):
     raise Http404
+
+@never_cache
+def server_epoch(request):
+    return HttpResponse(int(time.time()))
 
 def hc(request):
     site = getattr(settings, 'SITE_NAME_SHORT')

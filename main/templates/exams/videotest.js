@@ -60,17 +60,19 @@
 
         C2G.videoSetup.selectSlide = function (time) {
             nearest = -1;
+            nearest_key = "";
             for (i in C2G.videoSetup.slideIndices) {
                 var numi = parseFloat(i);
                 $(C2G.videoSetup.slideIndices[i].displayDiv).addClass('unselected');
                 $(C2G.videoSetup.slideIndices[i].displayDiv).removeClass('selected');
                 if (numi<=time && numi>nearest) {
-                    nearest=numi;
+                    nearest = numi;
+                    nearest_key = i;
                 }
             }
 
             if (nearest >-1) {
-                var selected = C2G.videoSetup.slideIndices[''+nearest].displayDiv;
+                var selected = C2G.videoSetup.slideIndices[nearest_key].displayDiv;
                 $(selected).addClass('selected');
                 $(selected).removeClass('unselected');
                 $('#slideIndex').scrollLeft(selected.offsetLeft-($('#slideIndex').width()-$(selected).width()));

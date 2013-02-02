@@ -5,7 +5,6 @@ import os
 import re
 import sys
 import time
-from urlparse import urlparse, urlunparse
 from xml.dom.minidom import parseString
 
 from django import forms
@@ -36,16 +35,6 @@ def get_file_path(instance, filename):
         return os.path.join(str(parts[0]), str(parts[1]), 'videos', str(instance.id), filename)
     if isinstance(instance, File):
         return os.path.join(str(parts[0]), str(parts[1]), 'files', filename)
-
-
-def remove_querystring(url):
-    """
-    remove_querystring("http://www.example.com:8080/salad?foo=bar#93")
-    'http://www.example.com:8080/salad'
-    """
-    split = urlparse(url)
-    combined = (split.scheme, split.netloc, split.path, '', '', '')
-    return urlunparse(combined)
 
 
 class TimestampMixin(models.Model):
@@ -598,8 +587,7 @@ class File(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                     storecache_val = {'size':0}
                     storecache.set(storecache_key, storecache_val)
                     return ""
-                url_raw = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
-                url = remove_querystring(url_raw)  # TODO: preserve when we have longer timeouts
+                url = self.file.storage.url_monkeypatched(filename, response_headers={'response-content-disposition': 'attachment'})
                 storecache_val = {'url':url}
                 storecache.set(storecache_key, storecache_val)
         return url
@@ -765,7 +753,6 @@ class CourseCertificate(TimestampMixin, models.Model):
                 url = get_site_url() + default_storage.url(asset_path)
             else:
                 url = default_storage.url_monkeypatched(asset_path, response_headers={'response-content-disposition': 'attachement'})
-                url = remove_querystring(url)        # TODO: Remove when we have longer timeouts
         return url
 
     def __repr__(self):
@@ -1137,9 +1124,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                 # FileSystemStorage returns a path, not a url
                 loc_raw = get_site_url() + self.file.storage.url(videoname)
             else:
-                loc_raw = self.file.storage.url_monkeypatched(videoname,
+                loc = self.file.storage.url_monkeypatched(videoname,
                     response_headers={'response-content-disposition': 'attachment'})
-            loc = remove_querystring(loc_raw)  # TODO - preserve query strings when we have longer timeouts
             storecache_val = {'size':self.file.size, 'url':loc }
             storecache.set(storecache_key, storecache_val)
             return loc
@@ -1182,8 +1168,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                     gotback = [x for x in mystore.bucket.list(prefix=checkfor)]
                     if gotback:
                         filesize=gotback[0].size
-                        fileurl=remove_querystring(urlof(checkfor,
-                                response_headers={'response-content-disposition': 'attachment'}))
+                        fileurl=urlof(checkfor,
+                                response_headers={'response-content-disposition': 'attachment'})                  
                         filedesc=video_resize_options[size][3]
                         names.append((size, fileurl, filesize, filedesc))
                         # positive cache
@@ -1197,8 +1183,8 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
                         storecache.set(storecache_key, storecache_val)
 
             if not names:
-                fileurl=remove_querystring(urlof(myname,
-                                response_headers={'response-content-disposition': 'attachment'}))
+                fileurl=urlof(myname,
+                                response_headers={'response-content-disposition': 'attachment'})          
                 names = [('large', fileurl, self.file.size, '')]
             return names
 
@@ -2467,7 +2453,6 @@ class CurrentTermMap(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.course_prefix + "--" + self.course_suffix)
 
-# Deprecated in favor of ExamScore (complete / incomplete to track state)
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)

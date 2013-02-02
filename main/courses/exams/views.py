@@ -22,7 +22,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata
+from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata, StudentExamStart
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -80,6 +80,34 @@ def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
         return render_to_response('exams/ready/list.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'reverse_show':ex_type+'_show', 'form':form, }, context_instance=RequestContext(request))
 
 
+@auth_view_wrapper
+def confirm(request, course_prefix, course_suffix, exam_slug):
+    
+    course = request.common_page_data['course']
+        
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    slug_for_leftnav = exam_slug
+
+    ready_section = exam.section
+    if ready_section and ready_section.mode == "draft":
+        ready_section = ready_section.image
+
+    minutesallowed = exam.minutesallowed if exam.minutesallowed else 999
+
+    allowed_timedelta = datetime.timedelta(minutes=minutesallowed)
+
+    endtime = datetime.datetime.now() + allowed_timedelta
+
+    return render_to_response('exams/confirm.html',
+                              {'common_page_data':request.common_page_data, 'course': course, 'exam':exam, 'ready_section':ready_section,
+                              'endtime': endtime, 'slug_for_leftnav':slug_for_leftnav, 'minutesallowed':minutesallowed,
+                              }, RequestContext(request))
+
+
 # Create your views here.
 @auth_view_wrapper
 def show_exam(request, course_prefix, course_suffix, exam_slug):
@@ -90,7 +118,6 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
-    incomplete_record = get_or_update_incomplete_examrecord(course, exam, request.user)
     too_many_attempts = exam.max_attempts_exceeded(request.user)
 
     too_recent = False
@@ -98,6 +125,11 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
 
     if last_record and (datetime.datetime.now() - last_record.last_updated) < datetime.timedelta(minutes=exam.minutes_btw_attempts):
         too_recent = True
+
+    if (not too_many_attempts) and (not too_recent) and exam.timed \
+        and request.GET.get("confirm", "") != "True" and not StudentExamStart.objects.filter(student=request.user, exam=exam).exists():
+        return HttpResponseRedirect(reverse('confirm_exam_start', args=(course.prefix, course.suffix, exam.slug)))
+
 
     ready_section = exam.section
     if ready_section and ready_section.mode == "draft":
@@ -117,11 +149,32 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     except ContentGroup.DoesNotExist:
         slug_for_leftnav = exam.slug
 
+    incomplete_record = get_or_update_incomplete_examrecord(course, exam, request.user)
+
+    #Code for timed exam
+    timeopened = datetime.datetime.now()
+
+    editable = not exam.past_due()  #editable controls whether the inputs are enabled or disabled
+    allow_submit = not exam.past_due() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
+
+    if exam.timed:
+        startobj, created = StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
+        endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
+        
+        if timeopened > endtime :
+            editable = False
+            allow_submit = False
+                
+    else:
+        endtime = None
+
+
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
                               'json_pre_pop':incomplete_record.json_data, 'too_recent':too_recent,
                               'last_record':last_record, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav,
-                              'scores':"{}",'editable':True,'single_question':exam.display_single,'videotest':False,
-                              'allow_submit':True, 'too_many_attempts':too_many_attempts,
+                              'scores':"{}",'editable':editable,'single_question':exam.display_single,'videotest':False,
+                              'allow_submit':allow_submit, 'too_many_attempts':too_many_attempts,
+                              'endtime':endtime, 'timeopened':timeopened,
                               'exam':exam,}, RequestContext(request))
 
 def last_completed_record(exam, student, include_contentgroup=False):
@@ -158,48 +211,6 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
 
     too_many_attempts = exam.max_attempts_exceeded(request.user)
 
-
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop,
-                                                       'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable,
-                                                       'allow_submit':True, 'too_many_attempts':too_many_attempts},
-                              RequestContext(request))
-
-@auth_view_wrapper
-def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exam"):
-    course = request.common_page_data['course']
-    
-    try:
-        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
-    except Exam.DoesNotExist:
-        raise Http404
-
-    try:
-        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).latest('time_created')
-        json_pre_pop = record.json_data
-        if record.json_score_data:
-            correx_obj = json.loads(record.json_score_data)
-        else:
-            correx_obj = {}
-        correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
-        json_pre_pop_correx = json.dumps(correx_obj)
-        
-    except ExamRecord.DoesNotExist:
-        record = None
-        json_pre_pop = "{}"
-        json_pre_pop_correx = "{}"
-
-    try:
-        score_obj = ExamScore.objects.get(course=course, exam=exam, student=request.user)
-        score = score_obj.score
-        score_fields = {}
-        for s in list(ExamScoreField.objects.filter(parent=score_obj)):
-            score_fields[s.field_name] = s.subscore
-        scores_json = json.dumps(score_fields)
-    except ExamScore.DoesNotExist, ExamScore.MultipleObjectsReturned:
-        score = None
-        score_fields = {}
-        scores_json = "{}"
-
     ready_section = exam.section
     if ready_section and ready_section.mode == "draft":
         ready_section = ready_section.image
@@ -219,8 +230,43 @@ def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exa
         slug_for_leftnav = exam.slug
 
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'score':score, 'allow_submit':False,
-                               'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav}, RequestContext(request))
+    #Code for timed exams
+    allow_submit = not exam.past_due() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
+        
+    timeopened = datetime.datetime.now()
+    
+    if exam.timed:
+        startobj, created=StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
+        endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
+        
+        if timeopened > endtime :
+            editable = False
+            allow_submit = False
+    else:
+        endtime = None
+
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop,
+                                                       'slug_for_leftnav':slug_for_leftnav, 'ready_section':ready_section,
+                                                       'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable, 'endtime':endtime,
+                                                       'allow_submit':allow_submit, 'timeopened':timeopened, 'too_many_attempts':too_many_attempts},
+                              RequestContext(request))
+
+@auth_view_wrapper
+def show_graded_exam(request, course_prefix, course_suffix, exam_slug, type="exam"):
+    course = request.common_page_data['course']
+    
+    try:
+        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
+    except Exam.DoesNotExist:
+        raise Http404
+
+    try:
+        record = ExamRecord.objects.filter(course=course, exam=exam, student=request.user, complete=True, time_created__lt=exam.grace_period).latest('time_created')
+        #call show_graded_record to for code reuse
+        return show_graded_record(request, course_prefix, course_suffix, exam_slug, record.id, type=type)
+        
+    except ExamRecord.DoesNotExist:
+        raise Http404
 
 
 @auth_view_wrapper
@@ -278,8 +324,6 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
             slug_for_leftnav = parent.slug
     except ContentGroup.DoesNotExist:
         slug_for_leftnav = exam.slug
-
-
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav}, RequestContext(request))
 
@@ -345,10 +389,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
             sub_obj = json.loads(latest_sub['json_data']).iteritems()
             for k,v in sub_obj:
                 vals = parse_val(v)
-                if exam.exam_type == 'survey':
-                    outstring = '"%s","%s","%s","%s"\n' % (latest_sub['student__username'], k, vals[1], vals[0])
-                else:
-                    outstring = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, vals[0])
+                outstring = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, vals)
                 outfile.write(outstring)
         except ValueError:
             could_not_parse += latest_sub['student__username']+ " " #Don't output if the latest submission was erroneous
@@ -379,11 +420,9 @@ def parse_val(v):
     if isinstance(v,list):
         sorted_list = sorted(map(lambda li: li['value'], v))
         return reduce(lambda x,y: x+y+",", sorted_list, "")
-    elif isinstance(v,basestring):
-        return v
     else:
         try:
-           return(v.get('value', ""), v.get('report', ""))
+           return v.get('value', "")
         except TypeError, AttributeError:
             return str(v)
 
@@ -405,6 +444,16 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     if exam.mode == "ready" and exam.past_all_deadlines():
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
                                       datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
+
+    if exam.timed:
+        try:
+            started = StudentExamStart.objects.get(exam=exam, student=user)
+            endtime = started.time_created + datetime.timedelta(minutes = (exam.minutesallowed+1))
+            if datetime.datetime.now() > endtime:
+                return HttpResponseBadRequest("Sorry!  This submission is past your submission window, which ended at %s" % \
+                                              datetime.datetime.strftime(endtime, "%m/%d/%Y %H:%M PST"));
+        except StudentExamStart.DoesNotExist:
+            pass #somehow we didn't record a start time for the student.  So we just let them submit.
 
     attempt_number = exam.num_of_student_records(user)+1
 
