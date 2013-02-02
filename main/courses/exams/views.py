@@ -902,7 +902,7 @@ def view_csv_grades(request, course_prefix, course_suffix, exam_slug):
     s3file.write(outfile.read())
     s3file.close()
     outfile.close()
-    return HttpResponseRedirect(secure_file_storage.url("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname), response_headers={'response-content-disposition': 'attachment'}))
+    return HttpResponseRedirect(secure_file_storage.url_monkeypatched("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname), response_headers={'response-content-disposition': 'attachment'}))
 
 
 
