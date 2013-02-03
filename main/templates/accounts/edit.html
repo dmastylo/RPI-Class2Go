@@ -29,7 +29,7 @@
     </p>
     {% else %}
 		{% url 'default_login' as default_login_url %}
-			<h4>{% blocktrans%}Please <a data-toggle="modal" href="{{default_login_url}}?next={{ request.get_full_path }}">log in</a> to see profile information{% endblocktrans %}</h4>
+		<h4>{% blocktrans with next_arg=request.get_full_path %}Please <a data-toggle="modal" href="{{default_login_url}}?next={{next_arg}}">log in</a> to see profile information{% endblocktrans %}</h4>
     {% endif %}
 
     {% endif %}
