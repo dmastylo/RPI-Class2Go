@@ -54,9 +54,7 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span9">
-<div class="alert alert-error" id="nojswarn">
-You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
-</div>
+
 {% autoescape off %}
 
 {% if common_page_data.course.mode == "ready" and not exam.is_live %}
@@ -683,8 +681,6 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $(returnToListLink).after($(userNote));
         $(userNote).hide();
     {% endif %}
-                      
-    $('#nojswarn').remove();
                       
     /********* Save Work Button (not submitting as complete) ********/
                       
