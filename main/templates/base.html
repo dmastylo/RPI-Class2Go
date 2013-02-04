@@ -185,11 +185,11 @@
                     minutes = formatMinutes(serverMinutes);
                     hours = formatHours(serverHours);
                     if (serverHours >= 12) { ampm = "PM" } else { ampm = "AM" }
-                    console.log(hours + ':' + minutes + ampm + '(Server)'); //----------------------------SERVER CONSOLE.LOG
+                    //console.log(hours + ':' + minutes + ampm + '(Server)'); //----------------------------SERVER CONSOLE.LOG
                     displayTime(hours, minutes, ampm);
                 }, error:function(data){
                     changeTime(hours, minutes, ampm);
-                    console.log(hours + ':' + minutes + ampm + '(jQuery)'); //----------------------------JQUERY ONSOLE.LOG
+                    //console.log(hours + ':' + minutes + ampm + '(jQuery)'); //----------------------------JQUERY ONSOLE.LOG
                     displayTime(hours, minutes, ampm);
                 }
             });
