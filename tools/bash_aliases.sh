@@ -46,4 +46,14 @@ function multitail-prod-util {
         -l 'ssh ubuntu@util2.prod.c2gops.com "tail -f /var/log/celery/*.log"' 
 }
 
+function c2g {
+    if [ "x$1" == "x" ]; then
+        echo "usage: c2g <host_prefix>"
+        echo "  example: \"c2g app1.prod\" will ssh to app1.prod.c2gops.com"
+        return 1
+    fi
+    target="ubuntu@$1.c2gops.com"
+    echo "connecting to $target via ssh"
+    ssh -A $target
+}
 
