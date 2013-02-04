@@ -691,56 +691,62 @@
     /********* Save Work Button (not submitting as complete) ********/
                       
     {% if not videotest and editable %}
-    var saveWorkBtn = document.createElement('button');
-    $(saveWorkBtn).text('Save Answers')
-                  .addClass('btn')
-                  .attr('id','saveWorkBtn');
-    var submitBtn = $('#submit-button');
-    submitBtn.after($(saveWorkBtn));
+        var saveWorkBtn = document.createElement('button');
+        $(saveWorkBtn).text('Save Answers')
+                      .addClass('btn')
+                      .attr('id','saveWorkBtn');
+        $(saveWorkBtn).insertAfter($('#submit-button'));
 
-    $(saveWorkBtn).click(function () {
-        var fieldCollection = $('#exam-pane').find('input,textarea');
-        var userAnswerObj = window.collectUserAnswers(fieldCollection);
-        var userSelections = userAnswerObj.userSelections; 
+        $(saveWorkBtn).click(function () {
+            $(saveWorkBtn).attr('disabled', 'disabled')         /* Disallow saving while saving */
+            var fieldCollection = $('#exam-pane').find('input,textarea');
+            var userAnswerObj = window.collectUserAnswers(fieldCollection);
+            var userSelections = userAnswerObj.userSelections; 
 
-        window.myData = JSON.stringify(userSelections);
+            window.myData = JSON.stringify(userSelections);
 
-        var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
-                       {   csrfmiddlewaretoken: "{{ csrf_token }}",
-                           json_data:JSON.stringify(userSelections),
-                           onpage:$(location).attr('href')
-                       });
-                       
-        saveXHR.error(function(xhr, status, msg) {
-                    var dialogDiv = window.getDialog(status.toUpperCase());
-                    var displayText = "Your answers could not be saved!";
-                    if (typeof msg != "undefined" && msg != "") {
-                        displayText += " " + msg;
-                    }
-                    if (typeof xhr.responseText != "undefined" && xhr.responseText != "") {
-                        displayText += xhr.responseText.substr(0,99);
-                    }
-                     $(dialogDiv).find('p').text(displayText);
-                    if (typeof window.myData != "undefined" && window.myData != "" && typeof localStorage != "undefined") {
-                            var storageKey = "{{user.id}}_" + Date.now() + "_{{exam.slug}}";
-                            localStorage[storageKey] = window.myData;
-                    }
-                     $(dialogDiv).dialog({ modal: true,
-                                           buttons: {'Close':function(){$(this).dialog("close");}}
-                                         });
+            var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
+                           {   csrfmiddlewaretoken: "{{ csrf_token }}",
+                               json_data:JSON.stringify(userSelections),
+                               onpage:$(location).attr('href')
+                           });
+                           
+            saveXHR.error(function(xhr, status, msg) {
+                        $(saveWorkBtn).removeAttr('disabled');   /* Saving failed; allow saving again */
+                        var dialogDiv = window.getDialog(status.toUpperCase());
+                        var displayText = "Your answers could not be saved!";
+                        if (typeof msg != "undefined" && msg != "") {
+                            displayText += " " + msg;
+                        }
+                        if (typeof xhr.responseText != "undefined" && xhr.responseText != "") {
+                            displayText += xhr.responseText.substr(0,99);
+                        }
+                         $(dialogDiv).find('p').text(displayText);
+                        if (typeof window.myData != "undefined" && window.myData != "" && typeof localStorage != "undefined") {
+                                var storageKey = "{{user.id}}_" + Date.now() + "_{{exam.slug}}";
+                                localStorage[storageKey] = window.myData;
+                        }
+                         $(dialogDiv).dialog({ modal: true,
+                                               buttons: {'Close':function(){$(this).dialog("close");}}
+                                             });
+            });
+
+            saveXHR.success(function(status, msg, xhr) { 
+                    var dialogDiv = window.getDialog(msg.toUpperCase());
+                    $(dialogDiv).find('p').text("Your answers have been saved, but not submitted!");
+
+                    $(dialogDiv).dialog({ modal: true,
+                                          buttons: {'Close': function() {
+                                                                         $(this).dialog("close");
+                                                                         /* allow saving again on dialog close */
+                                                                         $(saveWorkBtn).removeAttr('disabled');
+                                                                        }
+                                                   }
+                                        });
+            });
+            
+            unsavedChanges = false; //clear flag when save button clicked
         });
-
-        saveXHR.success(function(status, msg, xhr) { 
-                var dialogDiv = window.getDialog(msg.toUpperCase());
-                $(dialogDiv).find('p').text("Your answers have been saved, but not submitted!");
-
-                $(dialogDiv).dialog({ modal: true,
-                                   buttons: {'Close':function(){$(this).dialog("close");}}
-                                 });
-        });
-        
-        unsavedChanges = false; //clear flag when save button clicked
-    });
 
 
     {% endif %}
@@ -1114,8 +1120,8 @@
         // questionTimes from parsed XML metadata 
         var questionTimes = JSON.parse('{{question_times|escapejs}}');
 
-	var video_rec_id = {{ video_rec.id }}
-	var csrf_token = '{{ csrf_token }}'
+    var video_rec_id = {{ video_rec.id }}
+    var csrf_token = '{{ csrf_token }}'
     {% include 'exams/videotest.js' %} 
 {% if not video.url %}
     $('#demoplayer').hide();
