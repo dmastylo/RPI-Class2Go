@@ -1,1 +1,0 @@
-{"0.0":{"imgsrc":"img001.jpeg"},"6.0":{"imgsrc":"img007.jpeg"},"7.0":{"imgsrc":"img008.jpeg"},"198.0":{"imgsrc":"img199.jpeg"},"286.0":{"imgsrc":"img287.jpeg"},"524.0":{"imgsrc":"img525.jpeg"},"602.0":{"imgsrc":"img603.jpeg"},"704.0":{"imgsrc":"img705.jpeg"},"740.0":{"imgsrc":"img741.jpeg"},"763.0":{"imgsrc":"img764.jpeg"},"865.0":{"imgsrc":"img866.jpeg"}}
