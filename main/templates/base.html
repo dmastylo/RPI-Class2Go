@@ -125,6 +125,7 @@
                 {% endif %}
             {% endif %}
                 <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><em class="icon-reorder"></em></a></li>
+                <li id="PacTime"><span><strong class="hours">{% now "g" %}</strong>:<strong class="minutes">{% now "i" %}</strong> <strong class="ampm">{% now "A" %}</strong> {% now "T" %}</span></li>
                 </ul>
             </div>
             {% endblock topnav %}
@@ -166,6 +167,66 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/bootstrap.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
+    <script type="text/javascript">
+        //alert(navigator.userAgent);
+        
+        var hours = $('#PacTime .hours').html(); var minutes = $('#PacTime .minutes').html(); var ampm = $('#PacTime .ampm').html();
+        var changeHour = false;
+        var serverMinutes, serverHours;
+        
+        var getServerTime = function() {
+            $.ajax("{% url 'c2g.views.server_epoch' %}", {
+                cache:false,
+                success:function(data){
+                    var serverDate = new Date(JSON.parse(data) * 1000);
+                    //alert(serverDate);
+                    serverMinutes = serverDate.getMinutes()*1;
+                    serverHours = serverDate.getHours()*1;
+                    minutes = formatMinutes(serverMinutes);
+                    hours = formatHours(serverHours);
+                    if (serverHours >= 12) { ampm = "PM" } else { ampm = "AM" }
+                    console.log(hours + ':' + minutes + ampm + '(Server)'); //----------------------------SERVER CONSOLE.LOG
+                    displayTime(hours, minutes, ampm);
+                }, error:function(data){
+                    changeTime(hours, minutes, ampm);
+                    console.log(hours + ':' + minutes + ampm + '(jQuery)'); //----------------------------JQUERY ONSOLE.LOG
+                    displayTime(hours, minutes, ampm);
+                }
+            });
+        }
+        
+        var changeTime = function(h, m, ap){
+            m++; formatMinutes(m);
+            if (changeHour) { h++; changeHour = false; }
+            formatHours(h, ap); minutes = m; hours = h;
+        }
+        
+        var formatMinutes = function(m){
+            if (m == 60 || m == 0) { m = "00"; changeHour = true; }
+            else if (m < 10) { m = '0' + m; }
+            return m;
+        }
+        
+        var formatHours = function(h, ap){
+            if ( h == 13 ) { h = 1; }
+            else if (h == 12 && ap == 'AM') { ampm = 'PM'; }
+            else if (h == 12 &&  ap == 'PM' ) { ampm = 'AM'; }
+            return h;
+        }
+        
+        var displayTime = function(h, m, ap){
+            $('#PacTime .minutes').html(m);
+            $('#PacTime .hours').html(h);
+            $('#PacTime .ampm').html(ap);
+        }
+        
+        $(function(){
+            getServerTime();
+            setInterval(function(){
+                getServerTime();
+            }, 60000);
+        });
+    </script>
     {% endblock bottom_scripts %}
     <script type="text/javascript">
       var _gaq = _gaq || [];
