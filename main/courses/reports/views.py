@@ -230,14 +230,13 @@ def generate_in_line_report(request, course_prefix, course_suffix):
             we_have_data = True
 
     elif report_name == 'student_scores':
-        if username:
-            report_data = gen_spec_in_line_report(report_name, course, username)
-            if report_data:
-                report_label = "Student Scores"
-                headings = report_data['headings']
-                max_scores = report_data['max_scores']
-                rows = report_data['rows']
-                we_have_data = True
+        report_data = gen_spec_in_line_report(report_name, course, username)
+        if report_data:
+            report_label = "Student Scores"
+            headings = report_data['headings']
+            max_scores = report_data['max_scores']
+            rows = report_data['rows']
+            we_have_data = True
     
     return render_to_response('reports/in_line.html', {
         'common_page_data':request.common_page_data,
