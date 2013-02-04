@@ -1,5 +1,7 @@
-cookbook_file "/home/ubuntu/proddump-daily.sh" do
+template "/home/ubuntu/proddump-daily.sh" do
+    source "proddump-daily.sh.erb"
     owner "ubuntu"
+    group "ubuntu"
     mode 00755
     action :create
 end
