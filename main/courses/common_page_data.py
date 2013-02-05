@@ -9,7 +9,15 @@ from c2g.models import AdditionalPage, CacheStat, ContentSection, Course
 logger=logging.getLogger(__name__)
 
 
-def get_common_page_data(request, prefix, suffix):
+def get_common_page_data(request, prefix, suffix, use_cache=True):
+    """Collect data frequently used by site templates, with caching.
+
+    request:   the HTTP request object
+    prefix:    the course prefix, e.g., 'networking'
+    suffix:    the course suffix, e.g., 'Fall2012'
+    use_cache: If False, forces cache lookups to miss.
+               Defaults to True. 
+    """
 
     CACHE_STORE   = 'course_store'
     CACHE         = get_cache(CACHE_STORE)
@@ -58,7 +66,7 @@ def get_common_page_data(request, prefix, suffix):
     # Course info pages
     course_info_page_handle = course_handle + '_' + course_mode + '_course_info_pages'
     course_info_pages = CACHE.get(course_info_page_handle)
-    if course_info_pages:
+    if use_cache and course_info_pages:
         CacheStat.report('hit', CACHE_STORE)
     else:
         CacheStat.report('miss', CACHE_STORE)
@@ -72,7 +80,7 @@ def get_common_page_data(request, prefix, suffix):
     if course_mode == 'ready':
         content_section_page_handle = course_handle + 'ready' +'_nonempty_content_sections'
         content_sections = CACHE.get(content_section_page_handle)
-        if content_sections:
+        if use_cache and content_sections:
             CacheStat.report('hit', CACHE_STORE)
         else:
             CacheStat.report('miss', CACHE_STORE)

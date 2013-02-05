@@ -395,7 +395,7 @@ def get_survey_data(ready_survey, get_visits = False):
                         if multi_answer_dict.get('questionreport', False):
                             question_report = multi_answer_dict.get('questionreport')
                         else:
-                            question_report = question 
+                            question_report = question
                         
                         question_reports[question] = question_report
                         tally = store_answer(tally, question, answer)
@@ -403,11 +403,15 @@ def get_survey_data(ready_survey, get_visits = False):
     return tally, errors, question_reports
     
 
-def get_student_scores(ready_course):
+def get_student_scores(ready_course, username=None):
     
     now = datetime.now()
-    exams = Exam.objects.values('title', 'total_score').filter(~Q(exam_type='survey'), course=ready_course, is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('due_date')
-    student_scores = ExamScore.objects.values('student__username', 'student__first_name', 'student__last_name', 'exam__title', 'score').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=ready_course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now).order_by('student__username', 'exam__partial_credit_deadline')
+    exams = Exam.objects.values('title', 'total_score').filter(~Q(exam_type='survey'), course=ready_course, is_deleted=0, section__is_deleted=0, live_datetime__lt=now).order_by('title')
+    if username:
+        username_list = re.sub(r'\s+', '', username).split(',')
+        student_scores = ExamScore.objects.values('student__username', 'student__first_name', 'student__last_name', 'exam__title', 'score').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=ready_course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now, student__username__in=username_list).order_by('student__username')
+    else:
+        student_scores = ExamScore.objects.values('student__username', 'student__first_name', 'student__last_name', 'exam__title', 'score').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=ready_course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now).order_by('student__username')
     
     return exams, student_scores
         
