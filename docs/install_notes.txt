@@ -1,0 +1,327 @@
+
+class2Go Insructions for Linux.
+ ** Taken from: https://github.com/Stanford-Online/class2go/blob/master/README_SETUP.md
+ ** Assumes Apache, MySQL, Python have all been installed
+ 
+1) Install virtual environment (installs easy_install)
+	* Documentation: http://www.pip-installer.org/en/latest/installing.html
+	* curl http://python-distribute.org/distribute_setup.py | python
+	* Please Note - pip installs here:  /usr/local/bin/pip
+	
+2) Install pip
+	* easy_install pip
+	
+3) Install virtualenv 
+	* /usr/local/bin/pip install virtualenv
+	
+4) Install virtualenvwrapper:
+	* /usr/local/bin/pip install virtualenvwrapper
+		
+5) Verfiy installations
+	* ls /usr/local/bin 
+
+6) Edit login script:
+	* vim /home/admin/.bashrc
+	* Add the following:
+		# virtualenv setup -- use Distribute by default
+		export VIRTUALENV_DISTRIBUTE=true
+
+		# virtualenvwrapper setup
+		export WORKON_HOME=/home/www/DevEnvs
+		export PROJECT_HOME=/home/www/cec
+		export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+		export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+		source /usr/local/bin/virtualenvwrapper.sh
+
+7) Source login script so env vars take effect:
+	* source /home/admin/.bashrc 
+
+8) Check out new virtual base directory
+	* ls -l /home/www/DevEnvs/ 
+
+9) Check out your PATH to see if /usr/local/bin comes before /usr/bin:
+	* echo $PATH
+	* If not, add export PATH=/usr/local/bin:$PATH to your .bashrc
+
+10) Make sure PROJECT_HOME is defined
+	* echo $PROJECT_HOME 
+
+11) Make new project directory
+	* mkdir -p $PROJECT_HOME 
+	
+12) Issue command to set up new project subdirectory and link it to virtual env:
+	* cd $PROJECT_HOME
+	* mkproject class2go
+	
+12a) Start Virtual Environment
+	* source <DevEnvs>/bin/activate
+
+13) Once inside virtual env/project directory, install django
+	* pip install django
+
+14) Clone class2go repo from github:
+	* cd $PROJECT_HOME
+		- It will download to: $PROJECT_HOME/class2go
+	* If git not installed:
+		- Add the j.eng repository:
+			# zypper addrepo http://jftp.medozas.de/openSUSE_12.1/ j.eng-i586
+		- Install git rpm package:
+			# zypper install git
+			# zypper install git-daemon
+	* git clone https://github.com/Stanford-Online/class2go.git 
+
+15) Check out where your mysql is installed, make sure mysql_config exists in the dir:
+	* ls `which mysql`
+	* Need to install mysql_config if it's not there:
+		+ zypper install libmysqlclient-devel
+
+17) Might need some extra python developer stuff / or python libraries:
+	* zypper install python-devel
+	* zypper install python-xml
+	* zypper install sqlite3
+	* zypper install sqlite3-devel 
+
+18) Install python hooks for MySQL:
+	* If gcc not installed, install it:
+		- zypper install gcc
+	* pip install MySQL-python
+
+19) Install Python Imaging Lib:
+	* pip install PIL
+
+20) Install South db stuff:
+	* pip install South
+
+21) Install modules for Amazon S3
+	* pip install django_storages
+	* pip install boto
+	
+22) Install GData (2.0.17)
+	* pip install gdata
+
+23) Install Celery ecosystem
+	* pip install django-celery django-celery-email pytz
+
+24) Install Element Tree
+	* pip install elementtree
+	
+25) Install sqlite for Python
+	* pip install pysqlite
+
+-------------------
+Configuratin commands
+-------------------
+
+Go to "main" dir and copy over database settings file:
+
+cd main
+cp database_example.py database.py
+Edit file and add db name, username and password:
+
+vim database.py 
+
+-------------------
+(class2go)linux-vp7u:/home/www/cec # python class2go/main/manage.py syncdb
+Syncing...
+Creating tables ...
+Creating table auth_permission
+Creating table auth_group_permissions
+Creating table auth_group
+Creating table auth_user_user_permissions
+Creating table auth_user_groups
+Creating table auth_user
+Creating table django_content_type
+Creating table django_session
+Creating table django_site
+Creating table django_admin_log
+Creating table registration_registrationprofile
+Creating table south_migrationhistory
+Creating table django_flatpage_sites
+Creating table django_flatpage
+
+You just installed Django's auth system, which means you don't have any superusers defined.
+Would you like to create one now? (yes/no): no
+Installing custom SQL ...
+Installing indexes ...
+Installed 0 object(s) from 0 fixture(s)
+
+Synced:
+ > django.contrib.auth
+ > django.contrib.contenttypes
+ > django.contrib.sessions
+ > django.contrib.sites
+ > django.contrib.messages
+ > django.contrib.staticfiles
+ > django.contrib.admin
+ > django.contrib.admindocs
+ > registration
+ > south
+ > courses
+ > courses.forums
+ > courses.announcements
+ > courses.videos
+ > courses.video_exercises
+ > courses.email_members
+ > khan
+ > problemsets
+ > django.contrib.flatpages
+ > storages
+ > celerytest
+ > convenience_redirect
+ > exception_snippet
+ > db_test_data
+
+Not synced (use migrations):
+ - djcelery
+ - c2g
+(use ./manage.py migrate to migrate these)
+
+--------------
+(class2go)linux-vp7u:/home/www/cec # python class2go/main/manage.py migrate
+Running migrations for djcelery:
+ - Migrating forwards to 0004_v30_changes.
+ > djcelery:0001_initial
+ > djcelery:0002_v25_changes
+ > djcelery:0003_v26_changes
+ > djcelery:0004_v30_changes
+ - Loading initial data for djcelery.
+Installed 0 object(s) from 0 fixture(s)
+Running migrations for c2g:
+ - Migrating forwards to 0012_auto__add_field_exam_total_score.
+ > c2g:0001_initial
+ > c2g:0002_auto__add_field_emailaddr_optout__add_field_emailaddr_optout_code__add
+ > c2g:0003_auto__add_pagevisitlog__add_videoviewtraces
+ > c2g:0004_auto__add_field_userprofile_piazza_email__add_field_userprofile_piazza
+ > c2g:0005_auto
+ > c2g:0006_auto__add_field_userprofile_email_me
+ > c2g:0007_auto__add_exam
+ > c2g:0008_auto__add_field_exam_due_date__add_field_exam_grace_period
+ > c2g:0009_auto__add_examrecord
+ > c2g:0010_auto__add_field_exam_description
+ > c2g:0011_auto__add_examscorefield__add_examscore
+ > c2g:0012_auto__add_field_exam_total_score
+ - Loading initial data for c2g.
+Installed 0 object(s) from 0 fixture(s)
+
+
+-----------------
+(class2go)linux-vp7u:/home/www/cec # python class2go/main/manage.py db_populate
+      Creating users
+      -----------------
+      Creating networking course
+      -------------------
+      Creating crypto course
+      ----------------------
+      -----------------------------
+      Successfully populated the db
+
+	  
+------------------
+(class2go)linux-vp7u:/home/www/cec # python class2go/main/manage.py syncdb --database=celery
+Syncing...
+Creating tables ...
+Creating table south_migrationhistory
+Installing custom SQL ...
+Installing indexes ...
+Installed 0 object(s) from 0 fixture(s)
+
+Synced:
+ > django.contrib.auth
+ > django.contrib.contenttypes
+ > django.contrib.sessions
+ > django.contrib.sites
+ > django.contrib.messages
+ > django.contrib.staticfiles
+ > django.contrib.admin
+ > django.contrib.admindocs
+ > registration
+ > south
+ > courses
+ > courses.forums
+ > courses.announcements
+ > courses.videos
+ > courses.video_exercises
+ > courses.email_members
+ > khan
+ > problemsets
+ > django.contrib.flatpages
+ > storages
+ > celerytest
+ > convenience_redirect
+ > exception_snippet
+ > db_test_data
+
+Not synced (use migrations):
+ - djcelery
+ - c2g
+(use ./manage.py migrate to migrate these)
+
+
+----------------------------
+(class2go)linux-vp7u:/home/www/cec # python class2go/main/manage.py migrate --database=celery
+Running migrations for djcelery:
+ - Migrating forwards to 0004_v30_changes.
+ > djcelery:0001_initial
+ > djcelery:0002_v25_changes
+ > djcelery:0003_v26_changes
+ > djcelery:0004_v30_changes
+ - Loading initial data for djcelery.
+Installed 0 object(s) from 0 fixture(s)
+Running migrations for c2g:
+ - Migrating forwards to 0012_auto__add_field_exam_total_score.
+ > c2g:0001_initial
+ > c2g:0002_auto__add_field_emailaddr_optout__add_field_emailaddr_optout_code__add
+ > c2g:0003_auto__add_pagevisitlog__add_videoviewtraces
+ > c2g:0004_auto__add_field_userprofile_piazza_email__add_field_userprofile_piazza
+ > c2g:0005_auto
+ > c2g:0006_auto__add_field_userprofile_email_me
+ > c2g:0007_auto__add_exam
+ > c2g:0008_auto__add_field_exam_due_date__add_field_exam_grace_period
+ > c2g:0009_auto__add_examrecord
+ > c2g:0010_auto__add_field_exam_description
+ > c2g:0011_auto__add_examscorefield__add_examscore
+ > c2g:0012_auto__add_field_exam_total_score
+ - Loading initial data for c2g.
+Installed 0 object(s) from 0 fixture(s)
+
+
+---------------------
+
+			Update settings file and add "static/" for STATIC_ROOT_DIR:
+
+			vim settings.py
+			Make sure directory exists, or create it:
+
+			mkdir static
+			Run collectstatic to copy stuff into your dir:
+
+			./manage.py collectstatic
+			Run server on whatever port you want:
+
+
+Setup STATIC path and copy files
+ 1) Edit class2go\main\settings.py
+	* Update static root to a desired folder, i.e. : STATIC_ROOT = '/home/www/cec/static/'
+		+ This is where the static files (html, css, jpg, etc.) are copied to
+ 2) Run:  python manage.py collectstatic
+ 3) Add the path to the STATICFILES_DIRS
+	* '/home/www/cec/static/',
+ 4) Remove the value from STATIC_ROOT
+	* STATIC_ROOT = ''
+ 5) To verify the static path is working, rename the "static" folder in: /home/www/cec/class2go/main/c2g
+		
+Create SU account:
+ 1) Start Python server:  python manage.py runserver 8000
+ 2) Goto: http://localhost:8000/accounts/register
+ 3) Enter the information
+ 4) Log into phpMyAdmin and update credentials:
+	- Table: auth_user
+	- is_staff = 1
+	- is_superuser = 1
+ 5) Or, run this query: 
+	- Verify the correct user is returned:   
+		select id,username,is_staff,is_superuser from auth_user where id=59;
+	- Update:
+		UPDATE auth_user SET  is_staff =  '1', is_superuser =  '1' WHERE id =59;
+ 6) Verify account by going logging in at: http://localhost:8000/admin
+
