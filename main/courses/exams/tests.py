@@ -3,13 +3,13 @@
 
 import random
 import re
-import urllib,urllib2
+from sets import Set
+
 from django.test import TestCase
-from django.conf import settings
+
 from courses.exams.autograder import *
 from courses.exams.views import compute_penalties
-from sets import Set
-from StringIO import StringIO
+from fake_remote_grader import *
 
 class SimpleTest(TestCase):
     def test_multiple_choice_factory_normal(self):
@@ -683,30 +683,6 @@ class SimpleTest(TestCase):
 
     # Helper Methods
 
-    def fake_remote_grader(self, answer):
-        """Helper function for the interactive grader, override the remote
-        grader to return the answer string provided."""
-
-        def fake_remote_grader(req):
-            grader_endpoint = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
-            if req.get_full_url() == grader_endpoint:
-                resp = urllib2.addinfourl(StringIO(answer), "", req.get_full_url())
-                resp.code = 200
-                resp.msg = ""
-                return resp
-
-        class FakeGraderHTTPHandler(urllib2.HTTPHandler):
-            def http_open(self, req):
-                return fake_remote_grader(req)
-
-        my_opener = urllib2.build_opener(FakeGraderHTTPHandler)
-        urllib2.install_opener(my_opener)
-
-    def restore_urllib2(self):
-        default_opener = urllib2.build_opener(urllib2.HTTPDefaultErrorHandler)
-        urllib2.install_opener(default_opener)
-
-
     def test_interactive_grader_basic(self):
         """
         Interactive autograder with fake remote endpoint (basic)
@@ -718,6 +694,8 @@ class SimpleTest(TestCase):
         files.  You have to remember to restore urllib2 to a good state before 
         finishing though otherwise urllib2 will be horked.  Method cribbed from:
             http://stackoverflow.com/questions/2276689/how-do-i-unit-test-a-module-that-relies-on-urllib2
+
+        Work for this is done in fake_remote_grader.py
         """
 
         interactive_xml = """
@@ -762,29 +740,28 @@ class SimpleTest(TestCase):
         fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
         fbstr = json.dumps(fb)
 
-        self.fake_remote_grader('{"score":0, "maximum-score":1, "feedback":%s}' %fbstr)
-        self.assertEqual(ag.grade("q1b", "should_fail"),
-                {'correct': False, 'score': 0, 'feedback': fb})
+        with fake_remote_grader('{"score":0, "maximum-score":1, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", "should_fail")
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
-        self.fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' %fbstr)
-        self.assertEqual(ag.grade("q1b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': fb})
+        with fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", "should_succeed")
+            self.assertEqual(g, {'correct': True, 'score': 1, 'feedback': fb})
 
-        self.fake_remote_grader('{"score":10, "maximum-score":10, "feedback":%s}' %fbstr)
-        self.assertEqual(ag.grade("q1b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': fb})
-        self.assertEqual(ag.grade("q2b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': fb})
+        with fake_remote_grader('{"score":10, "maximum-score":10, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", "should_succeed")
+            self.assertEqual(g, {'correct': True, 'score': 1, 'feedback': fb})
 
-        self.fake_remote_grader('{"score":1, "feedback":%s}' %fbstr)
-        self.assertEqual(ag.grade("q1b", "should_succeed"),
-                {'correct': True, 'score': 1, 'feedback': fb})
+            g = ag.grade("q2b", "should_succeed")
+            self.assertEqual(g, {'correct': True, 'score': 1, 'feedback': fb})
 
-        self.fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
-        self.assertEqual(ag.grade("q1b", "should_fail"),
-                {'correct': False, 'score': 0, 'feedback': fb})
+        with fake_remote_grader('{"score":1, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", "should_succeed")
+            self.assertEqual(g, {'correct': True, 'score': 1, 'feedback': fb})
 
-        self.restore_urllib2()
+        with fake_remote_grader('{"score":0, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", "should_fail")
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
 
     def test_interactive_grader_unicode(self):
@@ -816,12 +793,11 @@ class SimpleTest(TestCase):
         fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
         fbstr = json.dumps(fb)
 
-        self.fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
-        self.assertEqual(ag.grade("q1b", ascii_string),
-            {'correct': False, 'score': 0, 'feedback': fb})
+        with fake_remote_grader('{"score":0, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", ascii_string)
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
-        self.fake_remote_grader('{"score":0, "feedback":%s}' %fbstr)
-        self.assertEqual(ag.grade("q1b", unicode_string),
-            {'correct': False, 'score': 0, 'feedback': fb})
+        with fake_remote_grader('{"score":0, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", unicode_string)
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
-        self.restore_urllib2()
