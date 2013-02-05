@@ -253,6 +253,7 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'column5':column5,
         'column6':column6,
         'row_color':row_color,
+        'username':username,
         'max_scores':max_scores,
         'rows':rows
         

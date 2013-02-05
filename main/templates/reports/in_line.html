@@ -32,7 +32,15 @@
     	}
     	document.forms.reportForm.submit();
     }
-    window.onload = function() {document.getElementById("report_name").value = "{{report_name}}";};
+    window.onload = function() {document.getElementById("report_name").value = "{{report_name}}";
+                                if ("{{ report_name }}" == 'student_scores') {
+                                    var filter = document.getElementById("filter");
+                                    filter.style.visibility="visible";
+                                    var username_label = document.getElementById("username_label");
+                                    username_label.style.visibility="visible";
+                                    filter.value = "{{username}}"
+                                } 
+    }
     
 </script>
 
