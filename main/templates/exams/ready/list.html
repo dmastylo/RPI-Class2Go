@@ -1,21 +1,22 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 
 {% block title %}
-{% if "exam" in reverse_show %}Exams{% endif %}
-{% if "problemset" in reverse_show %}Quizzes{% endif %}
-{% if "survey" in reverse_show %}Surveys{% endif %}
-{% if "interactive_exercise" in reverse_show %}Interactive Exercises{% endif %}
+{% if "exam" in reverse_show %}{% trans 'Exams' %}{% endif %}
+{% if "problemset" in reverse_show %}{% trans 'Quizzes' %}{% endif %}
+{% if "survey" in reverse_show %}{% trans 'Surveys' %}{% endif %}
+{% if "interactive_exercise" in reverse_show %}{% trans 'Interactive Exercises' %}{% endif %}
  | {{common_page_data.course.title}}
 {% endblock title %}
 
 
 {% block course_page_title %}
-{% if "exam" in reverse_show %}Exams{% endif %}
-{% if "problemset" in reverse_show %}Quizzes{% endif %}
-{% if "survey" in reverse_show %}Surveys{% endif %}
-{% if "interactive_exercise" in reverse_show %}Interactive Exercises{% endif %}
+{% if "exam" in reverse_show %}{% trans 'Exams' %}{% endif %}
+{% if "problemset" in reverse_show %}{% trans 'Quizzes' %}{% endif %}
+{% if "survey" in reverse_show %}{% trans 'Surveys' %}{% endif %}
+{% if "interactive_exercise" in reverse_show %}{% trans 'Interactive Exercises' %}{% endif %}
  (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
 {% endblock course_page_title %}
 
@@ -43,10 +44,10 @@
         {% for section_structure in section_structures %}
             {% include "content_sections/ready/section.html" %}
         {% empty %}
-            <p style='margin: 20px;'>No content to display.</p>
+            <p style='margin: 20px;'>{% trans 'No content to display.' %}</p>
         {% endfor %}
     {% else %}
-        <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to see course materials.</h4>
+        <h4>{% trans 'Please <a data-toggle="modal" href="#login-modal">log in</a> to see course materials.' %}</h4>
     {% endif %}
 </div>
 {% endblock m_column_content %}

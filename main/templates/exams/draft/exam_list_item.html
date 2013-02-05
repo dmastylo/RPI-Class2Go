@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <table style="width:100%">
     <tr id="exam_{{item.exam.id}}">
         <td width="20" align="middle"><input type="checkbox" name="exam_{{item.exam.id}}" id="exam_{{item.exam.id}}" class="item_selector section_{{item.exam.section.id}}_item_selector" /></td>
@@ -7,11 +9,11 @@
     <td width="240">
         {% if item.exam.is_synced %}
             <div style="color: #00A000; padding: 0px;">
-                <em class="icon-ok" style="font-size:17px"></em> Draft=Ready
+                <em class="icon-ok" style="font-size:17px"></em> {% trans 'Draft=Ready' %}
             </div>
             {% else %}
             <div style="color: #A07000; padding: 0px;">
-                <em class="icon-random" style="font-size:17px"></em> Draft Different From Ready
+                <em class="icon-random" style="font-size:17px"></em> {% trans 'Draft Different From Ready' %}
             </div>
         {% endif %}
     </td>
@@ -19,7 +21,7 @@
         {% autoescape off %}{{ item.visible_status }}{% endautoescape %}
     </td>
 	<td width="60">
-        <a href="{% url 'courses.exams.views.edit_exam' common_page_data.course_prefix common_page_data.course_suffix item.exam.slug %}">Edit</a>
+        <a href="{% url 'courses.exams.views.edit_exam' common_page_data.course_prefix common_page_data.course_suffix item.exam.slug %}">{% trans 'Edit' %}</a>
 	</td>
 	<td width="140">
 	</td>
