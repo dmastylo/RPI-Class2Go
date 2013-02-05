@@ -2170,8 +2170,16 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         if self.assessment_type != self.image.assessment_type:
             return False
-
         return True
+
+    def delete(self):
+        """Do housekeeping on related Videos before calling up."""
+        my_videos = self.video_set.all()
+        for vid in my_videos:
+            if vid.exam_id == self.id:
+                vid.exam = None
+                vid.save()
+        super(Exam, self).delete()
     
     def safe_exam_type(self):
         if self.exam_type not in [li[0] for li in self.EXAM_TYPE_CHOICES]:
