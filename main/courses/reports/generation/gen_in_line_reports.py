@@ -1,9 +1,11 @@
 from c2g.models import Exam, ExamScore
+from c2g.readonly import use_readonly_database
 from django.db.models import Count, Q
 from datetime import datetime
 from courses.reports.generation.get_quiz_data import get_student_scores
 from courses.reports.generation.gen_quiz_summary_report import construct_scores_dict
 
+@use_readonly_database
 def gen_spec_in_line_report(report_name, course, username):
 
     if report_name == 'quizzes_summary': 
