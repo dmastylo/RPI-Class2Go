@@ -14,7 +14,6 @@ import copy
 import urllib2, urlparse
 from xml.dom.minidom import parseString
 import markdown
-from random import randint
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
@@ -596,7 +595,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     assessment_type = request.POST.get('assessment_type','')
     section=request.POST.get('section','')
     invideo_val=request.POST.get('invideo','')
-    
+
     if invideo_val and invideo_val == "true":
         invideo = True
     else:
