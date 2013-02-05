@@ -340,7 +340,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
                 var sel = $('#staging-area div[data-report="' + c2gXMLParse.slugify(parts[0].trim()) + '"]');
                 if (sel.length && time != "") {
                     var qElem = $("<question />");
-                    qElem.attr("id", sel.attr("id"))
+                    qElem.attr("id", sel.eq(0).attr("id"))
                          .attr("time", time);
                     vElem.append(qElem);
                 }
@@ -376,7 +376,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
             if ($(this).is("h1") && $(this).text().trim().toUpperCase() != "VIDEO TIMES") {
                 //First create the display HTML
                 var myDiv = $('<div class="question"></div>');
-                var slug = c2gXMLParse.slugify($(this).text());
+                var slug = c2gXMLParse.slugify($(this).text().trim());
                 myDiv.attr("data-report",slug).attr("title", $(this).text());
                 var title = $('<h3 class="questionNumber"></h3>');
                 $(title).html($(this).html());
