@@ -748,9 +748,7 @@ class SimpleTest(TestCase):
 
 
     def test_interactive_grader_unicode(self):
-        """
-        Interactive autograder with fake remote endpoint (unicode)
-        """
+        """Interactive autograder with fake remote endpoint (unicode)"""
 
         ag = AutoGrader(self.interactive_xml)
 
@@ -769,9 +767,8 @@ class SimpleTest(TestCase):
             self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
 
-    def test_interactive_failure_modes(self):
-        """
-        Interactive autograder error handling tests
+    def test_interactive_bad_input(self):
+        """Interactive autograder error handling, bad input
 
         The interactive autograder needs to handle all sorts of
         cases where the remote grader fails.  The right behavior
@@ -781,20 +778,32 @@ class SimpleTest(TestCase):
 
         fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
         fbstr = json.dumps(fb)
-
         ag = AutoGrader(self.interactive_xml)
 
         with fake_remote_grader('Timed Out'):
-            with self.assertRaisesRegexp(AutoGraderGradingException,
-                    "Error parsing interactive grader result: Timed Out"):
+            with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
-
-        with fake_remote_grader_fails_n_times('{"score":0, "feedback":%s}' % fbstr, 1):
-            g = ag.grade("q1b", "should eventually score, incorrectly")
-            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
         with fake_remote_grader_garbage(""):
-            with self.assertRaisesRegexp(AutoGraderGradingException,
-                    "Error reading interactive grader results: Bad Connection"):
+            with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
 
+
+    def test_interactive_retries(self):
+        """Interactive autograder error handling, retry logic"""
+
+        fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
+        fbstr = json.dumps(fb)
+        ag = AutoGrader(self.interactive_xml)
+
+        for i in range(3):
+            # up to four attempts are allowed
+            fails_allowed = i+1
+            with fake_remote_grader_fails_n_times('{"score":0, "feedback":%s}' % fbstr, 
+                    fails_allowed):
+                g = ag.grade("q1b", "should eventually score, incorrectly")
+                self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
+
+        with fake_remote_grader_fails_n_times('{"score":0, "feedback":%s}' % fbstr, 4):
+            with self.assertRaises(AutoGraderGradingException):
+                g = ag.grade("q1b", "should eventually score, incorrectly")
