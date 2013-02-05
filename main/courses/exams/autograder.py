@@ -3,6 +3,7 @@ import urllib,urllib2
 import json
 import logging
 import random 
+import string
 from datetime import datetime
 import time
 
@@ -491,8 +492,9 @@ class AutoGrader():
                                 % (grader_name, str(duration)))
                         graded_result = grader_conn.read()
 
-                        if graded_result.lower() in watchwords:
-                            raise AutoGraderGradingException(graded_result)
+                        for w in watchwords:
+                            if string.find(graded_result.lower(), w, 0, 10) != -1:
+                                raise AutoGraderGradingException(graded_result)
                         graded = json.loads(graded_result)
 
                         return graded

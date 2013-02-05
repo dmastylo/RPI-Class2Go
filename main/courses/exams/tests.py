@@ -776,13 +776,20 @@ class SimpleTest(TestCase):
         give up instead of scoring a failure.
         """
 
-        fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
-        fbstr = json.dumps(fb)
         ag = AutoGrader(self.interactive_xml)
 
+        # this is on our watchword list
         with fake_remote_grader('Timed Out'):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
+
+        # a watchword used elsewhere should succeed though.  Let's say that "timeout"
+        # is a valid explanation for some reason.
+        fb = [{"user_answer": "timeout", "explanation": "Timed Out", "score": 1}]
+        fbstr = json.dumps(fb)
+        with fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' % fbstr):
+            g = ag.grade("q1b", "should succeed")
+            self.assertEqual(g, {'correct': True, 'score': 1, 'feedback': fb})
 
         with fake_remote_grader_garbage(""):
             with self.assertRaises(AutoGraderGradingException):
