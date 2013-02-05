@@ -73,34 +73,38 @@
               </tr>
           {% endfor %}
           {% for title in column1 %}
-                  <tr>
-                  <td>{{title.title}}</td>
-                  {% for key, val in column2.items %}
-                      {% ifequal key title.title %}
-                          <td>{{val}}</td>
-                      {% endifequal %}
-                  {% endfor %}
-                  {% for key, val in column3.items %}
-                      {% ifequal key title.title %}
-                          <td>{{val}}</td>
-                      {% endifequal %}
-                  {% endfor %}                  
-                  {% for key, val in column4.items %}
-                      {% ifequal key title.title %}
-                          <td>{{val}}</td>
-                      {% endifequal %}
-                  {% endfor %}
-                  {% for key, val in column5.items %}
-                      {% ifequal key title.title %}
-                          <td>{{val}}</td>
-                      {% endifequal %}
-                  {% endfor %}                  
-                  {% for key, val in column6.items %}
-                      {% ifequal key title.title %}
-                          <td>{{val}}</td>
-                      {% endifequal %}
-                  {% endfor %}        
-                  </tr>
+              {% for color_key, color_val in row_color.items %}
+                 {% ifequal color_key title.title %} 
+                      <tr style="color: {{ color_val }};">
+                 {% endifequal %}
+              {% endfor %}
+              <td>{{title.title}}</td>
+              {% for key, val in column2.items %}
+                  {% ifequal key title.title %}
+                      <td>{{val}}</td>
+                  {% endifequal %}
+              {% endfor %}
+              {% for key, val in column3.items %}
+                  {% ifequal key title.title %}
+                      <td>{{val}}</td>
+                  {% endifequal %}
+              {% endfor %}                  
+              {% for key, val in column4.items %}
+                  {% ifequal key title.title %}
+                      <td>{{val}}</td>
+                  {% endifequal %}
+              {% endfor %}
+              {% for key, val in column5.items %}
+                  {% ifequal key title.title %}
+                      <td>{{val}}</td>
+                  {% endifequal %}
+              {% endfor %}                  
+              {% for key, val in column6.items %}
+                  {% ifequal key title.title %}
+                      <td>{{val}}</td>
+                  {% endifequal %}
+              {% endfor %}        
+              </tr>
           {% endfor %}
           </table>        
           

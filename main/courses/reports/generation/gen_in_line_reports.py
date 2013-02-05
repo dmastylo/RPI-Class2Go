@@ -1,3 +1,4 @@
+from __future__ import division
 from c2g.models import Exam, ExamScore
 from django.db.models import Count, Q
 from datetime import datetime
@@ -15,6 +16,7 @@ def gen_spec_in_line_report(report_name, course, username):
         count_gt_67 = {}
         count_gt_34 = {}
         count_lt_34 = {}
+        row_color = {}
         
         headings = ['Quiz Title', '# Students <33%', '# Students >33%', '# Students >67%']
 
@@ -30,12 +32,38 @@ def gen_spec_in_line_report(report_name, course, username):
         for row in students_lt_34:
             count_lt_34[row['exam__title']] = row['num_students']            
         
+        for exam in exams:
+            total = 0
+            total_gt_67 = 0
+            if count_gt_34.get(exam['title'], False):
+                total = count_gt_34.get(exam['title'])
+            else:
+                count_gt_34[exam['title']] = 0
+                
+            if count_lt_34.get(exam['title'], False):
+                total += count_lt_34.get(exam['title'])
+            else:
+                count_lt_34[exam['title']] = 0
+                
+            if count_gt_67.get(exam['title'], False):
+                total_gt_67 = count_gt_67.get(exam['title'])
+            else:
+                count_gt_67[exam['title']] = 0                
+            
+            if total_gt_67 > 0 and (total_gt_67/total)*100 >=50:
+                row_color[exam['title']] = "green"
+            elif (total_gt_67 > 0) and ((total_gt_67/total)*100 >=40):
+                row_color[exam['title']] = "yellow"
+            else:
+                row_color[exam['title']] = "red"
+        
         report_results = {}        
         report_results['headings'] = headings
         report_results['exam_titles'] = exams
         report_results['count_gt_67'] = count_gt_67
         report_results['count_gt_34'] = count_gt_34
         report_results['count_lt_34'] = count_lt_34
+        report_results['row_color'] = row_color
         
         return report_results
     
