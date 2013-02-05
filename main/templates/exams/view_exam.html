@@ -890,6 +890,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var questionMD = $(examMD).find('question_metadata');
         $(questionMD).each(function(){displayQuestionExplanation(this);
                          displayChoiceExplanations(this);});
+        {% if exam.load_mathjax %}
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub,"exam-pane"]);
+        {% endif %}
+
 
     };
 

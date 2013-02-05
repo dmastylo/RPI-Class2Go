@@ -19,7 +19,6 @@ var c2gXMLParse = (function() {
         renderPreview: function() {
             $('#staging-area').empty();
             $('#staging-area').append(editor.getValue());
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
             var psetQuestions = $('#staging-area div.question');
             if (psetQuestions.length > 1) {
                 var qQumx = 1;
@@ -32,6 +31,8 @@ var c2gXMLParse = (function() {
             var questionMD = $(mDOM).find('question_metadata');
             $(questionMD).each(function(){displayQuestionExplanation(this);
                               displayChoiceExplanations(this, true);});
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
+
         },
                    
         addNumberToQuestionDiv: function(elem, num) {
