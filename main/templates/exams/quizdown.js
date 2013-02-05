@@ -200,7 +200,6 @@ c2gXMLParse.markdown2quiz = function (html_text) {
                  .attr('data-report', qslug);
         
         $(aElem).before(inputElem);
-        $(aElem).remove();
         
         //Now do the metadata
         var answertext = "";
@@ -214,6 +213,9 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         else {
             answertext = $(aElem).attr('title');
         }
+        
+        $(aElem).remove();  //Moved so that we remove aElem after all references to it
+
         console.log(answertext);
         var resp = $('<response answertype="' + inputTypes[type] + '"></response>');
         resp.attr('id', qname)
