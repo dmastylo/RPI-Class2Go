@@ -36,7 +36,7 @@ class fake_remote_grader(fake_remote_grader_abstract):
 
         ag = AutoGrader(xml)
         with fake_healthy_grader("all is well"):
-            ag.grade("question", "answer")
+            g = ag.grade("question", "answer")
     """
 
     def fake_response(self, req):
@@ -44,5 +44,46 @@ class fake_remote_grader(fake_remote_grader_abstract):
         if req.get_full_url() == grader_endpoint:
             resp = urllib2.addinfourl(StringIO(self.answer), "", req.get_full_url())
             resp.code = 200
-            resp.msg = ""
+            resp.msg = "OK"
             return resp
+
+
+
+class fake_remote_grader_fails_n_times(fake_remote_grader):
+    """
+    Fake remote grader that will fail N times before succeeding with 
+    answer provided.  Initialize it with the number of fails allowed.
+    Inherits from fake_remote_grader, instead of the abstract parent,
+    so it can use the child's happy-path responder.
+    """
+
+    def __init__(self, answer, fails_allowed):
+        self.failcount = 0
+        self.fails_allowed = fails_allowed
+        super(fake_remote_grader_fails_n_times, self).__init__(answer)
+
+    def fake_response(self, req):
+        grader_endpoint = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
+        if req.get_full_url() == grader_endpoint:
+            if self.failcount >= self.fails_allowed:
+                resp = super(fake_remote_grader_fails_n_times, self).fake_response(req)
+                return resp
+            else:
+                self.failcount += 1
+                resp = urllib2.addinfourl(StringIO(""), "", req.get_full_url())
+                resp.code = 500
+                resp.msg = "Server Error"
+                return resp
+
+
+class fake_remote_grader_garbage(fake_remote_grader_abstract):
+    """
+    Fake grader that will return connection junk that shouldn't be parsable
+    as a HTTP response.
+    """
+
+    def fake_response(self, req):
+        grader_endpoint = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
+        if req.get_full_url() == grader_endpoint:
+            return "garbage_response"
+

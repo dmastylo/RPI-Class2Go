@@ -768,3 +768,33 @@ class SimpleTest(TestCase):
             g = ag.grade("q1b", unicode_string)
             self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
+
+    def test_interactive_failure_modes(self):
+        """
+        Interactive autograder error handling tests
+
+        The interactive autograder needs to handle all sorts of
+        cases where the remote grader fails.  The right behavior
+        is to retry until it can get a valid grade, and if it can't,
+        give up instead of scoring a failure.
+        """
+
+        fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
+        fbstr = json.dumps(fb)
+
+        ag = AutoGrader(self.interactive_xml)
+
+        with fake_remote_grader('Timed Out'):
+            with self.assertRaisesRegexp(AutoGraderGradingException,
+                    "Error parsing interactive grader result: Timed Out"):
+                g = ag.grade("q1b", "should throw exception")
+
+        with fake_remote_grader_fails_n_times('{"score":0, "feedback":%s}' % fbstr, 1):
+            g = ag.grade("q1b", "should eventually score, incorrectly")
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
+
+        with fake_remote_grader_garbage(""):
+            with self.assertRaisesRegexp(AutoGraderGradingException,
+                    "Error reading interactive grader results: Bad Connection"):
+                g = ag.grade("q1b", "should throw exception")
+
