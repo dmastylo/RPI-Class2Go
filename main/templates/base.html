@@ -193,6 +193,9 @@
             if (m < 10) {
                 m = '0' + m;
             }
+            if (h > 12) {
+                h = h - 12;
+            }
             $('#PacTime .hours').text(h);
             $('#PacTime .minutes').text(m);
             $('#PacTime .ampm').text(ap);
