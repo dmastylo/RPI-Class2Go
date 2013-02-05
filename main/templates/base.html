@@ -170,55 +170,55 @@
     <script type="text/javascript">
         //alert(navigator.userAgent);
         
-        var hours = $('#PacTime .hours').html(); var minutes = $('#PacTime .minutes').html(); var ampm = $('#PacTime .ampm').html();
-        var changeHour = false;
-        var serverMinutes, serverHours;
-        
         var getServerTime = function() {
             $.ajax("{% url 'c2g.views.server_epoch' %}", {
                 cache:false,
                 success:function(data){
                     var serverDate = new Date(JSON.parse(data) * 1000);
-                    //alert(serverDate);
-                    serverMinutes = serverDate.getMinutes()*1;
-                    serverHours = serverDate.getHours()*1;
-                    minutes = formatMinutes(serverMinutes);
-                    hours = formatHours(serverHours);
+                    var serverMinutes = parseInt(serverDate.getMinutes());
+                    var serverHours = parseInt(serverDate.getHours());
                     if (serverHours >= 12) { ampm = "PM" } else { ampm = "AM" }
-                    //console.log(hours + ':' + minutes + ampm + '(Server)'); //----------------------------SERVER CONSOLE.LOG
-                    displayTime(hours, minutes, ampm);
-                }, error:function(data){
-                    changeTime(hours, minutes, ampm);
-                    //console.log(hours + ':' + minutes + ampm + '(jQuery)'); //----------------------------JQUERY ONSOLE.LOG
-                    displayTime(hours, minutes, ampm);
+                    displayTime(serverHours, serverMinutes, ampm);
+                }, 
+                error:function(data){
+                    var hours = parseInt($('#PacTime .hours').text()); 
+                    var minutes = parseInt($('#PacTime .minutes').text()); 
+                    var ampm = $('#PacTime .ampm').text();
+                    adjustLocalTime(hours, minutes, ampm);
                 }
             });
-        }
+        };
         
-        var changeTime = function(h, m, ap){
-            m++; formatMinutes(m);
-            if (changeHour) { h++; changeHour = false; }
-            formatHours(h, ap); minutes = m; hours = h;
-        }
-        
-        var formatMinutes = function(m){
-            if (m == 60 || m == 0) { m = "00"; changeHour = true; }
-            else if (m < 10) { m = '0' + m; }
-            return m;
-        }
-        
-        var formatHours = function(h, ap){
-            if ( h == 13 ) { h = 1; }
-            else if (h == 12 && ap == 'AM') { ampm = 'PM'; }
-            else if (h == 12 &&  ap == 'PM' ) { ampm = 'AM'; }
-            return h;
-        }
-        
-        var displayTime = function(h, m, ap){
-            $('#PacTime .minutes').html(m);
-            $('#PacTime .hours').html(h);
-            $('#PacTime .ampm').html(ap);
-        }
+        var displayTime = function(h, m, ap) {
+            if (m < 10) {
+                m = '0' + m;
+            }
+            $('#PacTime .hours').text(h)
+            $('#PacTime .minutes').text(m)
+            $('#PacTime .ampm').text(ap)
+        };
+
+        var adjustLocalTime = function(h, m, ap){
+            var localM, localH, localAP;
+
+            if (m >= 59) {
+                localM = 0;
+                localH = (h >= 12) ? 1 : (h + 1);
+                if (localH == 12 && ap.toUpperCase() == "AM") {
+                    localAP = "PM";
+                } else if (localH == 12 && ap.toUpperCase() == "PM") {
+                    localAP = "AM";
+                } else {
+                    localAP = ap;
+                } 
+            } else {
+                localM = m + 1;
+                localH = h;
+                localAP = ap;
+            }
+
+            displayTime(localH, localM, localAP);
+        };
         
         $(function(){
             getServerTime();
