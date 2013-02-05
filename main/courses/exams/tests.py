@@ -650,55 +650,7 @@ class SimpleTest(TestCase):
 
     ### INTERACTIVE AUTOGRADER ###
 
-    def test_interactive_grader_required_elements(self):
-        """Interactive grader requires some XML elements"""
-
-        valid_xml="""
-<exam_metadata>
-    <question_metadata id="q1" data-report="q1">
-        <solution></solution>
-        <response name="q1b" answertype="dbinteractiveresponse">
-            <grader_name>SQL_Grader_schroot</grader_name>
-            <database-file>sql-social-query2.db</database-file>
-            <answer-file>sql-social-query-ans2.txt</answer-file>
-            <select_dict></select_dict>
-            <parameters>
-                <qnum>1</qnum>
-                <answer-text>Enter your SQL query here</answer-text>
-            </parameters>
-        </response>
-    </question_metadata>
-</exam_metadata>"""
-
-        elements = ["database-file", "parameters", "select_dict", "answer-file"]
-        for elem in elements:
-            open_tag = "<" + elem + ">"
-            close_tag = "</" + elem + ">"
-            # re.S flag so the regexp can match newlines between elements
-            partial_xml = re.sub("%s.*%s" % (open_tag, close_tag), "", valid_xml, flags=re.S)
-            with self.assertRaisesRegexp(AutoGraderMetadataException,
-                    ".*A <%s> element is required" % elem):
-                AutoGrader(partial_xml)
-
-
-    # Helper Methods
-
-    def test_interactive_grader_basic(self):
-        """
-        Interactive autograder with fake remote endpoint (basic)
-
-        Uses some XML from a db class interactive exercise, but the actual values
-        aren't used since we just fake out the endpoint.
-
-        The trick here is overriding the global method that urllib2 uses to open
-        files.  You have to remember to restore urllib2 to a good state before 
-        finishing though otherwise urllib2 will be horked.  Method cribbed from:
-            http://stackoverflow.com/questions/2276689/how-do-i-unit-test-a-module-that-relies-on-urllib2
-
-        Work for this is done in fake_remote_grader.py
-        """
-
-        interactive_xml = """
+    interactive_xml = """
 <exam_metadata>
 
     <question_metadata id="q1" data-report="q1">
@@ -729,9 +681,40 @@ class SimpleTest(TestCase):
         </response>
     </question_metadata>
 
-</exam_metadata>"""
+</exam_metadata>
+"""
 
-        ag = AutoGrader(interactive_xml)
+    def test_interactive_grader_required_elements(self):
+        """Interactive grader requires some XML elements"""
+
+        elements = ["database-file", "parameters", "select_dict", "answer-file"]
+        for elem in elements:
+            open_tag = "<" + elem + ">"
+            close_tag = "</" + elem + ">"
+            # re.S flag so the regexp can match newlines between elements
+            partial_xml = re.sub("%s.*%s" % (open_tag, close_tag), 
+                    "", self.interactive_xml, flags=re.S)
+            with self.assertRaisesRegexp(AutoGraderMetadataException,
+                    ".*A <%s> element is required" % elem):
+                AutoGrader(partial_xml)
+
+
+    def test_interactive_grader_basic(self):
+        """
+        Interactive autograder with fake remote endpoint (basic)
+
+        Uses some XML from a db class interactive exercise, but the actual values
+        aren't used since we just fake out the endpoint.
+
+        The trick here is overriding the global method that urllib2 uses to open
+        files.  You have to remember to restore urllib2 to a good state before 
+        finishing though otherwise urllib2 will be horked.  Method cribbed from:
+            http://stackoverflow.com/questions/2276689/how-do-i-unit-test-a-module-that-relies-on-urllib2
+
+        Work for this is done in fake_remote_grader.py
+        """
+
+        ag = AutoGrader(self.interactive_xml)
 
         self.assertEqual(ag.points_possible, 2.0)
         self.assertEqual(len(ag.grader_functions), 2)
@@ -769,23 +752,7 @@ class SimpleTest(TestCase):
         Interactive autograder with fake remote endpoint (unicode)
         """
 
-        interactive_xml = """
-<exam_metadata>
-    <question_metadata id="q1" data-report="q1">
-        <solution></solution>
-        <response name="q1b" answertype="dbinteractiveresponse">
-            <grader_name>SQL_Grader_schroot</grader_name>
-            <database-file>sql-social-query2.db</database-file>
-            <answer-file>sql-social-query-ans2.txt</answer-file>
-            <select_dict></select_dict>
-            <parameters>
-                <qnum>1</qnum>
-                <answer-text>Enter your SQL query here</answer-text>
-            </parameters>
-        </response>
-    </question_metadata>
-</exam_metadata>"""
-        ag = AutoGrader(interactive_xml)
+        ag = AutoGrader(self.interactive_xml)
 
         ascii_string = "ascii test string"
         unicode_string = u'娱乐资讯请点击'    # "click infotainment" from china.com homepage
