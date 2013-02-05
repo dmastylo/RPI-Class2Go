@@ -198,11 +198,15 @@
             $('#PacTime .ampm').text(ap)
         };
 
+        // increments time passed in by 1 minute
         var adjustLocalTime = function(h, m, ap){
             var localM, localH, localAP;
 
+            // only major changes are when flipping over :59 to :00
             if (m >= 59) {
                 localM = 0;
+                // hours not displayed in 24 hour format, so no need to subtract 12;
+                // just handle 12:59 to 1:00, >= is for safety 
                 localH = (h >= 12) ? 1 : (h + 1);
                 if (localH == 12 && ap.toUpperCase() == "AM") {
                     localAP = "PM";
