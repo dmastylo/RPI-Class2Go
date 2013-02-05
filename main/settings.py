@@ -365,7 +365,7 @@ LOGGING = {
             'level':'INFO', #making this DEBUG will log _all_ SQL queries.
             'class':'logging.handlers.RotatingFileHandler',
             'formatter':'verbose',
-            'filename': LOGGING_DIR+APP+'-django.log',
+            'filename': LOGGING_DIR+'/'+APP+'-django.log',
             'maxBytes': 1024*1024*500,
             'backupCount': 3,
         },
@@ -433,7 +433,7 @@ if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
 #Otherwise, send email to a file in the logging directory
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = LOGGING_DIR + 'emails_sent.log'
+    EMAIL_FILE_PATH = LOGGING_DIR + '/emails_sent.log'
 
 #Max number of emails sent by each worker, defaults to 10
 #EMAILS_PER_WORKER = 10
