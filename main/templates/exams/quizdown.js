@@ -103,6 +103,10 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         var type;
         var choiceOrd = 0;        
         var qslug = c2gXMLParse.slugify($(list).prev("p").text());
+        //if qslug is unsatisfying, let's grab more text
+        if (qslug.length < 5) {
+            qslug = c2gXMLParse.slugify($(list).prev().text()) + '-' + qslug;
+        }
         
         //Do the display HTML
         if (choices.length <= 5) {
