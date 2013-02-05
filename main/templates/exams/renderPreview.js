@@ -28,6 +28,10 @@ var c2gXMLParse = (function() {
                     qQumx = qQumx + 1;}
                 );
             }
+            var mDOM=$.parseXML(metadata_editor.getValue());
+            var questionMD = $(mDOM).find('question_metadata');
+            $(questionMD).each(function(){displayQuestionExplanation(this);
+                              displayChoiceExplanations(this, true);});
         },
                    
         addNumberToQuestionDiv: function(elem, num) {
