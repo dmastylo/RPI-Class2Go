@@ -11,6 +11,7 @@ elementtree
 pysqlite
 djangorestframework
 PySimpleSOAP
+xhtml2pdf
 
 # celery dependencies
 django-celery
