@@ -13,7 +13,7 @@ from django.db.models import Sum, Max, F
 import copy
 import urllib2, urlparse
 from xml.dom.minidom import parseString
-
+import markdown
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
@@ -1232,3 +1232,14 @@ def student_save_progress(request, course_prefix, course_suffix, exam_slug):
     exam_rec.save()
     return HttpResponse("OK")
 
+
+@require_POST
+def parse_markdown(request):
+    """Using a python parser for markdown.  This seems like the most stable version thus
+       far.
+    """
+    md = markdown.Markdown(extensions = ['meta'], output_format = "html")
+    mkd = request.POST.get('markdown',"")
+    html = md.convert(mkd)
+    returnobj = {'html':html, 'meta':md.Meta}
+    return HttpResponse(json.dumps(returnobj))
