@@ -468,7 +468,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         autograder = AutoGrader("<null></null>", default_return=True) #create a null autograder that always returns the "True" object
     elif exam.autograde:
         try:
-            autograder = AutoGrader(exam.xml_metadata)
+            autograder = AutoGrader(exam.xml_metadata, default_return=True)
         except Exception as e: #Pass back all the exceptions so user can see
             return HttpResponseBadRequest(unicode(e))
 
@@ -520,6 +520,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                                  associated_text = v.get('associatedText', ""))
                     field_obj.save()
             except AutoGraderGradingException as e:
+                #TODO: need to handle v is a list case, otherwise gives 500
                 feedback[prob]={'correct':False, 'score':0}
                 field_obj = ExamRecordScoreField(parent=record_score,
                                  field_name = prob,

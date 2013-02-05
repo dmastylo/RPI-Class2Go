@@ -176,8 +176,10 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         if (wrapperElem.is("select") && numCorrect > 1) {
             wrapperElem.attr("multiple", "multiple");
         }
-        mDOM.find("question_metadata#"+qID).append(resp);
-
+        //Only if there is a correct answer, add response to question_metadata
+        if (numCorrect > 0) {
+            mDOM.find("question_metadata#"+qID).append(resp);
+        }
     };
     
     //Function to make <a> elements into inputs
@@ -186,6 +188,10 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         console.log(qID);
         var qname = "Q"+ qnum + "_SA" + ordinal;
         var qslug = c2gXMLParse.slugify($(aElem).closest("p").text());
+        //Handle textboxes on a line by themselves
+        if (qslug == $(aElem).text()) {
+            qslug = c2gXMLParse.slugify($(aElem).closest("p").prev("p").text()) + '-' + qslug;
+        }
         
         //Setup the display HTML
         var inputElem;
@@ -248,6 +254,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
             resp.append(param);
         }
         
+        //If answertext is blank, we treat it as a survey question that doesn't have a correct answer
         if (answertext != "") {
             mDOM.find("question_metadata#"+qID).append(resp);
         }
@@ -317,6 +324,11 @@ c2gXMLParse.markdown2quiz = function (html_text) {
                                  transform_a(this, qnum, ordinal, $(this).text().trim().toUpperCase());
                              }
                          });
+        
+        //Remove question meta if no parts of it are graded
+        if (q_meta.find('response').length == 0) {
+            q_meta.remove()
+        }
         
     };
     
