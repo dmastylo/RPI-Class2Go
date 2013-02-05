@@ -38,9 +38,8 @@ def gen_spec_in_line_report(report_name, course, username):
                 
             total = count_gt_34.setdefault(exam['title'], 0)
             total += count_lt_34.setdefault(exam['title'], 0)               
-            count_gt_67.setdefault(exam['title'], 0)
             
-            total_gt_67 = count_gt_67.get(exam['title'])
+            total_gt_67 = count_gt_67.setdefault(exam['title'], 0)
             
             if total_gt_67 > 0 and (total_gt_67/total)*100 >=50:
                 row_color[exam['title']] = "green"
