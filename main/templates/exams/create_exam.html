@@ -672,7 +672,8 @@ age: 20,
                        invideo:$('input#invideo_id')[0].checked,
                        metaXMLContent:metadata_editor.getValue(),
                        htmlContent:editor.getValue(),
-                       xmlImported:$('#xml-entry').val()
+                       xmlImported:$('#xml-entry').val(),
+                       quizdown:$('#quizdown-entry').val()
                },
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
                success: function(data,textStatus,jqXHR) {
@@ -717,7 +718,10 @@ age: 20,
       
     $('#wrap').click(toggleWrap);
     $('#wrap').click();
-      
+    
+    $('#exam_title').keyup(function() {
+        $('#exam_slug').val(c2gXMLParse.slugify($('#exam_title').val()));
+    });
       
     //$('#preview-btn').click(c2gXMLParse.renderPreview);
     $('#preview-tab').click(c2gXMLParse.renderPreview);
@@ -744,7 +748,9 @@ age: 20,
         metadata_editor.setValue(prepop.metadata);
         editor.setValue(prepop.htmlContent);
         $('#xml-entry').val(prepop.xmlImported);
+        $('#quizdown-entry').val(prepop.quizdown);
 
+        c2gXMLParse.renderPreview();
     }
 
       
