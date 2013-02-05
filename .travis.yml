@@ -1,0 +1,13 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+# command to install dependencies
+install:
+  - "pip install -r requirements.txt --use-mirrors"
+# command to run tests
+script: python main/manage.py test -v 2
+notifications:
+  irc:
+    channels: "irc.freenode.org#class2go-internal"
+    on_failure: change
