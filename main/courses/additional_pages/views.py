@@ -11,13 +11,12 @@ from courses.views import get_full_contentsection_list
 @auth_is_course_admin_view_wrapper
 def manage_nav_menu(request, course_prefix, course_suffix):
     try:
-        common_page_data = get_common_page_data(request, course_prefix, course_suffix)
-    except:
+        common_page_data = get_common_page_data(request, course_prefix, course_suffix, use_cache=False)
+    except e, msg:
+        # Remark to console exception characterization so we can make this clause more specific
+        print "Error in manage_nav_menu getting common_page_data, exception caught: %s" % msg
         raise Http404
         
-    if not common_page_data['is_course_admin']:
-        return redirect('courses.views.main', course_prefix, course_suffix)
-    
     return render_to_response('additional_pages/manage_nav_menu.html', {'common_page_data':common_page_data, 'mode':'nav_menu'}, context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper

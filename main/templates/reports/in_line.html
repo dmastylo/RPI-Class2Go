@@ -8,24 +8,70 @@
     <div class="container">  
     <div class="row">  
 
-      <form action="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+<script type="text/javascript">
+    function GetReportName() {
+        var report_name = document.getElementById("report_name").value;
+        var filter = document.getElementById("filter");
+        var username_label = document.getElementById("username_label");
+        if (report_name == "student_scores" && "{{ common_page_data.course.institution_only }}" == "False") {
+        	filter.style.visibility="visible";
+        	username_label.style.visibility="visible";
+        }else {
+        	filter.style.visibility="hidden";
+        	username_label.style.visibility="hidden";
+        }
+    }
+    function checkUsername(event) {
+    	var report_name = document.getElementById("report_name").value;
+    	var filter = document.getElementById("filter").value;
+		warning = document.getElementById("warning");
+		warning.style.visibility="hidden";    	
+    	if (report_name == "student_scores" && filter == "" && "{{ common_page_data.course.institution_only }}" == "False") {
+    		warning.style.visibility="visible";
+    		return false;
+    	}
+    	document.forms.reportForm.submit();
+    }
+    window.onload = function() {document.getElementById("report_name").value = "{{report_name}}";};
+    
+</script>
+
+      <form action="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST" id="reportForm">
          <label for="report" style='display: inline;'>Report</label>
-         <select name="report_name" style="margin-left: 10px;" style="margin-left: 10px;">             
+         <select name="report_name" id="report_name" onclick="GetReportName()" style="margin-left: 10px;" style="margin-left: 10px;">             
              <option value="quizzes_summary">quizzes summary</option>
+             <option value="student_scores">student scores</option>             
          </select>
-         <input type="submit" class='btn' value="Generate report" style="margin-left: 10px;" />
+         <input type="submit" id="generateReport" class='btn' value="Generate report" onclick="checkUsername(); return false;"  style="margin-left: 10px;" />
          <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+         <div id="optional_filter">
+             <label id="username_label" style='display: inline; visibility: hidden;'>Username</label>
+             <input type="text" id="filter" name="filter" style="visibility: hidden;" />
+             <label id="warning" style='display: inline; visibility: hidden;'>Warning: username cannot be left bank</label>
+         </div>
          {% csrf_token %}
       </form>
 
       {% if we_have_data %}
           {{ report_label }}
-          <table class="table table-striped" style="margin-left: 40px;width: 600px;">
+          <table class="table table-striped" style="margin-left: 40px;width: 600px;overflow: auto;">
           <tr>
           {% for heading in headings %}
               <td>{{heading}}</td>
           {% endfor %}
           </tr>
+          <tr>
+          {% for max_score in max_scores %}
+              <td>{{max_score}}</td>
+          {% endfor %}
+          </tr>
+          {% for row in rows %}
+              <tr>
+              {% for score in row %}
+                  <td>{{score}}</td>
+              {% endfor %}
+              </tr>
+          {% endfor %}
           {% for title in column1 %}
                   <tr>
                   <td>{{title.title}}</td>
