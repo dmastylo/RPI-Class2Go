@@ -710,10 +710,10 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
         super(Announcement, self).save(args, kwargs)
-    def delete(self, *args, **kwargs):
+    def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(Announcement, self).delete(args, kwargs)
+        super(Announcement, self).delete()
 
 class StudentSection(TimestampMixin, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
@@ -809,10 +809,10 @@ class UserProfile(TimestampMixin, models.Model):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
         super(UserProfile, self).save(args, kwargs)
-    def delete(self, *args, **kwargs):
+    def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(UserProfile, self).delete(args, kwargs)
+        super(UserProfile, self).delete()
 
     def __unicode__(self):
         return self.user.username
@@ -1330,10 +1330,10 @@ class VideoActivity(models.Model):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
         super(VideoActivity, self).save(args, kwargs)
-    def delete(self, *args, **kwargs):
+    def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(VideoActivity, self).delete(args, kwargs)
+        super(VideoActivity, self).delete()
 
         
 class VideoDownload(models.Model):
@@ -2293,10 +2293,10 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
         super(Exam, self).save(args, kwargs)
-    def delete(self, *args, **kwargs):
+    def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(Exam, self).delete(args, kwargs)
+        super(Exam, self).delete()
     
 def videos_in_exam_metadata(xml, times_for_video_slug=None):
     """
@@ -2368,10 +2368,10 @@ class ExamRecord(TimestampMixin, models.Model):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
         super(ExamRecord, self).save(args, kwargs)
-    def delete(self, *args, **kwargs):
+    def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(ExamRecord, self).delete(args, kwargs)
+        super(ExamRecord, self).delete()
 
 class Instructor(TimestampMixin, models.Model):
     name = models.TextField(blank=True)
@@ -2434,10 +2434,10 @@ class ExamScore(TimestampMixin, models.Model):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
         super(ExamScore, self).save(args, kwargs)
-    def delete(self, *args, **kwargs):
+    def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(ExamScore, self).delete(args, kwargs)
+        super(ExamScore, self).delete()
 
     def setScore(self):
         #Set score to max of ExamRecordScore.score for this exam, student
@@ -2484,10 +2484,10 @@ class ExamRecordScore(TimestampMixin, models.Model):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
         super(ExamRecordScore, self).save(args, kwargs)
-    def delete(self, *args, **kwargs):
+    def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(ExamRecordScore, self).delete(args, kwargs)
+        super(ExamRecordScore, self).delete()
 
 
 
