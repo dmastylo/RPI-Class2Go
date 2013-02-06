@@ -154,8 +154,8 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     #Code for timed exam
     timeopened = datetime.datetime.now()
 
-    editable = not exam.past_due()  #editable controls whether the inputs are enabled or disabled
-    allow_submit = not exam.past_due() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
+    editable = not exam.past_all_deadlines()  #editable controls whether the inputs are enabled or disabled
+    allow_submit = not exam.past_all_deadlines() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
 
     if exam.timed:
         startobj, created = StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
@@ -231,7 +231,7 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
 
 
     #Code for timed exams
-    allow_submit = not exam.past_due() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
+    allow_submit = not exam.past_all_deadlines() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
         
     timeopened = datetime.datetime.now()
     
