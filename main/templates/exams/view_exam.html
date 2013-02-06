@@ -734,16 +734,12 @@
             });
 
             saveXHR.success(function(status, msg, xhr) { 
+                    $(saveWorkBtn).removeAttr('disabled'); /* allow saving again on dialog close */
                     var dialogDiv = window.getDialog(msg.toUpperCase());
                     $(dialogDiv).find('p').text("Your answers have been saved, but not submitted!");
 
                     $(dialogDiv).dialog({ modal: true,
-                                          buttons: {'Close': function() {
-                                                                         $(this).dialog("close");
-                                                                         /* allow saving again on dialog close */
-                                                                         $(saveWorkBtn).removeAttr('disabled');
-                                                                        }
-                                                   }
+                                          buttons: {'Close': function() { $(this).dialog("close"); } }
                                         });
             });
             
