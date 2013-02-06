@@ -144,6 +144,12 @@ But if you want to do it with:
     You can tell this because is puts an environment indicator at
     the beginning of your prompt.
 
+Install all the dependencies with this command::
+
+    pip install -r requirements.txt
+
+Or if you want to install them manually, you can do so using the following.
+
 1. Install django itself (this will be inside the virtualenv)
 
         pip install django
