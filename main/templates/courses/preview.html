@@ -78,7 +78,7 @@
        {% if login_form.errors %}
        <div class="alert alert-error">
          <button class="close" data-dismiss="alert">×</button>
-         {% trans 'Uh-oh.  We couldn&apos;t find username and password you entered.  Try again?' %}
+         {% blocktrans %}Uh-oh.  We couldn't find username and password you entered.{% endblocktrans %}
        </div>
        {% endif %}
        <div class="well preview-registration">
@@ -125,8 +125,7 @@
               <div class="form-actions">
                   <p>
                   {% url 'c2g.views.tos' as tos_url %}
-                  {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}&apos;s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, 
-                  <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
+                  {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}'s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
                   </p>
                   <input type="submit" value="{% trans 'Register' %}" class="btn btn-primary btn-large" /> &nbsp; {% trans 'Already have an account?' %}  <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login"> {% trans 'Login instead' %}</a>
               </div>
