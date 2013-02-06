@@ -1,10 +1,11 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% block videos_link_class %}class="active"{% endblock videos_link_class %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
-    <h3>Edit video</h3>
+    <h3>{% trans 'Edit video' %}</h3>
       <form name="reset_form" style="display:none" action="{% url 'courses.videos.actions.reset_video' common_page_data.course_prefix common_page_data.course_suffix slug %}" method="POST">
         {% csrf_token %}
       </form>
@@ -14,7 +15,7 @@
         <fieldset class="well">
 
             <div class="pull-right">
-            <h3>Associated Problem Set/Survey</h3>
+            <h3>{% trans 'Associated Problem Set/Survey' %}</h3>
             <!-- <h4>video: {{video.exam_id}}</h4> -->
             <select name="exam_id" id="exam_id">
                 <option value="">--</option>
@@ -27,7 +28,7 @@
         {% for field in form %}
           <div class="fieldWrapper {% if field.errors %}errors{% endif %}">
 	    {% if field.name == "live_datetime" %}
-	      <label>Live Date
+	      <label>{% trans 'Live Date' %}
 	      {% if field.value %}
 	        <input type="checkbox" name="set_live_date" value="1" onchange="toggleLiveDate(this.checked)" checked />
 	      {% else %}
@@ -42,7 +43,7 @@
               {% endif %}
               {{ field }}
 	      {% if field.name == "slug" %}
-	      <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">Changing this also changes the ready version's slug, and will break external references if it is live.</div>
+	      <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">{% blocktrans %}Changing this also changes the ready version's slug, and will break external references if it is live.{% endblocktrans %}</div>
 	      {% endif %}
 	    {% endif %}
 	    {{ field.errors }}
@@ -50,10 +51,10 @@
         {% endfor %}
 	</fieldset>
 	<div class="form-actions">
-	  <input type="submit" name="action" value="Save and Set as Ready" class="btn btn-primary" />
-	  <input type="submit" name="action" value="Save as Draft" class="btn" />
-	  <input type="button" name="action" value="Reset to Ready" class="btn" onclick="document.forms.reset_form.submit()" />
-	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
+	  <input type="submit" name="action" value="{% trans 'Save and Set as Ready' %}" class="btn btn-primary" />
+	  <input type="submit" name="action" value="{% trans 'Save as Draft' %}" class="btn" />
+	  <input type="button" name="action" value="{% trans 'Reset to Ready' %}" class="btn" onclick="document.forms.reset_form.submit()" />
+	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">{% trans 'Cancel' %}</a>
 	</div>
       </form>
     {% else %} {# This is technically unreachable due to admin decorator, but doing this just to be complete #}
