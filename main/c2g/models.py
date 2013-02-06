@@ -709,7 +709,7 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(Announcement, self).save(args, kwargs)
+        super(Announcement, self).save(*args, **kwargs)
     def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
@@ -808,7 +808,7 @@ class UserProfile(TimestampMixin, models.Model):
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(UserProfile, self).save(args, kwargs)
+        super(UserProfile, self).save(*args, **kwargs)
     def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
@@ -1329,7 +1329,7 @@ class VideoActivity(models.Model):
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(VideoActivity, self).save(args, kwargs)
+        super(VideoActivity, self).save(*args, **kwargs)
     def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
@@ -2300,7 +2300,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(Exam, self).save(args, kwargs)
+        super(Exam, self).save(*args, **kwargs)
     def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
@@ -2375,7 +2375,7 @@ class ExamRecord(TimestampMixin, models.Model):
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(ExamRecord, self).save(args, kwargs)
+        super(ExamRecord, self).save(*args, **kwargs)
     def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
@@ -2441,7 +2441,7 @@ class ExamScore(TimestampMixin, models.Model):
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(ExamScore, self).save(args, kwargs)
+        super(ExamScore, self).save(*args, **kwargs)
     def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
@@ -2491,7 +2491,7 @@ class ExamRecordScore(TimestampMixin, models.Model):
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
-        super(ExamRecordScore, self).save(args, kwargs)
+        super(ExamRecordScore, self).save(*args, **kwargs)
     def delete(self):
         if get_database_considering_override() == 'readonly':
             raise DatabaseError
