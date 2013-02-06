@@ -3,7 +3,7 @@
 {% load url from future %}
 {% block course_info_link_class %} active{% endblock course_info_link_class %}
 
-{% block course_page_title %}Course Info Pages (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>){% endblock course_page_title %}
+{% block course_page_title %}{% trans 'Course Info Pages' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>){% endblock course_page_title %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">

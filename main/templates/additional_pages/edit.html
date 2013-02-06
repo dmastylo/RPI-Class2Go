@@ -107,7 +107,7 @@
             <div class="controls">
                 <input name="slug" id="id_slug" value="{{page.slug}}" type="text" />
             </div>
-	    <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">{% trans 'Changing this also changes the ready version&apos;s slug, and will break external references if it is live.' %}</div>
+	    <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">{% blocktrans %}Changing this also changes the ready version's slug, and will break external references if it is live.{% endblocktrans %}</div>
         </div>
         {% else %}
             <input type='hidden' name='slug' value='overview' />

@@ -111,7 +111,7 @@
           <div class="alert alert-error">
             <button class="close" data-dismiss="alert">×</button>
             {% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix as login_url%}
-            {% blocktrans %}Someone with the email address you entered already has an account.  Perhaps you&apos;d like to <a class="btn" href="{{login_url}}?login">Login</a> instead?{% endblocktrans %}
+            {% blocktrans %}Someone with the email address you entered already has an account.  Perhaps you'd like to <a class="btn" href="{{login_url}}?login">Login</a> instead?{% endblocktrans %}
           </div>
           {% endif %}
       {% endfor %}

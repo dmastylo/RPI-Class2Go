@@ -4,7 +4,7 @@
 {% block course_info_link_class %} active{% endblock course_info_link_class %}
 
 {% block course_page_title %}
-    Add New Static Page 
+    {% trans 'Add New Static Page' %} 
     (<a href="{% url 'courses.views.main' 
                      common_page_data.course_prefix 
                      common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>)
