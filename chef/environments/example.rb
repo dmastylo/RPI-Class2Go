@@ -10,16 +10,26 @@ default_attributes \
         # AWS GLOBAL
         "access_key" => "aaaaaaaaaaaaaaaaaaaa",
         "access_secret" => "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-        # RDS
+
+        # RDS - Main Database
         "database_host" => "env.cccccccccccc.us-west-2.rds.amazonaws.com",
         "database_instance" => "class2go",
         "database_user" => "xxxxxxxxxxxx",
         "database_password" => "dddddddddd",
-        # S3
-        "storage_bucket" => "stage-c2g",
-        "secure_bucket" => "stage-c2g",
-        "release_bucket" => "qqqqqqqqqqqqqqqq",
-        # SES
+
+        # RDS - Readonly Database Instance
+        # These entries are optional, reporting will use this if provided
+        "readonly_database_host" => "env.cccccccccccc.us-west-2.rds.amazonaws.com",
+        "readonly_database_instance" => "class2go",
+        "readonly_database_user" => "xxxxxxxxxxxx",
+        "readonly_database_password" => "dddddddddd",
+
+        # S3 - Storage Buckets
+        "storage_bucket" => "stage-c2g",         # class assets
+        "secure_bucket" => "stage-c2g",          # reports
+        "release_bucket" => "qqqqqqqqqqqqqqqq",  # private info
+
+        # SES - Bulk Email Service
         "smtp_user" => "eeeeeeeeeeeeeeeeeeee",
         "smtp_password" => "ffffffffffffffffffffffffffffffffffffffffffff"
     },

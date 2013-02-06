@@ -2,7 +2,9 @@ from c2g.models import *
 from datetime import datetime
 from courses.reports.generation.C2GReportWriter import *
 from courses.reports.generation.get_quiz_data import *
+from c2g.readonly import use_readonly_database
 
+@use_readonly_database
 def gen_quiz_full_report(ready_course, ready_quiz, save_to_s3=False):
 
     ### 1- Create the S3 file name and report writer object
@@ -116,6 +118,7 @@ def has_activity(per_student_data):
             
     return False
 
+@use_readonly_database
 def gen_assessment_full_report(ready_course, ready_exam, save_to_s3=False):
 
     ### 1- Create the S3 file name and report writer object
