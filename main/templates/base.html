@@ -39,7 +39,10 @@
         <div id="global-header">
             <h1 class="stanford-logo">
             	{% if SITE_NAME_SHORT == 'Stanford' %}
-                <a href="http://www.stanford.edu">Stanford University</a>
+                <a href="http://www.stanford.edu">
+                    <img src="/static/graphics/core/header-stanford-logo.png" width="160" alt="Stanford University">
+                    Stanford University
+                </a>
                 {% else %}
                 <a href="http://www.uwa.edu.au">{{ SITE_NAME_LONG }}</a>
                 {% endif %}
