@@ -16,6 +16,7 @@ from optparse import make_option
 
 import kelvinator.tasks
 from c2g.models import Video
+from c2g.readonly import use_readonly_database
 
 class Command(BaseCommand):
     help = """    Audit videos to see what commands need to be run to fix them
@@ -41,6 +42,7 @@ class Command(BaseCommand):
     ) + BaseCommand.option_list
 
 
+    @use_readonly_database
     def handle(self, *args, **options):
 
         @total_ordering
@@ -77,7 +79,6 @@ class Command(BaseCommand):
 
             def fixup_params(self):
                 return "%s %s %s" % (self.prefix, self.suffix, self.slug)
-
 
         def searchDatabase(limitClass=None, limitTerm=None):
             """

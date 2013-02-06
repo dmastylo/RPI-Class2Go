@@ -1,6 +1,8 @@
 Class2Go 
 ========
 
+[![Build Status](https://travis-ci.org/Stanford-Online/class2go.png?branch=master)](https://travis-ci.org/Stanford-Online/class2go)
+
 Class2Go is Stanford's internal open-source platform for on-line
 education. A team of eight built the first version over the summer
 2012, and it is still under active development.  Class2Go launched

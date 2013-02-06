@@ -20,6 +20,7 @@ from django.db.models.signals import post_save
 from django.utils import encoding
 
 from c2g.util import is_storage_local, get_site_url
+from c2g.readonly import get_database_considering_override
 from kelvinator.tasks import sizes as video_resize_options 
 
 logger = logging.getLogger(__name__)
@@ -704,6 +705,16 @@ class Announcement(TimestampMixin, Stageable, Sortable, Deletable, models.Model)
     class Meta:
         db_table = u'c2g_announcements'
 
+    # Prevent writes to read-only database, fail is better than data loss
+    def save(self, *args, **kwargs):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(Announcement, self).save(*args, **kwargs)
+    def delete(self):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(Announcement, self).delete()
+
 class StudentSection(TimestampMixin, Deletable, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -793,6 +804,16 @@ class UserProfile(TimestampMixin, models.Model):
 
     certificates = models.ManyToManyField(CourseCertificate)
     
+    # Prevent writes to read-only database, fail is better than data loss
+    def save(self, *args, **kwargs):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(UserProfile, self).save(*args, **kwargs)
+    def delete(self):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(UserProfile, self).delete()
+
     def __unicode__(self):
         return self.user.username
 
@@ -1289,20 +1310,31 @@ class VideoViewTraces(TimestampMixin, models.Model):
         db_table = u'c2g_video_view_traces'
         
 class VideoActivity(models.Model):
-     student = models.ForeignKey(User)
-     course = models.ForeignKey(Course)
-     video = models.ForeignKey(Video)
-     start_seconds = models.IntegerField(default=0, blank=True)
-     max_end_seconds = models.IntegerField(default=0, blank=True)
-     #last_watched = models.DateTimeField(auto_now=True, auto_now_add=False)
+    student = models.ForeignKey(User)
+    course = models.ForeignKey(Course)
+    video = models.ForeignKey(Video)
+    start_seconds = models.IntegerField(default=0, blank=True)
+    max_end_seconds = models.IntegerField(default=0, blank=True)
+    #last_watched = models.DateTimeField(auto_now=True, auto_now_add=False)
 
-     def percent_done(self):
-         return float(self.start_seconds)*100/self.video.duration
+    def percent_done(self):
+        return float(self.start_seconds)*100/self.video.duration
 
-     def __unicode__(self):
-            return self.student.username
-     class Meta:
+    def __unicode__(self):
+        return self.student.username
+    class Meta:
         db_table = u'c2g_video_activity'
+
+    # Prevent writes to read-only database, fail is better than data loss
+    def save(self, *args, **kwargs):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(VideoActivity, self).save(*args, **kwargs)
+    def delete(self):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(VideoActivity, self).delete()
+
         
 class VideoDownload(models.Model):
     student = models.ForeignKey(User)
@@ -1906,6 +1938,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     html_content = models.TextField(blank=True)
     xml_metadata = models.TextField(null=True, blank=True)
     xml_imported = models.TextField(null=True, blank=True) ###This is the XML used to import the exam content.  We only store it to re-display it.
+    quizdown = models.TextField(null=True, blank=True) ### Stored only for redisplay
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
@@ -1978,6 +2011,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             mode='ready',
             image=self,
             due_date=self.due_date,
+            quizdown = self.quizdown,
             grace_period=self.grace_period,
             total_score=self.total_score,
             exam_type=self.exam_type,
@@ -2032,6 +2066,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.xml_metadata = self.xml_metadata
         if not clone_fields or 'xml_imported' in clone_fields:
             ready_instance.xml_imported = self.xml_imported
+        if not clone_fields or 'quizdown' in clone_fields:
+            ready_instance.quizdown = self.quizdown
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             ready_instance.partial_credit_deadline = self.partial_credit_deadline
         if not clone_fields or 'late_penalty' in clone_fields:
@@ -2089,6 +2125,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.xml_metadata = ready_instance.xml_metadata 
         if not clone_fields or 'xml_imported' in clone_fields:
             self.xml_imported = ready_instance.xml_imported
+        if not clone_fields or 'quizdown' in clone_fields:
+            self.quizdown = ready_instance.quizdown
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             self.partial_credit_deadline = ready_instance.partial_credit_deadline 
         if not clone_fields or 'late_penalty' in clone_fields:
@@ -2144,6 +2182,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         if self.xml_metadata != self.image.xml_metadata:
             return False
+        if self.quizdown != self.image.quizdown:
+            return False
         if self.xml_imported != self.image.xml_imported:
             return False
         if self.partial_credit_deadline != self.image.partial_credit_deadline:
@@ -2170,8 +2210,16 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         if self.assessment_type != self.image.assessment_type:
             return False
-
         return True
+
+    def delete(self):
+        """Do housekeeping on related Videos before calling up."""
+        my_videos = self.video_set.all()
+        for vid in my_videos:
+            if vid.exam_id == self.id:
+                vid.exam = None
+                vid.save()
+        super(Exam, self).delete()
     
     def safe_exam_type(self):
         if self.exam_type not in [li[0] for li in self.EXAM_TYPE_CHOICES]:
@@ -2248,6 +2296,16 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     def __unicode__(self):
         return self.title + " | Mode: " + self.mode
 
+    # Prevent writes to read-only database, fail is better than data loss
+    def save(self, *args, **kwargs):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(Exam, self).save(*args, **kwargs)
+    def delete(self):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(Exam, self).delete()
+    
 def videos_in_exam_metadata(xml, times_for_video_slug=None):
     """
         Refactored code that parses exam_metadata for video associations.
@@ -2312,7 +2370,17 @@ class ExamRecord(TimestampMixin, models.Model):
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
-    
+
+    # Prevent writes to read-only database, fail is better than data loss
+    def save(self, *args, **kwargs):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(ExamRecord, self).save(*args, **kwargs)
+    def delete(self):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(ExamRecord, self).delete()
+
 class Instructor(TimestampMixin, models.Model):
     name = models.TextField(blank=True)
     email = models.TextField(blank=True)
@@ -2369,6 +2437,16 @@ class ExamScore(TimestampMixin, models.Model):
     class Meta:
         unique_together = ("exam", "student")
         
+    # Prevent writes to read-only database, fail is better than data loss
+    def save(self, *args, **kwargs):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(ExamScore, self).save(*args, **kwargs)
+    def delete(self):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(ExamScore, self).delete()
+
     def setScore(self):
         #Set score to max of ExamRecordScore.score for this exam, student
         exam_records = ExamRecord.objects.values('student').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score'))
@@ -2408,6 +2486,17 @@ class ExamRecordScore(TimestampMixin, models.Model):
     
     def __unicode__(self):
         return (self.record.student.username + ":" + self.record.course.title + ":" + self.record.exam.title + ":" + str(self.raw_score))
+
+    # Prevent writes to read-only database, fail is better than data loss
+    def save(self, *args, **kwargs):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(ExamRecordScore, self).save(*args, **kwargs)
+    def delete(self):
+        if get_database_considering_override() == 'readonly':
+            raise DatabaseError
+        super(ExamRecordScore, self).delete()
+
 
 
 class ExamRecordScoreField(TimestampMixin, models.Model):
