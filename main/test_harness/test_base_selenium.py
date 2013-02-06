@@ -10,6 +10,7 @@ if ( environ.has_key('C2G_HEADLESS_TESTS') and
      environ['C2G_HEADLESS_TESTS'] ):
   from pyvirtualdisplay import Display
 
+@attr('slow')
 class SeleniumTestBase(LiveServerTestCase):
 
     @classmethod
