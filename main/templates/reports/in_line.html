@@ -32,22 +32,24 @@
     	}
     	document.forms.reportForm.submit();
     }
-    window.onload = function() {document.getElementById("report_name").value = "{{report_name}}";
+    $(window).load( function() {
                                 if ("{{ report_name }}" == 'student_scores') {
                                     var filter = document.getElementById("filter");
                                     filter.style.visibility="visible";
                                     var username_label = document.getElementById("username_label");
                                     username_label.style.visibility="visible";
                                     filter.value = "{{username}}"
-                                } 
-    }
+                                    document.getElementById("report_name").value = "{{report_name}}";
+                                }
+                                
+    });
     
 </script>
 
       <form action="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST" id="reportForm">
          <label for="report" style='display: inline;'>Report</label>
-         <select name="report_name" id="report_name" onclick="GetReportName()" style="margin-left: 10px;" style="margin-left: 10px;">             
-             <option value="quizzes_summary">quizzes summary</option>
+         <select name="report_name" id="report_name" onclick="GetReportName()" style="margin-left: 10px;" style="margin-left: 10px;"> 
+             <option value="quizzes_summary" selected="selected">quizzes summary</option>
              <option value="student_scores">student scores</option>             
          </select>
          <input type="submit" id="generateReport" class='btn' value="Generate report" onclick="checkUsername(); return false;"  style="margin-left: 10px;" />
