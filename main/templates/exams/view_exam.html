@@ -423,6 +423,7 @@
         var quickCheck = function () {
             if ($(this).hasClass('quick-check')) {
                 $(this).val('Checking...');
+                $(this).attr('disabled', 'disabled');           /* disallow while checking */
             }
 
             var checkBtnID = $(this).attr('id');
@@ -530,6 +531,7 @@
             var resetButtonText = function (buttonId) {
                 return function (xhr, status) {
                     $('#' + buttonId).val('Check Answer');
+                    $('#' + buttonId).removeAttr('disabled');   /* allow saving again on reset */
                 }
             }
 
@@ -632,8 +634,8 @@
         $('.quick-check').click(quickCheck);
 
         $('.toggle-explanation').click(toggleExplanation);
-        {% endif %}
-    {% endif %}
+        {% endif %} {# exam.invideo or exam.exam_type == "interactive_exercise" #}
+    {% endif %} {# single_question #}
 
     {% comment %}
     SUBMISSION_RETURN_URL tells us where to go after user is done with the exam 
