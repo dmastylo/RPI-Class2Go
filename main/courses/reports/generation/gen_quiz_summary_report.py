@@ -1,11 +1,14 @@
-from c2g.models import *
-from courses.reports.generation.C2GReportWriter import *
-from courses.reports.generation.get_quiz_data import *
 import math
 import json
 
+from c2g.models import *
+from courses.reports.generation.C2GReportWriter import *
+from courses.reports.generation.get_quiz_data import *
+from c2g.readonly import use_readonly_database
+
 mean = lambda k: sum(k)/len(k)
 
+@use_readonly_database
 def gen_course_quizzes_report(ready_course, save_to_s3=False):
     
     ### 1- Compose the report file name and instantiate the report writer object
@@ -40,6 +43,8 @@ def gen_course_quizzes_report(ready_course, save_to_s3=False):
     report_content = rw.writeout()
     return {'name': report_name, 'content': report_content, 'path': s3_filepath}
 
+
+@use_readonly_database
 def gen_quiz_summary_report(ready_course, ready_quiz, save_to_s3=False):
     
     ### 1- Create the S3 file name and report writer object
@@ -322,21 +327,7 @@ def WriteAssessmentStudentScoresReportContent(ready_course, rw, full=False):
     exams, student_scores = get_student_scores(ready_course)
     
     ### 2- Construct scores dictionary
-    # scores_dict is a dict of dicts. Each dict represents a row in the report for a
-    # username. All this block does is convert rows from the returned queryset into
-    # columns for the report.
-    # Each dict contains <exam title>:<score> key:value pairs.
-    scores_dict = {}
-    last_username = ""
-    for student_score in student_scores:
-        username = student_score['student__username']
-        if username != last_username:
-            scores_dict[username] = {}
-            scores_dict[username]['username'] = username
-            scores_dict[username]['name'] = student_score['student__first_name'] + " " + student_score['student__last_name']
-        
-        scores_dict[username][student_score['exam__title']] = student_score['score']
-        last_username = username
+    scores_dict = construct_scores_dict(student_scores)
     
     ### 3- Construct column title array and max_scores array and print them.
     titles = ["", "Title"]
@@ -363,3 +354,22 @@ def WriteAssessmentStudentScoresReportContent(ready_course, rw, full=False):
         row = []  
         
     rw.write([""])
+    
+def construct_scores_dict(student_scores):
+    # scores_dict is a dict of dicts. Each dict represents a row in the report for a
+    # username. All this block does is convert rows from the returned queryset into
+    # columns for the report.
+    # Each dict contains <exam title>:<score> key:value pairs.
+    scores_dict = {}
+    last_username = ""
+    for student_score in student_scores:
+        username = student_score['student__username']
+        if username != last_username:
+            scores_dict[username] = {}
+            scores_dict[username]['username'] = username
+            scores_dict[username]['name'] = student_score['student__first_name'] + " " + student_score['student__last_name']
+        
+        scores_dict[username][student_score['exam__title']] = student_score['score']
+        last_username = username
+        
+    return scores_dict

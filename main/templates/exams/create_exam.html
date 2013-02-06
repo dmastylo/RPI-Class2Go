@@ -53,7 +53,7 @@
     textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
     #preview-pane label {clear: both; display: block; min-width:200px;}
     #preview-pane label input {float: left; margin-right: 1em;}
-    #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 1em;}
+    #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 0em;}
     .problem {border:1px solid #999; border-radius: 5px; margin: 1em 0; padding: 1em;}
     .picker {position:relative; z-index:10;}
     h3 {clear:both;}
@@ -71,7 +71,15 @@
     div.question textarea { width:70%; height:100px; }
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
-
+    p {padding-bottom: 0px; }
+    fieldset {margin-bottom: 2em;}
+    select {margin-bottom: 2em; }
+    input[type="checkbox"] {margin-top: 3px;}
+    .explanation {background: #fff; border: 1px solid black; border-radius: 3px; clear: both; margin: 1em; padding: 1em;}
+    .explanation .toggle-expl {cursor: pointer;}
+    #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
+    #staging-area .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
+    #staging-area .inline-explanation.correct{color: #090;}
 
 </style>
 
@@ -88,6 +96,7 @@
     
     <div class="control-group">
         <input type="button" id="xml-entry-btn" class="btn" value="Import XML" title="Click to import XML" />
+        <input type="button" id="quizdown-entry-btn" class="btn" value="Import Quizdown" title="Click to import Quizdown" />
     </div>
 
     <div class="control-group">
@@ -195,6 +204,157 @@
     </div>
 
 </div>
+
+<div id="quizdown-form" title="Paste Your Quizdown">
+    <form>
+    <fieldset>
+        <label for="quizdown-entry" id="quizdown-import-label">Import your Quizdown here.  This will overwrite the HTML and XML Metadata editors.</label>
+        <textarea name="quizdown-entry" id="quizdown-entry" class="text ui-widget-content ui-corner-all">
+title:  Example assessment
+description:  This is an example assessment
+assessment-type: summative
+due-date: 12/29/2013 00:00
+grace-period: 12/29/2013 00:00
+hard-deadline: 12/29/2013 00:00
+late-penalty: 10
+num-subs-permitted: 9999
+resubmission-penalty: 10
+section: Test Videos
+invideo: true
+
+            
+This is the exam preamble.  You could put data common to all of the problems here.  I think that MathJax should survive the conversion
+            $$a + b = c$$.
+
+Arbitrary stuff here.
+
+Colors in the natural world
+======================
+![spectrum](http://www.giangrandi.ch/optics/spectrum/visible-a.jpg)
+
+Select the Color with the longest wavelength:
+            
+1. Blue
+2. Green
+3. Yellow
+4. Red
+5. Orange
+6. Purple
+            
+Answer
+-----
+1. Wrong.
+2. Wrong.
+3. Wrong.
+4. Correct.
+5. Wrong.
+6. Wrong.
+            
+
+On days without clouds, what *color* does the sky **most** resemble?
+
+1. Blue
+2. Red
+3. Purple
+4. Green
+
+Answer
+------
+1. Correct. This is the color of the sky.
+2. Wrong. Only dirt is red.
+3. Wrong. Sort of half-right.
+4. Wrong. Green Day?
+
+            
+####What color is snow?
+
+* Blue
+* White
+* Pink
+* Yellow
+
+Answer
+--------
+* Wrong.  There must have been a slurpee spilled.
+* Correct.  This is the color of snow.
+* Wrong.  Pink snow is good for unicorns.
+* Wrong.  Well.  Yellow snow is bad news.
+
+Explanation
+------
+Of the choices, Red has the longest wavelength.
+            
+Sunlight reaches Earth's atmosphere and is scattered in all directions by all the gases and particles in the air. Blue light is scattered in all directions by the tiny molecules of air in Earth's atmosphere. Blue is scattered more than other colors because it travels as shorter, smaller waves. This is why we see a blue sky most of the time.
+
+Snow is white because it reflects sunlight instead of absorbing a certain part of the spectrum, making it white.
+            
+            
+Testing your common sense
+=====================
+Please answer these common sense questions.  This might be useful to tell us that you’re not a robot.
+
+How many eyes do most people have? [Number][eyes]
+
+How many fingers do people have? [Number][fingers]
+
+Hamlet said: To be or not to [Text][hamlet].
+            
+A regex question on a new line.  Type some text that begins with 's':
+            
+[Regex][regexq]
+            
+Answer
+-------
+[eyes]: (2)
+[fingers]: (10 +- 2)
+[hamlet]: (be)
+[regexq]: (^s)
+            
+Explanation
+------
+2 is usually the case, unless you’re a pirate.
+
+10, unless you’re a polydactyl then it’s 12.  We don’t support asymmetrical tolerance, so 8 is okay too.  Besides, you might be a Simpson (not OJ).
+
+Hamlet is confused, to be.
+            
+Lots of words begin with 's'
+            
+Favorite Animal
+===============
+Which of these are amongst your favorite animals?
+            
+* Dog
+* Cat
+* Rat
+* Bat
+* Other
+            
+If other, please specify (An ungraded textarea causes the need for an answer section, unfortunately.  Make sure the [id] is in brackets in the answer section **and** followed by empty parens ()  ):
+
+[Textarea][surveyother]
+
+Answer
+------
+[surveyother]: ()
+            
+Video Times
+===========
+
+storages116
+------
+Colors in the natural world: 4.5 sec
+Testing your common sense: 10 sec
+
+secondtime
+------
+Colors in the natural world: 8 sec
+Testing your common sense: 15.6 sec
+        </textarea>
+    </fieldset>
+    </form>
+</div>
+
 
 <div id="dialog-form" title="Paste Your XML">
     <form>
@@ -417,6 +577,7 @@ age: 20,
         modal: true,
         close: function() {
             if (!__xml_saved)  $('#xml-entry').val(__saved_import_xml);
+            __xml_saved=false;
         },
         buttons: [{
                     text:"Import XML",
@@ -437,12 +598,45 @@ age: 20,
                         }
                   }],
     });
-                               
+    var __saved_quizdown="";
+    var __quizdown_saved=false;
+    
+    $( "#quizdown-form" ).dialog({
+        autoOpen: false,
+        height: 500,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__quizdown_saved)  $('#quizdown-entry').val(__saved_quizdown);
+            __quizdown_saved=false;
+        },
+        buttons: [{
+                    text:"Import",
+                    id:"import-quizdown-button",
+                    click: function() {
+                        __quizdown_saved=true;
+                        c2gXMLParse.parseQuizDown();
+                        $( this ).dialog( "close" );
+                    }
+                  },
+                  {
+                    text:"Cancel",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                    }
+                  }],
+        });
 
     $('#xml-entry-btn').click(function() {
         __saved_import_xml=$('#xml-entry').val();
         $( "#dialog-form" ).dialog( "open" );
     });
+    $('#quizdown-entry-btn').click(function() {
+        __saved_quizdown = $('#quizdown-entry').val();
+        $( "#quizdown-form" ).dialog( "open" );
+    });
+
+    
     $("#import-xml-button").before("<span class='warning' id='clobber-warning'>Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.</span>");
     $("#clobber-warning").hide();
     $("#import-xml-button").hover(function(){$("#clobber-warning").show();},
@@ -461,8 +655,11 @@ age: 20,
     metadata_editor.getSession().setUseWrapMode(true);
     
     var questionIdx = 0;
-      
+    
+    {% include "exams/displayExplanation.js" %}
     {% include "exams/renderPreview.js" %}
+    {% include "exams/quizdown.js" %}
+    
 
     $(function() {
         {% if edit_mode %}
@@ -500,7 +697,8 @@ age: 20,
                        invideo:$('input#invideo_id')[0].checked,
                        metaXMLContent:metadata_editor.getValue(),
                        htmlContent:editor.getValue(),
-                       xmlImported:$('#xml-entry').val()
+                       xmlImported:$('#xml-entry').val(),
+                       quizdown:$('#quizdown-entry').val()
                },
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
                success: function(data,textStatus,jqXHR) {
@@ -545,7 +743,10 @@ age: 20,
       
     $('#wrap').click(toggleWrap);
     $('#wrap').click();
-      
+    
+    $('#exam_title').keyup(function() {
+        $('#exam_slug').val(c2gXMLParse.slugify($('#exam_title').val()));
+    });
       
     //$('#preview-btn').click(c2gXMLParse.renderPreview);
     $('#preview-tab').click(c2gXMLParse.renderPreview);
@@ -572,7 +773,9 @@ age: 20,
         metadata_editor.setValue(prepop.metadata);
         editor.setValue(prepop.htmlContent);
         $('#xml-entry').val(prepop.xmlImported);
+        $('#quizdown-entry').val(prepop.quizdown);
 
+        c2gXMLParse.renderPreview();
     }
 
       

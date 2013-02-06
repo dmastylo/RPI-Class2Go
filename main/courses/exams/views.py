@@ -13,7 +13,7 @@ from django.db.models import Sum, Max, F
 import copy
 import urllib2, urlparse
 from xml.dom.minidom import parseString
-
+import markdown
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
@@ -468,7 +468,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         autograder = AutoGrader("<null></null>", default_return=True) #create a null autograder that always returns the "True" object
     elif exam.autograde:
         try:
-            autograder = AutoGrader(exam.xml_metadata)
+            autograder = AutoGrader(exam.xml_metadata, default_return=True)
         except Exception as e: #Pass back all the exceptions so user can see
             return HttpResponseBadRequest(unicode(e))
 
@@ -520,6 +520,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                                  associated_text = v.get('associatedText', ""))
                     field_obj.save()
             except AutoGraderGradingException as e:
+                #TODO: need to handle v is a list case, otherwise gives 500
                 feedback[prob]={'correct':False, 'score':0}
                 field_obj = ExamRecordScoreField(parent=record_score,
                                  field_name = prob,
@@ -578,12 +579,14 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     if course.mode == "ready":
         course = course.image
     
-    slug = request.POST.get('slug','')
+    old_slug = old_slug.strip()
+    slug = request.POST.get('slug','').strip()
     title = request.POST.get('title', '')
     description = request.POST.get('description', '')
     metaXMLContent = request.POST.get('metaXMLContent', '')
     htmlContent = request.POST.get('htmlContent', '')
     xmlImported = request.POST.get('xmlImported','')
+    quizdown = request.POST.get('quizdown','')
     due_date = request.POST.get('due_date', '')
     grace_period = request.POST.get('grace_period', '')
     partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
@@ -593,7 +596,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     assessment_type = request.POST.get('assessment_type','')
     section=request.POST.get('section','')
     invideo_val=request.POST.get('invideo','')
-    
+
     if invideo_val and invideo_val == "true":
         invideo = True
     else:
@@ -606,6 +609,12 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         validate_slug(slug)
     except ValidationError as ve:
         return HttpResponseBadRequest(unicode(ve))
+
+    ###now validate slug uniqueness ####
+    num_exams = Exam.objects.filter(course=course, slug=slug, is_deleted=False).count()
+    num_allowed = 1 if (old_slug and old_slug == slug) else 0
+    if num_exams > num_allowed:
+        return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
 
     if not title:
         return HttpResponseBadRequest("No Title value provided")
@@ -697,13 +706,11 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
 
     #create or edit the Exam
     if create_or_edit == "create":
-        if Exam.objects.filter(course=course, slug=slug, is_deleted=False).exists():
-            return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
         exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent,
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
                         grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
-                        xml_imported=xmlImported
+                        xml_imported=xmlImported, quizdown=quizdown
                         )
 
         exam_obj.save()
@@ -739,6 +746,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.html_content=htmlContent
             exam_obj.xml_metadata=metaXMLContent
             exam_obj.xml_imported=xmlImported
+            exam_obj.quizdown=quizdown
             exam_obj.due_date=dd
             exam_obj.total_score=total_score
             exam_obj.assessment_type=assessment_type
@@ -830,7 +838,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
-          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported}
+          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported, 'quizdown':exam.quizdown}
 
     groupable_exam = exam
     if exam.mode != 'ready':
@@ -1227,3 +1235,14 @@ def student_save_progress(request, course_prefix, course_suffix, exam_slug):
     exam_rec.save()
     return HttpResponse("OK")
 
+
+@require_POST
+def parse_markdown(request):
+    """Using a python parser for markdown.  This seems like the most stable version thus
+       far.
+    """
+    md = markdown.Markdown(extensions = ['meta'], output_format = "html")
+    mkd = request.POST.get('markdown',"")
+    html = md.convert(mkd)
+    returnobj = {'html':html, 'meta':md.Meta}
+    return HttpResponse(json.dumps(returnobj))

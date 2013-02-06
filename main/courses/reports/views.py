@@ -196,23 +196,31 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     if request.POST.get("report_name", False): 
         report_name = request.POST["report_name"]
     else:
-        report_name = ""
+        report_name = ''
     
+    if request.POST.get("filter", False):
+        username = request.POST["filter"]
+    else:
+        username = None
+        
     course = request.common_page_data['ready_course']
     
     report_label = None
     report_data = {}
     headings = {}
+    max_scores = {}
     column1 = {}
     column2 = {}
     column3 = {}
     column4 = {}
     column5 = {}
     column6 = {}
+    row_color = {}
+    rows = {}
     
     we_have_data = False
     if report_name == 'quizzes_summary':
-        report_data = gen_spec_in_line_report(report_name, course)
+        report_data = gen_spec_in_line_report(report_name, course, username)
         if report_data:
             report_label = "Quizzes Summary"
             headings = report_data['headings']
@@ -220,12 +228,23 @@ def generate_in_line_report(request, course_prefix, course_suffix):
             column2 = report_data['count_lt_34']
             column3 = report_data['count_gt_34']
             column4 = report_data['count_gt_67']
+            row_color = report_data['row_color']
             we_have_data = True
 
+    elif report_name == 'student_scores':
+        report_data = gen_spec_in_line_report(report_name, course, username)
+        if report_data:
+            report_label = "Student Scores"
+            headings = report_data['headings']
+            max_scores = report_data['max_scores']
+            rows = report_data['rows']
+            we_have_data = True
+    
     return render_to_response('reports/in_line.html', {
         'common_page_data':request.common_page_data,
         'we_have_data':we_have_data,
         'report_label':report_label,
+        'report_name':report_name,
         'headings':headings,
         'column1':column1,
         'column2':column2,
@@ -233,5 +252,10 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'column4':column4,
         'column5':column5,
         'column6':column6,
+        'row_color':row_color,
+        'username':username,
+        'max_scores':max_scores,
+        'rows':rows
+        
     }, context_instance=RequestContext(request))
     
