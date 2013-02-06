@@ -1938,6 +1938,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     html_content = models.TextField(blank=True)
     xml_metadata = models.TextField(null=True, blank=True)
     xml_imported = models.TextField(null=True, blank=True) ###This is the XML used to import the exam content.  We only store it to re-display it.
+    quizdown = models.TextField(null=True, blank=True) ### Stored only for redisplay
     slug = models.SlugField("URL Identifier", max_length=255, null=True)
     due_date = models.DateTimeField(null=True, blank=True)
     grace_period = models.DateTimeField(null=True, blank=True)
@@ -2010,6 +2011,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             mode='ready',
             image=self,
             due_date=self.due_date,
+            quizdown = self.quizdown,
             grace_period=self.grace_period,
             total_score=self.total_score,
             exam_type=self.exam_type,
@@ -2064,6 +2066,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.xml_metadata = self.xml_metadata
         if not clone_fields or 'xml_imported' in clone_fields:
             ready_instance.xml_imported = self.xml_imported
+        if not clone_fields or 'quizdown' in clone_fields:
+            ready_instance.quizdown = self.quizdown
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             ready_instance.partial_credit_deadline = self.partial_credit_deadline
         if not clone_fields or 'late_penalty' in clone_fields:
@@ -2121,6 +2125,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.xml_metadata = ready_instance.xml_metadata 
         if not clone_fields or 'xml_imported' in clone_fields:
             self.xml_imported = ready_instance.xml_imported
+        if not clone_fields or 'quizdown' in clone_fields:
+            self.quizdown = ready_instance.quizdown
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             self.partial_credit_deadline = ready_instance.partial_credit_deadline 
         if not clone_fields or 'late_penalty' in clone_fields:
@@ -2175,6 +2181,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.live_datetime != self.image.live_datetime:
             return False
         if self.xml_metadata != self.image.xml_metadata:
+            return False
+        if self.quizdown != self.image.quizdown:
             return False
         if self.xml_imported != self.image.xml_imported:
             return False
