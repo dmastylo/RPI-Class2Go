@@ -233,6 +233,32 @@
                 getServerTime();
             }, 60000);
         });
+        
+        /*******************************************************************************************
+	Make Footer Sticky
+	*/
+        function stickyFooter(){
+            var windowHeight = $(window).height(); //get current window height
+            var initContentHeight = $("#viewport").height() + 0; //get page content height
+            var contentHeight = initContentHeight;
+            var footerHeight = $("#global-footer").height() + parseInt($("#global-footer").css('paddingTop')) + parseInt($("#global-footer").css('paddingBottom')) + $(".class2go").height() + 0; //get footer height
+            var footerOffset = $('#global-footer').offset().top;
+            if ((footerOffset + footerHeight ) < windowHeight) {
+                contentHeight = initContentHeight + windowHeight - (footerOffset + footerHeight);
+                $("#viewport").height(contentHeight);
+            }
+            $(window).resize(function() {
+                windowHeight = $(window).height();
+                if ((footerOffset + footerHeight) < windowHeight) {
+                    contentHeight = initContentHeight + windowHeight - (footerOffset + footerHeight);
+                    $("#viewport").height(contentHeight);
+                } else {
+                    $("#viewport").height(initContentHeight);
+                }
+            });
+        }
+        stickyFooter();
+        
     </script>
     {% endblock bottom_scripts %}
     <script type="text/javascript">
