@@ -1,7 +1,7 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 
-{% with PREFIX=common_page_data.course_prefix SUFFIX=common_page_data.course_suffix TITLE=common_page_data.course.title %}
+{% with TITLE=common_page_data.course.title %}
 
 {% block title %}
     {% if "surveys" in request.path %}
@@ -18,13 +18,13 @@
 
 {% block course_page_title %}
     {% if "surveys" in request.path %}
-        Surveys (<a href="{% url 'courses.views.main' PREFIX SUFFIX %}">{{TITLE}}</a>)
+        Surveys (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% elif "exams" in request.path %}
-        Exams (<a href="{% url 'courses.views.main' PREFIX SUFFIX %}">{{TITLE}}</a>)
+        Exams (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% elif "problemsets" in request.path %}
-        Quizzes (<a href="{% url 'courses.views.main' PREFIX SUFFIX %}">{{TITLE}}</a>)
+        Quizzes (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% else %}
-        Interactive Exercises (<a href="{% url 'courses.views.main' PREFIX SUFFIX %}">{{TITLE}}</a>)
+        Interactive Exercises (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% endif %}
 {% endblock course_page_title %}
 
@@ -41,7 +41,7 @@
             {% if common_page_data.course_mode == "ready" and exam.past_due %}
                 <h4>{{exam.title}}</h4>
             {% else %}
-                <h4><a href="{% url exam.show_view PREFIX SUFFIX exam.slug %}">{{exam.title}}</a></h4>
+                <h4><a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
             {% endif %}
             <p>{{exam.description}}</p>
             
@@ -53,8 +53,8 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'courses.exams.views.view_submissions_to_grade' PREFIX SUFFIX exam.slug %}">Student Submissions</a></li>
-                        <li><a href="{% url 'courses.exams.views.view_csv_grades' PREFIX SUFFIX exam.slug %}">Student Grades</a></li>
+                        <li><a href="{% url 'courses.exams.views.view_submissions_to_grade' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">Student Submissions</a></li>
+                        <li><a href="{% url 'courses.exams.views.view_csv_grades' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">Student Grades</a></li>
                     </ul>
                 </div>
                 
@@ -67,7 +67,7 @@
                     <h3 id="ModalLabel{{exam.slug}}">Select a CSV File with Student Grades</h3>
                 </div>
                 <div class="modal-body">
-                    <form id="csv_upload{{exam.slug}}" enctype="multipart/form-data" method="POST" action="{% url 'courses.exams.views.post_csv_grades' PREFIX SUFFIX exam.slug%}">
+                    <form id="csv_upload{{exam.slug}}" enctype="multipart/form-data" method="POST" action="{% url 'courses.exams.views.post_csv_grades' common_page_data.course_prefix common_page_data.course_suffix exam.slug%}">
                         {% csrf_token %}
                         <input style="line-height:0px" id="fileinput" type="file" name="file" />
                     </form>
@@ -81,11 +81,11 @@
 
             {% endif %}
             {% if score %}
-            <b><a href="{% url exam.graded_view PREFIX SUFFIX exam.slug %}">Score: {{score}}/{{exam.total_score}} </a></b>
+            <b><a href="{% url exam.graded_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">Score: {{score}}/{{exam.total_score}} </a></b>
             &nbsp;
             {% endif %}
             {% if exam.exam_type == "exam" %}
-            <a href="{% url exam.my_submissions_view PREFIX SUFFIX exam.slug %}">
+            <a href="{% url exam.my_submissions_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">
             View Submissions</a>
             {% endif %}
             
@@ -109,4 +109,4 @@
 
 {% endblock m_column_content %}
 
-{% endwith %} {# PREFIX SUFFIX TITLE #}
+{% endwith %} {# TITLE #}
