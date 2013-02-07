@@ -971,4 +971,8 @@ width: auto;
   .navbar .nav li.dropdown.open .dropdown-toggle li a:hover {
     background:#e6e4db;
   }
+  
+  .profile-courses .course {
+    margin: 15px !important;
+  }
 }
