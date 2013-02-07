@@ -188,8 +188,8 @@
             {% if single_question %}
             {% comment %} Only for formative/one-question-at-a-time {% endcomment %}
             <div id="problemset-nav">
-                <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
-                <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
+                <button type="button" id="next-question" class="btn question-nav" value="Next Question" title="Next Question"><em class="icon-arrow-right"></em></button>
+                <button type="button" id="prev-question" class="btn question-nav" value="Previous Question" title="Previous Question"><em class="icon-arrow-left"></em></button>
             </div>
             {% endif %}
 
@@ -202,7 +202,7 @@
                 <input class="btn" id="survey-submit" type="submit" value="Submit" />
             {##% endif %}
             {% endcomment %}
-            <input class="btn" id="submit-button" type="submit" value="Submit Answers" />
+            <input class="btn btn-primary pull-right" id="submit-button" type="submit" value="Submit Answers" />
         </div>
 
 
@@ -697,7 +697,12 @@
         $(saveWorkBtn).text('Save Answers')
                       .addClass('btn')
                       .attr('id','saveWorkBtn');
-        $(saveWorkBtn).insertAfter($('#submit-button'));
+                   if ($('#prev-question').length == 0) {
+                       $(saveWorkBtn).insertAfter($('#submit-button'));               
+                   } else {
+                       $(saveWorkBtn).insertAfter($('#prev-question')); 
+                   }
+        
 
         $(saveWorkBtn).click(function () {
             $(saveWorkBtn).attr('disabled', 'disabled')         /* Disallow saving while saving */
