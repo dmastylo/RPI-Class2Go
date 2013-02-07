@@ -3,19 +3,27 @@
 <table style="width:100%">
     <tr id="file_{{item.file.id}}">
         <td width="20" align="middle"><input type="checkbox" name="file_{{item.file.id}}" id="file_{{item.file.id}}" class="item_selector section_{{item.file.section.id}}_item_selector" /></td>
-	<td><em class="icon-file" style="font-size:16px;opacity:.3;"></em> <h4 style="margin-top:10px;display:inline;"><a id="file_{{item.file.id}}_title" href="{{item.file.file.url}}">{{item.file.title}}<a></h4></td>
-	<td width="240">
-	</td>
-	<td width="70">
+        <td>
+            <em class="icon-file" style="font-size:16px;opacity:.3;"></em>
+            <h4 style="margin-top:10px;display:inline;">
+                <a id="file_{{item.file.id}}_title" href="{{item.file.file.url}}">{{item.file.title}}<a></h4>
+            {% if item.is_child %}
+                <span style="opacity:.6;">( <em class="icon-sitemap" style="font-size:16px;opacity:.3;"></em>child of {{item.parent.title}} )</span>
+            {% endif %}
+        </td>
+        <td width="240">
+            <!-- spacer -->
+        </td>
+        <td width="70">
             {% autoescape off %}{{ item.visible_status }}{% endautoescape %}
         </td>
-	<td width="60">
-        <a href="{% url 'courses.files.views.edit' common_page_data.course_prefix common_page_data.course_suffix item.file.id %}">{% trans 'Edit' %}</a>
-	</td>
-	<td width="140">
-	</td>
-	<td width="20">
-	    <a href="javascript:DeleteFile('{{item.file.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
-	</td>
+        <td width="60">
+            <a href="{% url 'courses.files.views.edit' common_page_data.course_prefix common_page_data.course_suffix item.file.id %}">{% trans 'Edit' %}</a>
+        </td>
+        <td width="140">
+        </td>
+        <td width="20">
+            <a href="javascript:DeleteFile('{{item.file.id}}')" style="float: right; font-size: 12pt; font-weight: bold; color: rgb(150,150,150);margin-right: 10px;">x</a>
+        </td>
     </tr>
 </table>

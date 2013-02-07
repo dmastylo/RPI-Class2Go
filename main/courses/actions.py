@@ -1,18 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.shortcuts import render, render_to_response, redirect
-from django.template import Context, loader
-from django.template import RequestContext
-from django.contrib.auth.models import User,Group
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import Group
 from courses.course_materials import get_course_materials
-from courses.common_page_data import get_common_page_data
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from courses.forms import *
 from c2g.models import *
-from random import randrange
 from datetime import datetime
 from os.path import basename
 import settings
