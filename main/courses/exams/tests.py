@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # per http://www.python.org/peps/pep-0263.html
 
+from nose.plugins.attrib import attr
 import random
 import re
 from sets import Set
@@ -11,6 +12,7 @@ from courses.exams.autograder import *
 from courses.exams.views import compute_penalties
 from fake_remote_grader import *
 
+@attr('slow')
 class SimpleTest(TestCase):
     def test_multiple_choice_factory_normal(self):
         """
