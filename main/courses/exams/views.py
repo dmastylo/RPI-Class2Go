@@ -1,6 +1,4 @@
 # Create your views here.
-import sys
-import traceback
 import json
 import operator
 import logging
@@ -8,11 +6,8 @@ import settings
 import datetime
 import csv
 import HTMLParser
-import json
-from django.db.models import Sum, Max, F
+from django.db.models import Max, F
 import copy
-import urllib2, urlparse
-from xml.dom.minidom import parseString
 import markdown
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
@@ -29,55 +24,43 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 from django.core.validators import validate_slug, ValidationError
-from django.core.exceptions import MultipleObjectsReturned
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 from django.views.decorators.http import require_POST
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.utils import encoding
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 from courses.course_materials import get_course_materials
-from django.views.decorators.csrf import csrf_protect
 from storages.backends.s3boto import S3BotoStorage
 
 
 @auth_view_wrapper
 def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
     
-    course = request.common_page_data['course']
-    if course.mode == "draft": #draft mode, lists grades
+    cpd    = request.common_page_data
+    course = cpd['course']
+
+    if course.mode == "draft":         # draft mode, lists grades
         exams = list(Exam.objects.filter(course=course, is_deleted=0, exam_type__in=show_types))
 
-        #if course.mode=="live":
-            #exams = filter(lambda item: item.is_live(), exams)
-        
         scores = []
-
         for e in exams:
-            if ExamScore.objects.filter(course=course, exam=e, student=request.user).exists():
-                scores.append(ExamScore.objects.filter(course=course, exam=e, student=request.user)[0].score)
-            else:
-                scores.append(None)
+            score = ExamScore.objects.filter(course=course, exam=e, student=request.user)
+            scores.append(score[0].score if score else None)
 
         return render_to_response('exams/list.html',
-                                  {'common_page_data':request.common_page_data,
-                                   'course':course,
+                                  {'common_page_data':cpd,
                                   'exams_and_scores':zip(exams,scores)},
                                   RequestContext(request))
-    else: #ready mode, uses section structures
-        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=False, get_exam_content=True, exam_types=show_types)
+
+    else:                              # ready mode, uses section structures
+        section_structures = get_course_materials(common_page_data=cpd, get_exam_content=True, exam_types=show_types)
+        ex_type = show_types[0] if show_types else "exam" 
         
-        form = None
-        
-        if show_types:
-            ex_type = show_types[0]
-        else:
-            ex_type = "exam"
-            
-        
-        
-        return render_to_response('exams/ready/list.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'reverse_show':ex_type+'_show', 'form':form, }, context_instance=RequestContext(request))
+        return render_to_response('exams/ready/list.html', 
+                                  {'common_page_data': cpd, 
+                                   'section_structures':section_structures, 
+                                   'reverse_show':ex_type+'_show', 
+                                  }, 
+                                  context_instance=RequestContext(request))
 
 
 @auth_view_wrapper
@@ -108,7 +91,6 @@ def confirm(request, course_prefix, course_suffix, exam_slug):
                               }, RequestContext(request))
 
 
-# Create your views here.
 @auth_view_wrapper
 def show_exam(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
@@ -185,7 +167,7 @@ def last_completed_record(exam, student, include_contentgroup=False):
     try:
         if include_contentgroup:
             cginfo = ContentGroup.groupinfo_by_id('exam',exam.id)
-            exam_list = cginfo.get('exam',[exam]) #default to a singleton list consisting of just this exam
+            exam_list = cginfo.get('exam',[exam]) # default to a 1-item list with only this exam
             record = ExamRecord.objects.filter(exam__in=exam_list, complete=True, student=student).latest('last_updated')
         else:
             record = ExamRecord.objects.filter(exam=exam, complete=True, student=student).latest('last_updated')
