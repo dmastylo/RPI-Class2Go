@@ -1,5 +1,8 @@
 /* Bootstrap overrides
 -------------------------------------------------- */
+body {
+    background-color: #f8f6ea;
+}
 
 h1,h2,h3,h4 {margin:0;}
 
@@ -38,7 +41,7 @@ a {color:#820000;}
 a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
 .well {border-color:#ddcf99;}
-.well.tight {padding:10px 0;background:#f8f6ea;}
+.well.tight {padding:10px 0;background:#f3efd8;}
 .well.tight .nav-list li {clear:left;}
 .well.tight .nav-list li a {
     padding:5px 15px;
@@ -148,6 +151,12 @@ a:hover [class^="icon-"] {
     color:#333;
     cursor: pointer;
 }
+.nav > li.active {
+    height: 34px;
+}
+.nav > li.active > a {
+    border-bottom: 1px solid #999;
+}
 
 .nav-list > .current > a,
 .nav-list > .current > a:hover {
@@ -173,6 +182,10 @@ a.thumbnail:hover {
 .navbar .btn-search {
     margin-left:-4px;
 }
+.navbar-inner {
+    min-height: 35px;
+    height: 35px;
+}
 .navbar-search {
     position:absolute;
     right:15px;
@@ -188,21 +201,31 @@ a.thumbnail:hover {
 .dropdown-submenu:hover > a {
   display: block;
   border-top:0;
-  background:#f8f6ea;
+  background:#e6e4db;
   color:#333;
 }
 .caret {
     opacity:.4;
 }
 .navbar .nav > li > a {
-    text-shadow:0 1px 0 #f0e7cb;
+    text-shadow: none !important;
 }
 .navbar .nav li.dropdown .dropdown-toggle .caret {
     border-top-color: #222;
     border-bottom-color: #222;
 }
 
-
+.navbar .nav li.dropdown.open > .dropdown-toggle,
+.navbar .nav li.dropdown.active > .dropdown-toggle,
+.navbar .nav li.dropdown.open.active > .dropdown-toggle {
+    background: #dddbd0 url('../../graphics/core/bg-nav-selected.png') repeat-x bottom center;
+    background: #dddbd0 none;
+    background: -webkit-gradient(linear, left top, left bottom, from(#c6c5bb), to(#f7f5e9)); /* Safari 4-5, Chrome 1-9 */
+    background: -webkit-linear-gradient(top, #c6c5bb, #f7f5e9); /* Safari 5.1, Chrome 10+ */
+    background: -moz-linear-gradient(top, #c6c5bb, #f7f5e9); /* Firefox 3.6+ */
+    background: -ms-linear-gradient(top, #c6c5bb, #f7f5e9); /* IE 10 */
+    background: -o-linear-gradient(top, #c6c5bb, #f7f5e9); /* Opera 11.10+ */
+}
 
 .navbar .nav li.dropdown.open a {
     color: white;
@@ -460,15 +483,15 @@ small.date {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    /*background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
-    background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e0d096), to(#cabb84));
-    background-image: -webkit-linear-gradient(top, #e0d096, #cabb84);
-    background-image: -o-linear-gradient(top, #e0d096, #cabb84);
-    background-image: linear-gradient(top, #e0d096, #cabb84);
-    background-repeat: repeat-x;
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);*/
-    background: #e0d096 url('../../graphics/core/bg-nav.png') repeat-x bottom center;
+
+    background: #c8bc8b url('../../graphics/core/bg-nav.png') repeat-x bottom center;
+    background: #c8bc8b none;
+    background: -webkit-gradient(linear, left top, left bottom, from(#dcce98), to(#b1a67a)); /* Safari 4-5, Chrome 1-9 */
+    background: -webkit-linear-gradient(top, #dcce98, #b1a67a); /* Safari 5.1, Chrome 10+ */
+    background: -moz-linear-gradient(top, #dcce98, #b1a67a); /* Firefox 3.6+ */
+    background: -ms-linear-gradient(top, #dcce98, #b1a67a); /* IE 10 */
+    background: -o-linear-gradient(top, #dcce98, #b1a67a); /* Opera 11.10+ */
+    
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
