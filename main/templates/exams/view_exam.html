@@ -296,11 +296,17 @@
                 var key = (name != undefined) ? name.trim() : "";
                 // keep track of number of inputs with same name
                 // for possible later use 
-                if (key != "" && uniqueFormElements[key] == undefined) {
-                    uniqueFormElements[key] = 1;
-                    totalUniqueFormEls += 1;
-                } else {
-                    uniqueFormElements[key] += 1;
+                if (key != "") {
+                    if (uniqueFormElements[key] == undefined) {
+                        if (this.tagName == "SELECT") {
+                            uniqueFormElements[key] = this.options.length;
+                        } else {
+                            uniqueFormElements[key] = 1;
+                        }
+                        totalUniqueFormEls += 1;
+                    } else {
+                        uniqueFormElements[key] += 1;
+                    }
                 }
                 if (($(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio')
                      && $(this).get(0).checked == true) {
@@ -327,6 +333,17 @@
                     tmpObj.report = $(this).attr('data-report');
                     tmpObj.questionreport = $(this).closest('.question').attr('data-report');
                     userSelections[key]=tmpObj;
+                } else if (this.tagName == "SELECT") {
+                    var questionreport = $(this).attr('data-report');
+                    userSelections[key] = [];
+                    $(this).find("option").filter(":selected").each(function () {
+                        var tmpObj = {};
+                        tmpObj.questionreport = questionreport;
+                        tmpObj.value = $(this).val();
+                        tmpObj.report = $(this).attr('data-report');
+                        tmpObj.associatedText = $(this).text().trim().substr(0,40);
+                        userSelections[key].push(tmpObj);
+                    });
                 }
             });
 
@@ -439,7 +456,7 @@
 
             var checkBtn = $(this);
             var getAllUserAnswers = function () {
-                var inputCollection = $(checkBtn).closest('.question').find('input,textarea');
+                var inputCollection = $(checkBtn).closest('.question').find('input,textarea,select');
                 var userAnswersObj = window.collectUserAnswers(inputCollection);
                 return userAnswersObj.userSelections;
             };
@@ -701,7 +718,7 @@
 
         $(saveWorkBtn).click(function () {
             $(saveWorkBtn).attr('disabled', 'disabled')         /* Disallow saving while saving */
-            var fieldCollection = $('#exam-pane').find('input,textarea');
+            var fieldCollection = $('#exam-pane').find('input,textarea,select');
             var userAnswerObj = window.collectUserAnswers(fieldCollection);
             var userSelections = userAnswerObj.userSelections; 
 
@@ -760,6 +777,7 @@
         //$('textarea').text('');
         $('input[type|="checkbox"]').removeAttr('checked');
         $('input[type|="radio"]').removeAttr('checked');
+	$('select').val('');
 
         // calling repopulateForm without an arg just wipes all data and returns 
         if (!jsonStr) {
@@ -771,7 +789,7 @@
 
         // iterate through named form inputs
         for (member in dataObj) {
-            
+
             if ($.type(dataObj[member]) == "object") {
                 // it's a text input/textarea
                 $('input[name|=' + member + ']').val(dataObj[member].value);
@@ -785,22 +803,28 @@
                 if (scores.hasOwnProperty(member)) {
                       //Label the closet div enclosing the choices with the score (probably want fieldset instead)
                       $('input[name|=' + member + ']').first().closest('fieldset').before("<b style='color:red'> " + scores[member]+" </b> ");
-                      $('option[name|=' + member + ']').first().closest('select').before("<b style='color:red'> " + scores[member]+" </b> ");
+                      $('select[name|=' + member + ']').before("<b style='color:red'> " + scores[member]+" </b> ");
                 }
                 // it's multiple choice, therefore an array
-                $('input[name|=' + member + ']').removeAttr('checked');
+		if ($('select[name|=' + member + ']').length) {
+		    var selectValues = $.map(dataObj[member], function(val, idex) {
+					   return val.value;
+		    });
+		    $('select[name|=' + member + ']').val(selectValues);
+		} else {
+                    $('input[name|=' + member + ']').removeAttr('checked');
                       
-                var selectedValues = $.map(dataObj[member], function(val, idex) {
-                                           return 'input[value="' + val.value + '"]';
-                                           });
+                    var selectedValues = $.map(dataObj[member], function(val, idex) {
+                                               return 'input[value="' + val.value + '"]';
+                                               });
                       
                       //check all inputs
-                var selector =  selectedValues.join(",");
-                      
+                    var selector =  selectedValues.join(",");
+
                       //console.log('input[name|=' + member + ']');
                       //console.log(selector);
-                $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
-
+                    $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
+		}
             } 
 
         }
@@ -810,6 +834,7 @@
             // disable all inputs
             $('#main-content input').attr('disabled','disabled');
             $('#main-content textarea').attr('disabled','disabled');
+	    $('#main-content select').attr('disabled', 'disabled');
 
             // hide submit button
             var submitBtn = $('#submit-button');
@@ -827,6 +852,7 @@
             $(reEnableBtn).click(function (ev) {
                 $('input').removeAttr('disabled');
                 $('textarea').removeAttr('disabled');
+		$('select').removeAttr('disabled');
                 submitBtn.show();
             });
         }
@@ -935,7 +961,7 @@
                       
     $('#submit-button').click(function () {
         $('#submit-button').attr('disabled','disabled');
-        var fieldCollection = $('#exam-pane').find('input,textarea');
+        var fieldCollection = $('#exam-pane').find('input,textarea,select');
         var userAnswerObj = window.collectUserAnswers(fieldCollection);
 
         if (__exam_type != "survey" && !userAnswerObj.answeredAll) {
