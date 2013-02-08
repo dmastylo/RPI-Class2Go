@@ -92,6 +92,20 @@ c2gXMLParse.markdown2quiz = function (html_text) {
     var mDOM = $(outer_mDOM).find("exam_metadata");
     
     /**** Declare local helper functions ****/
+
+    //Helper function to parse and remove point values from surrounding text
+    var parseOutPoints = function(text) {
+        var defaultPoints = {"found":false, "correct":"1", "wrong":"0", "text":text};
+        var regexnum = /\+(\d+\.?\d*)\s*\/\s*-(\d+\.?\d*)\s* points\.?/i
+        var match = regexnum.exec(text);
+        if (match != null && match.length == 3) {
+            defaultPoints.correct = match[1];
+            defaultPoints.wrong = match[2];
+            defaultPoints.found = true;
+            defaultPoints.text = text.replace(regexnum, "");
+        }
+        return defaultPoints;
+    }
     
     //Changes <ul>, <ol> into checkbox or radio or select
     var transform_lists = function (list, answerlist, qnum, ordinal) {
@@ -163,8 +177,16 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         resp.attr('name', qname).attr('data-report', qslug);
         var numCorrect = 0;
         $(answerlist).find("li").each(function(){
+            //Get potential points
+            var answerText = $(this).text();
+            var retobj = parseOutPoints(answerText);
+            if (retobj.found) {
+                answerText = retobj.text;
+                resp.attr("correct-points", retobj.correct);
+                resp.attr("wrong-points", retobj.wrong);
+            }
             var regex = /^(correct|right)\./i;
-            var correct = regex.test($(this).text());
+            var correct = regex.test(answerText);
             if (correct) numCorrect += 1;
             choiceOrd += 1;
             var choiceID = qname + "_" + choiceOrd;
@@ -172,7 +194,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
             choice.attr('value',choiceOrd)
                   .attr('data-report', wrapperElem.find("#"+choiceID).attr('data-report'))
                   .attr('correct', (correct)?'true':'false');
-            var explanation = $("<explanation>" + $(this).text() + "</explanation>");
+            var explanation = $("<explanation>" + answerText + "</explanation>");
             choice.append(explanation);
             resp.append(choice);            
         });
@@ -212,54 +234,62 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         $(aElem).before(inputElem);
         
         //Now do the metadata
-        var answertext = "";
+        var answerText = "";
         if ($(aElem).attr('title') == undefined) {
-            var regexMatch = /\(.*\)/.exec($(aElem).attr('href'));
+            var regexMatch = /\((.*)\)/.exec($(aElem).attr('href'));
             console.log(regexMatch);
             if (regexMatch) {
-                answertext = regexMatch[0].substr(1, regexMatch[0].length-2);
+                answerText = regexMatch[1];
             }
         }
         else {
-            answertext = $(aElem).attr('title');
+            answerText = $(aElem).attr('title');
         }
         
         $(aElem).remove();  //Moved so that we remove aElem after all references to it
 
-        console.log(answertext);
         var resp = $('<response answertype="' + inputTypes[type] + '"></response>');
         resp.attr('id', qname)
             .attr('name', qname)
             .attr('data-report', qslug);
+        
+        var retobj = parseOutPoints(answerText);
+        if (retobj.found) {
+            answerText = retobj.text;
+            resp.attr("correct-points", retobj.correct);
+            resp.attr("wrong-points", retobj.wrong);
+        }
+        console.log(answerText);
+
         if (type == "NUMBER") {
-            var tolI = answertext.indexOf("+-");
+            var tolI = answerText.indexOf("+-");
             if (tolI > -1) {
-                var answer = answertext.substr(0, tolI).trim();
+                var answer = answerText.substr(0, tolI).trim();
                 console.log(answer);
-                var tolString = answertext.substr(tolI+2, answertext.length).trim();
+                var tolString = answerText.substr(tolI+2, answerText.length).trim();
                 console.log(tolString);
                 var tolElem = $('<responseparam type="tolerance" default="' + tolString + '"></responseparam>');
                 resp.append(tolElem);
             }
             else {
-                var answer = answertext.trim();
+                var answer = answerText.trim();
             }
             resp.attr('answer',answer);
         }
         else if (type == "TEXT" || type == "TEXTAREA") {
-            var answer = answertext.trim();
+            var answer = answerText.trim();
             resp.attr('ignorecase','true')
                 .attr('answer',answer);
         }
         else if (type == "REGEX") {
-            var answer = answertext.trim();
+            var answer = answerText.trim();
             resp.attr('answer',answer);
             var param = $('<responseparam flag="IGNORECASE" />');
             resp.append(param);
         }
         
-        //If answertext is blank, we treat it as a survey question that doesn't have a correct answer
-        if (answertext != "") {
+        //If answerText is blank, we treat it as a survey question that doesn't have a correct answer
+        if (answerText != "") {
             mDOM.find("question_metadata#"+qID).append(resp);
         }
     };
@@ -319,7 +349,10 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         
         //radio / checkbox / select
         var ordinal=0;
-        q.find("ul, ol").each(function () {ordinal+=1; transform_lists(this, mc_answers.eq(ordinal-1), qnum, ordinal); });
+        q.find("ul, ol").each(function () {
+                                  ordinal+=1;
+                                  transform_lists(this, mc_answers.eq(ordinal-1), qnum, ordinal);
+                              });
         
         //Inputs
         q.find("a").each(function() {
@@ -367,6 +400,8 @@ c2gXMLParse.markdown2quiz = function (html_text) {
 
         });
     };
+    
+    
     /****  The actual actions performed by this function ******/
     $("#staging-area").empty();
     console.log(html_text);
