@@ -7,7 +7,7 @@ DATABASES = {
         'HOST': '<%= @node[:aws][:database_host] %>',
         'PORT': '',
     },
-<% if defined?(@node[:aws][:readonly_database_instance]) %>
+<% if @node[:aws].has_key?("readonly_database_instance") %>
     'readonly': {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': '<%= @node[:aws][:readonly_database_instance] %>',
