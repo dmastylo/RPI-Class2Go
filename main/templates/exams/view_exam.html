@@ -299,7 +299,7 @@
                 if (key != "") {
                     if (uniqueFormElements[key] == undefined) {
                         if (this.tagName == "SELECT") {
-                            uniqueFormElements[key] = this.options.length;
+                            uniqueFormElements[key] = $(this).find('option').length;
                         } else {
                             uniqueFormElements[key] = 1;
                         }
@@ -777,7 +777,7 @@
         //$('textarea').text('');
         $('input[type|="checkbox"]').removeAttr('checked');
         $('input[type|="radio"]').removeAttr('checked');
-	$('select').val('');
+        $('select').val('');
 
         // calling repopulateForm without an arg just wipes all data and returns 
         if (!jsonStr) {
@@ -800,18 +800,18 @@
                 };
                 
             } else {
+                // it's multiple choice/select, therefore an array
                 if (scores.hasOwnProperty(member)) {
                       //Label the closet div enclosing the choices with the score (probably want fieldset instead)
                       $('input[name|=' + member + ']').first().closest('fieldset').before("<b style='color:red'> " + scores[member]+" </b> ");
                       $('select[name|=' + member + ']').before("<b style='color:red'> " + scores[member]+" </b> ");
                 }
-                // it's multiple choice, therefore an array
-		if ($('select[name|=' + member + ']').length) {
-		    var selectValues = $.map(dataObj[member], function(val, idex) {
-					   return val.value;
-		    });
-		    $('select[name|=' + member + ']').val(selectValues);
-		} else {
+                if ($('select[name|=' + member + ']').length) {
+                    var selectValues = $.map(dataObj[member], function(val, idex) {
+                               return val.value;
+                    });
+                    $('select[name|=' + member + ']').val(selectValues);
+                } else {
                     $('input[name|=' + member + ']').removeAttr('checked');
                       
                     var selectedValues = $.map(dataObj[member], function(val, idex) {
@@ -824,9 +824,8 @@
                       //console.log('input[name|=' + member + ']');
                       //console.log(selector);
                     $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
-		}
-            } 
-
+                }
+            }
         }
 
         var enabled = ('{{editable}}' == 'True') ? true : false;
@@ -834,7 +833,7 @@
             // disable all inputs
             $('#main-content input').attr('disabled','disabled');
             $('#main-content textarea').attr('disabled','disabled');
-	    $('#main-content select').attr('disabled', 'disabled');
+            $('#main-content select').attr('disabled', 'disabled');
 
             // hide submit button
             var submitBtn = $('#submit-button');
@@ -852,7 +851,7 @@
             $(reEnableBtn).click(function (ev) {
                 $('input').removeAttr('disabled');
                 $('textarea').removeAttr('disabled');
-		$('select').removeAttr('disabled');
+                $('select').removeAttr('disabled');
                 submitBtn.show();
             });
         }
