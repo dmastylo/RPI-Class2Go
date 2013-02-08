@@ -100,7 +100,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         var match = regexnum.exec(text);
         if (match != null && match.length == 3) {
             defaultPoints.correct = match[1];
-            defaultPoints.wrong = match[2];
+            defaultPoints.wrong = "-"+match[2];
             defaultPoints.found = true;
             defaultPoints.text = text.replace(regexnum, "");
         }
