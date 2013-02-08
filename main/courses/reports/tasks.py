@@ -160,7 +160,7 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
             reports.append(report)
             logger.info("Assessment student scores report for course %s generated successfully for user %s." % (course_handle, username))            
             
-    send_emails = getattr(settings, EMAIL_NIGHTLY_REPORTS, False)
+    send_emails = getattr(settings, 'EMAIL_NIGHTLY_REPORTS', False)
     if send_emails:
         # Email Generated Reports
         staff_email = ready_course.contact
