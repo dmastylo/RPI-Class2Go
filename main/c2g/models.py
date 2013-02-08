@@ -138,7 +138,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
 
     def logo_dl_link(self):
 
-        if self.logo.name is None or not self.logo.storage.exists(self.logo.name):
+        if not self.logo.name or not self.logo.storage.exists(self.logo.name): 
             return settings.STATIC_URL + "graphics/core/class2go.png"
         
         url = self.logo.storage.url(self.logo.name)
