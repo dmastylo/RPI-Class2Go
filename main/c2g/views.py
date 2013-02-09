@@ -55,20 +55,16 @@ def server_epoch(request):
     return HttpResponse(int(time.time()))
 
 def hc(request):
-    site = getattr(settings, 'SITE_NAME_SHORT')
-    return render_to_response('sites/%s/honor_code.html' % site,{},RequestContext(request))
+    return render_to_response('honor_code.html',{},RequestContext(request))
 
 def tos(request):
-    site = getattr(settings, 'SITE_NAME_SHORT')
-    return render_to_response('sites/%s/TOS.html' % site,{},RequestContext(request))
+    return render_to_response('TOS.html',{},RequestContext(request))
 
 def privacy(request):
-    site = getattr(settings, 'SITE_NAME_SHORT')
-    return render_to_response('sites/%s/privacy.html' % site,{},RequestContext(request))
+    return render_to_response('privacy.html',{},RequestContext(request))
     
 def faq(request):
-    site = getattr(settings, 'SITE_NAME_SHORT')
-    return render_to_response('sites/%s/faq.html' % site,{},context_instance=RequestContext(request))
+    return render_to_response('faq.html',{},context_instance=RequestContext(request))
 
 def contactus(request):
     if request.GET.get('pre') and request.GET.get('post'):
@@ -83,8 +79,7 @@ def contactus(request):
         course=None
         staffmail=''
 
-    site = getattr(settings, 'SITE_NAME_SHORT')
-    return render_to_response('sites/%s/contactus.html' % site,
+    return render_to_response('contactus.html',
                               {'request': request,
                                'course': course,
                                'staffmail' : staffmail,

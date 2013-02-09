@@ -239,8 +239,9 @@ CACHES = {
 
 thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
-    thispath+'/templates',
-    thispath+'/templates/sites/'+SITE_NAME_SHORT
+    thispath+'/site_templates/'+SITE_NAME_SHORT,
+    thispath+'/templates'
+
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
