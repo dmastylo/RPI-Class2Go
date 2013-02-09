@@ -480,7 +480,7 @@ class AutoGrader():
                 grader_timeout = 45    # seconds
                 retry_limit = 4        # after this many attempts, don't retry
                 attempt = 1            # start counting at 1
-                watchwords = ['time out', 'timed out', 'timeout', 'error', 'fail', 'failure']
+                watchwords = ['', 'time out', 'timed out', 'timeout error', 'failure']
                 while attempt <= retry_limit:
                     try:
                         post_data = urllib.urlencode(post_params)
@@ -492,10 +492,13 @@ class AutoGrader():
                                 % (grader_name, str(duration)))
                         graded_result = grader_conn.read()
 
-                        for w in watchwords:
-                            if string.find(graded_result.lower(), w, 0, 10) != -1:
-                                raise AutoGraderGradingException(graded_result)
                         graded = json.loads(graded_result)
+
+                        for ww in watchwords:
+                            if 'feedback' in graded \
+                                    and 'explanation' in graded['feedback'][0] \
+                                    and graded['feedback'][0]['explanation'].lower() == ww:
+                                raise AutoGraderGradingException("Fail with \"%s\"" % ww)
 
                         return graded
 
