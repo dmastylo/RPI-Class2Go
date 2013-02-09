@@ -141,7 +141,7 @@ def generate_report(request):
         email_title = "[Class2Go] Assessment Student Scores Report for %s" % (course_handle_pretty)
         req_reports = [{'type': 'assessment_student_scores'}]    
     
-    generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
+    generate_and_email_reports(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
     return redirect(request.META.get('HTTP_REFERER', None))
 
@@ -203,9 +203,20 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     else:
         username = None
         
+    if request.POST.get("green_param", False):
+        green_param = request.POST["green_param"]
+    else:
+        green_param = 50
+        
+    if request.POST.get("orange_param", False):
+        orange_param = request.POST["orange_param"]
+    else:
+        orange_param = 40
+        
     course = request.common_page_data['ready_course']
     
     report_label = None
+    explanation = ""
     report_data = {}
     headings = {}
     max_scores = {}
@@ -219,10 +230,11 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     rows = {}
     
     we_have_data = False
+    report_data = gen_spec_in_line_report(report_name, course, username, green_param, orange_param)
     if report_name == 'quizzes_summary':
-        report_data = gen_spec_in_line_report(report_name, course, username)
         if report_data:
             report_label = "Quizzes Summary"
+            explanation = "Number of students whose best score, compared against maximum possible score, falls into each given category"
             headings = report_data['headings']
             column1 = report_data['exam_titles']
             column2 = report_data['count_lt_34']
@@ -232,9 +244,9 @@ def generate_in_line_report(request, course_prefix, course_suffix):
             we_have_data = True
 
     elif report_name == 'student_scores':
-        report_data = gen_spec_in_line_report(report_name, course, username)
         if report_data:
             report_label = "Student Scores"
+            explanation = "Student's best score for each assessment"
             headings = report_data['headings']
             max_scores = report_data['max_scores']
             rows = report_data['rows']
@@ -244,6 +256,7 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'common_page_data':request.common_page_data,
         'we_have_data':we_have_data,
         'report_label':report_label,
+        'explanation':explanation,
         'report_name':report_name,
         'headings':headings,
         'column1':column1,
@@ -253,6 +266,8 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'column5':column5,
         'column6':column6,
         'row_color':row_color,
+        'green_param':green_param,
+        'orange_param':orange_param,
         'username':username,
         'max_scores':max_scores,
         'rows':rows
