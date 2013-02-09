@@ -494,11 +494,19 @@ class AutoGrader():
 
                         graded = json.loads(graded_result)
 
-                        for ww in watchwords:
-                            if 'feedback' in graded \
-                                    and 'explanation' in graded['feedback'][0] \
-                                    and graded['feedback'][0]['explanation'].lower() == ww:
-                                raise AutoGraderGradingException("Fail with \"%s\"" % ww)
+                        # test for cases where score == 0 but explanation hints at an error
+                        # if score > 0, then let through, we never want to take away points
+                        # because we suspect a grader error (fail safe)
+                        if 'score' in graded and graded['score'] == 0:
+                            for ww in watchwords:
+                                if 'feedback' in graded \
+                                        and 'explanation' in graded['feedback'][0] \
+                                        and graded['feedback'][0]['explanation'].lower() == ww:
+                                    if ww == "":
+                                        errmsg="Fail with empty explanation"
+                                    else:
+                                        errmsg="Fail with \"%s\" explanation" % ww
+                                    raise AutoGraderGradingException(errmsg)
 
                         return graded
 

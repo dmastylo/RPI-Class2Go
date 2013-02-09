@@ -787,10 +787,16 @@ class SimpleTest(TestCase):
                 g = ag.grade("q1b", "should throw exception")
 
         # we've seen a sick grader time out like this too
-        no_explanation_whatsoever = r'{"score":0, "maximum":1, "feedback":[{"explanation":""}]}'
-        with fake_remote_grader(no_explanation_whatsoever):
+        no_explanation_score0 = r'{"score":0, "maximum":1, "feedback":[{"explanation":""}]}'
+        with fake_remote_grader(no_explanation_score0):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
+
+        # but same thing with score=1 should be OK though (never penalize for no explanation)
+        no_explanation_score1 = r'{"score":1.0, "maximum":1, "feedback":[{"explanation":""}]}'
+        with fake_remote_grader(no_explanation_score1):
+            g = ag.grade("q1b", "should be OK")
+            self.assertEqual(g, {'correct': True, 'score': 1.0, 'feedback': [{"explanation": ""}] })
 
 
     def test_interactive_retries(self):
