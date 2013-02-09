@@ -225,7 +225,8 @@ invideo: true
             
 This is the exam preamble.  You could put data common to all of the problems here.  I think that MathJax should survive the conversion
             $$a + b = c$$.
-
+<!-- Markdown preserves HTML comments.  So this comment should not show up in the rendered problem.  It does show up in the HTML source of the question, though -->
+            
 Arbitrary stuff here.
 
 Colors in the natural world
@@ -243,7 +244,7 @@ Select the Color with the longest wavelength:
             
 Answer
 -----
-1. Wrong.
+1. Wrong. 
 2. Wrong.
 3. Wrong.
 4. Correct.
@@ -260,7 +261,7 @@ On days without clouds, what *color* does the sky **most** resemble?
 
 Answer
 ------
-1. Correct. This is the color of the sky.
+1. Correct. This is the color of the sky.  +10.5/-3 points
 2. Wrong. Only dirt is red.
 3. Wrong. Sort of half-right.
 4. Wrong. Green Day?
@@ -305,8 +306,8 @@ A regex question on a new line.  Type some text that begins with 's':
             
 Answer
 -------
-[eyes]: (2)
-[fingers]: (10 +- 2)
+[eyes]: (2            +1.5/-1 points)
+[fingers]: (10 +- 2   +1.3/-1 points)
 [hamlet]: (be)
 [regexq]: (^s)
             
@@ -330,7 +331,7 @@ Which of these are amongst your favorite animals?
 * Bat
 * Other
             
-If other, please specify (An ungraded textarea causes the need for an answer section, unfortunately.  Make sure the [id] is in brackets in the answer section **and** followed by empty parens ()  ):
+If other, please specify. <!-- An ungraded textarea causes the need for an answer section, unfortunately.  Make sure the [id] is in brackets in the answer section **and** followed by empty parens ()  -->
 
 [Textarea][surveyother]
 
@@ -341,12 +342,12 @@ Answer
 Video Times
 ===========
 
-storages116
+video1
 ------
 Colors in the natural world: 4.5 sec
 Testing your common sense: 10 sec
 
-secondtime
+video2
 ------
 Colors in the natural world: 8 sec
 Testing your common sense: 15.6 sec
