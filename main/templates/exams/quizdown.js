@@ -27,7 +27,7 @@ c2gXMLParse.parseQuizDown = function () {
                },
                success: function(data) {
                    var obj=JSON.parse(data);
-                    console.log(obj.meta);
+                   //console.log(obj.meta);
                    c2gXMLParse.importMeta(obj.meta);
                    c2gXMLParse.markdown2quiz(obj.html);
                }
@@ -44,7 +44,7 @@ c2gXMLParse.importMeta = function (meta) {
         var value = meta[key][0];
         var k = key.trim().toLowerCase();
         var kslug = c2gXMLParse.slugify(k);
-        console.log( k + " , " + kslug);
+        //console.log( k + " , " + kslug);
         if (k == "title") {
             $('#exam_title').val(value);
             $('#exam_slug').val(c2gXMLParse.slugify(value));
@@ -92,11 +92,25 @@ c2gXMLParse.markdown2quiz = function (html_text) {
     var mDOM = $(outer_mDOM).find("exam_metadata");
     
     /**** Declare local helper functions ****/
+
+    //Helper function to parse and remove point values from surrounding text
+    var parseOutPoints = function(text) {
+        var defaultPoints = {"found":false, "correct":"1", "wrong":"0", "text":text};
+        var regexnum = /\+(\d+\.?\d*)\s*\/\s*-(\d+\.?\d*)\s* points\.?/i
+        var match = regexnum.exec(text);
+        if (match != null && match.length == 3) {
+            defaultPoints.correct = match[1];
+            defaultPoints.wrong = "-"+match[2];
+            defaultPoints.found = true;
+            defaultPoints.text = text.replace(regexnum, "");
+        }
+        return defaultPoints;
+    }
     
     //Changes <ul>, <ol> into checkbox or radio or select
     var transform_lists = function (list, answerlist, qnum, ordinal) {
         var qID = $(list).closest('div.question').attr('id');
-        console.log(qID);
+        //console.log(qID);
         var choices = $(list).find("li");
         var wrapperElem;
         var qname = "Q"+ qnum + "_MC" + ordinal;
@@ -163,8 +177,16 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         resp.attr('name', qname).attr('data-report', qslug);
         var numCorrect = 0;
         $(answerlist).find("li").each(function(){
+            //Get potential points
+            var answerText = $(this).text();
+            var retobj = parseOutPoints(answerText);
+            if (retobj.found) {
+                answerText = retobj.text;
+                resp.attr("correct-points", retobj.correct);
+                resp.attr("wrong-points", retobj.wrong);
+            }
             var regex = /^(correct|right)\./i;
-            var correct = regex.test($(this).text());
+            var correct = regex.test(answerText);
             if (correct) numCorrect += 1;
             choiceOrd += 1;
             var choiceID = qname + "_" + choiceOrd;
@@ -172,7 +194,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
             choice.attr('value',choiceOrd)
                   .attr('data-report', wrapperElem.find("#"+choiceID).attr('data-report'))
                   .attr('correct', (correct)?'true':'false');
-            var explanation = $("<explanation>" + $(this).text() + "</explanation>");
+            var explanation = $("<explanation>" + answerText + "</explanation>");
             choice.append(explanation);
             resp.append(choice);            
         });
@@ -189,7 +211,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
     //Function to make <a> elements into inputs
     var transform_a = function(aElem, qnum, ordinal, type){
         var qID = $(aElem).closest('div.question').attr('id');
-        console.log(qID);
+        //console.log(qID);
         var qname = "Q"+ qnum + "_SA" + ordinal;
         var qslug = c2gXMLParse.slugify($(aElem).closest("p").text());
         //Handle textboxes on a line by themselves
@@ -212,54 +234,60 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         $(aElem).before(inputElem);
         
         //Now do the metadata
-        var answertext = "";
+        var answerText = "";
         if ($(aElem).attr('title') == undefined) {
-            var regexMatch = /\(.*\)/.exec($(aElem).attr('href'));
-            console.log(regexMatch);
+            var regexMatch = /\((.*)\)/.exec($(aElem).attr('href'));
+            //console.log(regexMatch);
             if (regexMatch) {
-                answertext = regexMatch[0].substr(1, regexMatch[0].length-2);
+                answerText = regexMatch[1];
             }
         }
         else {
-            answertext = $(aElem).attr('title');
+            answerText = $(aElem).attr('title');
         }
         
         $(aElem).remove();  //Moved so that we remove aElem after all references to it
 
-        console.log(answertext);
         var resp = $('<response answertype="' + inputTypes[type] + '"></response>');
         resp.attr('id', qname)
             .attr('name', qname)
             .attr('data-report', qslug);
+        
+        var retobj = parseOutPoints(answerText);
+        if (retobj.found) {
+            answerText = retobj.text;
+            resp.attr("correct-points", retobj.correct);
+            resp.attr("wrong-points", retobj.wrong);
+        }
+        //console.log(answerText);
+
         if (type == "NUMBER") {
-            var tolI = answertext.indexOf("+-");
+            var tolI = answerText.indexOf("+-");
             if (tolI > -1) {
-                var answer = answertext.substr(0, tolI).trim();
-                console.log(answer);
-                var tolString = answertext.substr(tolI+2, answertext.length).trim();
-                console.log(tolString);
+                var answer = answerText.substr(0, tolI).trim();
+                var tolString = answerText.substr(tolI+2, answerText.length).trim();
                 var tolElem = $('<responseparam type="tolerance" default="' + tolString + '"></responseparam>');
                 resp.append(tolElem);
             }
             else {
-                var answer = answertext.trim();
+                var answer = answerText.trim();
             }
             resp.attr('answer',answer);
         }
         else if (type == "TEXT" || type == "TEXTAREA") {
-            var answer = answertext.trim();
+            var answer = answerText.trim();
             resp.attr('ignorecase','true')
                 .attr('answer',answer);
         }
         else if (type == "REGEX") {
-            var answer = answertext.trim();
+            var answer = answerText.trim();
             resp.attr('answer',answer);
             var param = $('<responseparam flag="IGNORECASE" />');
             resp.append(param);
         }
         
-        //If answertext is blank, we treat it as a survey question that doesn't have a correct answer
-        if (answertext != "") {
+        //If answerText is blank, we treat it as a survey question that doesn't have a correct answer
+        if (answerText != "") {
             mDOM.find("question_metadata#"+qID).append(resp);
         }
     };
@@ -298,7 +326,6 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         var answers_dom = answer_headings.nextUntil(':not(ul, ol)');
         var mc_answers_dom = answers_dom.filter("ul, ol");
         var mc_answers = mc_answers_dom.clone();
-        console.log(mc_answers.length);
         answer_headings.remove();
         answers_dom.remove();
         
@@ -319,7 +346,10 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         
         //radio / checkbox / select
         var ordinal=0;
-        q.find("ul, ol").each(function () {ordinal+=1; transform_lists(this, mc_answers.eq(ordinal-1), qnum, ordinal); });
+        q.find("ul, ol").each(function () {
+                                  ordinal+=1;
+                                  transform_lists(this, mc_answers.eq(ordinal-1), qnum, ordinal);
+                              });
         
         //Inputs
         q.find("a").each(function() {
@@ -343,7 +373,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
             var vidSlug = $(this).text()
             var qTitles = $(this).nextUntil('h2');
             var qLines = qTitles.text().split('\n');
-            console.log(qLines);
+            //console.log(qLines);
             var vElem = $("<video />");
             vElem.attr('url-identifier', vidSlug);
             for (i=0; i < qLines.length; i++) {
@@ -367,9 +397,11 @@ c2gXMLParse.markdown2quiz = function (html_text) {
 
         });
     };
+    
+    
     /****  The actual actions performed by this function ******/
     $("#staging-area").empty();
-    console.log(html_text);
+    //console.log(html_text);
     var qd = $(html_text);
     qd = qd.filter(function() {
                  //get rid of text nodes that are just whitespace
@@ -377,7 +409,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
                  return true;
             });
     var qd_orig = qd.clone();
-    console.log(qd);
+    //console.log(qd);
     var firstChild = qd.first();
     var preamble = firstChild.add(firstChild.nextUntil('h1'));
     var content = qd.not(preamble);
@@ -400,7 +432,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
                 $(title).html($(this).html());
                 myDiv.append($(title));
                 myDiv.append($(this).nextUntil("h1").clone());
-                console.log(myDiv.html());
+                //console.log(myDiv.html());
                 $("#staging-area").append($(myDiv));
                  
                 //Now create metadata
