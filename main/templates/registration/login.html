@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% block title %}{{ SITE_TITLE }} | Register{% endblock title %}
 {% block topnav %} {% endblock topnav %}
@@ -8,14 +9,14 @@
 {% if form.errors %}
 <div class="alert alert-error">
     <button class="close" data-dismiss="alert">×</button>
-    Your username or password didn't match a credential in our system. Please try again. <span class="alert-special-note"><strong>Remember:</strong> Your username might not be your email address.</span>
+    {% blocktrans %}Your username or password didn't match a credential in our system. Please try again.{% endblocktrans %}<span class="alert-special-note"><strong>{% trans 'Remember' %}:</strong> {% trans 'Your username might not be your email address.' %}</span>
 </div>
 {% endif %}
 
 
 {% if user.is_authenticated %}
 
-<p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+<p>{% trans 'Welcome' %}, {{ user.username }}. {% trans 'Thanks for logging in.' %}</p>
 
 {% else %}
  <div class="row-fluid">
@@ -23,11 +24,11 @@
        {% if login_form.errors %}
        <div class="alert alert-error">
          <button class="close" data-dismiss="alert">×</button>
-         Uh-oh.  We couldn't find username and password you entered.  Try again?
+         {% blocktrans %}Uh-oh.  We couldn't find username and password you entered.{% endblocktrans %}  {% trans 'Try again?' %}
        </div>
        {% endif %}
        <div class="well preview-registration span5" style="margin-top:50px;">
-       <h3>Enter your login information:</h3>
+       <h3>{% trans 'Enter your login information:' %}</h3>
     
 {% if SITE_NAME_SHORT == 'Stanford' %}
 <form method="post" action="{% url 'auth_login' %}?next={{ next }}" class="form-vertical">
@@ -47,8 +48,8 @@
 </tr>
 </table>
 
-<input type="submit" value="Login" class="btn" />
-&nbsp; <a href="{% url 'auth_password_reset' %}">Forgot my username or password</a>
+<input type="submit" value="{% trans 'Login' %}" class="btn" />
+&nbsp; <a href="{% url 'auth_password_reset' %}">{% trans 'Forgot my username or password' %}</a>
 {% if next|stringformat:"s" == '/accounts/password/reset/complete/'  %}
 <input type="hidden" name="next" value='/' />
 {% else %}

@@ -1,12 +1,13 @@
 {% extends "course_base.html" %}
 {% load url from future %}
+{% load i18n %}
 {% block title %}{{ SITE_TITLE }} | {{ common_page_data.course.title }}{% endblock title %}
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
 {% block course_notification %}
 {% if user.is_authenticated and not common_page_data.is_course_member %}
 <div class="alert alert-info inline">
-    <em class="icon-info-sign"></em>You are not yet a member in this course. <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+    <em class="icon-info-sign"></em>{% trans 'You are not yet a member in this course.' %} <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
         <input type="submit" id="login_button" class="btn" value="Join" />
         {% csrf_token %}
     </form>
@@ -24,14 +25,14 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h3 class="section-title pull-left">Recent Announcements</h3>
+    <h3 class="section-title pull-left">{% trans 'Recent Announcements' %}</h3>
     <div class="pull-right">
         {% if many_announcements %}
-            <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">View all announcements</a>
+            <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}</a>
         {% endif %}
         
         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-            <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
+            <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
             <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
             {% include "announcements/delete_announcement_form.html" %}
         {% endif %}
@@ -43,7 +44,7 @@
     {% for announcement in announcement_list %}
         {% include "announcements/announcement.html" %}
     {% empty %}
-        <p style="margin:20px;">No announcements to display.</p>
+        <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
 	{% endfor %}
 
 </div>

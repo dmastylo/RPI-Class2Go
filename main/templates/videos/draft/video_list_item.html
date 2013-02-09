@@ -1,15 +1,17 @@
+{% load i18n %}
+
 <table style="width:100%">
     <tr id="video_{{item.video.id}}">
         <td width="20" align="middle"><input type="checkbox" name="video_{{item.video.id}}" id="video_{{item.video.id}}" class="item_selector section_{{item.video.section.id}}_item_selector" /></td>
-        <td><em class="icon-facetime-video" style="font-size:16px;opacity:.3;"></em> <h4 style="margin-top:10px;display:inline;"><a id="video_{{item.video.id}}_title" href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a>{% if item.video.url %} <a data-c2g-tooltip title="Audience retention report - you must be logged into the correct YT account to use" href="{{item.video.ret_url}}" target="_blank">&nbsp;<em class="icon-dashboard"></em></a>{% endif %}</h4></td>
+        <td><em class="icon-facetime-video" style="font-size:16px;opacity:.3;"></em> <h4 style="margin-top:10px;display:inline;"><a id="video_{{item.video.id}}_title" href="{% url 'courses.videos.views.view' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{{item.video.title}}</a>{% if item.video.url %} <a data-c2g-tooltip title="{% trans 'Audience retention report - you must be logged into the correct YT account to use' %}" href="{{item.video.ret_url}}" target="_blank">&nbsp;<em class="icon-dashboard"></em></a>{% endif %}</h4></td>
         <td width="240">
             {% if item.video.is_synced %}
             <div style="color: #00A000; padding: 0px;">
-                <em class="icon-ok" style="font-size:17px"></em> Draft=Ready
+                <em class="icon-ok" style="font-size:17px"></em> {% trans 'Draft=Ready' %}
             </div>
             {% else %}
             <div style="color: #A07000; padding: 0px;">
-                <em class="icon-random" style="font-size:17px"></em> Draft Different From Ready
+                <em class="icon-random" style="font-size:17px"></em> {% trans 'Draft Different From Ready' %}
             </div>
             {% endif %}
         </td>
@@ -17,7 +19,7 @@
             {% autoescape off %}{{ item.visible_status }}{% endautoescape %}
         </td>
     	<td width="60">
-    	    <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">Edit</a>
+    	    <a href="{% url 'courses.videos.views.edit' common_page_data.course_prefix common_page_data.course_suffix item.video.slug %}">{% trans 'Edit' %}</a>
     	</td>
         <td width="140">
         </td>

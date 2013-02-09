@@ -1,5 +1,6 @@
 {% load url from future %}
 {% load template_utils %}
+{% load i18n %}
 
     <div id="left-nav" class="well tight nav" role="navigation" aria-labelledby="sidebar-nav-heading-0">
         {% for content_section in contentsection_list %}
@@ -14,14 +15,14 @@
                             {% for item in full_index_list|byKey:contentsection_id %}
                                 {% with item_type=item.type item_title=item.ref.title ref=item.ref %}
                                     {% if item_type == 'video' %} 
-                                         <li id="leftnav-li-video-{{ref.slug}}"><a href="{% url 'courses.videos.views.view' PREFIX SUFFIX ref.slug %}" title="Video"><em class="icon-facetime-video"></em> <span>{{item_title}}</span></a></li>
+                                         <li id="leftnav-li-video-{{ref.slug}}"><a href="{% url 'courses.videos.views.view' PREFIX SUFFIX ref.slug %}" title="{% trans 'Video' %}"><em class="icon-facetime-video"></em> <span>{{item_title}}</span></a></li>
                                     {% elif item_type == 'additional_page' %}
-                                         <li id="leftnav-li-page-{{ref.slug}}"><a href="{% url 'courses.additional_pages.views.main' PREFIX SUFFIX ref.slug %}" title="Page"><em class="icon-book"></em> <span>{{item_title}}</span></a></li>
+                                         <li id="leftnav-li-page-{{ref.slug}}"><a href="{% url 'courses.additional_pages.views.main' PREFIX SUFFIX ref.slug %}" title="{% trans 'Page' %}"><em class="icon-book"></em> <span>{{item_title}}</span></a></li>
                                     {% elif item_type == 'exam' %}
                                              {% if item.is_parent %}
-                                                <li id="leftnav-li-exam-{{ref.slug}}"><a href="{% url ref.list_view PREFIX SUFFIX %}#hashtag_{{ref.slug}}" title="Exam"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
+                                                <li id="leftnav-li-exam-{{ref.slug}}"><a href="{% url ref.list_view PREFIX SUFFIX %}#hashtag_{{ref.slug}}" title="{% trans 'Exam' %}"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
                                              {% else %}
-                                                <li id="leftnav-li-exam-{{ref.slug}}"><a href="{% url ref.show_view PREFIX SUFFIX ref.slug %}" title="Exam"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
+                                                <li id="leftnav-li-exam-{{ref.slug}}"><a href="{% url ref.show_view PREFIX SUFFIX ref.slug %}" title="{% trans 'Exam' %}"><em class="icon-pencil"></em> <span>{{item_title}}</span></a></li>
                                              {% endif %}
                                     {% elif item_type == 'file' %}
                                          <li><a href="{{ref.file.url}}"><em class="icon-{{item.icon}}"></em> <span>{{item_title}}</span></a></li>
@@ -36,9 +37,9 @@
             {% endwith %} {# contentsection_id #}
         {% endfor %}
         <ul class="nav nav-list">
-            <li><a href="{% url 'c2g.views.faq' %}">Help/FAQs</a></li>
-            <li><a href="{% url 'c2g.views.contactus' %}?pre={{PREFIX}}&post={{SUFFIX}}">Contact</a></li>
-            <li><a href="/accounts/profile">My profile</a></li>
+            <li><a href="{% url 'c2g.views.faq' %}">{% trans 'Help/FAQs' %}</a></li>
+            <li><a href="{% url 'c2g.views.contactus' %}?pre={{PREFIX}}&post={{SUFFIX}}">{% trans 'Contact' %}</a></li>
+            <li><a href="/accounts/profile">{% trans 'My profile' %}</a></li>
         </ul>
     </div>
 

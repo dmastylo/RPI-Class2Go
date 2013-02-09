@@ -1,11 +1,12 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% block title %}Forums | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 {% block mode_switcher %}{% endblock mode_switcher %}
 
 {% block forums_link_class %}class="dropdown active"{% endblock forums_link_class %}
 
-{% block course_page_title %}Forum (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
+{% block course_page_title %}{% trans 'Forum' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
 {% block m_column_content %}
 
@@ -48,23 +49,23 @@
 {# the accounts on their side. #}
 
 <div id="confirm_lti" class="well" {% if not show_confirmation %}style="visibility:hidden"{% endif %}>
-<h2>Link your account with Piazza<h2>
-<h3>You'll only see this once, and you can make changes later on your profile page (click on your name).</h3>
+<h2>{% trans 'Link your account with Piazza' %}<h2>
+<h3>{% blocktrans %}You'll only see this once, and you can make changes later on your profile page (click on your name).{% endblocktrans %}</h3>
     
 <form id="piazza_lti_form" name="piazza_lti_form" action="{{ piazza_target_url }}{% if querystring %}?{{ querystring|safe }}{% endif %}" method="post" target="piazza_iframe" encType="application/x-www-form-urlencoded">
     {% for field in form %}
       {% if field.name == 'lis_person_name_full' %}
-        <label for="id_lis_person_name_full">Choose the name (or alias) that you'd like to be publicly known by on Piazza.  (If you've already chosen a handle on Piazza, this may not override your previous choice.)</label>
+        <label for="id_lis_person_name_full">{% blocktrans %}Choose the name (or alias) that you'd like to be publicly known by on Piazza.  (If you've already chosen a handle on Piazza, this may not override your previous choice.){% endblocktrans %}</label>
         {{ field }}
       {% elif field.name = 'lis_person_contact_email_primary' %}
-        <label for="id_lis_person_contact_email_primary">If you already have a Piazza account you'd like to use, please enter the email address associated with it.  Otherwise, enter an email address that will be used to create a new Piazza account for you.</label>
+        <label for="id_lis_person_contact_email_primary">{% blocktrans %}If you already have a Piazza account you'd like to use, please enter the email address associated with it.  Otherwise, enter an email address that will be used to create a new Piazza account for you.{% endblocktrans %}</label>
         {{ field }}
       {% else %}
         {{ field.as_hidden }}
       {% endif %}
     {% endfor %}
     <br />
-    <a class="btn" href="javascript:" onclick="save_profile_then_lti_submit()" >Submit</a>
+    <a class="btn" href="javascript:" onclick="save_profile_then_lti_submit()" >{% trans 'Submit' %}</a>
 </form>
 
 </div>
