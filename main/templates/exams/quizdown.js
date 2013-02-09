@@ -27,7 +27,7 @@ c2gXMLParse.parseQuizDown = function () {
                },
                success: function(data) {
                    var obj=JSON.parse(data);
-                    console.log(obj.meta);
+                   //console.log(obj.meta);
                    c2gXMLParse.importMeta(obj.meta);
                    c2gXMLParse.markdown2quiz(obj.html);
                }
@@ -44,7 +44,7 @@ c2gXMLParse.importMeta = function (meta) {
         var value = meta[key][0];
         var k = key.trim().toLowerCase();
         var kslug = c2gXMLParse.slugify(k);
-        console.log( k + " , " + kslug);
+        //console.log( k + " , " + kslug);
         if (k == "title") {
             $('#exam_title').val(value);
             $('#exam_slug').val(c2gXMLParse.slugify(value));
@@ -110,7 +110,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
     //Changes <ul>, <ol> into checkbox or radio or select
     var transform_lists = function (list, answerlist, qnum, ordinal) {
         var qID = $(list).closest('div.question').attr('id');
-        console.log(qID);
+        //console.log(qID);
         var choices = $(list).find("li");
         var wrapperElem;
         var qname = "Q"+ qnum + "_MC" + ordinal;
@@ -211,7 +211,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
     //Function to make <a> elements into inputs
     var transform_a = function(aElem, qnum, ordinal, type){
         var qID = $(aElem).closest('div.question').attr('id');
-        console.log(qID);
+        //console.log(qID);
         var qname = "Q"+ qnum + "_SA" + ordinal;
         var qslug = c2gXMLParse.slugify($(aElem).closest("p").text());
         //Handle textboxes on a line by themselves
@@ -237,7 +237,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         var answerText = "";
         if ($(aElem).attr('title') == undefined) {
             var regexMatch = /\((.*)\)/.exec($(aElem).attr('href'));
-            console.log(regexMatch);
+            //console.log(regexMatch);
             if (regexMatch) {
                 answerText = regexMatch[1];
             }
@@ -259,15 +259,13 @@ c2gXMLParse.markdown2quiz = function (html_text) {
             resp.attr("correct-points", retobj.correct);
             resp.attr("wrong-points", retobj.wrong);
         }
-        console.log(answerText);
+        //console.log(answerText);
 
         if (type == "NUMBER") {
             var tolI = answerText.indexOf("+-");
             if (tolI > -1) {
                 var answer = answerText.substr(0, tolI).trim();
-                console.log(answer);
                 var tolString = answerText.substr(tolI+2, answerText.length).trim();
-                console.log(tolString);
                 var tolElem = $('<responseparam type="tolerance" default="' + tolString + '"></responseparam>');
                 resp.append(tolElem);
             }
@@ -328,7 +326,6 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         var answers_dom = answer_headings.nextUntil(':not(ul, ol)');
         var mc_answers_dom = answers_dom.filter("ul, ol");
         var mc_answers = mc_answers_dom.clone();
-        console.log(mc_answers.length);
         answer_headings.remove();
         answers_dom.remove();
         
@@ -376,7 +373,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
             var vidSlug = $(this).text()
             var qTitles = $(this).nextUntil('h2');
             var qLines = qTitles.text().split('\n');
-            console.log(qLines);
+            //console.log(qLines);
             var vElem = $("<video />");
             vElem.attr('url-identifier', vidSlug);
             for (i=0; i < qLines.length; i++) {
@@ -404,7 +401,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
     
     /****  The actual actions performed by this function ******/
     $("#staging-area").empty();
-    console.log(html_text);
+    //console.log(html_text);
     var qd = $(html_text);
     qd = qd.filter(function() {
                  //get rid of text nodes that are just whitespace
@@ -412,7 +409,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
                  return true;
             });
     var qd_orig = qd.clone();
-    console.log(qd);
+    //console.log(qd);
     var firstChild = qd.first();
     var preamble = firstChild.add(firstChild.nextUntil('h1'));
     var content = qd.not(preamble);
@@ -435,7 +432,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
                 $(title).html($(this).html());
                 myDiv.append($(title));
                 myDiv.append($(this).nextUntil("h1").clone());
-                console.log(myDiv.html());
+                //console.log(myDiv.html());
                 $("#staging-area").append($(myDiv));
                  
                 //Now create metadata
