@@ -786,8 +786,13 @@ class SimpleTest(TestCase):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
 
-        # we've seen a sick grader time out like this too
-        no_explanation_whatsoever = r'{"score":0, "maximum":1, "feedback":[{"explanation":""}]}'
+        # Other cases we think we should watch out for 
+        no_explanation_whatsoever = r'{"score":0, "maximum":1, "explanation":""}'
+        with fake_remote_grader(no_explanation_whatsoever):
+            with self.assertRaises(AutoGraderGradingException):
+                g = ag.grade("q1b", "should throw exception")
+
+        no_explanation_whatsoever = r'{"score":0, "maximum":1, "feedback":""}'
         with fake_remote_grader(no_explanation_whatsoever):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
