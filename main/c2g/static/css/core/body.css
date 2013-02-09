@@ -1,11 +1,13 @@
 /* Bootstrap overrides
 -------------------------------------------------- */
+
 body {
     background-color: #f8f6ea;
     position: relative;
     width: 100%;
     min-width: 480px;
     min-height: 100%;
+    font-family: 'Source Sans Pro', 'Helvetica Neue', helvetica, sans-serif;
 }
 
 h1,h2,h3,h4 {margin:0;}
@@ -418,13 +420,26 @@ small.date {
     width:100%;
 }
 .stanford-logo {
-    background:transparent url(../../graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
-    padding:13px 20px;
-    width:198px;
-    height:11px;
+    /*
+    background:transparent url(../../graphics/core/header-stanford-logo.png) no-repeat 20px 10px;
+    background-size: 160px 19px;
+    padding:9px 20px;
+    width:160px;
+    height:19px;
+    */
     text-indent: -999px;
     display:block;
     overflow:hidden;
+}
+.stanford-logo a {
+    display: block;
+    padding:9px 20px;
+    width:160px;
+    height:19px;
+}
+.stanford-logo a img {
+    display: block;
+    margin-top: 1px;
 }
 #c2g_layout_topbar {
     position:relative;
@@ -456,6 +471,10 @@ small.date {
     position:absolute;
     top:-32px;
     right:20px;
+    font-size: 1.15em;
+}
+.top-nav strong {
+    font-weight: normal;
 }
 .top-nav li {
     float:right;

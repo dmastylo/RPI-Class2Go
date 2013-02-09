@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, target-densitydpi=device-dpi">
     <meta name="apple-mobile-web-app-capable" content="yes">
     {% block top_scripts %}
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,600,300italic,600italic' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
@@ -31,19 +32,22 @@
 
 {% block bodytag %}<body class="{% block body_class %}{% endblock body_class %}">{% endblock bodytag %}
     <div id="viewport">
-        {% if not request.session.headless %}
-            <div id="global-header">
-                <h1 class="stanford-logo">
-                    {% if SITE_NAME_SHORT == 'Stanford' %}
-                    <a href="http://www.stanford.edu">Stanford University</a>
-                    {% else %}
-                    <a href="http://www.uwa.edu.au">{{ SITE_NAME_LONG }}</a>
-                    {% endif %}
-                </h1>
-                <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
-            </div>
-            {% block topcontent %}<div id="top-content"></div>{% endblock topcontent %}
-        {% endif %}
+      {% if not request.session.headless %}
+        <div id="global-header">
+            <h1 class="stanford-logo">
+            	{% if SITE_NAME_SHORT == 'Stanford' %}
+                <a href="http://www.stanford.edu">
+                    <img src="/static/graphics/core/header-stanford-logo.png" width="160" alt="Stanford University">
+                    Stanford University
+                </a>
+                {% else %}
+                <a href="http://www.uwa.edu.au">{{ SITE_NAME_LONG }}</a>
+                {% endif %}
+            </h1>
+            <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
+        </div>
+        {% block topcontent %}<div id="top-content"></div>{% endblock topcontent %}
+      {% endif %}
         {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}
         
             {% if not request.session.headless %}
@@ -235,7 +239,9 @@
         
         /*******************************************************************************************
 	Make Footer Sticky
-	*/
+	
+	Removed for now until I can figure out the left nav script behavior...
+	
         function stickyFooter(){
             var windowHeight = $(window).height(); //get current window height
             var initContentHeight = $("#viewport").height() + 0; //get page content height
@@ -257,6 +263,7 @@
             });
         }
         stickyFooter();
+        */
         
     </script>
     {% endblock bottom_scripts %}
