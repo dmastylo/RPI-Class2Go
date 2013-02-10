@@ -62,7 +62,6 @@ def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
                                   }, 
                                   context_instance=RequestContext(request))
 
-
 @auth_view_wrapper
 def confirm(request, course_prefix, course_suffix, exam_slug):
     
@@ -89,35 +88,6 @@ def confirm(request, course_prefix, course_suffix, exam_slug):
                               {'common_page_data':request.common_page_data, 'course': course, 'exam':exam, 'ready_section':ready_section,
                               'endtime': endtime, 'slug_for_leftnav':slug_for_leftnav, 'minutesallowed':minutesallowed,
                               }, RequestContext(request))
-
-
-@auth_view_wrapper
-def confirm(request, course_prefix, course_suffix, exam_slug):
-    
-    course = request.common_page_data['course']
-        
-    try:
-        exam = Exam.objects.get(course=course, is_deleted=0, slug=exam_slug)
-    except Exam.DoesNotExist:
-        raise Http404
-
-    slug_for_leftnav = exam_slug
-
-    ready_section = exam.section
-    if ready_section and ready_section.mode == "draft":
-        ready_section = ready_section.image
-
-    minutesallowed = exam.minutesallowed if exam.minutesallowed else 999
-
-    allowed_timedelta = datetime.timedelta(minutes=minutesallowed)
-
-    endtime = datetime.datetime.now() + allowed_timedelta
-
-    return render_to_response('exams/confirm.html',
-                              {'common_page_data':request.common_page_data, 'course': course, 'exam':exam, 'ready_section':ready_section,
-                              'endtime': endtime, 'slug_for_leftnav':slug_for_leftnav, 'minutesallowed':minutesallowed,
-                              }, RequestContext(request))
-
 
 @auth_view_wrapper
 def show_exam(request, course_prefix, course_suffix, exam_slug):
