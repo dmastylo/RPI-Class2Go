@@ -959,7 +959,7 @@
         var userAnswerObj = window.collectUserAnswers(fieldCollection);
 
         if (__exam_type != "survey" && !userAnswerObj.answeredAll) {
-			var userProceed = confirm("{% blocktrans with get_human_type=exam.get_human_type %}This will submit the entire {{ get_human_type }} and you haven't answered all questions. Still submit?{% endblocktrans %}");
+            var userProceed = confirm("{% blocktrans with get_human_type=exam.get_human_type %}This will submit the entire {{ get_human_type }} and you haven't answered all questions. Still submit?{% endblocktrans %}");
             if (!userProceed) {
                 $('#submit-button').removeAttr('disabled');
                 return;
