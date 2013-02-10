@@ -53,7 +53,7 @@
          	<div class="sixcol">
 			<div class="home-unit">
 				{% if course.institution_only = 1 %}
-				<div id="badge"><img src=" {{ STATIC_URL }}graphics/core/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
+				<div id="badge"><img src=" {{ STATIC_URL }}graphics/sites/UWA/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
    			    {% endif %}
    			    <div class="innercontainer">
     				<a href="{% url 'courses.views.main' course.prefix course.suffix %}">
@@ -74,7 +74,7 @@
 			<div class="sixcol last">
 			<div class="home-unit">
 				{% if course.institution_only = 1 %}
-				<div id="badge"><img src=" {{ STATIC_URL }}graphics/core/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
+				<div id="badge"><img src=" {{ STATIC_URL }}graphics/sites/UWA/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
    			    {% endif %}
    			    <div class="innercontainer">
     				<a href="{% url 'courses.views.main' course.prefix course.suffix %}">
