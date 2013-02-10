@@ -24,10 +24,10 @@
     <div class="alert alert-error">{% blocktrans %}We're sorry, there was an error decoding this submission. If this is the graded submission you'll need to retake the exam or restore from a previous submission.{% endblocktrans %}</div>
   {% else %}
     {% for prob, data in sub.json_obj %}
-      {% if data|islist and data.0.questionTag4humans %}
-        {% blocktrans with question_tag=data.0.questionTag4humans %}On question {{prob}} ({{question_tag}}), you answered:{% endblocktrans %}
+      {% if data|islist and data.0.questionreport %}
+        {% blocktrans with question_tag=data.0.questionreport %}On question {{prob}} ({{question_tag}}), you answered:{% endblocktrans %}
       {% else %}
-        {% blocktrans with question_tag=data.questionTag4humans %}On question {{prob}} ({{question_tag}}), you answered:{% endblocktrans %}
+        {% blocktrans with question_tag=data.questionreport %}On question {{prob}} ({{question_tag}}), you answered:{% endblocktrans %}
       {% endif %}
          {% if data|islist %}{# Custom template tag to test if object is a list #}
              {% for i in data %}
