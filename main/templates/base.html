@@ -26,7 +26,7 @@
         <script type="text/javascript" src="{{ STATIC_URL }}js/core/respond.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function () {
-            {% blocktrans %}alert({{ browser_warning }});{% endblocktrans %}
+            {% blocktrans %}alert("{{ browser_warning }}");{% endblocktrans %}
             });
         </script>
     <![endif]-->
