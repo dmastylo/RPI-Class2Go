@@ -46,7 +46,7 @@
         </p>
         {% endif %}
         <p>
-        {% trans 'You are about to start working on' %} {{exam.title}}.  {% blocktrans %}You will have <b>{{minutesallowed}}</b> minutes, or approximately until <b>{{endtime|date:"N d, P T"}}</b>, to submit your answers.{% endblocktrans %}
+        {% trans 'You are about to start working on' %} {{exam.title}}.  {% blocktrans with et=endtime|date:"N d, P T" %}You will have <b>{{minutesallowed}}</b> minutes, or approximately until <b>{{et}}</b>, to submit your answers.{% endblocktrans %}
         </p>
         <p>
         {% trans 'The system <b>will not</b> automatically submit for you at the end of your time, so make sure to submit yourself.' %}
