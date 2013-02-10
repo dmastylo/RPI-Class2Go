@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% trans 'Login' as Login_trans %}
+
 {% block title %}{{ SITE_TITLE }} | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 
@@ -84,7 +86,7 @@
                 {% else %}
                     <li class="visible-phone">
                         {% if SITE_NAME_SHORT == 'Stanford' %}
-                            {% with login_course=common_page_data.course login_link_id="phone_login" login_link_class="" link_text="Login" %}
+                            {% with login_course=common_page_data.course login_link_id="phone_login" login_link_class="" link_text=Login_trans %}
                                 {% include "registration/login_link.html" %}
                             {% endwith %}
                         {% else %}
