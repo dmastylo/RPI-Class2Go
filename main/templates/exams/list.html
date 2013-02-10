@@ -109,7 +109,7 @@
     {% else %}
 	
 	{% url 'auth_login' as auth_login_url %}
-    <h4>{% blocktrans %}Please <a href="{{ 'auth_login_url' }}">log in</a> to see course materials.{% endblocktrans %}</h4>
+    <h4>{% blocktrans %}Please <a href="{{ auth_login_url }}">log in</a> to see course materials.{% endblocktrans %}</h4>
     {% endif %}
 </div>
 
