@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% block title %}{{ SITE_TITLE }} | Logout{% endblock title %}
 
 {% block content %}
 
-You have been logged out.
+{% trans 'You have been logged out.' %}
 
 {% endblock %}

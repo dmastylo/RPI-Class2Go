@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block addl_stylesheets %}
@@ -15,47 +16,47 @@
 .explanation {color: #800000; font-size: 9pt; font-style: italic; display: block; margin: 0px; }
 </style>
 
-<h2>Create New Course</h2>
+<h2>{% trans 'Create New Course' %}</h2>
 
 <form name="form_new_course" method="POST" action="{% url 'courses.admin_views.new' %}">
-    <label class='header'>Title</label>
-    <label class='explanation'>Examples: Introduction to Statistical Signal Processing, CS106: Programming Abstractions (Fall 2012)</label>
+    <label class='header'>{% trans 'Title' %}</label>
+    <label class='explanation'>{% trans 'Examples' %}: Introduction to Statistical Signal Processing, CS106: Programming Abstractions (Fall 2012)</label>
     <input type='text' id='id_title' name='title' style='width: 600px;'/>
     
-    <label class='header'>Course URL</label>
-    <label class='explanation'>Fill in the two fields below using only alphabets, numbers, and/or underscores.</label>
-    <label class='explanation'>Examples:&nbsp;&nbsp;http://sophi.stanford.edu/nlp/2012_public&nbsp;&nbsp;,&nbsp;&nbsp;http:/sophi.stanford.edu/cs108/winter_2013</label>
+    <label class='header'>{% trans 'Course URL' %}</label>
+    <label class='explanation'>{% trans 'Fill in the two fields below using only alphabets, numbers, and/or underscores.' %}</label>
+    <label class='explanation'>{% trans 'Examples' %}:&nbsp;&nbsp;http://class2go.stanford.edu/nlp/Fall2012&nbsp;&nbsp;,&nbsp;&nbsp;http://class2go.stanford.edu/cs108/Winter2013</label>
     <table>
         <tr>
-            <td>http://class.stanford.edu/</td>
+            <td>http://class2go.stanford.edu/</td>
             <td><input type='text' id='id_prefix' name='prefix' style='width:120px;' /></td>
             <td>/</td>
             <td><input type='text' id='id_suffix' name='suffix' style='width:120px;' /></td>
         </tr>
     </table>
     
-    <label class='header'>Course contact email</label>
+    <label class='header'>{% trans 'Course contact email' %}</label>
     <input type='text' id='id_contact' name='contact' style='width: 600px;'/>
     
-    <label class='header'>When does the course go live, and when does it end?</label>
+    <label class='header'>{% trans 'When does the course go live, and when does it end?' %}</label>
     <table>
         <tr>
-            <td style="padding: 10px;">Term</td>
+            <td style="padding: 10px;">{% trans 'Term' %}</td>
             <td style="padding: 10px;">
                 <select name='term'>
-                    <option value="fall">Fall</option>
-                    <option value="winter">Winter</option>
-                    <option value="spring">Spring</option>
-                    <option value="summer">Summer</option>
+                    <option value="fall">{% trans 'Fall' %}</option>
+                    <option value="winter">{% trans 'Winter' %}</option>
+                    <option value="spring">{% trans 'Spring' %}</option>
+                    <option value="summer">{% trans 'Summer' %}</option>
                 </select>
             </td>
-            <td style="padding: 10px;">Year</td>
+            <td style="padding: 10px;">{% trans 'Year' %}</td>
             <td style="padding: 10px;"><input type='text' name='year' id='id_year'></td>
         </tr>
         <tr>
-            <td style="padding: 10px;">Start date</td>
+            <td style="padding: 10px;">{% trans 'Start date' %}</td>
             <td style="padding: 10px;"><input type='text' class='datepicker' name='start_date' id='id_start_date' value="{{date}}" data-date-format="mm-dd-yyyy"></td>
-            <td style="padding: 10px;">End date</td>
+            <td style="padding: 10px;">{% trans 'End date' %}</td>
             <td style="padding: 10px;"><input type='text' class='datepicker' name='end_date' id='id_end_date' value="{{date}}" data-date-format="mm-dd-yyyy"></td>
         </tr>
     </table>
@@ -69,38 +70,38 @@
     </select-->
     <input type="hidden" name="institution" value="2" />
 	
-	<input type="button" class="btn" onclick="ValidateAndSubmit()" value="Save" style='padding: 5px; margin-top: 20px;'/>
+	<input type="button" class="btn" onclick="ValidateAndSubmit()" value="{% trans 'Save' %}" style='padding: 5px; margin-top: 20px;'/>
 	{% csrf_token %}
 </form>
 <script type="text/javascript">
 function ValidateAndSubmit() {
     title= $("#id_title").val();
     if (title.length == 0 || title.length > 100) {
-        alert("Error: Title must not be empty and must be at most 100 characters long.");
+        alert("{% trans 'Error: Title must not be empty and must be at most 100 characters long.' %}");
         return;
     }
     
     contact= $("#id_contact").val();
     if (contact.length == 0) {
-        alert("Error: Please specify course contact email.");
+        alert("{% trans 'Error: Please specify course contact email.' %}");
         return;
     }
     
     prefix = $("#id_prefix").val(); suffix = $("#id_suffix").val();
     if (!prefix.match(/^[a-zA-Z0-9_-]+$/) || !suffix.match(/^[a-zA-Z0-9_-]+$/)) {
-        alert("Error: Both URL slugs must be non-empty and can contain only lower case alphabets, numbers, or underscores.");
+        alert("{% trans 'Error: Both URL slugs must be non-empty and can contain only lower case alphabets, numbers, or underscores.' %}");
         return;
     }
     
     year = $("#id_year").val();
     if (!year.match(/^[0-9]{4}$/)) {
-        alert("Error: Year must be a 4-digit number");
+        alert("{% trans 'Error: Year must be a 4-digit number.' %}");
         return;
     }
     
     start_date = $("#id_start_date").val(); end_date = $("#id_end_date").val();
     if (!start_date.match(/^[0-9]{2}-[0-9]{2}-[0-9]{4}$/) || !end_date.match(/^[0-9]{2}-[0-9]{2}-[0-9]{4}$/)) {
-        alert("Error: Start and end dates must be on the form MM-DD-YYYY.");
+        alert("{% trans 'Error: Start and end dates must be on the form MM-DD-YYYY.' %}");
         return;
     }
     

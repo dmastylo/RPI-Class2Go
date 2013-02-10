@@ -1,10 +1,12 @@
+{% load i18n %}
+
 {% if assignments %}
 	<div id="right_nav" class="upcoming well nav">
-		<h4>Upcoming Due Dates</h4>
+		<h4>{% trans 'Upcoming Due Dates' %}</h4>
 		<table class="table table-condensed">
 			<thead>
-				<th>Assignment</th>
-				<th>Due Date</th>
+				<th>{% trans 'Assignment' %}</th>
+				<th>{% trans 'Due Date' %}</th>
 			</thead>
   			{% for assignment in assignments %}
 			<tr>
@@ -17,7 +19,7 @@
                             <span>{{assignment.title}}</span>
                             </a>
                     </td>
-					<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} PST</td>
+					<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} {{ assignment.due_date|date:"T"}}</td>
 			</tr>
 			{% endfor %}
 		</table>

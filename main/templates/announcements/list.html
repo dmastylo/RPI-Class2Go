@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block course_page_title %}Announcements (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
@@ -7,8 +8,7 @@
 <div id="c2g_layout_m_column" class="span12">
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
     <div>
-        <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">New announcement</button>
-        <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
+        <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
     </div>
     {% include "announcements/delete_announcement_form.html" %}
     {% endif %}
@@ -20,7 +20,7 @@
     {% for announcement in announcements %}
         {% include "announcements/announcement.html" %}
     {% empty %}
-        <p style="margin:20px;">No announcements to display.</p>
+        <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
 	{% endfor %}
 
 </div>

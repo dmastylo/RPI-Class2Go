@@ -1,1 +1,16 @@
-<form name="delete_additional_page_form" action="{% url 'courses.additional_pages.actions.delete' %}" method="POST">    <input type="hidden" name="page_id" id="delete_page_id" />    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />    {% csrf_token %}</form><script type="text/javascript">    function DeleteAdditionalPage(id) {        if (confirm("Are you sure you want to delete the page '" + $("#additionalpage_"+id+"_title").html() + "'?")) {            $("#delete_page_id").val(id);            document.forms.delete_additional_page_form.submit();        }    }</script>
+{% load i18n %}
+
+<form name="delete_additional_page_form" action="{% url 'courses.additional_pages.actions.delete' %}" method="POST">
+    <input type="hidden" name="page_id" id="delete_page_id" />
+    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+    {% csrf_token %}
+</form>
+<script type="text/javascript">
+    function DeleteAdditionalPage(id) {
+        if (confirm("{% trans 'Are you sure you want to delete the page' %} '" + $("#additionalpage_"+id+"_title").html() + "'?")) {
+            $("#delete_page_id").val(id);
+            document.forms.delete_additional_page_form.submit();
+        }
+    }
+</script>

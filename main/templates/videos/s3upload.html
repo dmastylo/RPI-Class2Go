@@ -1,17 +1,18 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% block videos_link_class %}class="active"{% endblock videos_link_class %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
-    <h3>Upload Videos</h3>
+    <h3>{% trans 'Upload Videos' %}</h3>
 	<form id="videoform" name="upload_form" action="{% url 'courses.videos.actions.upload' %}" method="POST" enctype="multipart/form-data">
 
 	  {% csrf_token %}
 	  <fieldset class="well">
       
         <div class="pull-right">
-        <h3>Add Exam</h3>
+        <h3>{% trans 'Add Exam' %}</h3>
         <select name="exam_id" id="exam_id">
             <option value="">--</option>
         {% for pset in psets %}
@@ -26,7 +27,7 @@
 		  {% for field in form %}
 		  <div class="fieldWrapper {% if field.errors %}errors{% endif %}">
 		    {% if field.name == "url" %}
-		    <label><a data-c2g-tooltip title="If the video is already on YouTube, we won't upload it there again, just tell us its ID"><em class="icon-info-sign"></em>Already on YouTube?  Enter Video ID</a>
+		    <label><a data-c2g-tooltip title="{% blocktrans %}If the video is already on YouTube, we won't upload it there again, just tell us its ID{% endblocktrans %}"><em class="icon-info-sign"></em>{% trans 'Already on YouTube?  Enter Video ID' %}</a>
 		      {% if field.value %}
 		      <input type="checkbox" name="yt_id" value="1" data-toggler-target="#yt_id" checked />
 		    </label>
@@ -37,7 +38,7 @@
                     <div id="yt_id" style="display:none">{{ field }}</div>
 		      {% endif %}
 		    {% elif field.name == "live_datetime" %}
-		    <label><a data-c2g-tooltip title="If you're ready to set a live date for the video, check here. If you're not ready to decide on a live date yet, you can leave this box unchecked."><em class="icon-info-sign"></em>Set Live Date</a>
+		    <label><a data-c2g-tooltip title="{% blocktrans %}If you're ready to set a live date for the video, check here. If you're not ready to decide on a live date yet, you can leave this box unchecked.{% endblocktrans %}"><em class="icon-info-sign"></em>{% trans 'Set Live Date' %}</a>
 		      {% if field.value %}
 		      <input type="checkbox" name="set_live_date" value="1" data-toggler-target="#live_date" checked />
 		    </label>
@@ -59,13 +60,13 @@
                   </div>
                   {% endfor %}
                   <div class="fieldWrapper">
-                    <label><a data-c2g-tooltip title="This sets your video's YouTube privacy setting to be public if checked, and unlisted if not. *Note: Unlisted YouTube videos will not have working retention reports."><em class="icon-info-sign"></em>Make video public</a>
+                    <label><a data-c2g-tooltip title="{% blocktrans %}This sets your video's YouTube privacy setting to be public if checked, and unlisted if not. *Note: Unlisted YouTube videos will not have working retention reports.{% endblocktrans %}"><em class="icon-info-sign"></em>{% trans 'Make video public' %}</a>
                       <input type="checkbox" name="video_privacy" value="public" {% ifequal request.session.video_privacy 'public' %}checked{% endifequal %} />
                     </label>
                   </div>
 	        </td>
                 <td>
-		  <strong><font color="#FF0000">Important:</strong></font> If you are logged into any Google services (e.g. Google Docs, Gmail, YouTube) with a Google ID other than the Course YouTube ID, please <a href="https://www.google.com/accounts/Logout" target="_blank">logout</a> of your Google account.
+		  <strong><font color="#FF0000">{% trans 'Important' %}:</strong></font> {% blocktrans %}If you are logged into any Google services (e.g. Google Docs, Gmail, YouTube) with a Google ID other than the Course YouTube ID, please <a href="https://www.google.com/accounts/Logout" target="_blank">logout</a> of your Google account.{% endblocktrans %}
 		</td>
               </tr>
 	    </table>
@@ -73,13 +74,13 @@
 	  <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
 	  <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
 	  <div class="form-actions">
-	    <div>Clicking below will upload your video to Amazon, and from there it will be uploaded to YouTube if you did not specify a YouTube Video ID.</div>
+	    <div>{% blocktrans %}Clicking below will upload your video to Amazon, and from there it will be uploaded to YouTube if you did not specify a YouTube Video ID.{% endblocktrans %}</div>
 	    <ul>
-	      <li>You may be asked to sign into Google/YouTube if you're not signed in already. If you're signed in to any Google service, such as Google Docs, Gmail, or YouTube, your video may be uploaded to the wrong YouTube account. Please make sure you're signed in to the course YouTube account.</li>
-	      <li>If you haven't uploaded a video via Class2Go already, you will be asked to grant us permissions to "Manage your YouTube account". Please OK that.</li>
-	      <li>Do not close this window, it will terminate the upload. It may take a long time. We are currently working to make this asynchronous.</li>
+	      <li>{% blocktrans %}You may be asked to sign into Google/YouTube if you're not signed in already. If you're signed in to any Google service, such as Google Docs, Gmail, or YouTube, your video may be uploaded to the wrong YouTube account. Please make sure you're signed in to the course YouTube account.{% endblocktrans %}</li>
+	      <li>{% blocktrans %}If you haven't uploaded a video via Class2Go already, you will be asked to grant us permissions to "Manage your YouTube account". Please OK that.{% endblocktrans %}</li>
+	      <li>{% blocktrans %}Do not close this window, it will terminate the upload. It may take a long time. We are currently working to make this asynchronous.{% endblocktrans %}</li>
 	    </ul>
-	    <input type="submit" value="Upload" class="btn btn-primary"/>
+	    <input type="submit" value="{% trans 'Upload' %}" class="btn btn-primary"/>
 	  </div>
 	</form>
    {% else %} {# This is technically unreachable due to admin decorator, but doing this just to be complete #}
@@ -97,7 +98,7 @@
 <script>
 
 $('#videoform').submit(function() {
-    $.blockUI({fadeIn: 0, message:"Uploading, this could take several minutes...", css: {'font-size': '20px', padding:'15px', '-webkit-border-radius':'5px', '-moz-border-radius':'5px', 'border-radius':'5px'}});
+    $.blockUI({fadeIn: 0, message:"{% trans 'Uploading, this could take several minutes...' %}", css: {'font-size': '20px', padding:'15px', '-webkit-border-radius':'5px', '-moz-border-radius':'5px', 'border-radius':'5px'}});
     return true;
 });
 

@@ -1,7 +1,8 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% block m_column_content %}
 
-<h2>List files for course "{{course_prefix}} ({{course_suffix}})" </h2>
+<h2>{% trans 'List files for course' %} "{{course_prefix}} ({{course_suffix}})" </h2>
 
 {% endblock m_column_content %}

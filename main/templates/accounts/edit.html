@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}{{ SITE_TITLE }} | Edit Profile{% endblock title %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
 <div class="row-fluid page-header">
     <div class="span12">
-        <h2>Edit Profile</h2>
+        <h2>{% trans 'Edit Profile' %}</h2>
     </div>
 </div>
     {% if user.is_authenticated %}
-        <p>Need help? Contact <a href="mailto:c2g-techsupport@class.stanford.edu">c2g-techsupport@class.stanford.edu</a></p>
+        <p>{% trans 'Need help? Contact' %} <a href="mailto:c2g-techsupport@class.stanford.edu">c2g-techsupport@class.stanford.edu</a></p>
         <form name="edit profile form-vertical" action="{% url 'accounts.views.save_edits' %}" method="POST">
             {% csrf_token %}
             {{uform.as_p}}
@@ -18,16 +19,17 @@
         </form>
     {% else %}
 
-    <h3> Please login to see profile information: </h3>
+    <h3> {% trans 'Please login to see profile information:' %} </h3>
 
 
     {% if SITE_NAME_SHORT == 'Stanford' %}
     <p>
-    <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Stanford WebAuth</a>
-    <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Class2Go Login (Public course students)</a>
+    <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">{% trans 'Stanford WebAuth' %}</a>
+    <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">{% trans 'Class2Go Login (Public course students)' %}</a>
     </p>
     {% else %}
-        <h4> Please <a data-toggle="modal" href="{% url 'default_login' %}?next={{ request.get_full_path }}">log in</a> to see profile information</h4>
+		{% url 'default_login' as default_login_url %}
+		<h4>{% blocktrans with next_arg=request.get_full_path %}Please <a data-toggle="modal" href="{{default_login_url}}?next={{next_arg}}">log in</a> to see profile information{% endblocktrans %}</h4>
     {% endif %}
 
     {% endif %}

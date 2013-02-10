@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %} | Stanford Online{% endblock %}
@@ -36,23 +37,23 @@
 <div id="c2g_layout_m_column" class="span9">
     <div class="well">
         <h3>
-           Ready to begin <b>"{{exam.title}}"</b>?
+           {% trans 'Ready to begin' %} <b>"{{exam.title}}"</b>?
         </h3>
         {% if exam.description %}
         <p>
-        <h4> {{exam.title}} description: </h4>
-        {{exam.description }}
+            <h4> {{exam.title}} {% trans 'description' %}: </h4>
+            {{ exam.description }}
         </p>
         {% endif %}
         <p>
-        You are about to start working on {{exam.title}}.  You will have <b>{{minutesallowed}}</b> minutes, or approximately until <b>{{endtime}} PST</b>, to submit your answers.
+        {% trans 'You are about to start working on' %} {{exam.title}}.  {% blocktrans with et=endtime|date:"N d, P T" %}You will have <b>{{minutesallowed}}</b> minutes, or approximately until <b>{{et}}</b>, to submit your answers.{% endblocktrans %}
         </p>
         <p>
-        The system <b>will not</b> automatically submit for you at the end of your time, so make sure to submit yourself.
+        {% trans 'The system <b>will not</b> automatically submit for you at the end of your time, so make sure to submit yourself.' %}
         </p>
         <div>
-            <a class="btn" href="{% url exam.show_view course.prefix course.suffix exam.slug %}?confirm=True">Start Now!</a>
-            <a class="btn" href="{{ request.META.HTTP_REFERER }}">Take me back</a>
+            <a class="btn" href="{% url exam.show_view course.prefix course.suffix exam.slug %}?confirm=True">{% trans 'Start Now!' %}</a>
+            <a class="btn" href="{{ request.META.HTTP_REFERER }}">{% trans 'Take me back' %}</a>
         </div>
     </div>
 </div>
