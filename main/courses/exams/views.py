@@ -9,6 +9,7 @@ import HTMLParser
 from django.db.models import Max, F
 import copy
 import markdown
+from pytz import timezone
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
@@ -30,7 +31,7 @@ from django.core.urlresolvers import reverse
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 from courses.course_materials import get_course_materials
 from storages.backends.s3boto import S3BotoStorage
-
+from django.utils.timezone import get_default_timezone_name
 
 @auth_view_wrapper
 def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
@@ -420,17 +421,22 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
     json_obj=json.loads(postdata)
 
+    #e.g. PST or PDT
+    tz = timezone(get_default_timezone_name())
+    tz_string1 = tz.tzname(exam.partial_credit_deadline)
+
     if exam.mode == "ready" and exam.past_all_deadlines():
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
-                                      datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
+                                      datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M " + tz_string1))
 
     if exam.timed:
         try:
             started = StudentExamStart.objects.get(exam=exam, student=user)
             endtime = started.time_created + datetime.timedelta(minutes = (exam.minutesallowed+1))
+            tz_string2 = tz.tzname(endtime)
             if datetime.datetime.now() > endtime:
                 return HttpResponseBadRequest("Sorry!  This submission is past your submission window, which ended at %s" % \
-                                              datetime.datetime.strftime(endtime, "%m/%d/%Y %H:%M PST"));
+                                              datetime.datetime.strftime(endtime, "%m/%d/%Y %H:%M " + tz_string2))
         except StudentExamStart.DoesNotExist:
             pass #somehow we didn't record a start time for the student.  So we just let them submit.
 

@@ -60,7 +60,7 @@
 
 {% if common_page_data.course.mode == "ready" and not exam.is_live %}
 
-    {% trans 'This exam will go live on' %} {{ exam.live_datetime }} {% trans 'PST' %}.
+    {% trans 'This exam will go live on' %} {{ exam.live_datetime|date:"N d Y, P T" }}.
 
     <br />
     <a href="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}">Return to {{exam.get_human_type}} list.</a>

@@ -19,7 +19,7 @@
                             <span>{{assignment.title}}</span>
                             </a>
                     </td>
-					<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} PST</td>
+					<td>{{ assignment.due_date|date:"M d" }}, {{ assignment.due_date|date:"f A"|lower}} {{ assignment.due_date|date:"T"}}</td>
 			</tr>
 			{% endfor %}
 		</table>

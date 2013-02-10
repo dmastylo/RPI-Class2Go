@@ -93,7 +93,7 @@
             
             
 
-            <p><strong>{% trans 'Deadline' %}:</strong> {{exam.due_date}} {% trans 'PST' %}<br /><br /></p>
+            <p><strong>{% trans 'Deadline' %}:</strong> {{exam.due_date|date:"N d Y, P T"}}<br /><br /></p>
             
         </div>
     </li>
