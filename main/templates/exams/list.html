@@ -2,9 +2,9 @@
 {% load i18n %}
 {% load url from future %}
 
-{% with TITLE=common_page_data.course.title %}
 
 {% block title %}
+    {% with TITLE=common_page_data.course.title %}
     {% if "surveys" in request.path %}
         {% trans 'Surveys' %} | {{TITLE}}
     {% elif "exams" in request.path %}
@@ -14,10 +14,12 @@
     {% else %}
         {% trans 'Interactive Exercises' %} | {{TITLE}}
     {% endif %}
+    {% endwith %}
 {% endblock title %}
 {% block exams_link_class %}class="active"{% endblock exams_link_class %}
 
 {% block course_page_title %}
+    {% with TITLE=common_page_data.course.title %}
     {% if "surveys" in request.path %}
         {% trans 'Surveys' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% elif "exams" in request.path %}
@@ -27,6 +29,7 @@
     {% else %}
         {% trans 'Interactive Exercises' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% endif %}
+    {% endwith %}
 {% endblock course_page_title %}
 
 {% block m_column_content %}
@@ -112,4 +115,3 @@
 
 {% endblock m_column_content %}
 
-{% endwith %} {# TITLE #}
