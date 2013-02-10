@@ -96,10 +96,10 @@ window.toggleExplanation = function () {
     
     if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
         $(this).attr('data-status', 'Hide');
-        $(this).val('{{ show_explanation_trans }}');
+        $(this).val('{{ hide_explanation_trans }}');
     } else {
         $(this).attr('data-status', 'Show');
-        $(this).val('{{ hide_explanation_trans }}');
+        $(this).val('{{ show_explanation_trans }}');
     }
     
 };
