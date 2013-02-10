@@ -206,6 +206,7 @@
             if (h > 12) {
                 h = h - 12;
             }
+            else if (h == 0) h = 12; //0 a.m. -> 12 a.m.
             $('#PacTime .hours').text(h);
             $('#PacTime .minutes').text(m);
             $('#PacTime .ampm').text(ap);
