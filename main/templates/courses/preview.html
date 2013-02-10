@@ -54,14 +54,14 @@
             <input class="btn-mini" type="Submit"  value="{% trans 'Unenroll' %}" onclick="return confirm('{% trans 'Do you really want to unenroll?' %}')" />
         </form>
     </div>
-    <p>{% blocktrans %}The course starts on {{common_page_data.course.calendar_start}}. The course staff will contact you with an email introduction when the date approaches. Hope to see you online this term!{% endblocktrans %}</p>
+    <p>{% blocktrans with sd=common_page_data.course.calendar_start %}The course starts on {{sd}}. The course staff will contact you with an email introduction when the date approaches. Hope to see you online this term!{% endblocktrans %}</p>
     <p><a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">
         {% trans 'Register or log-in as someone else' %}</a>
     </p>
   </div>
   {% else %}
     <div class="span5">
-    <div class="alert alert-info"><em class="icon-info-sign"></em>{% blocktrans %}Hi {{user.first_name}} {{user.last_name}}. It looks we already have record of you at {{SITE_TITLE}}.  Would you like to register for {{common_page_data.course.title}}?{% endblocktrans %}
+    <div class="alert alert-info"><em class="icon-info-sign"></em>{% blocktrans with fn=user.first_name ln=user.last_name title=common_page_data.course.title %}Hi {{fn}} {{ln}}. It looks we already have record of you at {{SITE_TITLE}}.  Would you like to register for {{title}}?{% endblocktrans %}
     <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}?redirect_to={{request.path}}" method="POST">
     <input type="submit" id="login_button" class="btn" value="{% trans 'Enroll' %}" />
     {% csrf_token %}
