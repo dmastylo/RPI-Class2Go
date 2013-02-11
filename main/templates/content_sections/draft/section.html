@@ -1,8 +1,10 @@
+{% load i18n %}
+
 <div class="row-fluid">
     <div class="span12">
         <h3 class="pull-left">{{section_structure.section.title}}</h3>
-        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')"><em class="icon-trash icon-large" style="margin-left:10px;"></em>Delete Section</a>
-        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}"><em class="icon-edit icon-large" style="margin-right:4px"></em>Rename Section</a>
+        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')"><em class="icon-trash icon-large" style="margin-left:10px;"></em>{% trans 'Delete Section' %}</a>
+        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}"><em class="icon-edit icon-large" style="margin-right:4px"></em>{% trans 'Rename Section' %}</a>
     </div>
 </div>
 
@@ -18,7 +20,7 @@
 {% if section_structure.items|length > 0 %}
 <div class="row-fluid">
     <div class="span12">
-        <a href="javascript:sectionSelectAll('{{section_structure.section.id}}')">Select all in section</a> / <a href="javascript:sectionUnselectAll('{{section_structure.section.id}}')">Unselect all in section</a>
+        <a href="javascript:sectionSelectAll('{{section_structure.section.id}}')">{% trans 'Select all in section' %}</a> / <a href="javascript:sectionUnselectAll('{{section_structure.section.id}}')">{% trans 'Unselect all in section' %}</a>
     </div>
 </div>
 {% endif %}
@@ -58,14 +60,14 @@
 		        </li>
 	        {% endifequal %}
         {% empty %}
-            <p style='margin: 20px;'>No items have been added to this section</p>
+            <p style='margin: 20px;'>{% trans 'No items have been added to this section' %}</p>
         {% endfor %}
     </ul>
     {% if context == 'course_materials' and section_structure.items|length > 1 %}
         <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
         <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
         <input type="hidden" name="section_id" value="{{ section_structure.section.id }}" />
-        <input type="submit" value="Save order" class="btn" />
+        <input type="submit" value="{% trans 'Save order' %}" class="btn" />
         {% csrf_token %}
     {% endif %}
 </form>

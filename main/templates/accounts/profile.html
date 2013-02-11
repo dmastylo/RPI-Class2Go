@@ -1,76 +1,78 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load url from future %}
-{% block title %} {{ SITE_TITLE }} | User Profile{% endblock title %} 
+{% block title %} {{ SITE_TITLE }} | User Profile{% endblock title %}
+{% block body_class %} profile_page {% endblock body_class %}
 {% load template_utils %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span12">
-    {% if user.is_authenticated %}
-        <div class="row-fluid page-header">
-            <div class="span6 pull-left">
-                <h2>Profile Information</h2>
+    <div id="c2g_layout_m_column" class="span12">
+        {% if user.is_authenticated %}
+            <div class="row-fluid page-header">
+                <div class="pull-left">
+                    <h2>{% trans 'My Profile' %}</h2>
+                </div>
+                <div class="pull-right">
+                    <a href="{% url 'accounts.views.edit' %}" class="btn">{% trans 'Edit Info' %}</a>
+                  {% if not has_webauth %}
+                    <a href="{% url 'auth_password_change' %}" class="btn">{% trans 'Change Password' %}</a>
+                  {% endif %}
+                </div>
             </div>
-            <div class="span6 pull-right">
-              <a href="{% url 'accounts.views.edit' %}" class="btn">Change Info</a>
-              {% if not has_webauth %}
-              <a href="{% url 'auth_password_change' %}" class="btn">Change Class2Go Password</a>
-              {% endif %}
-            </div>
-        </div>
-
-        <ul style="overflow:hidden" class="unstyled profile-info">
-            <li><strong>Username:</strong> {{ user.username }}</li>
-            <li><strong>First Name:</strong> {{ user.first_name }}</li>
-            <li><strong>Last Name:</strong> {{ user.last_name }}</li>
-            <li><strong>E-mail:</strong> {{ user.email }}</li>
-            <li><strong>Year of Birth:</strong> {{ user_profile.birth_year }}</li>
-            <li><strong>Gender:</strong> {{user_profile.gender }}</li>
-            <li><strong>Education:</strong> {{user_profile.education }}</li>
-            <li><strong>Work:</strong> {{user_profile.work }}</li>
+            
             <hr />
-            <li><strong>Piazza handle:</strong> {{user_profile.piazza_name }}</li>
-            <li><strong>Piazza email:</strong> {{user_profile.piazza_email }}</li>
-            <li><strong>Receive course emails:</strong> {% if user_profile.email_me %} Yes {% else %} No {% endif %} </li>
-            <hr />
-            <li class="pull-left"><strong>Courses:</strong></li>
-
+            <ul style="overflow:hidden" class="unstyled profile-info">
+                <div class="span5">
+                    <li><strong>{% trans 'Username' %}:</strong> {{ user.username }}</li>
+                    <li><strong>{% trans 'First Name' %}:</strong> {{ user.first_name }}</li>
+                    <li><strong>{% trans 'Last Name' %}:</strong> {{ user.last_name }}</li>
+                    <li><strong>{% trans 'E-mail' %}:</strong> {{ user.email }}</li>
+                    <li><strong>{% trans 'Year of Birth' %}:</strong> {{ user_profile.birth_year }}</li>
+                    <li><strong>{% trans 'Gender' %}:</strong> {{user_profile.gender }}</li>
+                </div>
+                <div class="span5">
+                    <li><strong>{% trans 'Education' %}:</strong> {{user_profile.education }}</li>
+                    <li><strong>{% trans 'Work' %}:</strong> {{user_profile.work }}</li>
+                    <li><strong>{% trans 'Piazza handle' %}:</strong> {{user_profile.piazza_name }}</li>
+                    <li><strong>{% trans 'Piazza email' %}:</strong> {{user_profile.piazza_email }}</li>
+                    <li><strong>{% trans 'Receive emails' %}:</strong> {% if user_profile.email_me %} {% trans 'Yes' %} {% else %} {% trans 'No' %} {% endif %} </li>
+                </div>
+            </ul>
             {% if courses %}
-                <table id="courses_table">
-                    <tr><th style="padding-right: 15px;">Title</th><th style="padding-right: 15px;">Enrollment</th>
-                        {% if longest_certs %}
-                            <th style="padding-right: 15px;">Statements of Accomplishment</th>
-                        {% endif %}
+                <hr />
+                <span><strong>{% trans 'Courses' %}:</strong></span>
+                <div class="profile-courses">
                     {% for course in courses %}
-                        <tr>
-                            <td style="padding-right: 15px;"><a style="display:inline" href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></td>
-                            <td style="padding-right: 15px;">{% if course in is_student_list %}
-                                   <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
-                                       {% csrf_token %}
-                                       <input class="btn-mini" type="Submit"  value="Unenroll as Student" onclick="return confirm('Do you really want to unenroll?')" />
-                                   </form>
+                        <div class="course">
+                            <div class="image"><img alt="Course Image" height="200" width="200" src="{{course.logo_dl_link}}" /></div>
+                            <h3><a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></h3>
+                            <p><strong>{{course.calendar_start}} - {{course.calendar_end}}</strong></p>
+                            {% if certifications|byKey:course.id %}
+                                {% for certinfo in certifications|byKey:course.id %}
+                            <a class="btn" href="{{certinfo.1}}">{{certinfo.0|uscore2space|title}} {% trans 'Accomplished' %}</a>
+                                {% endfor %}
+                            {% else %}
+                                {% if course in is_student_list %}
+                                    <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
+                                        {% csrf_token %}
+                                        <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick="return confirm('{% trans 'Do you really want to unenroll?' %}')" />
+                                    </form>
                                 {% else %}
-                                    Staff Member
+                                <a class="btn disabled">{% trans 'Staff Member' %}</a>
                                 {% endif %}
-                            </td>
-                            {% for certinfo in certifications|byKey:course.id %}
-                                <td style="padding-right: 15px;">
-                                    <a href="{{certinfo.1}}">{{certinfo.0|uscore2space|title}} Accomplished</a>
-                                </td>
-                            {% endfor %}
-                        </tr>
+                            {% endif %}
+                        </div>
                     {% endfor %}
-                </table>
-
-             {% endif %}
-        </ul>
-        
-    {% else %}
-        <h3> Please login to see profile information: </h3>
-        <p>
-            <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">Stanford WebAuth</a>
-            <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">Class2Go Login (Public course students)</a>
-        </p>
-    {% endif %}
-
-</div>
+                </div>
+            {% endif %}
+            
+        {% else %}
+        <h3> {% trans 'Please login to see profile information' %}': </h3>
+            <p>
+                <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">{% trans 'Stanford WebAuth' %}</a>
+                <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">{% trans 'Class2Go Login (Public course students)' %}</a>
+            </p>
+        {% endif %}
+    
+    </div>
 {% endblock m_column_content %}

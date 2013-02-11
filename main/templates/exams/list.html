@@ -1,29 +1,35 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
+
 {% block title %}
+    {% with TITLE=common_page_data.course.title %}
     {% if "surveys" in request.path %}
-        Surveys | {{common_page_data.course.title}}
+        {% trans 'Surveys' %} | {{TITLE}}
     {% elif "exams" in request.path %}
-        Exams | {{common_page_data.course.title}}
+        {% trans 'Exams' %} | {{TITLE}}
     {% elif "problemsets" in request.path %}
-        Quizzes | {{common_page_data.course.title}}
+        {% trans 'Quizzes' %} | {{TITLE}}
     {% else %}
-        Interactive Exercises | {{common_page_data.course.title}}
+        {% trans 'Interactive Exercises' %} | {{TITLE}}
     {% endif %}
+    {% endwith %}
 {% endblock title %}
 {% block exams_link_class %}class="active"{% endblock exams_link_class %}
 
 {% block course_page_title %}
+    {% with TITLE=common_page_data.course.title %}
     {% if "surveys" in request.path %}
-        Surveys (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+        {% trans 'Surveys' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% elif "exams" in request.path %}
-        Exams (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+        {% trans 'Exams' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% elif "problemsets" in request.path %}
-        Quizzes (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+        {% trans 'Quizzes' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% else %}
-        Interactive Exercises (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>)
+        {% trans 'Interactive Exercises' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{TITLE}}</a>)
     {% endif %}
+    {% endwith %}
 {% endblock course_page_title %}
 
 {% block m_column_content %}
@@ -36,11 +42,10 @@
             <em class="icon-pencil"></em>
         </div>
         <div class="course-list-content">
-            {% if common_page_data.course.mode == "ready" and exam.past_due %}
+            {% if common_page_data.course_mode == "ready" and exam.past_due %}
                 <h4>{{exam.title}}</h4>
             {% else %}
-            
-                   <h4><a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
+                <h4><a href="{% url exam.show_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{{exam.title}}</a></h4>
             {% endif %}
             <p>{{exam.description}}</p>
             
@@ -48,64 +53,65 @@
             <div class="btn-toolbar">
                 <div class="btn-group">
                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                        Download CSV
+                        {% trans 'Download CSV' %}
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'courses.exams.views.view_submissions_to_grade' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Student Submissions</a></li>
-                        <li><a href="{% url 'courses.exams.views.view_csv_grades' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Student Grades</a></li>
+                        <li><a href="{% url 'courses.exams.views.view_submissions_to_grade' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{% trans 'Student Submissions' %}</a></li>
+                        <li><a href="{% url 'courses.exams.views.view_csv_grades' common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{% trans 'Student Grades' %}</a></li>
                     </ul>
                 </div>
                 
-                <a href="#myModal{{exam.slug}}" role="button" class="btn" data-toggle="modal">Upload CSV</a>
+                <a href="#myModal{{exam.slug}}" role="button" class="btn" data-toggle="modal">{% trans 'Upload CSV' %}</a>
             </div>
             
             <div id="myModal{{exam.slug}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel{{exam.slug}}" aria-hidden="true">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h3 id="ModalLabel{{exam.slug}}">Select a CSV File with Student Grades</h3>
+                    <h3 id="ModalLabel{{exam.slug}}">{% trans 'Select a CSV File with Student Grades' %}</h3>
                 </div>
                 <div class="modal-body">
-                    <form id="csv_upload{{exam.slug}}" enctype="multipart/form-data" method="POST" action="{% url 'courses.exams.views.post_csv_grades' common_page_data.course.prefix common_page_data.course.suffix exam.slug%}">
+                    <form id="csv_upload{{exam.slug}}" enctype="multipart/form-data" method="POST" action="{% url 'courses.exams.views.post_csv_grades' common_page_data.course_prefix common_page_data.course_suffix exam.slug%}">
                         {% csrf_token %}
                         <input style="line-height:0px" id="fileinput" type="file" name="file" />
                     </form>
-                    <b>Note:</b>  for a file with a lot of records (~50k), this import will take up to 10 minutes, so please don't navigate away after you clicked import.
+                    <b>{% trans 'Note' %}:</b>  {% blocktrans %}for a file with a lot of records (~50k), this import will take up to 10 minutes, so please don't navigate away after you clicked import.{% endblocktrans %}
                 </div>
                 <div class="modal-footer">
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                    <input class="btn btn-primary" type="submit" value="Import Grade CSV" onclick="$('#csv_upload{{exam.slug}}').submit()" />
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">{% trans 'Close' %}</button>
+                    <input class="btn btn-primary" type="submit" value="{% trans 'Import Grade CSV' %}" onclick="$('#csv_upload{{exam.slug}}').submit()" />
                 </div>
             </div>
 
             {% endif %}
             {% if score %}
-            <b><a href="{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">Score: {{score}}/{{exam.total_score}} </a></b>
+            <b><a href="{% url exam.graded_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{% trans 'Score' %}: {{score}}/{{exam.total_score}} </a></b>
             &nbsp;
             {% endif %}
             {% if exam.exam_type == "exam" %}
-            <a href="{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}">
-            View Submissions</a>
+            <a href="{% url exam.my_submissions_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">
+            {% trans 'View Submissions' %}</a>
             {% endif %}
             
             
             
 
-            <p><strong>Deadline:</strong> {{exam.due_date}} PST<br /><br /></p>
+            <p><strong>{% trans 'Deadline' %}:</strong> {{exam.due_date|date:"N d Y, P T"}}<br /><br /></p>
             
         </div>
     </li>
     
     
     {% empty %}
-    <p style='margin: 20px;'>No content to display.</p>
+    <p style='margin: 20px;'>{% trans 'No content to display.' %}</p>
     {% endfor %}
     </ul>
     {% else %}
-    <h4>Please <a href="{% url 'auth_login' %}">log in</a> to see course materials.</h4>
+	
+	{% url 'auth_login' as auth_login_url %}
+    <h4>{% blocktrans %}Please <a href="{{ auth_login_url }}">log in</a> to see course materials.{% endblocktrans %}</h4>
     {% endif %}
 </div>
 
 {% endblock m_column_content %}
-
 

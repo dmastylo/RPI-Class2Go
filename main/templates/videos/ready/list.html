@@ -1,8 +1,9 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% block title %}Videos | {{common_page_data.course.title}}{% endblock %}
 {% block videos_link_class %}class="active"{% endblock videos_link_class %}
 
-{% block course_page_title %}Videos (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
+{% block course_page_title %}{% trans 'Videos' %} (<a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{{common_page_data.course.title}}</a>){% endblock course_page_title %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
@@ -10,10 +11,10 @@
         {% for section_structure in section_structures %}
             {% include "content_sections/ready/section.html" %}
         {% empty %}
-            <p style='margin: 20px;'>No content to display.</p>
+            <p style='margin: 20px;'>{% trans 'No content to display.' %}</p>
         {% endfor %}
     {% else %}
-        <h4>Please <a data-toggle="modal" href="#login-modal">log in</a> to see course materials.</h4>
+        <h4>{% blocktrans %}Please <a data-toggle="modal" href="#login-modal">log in</a> to see course materials.{% endblocktrans %}</h4>
     {% endif %}
 </div>
 {% endblock m_column_content %}

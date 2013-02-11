@@ -1,9 +1,11 @@
+{% load i18n %}
+
 <div class="announcement">
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
     <small class="date"> {{announcement.last_updated}}</small>
     <div class="announcement-actions">
-        <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><em class="icon-edit icon-large"></em> Edit</a>
-        <a href="javascript:DeleteAnnouncement('{{announcement.id}}')"><em class="icon-trash icon-large"></em> Delete</a>
+        <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><em class="icon-edit icon-large"></em> {% trans 'Edit' %}</a>
+        <a href="javascript:DeleteAnnouncement('{{announcement.id}}')"><em class="icon-trash icon-large"></em> {% trans 'Delete' %}</a>
     </div>
     {% else %}
         <small class="date"> {{announcement.last_updated}}</small>
@@ -14,11 +16,11 @@
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
         {% if announcement.is_synced %}
         <span class="badge badge-success">
-            <em class="icon-ok icon-large"></em> <strong>Published!</strong>
+            <em class="icon-ok icon-large"></em> <strong>{% trans 'Published!' %}</strong>
         </span>
         {% else %}
         <span class="badge badge-warning">
-            <em class="icon-random icon-large"></em> Draft has unpublished changes
+            <em class="icon-random icon-large"></em> {% trans 'Draft has unpublished changes' %}
         </span>
         {% endif %}
     {% endif %}

@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <!-- video_list_item -->
     <div class="pull-left icon">
         <em class="icon-facetime-video"></em>
@@ -22,9 +24,9 @@
                 {% endif %}
                 
                 {% if item.completed_percent > 90 %}
-                    <div data-c2g-tooltip class="progress progress-success progress-striped" style="margin-left:3px;" rel="tooltip" title="Video Completed">
+                    <div data-c2g-tooltip class="progress progress-success progress-striped" style="margin-left:3px;" rel="tooltip" title="{% trans 'Video Completed' %}">
                 {% else %}
-                    <div data-c2g-tooltip class="progress progress-info progress-striped" style="margin-left:3px;" rel="tooltip" title="Video Progress: {{ item.completed_percent|floatformat:0}}%">
+                    <div data-c2g-tooltip class="progress progress-info progress-striped" style="margin-left:3px;" rel="tooltip" title="{% trans 'Video Progress' %}: {{ item.completed_percent|floatformat:0}}%">
                 {% endif %}
                         <div class="bar" style="width:{{item.completed_percent}}%"></div>
                     </div>

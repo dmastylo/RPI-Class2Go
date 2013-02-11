@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # per http://www.python.org/peps/pep-0263.html
 
+from nose.plugins.attrib import attr
 import random
 import re
 from sets import Set
@@ -11,6 +12,7 @@ from courses.exams.autograder import *
 from courses.exams.views import compute_penalties
 from fake_remote_grader import *
 
+@attr('slow')
 class SimpleTest(TestCase):
     def test_multiple_choice_factory_normal(self):
         """
@@ -778,22 +780,23 @@ class SimpleTest(TestCase):
 
         ag = AutoGrader(self.interactive_xml)
 
-        # this is on our watchword list
-        with fake_remote_grader('Timed Out'):
+        # we've seen a sick grader time out like this -- shouldn't grade
+        bad_return = r'{"score":0,"maximum-score":1,"feedback":[{"user_answer":"<result> {for $c1 in doc(\"countries.xml\")//country let $d1 := ($c1/@population div $c1/@area) for $c2 in doc(\"countries.xml\")//country let $d2:= ($c2/@population div $c2/@area) where $d1 >= $d2 return <highest density = \"{$d1}\">{data($c1/@name)} </highest>}  {for $c1 in doc(\"countries.xml\")//country let $d1 := ($c1/@population div $c1/@area) for $c2 in doc(\"countries.xml\")//country let $d2:= ($c2/@population div $c2/@area) where $d1 <= $d2 return <lowest density = \"{$d1}\">{data($c1/@name)} </lowest>} </result>","score":0,"explanation":"Timeout Error"}]}'
+        with fake_remote_grader(bad_return):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
 
-        # a watchword used elsewhere should succeed though.  Let's say that "timeout"
-        # is a valid explanation for some reason.
-        fb = [{"user_answer": "timeout", "explanation": "Timed Out", "score": 1}]
-        fbstr = json.dumps(fb)
-        with fake_remote_grader('{"score":1, "maximum-score":1, "feedback":%s}' % fbstr):
-            g = ag.grade("q1b", "should succeed")
-            self.assertEqual(g, {'correct': True, 'score': 1, 'feedback': fb})
-
-        with fake_remote_grader_garbage(""):
+        # we've seen a sick grader time out like this too
+        no_explanation_score0 = r'{"score":0, "maximum":1, "feedback":[{"explanation":""}]}'
+        with fake_remote_grader(no_explanation_score0):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should throw exception")
+
+        # but same thing with score=1 should be OK though (never penalize for no explanation)
+        no_explanation_score1 = r'{"score":1.0, "maximum":1, "feedback":[{"explanation":""}]}'
+        with fake_remote_grader(no_explanation_score1):
+            g = ag.grade("q1b", "should be OK")
+            self.assertEqual(g, {'correct': True, 'score': 1.0, 'feedback': [{"explanation": ""}] })
 
 
     def test_interactive_retries(self):

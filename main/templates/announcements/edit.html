@@ -1,17 +1,18 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
-{% block course_page_title %}Edit Announcement{% endblock course_page_title %}
+{% block course_page_title %}{% trans 'Edit Announcement' %}{% endblock course_page_title %}
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
     {% if announcement.is_synced %}
     <div class="alert alert-success">
-        <em class="icon-ok icon-large"></em> <strong>Published!</strong> This draft is published.
+        <em class="icon-ok icon-large"></em> <strong>{% trans 'Published!' %}</strong> {% trans 'This draft is published.' %}
     </div>
     {% else %}
     <div class="alert">
-        <em class="icon-random icon-large"></em> Draft contains saved changes that have not yet been published.
+        <em class="icon-random icon-large"></em> {% trans 'Draft contains saved changes that have not yet been published.' %}
     </div>
     {% endif %}
     <!--table style="width: 100%;">
@@ -30,14 +31,14 @@
     
     <form name="edit_announcement_form" action="{% url 'courses.announcements.actions.save_announcement' %}" method="POST" class="form-vertical">
         <div class="control-group">
-            <label>Title</label>
+            <label>{% trans 'Title' %}</label>
             <div class="controls">
                 <input name="title" id="announcement_title" value="{{announcement.title}}" type="text" />
             </div>
         </div>
         <div class="control-group">
-            <label>Description:</label>
-            <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
+            <label>{% trans 'Description:' %}</label>
+            <p><span style='text-decoration: italic; font-weight: bold;'>{% trans 'Note:' %}</span> {% trans 'To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain.' %} <span style='text-decoration: italic; font-weight: bold;'>{% trans 'Always use absolute URLs only' %} (http://.....)</span>.</p>
             <div class="controls">
                 <textarea class="tinymce" name="description" id="announcement_description">{{announcement.description}}</textarea>
             </div>
@@ -49,12 +50,12 @@
         <input type="hidden" name="revert" id="revert" value="0" />
         {% csrf_token %}
         
-        <input type="button" class="btn btn-primary" value="Save and Make Ready" onclick="SaveAnnouncement(1,0);" />
-        <input type="button" class="btn" value="Save as Draft" onclick="SaveAnnouncement(0,0);" />
+        <input type="button" class="btn btn-primary" value="{% trans 'Save and Make Ready' %}" onclick="SaveAnnouncement(1,0);" />
+        <input type="button" class="btn" value="{% trans 'Save as Draft' %}" onclick="SaveAnnouncement(0,0);" />
         {% if announcement.image %}
-            <input type="button" class="btn" value="Revert" onclick="SaveAnnouncement(0,1);" />
+            <input type="button" class="btn" value="{% trans 'Revert' %}" onclick="SaveAnnouncement(0,1);" />
         {% endif %}
-        <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
+        <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">{% trans 'Cancel' %}</a>
     </form>
     <script type="text/javascript">
         function SaveAnnouncement(commit,revert) {

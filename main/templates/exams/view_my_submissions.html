@@ -1,7 +1,8 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% load listtest %}
-{% block course_page_title %}Submissions on {{exam.title}}{% endblock course_page_title %}
+{% block course_page_title %}{% trans 'Submissions on' %} {{exam.title}}{% endblock course_page_title %}
 
 {% block exam_link_class %}
 {% if "exam" in exam.exam_type and not videotest %}class="active"{% endif %}
@@ -12,7 +13,7 @@
 <form method="post" action="snapshot" name="sub_{{sub.id}}">
 {% if forloop.first %}
 <div id="graded_sub" class="well well-small">
-    <h3>Graded submission:  {% if score %} Score: {{score}} {% endif %}
+    <h3>{% trans 'Graded submission' %}:  {% if score %} {% trans 'Score' %}: {{score}} {% endif %}
     </h3>
 {% else %}
 <div class="muted">
@@ -20,13 +21,13 @@
 <p>
 <h4>{{sub.time_created}} :</h4>
   {% if sub.json_obj == "__ERROR__" and sub.plain_json_obj == "__ERROR__" %}
-    <div class="alert alert-error">We're sorry, there was an error decoding this submission. If this is the graded submission you'll need to retake the exam or restore from a previous submission. </div>
+    <div class="alert alert-error">{% blocktrans %}We're sorry, there was an error decoding this submission. If this is the graded submission you'll need to retake the exam or restore from a previous submission.{% endblocktrans %}</div>
   {% else %}
     {% for prob, data in sub.json_obj %}
-      {% if data|islist and data.0.questionTag4humans %}
-        On question {{prob}} ({{data.0.questionTag4humans}}), you answered:
+      {% if data|islist and data.0.questionreport %}
+        {% blocktrans with question_tag=data.0.questionreport %}On question {{prob}} ({{question_tag}}), you answered:{% endblocktrans %}
       {% else %}
-        On question {{prob}} ({{data.questionTag4humans}}), you answered:
+        {% blocktrans with question_tag=data.questionreport %}On question {{prob}} ({{question_tag}}), you answered:{% endblocktrans %}
       {% endif %}
          {% if data|islist %}{# Custom template tag to test if object is a list #}
              {% for i in data %}
@@ -50,13 +51,13 @@
     <input type="hidden" name="scores" value="{{score_fields}}" />
 {% endif %}
   {% if sub.json_obj != "__ERROR__" or sub.plain_json_obj != "__ERROR__" %}
-     <input type="submit" name="pre-pop-submit" id="pre-pop-submit" value="See exam form with this submission" />
+     <input type="submit" name="pre-pop-submit" id="pre-pop-submit" value="{% trans 'See exam form with this submission' %}" />
   {% endif %}
 {% csrf_token %}
 </div>
 </form>
 {% endfor %}
-<a class="btn" href="{% url 'exam_list' common_page_data.course.prefix common_page_data.course.suffix %}">Back to exams</a>
+<a class="btn" href="{% url 'exam_list' common_page_data.course.prefix common_page_data.course.suffix %}">{% trans 'Back to exams' %}</a>
 {% endblock m_column_content %}
 
 {% block addl_scripts %}

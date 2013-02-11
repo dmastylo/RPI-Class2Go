@@ -1,9 +1,17 @@
+{% load i18n %}
+
+{# put the translation variables--where translations don't fit well inline--at the top #}
+{% trans 'Warning: you are using an unsupported browser\nand will be unable to save or submit work!\n\nWe suggest you use either Mozilla Firefox or\nGoogle Chrome.' as browser_warning %}
+{% trans 'Login' as Login_trans %}
+{% trans 'login' as login_trans %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, target-densitydpi=device-dpi">
     <meta name="apple-mobile-web-app-capable" content="yes">
     {% block top_scripts %}
+    <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,600,300italic,600italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
@@ -16,12 +24,9 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <!--[if lte IE 8]>
         <script type="text/javascript" src="{{ STATIC_URL }}js/core/respond.min.js"></script>
-        
-    <![endif]-->
-    <!--[if IE]>
         <script type="text/javascript">
             $(document).ready(function () {
-                alert('Warning: you are using an unsupported browser\nand will be unable to save or submit work!\n\nWe suggest you use either Mozilla Firefox or\nGoogle Chrome.');
+            {% blocktrans %}alert("{{ browser_warning }}");{% endblocktrans %}
             });
         </script>
     <![endif]-->
@@ -32,102 +37,107 @@
     <title>{% block title %}{{ SITE_TITLE }}{% endblock %}</title>
 </head>
 
-{% block bodytag %}<body>{% endblock bodytag %}
+{% block bodytag %}<body class="{% block body_class %}{% endblock body_class %}">{% endblock bodytag %}
     <div id="viewport">
       {% if not request.session.headless %}
         <div id="global-header">
             <h1 class="stanford-logo">
             	{% if SITE_NAME_SHORT == 'Stanford' %}
-                <a href="http://www.stanford.edu">Stanford University</a>
+                <a href="http://www.stanford.edu">
+                    <img src="/static/graphics/core/header-stanford-logo.png" width="160" alt="Stanford University">
+                    Stanford University
+                </a>
                 {% else %}
                 <a href="http://www.uwa.edu.au">{{ SITE_NAME_LONG }}</a>
                 {% endif %}
             </h1>
-            <p id="skip-nav"><a href="#main-content" class="hidden-accessible">Jump to content</a></p>
+            <p id="skip-nav"><a href="#main-content" class="hidden-accessible">{% trans 'Jump to content' %}</a></p>
         </div>
         {% block topcontent %}<div id="top-content"></div>{% endblock topcontent %}
       {% endif %}
-        {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}
-          {% if not request.session.headless %}
-            {% block navbar %}
-            {% ifequal user.is_staff True %}
-            <div class="navbar">
-                <div class="navbar-inner">
-                    <div class="container-fluid">
-                        <h2 id="main-nav-heading" class="hidden-accessible">Course Sections</h2>
-                        <ul class="nav" role="navigation" aria-labelledby="main-nav-heading">
-                            <li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">Create Course</a></li>
-                        </ul>
-                        <!--form class="navbar-search hidden-phone" action="">
-                            <div class="input-append">
-                                <input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
-                                <button class="btn btn-inverse btn-search" type="button"><em class="icon-search"></em></button>
+        {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}        
+            {% if not request.session.headless %}
+                {% block navbar %}
+                    {% ifequal user.is_staff True %}
+                        <div class="navbar">
+                            <div class="navbar-inner">
+                                <div class="container-fluid">
+                                    <h2 id="main-nav-heading" class="hidden-accessible">{% trans 'Course Sections' %}</h2>
+                                    <ul class="nav" role="navigation" aria-labelledby="main-nav-heading">
+                                        <li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">{% trans 'Create Course' %}</a></li>
+                                    </ul>
+                                    <!--form class="navbar-search hidden-phone" action="">
+                                        <div class="input-append">
+                                            <input class="span2 search-query" placeholder="Search" id="appendedInputButton" size="16" type="text">
+                                            <button class="btn btn-inverse btn-search" type="button"><em class="icon-search"></em></button>
+                                        </div>
+                                    </form-->
+                                </div>
                             </div>
-                        </form-->
-                    </div>
-                </div>
-            </div>
-            {% endifequal %}
-            {% endblock navbar %}
-          {% endif %}
+                        </div>
+                    {% endifequal %}
+                {% endblock navbar %}
+            {% endif %}
+            
             <div class="row-fluid" style="position:relative;">
-            {% block page_title %}
-            <div class="pull-left page-title">
-                {% if SITE_NAME_SHORT == 'Stanford' %}
-                <img src="{{ STATIC_URL }}graphics/core/top-banner-Stanford.png" alt="Stanford Online">
-                {% endif %}
-                <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
-            </div>
-            {% endblock page_title %}
-            {% block mode_switcher %}
-            {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
-                <div class="hidden-phone" style="position:absolute;top:0;right:0;">
-                    {% if common_page_data.can_switch_mode %}
-                        <form data-c2g-tooltip class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST" data-placement="left" title="Choosing EDIT mode lets you edit the course site. Choosing LIVE mode lets you view the site as students will.">
-                            <p>You are currently viewing:</p>
-                            <div class="btn-group btn-views-toggle">
-                                <button type="submit" name="to_mode" value="draft" class="btn btn-mini{% ifequal common_page_data.course_mode 'draft' %} active{% endifequal %}">Edit</button>
-                                <button type="submit" name="to_mode" value="ready" class="btn btn-mini{% ifequal common_page_data.course_mode 'ready' %} active{% endifequal %}">Live</button>
-                            </div>
-                            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
-                            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
-                            {% csrf_token %}
-                        </form>
+                {% block page_title %}
+                <div class="pull-left page-title">
+                    {% if common_page_data.course.title %}
+                        <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
                     {% endif %}
                 </div>
-            {% endif %}
-            {% endblock mode_switcher %}
+                {% endblock page_title %}
+        
+                {% block mode_switcher %}
+                    {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
+                        <div class="hidden-phone" style="position:absolute;top:0;right:0;">
+                            {% if common_page_data.can_switch_mode %}
+                                <form data-c2g-tooltip class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST" data-placement="left" title="{% trans 'Choosing EDIT mode lets you edit the course site. Choosing LIVE mode lets you view the site as students will.' %}">
+                                    <p>{% trans 'You are currently viewing:' %}</p>
+                                    <div class="btn-group btn-views-toggle">
+                                        <button type="submit" name="to_mode" value="draft" class="btn btn-mini{% ifequal common_page_data.course_mode 'draft' %} active{% endifequal %}">{% trans 'Edit' %}</button>
+                                        <button type="submit" name="to_mode" value="ready" class="btn btn-mini{% ifequal common_page_data.course_mode 'ready' %} active{% endifequal %}">{% trans 'Live' %}</button>
+                                    </div>
+                                    <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
+                                    <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
+                                    {% csrf_token %}
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endblock mode_switcher %}
             </div>
+            
             {% block topnav %}
-            <div class="top-nav">
-                <ul class="unstyled">
-            {% if user.is_authenticated %}
-                <li>
-                    <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
-                        <input type="submit" id="login_button" class="btn logout hidden-phone" value="Logout" />
-                        {% csrf_token %}
-                    </form>
-                </li>
-                <li class="hidden-phone"><span>Welcome <strong><a href="/accounts/profile">{{ user.first_name }} {{ user.last_name }}</a></strong>!</span></li>
-            {% else %}
-                <li class="hidden-phone">
-                	{% if SITE_NAME_SHORT == 'Stanford' %}
-                        {% with login_course=common_page_data.ready_course login_link_id="login_button" login_link_class="btn" link_text="Login" %}
-                            {% include "registration/login_link.html" %}
-                        {% endwith %}
-                    {% else %}
-                    <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">Login</a>
-                	{% endif %}
-
-                </li>
-                {% if not common_page_data.ready_course.institution_only %}
-                <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">Register</a></li>
-                {% endif %}
-            {% endif %}
-                <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><em class="icon-reorder"></em></a></li>
-                <li id="PacTime"><span><strong class="hours">{% now "g" %}</strong>:<strong class="minutes">{% now "i" %}</strong> <strong class="ampm">{% now "A" %}</strong> {% now "T" %}</span></li>
-                </ul>
-            </div>
+                <div class="top-nav">
+                    <ul class="unstyled">
+                        {% if user.is_authenticated %}
+                            <li>
+                                <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
+                                    <input type="submit" id="login_button" class="btn logout hidden-phone" value="{% trans 'Logout' %}" />
+                                    {% csrf_token %}
+                                </form>
+                            </li>
+                        <li class="hidden-phone"><span> {% trans 'Welcome' %} <strong><a href="/accounts/profile"> {{ user.first_name }} {{ user.last_name }} </a></strong>!</span></li>
+                        {% else %}
+                            <li class="hidden-phone">
+                                {% if SITE_NAME_SHORT == 'Stanford' %}
+                                    {% with login_course=common_page_data.ready_course login_link_id="login_button" login_link_class="btn" link_text=Login_trans %}
+                                                {% include "registration/login_link.html" %}
+                                    {% endwith %}
+                                
+                                {% else %}
+                                    <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">{% trans 'Login' %}</a>
+                                {% endif %}
+                            </li>
+                            {% if not common_page_data.ready_course.institution_only %}
+                            <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">{% trans 'Register' %}</a></li>
+                            {% endif %}
+                        {% endif %}
+                        <li class="visible-phone"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><em class="icon-reorder"></em></a></li>
+                        <li id="PacTime"><span><strong class="hours">{% now "g" %}</strong>:<strong class="minutes">{% now "i" %}</strong> <strong class="ampm">{% now "A" %}</strong> {% now "T" %}</span></li>
+                    </ul>
+                </div>
             {% endblock topnav %}
         </div>
         
@@ -141,11 +151,11 @@
                 		{% ifequal available_course.3 'False' %}
                 		    <form name="signup" action="{% url 'courses.actions.signup' %}" method="POST">
                                 <input type="hidden" id="handle" name="handle" value={{available_course.1}} />
-                                {{available_course.0}} ({{available_course.2}})<input type="button" value="Signup" class="btn btn-primary" style='width: 75px; margin-right: 10px;' onclick="signup_clicked('{{available_course.2}}')"/>
+                                {{available_course.0}} ({{available_course.2}})<input type="button" value="{% trans 'Signup' %}" class="btn btn-primary" style='width: 75px; margin-right: 10px;' onclick="signup_clicked('{{available_course.2}}')"/>
                                 {% csrf_token %}
                             </form>
                         {% else %}
-                            {{available_course.0}} ({{available_course.2}})<strong>Already signed up</strong>    
+                            {{available_course.0}} ({{available_course.2}})<strong>{% trans 'Already signed up' %}</strong>    
                         {% endifequal %}  
                 	{% endfor %}
                 {% endblock %}
@@ -195,6 +205,7 @@
             if (h > 12) {
                 h = h - 12;
             }
+            else if (h == 0) h = 12; //0 a.m. -> 12 a.m.
             $('#PacTime .hours').text(h);
             $('#PacTime .minutes').text(m);
             $('#PacTime .ampm').text(ap);
@@ -232,6 +243,35 @@
                 getServerTime();
             }, 60000);
         });
+        
+        /*******************************************************************************************
+	Make Footer Sticky
+	
+	Removed for now until I can figure out the left nav script behavior...
+	
+        function stickyFooter(){
+            var windowHeight = $(window).height(); //get current window height
+            var initContentHeight = $("#viewport").height() + 0; //get page content height
+            var contentHeight = initContentHeight;
+            var footerHeight = $("#global-footer").height() + parseInt($("#global-footer").css('paddingTop')) + parseInt($("#global-footer").css('paddingBottom')) + $(".class2go").height() + 0; //get footer height
+            var footerOffset = $('#global-footer').offset().top;
+            if ((footerOffset + footerHeight ) < windowHeight) {
+                contentHeight = initContentHeight + windowHeight - (footerOffset + footerHeight);
+                $("#viewport").height(contentHeight);
+            }
+            $(window).resize(function() {
+                windowHeight = $(window).height();
+                if ((footerOffset + footerHeight) < windowHeight) {
+                    contentHeight = initContentHeight + windowHeight - (footerOffset + footerHeight);
+                    $("#viewport").height(contentHeight);
+                } else {
+                    $("#viewport").height(initContentHeight);
+                }
+            });
+        }
+        stickyFooter();
+        */
+        
     </script>
     {% endblock bottom_scripts %}
     <script type="text/javascript">

@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% block title %}Course Materials | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 {% block course_materials_link_class %} active{% endblock course_materials_link_class %}
@@ -11,7 +12,7 @@
         {% for section_structure in section_structures %}
             {% include "content_sections/ready/section.html" %}
         {% empty %}
-            <p style='margin: 20px;'>No content to display.</p>
+            <p style='margin: 20px;'>{% trans 'No content to display.' %}</p>
         {% endfor %}
         {% if section_structures|length == 1 %}
             {% if prev_section %}<a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix prev_section.id %}" class="btn pull-left">&larr; {{ prev_section.title }}</a>{% endif %}
