@@ -9,103 +9,102 @@
     <div class="row">  
 
 <script type="text/javascript">
-    function GetReportName() {
-        var report_name = document.getElementById("report_name").value;
-        var filter = document.getElementById("filter");
-        var username_label = document.getElementById("username_label");
-        document.getElementById("param_warning").style.visibility="hidden";
-    	
-        if (report_name == "student_scores" && "{{ common_page_data.course.institution_only }}" == "False") {
-        	filter.style.visibility="visible";
-        	username_label.style.visibility="visible";
-        }else {
-        	filter.style.visibility="hidden";
-        	username_label.style.visibility="hidden";
-        }
-        
-        var color_params = document.getElementById("color_params");
-        if (report_name == "quizzes_summary") {
-    		warning = document.getElementById("warning");
-    		warning.style.visibility="hidden";
-        	color_params.style.visibility="visible";
-        }else {
-        	color_params.style.visibility="hidden";
-        }
+    var quizSummary = true;
+    var studentScores;
+    function showUsernameFilter() {
+	if ("{{ common_page_data.course.institution_only }}" == "False") {
+	    studentScores = true;
+	} else {
+	    studentScores = false;
+	}
     }
-    function checkUsername(event) {
-    	var report_name = document.getElementById("report_name").value;
-    	var filter = document.getElementById("filter").value;
-		var warning = document.getElementById("warning");
-		warning.style.visibility="hidden";
-		document.getElementById("param_warning").style.visibility="hidden";
-		
-    	if (report_name == "student_scores" && filter == "" && "{{ common_page_data.course.institution_only }}" == "False") {
-    		warning.style.visibility="visible";
-    		return false;
-    	}
-    	if (report_name == "quizzes_summary") {
-    		var green_param = document.getElementById("green_param").value;
-    		var orange_param = document.getElementById("orange_param").value;
-    		
-    		if (parseFloat(orange_param) >= parseFloat(green_param) || green_param == "" || orange_param == "") {
-    			document.getElementById("param_warning").style.visibility="visible";
-    			return false;
-    		}
-    	}
-    	document.forms.reportForm.submit();
-    }
-    $(window).load( function() {
-                                if ("{{ report_name }}" == 'student_scores') {
-                                    var filter = document.getElementById("filter");
-                                    filter.style.visibility="visible";
-                                    var username_label = document.getElementById("username_label");
-                                    username_label.style.visibility="visible";
-                                    filter.value = "{{username}}"
-                                    document.getElementById("report_name").value = "{{report_name}}";
-                                    
-                                	var color_params = document.getElementById("color_params");
-                                	color_params.style.visibility="visible";
-                                    
-                                }else {
-                                	var color_params = document.getElementById("color_params");
-                                	color_params.style.visibility="visible";
-                                }
-                                
+	
+    $(window).load(function() {
+	$("#report_name").val("{{ report_name }}");
+	if ("{{ report_name }}" == 'student_scores') {
+	    $("#filters .filter").hide();
+	    $("#username_filter").show().children("input").val("{{username}}");
+	    showUsernameFilter();
+	    quizSummary = false; 
+	} else if ("{{ report_name }}" == 'quizzes_summary') {
+	    $("#filters .filter").hide();
+	    $("#color_filter").show();
+	    $("#green_param input").val("{{green_param}}");
+	    $("#orange_param input").val("{{orange_param}}");
+	    showUsernameFilter();
+	    quizSummary = true;
+	}
+	
+	$("#report_name").change(function() {
+	    $("#warningText").hide();
+	    if ($(this).val() == 'student_scores') {
+		showUsernameFilter();
+		quizSummary = false;
+		$("#filters .filter").hide();
+		if (studentScores) {
+		    $("#username_filter").show();
+		}
+	    } else if ($(this).val() == 'quizzes_summary') {
+		showUsernameFilter();
+		quizSummary = true;
+		$("#filters .filter").hide();
+		$("#color_filter").show();
+	    }
+	});
     });
+    
+    function checkInputs() {
+    	if (studentScores && $("#username_filter input").val() == "") {
+	    $("#warningText").text($("#filterWarning").text()).show();
+	    return false;
+    	}
+	if (quizSummary) {
+    	    var green_param = $("#green_param input").val();
+    	    var orange_param = $("#orange_param input").val();
+    		
+    	    if (parseFloat(orange_param) >= parseFloat(green_param) || green_param == "" || orange_param == "") {
+    		$("#warningText").text($("#filterWarning").text()).show();
+    		return false;
+    	    }
+    	}
+	document.forms.reportForm.submit();
+    }
     
 </script>
 
-      <form action="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST" id="reportForm">
-         <label for="report" style='display: inline;'>Report</label>
-         <select name="report_name" id="report_name" onclick="GetReportName()" style="margin-left: 10px;" style="margin-left: 10px;"> 
-             <option value="quizzes_summary" selected="selected">quizzes summary</option>
-             <option value="student_scores">student scores</option>             
-         </select>
-         <input type="submit" id="generateReport" class='btn' value="Generate report" onclick="checkUsername(); return false;"  style="margin-left: 10px;" />
-         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
-         <div id="optional_filter">
-             <label id="username_label" style='display: inline; visibility: hidden;'>Username</label>
-             <input type="text" id="filter" name="filter" style="visibility: hidden;" />
-             <label id="warning" style='display: inline; visibility: hidden;'>Warning: username cannot be blank</label>
-         </div>
-         <div>
-             <label id="param_warning" style='display: inline; visibility: hidden;'>Your parameters are invalid</label>
-         </div>
-         <div id="color_params">
-             <div>
-             <input type="text" id="green_param" name="green_param" maxlength="2" value="{{ green_param }}">
-             <label id="green_text" style='display: inline;'>% scoring above 67% to show green</label>
-             </div>
-             <div>
-             <input type="text" id="orange_param" name="orange_param" maxlength="2" value="{{orange_param}}"> 
-             <label id="orange_text" style='display: inline;'>% scoring above 67% to show orange</label>
-             </div>
-         </div>
+    <form action="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST" id="reportForm">
+        <select name="report_name" id="report_name" style="margin-left: 10px; float: left;" style="margin-left: 10px;"> 
+            <option value="quizzes_summary" selected="selected">Quiz Summary Report</option>
+            <option value="student_scores">Student Scores Report</option>             
+        </select>
+        <div id="filters">
+	    <div id="username_filter" class="filter" style="display: none; float: left; margin-left: 5px;">
+		<input type="text" id="username" name="filter" placeholder="Username" />
+		<label id="filterWarning" style='display: none;'>Warning: username cannot be blank!</label>
+	    </div>
+	    <div id="color_filter" class="filter" style="float: left; margin-left: 10px;">
+		<div id="green_param" style="float: left; margin-right: 10px;">
+		   <input type="text" name="green_param" maxlength="2" value="{{ green_param }}" style="width: 125px; margin-bottom: 0;">
+		   <label style='display: inline;'>%</label>
+		   <span class="text" style='display: block;'>scored above 67% (High)</span>
+		</div>
+		<div id="orange_param" style="float: left;">
+		   <input type="text" name="orange_param" maxlength="2" value="{{orange_param}}" style="width: 125px; margin-bottom: 0;"> 
+		   <label class="text" style='display: inline;'>%</label>
+		   <label class="text" style='display: block;'>scored above 67% (Low)</label>
+		</div>
+		<label id="colorWarning" style='display: none;'>Warning: Your parameters are invalid!</label>
+	    </div>
+	</div>
+	<input type="submit" id="generateReport" class='btn' value="Generate" onclick="checkInputs(); return false;"  style="margin-left: 10px;" />
+        <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
+	
+        <p id="warningText" style="font-size: 1em; color: red; margin: 25px; display: none; clear: both;"></p>
+	
          {% csrf_token %}
       </form>
 
       {% if we_have_data %}
-          {{ report_label }}
           <table class="table table-striped" style="margin-left: 40px;width: 600px;overflow: auto;">
           <tr>
           {% for heading in headings %}
