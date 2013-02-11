@@ -2,12 +2,13 @@
 -------------------------------------------------- */
 
 body {
-    background-color: #f8f6ea;
+    background-color: #fcfaf5;
     position: relative;
     width: 100%;
     min-width: 480px;
     min-height: 100%;
     font-family: 'Source Sans Pro', 'Helvetica Neue', helvetica, sans-serif;
+    font-size: 1em;
 }
 
 h1,h2,h3,h4 {margin:0;}
@@ -588,7 +589,7 @@ small.date {
 -------------------------------------------------- */
 .registration .well {
     margin:0 auto;
-    background:#f8f6ea;
+    background:#fcfaf5;
     padding:0;
 }
 .registration .well fieldset {
@@ -728,14 +729,14 @@ h3.course-section-heading {
 }
 
 .course-list-item.zebra_light {
-    background-color: #f8f6ea;
+    background-color: #fcfaf5;
 }
 .course-list-item.zebra_dark {
     background-color: #e9e6df;
 }
 
 .course-list-item.zebra_light {
-    background-color: #f8f6ea;
+    background-color: #fcfaf5;
 }
 .course-list-item.zebra_dark {
     background-color: #e9e6df;
@@ -803,7 +804,7 @@ h3.course-section-heading {
     padding:10px 10px 0;
     border:1px solid #eee;
     margin-bottom:10px;
-    background:#f8f6ea;
+    background:#fcfaf5;
     border-radius:5px;
     -moz-border-radius:5px;
     -webkit-border-radius:5px;
@@ -896,7 +897,7 @@ input[type="checkbox"] {
 }
 .class2go a {
     font-size:11px;
-    background:#f8f6ea;
+    background:#fcfaf5;
     padding:3px 10px;
     position:absolute;
     right:20px;
@@ -1689,10 +1690,10 @@ hr {
     border-bottom: 0;
     height: 1px;
     background: #bdb7a1 none;
-    background: -webkit-gradient(linear, left top, right top, from(#bdb7a1), to(#f8f6ea)); /* Safari 4-5, Chrome 1-9 */
-    background: -webkit-linear-gradient(left, #bdb7a1, #f8f6ea); /* Safari 5.1, Chrome 10+ */
-    background: -moz-linear-gradient(left, #bdb7a1, #f8f6ea); /* Firefox 3.6+ */
-    background: -ms-linear-gradient(left, #bdb7a1, #f8f6ea); /* IE 10 */
-    background: -o-linear-gradient(left, #bdb7a1, #f8f6ea); /* Opera 11.10+ */
+    background: -webkit-gradient(linear, left top, right top, from(#bdb7a1), to(#fcfaf5)); /* Safari 4-5, Chrome 1-9 */
+    background: -webkit-linear-gradient(left, #bdb7a1, #fcfaf5); /* Safari 5.1, Chrome 10+ */
+    background: -moz-linear-gradient(left, #bdb7a1, #fcfaf5); /* Firefox 3.6+ */
+    background: -ms-linear-gradient(left, #bdb7a1, #fcfaf5); /* IE 10 */
+    background: -o-linear-gradient(left, #bdb7a1, #fcfaf5); /* Opera 11.10+ */
     margin: 0 0 25px 0;
 }
