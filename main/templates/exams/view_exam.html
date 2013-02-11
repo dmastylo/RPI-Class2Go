@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %} | Stanford Online{% endblock %}
@@ -59,18 +60,17 @@
 
 {% if common_page_data.course.mode == "ready" and not exam.is_live %}
 
-    This exam will go live on {{ exam.live_datetime }} PST.
+    {% trans 'This exam will go live on' %} {{ exam.live_datetime|date:"N d Y, P T" }}.
 
     <br />
     <a href="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}">Return to {{exam.get_human_type}} list.</a>
 
 {% elif too_recent %}
-    
-    <h3>You've completed this activity (or one of its variants) too recently ({{last_record.last_updated}}).
-        There must be a {{exam.minutes_btw_attempts}} minute wait after that time.</h3>
+    <h3>{% blocktrans with last_updated=last_record.last_updated minutes_btw_attempts=exam.minutes_btw_attempts %}You've completed this activity (or one of its variants) too recently ({{last_updated}}).
+        There must be a {{minutes_btw_attempts}} minute wait after that time.{% endblocktrans %}</h3>
 
     <br />
-    <a href="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}">Return to {{exam.get_human_type}} list.</a>
+    <a href="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}">{% blocktrans with get_human_type=exam.get_human_type %}Return to {{get_human_type}} list.{% endblocktrans %}</a>
 
 {% else %}
 
@@ -119,8 +119,8 @@
         
     .correct {color: #090;}
     .incorrect {color: #900;}
-        .timer_container {float:right; position:relative; right:0px; padding:2px; margin:0px; font-size:16px; background:white; border: 1px solid transparent;}
-        .timer_container.fixed { padding:2px; margin:0px; position: fixed; top:5px; right:5px; z-index:11; background:white; border-radius: 4px; border: 1px solid #DDCF99;}
+    .timer_container {float:right; position:relative; right:0px; padding:2px; margin:0px; font-size:16px; background:white; border: 1px solid transparent;}
+    .timer_container.fixed { padding:2px; margin:0px; position: fixed; top:5px; right:5px; z-index:11; background:white; border-radius: 4px; border: 1px solid #DDCF99;}
     input[type="checkbox"] {margin-top: 4px;}
     
     p {padding-bottom: 0px; }
@@ -144,39 +144,39 @@
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines %}
 
-       <h3>This exam was closed on {{ exam.partial_credit_deadline }} PST.  Submissions are disabled. </h3>
+       <h3>{% trans 'This exam was closed on' %} {{ exam.partial_credit_deadline|date:"N d Y, P T" }}.  {% trans 'Submissions are disabled.' %} </h3>
     
     {% endif %}
     {% if endtime %}
         {% if timeopened < endtime %}
             <div class="timer_container" id="countdown">
-            <b style="color:green">End: {{ endtime|date:"N d, P T" }}. About <span id="timeremaining">00:00:00</span> left</b>
+            <b style="color:green">{% trans 'End:' %} {{ endtime|date:"N d, P T" }}. {% trans 'About' context "approximate" %} <span id="timeremaining">00:00:00</span> {% trans 'left' context "time remaining" %}</b>
             </div>
             
         {% else %}
-            <h3> <b style="color:red"> Your time on the exam expired at {{ endtime|date:"N d Y, P T" }}. </b></h3><br />
+            <h3> <b style="color:red"> {% trans 'Your time on the exam expired at' %} {{ endtime|date:"N d Y, P T" }}. </b></h3><br />
         {% endif %}
 
     {% endif %}
     {% if too_many_attempts %}
     
-        <h3>You've made too many attempts. Submissions are disabled.</h3>
+        <h3>{% blocktrans %}You've made too many attempts. Submissions are disabled.{% endblocktrans %}</h3>
 
     {% endif %}
 
     
     
     {% if score %}
-    <h4><b style="color:red">Score: {{score}}/{{exam.total_score}}</b></h4>
+    <h4><b style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</b></h4>
     {% endif %}
 
     {% if raw_score %}
-    <h4><b style="color:red">Raw Score (without late or resubmission penalties): {{raw_score}}</b></h4>
+    <h4><b style="color:red">{% trans 'Raw Score (without late or resubmission penalties)' %}: {{raw_score}}</b></h4>
     {% endif %}
 
 
     <noscript>
-    <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
+    <div class="alert alert-error">{% trans 'Your browser does not have JavaScript enabled. Please enable it before taking this exam' %}</div>
     </noscript>
 
     <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
@@ -188,21 +188,12 @@
             {% if single_question %}
             {% comment %} Only for formative/one-question-at-a-time {% endcomment %}
             <div id="problemset-nav">
-                <button type="button" id="next-question" class="btn question-nav" value="Next Question" title="Next Question"><em class="icon-arrow-right"></em></button>
-                <button type="button" id="prev-question" class="btn question-nav" value="Previous Question" title="Previous Question"><em class="icon-arrow-left"></em></button>
+                <button type="button" id="next-question" class="btn question-nav" value="{% trans 'Next Question' %}" title="{% trans 'Next Question' %}"><em class="icon-arrow-right"></em></button>
+                <button type="button" id="prev-question" class="btn question-nav" value="{% trans 'Previous Question' %}" title="{% trans 'Previous Question' %}"><em class="icon-arrow-left"></em></button>
             </div>
             {% endif %}
 
-            {% comment %}
-            {##% if not videotest %} 
-                {##% comment %} Regular exam/problem set submit button, when no video is present {##% endcomment %}
-                <input class="btn" type="submit" value="Submit" />
-            {##% elif exam.exam_type == "survey" and exam.invideo %}
-                {##% comment %} Only for in-video surveys, provide special-cased submit button {##% endcomment %}
-                <input class="btn" id="survey-submit" type="submit" value="Submit" />
-            {##% endif %}
-            {% endcomment %}
-            <input class="btn btn-primary pull-right" id="submit-button" type="submit" value="Submit Answers" />
+            <input class="btn btn-primary pull-right" id="submit-button" type="submit" value="{% trans 'Submit Answers' %}" />
         </div>
 
 
@@ -371,10 +362,10 @@
             
             if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
                 $(this).attr('data-status', 'Hide');
-                $(this).val('Hide Explanation');
+                $(this).val('{% trans 'Hide Explanation' %}');
             } else {
                 $(this).attr('data-status', 'Show');
-                $(this).val('Show Explanation');
+                $(this).val('{% trans 'Show Explanation' %}');
             } 
     
         }; 
@@ -439,7 +430,7 @@
 
         var quickCheck = function () {
             if ($(this).hasClass('quick-check')) {
-                $(this).val('Checking...');
+                $(this).val("{% trans 'Checking...' %}");
                 $(this).attr('disabled', 'disabled');           /* disallow while checking */
             }
 
@@ -547,7 +538,7 @@
             // for use in any "Check Answer" exercise
             var resetButtonText = function (buttonId) {
                 return function (xhr, status) {
-                    $('#' + buttonId).val('Check Answer');
+                    $('#' + buttonId).val("{% trans 'Check Answer' %}");
                     $('#' + buttonId).removeAttr('disabled');   /* allow saving again on reset */
                 }
             }
@@ -566,7 +557,7 @@
 
                 var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
                     var resultsArea = getResultsArea();
-                    $(resultsArea).append("There was an error contacting the grader service, try again later.");
+                    $(resultsArea).append("{% trans 'There was an error contacting the grader service, try again later' %}.");
                     if (textStatus != "null") {
                         $(resultsArea).append("   (" + textStatus + ")");
                     }
@@ -628,9 +619,9 @@
             $(checkBtn).attr('id','quickCheck_' + idx);
             $(checkBtn).addClass('btn').addClass('quick-check');
             if (__exam_type == "interactive_exercise") {
-                $(checkBtn).attr('value', 'Check Answer');
+                $(checkBtn).attr('value', '{% trans 'Check Answer' %}');
             } else {
-                $(checkBtn).attr('value', 'Check Answers');
+                $(checkBtn).attr('value', '{% trans 'Check Answers' %}');
             }
             $(perQButtonDiv).append($(checkBtn));
 
@@ -641,7 +632,7 @@
                 $(toggleExplBtn).attr('id','toggleExplanation_' + idx);
                 $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
                 $(toggleExplBtn).attr('data-status', 'Show');
-                $(toggleExplBtn).attr('value', 'Show Explanation');
+                $(toggleExplBtn).attr('value', '{% trans 'Show Explanation' %}');
                 $(toggleExplBtn).attr('disabled', 'disabled');
                 $(perQButtonDiv).append($(toggleExplBtn));
             }
@@ -684,8 +675,8 @@
         var returnToListLink = document.createElement('a');
         $(returnToListLink).attr('id', 'returnToListLink');
         $(returnToListLink).attr('href', SUBMISSION_RETURN_URL);
-        $(returnToListLink).attr('title', 'Click to return to the submissions list without submitting this form');
-        $(returnToListLink).text('View Previous Submissions (Without Submitting Form)');
+        $(returnToListLink).attr('title', '{% trans 'Click to return to the submissions list without submitting this form' %}');
+        $(returnToListLink).text('{% trans 'View Previous Submissions (Without Submitting Form)' %}');
         $(returnToListLink).mouseover(function (ev) {
             $(userNote).show();
         }).mouseout(function (ev) {
@@ -702,7 +693,7 @@
 
         var userNote = document.createElement('em');
         $(userNote).addClass('userNote');
-        $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
+        $(userNote).text('{% trans 'Note: Leaving this page without submitting form will cause you to lose changes' %}');
         $(returnToListLink).after($(userNote));
         $(userNote).hide();
     {% endif %}
@@ -711,7 +702,7 @@
                       
     {% if not videotest and editable %}
         var saveWorkBtn = document.createElement('button');
-        $(saveWorkBtn).text('Save Answers')
+        $(saveWorkBtn).text("{% trans 'Save Answers' %}")
                       .addClass('btn')
                       .attr('id','saveWorkBtn');
                    if ($('#prev-question').length == 0) {
@@ -738,7 +729,7 @@
             saveXHR.error(function(xhr, status, msg) {
                         $(saveWorkBtn).removeAttr('disabled');   /* Saving failed; allow saving again */
                         var dialogDiv = window.getDialog(status.toUpperCase());
-                        var displayText = "Your answers could not be saved!";
+                        var displayText = "{% trans 'Your answers could not be saved!' %}";
                         if (typeof msg != "undefined" && msg != "") {
                             displayText += " " + msg;
                         }
@@ -758,10 +749,9 @@
             saveXHR.success(function(status, msg, xhr) { 
                     $(saveWorkBtn).removeAttr('disabled'); /* allow saving again on dialog close */
                     var dialogDiv = window.getDialog(msg.toUpperCase());
-                    $(dialogDiv).find('p').text("Your answers have been saved, but not submitted!");
-
+                    $(dialogDiv).find('p').text("{% trans 'Your answers have been saved, but not submitted!' %}");
                     $(dialogDiv).dialog({ modal: true,
-                                          buttons: {'Close': function() { $(this).dialog("close"); } }
+                                          buttons: {"{% trans 'Close' %}": function() { $(this).dialog("close"); } }
                                         });
             });
             
@@ -849,9 +839,9 @@
             var reEnableBtn = document.createElement('input');
             $(reEnableBtn).attr('id', 'reEnableForm');
             $(reEnableBtn).attr('type', 'button');
-            $(reEnableBtn).attr('title', 'Click to re-enable answers for re-submission of this exam');
+            $(reEnableBtn).attr('title', '{% trans 'Click to re-enable answers for re-submission of this exam' %}');
             $(reEnableBtn).addClass('btn btn-spaced');
-            $(reEnableBtn).val('Click to Re-Enable Answers');
+            $(reEnableBtn).val('{% trans 'Click to Re-Enable Answers' %}');
             submitBtn.before($(reEnableBtn));
             $(reEnableBtn).click(function (ev) {
                 $('input').removeAttr('disabled');
@@ -969,7 +959,7 @@
         var userAnswerObj = window.collectUserAnswers(fieldCollection);
 
         if (__exam_type != "survey" && !userAnswerObj.answeredAll) {
-            var userProceed = confirm("This will submit the entire {{ exam.get_human_type }} and you haven't answered all questions. Still submit?");
+            var userProceed = confirm("{% blocktrans with get_human_type=exam.get_human_type %}This will submit the entire {{ get_human_type }} and you haven't answered all questions. Still submit?{% endblocktrans %}");
             if (!userProceed) {
                 $('#submit-button').removeAttr('disabled');
                 return;
@@ -998,12 +988,12 @@
                 var title="";
 
                 if (__exam_type == "exam")
-                    { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
-                      confirmText = "See My Submissions"; 
-                      title = "Submission complete.";}
+                    { message = "{% trans 'Your submission has been saved.' %}  \n{% blocktrans with due_date=exam.due_date|date:'D M d Y' %}Please check back after {{due_date}} for your score.{% endblocktrans %}";
+                      confirmText = "{% trans 'See My Submissions' %}"; 
+                      title = "{% trans 'Submission complete' %}.";}
                 else if (__exam_type == "survey")
-                    { message = "Thanks!";
-                      title= "Survey complete.";}
+                    { message = "{% trans 'Thanks' %}!";
+                      title= "{% trans 'Survey complete' %}.";}
                       
                 var dialogDiv = window.getDialog(title);
                 

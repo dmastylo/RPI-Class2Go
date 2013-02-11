@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
+{% trans 'Login' as Login_trans %}
+
 {% block title %}{{ SITE_TITLE }} | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 
@@ -12,100 +15,100 @@
 <div class="navbar">
     <div class="navbar-inner nav-collapse collapse">
         <div class="container-fluid">
-            <h2 id="main-nav-heading" class="hidden-accessible">Course Sections</h2>
+            <h2 id="main-nav-heading" class="hidden-accessible">{% trans 'Course Sections' %}</h2>
             <ul class="nav" role="navigation" aria-labelledby="main-nav-heading">
                 <li {% block home_link_class %}{% endblock home_link_class %}>
-                    <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Home</a>
+                    <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Home' %}</a>
                 </li>
                 {% if common_page_data.course_mode == 'draft' or common_page_data.course_info_pages|length > 0 %}
                 <li class="dropdown{% block course_info_link_class %}{% endblock course_info_link_class %}">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Info<em class="caret"></em></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Course Info' %}<em class="caret"></em></a>
                     <ul class="dropdown-menu">
                         {% for page in common_page_data.course_info_pages %}
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
                         {% endfor %}
                         {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
 			    <li class="divider"></li>
-                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">Manage pages</a></li>
+                            <li><a href="{% url 'courses.additional_pages.views.manage_nav_menu' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Manage pages' %}</a></li>
                         {% endif %}
                     </ul>
                 </li>
                 {% endif %}
 		{% if common_page_data.course_mode = 'draft' or common_page_data.content_sections|length > 0 %}
 		<li {% if common_page_data.course_mode = 'ready' %}class="dropdown{% endif %}{% block course_materials_link_class %}{% endblock course_materials_link_class %}{% if common_page_data.course_mode = 'ready' %}"{% endif %}>
-		    <a href={% if common_page_data.course_mode = 'draft' %}"{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}"{% else %}"#" class="dropdown-toggle" data-toggle="dropdown"{% endif %}>Course Materials{% if common_page_data.course_mode = 'ready' %}<em class="caret"></em>{% endif %}</a>
+		    <a href={% if common_page_data.course_mode = 'draft' %}"{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}"{% else %}"#" class="dropdown-toggle" data-toggle="dropdown"{% endif %}>{% trans 'Course Materials' %}{% if common_page_data.course_mode = 'ready' %}<em class="caret"></em>{% endif %}</a>
 		    {% if common_page_data.course_mode = 'ready' %}
 		    <ul class="dropdown-menu">
 		      {% for section in common_page_data.content_sections %}
                   <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
 		      {% endfor %}
 		      <li class="divider"></li>
-		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">Show all</a></li>
+		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Show all' %}</a></li>
 		    </ul>
 		    {% endif %}
                 </li>
 		{% endif %}
                 {% if common_page_data.course.has_videos %}
                 <li {% block videos_link_class %}{% endblock videos_link_class %}>
-                    <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">Videos</a>
+                    <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Videos' %}</a>
                 </li>
                 {% endif %}
                 {% if common_page_data.course.has_problem_sets %}
                 <li {% block problemsets_link_class %}{% endblock problemsets_link_class %}>
-                    <a href=" {% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">Quizzes</a>
+                    <a href=" {% url 'problemset_list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Quizzes' %}</a>
                 </li>
                 {% endif %}
                 {% if common_page_data.course.has_interactive_exercises %}
                 <li {% block interactive_exercise_link_class %}{% endblock interactive_exercise_link_class %}>
-                    <a href="{% url 'interactive_exercise_list' common_page_data.course_prefix common_page_data.course_suffix %}">Interactive Exercises</a>
+                    <a href="{% url 'interactive_exercise_list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Interactive Exercises' %}</a>
                 </li>
                 {% endif %}
                 {% if common_page_data.course.has_exams %}
                 <li {% block exam_link_class %}{% endblock exam_link_class %}>
-                    <a href="{% url 'exam_list' common_page_data.course_prefix common_page_data.course_suffix %}">Exams</a>
+                    <a href="{% url 'exam_list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Exams' %}</a>
                 </li>
                 {% endif %}
                 {% if common_page_data.course.has_surveys %}
                 <li {% block survey_link_class %}{% endblock survey_link_class %}>
-                    <a href="{% url 'survey_list' common_page_data.course_prefix common_page_data.course_suffix %}">Surveys</a>
+                    <a href="{% url 'survey_list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Surveys' %}</a>
                 </li>
                 {% endif %}
                 <li {% block forums_link_class %}{% endblock forums_link_class %}>
-                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">Forum</a>
+                    <a href="{% url 'courses.forums.views.view' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Forum' %}</a>
                 </li>
                 {% if user.is_authenticated %}
                 <li class="visible-phone">
-                    <a href="/accounts/profile">My Account</a>
+                    <a href="/accounts/profile">{% trans 'My Account' %}</a>
                 </li>
                 <li class="visible-phone">
-                    <a href="{% url 'auth_logout' %}">Logout</a>
+                    <a href="{% url 'auth_logout' %}">{% trans 'Logout' %}</a>
                 </li>
                 {% else %}
                     <li class="visible-phone">
                         {% if SITE_NAME_SHORT == 'Stanford' %}
-                            {% with login_course=common_page_data.course login_link_id="phone_login" login_link_class="" link_text="Login" %}
+                            {% with login_course=common_page_data.course login_link_id="phone_login" login_link_class="" link_text=Login_trans %}
                                 {% include "registration/login_link.html" %}
                             {% endwith %}
                         {% else %}
-                        <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">Login</a>
+                        <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">{% trans 'Login' %}</a>
                         {% endif %}
                     </li>
                     {% if not common_page_data.course.institution_only %}
                     <li class="visible-phone">
-                        <a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">Register</a>
+                        <a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">{% trans 'Register' %}</a>
                     </li>
                     {% endif %}
                 {% endif %}
                 {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                     {% if common_page_data.course_mode == 'draft' %}
                         <li class="dropdown"{% block course_admin_link %}{% endblock course_admin_link %}>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Course Administration<em class="caret"></em></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Course Administration' %}<em class="caret"></em></a>
                             <ul class="dropdown-menu">
-                              <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">Email Course Members</a></li>
-                              <li><a href="{% url 'courses.reports.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">Reports</a></li>
-                              <li><a href="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}">In-line Reports</a></li>
+                              <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Email Course Members' %}</a></li>
+                              <li><a href="{% url 'courses.reports.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Reports' %}</a></li>
+                              <li><a href="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'In-line Reports' %}</a></li>
                                 {% if common_page_data.course.share_to.exists %}
-                              <li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">Copy Content To Other Course</a></li>
+                              <li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Copy Content To Other Course' %}</a></li>
                                 {% endif %}
                               <!-- <li><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Coming Soon!</a></li> -->
                             </ul>

@@ -1,9 +1,10 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% block course_info_link_class %} active{% endblock course_info_link_class %}
 
 {% block course_page_title %}
-    Add New Static Page 
+    {% trans 'Add New Static Page' %} 
     (<a href="{% url 'courses.views.main' 
                      common_page_data.course_prefix 
                      common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>)
@@ -16,15 +17,15 @@
             <form action="{% url 'courses.additional_pages.actions.add' %}" method="POST" class="form-inline" style="margin-bottom:0;">
                 <table style="width:500px;">
                     <tr>
-                        <td style="width:100px;"><strong>Title</strong></td>
+                        <td style="width:100px;"><strong>{% trans 'Title' %}</strong></td>
                         <td style="width:400px;"><input name="title" id="title" type="text" /></td>
                     </tr>
                     <tr>
-                        <td style="width:100px;"><strong>URL identifier</strong></td>
+                        <td style="width:100px;"><strong>{% trans 'URL identifier' %}</strong></td>
                         <td style="width:400px;"><input name="slug" id="slug" type="text" /></td>
                     </tr>
                     <tr>
-                        <td style="width:100px;"><strong>Section</strong></td>
+                        <td style="width:100px;"><strong>{% trans 'Section' %}</strong></td>
                         <td style="width:400px;">
                             <select name="section_id" onChange="prefill_children(this);">
                                 {% for section in sections %}
@@ -34,7 +35,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="width:100px;"><strong>Parent</strong></td>
+                        <td style="width:100px;"><strong>{% trans 'Parent' %}</strong></td>
                         <td style="width:400px;">
                             <select name="parent_id">
                                 <!-- Filled by prefill_children() -->

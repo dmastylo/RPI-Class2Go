@@ -1,3 +1,7 @@
+{% load i18n %}
+{% trans "Show Explanation" as show_explanation_trans %}
+{% trans "Hide Explanation" as hide_explanation_trans %}
+
 window.displayQuestionExplanation = function(questionMD){
     //This function takes a DOM object of the metadata and displays the question explanation after the
     //question with the corresponding id
@@ -16,12 +20,12 @@ window.displayQuestionExplanation = function(questionMD){
         //$(toggleExplBtn).attr('id','toggleExplanation_' + idx);
         $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
         $(toggleExplBtn).attr('data-status', 'Show');
-        $(toggleExplBtn).attr('value', 'Show Explanation');
+        $(toggleExplBtn).attr('value', '{{ show_explanation_trans }}');
         $(toggleExplBtn).click(toggleExplanation);
     }
     $(explArea).hide();
     $('#' + assocQID + ' .toggle-explanation').attr('data-status', 'Show');
-    $('#' + assocQID + ' .toggle-explanation').val("Show explanation");
+    $('#' + assocQID + ' .toggle-explanation').val('{{ show_explanation_trans }}');
     //$(explArea).append("<h4>Explanation</h4>");
     $(mySolution).contents().each(function(){
         //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
@@ -92,10 +96,10 @@ window.toggleExplanation = function () {
     
     if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
         $(this).attr('data-status', 'Hide');
-        $(this).val('Hide Explanation');
+        $(this).val('{{ hide_explanation_trans }}');
     } else {
         $(this).attr('data-status', 'Show');
-        $(this).val('Show Explanation');
+        $(this).val('{{ show_explanation_trans }}');
     }
     
 };

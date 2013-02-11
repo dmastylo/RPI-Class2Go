@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block m_column_content %}
 
-Thanks for registering.  You should soon receive an email with account activation information at the email you entered.
+{% trans 'Thanks for registering.  You should soon receive an email with account activation information at the email you entered.' %}
 
 {% endblock m_column_content %}

@@ -1,3 +1,4 @@
+{% load i18n %}
 <form name="delete_exam_form" action="{% url 'courses.exams.actions.delete_exam' %}" method="POST">
     <input type="hidden" name="exam_id" id="delete_exam_id" />
     <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
@@ -6,7 +7,7 @@
 </form>
 <script type="text/javascript">
     function DeleteExam(id) {
-        if (confirm("Are you sure you want to delete the exam '" + $("#exam_"+id+"_title").html() + "'?")) {
+        if (confirm("{% trans 'Are you sure you want to delete the exam' %} '" + $("#exam_"+id+"_title").html() + "'?")) {
             $("#delete_exam_id").val(id);
             document.forms.delete_exam_form.submit();
         }

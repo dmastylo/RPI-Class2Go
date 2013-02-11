@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% block title %}{{ SITE_TITLE }} | Register{% endblock title %}
 {% block topnav %} {% endblock topnav %}
@@ -8,7 +9,7 @@
 {% if form.errors %}
     <div class="alert alert-error">
     <button class="close" data-dismiss="alert">×</button>
-    Please correct the errors below.
+    {% trans 'Please correct the errors below.' %}
     </div>
 {% endif %}
 
@@ -17,7 +18,7 @@
 </div>
 <div class="registration span5">
 	<div class="well">
-        <h2>Register for {{ SITE_TITLE }}</h2>
+        <h2>{% trans 'Register for' %} {{ SITE_TITLE }}</h2>
 
 		<form action="{% url 'registration_register' %}" method="post" class="form-horizontal">
             <fieldset>
@@ -25,11 +26,10 @@
             </fieldset>
 		    <div class="form-actions">
                 <p>
-                 {{form.tos}} I agree to {{ SITE_TITLE }}'s <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>,
-                <a href="{% url 'c2g.views.tos' %}#honor" target="_blank" >Honor Code</a>, and <a href="{% url 'c2g.views.tos' %}#privacy" target="_blank">Privacy Policy</a>
-
+                 {% url 'c2g.views.tos' as tos_url %}
+                 {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}'s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
                 </p>
-		    	<input type="submit" value="Register" class="btn btn-primary btn-large" /> &nbsp; Already have an account?  <a href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}"> Login instead</a>
+		    	<input type="submit" value="{% trans 'Register' %}" class="btn btn-primary btn-large" /> &nbsp; {% trans 'Already have an account?' %}  <a href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}"> {% trans 'Login instead' %}</a>
 			</div>
 		</form>        
 	</div>

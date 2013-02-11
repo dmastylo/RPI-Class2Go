@@ -1,1 +1,15 @@
-<form name="delete_content_section_form" action="{% url 'courses.content_sections.actions.delete_content_section' %}" method="POST">    <input type="hidden" name="section_id" id="delete_section_id" />    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />    {% csrf_token %}</form><script type="text/javascript">    function DeleteContentSection(id) {        if (confirm("Are you sure you want to delete this section and all videos and problem sets it contains?")) {            $("#delete_section_id").val(id);            document.forms.delete_content_section_form.submit();        }    }</script>
+{% load i18n %}
+<form name="delete_content_section_form" action="{% url 'courses.content_sections.actions.delete_content_section' %}" method="POST">
+    <input type="hidden" name="section_id" id="delete_section_id" />
+    <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
+    <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
+    {% csrf_token %}
+</form>
+<script type="text/javascript">
+    function DeleteContentSection(id) {
+        if (confirm("{% trans 'Are you sure you want to delete this section and all videos and problem sets it contains?' %}")) {
+            $("#delete_section_id").val(id);
+            document.forms.delete_content_section_form.submit();
+        }
+    }
+</script>
