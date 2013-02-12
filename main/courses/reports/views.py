@@ -206,12 +206,12 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     if request.POST.get("green_param", False):
         green_param = request.POST["green_param"]
     else:
-        green_param = 50
+        green_param = 67
         
-    if request.POST.get("orange_param", False):
-        orange_param = request.POST["orange_param"]
+    if request.POST.get("blue_param", False):
+        blue_param = request.POST["blue_param"]
     else:
-        orange_param = 40
+        blue_param = 34
         
     course = request.common_page_data['ready_course']
     
@@ -230,7 +230,7 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     rows = {}
     
     we_have_data = False
-    report_data = gen_spec_in_line_report(report_name, course, username, green_param, orange_param)
+    report_data = gen_spec_in_line_report(report_name, course, username, green_param, blue_param)
     if report_name == 'quizzes_summary':
         if report_data:
             report_label = "Quizzes Summary"
@@ -270,7 +270,7 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'column6':column6,
         'row_color':row_color,
         'green_param':green_param,
-        'orange_param':orange_param,
+        'blue_param':blue_param,
         'username':username,
         'max_scores':max_scores,
         'rows':rows

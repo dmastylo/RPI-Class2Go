@@ -35,7 +35,7 @@
 		    $("#filters .filter").hide();
 		    $("#color_filter").show();
 		    $("#green_param input").val("{{green_param}}");
-		    $("#orange_param input").val("{{orange_param}}");
+		    $("#blue_param input").val("{{blue_param}}");
 		    studentScores = false;
 		    quizSummary = true;
 		}
@@ -66,9 +66,9 @@
     	}
 		if (quizSummary) {
     	    var green_param = $("#green_param input").val();
-    	    var orange_param = $("#orange_param input").val();
+    	    var blue_param = $("#blue_param input").val();
     		
-    	    if (parseFloat(orange_param) >= parseFloat(green_param) || green_param == "" || orange_param == "") {
+    	    if (parseFloat(blue_param) >= parseFloat(green_param) || green_param == "" || blue_param == "") {
     		$("#warningText").text($("#colorWarning").text()).show();
     		return false;
     	    }
@@ -92,12 +92,12 @@
 			<div id="green_param" style="float: left; margin-right: 10px;">
 			   <input type="text" name="green_param" maxlength="2" value="{{ green_param }}" style="width: 125px; margin-bottom: 0;">
 			   <label style='display: inline;'>%</label>
-			   <span class="text" style='display: block; color: green'>scored above 67% (green)</span>
+			   <span class="text" style='display: block; color: green'>show green if > this % of students scored above 67%</span>
 			</div>
-			<div id="orange_param" style="float: left;">
-			   <input type="text" name="orange_param" maxlength="2" value="{{orange_param}}" style="width: 125px; margin-bottom: 0;"> 
+			<div id="blue_param" style="float: left;">
+			   <input type="text" name="blue_param" maxlength="2" value="{{blue_param}}" style="width: 125px; margin-bottom: 0;"> 
 			   <label class="text" style='display: inline;'>%</label>
-			   <span class="text" style='display: block; color: blue'>scored above 67% (Low)</span><span class="text" style='display: block; color: red'>Those below this value will be red</span>
+			   <span class="text" style='display: block; color: red'>show red if < this % of students scored above 67%</span><span class="text" style='display: block; color: blue'>assessments with % of students in between these values will be displayed in blue</span>
 			</div>
 			<label id="colorWarning" style='display: none;'>Warning: Your parameters are invalid!</label>
 	    </div>
