@@ -52,6 +52,9 @@ urlpatterns = patterns('',
                        
     # Get server epoch
     url(r'^server_epoch/?$', 'c2g.views.server_epoch'),
+    
+    # Get server time
+    url(r'^server_time/?$', 'c2g.views.server_time'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
 

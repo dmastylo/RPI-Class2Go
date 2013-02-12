@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+import pytz
 
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
@@ -53,6 +54,11 @@ def throw404(request):
 @never_cache
 def server_epoch(request):
     return HttpResponse(int(time.time()))
+
+@never_cache
+def server_time(request):
+    t = datetime.now(tz=pytz.timezone(settings.TIME_ZONE))
+    return HttpResponse('{"hour": ' + str(t.hour) + ', "minute": ' + str(t.minute) + ', "second": ' + str(t.second) + '}')
 
 def hc(request):
     site = getattr(settings, 'SITE_NAME_SHORT')

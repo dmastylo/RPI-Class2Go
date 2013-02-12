@@ -183,14 +183,13 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
     <script type="text/javascript">
         //alert(navigator.userAgent);
-        
         var getServerTime = function() {
-            $.ajax("{% url 'c2g.views.server_epoch' %}", {
+            $.ajax("{% url 'c2g.views.server_time' %}", {
                 cache:false,
                 success:function(data){
-                    var serverDate = new Date(JSON.parse(data) * 1000);
-                    var serverMinutes = parseInt(serverDate.getMinutes());
-                    var serverHours = parseInt(serverDate.getHours());
+                    var serverTime = JSON.parse(data);
+                    var serverHours = serverTime.hour;
+                    var serverMinutes = serverTime.minute;
                     if (serverHours >= 12) { ampm = "PM" } else { ampm = "AM" }
                     displayTime(serverHours, serverMinutes, ampm);
                 }, 
