@@ -1032,11 +1032,15 @@
         unsavedChanges = true; //denote keystroke and register unsaved changes
     });
     
+    {% if not videotest %}
+                      
     $(window).on('beforeunload', function(){
         if (unsavedChanges) {
            return 'You have unsaved changes!';
         }
     });
+                      
+    {% endif %}
                       
     // Make sure pre-pop is in a properly-escaped string 
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
