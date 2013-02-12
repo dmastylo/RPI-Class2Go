@@ -25,7 +25,12 @@
 	    $("#filters .filter").hide();
 	    $("#username_filter").show().children("input").val("{{username}}");
 	    showUsernameFilter();
-	    quizSummary = false; 
+	    quizSummary = false;
+	    if (studentScores) {
+	    	$("#username_filter").show();
+	    }else {
+	        $("#username_filter").hide();
+	    }
 	} else if ("{{ report_name }}" == 'quizzes_summary') {
 	    $("#filters .filter").hide();
 	    $("#color_filter").show();
@@ -63,7 +68,7 @@
     	    var orange_param = $("#orange_param input").val();
     		
     	    if (parseFloat(orange_param) >= parseFloat(green_param) || green_param == "" || orange_param == "") {
-    		$("#warningText").text($("#filterWarning").text()).show();
+    		$("#warningText").text($("#colorWarning").text()).show();
     		return false;
     	    }
     	}
@@ -91,7 +96,7 @@
 		<div id="orange_param" style="float: left;">
 		   <input type="text" name="orange_param" maxlength="2" value="{{orange_param}}" style="width: 125px; margin-bottom: 0;"> 
 		   <label class="text" style='display: inline;'>%</label>
-		   <label class="text" style='display: block;'>scored above 67% (Low)</label>
+		   <span class="text" style='display: block;'>scored above 67% (Low)</span>
 		</div>
 		<label id="colorWarning" style='display: none;'>Warning: Your parameters are invalid!</label>
 	    </div>
@@ -105,7 +110,8 @@
       </form>
 
       {% if we_have_data %}
-          <table class="table table-striped" style="margin-left: 40px;width: 600px;overflow: auto;">
+          <br/>
+          <table class="table table-striped" style="overflow: auto;">
           <tr>
           {% for heading in headings %}
               <td>{{heading}}</td>
