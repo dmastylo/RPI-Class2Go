@@ -2,7 +2,7 @@
 -------------------------------------------------- */
 
 body {
-    background-color: #fcfaf5;
+    background-color: #FBFBF9;
     position: relative;
     width: 100%;
     min-width: 480px;
@@ -48,7 +48,7 @@ a {color:#820000;}
 a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
 .well {border-color:#bdb7a1;}
-.well.tight {padding:10px 0;background:#f3efd8;}
+.well.tight {padding:10px 0;background:#e9e6df;}
 .well.tight .nav-list li {clear:left;}
 .well.tight .nav-list li a {
     padding:5px 15px;
@@ -68,7 +68,7 @@ a:hover {color:#820000;}
 
 .upcoming {
   padding:10px 0px;
-  background:#f3efd8;
+  background:#e9e6df;
 }
 .upcoming h4 {
   margin-left: 5px;
@@ -99,7 +99,7 @@ a:hover {color:#820000;}
 .modal-header {border-bottom:1px solid #ddcf99;}
 .modal-body {border-top:1px solid white;}
 .modal-footer {border-top:1px solid #ddcf99;background:#e3dfd5;}
-.nav-list .divider {background-color: #ddcf99;}
+.nav-list .divider {background-color: #aca68d;}
 
 .btn-primary {
     background-color: #8f2618;
