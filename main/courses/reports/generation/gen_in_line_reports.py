@@ -46,7 +46,7 @@ def gen_spec_in_line_report(report_name, course, username, green_param, orange_p
             if total_gt_67 > 0 and ((total_gt_67/total)*100 >= int(green_param)):
                 row_color[exam['title']] = "green"
             elif (total_gt_67 > 0) and ((total_gt_67/total)*100 >= int(orange_param)):
-                row_color[exam['title']] = "orange"
+                row_color[exam['title']] = "blue"
             else:
                 row_color[exam['title']] = "red"
         

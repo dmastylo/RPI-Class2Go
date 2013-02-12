@@ -198,7 +198,7 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     else:
         report_name = ''
     
-    if request.POST.get("filter", False):
+    if request.POST.get("filter", False) and request.POST["filter"] != 'None':
         username = request.POST["filter"]
     else:
         username = None
@@ -251,6 +251,9 @@ def generate_in_line_report(request, course_prefix, course_suffix):
             max_scores = report_data['max_scores']
             rows = report_data['rows']
             we_have_data = True
+    
+    
+    print "report_name : " + str(report_name)
     
     return render_to_response('reports/in_line.html', {
         'common_page_data':request.common_page_data,
