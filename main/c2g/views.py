@@ -57,7 +57,7 @@ def server_epoch(request):
 
 @never_cache
 def server_time(request):
-    t = datetime.now(tz=pytz.timezone('US/Pacific'))
+    t = datetime.now(tz=pytz.timezone(settings.TIME_ZONE))
     return HttpResponse('{"hour": ' + str(t.hour) + ', "minute": ' + str(t.minute) + ', "second": ' + str(t.second) + '}')
 
 def hc(request):
