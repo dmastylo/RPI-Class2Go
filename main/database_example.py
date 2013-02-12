@@ -1,3 +1,5 @@
+import os
+
 # Don't forget to actually create the database named NAME
 DATABASES = {
     'default': {
