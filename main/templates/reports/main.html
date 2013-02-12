@@ -10,68 +10,85 @@
         <div class="tabbable span12">  
             <ul class="nav nav-tabs" style='font-size: 10pt;'>  
                 <li class="active"><a href="#dashboard" data-toggle="tab">Course Dashboard</a></li>
-                <li><a href="#all_assessment_summary" data-toggle="tab">Combined Summary of all Assessments</a></li>
-                <li><a href="#assessment_student_data" data-toggle="tab">Assessment Student Data</a></li>
-                <li><a href="#assessment_summary" data-toggle="tab">Assessment Summary</a></li>
+                <li><a href="#individual_student_scores_q" data-toggle="tab">Individual Student Scores by Question</a></li>
+                <li><a href="#individual_student_scores_a" data-toggle="tab">Individual Student Scores by Assessment</a></li>
+                <li><a href="#aggregated_attempts_by_q" data-toggle="tab">Aggregated Attempts by Question</a></li>                                                
+                <li><a href="#aggregated_attempts_by_a" data-toggle="tab">Aggregated Attempts by Question for all Assessments</a></li>
                 <li><a href="#videos_full" data-toggle="tab">Video Student Data</a></li>
                 <li><a href="#videos_summary" data-toggle="tab">Video Summary</a></li>
                 <li><a href="#class_roster" data-toggle="tab">Class Roster</a></li>
                 <li><a href="#survey_summary" data-toggle="tab">Survey Summary</a><li>
-                <li><a href="#assessment_student_scores" data-toggle="tab">Assessment Student Scores</a></li>
             </ul>
             <div class="tab-content">
                 <div id="dashboard" class="tab-pane active" style="padding-left: 10px;">
                     <h3>Generate new course dashboard report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
-                        <input type="submit" class='btn' value="Generate new dashboard report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="dashboard" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available course dashboard reports</h3>
+                    <h3>Available reports</h3>
                     <table class="table table-striped" style="width: 600px;">
                         {% for rep in dashboard_reports %}
                             <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'dashboard' rep.s3_name %}">{{ rep.name }}</a></td></tr>
                         {% empty %}
-                            <tr><td style="width: 600px;">No dashboard reports available at the moment.</td></tr>
+                            <tr><td style="width: 600px;">No reports available at the moment.</td></tr>
                         {% endfor %}
                     </table>
                 </div>
                 
-                <div id="all_assessment_summary" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new course assessment summary</h3>
+                <div id="aggregated_attempts_by_a" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new aggregated attempts by question for all assessments report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <p >Performance of the class for each question, for all assessments, giving mean score, max score, total attempts, distinct students who have attempted, # correct attempts and # correct first, second and third attempts.</p>
+                    <table class="table table-striped" style="margin-left: 40px;width: 600px;overflow: auto;">
+                    <tr><td>Field</td><td>Total attempts</td><td>Students who have attempted</td><td>Correct attempts</td><td>Correct 1st attempts</td><td>Correct 2nd attempts</td><td>Correct 3rd attempts</td></tr>
+					<tr><td>q3b</td><td>11750</td><td>9868</td><td>10470</td><td>8591</td><td>1458</td><td>288</td></tr>
+					<tr><td>q2b</td><td>12277</td><td>10174</td><td>11194</td><td>9150</td><td>1580</td><td>321</td></tr>
+					<tr><td>q1b</td><td>12727</td><td>10355</td><td>11693</td><td>9558</td><td>1643</td><td>327</td></tr>
+					</table>
+                    
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
-                        <input type="submit" class='btn' value="Generate new course assessment summary" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="course_assessments" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available course assessment summaries</h3>
+                    <h3>Available reports</h3>
                     <table class="table table-striped" style="width: 600px;">
                         {% for rep in course_assessment_reports %}
                             <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'course_assessments' rep.s3_name %}">{{ rep.name }}</a></td></tr>
                         {% empty %}
-                            <tr><td style="width: 600px;">No course assessment reports available at the moment.</td></tr>
+                            <tr><td style="width: 600px;">No reports available at the moment.</td></tr>
                         {% endfor %}
                     </table>
                 </div>                
                 
-                <div id="assessment_student_data" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new assessment full report</h3>
+                <div id="individual_student_scores_q" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new student scores by question report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <p >How each student performed for each question giving correct or incorrect, # attempts, score and total score for the assessment.</p>
+                    <table class="table table-striped" style="margin-left: 40px;width: 600px;overflow: auto;">
+                    <tr><td>Field</td><td>Correct #</td><td>Attempts</td><td>Sub score</td><td>Total score</td><td>Max possible score</td></tr>
+                    <tr><td/><td/><td/><td/><td>3</td><td>3</td></tr>
+					<tr><td>q3b</td><td>1</td><td>2</td><td>1</td></tr>
+					<tr><td>q2b</td><td>1</td><td>1</td><td>1</td></tr>
+					<tr><td>q1b</td><td>1</td><td>3</td><td>1</td></tr>
+					</table>
+
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
                         <label for="video" style='display: inline;'>Assessments</label>
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
                             {% for exam in exams %}<option value="{{exam.slug}}">{{exam.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new assessment full report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="assessment_full" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available assessment full reports</h3>
+                    <h3>Available reports</h3>
                     {% for ps in assessment_full_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
                         {% if ps.reports|length > 0 %}
@@ -81,25 +98,32 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No full reports available for this assessment.</label>
+                            <label style="margin-left: 40px;">No reports available at the moment.</label>
                         {% endif %}
                     {% endfor %}
                 </div>                
                 
-                <div id="assessment_summary" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new assessment summary report</h3>
+                <div id="aggregated_attempts_by_q" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new aggregated attempts by question report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <p >Performance of the class for each question giving total attempts, distinct students who have attempted, # correct attempts and # correct first, second and third attempts.</p>
+                    <table class="table table-striped" style="margin-left: 40px;width: 600px;overflow: auto;">
+                    <tr><td>Field</td><td>Total attempts</td><td>Students who have attempted</td><td>Correct attempts</td><td>Correct 1st attempts</td><td>Correct 2nd attempts</td><td>Correct 3rd attempts</td></tr>
+					<tr><td>q3b</td><td>11750</td><td>9868</td><td>10470</td><td>8591</td><td>1458</td><td>288</td></tr>
+					<tr><td>q2b</td><td>12277</td><td>10174</td><td>11194</td><td>9150</td><td>1580</td><td>321</td></tr>
+					<tr><td>q1b</td><td>12727</td><td>10355</td><td>11693</td><td>9558</td><td>1643</td><td>327</td></tr>
+					</table>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
                         <label for="video" style='display: inline;'>Assessment</label>
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
                             {% for exam in exams %}<option value="{{exam.slug}}">{{exam.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new assessment summary report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="assessment_summary" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available assessment summary reports</h3>
+                    <h3>Available reports</h3>
                     {% for ps in assessment_summ_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
                         {% if ps.reports|length > 0 %}
@@ -109,25 +133,26 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No summary reports available for this assessment.</label>
+                            <label style="margin-left: 40px;">No reports available at the moment.</label>
                         {% endif %}
                     {% endfor %}
                 </div>
                 
                 <div id="videos_full" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new video full report</h3>
+                    <h3>Generate new video student data report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <p >Student video page visits.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
                         <label for="video" style='display: inline;'>Video</label>
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
                             {% for v in videos %}<option value="{{v.slug}}">{{v.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new video full report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="video_full" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available video full reports</h3>
+                    <h3>Available reports</h3>
                     {% for vd in vd_quiz_full_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ vd.title }}</h4>
                         {% if vd.reports|length > 0 %}
@@ -137,7 +162,7 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No full reports available for this video.</label>
+                            <label style="margin-left: 40px;">No reports available at the moment.</label>
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -150,12 +175,12 @@
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
                             {% for v in videos %}<option value="{{v.slug}}">{{v.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new video summary report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="video_summary" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available video summary reports</h3>
+                    <h3>Available reports</h3>
                     {% for vd in vd_quiz_summ_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ vd.title }}</h4>
                         {% if vd.reports|length > 0 %}
@@ -165,21 +190,21 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No summary reports available for this video.</label>
+                            <label style="margin-left: 40px;">No reports available at the moment.</label>
                         {% endif %}
                     {% endfor %}
                 </div>
                 
                 <div id="class_roster" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new class roster</h3>
+                    <h3>Generate new class roster report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
-                        <input type="submit" class='btn' value="Generate new class roster" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="class_roster" />
                         {% csrf_token %}
                     </form>
-                    <h3>Download Class Roster</h3>
+                    <h3>Available reports</h3>
                     {% if class_rosters|length > 0 %}
                         <table class="table table-striped" style="margin-left: 40px;width: 600px;">
                             {% for rep in class_rosters %}
@@ -187,24 +212,25 @@
                             {% endfor %}
                         </table>
                     {% else %}
-                        <label style="margin-left: 40px;">No class roster has been generated yet for this course.</label>
+                        <label style="margin-left: 40px;">No reports available at the moment.</label>
                     {% endif %}
                 </div>
                 
                 <div id="survey_summary" class="tab-pane" style="padding-left: 10px;">
                     <h3>Generate new survey summary report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <p >Survey question responses.</p>
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
                         <label for="video" style='display: inline;'>Surveys</label>
                         <select name="slug" style="margin-left: 10px;" style="margin-left: 10px;">
                             {% for survey in surveys %}<option value="{{survey.slug}}">{{survey.title}}</option>{% endfor%}
                         </select>
-                        <input type="submit" class='btn' value="Generate new survey summary report" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="survey_summary" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available summary survey reports</h3>
+                    <h3>Available reports</h3>
                     {% for ps in survey_summ_reports %}
                         <h4 style="margin-top: 10px; margin-left: 20px;">{{ ps.title }}</h4>
                         {% if ps.reports|length > 0 %}
@@ -214,26 +240,34 @@
                                 {% endfor %}
                             </table>
                         {% else %}
-                            <label style="margin-left: 40px;">No summary reports available for this survey.</label>
+                            <label style="margin-left: 40px;">No reports available at the moment.</label>
                         {% endif %}
                     {% endfor %}
                 </div>
                 
-                <div id="assessment_student_scores" class="tab-pane" style="padding-left: 10px;">
-                    <h3>Generate new assessment student scores</h3>
+                <div id="individual_student_scores_a" class="tab-pane" style="padding-left: 10px;">
+                    <h3>Generate new student scores by assessment report</h3>
                     <p style="color: red;">Note: After clicking the button below, you will return to this page. Please refresh it periodically if you want to see the new report. Report may take a few minutes to generate. It will be emailed to the course staff email once available.</p>
+                    <p >How each student scored for each assessment with penalties included.</p>
+                    <table class="table table-striped" style="margin-left: 40px;width: 600px;overflow: auto;">
+                    <tr><td/><td>Authorization In-Video Quiz</td><td>Authorization Quiz</td></tr>
+                    <tr><td>Max Score</td><td>30</td><td>4</td></tr>
+					<tr><td>Jane Doe</td><td>30</td><td>2</td></tr>
+					<tr><td>John Doe</td><td>29</td><td>3</td></tr>
+					</table>
+                    
                     <form action="{% url 'courses.reports.views.generate_report' %}" method="POST">
-                        <input type="submit" class='btn' value="Generate new assessment student scores" style="margin-left: 10px;" />
+                        <input type="submit" class='btn' value="Generate new report" style="margin-left: 10px;" />
                         <input type="hidden" name="course_handle" value="{{request.common_page_data.course_prefix}}--{{request.common_page_data.course_suffix}}" />
                         <input type="hidden" name="type" value="assessment_student_scores" />
                         {% csrf_token %}
                     </form>
-                    <h3>Available assessment student scores</h3>
+                    <h3>Available reports</h3>
                     <table class="table table-striped" style="width: 600px;">
                         {% for rep in assessment_student_scores_reports %}
                             <tr><td style="width: 600px;"><a href="{% url 'courses.reports.views.download_report' request.common_page_data.course_prefix request.common_page_data.course_suffix 'assessment_student_scores' rep.s3_name %}">{{ rep.name }}</a></td></tr>
                         {% empty %}
-                            <tr><td style="width: 600px;">No assessment student scores reports available at the moment.</td></tr>
+                            <tr><td style="width: 600px;">No reports available at the moment.</td></tr>
                         {% endfor %}
                     </table>
                 </div>                      
