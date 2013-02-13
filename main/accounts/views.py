@@ -15,12 +15,12 @@ from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 from django.views.decorators.http import require_POST
 from django.contrib.auth import get_backends, REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, authenticate as auth_authenticate
-from django.contrib.auth.views import login as auth_login_view
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from c2g.models import Course, Institution,Video, Instructor, CourseInstructor
 from accounts.forms import *
 from registration import signals
+from registration.login_wrapper import login as auth_login_view
 from registration.forms import RegistrationFormUniqueEmail
 from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError
