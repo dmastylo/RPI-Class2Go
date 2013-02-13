@@ -158,7 +158,7 @@ a:hover [class^="icon-"] {
     cursor: pointer;
 }
 .nav > li, .nav > li.active {
-    height: 34px;
+//    height: 34px;
 }
 .nav > li.active > a {
     border-bottom: 1px solid #999;
