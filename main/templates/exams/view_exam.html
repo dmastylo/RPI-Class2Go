@@ -389,19 +389,21 @@
             } else if (newIdx < 0) {
                 localQuestionIdx -= 1;
             }
+                      
+            //enable both as initialization
+            $('#next-question').removeAttr('disabled');
+            $('#prev-question').removeAttr('disabled');
 
             if (localQuestionIdx >= ($('.question').length - 1)) {
                 // no longer cycle through; stop at last question
                 $('#next-question').attr('disabled', 'disabled');
                 localQuestionIdx = $('.question').length - 1;
-            } else if (localQuestionIdx <= 0) {
+            }
+            if (localQuestionIdx <= 0) {
                 // no longer cycle through; stop at first question
                 $('#prev-question').attr('disabled', 'disabled');
                 localQuestionIdx = 0;
-            } else {
-                $('#next-question').removeAttr('disabled');
-                $('#prev-question').removeAttr('disabled');
-            }
+            } 
 
             return localQuestionIdx;
         }
