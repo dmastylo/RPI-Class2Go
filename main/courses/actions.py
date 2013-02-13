@@ -32,8 +32,11 @@ def auth_view_wrapper(view):
 
         if not user.is_authenticated():
             messages.add_message(request,messages.ERROR, 'You must be logged-in to view the content you chose.')
-            if course.institution_only and settings.SITE_NAME_SHORT == "Stanford":
-                return HttpResponseRedirect(reverse('shib_login') + "?next=" + request.path)
+            if settings.SITE_NAME_SHORT == "Stanford":
+                if course.institution_only:
+                    return HttpResponseRedirect(reverse('shib_login') + "?next=" + request.path)
+                else:
+                    return HttpResponseRedirect(reverse('auth_login') + "?next=" + request.path)                        
             return HttpResponseRedirect(reverse('default_login') + "?next=" + request.path)
 
         return view(request, *args, **kw)
