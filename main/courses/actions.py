@@ -31,8 +31,7 @@ def auth_view_wrapper(view):
 
         if not user.is_authenticated():
             messages.add_message(request,messages.ERROR, 'You must be logged-in to view the content you chose.')
-
-            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+            return HttpResponseRedirect(reverse('default_login') + "?next=" + request.path)
 
         return view(request, *args, **kw)
     return inner
