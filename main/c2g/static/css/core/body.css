@@ -731,20 +731,13 @@ h3.course-section-heading {
 
 .course-list-item {
   overflow:hidden;
-  padding:8px 0 4px;
+  padding: 5px;
   border-bottom: 0; 
   /* border-bottom: 1px solid #eee; */
 }
 
 .course-list-item.zebra_light {
-    background-color: #fcfaf5;
-}
-.course-list-item.zebra_dark {
-    background-color: #e9e6df;
-}
-
-.course-list-item.zebra_light {
-    background-color: #fcfaf5;
+    background-color: #FBFBF9;
 }
 .course-list-item.zebra_dark {
     background-color: #e9e6df;
