@@ -165,6 +165,7 @@
             <li class="active"><a id="preview-tab" href="#preview-content">{% trans 'Preview' %}</a></li>
             <li><a id="enter-xml-tab" href="#enter-content-xml">{% trans 'Edit XML Metadata' %}</a></li>
             <li><a id="enter-html-tab" href="#enter-content-html">{% trans 'Edit HTML' %}</a></li>
+            <li><a id="create-tab" href="#create">{% trans 'Create' %}</a></li>
         </ul>
 
         <div class="tab-content">
@@ -189,6 +190,13 @@
                     <div id="staging-area"></div>
                 </div>
             </div>
+			<div class="tab-pane" id="create-tab">
+                <h4>{% trans 'Create Problemset below' %}:</h4>
+                <textarea id="ace_metadata_proxy" style="display:none"></textarea>
+                <div class="editor_container" id="metadata_editor_container">
+                    <div id="metadata_editor"></div>
+                </div>
+			</div>
         </div>
         
     </div>
