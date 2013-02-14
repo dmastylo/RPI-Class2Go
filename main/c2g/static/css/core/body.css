@@ -7,6 +7,8 @@ body {
     width: 100%;
     min-height: 100%;
     font-size: 1em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: auto !important;
 }
 
 h1,h2,h3,h4 {margin:0;}
@@ -499,9 +501,6 @@ small.date {
 }
 
 .top-nav #clock em {
-    -webkit-font-smoothing: antialiased;
-    font-smooth: never;
-    font-weight: 100 !important;
     font-size: 28px;
     padding-top: 6px;
     color: white;
