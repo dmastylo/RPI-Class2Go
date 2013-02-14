@@ -263,7 +263,7 @@ def shib_login(request):
 
     else:
         messages.add_message(request,messages.ERROR, 'WebAuth did not return your identity to us!  Please try logging in again.  If the problem continues please contact c2g-techsupport@class.stanford.edu')
-        return HttpResponseRedirect('/accounts/profile/')
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
     return HttpResponseRedirect(redir_to) 
 
