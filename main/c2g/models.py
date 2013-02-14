@@ -2545,7 +2545,9 @@ class CurrentTermMap(TimestampMixin, models.Model):
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)
-
+    
+    def __unicode__(self):
+        return (self.student.username + " ||| " + unicode(self.exam.course) + " ||| " + unicode(self.exam))
 
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
