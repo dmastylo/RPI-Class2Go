@@ -851,6 +851,16 @@ h3.course-section-heading {
   margin-bottom: 9px;
 }
 
+fieldset label {
+    padding: 0 2em !important;
+}
+fieldset label input {
+    position: absolute !important;
+    float: none !important;
+    left: 0 !important;
+    margin-right: 0 !important;
+}
+
 /* for datetime fields */
 input[data-datetimepicker] {
   width: auto;
