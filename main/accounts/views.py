@@ -255,7 +255,7 @@ def shib_login(request):
             clear_msgs = False
             storage = messages.get_messages(request)
             for message in storage:
-                if "You must be logged-in" in message:
+                if "You must be logged-in" in message.message:
                     clear_msgs = True
             storage.used = clear_msgs
 
