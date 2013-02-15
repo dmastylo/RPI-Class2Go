@@ -6,8 +6,9 @@ body {
     position: relative;
     width: 100%;
     min-height: 100%;
-    font-family: 'Source Sans Pro', 'Helvetica Neue', helvetica, sans-serif;
     font-size: 1em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: auto !important;
 }
 
 h1,h2,h3,h4 {margin:0;}
@@ -500,9 +501,6 @@ small.date {
 }
 
 .top-nav #clock em {
-    -webkit-font-smoothing: antialiased;
-    font-smooth: never;
-    font-weight: 100 !important;
     font-size: 28px;
     padding-top: 6px;
     color: white;
@@ -732,20 +730,13 @@ h3.course-section-heading {
 
 .course-list-item {
   overflow:hidden;
-  padding:8px 0 4px;
+  padding: 5px;
   border-bottom: 0; 
   /* border-bottom: 1px solid #eee; */
 }
 
 .course-list-item.zebra_light {
-    background-color: #fcfaf5;
-}
-.course-list-item.zebra_dark {
-    background-color: #e9e6df;
-}
-
-.course-list-item.zebra_light {
-    background-color: #fcfaf5;
+    background-color: #FBFBF9;
 }
 .course-list-item.zebra_dark {
     background-color: #e9e6df;
@@ -858,6 +849,16 @@ h3.course-section-heading {
   height: auto;
   line-height: normal;
   margin-bottom: 9px;
+}
+
+fieldset label {
+    padding: 0 2em !important;
+}
+fieldset label input {
+    position: absolute !important;
+    float: none !important;
+    left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* for datetime fields */
