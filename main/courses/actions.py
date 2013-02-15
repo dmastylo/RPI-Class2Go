@@ -108,9 +108,7 @@ def always_switch_mode(view):
     def do_mode_switch(request, *args, **kw):
         current_mode = request.session.get('course_mode', 'unknown state')
         if current_mode == 'draft':
-            print "DEBUG: no switch for %s, already 'draft'" % (wrapped_function_path)
             return view(request, *args, **kw)
-        print "DEBUG: switching mode for %s, from '%s' to 'draft'" % (wrapped_function_path, current_mode)
         request.session['course_mode'] = 'draft'
         course_prefix = kw.get('course_prefix', None) or request.POST.get('course_prefix', None) or request.common_page_data.get('course_prefix', '')
         course_suffix = kw.get('course_suffix', None) or request.POST.get('course_suffix', None) or request.common_page_data.get('course_suffix', '')
