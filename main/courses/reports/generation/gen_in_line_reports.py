@@ -12,7 +12,7 @@ def gen_spec_in_line_report(report_name, course, username, green_param, blue_par
     if report_name == 'quizzes_summary': 
         
         now = datetime.now()       
-        exams = Exam.objects.values('title').filter(~Q(exam_type='survey'), course=course, is_deleted=0, section__is_deleted=0, live_datetime__lt=now, invideo=0).order_by('title')
+        exams = Exam.objects.values('title', 'slug').filter(~Q(exam_type='survey'), course=course, is_deleted=0, section__is_deleted=0, live_datetime__lt=now, invideo=0).order_by('title')
 
         headings = {}
         count_gt_67 = {}

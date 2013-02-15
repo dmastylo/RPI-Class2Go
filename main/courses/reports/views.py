@@ -10,6 +10,7 @@ from courses.reports.tasks import generate_and_email_reports
 from storages.backends.s3boto import S3BotoStorage
 from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
 from courses.reports.generation.gen_in_line_reports import *
+from courses.reports.generation.gen_quiz_summary_report import WriteAssessmentSummaryReportContent
 
 secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
 re_prog = re.compile(r'([\d]{4})_([\d]{2})_([\d]{2})__([\d]{2})_([\d]{2})_([\d]{2})')
@@ -141,7 +142,7 @@ def generate_report(request):
         email_title = "[Class2Go] Assessment Student Scores Report for %s" % (course_handle_pretty)
         req_reports = [{'type': 'assessment_student_scores'}]    
     
-    generate_and_email_reports(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
+    generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
     return redirect(request.META.get('HTTP_REFERER', None))
 
@@ -252,9 +253,6 @@ def generate_in_line_report(request, course_prefix, course_suffix):
             rows = report_data['rows']
             we_have_data = True
     
-    
-    print "report_name : " + str(report_name)
-    
     return render_to_response('reports/in_line.html', {
         'common_page_data':request.common_page_data,
         'we_have_data':we_have_data,
@@ -276,4 +274,26 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'rows':rows
         
     }, context_instance=RequestContext(request))
+    
+    
+@auth_is_course_admin_view_wrapper    
+def summary_report(request, course_prefix, course_suffix, exam_slug):
+        
+    course = request.common_page_data['ready_course']
+    exam = Exam.objects.get(course=course, slug=exam_slug)
+ 
+    we_have_data = False
+    headings, rows = WriteAssessmentSummaryReportContent(exam, None, False, False)
+    if rows:
+        we_have_data = True
+    
+    return render_to_response('reports/drill_downs/assessment_summary.html', {
+        'we_have_data':we_have_data,
+        'common_page_data':request.common_page_data,
+        'headings':headings,
+        'rows':rows,
+        'exam':exam
+        
+    }, context_instance=RequestContext(request))
+    
     
