@@ -28,7 +28,7 @@ def auth_view_wrapper(view):
 
         if user.is_authenticated() and not is_member_of_course(course, user):
             messages.add_message(request,messages.ERROR, 'You must be a member of the course to view the content you chose.')      
-            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)) + "?join_next=" + request.path)
 
         if not user.is_authenticated():
             messages.add_message(request,messages.ERROR, 'You must be logged-in to view the content you chose.')
