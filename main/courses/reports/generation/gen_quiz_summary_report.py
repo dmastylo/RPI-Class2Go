@@ -95,7 +95,7 @@ def gen_course_assessments_report(ready_course, save_to_s3=False):
     
     exams = Exam.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
     for exam in exams:
-        WriteAssessmentSummaryReportContent(exam, rw, full=False)
+        WriteAssessmentSummaryReportContent(exam, rw, full=False, csv=True)
     
     ### 4- Proceed to write out and return
     report_content = rw.writeout()
@@ -117,7 +117,7 @@ def gen_assessment_summary_report(ready_course, exam, save_to_s3=False):
     rw.write(content = ["Assessment Summary for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
     
     ### 3- Write problem set reports
-    WriteAssessmentSummaryReportContent(exam, rw, full=False)
+    WriteAssessmentSummaryReportContent(exam, rw, full=False, csv=True)
     
     ### 4- Proceed to write out and return
     report_content = rw.writeout()
@@ -139,7 +139,7 @@ def gen_survey_summary_report(ready_course, survey, save_to_s3=False):
     rw.write(content = ["Survey Summary for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
     
     ### 3- Write survey report
-    WriteSurveySummaryReportContent(survey, rw, full=False)
+    WriteSurveySummaryReportContent(survey, rw, full=False, csv=True)
     
     ### 4- Proceed to write out and return
     report_content = rw.writeout()
@@ -240,56 +240,6 @@ def WriteQuizSummaryReportContent(ready_quiz, rw, full=False):
         
     rw.write([""])
     
-def WriteAssessmentSummaryReportContent(ready_exam, rw, full=False):
-    ### 1- Get the assessment data
-    exam_summary = get_assessment_data(ready_exam)
-    
-    ### 2- Write the title line
-    rw.write([exam_summary['title']])
-
-    # Field summary table header
-    content = ["Field"]
-    if exam_summary['assessment_type'] == 'summative': content.extend(["Mean score", "Max score"])
-    content.extend([
-        "Total attempts",
-        "Students who have attempted",
-        "Correct attempts",
-        "Correct 1st attempts",
-        "Correct 2nd attempts",
-        "Correct 3rd attempts",
-    ])
-    rw.write(content, indent = 1, nl=1)
-
-    content = []
-    # Fill in the values
-    for key, value in exam_summary['total_attempts'].iteritems():
-        field_name = exam_summary['human_field'].get(key)
-        if not field_name:
-            field_name = key
-
-        content.extend([field_name])
-        
-        if exam_summary['assessment_type'] == 'summative':
-            content.extend([
-                exam_summary['mean_score'].get(key, 0),
-                exam_summary['max_score'].get(key, 0),
-                ])
-        
-        content.extend([
-            value,
-            exam_summary['distinct_students'].get(key, 0),
-            exam_summary['correct_attempts'].get(key,0),
-            exam_summary['correct_first_attempts'].get(key, 0),
-            exam_summary['correct_second_attempts'].get(key, 0),
-            exam_summary['correct_third_attempts'].get(key, 0),
-        ])
-        rw.write(content, indent = 1)
-        content = []
-        
-    rw.write(content, indent = 1)
-        
-    rw.write([""])
-
 
 def WriteSurveySummaryReportContent(ready_survey, rw, full=False):
     
@@ -373,3 +323,69 @@ def construct_scores_dict(student_scores):
         last_username = username
         
     return scores_dict
+
+
+def WriteAssessmentSummaryReportContent(ready_exam, rw, full=False, csv=True):
+    ### 1- Get the assessment data
+    exam_summary = get_assessment_data(ready_exam)
+    
+    headings = []
+    rows = []
+    
+    ### 2- Write the title line
+    if csv:
+        rw.write([exam_summary['title']])
+
+    # Field summary table header
+    content = ["Field"]
+    if exam_summary['assessment_type'] == 'summative': content.extend(["Mean score", "Max score"])
+    content.extend([
+        "Total attempts",
+        "Students who have attempted",
+        "Correct attempts",
+        "Correct 1st attempts",
+        "Correct 2nd attempts",
+        "Correct 3rd attempts",
+    ])
+    
+    if csv:
+        rw.write(content, indent = 1, nl=1)
+    else:
+        headings = content
+        
+    content = []
+    # Fill in the values
+    for key, value in exam_summary['total_attempts'].iteritems():
+        field_name = exam_summary['human_field'].get(key)
+        if not field_name:
+            field_name = key
+
+        content.extend([field_name])
+        
+        if exam_summary['assessment_type'] == 'summative':
+            content.extend([
+                round(exam_summary['mean_score'].get(key, 0), 2),
+                exam_summary['max_score'].get(key, 0),
+                ])
+        
+        content.extend([
+            value,
+            exam_summary['distinct_students'].get(key, 0),
+            exam_summary['correct_attempts'].get(key,0),
+            exam_summary['correct_first_attempts'].get(key, 0),
+            exam_summary['correct_second_attempts'].get(key, 0),
+            exam_summary['correct_third_attempts'].get(key, 0),
+        ])
+        
+        if csv:
+            rw.write(content, indent = 1)
+        else:
+            rows.append(content)
+        content = []
+        
+    if csv:    
+        rw.write(content, indent = 1)
+        rw.write([""])
+        
+    else:
+        return headings, rows    

@@ -140,7 +140,7 @@
                       <tr style="color: {{ color_val }};">
                  {% endifequal %}
               {% endfor %}
-              <td>{{title.title}}</td>
+              <td><a href="{% url 'courses.reports.views.summary_report' common_page_data.course_prefix common_page_data.course_suffix title.slug %}">{{title.title}}</td>
               {% for key, val in column2.items %}
                   {% ifequal key title.title %}
                       <td>{{val}}</td>
