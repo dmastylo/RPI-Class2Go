@@ -89,6 +89,7 @@ def generate_report(request):
     report_type = request.POST["type"]
     course_handle = request.POST["course_handle"]
     course_handle_pretty = course_handle.replace('--','-')
+    url_suffix = ''
     
     email_message = "The report is attached. You can also download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
     attach_reports_to_email = True
@@ -96,6 +97,7 @@ def generate_report(request):
     if report_type == 'dashboard':
         email_title = "[Class2Go] Dashboard Report for %s" % course_handle_pretty
         req_reports = [{'type': 'dashboard'}]
+        url_suffix = '#' + 'dashboard'
         
     elif report_type == 'video_full':
         slug = request.POST["slug"]
@@ -104,20 +106,24 @@ def generate_report(request):
         attach_reports_to_email = False
         email_message = "The report has been generated. You can download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
         req_reports = [{'type': 'video_full', 'slug': slug}]
+        url_suffix = '#' + 'videos_full'
         
     elif report_type == 'video_summary':
         slug = request.POST["slug"]
         email_title = "[Class2Go] Video Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'video_summary', 'slug': slug}]
+        url_suffix = '#' + 'videos_summary'
         
     elif report_type == 'class_roster':
         email_title = "[Class2Go] Class Roster for %s" % (course_handle_pretty)
         req_reports = [{'type': 'class_roster'}]
+        url_suffix = '#' + 'class_roster'
     
     #Reports for the new assessments
     elif report_type == 'course_assessments':
         email_title = "[Class2Go] Course Assessments Report for %s" % course_handle_pretty
         req_reports = [{'type': 'course_assessments'}]
+        url_suffix = '#' + 'aggregated_attempts_by_a'
     
     elif report_type == 'assessment_full':
         slug = request.POST["slug"]
@@ -126,24 +132,28 @@ def generate_report(request):
         attach_reports_to_email = False
         email_message = "The report has been generated. You can download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
         req_reports = [{'type': 'assessment_full', 'slug': slug}]
+        url_suffix = '#' + 'individual_student_scores_q'
     
     elif report_type == 'assessment_summary':
         slug = request.POST["slug"]
         email_title = "[Class2Go] Assessment Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'assessment_summary', 'slug': slug}]
+        url_suffix = '#' + 'aggregated_attempts_by_q'
         
     elif report_type == 'survey_summary':
         slug = request.POST["slug"]
         email_title = "[Class2Go] Survey Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'survey_summary', 'slug': slug}]
+        url_suffix = '#' + 'survey_summary'
     
     elif report_type == 'assessment_student_scores':
         email_title = "[Class2Go] Assessment Student Scores Report for %s" % (course_handle_pretty)
-        req_reports = [{'type': 'assessment_student_scores'}]    
+        req_reports = [{'type': 'assessment_student_scores'}]
+        url_suffix = '#' + 'individual_student_scores_a'
     
     generate_and_email_reports(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
-    return redirect(request.META.get('HTTP_REFERER', None))
+    return redirect(request.META.get('HTTP_REFERER', None) + url_suffix)
 
 
 @auth_is_course_admin_view_wrapper  
