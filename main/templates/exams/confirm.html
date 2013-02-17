@@ -52,7 +52,7 @@
         {% trans 'The system <b>will not</b> automatically submit for you at the end of your time, so make sure to submit yourself.' %}
         </p>
         <div>
-            <a class="btn" href="{% url exam.show_view course.prefix course.suffix exam.slug %}?confirm=True">{% trans 'Start Now!' %}</a>
+            <a id="startbtn" class="btn" href="{% url exam.show_view course.prefix course.suffix exam.slug %}?confirm=True">{% trans 'Start Now!' %}</a>
             <a class="btn" href="{{ request.META.HTTP_REFERER }}">{% trans 'Take me back' %}</a>
         </div>
     </div>
@@ -63,7 +63,11 @@
 
 <script>
      $(document).ready(function () {
-                                           
+                       
+                      $("#startbtn").click(function() {
+                                           $(this).attr('disabled','disabled');
+                                           });
+                     
                       $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}",
                                                      function() {
                                                      c2g.installLeftNavChevron();
