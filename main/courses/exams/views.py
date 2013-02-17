@@ -84,6 +84,8 @@ def confirm(request, course_prefix, course_suffix, exam_slug):
     allowed_timedelta = datetime.timedelta(minutes=minutesallowed)
 
     endtime = datetime.datetime.now() + allowed_timedelta
+    
+    endtime = min(endtime, exam.partial_credit_deadline)
 
     return render_to_response('exams/confirm.html',
                               {'common_page_data':request.common_page_data, 'course': course, 'exam':exam, 'ready_section':ready_section,
@@ -141,6 +143,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     if exam.timed:
         startobj, created = StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
         endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
+        endtime = min(endtime, exam.partial_credit_deadline)
         
         if timeopened > endtime :
             editable = False
@@ -218,7 +221,8 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     if exam.timed:
         startobj, created=StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
         endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
-        
+        endtime = min(endtime, exam.partial_credit_deadline)
+
         if timeopened > endtime :
             editable = False
             allow_submit = False
