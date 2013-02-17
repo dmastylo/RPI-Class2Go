@@ -442,6 +442,9 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
     attempt_number = exam.num_of_student_records(user)+1
 
+    if attempt_number > exam.submissions_permitted:
+        return HttpResponseBadRequest("Sorry!  Your submission #%d has exceed the maximum allowed: %d" % (attempt_number, exam.submissions_permitted))
+
     onpage = request.POST.get('onpage','')
     
     record = ExamRecord(course=course, exam=exam, student=user, json_data=postdata, onpage=onpage, attempt_number=attempt_number, late=exam.past_due())
