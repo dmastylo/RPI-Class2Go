@@ -86,11 +86,6 @@ width: auto;
   display: inherit !important;
 }
 
-
-#c2g_layout_topbar .navbar .navbar-inner {
-    background:#e3ca93 url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
-    min-height:0;
-}
 #c2g_layout_topbar .navbar .navbar-inner .container-fluid {
     padding:0;
 }
@@ -100,13 +95,8 @@ width: auto;
 .navbar .nav > li > a {
     color:#333;
 }
-.navbar .nav .active > a, .navbar .nav .active > a:hover {
-    color:#820000;
-    background:#eadeb9;
-    background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -15px;
-}
 .navbar .nav > li > a {
-    padding: 7px 10px 8px;
+    padding: 7px 10px 7px;
     border-right:1px solid #999;
 }
 
@@ -142,6 +132,17 @@ width: auto;
     *padding-top:5px;
     margin-right: -10px !important;
   }
+  
+  .top-nav #clock #clock-bubble {
+    width: 120px;
+    left: -15px;
+    top: 34px;
+  }
+  .top-nav #clock #clock-bubble strong,
+  .top-nav #clock #clock-bubble span {
+    color: #555;
+  }
+  
   body {
     width:auto;
   }
@@ -920,10 +921,6 @@ width: auto;
   .registration .well {
     min-width:400px;
   }
-  #c2g_layout_topbar .navbar .navbar-inner {
-    background:#e3ca93 url('../../graphics/core/bg-nav.png') repeat-x bottom center !important;
-    min-height:34px;
-  }
   #c2g_layout_topbar .navbar .navbar-inner .container-fluid {
     padding:0;
   }
@@ -935,11 +932,9 @@ width: auto;
   }
   .navbar .nav .active > a, .navbar .nav .active > a:hover {
       color:#820000;
-      background:#eadeb9;
-      background:url('../../graphics/core/bg-nav-selected.png') repeat-x 0 -15px;
   }
   .navbar .nav > li > a {
-      padding: 7px 10px 8px;
+      padding: 7px 10px 7px;
       border-right:1px solid #999;
   }
 }
@@ -958,6 +953,17 @@ width: auto;
 }
 
 @media (min-width: 481px) {
+  .top-nav #clock em {
+    color: white;
+  }
+  .top-nav #clock #clock-bubble {
+    padding: 0;
+    left: -107px;
+    top: 0;
+    font-weight: bold;
+    opacity: 1;
+  }
+  
   ul.nav li.dropdown ul.dropdown-menu {
     margin-top:0px;
     margin-left:-1px;
@@ -985,6 +991,10 @@ width: auto;
   .navbar .nav li.dropdown.open ul.dropdown-menu li a:hover,
   .navbar .nav li.dropdown:hover .dropdown-toggle li a:hover,
   .navbar .nav li.dropdown.open .dropdown-toggle li a:hover {
-    background:#fff;
+    background:#e6e4db;
+  }
+  
+  .profile-courses .course {
+    margin: 15px !important;
   }
 }

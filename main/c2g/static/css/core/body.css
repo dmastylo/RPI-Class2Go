@@ -1,6 +1,16 @@
 /* Bootstrap overrides
 -------------------------------------------------- */
 
+body {
+    background-color: #FBFBF9;
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    font-size: 1em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: auto !important;
+}
+
 h1,h2,h3,h4 {margin:0;}
 
 h3 {margin-bottom:.5em;font-size:20px; line-height:1.2em;}
@@ -37,8 +47,8 @@ margin-right:50px;
 a {color:#820000;}
 a:hover {color:#820000;}
 .modal form {margin-bottom:0;}
-.well {border-color:#ddcf99;}
-.well.tight {padding:10px 0;background:#f8f6ea;}
+.well {border-color:#bdb7a1;}
+.well.tight {padding:10px 0;background:#e9e6df;}
 .well.tight .nav-list li {clear:left;}
 .well.tight .nav-list li a {
     padding:5px 15px;
@@ -58,7 +68,7 @@ a:hover {color:#820000;}
 
 .upcoming {
   padding:10px 0px;
-  background:#f8f7ea;
+  background:#e9e6df;
 }
 .upcoming h4 {
   margin-left: 5px;
@@ -89,7 +99,7 @@ a:hover {color:#820000;}
 .modal-header {border-bottom:1px solid #ddcf99;}
 .modal-body {border-top:1px solid white;}
 .modal-footer {border-top:1px solid #ddcf99;background:#e3dfd5;}
-.nav-list .divider {background-color: #ddcf99;}
+.nav-list .divider {background-color: #aca68d;}
 
 .btn-primary {
     background-color: #8f2618;
@@ -148,6 +158,12 @@ a:hover [class^="icon-"] {
     color:#333;
     cursor: pointer;
 }
+.nav > li, .nav > li.active {
+//    height: 34px;
+}
+.nav > li.active > a {
+    border-bottom: 1px solid #999;
+}
 
 .nav-list > .current > a,
 .nav-list > .current > a:hover {
@@ -173,6 +189,10 @@ a.thumbnail:hover {
 .navbar .btn-search {
     margin-left:-4px;
 }
+.navbar-inner {
+    min-height: 35px;
+    height: 35px;
+}
 .navbar-search {
     position:absolute;
     right:15px;
@@ -181,6 +201,10 @@ a.thumbnail:hover {
 }
 .page-header {
   margin-top:0;
+  border-bottom: none;
+}
+.page-header h2 {
+  font-weight: normal;
 }
 
 .dropdown-menu li > a:hover, 
@@ -188,21 +212,31 @@ a.thumbnail:hover {
 .dropdown-submenu:hover > a {
   display: block;
   border-top:0;
-  background:#f8f6ea;
+  background:#e6e4db;
   color:#333;
 }
 .caret {
     opacity:.4;
 }
 .navbar .nav > li > a {
-    text-shadow:0 1px 0 #f0e7cb;
+    text-shadow: none !important;
 }
 .navbar .nav li.dropdown .dropdown-toggle .caret {
     border-top-color: #222;
     border-bottom-color: #222;
 }
 
-
+.navbar .nav li.dropdown.open > .dropdown-toggle,
+.navbar .nav li.dropdown.active > .dropdown-toggle,
+.navbar .nav li.dropdown.open.active > .dropdown-toggle {
+    background: #dddbd0 url('../../graphics/core/bg-nav-selected.png') repeat-x bottom center;
+    background: #dddbd0 none;
+    background: -webkit-gradient(linear, left top, left bottom, from(#c6c5bb), to(#f7f5e9)); /* Safari 4-5, Chrome 1-9 */
+    background: -webkit-linear-gradient(top, #c6c5bb, #f7f5e9); /* Safari 5.1, Chrome 10+ */
+    background: -moz-linear-gradient(top, #c6c5bb, #f7f5e9); /* Firefox 3.6+ */
+    background: -ms-linear-gradient(top, #c6c5bb, #f7f5e9); /* IE 10 */
+    background: -o-linear-gradient(top, #c6c5bb, #f7f5e9); /* Opera 11.10+ */
+}
 
 .navbar .nav li.dropdown.open a {
     color: white;
@@ -262,14 +296,14 @@ body.home {
     font-size:37px;
 }
 .home .hero-header .hero h2 {
-    font-weight:300;
+    font-weight: normal;
     line-height:1em;
 }
 .home .container-fluid {
     padding:0;
 }
 .home h3 {
-    font-weight:300;
+    font-weight: normal;
     font-size:30px;
     line-height:1em;
 }
@@ -304,7 +338,7 @@ body.home {
 .home-examples p {
     color:#fff;
     font-size:20px;
-    font-weight:300;
+    font-weight: normal;
     margin-bottom:0;
 }
 .databases {
@@ -320,7 +354,7 @@ body.home {
     padding:20px 20px 20px 320px;
 }
 .home h3 a {
-    font-weight:300;
+    font-weight: normal;
 }
 .home-primary .span5 {
     padding-left:20px;
@@ -346,7 +380,7 @@ small.date {
 .announcement {
     margin-bottom:1em;
     padding:15px;
-    border:1px solid #eee;
+    border:1px solid #e3dfd5;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -387,13 +421,26 @@ small.date {
     width:100%;
 }
 .stanford-logo {
-    background:transparent url(../../graphics/core/header-stanford-logo.png) no-repeat 20px 14px;
-    padding:13px 20px;
-    width:198px;
-    height:11px;
+    /*
+    background:transparent url(../../graphics/core/header-stanford-logo.png) no-repeat 20px 10px;
+    background-size: 160px 19px;
+    padding:9px 20px;
+    width:160px;
+    height:19px;
+    */
     text-indent: -999px;
     display:block;
     overflow:hidden;
+}
+.stanford-logo a {
+    display: block;
+    padding:9px 20px;
+    width:160px;
+    height:19px;
+}
+.stanford-logo a img {
+    display: block;
+    margin-top: 1px;
 }
 #c2g_layout_topbar {
     position:relative;
@@ -414,7 +461,7 @@ small.date {
     margin-top:10px;
 }
 #c2g_layout_topbar h2 {
-  font-weight: 300;
+  font-weight: normal;
   font-size:30px;
 }
 #c2g_layout_topbar .top-nav a {
@@ -425,6 +472,7 @@ small.date {
     position:absolute;
     top:-32px;
     right:20px;
+    font-size: 1.15em;
 }
 .top-nav li {
     float:right;
@@ -447,9 +495,19 @@ small.date {
     background: rgb(80,0,0);
 }
 .top-nav li span {
-    color:white;
+    color: white;
     padding:4px 5px;
     display:block;
+}
+
+.top-nav #clock em {
+    font-size: 28px;
+    padding-top: 6px;
+    color: white;
+}
+.top-nav #clock #clock-bubble {
+    display: none;
+    position: absolute;
 }
 
 #c2g_layout_topbar .navbar {
@@ -460,15 +518,15 @@ small.date {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    /*background-image: -moz-linear-gradient(top, #e0d096, #cabb84);
-    background-image: -ms-linear-gradient(top, #e0d096, #cabb84);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e0d096), to(#cabb84));
-    background-image: -webkit-linear-gradient(top, #e0d096, #cabb84);
-    background-image: -o-linear-gradient(top, #e0d096, #cabb84);
-    background-image: linear-gradient(top, #e0d096, #cabb84);
-    background-repeat: repeat-x;
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#e0d096', endColorstr='#cabb84', GradientType=0);*/
-    background: #e0d096 url('../../graphics/core/bg-nav.png') repeat-x bottom center;
+
+    background: #eee6cb url('../../graphics/core/bg-nav.png') repeat-x bottom center;
+    background: #eee6cb none;
+    background: -webkit-gradient(linear, left top, left bottom, from(#eee6cb), to(#aca68d)); /* Safari 4-5, Chrome 1-9 */
+    background: -webkit-linear-gradient(top, #eee6cb, #aca68d); /* Safari 5.1, Chrome 10+ */
+    background: -moz-linear-gradient(top, #eee6cb, #aca68d); /* Firefox 3.6+ */
+    background: -ms-linear-gradient(top, #eee6cb, #aca68d); /* IE 10 */
+    background: -o-linear-gradient(top, #eee6cb, #aca68d); /* Opera 11.10+ */
+    
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
@@ -538,7 +596,7 @@ small.date {
 -------------------------------------------------- */
 .registration .well {
     margin:0 auto;
-    background:#f8f6ea;
+    background:#fcfaf5;
     padding:0;
 }
 .registration .well fieldset {
@@ -567,15 +625,66 @@ small.date {
 
 /* Profile Info
 -------------------------------------------------- */
+
+.profile_page .body-content {
+    padding-top:0 !important;
+}
+
+.profile_page .page-header {
+    margin-bottom: 0;
+}
+
 .profile-info {
-    margin-bottom:2em;
+    margin-bottom: 15px;
 }
 .profile-info li {
-    margin-bottom:5px;
+    margin-bottom:15px;
 }
 .profile-info strong {
-    width:90px;
+    width:135px;
     display:inline-block;
+}
+
+
+.profile-courses {
+    
+}
+.profile-courses .course {
+    position: relative;
+    display: block;
+    float: left;
+    width: 408px;
+    height: 200px;
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid #bdb7a1;
+    border-radius: 10px;
+    background-color: #f3efd9;
+}
+.profile-courses .course .image {
+    position: relative;
+    display: block;
+    float: left;
+    height: 200px;
+    width: 200px;
+    margin-right: 10px;
+}
+.profile-courses .course h3 {
+    font-size: 18px;
+    line-height: 1.5em;
+}
+.profile-courses .course .btn {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    padding: 5px 10px;
+    font-size: 13px; 
+}
+.profile-courses .course input.btn {
+    width: 195px;
+}
+.profile-courses .course .btn {
+    width: 173px;
 }
 
 /* Video - added by Kevin
@@ -621,23 +730,16 @@ h3.course-section-heading {
 
 .course-list-item {
   overflow:hidden;
-  padding:8px 0 4px;
+  padding: 5px;
   border-bottom: 0; 
   /* border-bottom: 1px solid #eee; */
 }
 
 .course-list-item.zebra_light {
-    background-color: white;
+    background-color: #FBFBF9;
 }
 .course-list-item.zebra_dark {
-    background-color: #eeeeee;
-}
-
-.course-list-item.zebra_light {
-    background-color: white;
-}
-.course-list-item.zebra_dark {
-    background-color: #eeeeee;
+    background-color: #e9e6df;
 }
 
 .course-list-item .progress {
@@ -702,7 +804,7 @@ h3.course-section-heading {
     padding:10px 10px 0;
     border:1px solid #eee;
     margin-bottom:10px;
-    background:#f8f6ea;
+    background:#fcfaf5;
     border-radius:5px;
     -moz-border-radius:5px;
     -webkit-border-radius:5px;
@@ -747,6 +849,16 @@ h3.course-section-heading {
   height: auto;
   line-height: normal;
   margin-bottom: 9px;
+}
+
+fieldset label {
+    padding: 0 2em !important;
+}
+fieldset label input {
+    position: absolute !important;
+    float: none !important;
+    left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* for datetime fields */
@@ -795,7 +907,7 @@ input[type="checkbox"] {
 }
 .class2go a {
     font-size:11px;
-    background:#f8f6ea;
+    background:#fcfaf5;
     padding:3px 10px;
     position:absolute;
     right:20px;
@@ -1582,3 +1694,16 @@ ul.icons li .icon-large:before {
 }
 
 /* Localized */
+
+hr {
+    border-top: 0;
+    border-bottom: 0;
+    height: 1px;
+    background: #bdb7a1 none;
+    background: -webkit-gradient(linear, left top, right top, from(#bdb7a1), to(#fcfaf5)); /* Safari 4-5, Chrome 1-9 */
+    background: -webkit-linear-gradient(left, #bdb7a1, #fcfaf5); /* Safari 5.1, Chrome 10+ */
+    background: -moz-linear-gradient(left, #bdb7a1, #fcfaf5); /* Firefox 3.6+ */
+    background: -ms-linear-gradient(left, #bdb7a1, #fcfaf5); /* IE 10 */
+    background: -o-linear-gradient(left, #bdb7a1, #fcfaf5); /* Opera 11.10+ */
+    margin: 0 0 25px 0;
+}

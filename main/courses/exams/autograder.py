@@ -2,7 +2,10 @@ import re, collections
 import urllib,urllib2
 import json
 import logging
+import random 
+import string
 from datetime import datetime
+import time
 
 from django.conf import settings
 from django.utils import encoding
@@ -458,30 +461,66 @@ class AutoGrader():
             """Grade an interactive exam by calling a remote grader."""
 
             def external_grader_request(grader_url, post_params):
-                """Hit external grader endpoint.  TODO: add retry logic, here or in frontend (#1730)."""
+                """Open a connection to the external grader and read from the result.  
+                We have retry logic here to try several times before giving up.  We are
+                catching many errors here on purpose since there are so many ways that 
+                a connection like this can fail: socket handling, connection handling, 
+                HTTP parsing, JSON parsing.
+
+                We have a blacklist of words that we watch for and consider them failures
+                as well, like "time out".
+                """
+
+                def retry_delay(n):
+                    """Simple little exponential backoff function.
+                            retry_delay(0) = 0.5 - 1.0   retry_delay(1) = 1.0 - 2.0
+                            retry_delay(2) = 2.0 - 4.0   retry_delay(3) = 4.0 - 8.0"""
+                    return 2**(n-1 + random.random())
+
                 grader_timeout = 45    # seconds
-                try:
-                    post_data = urllib.urlencode(post_params)
-                    time_before = datetime.now()
-                    grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
-                    time_after = datetime.now()
-                    duration = time_after - time_before  # timedelta
-                    logger.info("interactive grader \"%s\" returned in %s" % (grader_name, str(duration)))
-                except urllib2.HTTPError as e:
-                    raise AutoGraderGradingException("Interactive grader HTTP error: %s" % str(e))
-                except urllib2.URLError as e:
-                    raise AutoGraderGradingException("Interactive grader connection error: %s" % str(e))
+                retry_limit = 4        # after this many attempts, don't retry
+                attempt = 1            # start counting at 1
+                watchwords = ['', 'time out', 'timed out', 'timeout error', 'failure']
+                while attempt <= retry_limit:
+                    try:
+                        post_data = urllib.urlencode(post_params)
+                        time_before = datetime.now()
+                        grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
+                        time_after = datetime.now()
+                        duration = time_after - time_before  # timedelta
+                        logger.info("interactive grader \"%s\" returned in %s" 
+                                % (grader_name, str(duration)))
+                        graded_result = grader_conn.read()
 
-                try:
-                    graded_result = grader_conn.read()
-                except IOError as e:
-                    raise AutoGraderGradingException("Interactive grader IO error: %s", str(e))
-                except OSError as e:
-                    raise AutoGraderGradingException("Interactive grader OS error: %s", str(e))
-                if graded_result == "ERROR":
-                    raise AutoGraderGradingException("Interactive grader internal problem (returned \"%s\")" % graded_result)
+                        graded = json.loads(graded_result)
 
-                return graded_result
+                        # test for cases where score == 0 but explanation hints at an error
+                        # if score > 0, then let through, we never want to take away points
+                        # because we suspect a grader error (fail safe)
+                        if 'score' in graded and graded['score'] == 0:
+                            for ww in watchwords:
+                                if 'feedback' in graded \
+                                        and 'explanation' in graded['feedback'][0] \
+                                        and graded['feedback'][0]['explanation'].lower() == ww:
+                                    if ww == "":
+                                        errmsg="Fail with empty explanation"
+                                    else:
+                                        errmsg="Fail with \"%s\" explanation" % ww
+                                    raise AutoGraderGradingException(errmsg)
+
+                        return graded
+
+                    except Exception as e:
+                        if attempt >= retry_limit:
+                            logger.error("interactive grader \"%s\" attempt %d/%d, giving up: %s" \
+                                    % (grader_name, attempt, retry_limit, str(e)))
+                            raise AutoGraderGradingException(str(e))
+                        else:
+                            d = retry_delay(attempt)
+                            logger.info("interactive grader \"%s\" attempt %d/%d, retrying in %1.2f sec: %s" \
+                                    % (grader_name, attempt, retry_limit, d, str(e)))
+                            time.sleep(d)
+                            attempt += 1
 
             # grader_fn() body
             # default responses, to be overriden by what we actually got back
@@ -497,13 +536,7 @@ class AutoGrader():
             # call remote grader
             logger.debug("External grader call: %s" % str(post_params))
             grader_url = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
-            graded_result = external_grader_request(grader_url, post_params)
-            try:
-                graded = json.loads(graded_result)
-            except ValueError as e:
-                raise AutoGraderGradingException("Error parsing interactive grader result: %s" % str(graded_result))
-            except TypeError as e:
-                raise AutoGraderGradingException("Unexpected type in interactive grader: %s" % str(graded_result))
+            graded = external_grader_request(grader_url, post_params)
 
             # interpret what we got from the grader
             # class2go just has one float score, coursera used score vs max, convert here

@@ -52,10 +52,14 @@ urlpatterns = patterns('',
                        
     # Get server epoch
     url(r'^server_epoch/?$', 'c2g.views.server_epoch'),
+    
+    # Get server time
+    url(r'^server_time/?$', 'c2g.views.server_time'),
 
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll/?$', 'courses.views.unenroll'),
 
     # general exam stuff--These endpoints are hidden from student users and do not have to be named (i.e. aliased for each exam subtype)
+    url(r'^exams/parse_markdown/?$', 'courses.exams.views.parse_markdown', name='parse_markdown'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/create/?$', 'courses.exams.views.create_exam'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/save/?$', 'courses.exams.views.save_exam_ajax'),
     url(r'^delete_exam/?', 'courses.exams.actions.delete_exam'),
@@ -299,6 +303,7 @@ urlpatterns = patterns('',
     
     #In-line Reports
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/generate_in_line_report/?$', 'courses.reports.views.generate_in_line_report'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/summary_report/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.reports.views.summary_report'),
     
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),

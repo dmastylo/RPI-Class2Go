@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block title %}{{ SITE_TITLE }} | {{ common_page_data.course.title }} | Preview {% if display_login %}(Login){% endif %} {% endblock title %}
@@ -47,27 +48,26 @@
   <div class="span5">
     <div class="alert alert-success">
         <em class="icon-heart"></em>
-        You have signed up for {{common_page_data.course.title}}!
+        {% trans 'You have signed up for' %} {{common_page_data.course.title}}!
         <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' common_page_data.course_prefix common_page_data.course_suffix %}">
             {% csrf_token %}
-            <input class="btn-mini" type="Submit"  value="Unenroll" onclick="return confirm('Do you really want to unenroll?')" />
+            <input class="btn-mini" type="Submit"  value="{% trans 'Unenroll' %}" onclick="return confirm('{% trans 'Do you really want to unenroll?' %}')" />
         </form>
     </div>
-    <p>The course starts on {{common_page_data.course.calendar_start}}. The course staff will contact you with an email introduction when the date approaches.
-      Hope to see you online this term!</p>
+    <p>{% blocktrans with sd=common_page_data.course.calendar_start %}The course starts on {{sd}}. The course staff will contact you with an email introduction when the date approaches. Hope to see you online this term!{% endblocktrans %}</p>
     <p><a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">
-        Register or log-in as someone else</a>
+        {% trans 'Register or log-in as someone else' %}</a>
     </p>
   </div>
   {% else %}
     <div class="span5">
-    <div class="alert alert-info"><em class="icon-info-sign"></em>Hi {{user.first_name}} {{user.last_name}}.  It looks we already have record of you at {{SITE_TITLE}}.  Would you like to register for {{common_page_data.course.title}}?
+    <div class="alert alert-info"><em class="icon-info-sign"></em>{% blocktrans with fn=user.first_name ln=user.last_name title=common_page_data.course.title %}Hi {{fn}} {{ln}}. It looks we already have record of you at {{SITE_TITLE}}.  Would you like to register for {{title}}?{% endblocktrans %}
     <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}?redirect_to={{request.path}}" method="POST">
-    <input type="submit" id="login_button" class="btn" value="Enroll" />
+    <input type="submit" id="login_button" class="btn" value="{% trans 'Enroll' %}" />
     {% csrf_token %}
     </form>
     </div>
-    <a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Register or log-in as someone else</a>
+    <a href="{% url 'auth_logout' %}?next={% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">{% trans 'Register or log-in as someone else' %}</a>
     </div>
   {% endif %}
 
@@ -78,11 +78,11 @@
        {% if login_form.errors %}
        <div class="alert alert-error">
          <button class="close" data-dismiss="alert">×</button>
-         Uh-oh.  We couldn't find username and password you entered.  Try again?
+         {% blocktrans %}Uh-oh.  We couldn't find username and password you entered.{% endblocktrans %}
        </div>
        {% endif %}
        <div class="well preview-registration">
-       <h3>Confirm your login name</h3>
+       <h3>{% trans 'Confirm your login name' %}</h3>
        <form method="post" action="{% url 'accounts.views.default_preview_login' common_page_data.course_prefix common_page_data.course_suffix %}" class="form-vertical">  
            {% csrf_token %}
            <table>
@@ -95,12 +95,12 @@
                    <td>{{ login_form.password }}</td>
                </tr>
            </table>
-           <input type="submit" value="Login" class="btn" />
+           <input type="submit" value="{% trans 'Login' %}" class="btn" />
            <input type="hidden" name="next" value="{{ next }}" />
        </form>
-           <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">Registration</a>
+           <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix%}">{% trans 'Registration' %}</a>
            <br>
-           <a href="{% url 'auth_password_reset' %}">Forgot My Password or Username</a> 
+           <a href="{% url 'auth_password_reset' %}">{% trans 'Forgot My Password or Username' %}</a> 
        </div>
    </div>
 
@@ -110,23 +110,24 @@
           {% if "in use" in error %}
           <div class="alert alert-error">
             <button class="close" data-dismiss="alert">×</button>
-            Someone with the email address you entered already has an account.  Perhaps you'd like to <a class="btn" href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login">Login</a> instead?
+            {% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix as login_url%}
+            {% blocktrans %}Someone with the email address you entered already has an account.  Perhaps you'd like to <a class="btn" href="{{login_url}}?login">Login</a> instead?{% endblocktrans %}
           </div>
           {% endif %}
       {% endfor %}
       <div class="registration preview-registration">
           <div class="well">
-            <h2>{{ SITE_TITLE }} Signup</h2>
+            <h2>{{ SITE_TITLE }} {% trans 'Signup' %}</h2>
             <form action="{% url 'courses.preview.views.preview_reg' common_page_data.course_prefix common_page_data.course_suffix %}" method="post" class="form-horizontal">
               <fieldset>
               {% include "registration/regforminputs.html" %} 
               </fieldset>
               <div class="form-actions">
                   <p>
-                  {{form.tos}} I agree to {{ SITE_TITLE }}'s <a href="{% url 'c2g.views.tos' %}" target="_blank">Terms of Service</a>, 
-                  <a href="{% url 'c2g.views.tos' %}#honor" target="_blank" >Honor Code</a>, and <a href="{% url 'c2g.views.tos' %}#privacy" target="_blank">Privacy Policy</a>
+                  {% url 'c2g.views.tos' as tos_url %}
+                  {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}'s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
                   </p>
-                  <input type="submit" value="Register" class="btn btn-primary btn-large" /> &nbsp; Already have an account?  <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login"> Login instead</a>
+                  <input type="submit" value="{% trans 'Register' %}" class="btn btn-primary btn-large" /> &nbsp; {% trans 'Already have an account?' %}  <a href="{% url 'courses.preview.views.preview' common_page_data.course_prefix common_page_data.course_suffix %}?login"> {% trans 'Login instead' %}</a>
               </div>
             </form>
           </div>

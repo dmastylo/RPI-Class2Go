@@ -1,0 +1,29 @@
+Django
+MySQL-python
+#psycopg2
+PIL
+South
+django-storages
+boto
+gdata
+numpy
+elementtree
+pysqlite
+djangorestframework
+PySimpleSOAP
+xhtml2pdf
+markdown
+
+# celery dependencies
+django-celery
+django-celery-email
+pytz
+
+# dev/testing packages
+mock
+nose
+django_nose
+django_coverage
+lxml
+selenium
+selenose

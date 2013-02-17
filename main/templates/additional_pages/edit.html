@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block course_info_link_class %}{% if page.menu_slug %} active{% endif %}{% endblock course_info_link_class %}
@@ -32,11 +33,11 @@
 <div id="c2g_layout_m_column" class="span12">
     {% if page.is_synced %}
     <div class="alert alert-success">
-        <em class="icon-ok" style="font-size:17px"></em> <strong>Working=Ready</strong> The working and ready versions are the same.
+        <em class="icon-ok" style="font-size:17px"></em> <strong>{% trans 'Working=Ready' %}</strong> {% trans 'The working and ready versions are the same.' %}
     </div>
     {% else %}
     <div class="alert">
-        <em class="icon-random" style="font-size:17px"></em> Working version is different from ready.
+        <em class="icon-random" style="font-size:17px"></em> {% trans 'Working version is different from ready.' %}
     </div>
     {% endif %}
     {% ifnotequal page.slug 'overview' %}
@@ -52,7 +53,7 @@
 
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
-            <label class="control-label">Title</label>
+            <label class="control-label">{% trans 'Title' %}</label>
             <div class="controls">
                 <input name="title" value="{{page.title}}" type="text" />
             </div>
@@ -65,30 +66,30 @@
        
         {% ifequal page.slug 'overview' %}
             
-        <p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p>
+        <p><b>{% trans 'Note:' %}</b> {% trans 'To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain.' %} <i><b>{% trans 'Always use absolute URLs only' %} (http://.....)</b></i>.</p>
             
         <div class="control-group">
             <div class="controls">
                 
-                <h3>Prerequisites</h3>
+                <h3>{% trans 'Prerequisites' %}</h3>
                 
                 <textarea name="prerequisites" class="tinymce">
                     {% autoescape off %}{{course.prerequisites}}{% endautoescape %}
                 </textarea>
                 
-                <h3>FAQ</h3>
+                <h3>{% trans 'FAQ' %}</h3>
                 
                 <textarea name="faq" class="tinymce">
                     {% autoescape off %}{{course.faq}}{% endautoescape %}
                 </textarea>
                 
-                 <h3>Accompanying Materials</h3>
+                 <h3>{% trans 'Accompanying Materials' %}</h3>
                 
                 <textarea name="accompanying_materials" class="tinymce">
                     {% autoescape off %}{{course.accompanying_materials}}{% endautoescape %}
                 </textarea>
                 
-                 <h3>Outcomes</h3>
+                 <h3>{% trans 'Outcomes' %}</h3>
                 
                 <textarea name="outcomes" class="tinymce">
                     {% autoescape off %}{{course.outcomes}}{% endautoescape %}
@@ -102,11 +103,11 @@
 
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
-            <label class="control-label">URL identifier</label>
+            <label class="control-label">{% trans 'URL identifier' %}</label>
             <div class="controls">
                 <input name="slug" id="id_slug" value="{{page.slug}}" type="text" />
             </div>
-	    <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">Changing this also changes the ready version's slug, and will break external references if it is live.</div>
+	    <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">{% blocktrans %}Changing this also changes the ready version's slug, and will break external references if it is live.{% endblocktrans %}</div>
         </div>
         {% else %}
             <input type='hidden' name='slug' value='overview' />
@@ -114,11 +115,11 @@
 
         {% ifnotequal page.slug 'overview' %}
         <div class="control-group">
-            <label class="control-label">Section</label>
+            <label class="control-label">{% trans 'Section' %}</label>
             <div class="controls">
                 <select name="section" id="section_id" {% if page.section_id %}onChange="prefill_children();"{% endif %}>
                     {% if not page.section_id %}
-                        <option value="null" selected>** No content section **</option>
+                        <option value="null" selected>** {% trans 'No content section' %} **</option>
                     {% else %}
                         {% for section in sections %}
                             {% if page.section_id and page.section_id == section.id %}
@@ -154,14 +155,14 @@
         
         {% ifequal page.slug 'overview' %}
             <textarea class="proxy" id="ace_proxy" name="description">{{course.description|safe}}</textarea>
-            <h3>Course Description</h3>
+            <h3>{% trans 'Course Description' %}</h3>
             
         {% else %}
         <textarea class="proxy" id="ace_proxy" name="description">{{page.description|safe}}</textarea>
-        <label class="control-label">Page HTML</label>
+        <label class="control-label">{% trans 'Page HTML' %}</label>
         {% endifequal %}
             <div class="control-group">
-                <input type="button" id="tinymce-entry-btn" class="btn" value="Open WYSIWYG Editor" title="Click to open WYSIWYG Editor" />
+                <input type="button" id="tinymce-entry-btn" class="btn" value="{% trans 'Open WYSIWYG Editor' %}" title="{% trans 'Click to open WYSIWYG Editor' %}" />
             </div>
         <div id="edit-container">
             <div id="editor"></div>
@@ -179,20 +180,20 @@
         <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}" />
         </fieldset>
         <div class="form-actions">
-            <input type="button" value="Save and Set to Ready" onclick="Save(1,0);" class="btn btn-primary" />
-            <input type="button" value="Save as Draft" onclick="Save(0,0);" class="btn" />
+            <input type="button" value="{% trans 'Save and Set to Ready' %}" onclick="Save(1,0);" class="btn btn-primary" />
+            <input type="button" value="{% trans 'Save as Draft' %}" onclick="Save(0,0);" class="btn" />
             {% if page.image %}
-                <input type="button" value="Reset to Ready" onclick="Save(0,1);" class="btn" />
+                <input type="button" value="{% trans 'Reset to Ready' %}" onclick="Save(0,1);" class="btn" />
             {% endif %}
-            <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">Cancel</a>
+            <a href="{% url 'courses.views.main' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">{% trans 'Cancel' %}</a>
             {% ifnotequal page.slug 'overview' %}
-                <input type="button" class="btn" style="margin-left: 40px;" value="Delete page" onclick="if(confirm('Are you sure you want to delete this page?')) {document.forms.delete_page_form.submit()}" />
+                <input type="button" class="btn" style="margin-left: 40px;" value="{% trans 'Delete page' %}" onclick="if(confirm('{% trans 'Are you sure you want to delete this page?' %}')) {document.forms.delete_page_form.submit()}" />
             {% endifnotequal %}
         </div>
     </form>
     
     <div id="dialog-form" title="WYSIWYG Editor">
-        <label for="name" id="xml-import-label"><p>Use this Editor to Create your HTML.</p><p><span style='text-decoration: italic; font-weight: bold;'>Note:</span> To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain. <span style='text-decoration: italic; font-weight: bold;'>Always use absolute URLs only (http://.....)</span>.</p></label>
+        <label for="name" id="xml-import-label"><p>{% trans 'Use this Editor to Create your HTML.' %}</p><p><b>{% trans 'Note:' %}</b> {% trans 'To insert hyperlinks, please select the text that will be the link, then click the button that looks like a chain.' %} <b><i>{% trans 'Always use absolute URLs only' %} (http://.....)</i></b>.</p></label>
         <textarea class="tinymce" name="tinymce-entry" id="tinymce-entry" class="text ui-widget-content ui-corner-all"></textarea>
     </div>
     
@@ -203,7 +204,7 @@
             if (revert) $("#revert").val(1);
             
             if (revert) {
-                r = confirm("Reverting will cause all changes since the last publish to be lost. Are you sure you want to revert?");
+                r = confirm("{% trans 'Reverting will cause all changes since the last publish to be lost. Are you sure you want to revert?' %}");
                 if (!r) return;
             }
             
@@ -271,7 +272,7 @@ $('#id_slug').focus(function() {
        width: "80%",
        modal: true,
        buttons: [{
-                     text:"Write to HTML",
+                     text:"{% trans 'Write to HTML' %}",
                      id:"import-html-button",
                      click: function() {
                              editor.setValue(style_html($('#tinymce-entry').val(), {'max_char':80}));
@@ -279,7 +280,7 @@ $('#id_slug').focus(function() {
                      }
                  },
                  {
-                     text:"Cancel",
+                     text:"{% trans 'Cancel' %}",
                      click: function() {
                              $(this).dialog("close");
                      }

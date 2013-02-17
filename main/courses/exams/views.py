@@ -1,6 +1,4 @@
 # Create your views here.
-import sys
-import traceback
 import json
 import operator
 import logging
@@ -8,12 +6,10 @@ import settings
 import datetime
 import csv
 import HTMLParser
-import json
-from django.db.models import Sum, Max, F
+from django.db.models import Max, F
 import copy
-import urllib2, urlparse
-from xml.dom.minidom import parseString
-
+import markdown
+from pytz import timezone
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
@@ -29,56 +25,43 @@ from django.shortcuts import render_to_response
 from django.template import Context, loader
 from django.template import RequestContext
 from django.core.validators import validate_slug, ValidationError
-from django.core.exceptions import MultipleObjectsReturned
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 from django.views.decorators.http import require_POST
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.utils import encoding
 from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
 from courses.course_materials import get_course_materials
-from django.views.decorators.csrf import csrf_protect
 from storages.backends.s3boto import S3BotoStorage
-
+from django.utils.timezone import get_default_timezone_name
 
 @auth_view_wrapper
 def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
     
-    course = request.common_page_data['course']
-    if course.mode == "draft": #draft mode, lists grades
+    cpd    = request.common_page_data
+    course = cpd['course']
+
+    if course.mode == "draft":         # draft mode, lists grades
         exams = list(Exam.objects.filter(course=course, is_deleted=0, exam_type__in=show_types))
 
-        #if course.mode=="live":
-            #exams = filter(lambda item: item.is_live(), exams)
-        
         scores = []
-
         for e in exams:
-            if ExamScore.objects.filter(course=course, exam=e, student=request.user).exists():
-                scores.append(ExamScore.objects.filter(course=course, exam=e, student=request.user)[0].score)
-            else:
-                scores.append(None)
+            score = ExamScore.objects.filter(course=course, exam=e, student=request.user)
+            scores.append(score[0].score if score else None)
 
         return render_to_response('exams/list.html',
-                                  {'common_page_data':request.common_page_data,
-                                   'course':course,
+                                  {'common_page_data':cpd,
                                   'exams_and_scores':zip(exams,scores)},
                                   RequestContext(request))
-    else: #ready mode, uses section structures
-        section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=False, get_exam_content=True, exam_types=show_types)
-        
-        form = None
-        
-        if show_types:
-            ex_type = show_types[0]
-        else:
-            ex_type = "exam"
-            
-        
-        
-        return render_to_response('exams/ready/list.html', {'common_page_data': request.common_page_data, 'section_structures':section_structures, 'reverse_show':ex_type+'_show', 'form':form, }, context_instance=RequestContext(request))
 
+    else:                              # ready mode, uses section structures
+        section_structures = get_course_materials(common_page_data=cpd, get_exam_content=True, exam_types=show_types)
+        ex_type = show_types[0] if show_types else "exam" 
+        
+        return render_to_response('exams/ready/list.html', 
+                                  {'common_page_data': cpd, 
+                                   'section_structures':section_structures, 
+                                   'reverse_show':ex_type+'_show', 
+                                  }, 
+                                  context_instance=RequestContext(request))
 
 @auth_view_wrapper
 def confirm(request, course_prefix, course_suffix, exam_slug):
@@ -107,8 +90,6 @@ def confirm(request, course_prefix, course_suffix, exam_slug):
                               'endtime': endtime, 'slug_for_leftnav':slug_for_leftnav, 'minutesallowed':minutesallowed,
                               }, RequestContext(request))
 
-
-# Create your views here.
 @auth_view_wrapper
 def show_exam(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
@@ -154,8 +135,8 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     #Code for timed exam
     timeopened = datetime.datetime.now()
 
-    editable = not exam.past_due()  #editable controls whether the inputs are enabled or disabled
-    allow_submit = not exam.past_due() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
+    editable = not exam.past_all_deadlines()  #editable controls whether the inputs are enabled or disabled
+    allow_submit = not exam.past_all_deadlines() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
 
     if exam.timed:
         startobj, created = StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
@@ -185,7 +166,7 @@ def last_completed_record(exam, student, include_contentgroup=False):
     try:
         if include_contentgroup:
             cginfo = ContentGroup.groupinfo_by_id('exam',exam.id)
-            exam_list = cginfo.get('exam',[exam]) #default to a singleton list consisting of just this exam
+            exam_list = cginfo.get('exam',[exam]) # default to a 1-item list with only this exam
             record = ExamRecord.objects.filter(exam__in=exam_list, complete=True, student=student).latest('last_updated')
         else:
             record = ExamRecord.objects.filter(exam=exam, complete=True, student=student).latest('last_updated')
@@ -229,9 +210,8 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     except ContentGroup.DoesNotExist:
         slug_for_leftnav = exam.slug
 
-
     #Code for timed exams
-    allow_submit = not exam.past_due() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
+    allow_submit = not exam.past_all_deadlines() #allow submit controls whether diabled inputs can be reenabled and whether to show the submit button
         
     timeopened = datetime.datetime.now()
     
@@ -441,17 +421,22 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     postdata = request.POST['json_data'] #will return an error code to the user if either of these fail (throws 500)
     json_obj=json.loads(postdata)
 
+    #e.g. PST or PDT
+    tz = timezone(get_default_timezone_name())
+    tz_string1 = tz.tzname(exam.partial_credit_deadline)
+
     if exam.mode == "ready" and exam.past_all_deadlines():
         return HttpResponseBadRequest("Sorry!  This submission is past the last deadline of %s" % \
-                                      datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M PST"));
+                                      datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M " + tz_string1))
 
     if exam.timed:
         try:
             started = StudentExamStart.objects.get(exam=exam, student=user)
             endtime = started.time_created + datetime.timedelta(minutes = (exam.minutesallowed+1))
+            tz_string2 = tz.tzname(endtime)
             if datetime.datetime.now() > endtime:
                 return HttpResponseBadRequest("Sorry!  This submission is past your submission window, which ended at %s" % \
-                                              datetime.datetime.strftime(endtime, "%m/%d/%Y %H:%M PST"));
+                                              datetime.datetime.strftime(endtime, "%m/%d/%Y %H:%M " + tz_string2))
         except StudentExamStart.DoesNotExist:
             pass #somehow we didn't record a start time for the student.  So we just let them submit.
 
@@ -468,7 +453,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         autograder = AutoGrader("<null></null>", default_return=True) #create a null autograder that always returns the "True" object
     elif exam.autograde:
         try:
-            autograder = AutoGrader(exam.xml_metadata)
+            autograder = AutoGrader(exam.xml_metadata, default_return=True)
         except Exception as e: #Pass back all the exceptions so user can see
             return HttpResponseBadRequest(unicode(e))
 
@@ -520,6 +505,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
                                  associated_text = v.get('associatedText', ""))
                     field_obj.save()
             except AutoGraderGradingException as e:
+                #TODO: need to handle v is a list case, otherwise gives 500
                 feedback[prob]={'correct':False, 'score':0}
                 field_obj = ExamRecordScoreField(parent=record_score,
                                  field_name = prob,
@@ -578,12 +564,14 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     if course.mode == "ready":
         course = course.image
     
-    slug = request.POST.get('slug','')
+    old_slug = old_slug.strip()
+    slug = request.POST.get('slug','').strip()
     title = request.POST.get('title', '')
     description = request.POST.get('description', '')
     metaXMLContent = request.POST.get('metaXMLContent', '')
     htmlContent = request.POST.get('htmlContent', '')
     xmlImported = request.POST.get('xmlImported','')
+    quizdown = request.POST.get('quizdown','')
     due_date = request.POST.get('due_date', '')
     grace_period = request.POST.get('grace_period', '')
     partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
@@ -593,7 +581,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     assessment_type = request.POST.get('assessment_type','')
     section=request.POST.get('section','')
     invideo_val=request.POST.get('invideo','')
-    
+
     if invideo_val and invideo_val == "true":
         invideo = True
     else:
@@ -606,6 +594,12 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         validate_slug(slug)
     except ValidationError as ve:
         return HttpResponseBadRequest(unicode(ve))
+
+    ###now validate slug uniqueness ####
+    num_exams = Exam.objects.filter(course=course, slug=slug, is_deleted=False).count()
+    num_allowed = 1 if (old_slug and old_slug == slug) else 0
+    if num_exams > num_allowed:
+        return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
 
     if not title:
         return HttpResponseBadRequest("No Title value provided")
@@ -697,13 +691,11 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
 
     #create or edit the Exam
     if create_or_edit == "create":
-        if Exam.objects.filter(course=course, slug=slug, is_deleted=False).exists():
-            return HttpResponseBadRequest("An exam with this URL identifier already exists in this course")
         exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent,
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
                         grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
-                        xml_imported=xmlImported
+                        xml_imported=xmlImported, quizdown=quizdown
                         )
 
         exam_obj.save()
@@ -739,6 +731,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.html_content=htmlContent
             exam_obj.xml_metadata=metaXMLContent
             exam_obj.xml_imported=xmlImported
+            exam_obj.quizdown=quizdown
             exam_obj.due_date=dd
             exam_obj.total_score=total_score
             exam_obj.assessment_type=assessment_type
@@ -830,7 +823,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
-          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported}
+          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported, 'quizdown':exam.quizdown}
 
     groupable_exam = exam
     if exam.mode != 'ready':
@@ -1227,3 +1220,14 @@ def student_save_progress(request, course_prefix, course_suffix, exam_slug):
     exam_rec.save()
     return HttpResponse("OK")
 
+
+@require_POST
+def parse_markdown(request):
+    """Using a python parser for markdown.  This seems like the most stable version thus
+       far.
+    """
+    md = markdown.Markdown(extensions = ['meta'], output_format = "html")
+    mkd = request.POST.get('markdown',"")
+    html = md.convert(mkd)
+    returnobj = {'html':html, 'meta':md.Meta}
+    return HttpResponse(json.dumps(returnobj))

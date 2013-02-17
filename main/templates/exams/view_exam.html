@@ -1,4 +1,5 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block title %}{% if not videotest %}{{ exam.title }}{% else %}{{ video.title }}{% endif %} | Stanford Online{% endblock %}
@@ -54,30 +55,27 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span9">
-<div class="alert alert-error" id="nojswarn">
-You don't have Javascript enabled or jQuery was not loaded.  This page won't work!  Please re-enable Javascript.
-</div>
+
 {% autoescape off %}
 
 {% if common_page_data.course.mode == "ready" and not exam.is_live %}
 
-    This exam will go live on {{ exam.live_datetime }} PST.
+    {% trans 'This exam will go live on' %} {{ exam.live_datetime|date:"N d Y, P T" }}.
 
     <br />
     <a href="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}">Return to {{exam.get_human_type}} list.</a>
 
 {% elif too_recent %}
-    
-    <h3>You've completed this activity (or one of its variants) too recently ({{last_record.last_updated}}).
-        There must be a {{exam.minutes_btw_attempts}} minute wait after that time.</h3>
+    <h3>{% blocktrans with last_updated=last_record.last_updated minutes_btw_attempts=exam.minutes_btw_attempts %}You've completed this activity (or one of its variants) too recently ({{last_updated}}).
+        There must be a {{minutes_btw_attempts}} minute wait after that time.{% endblocktrans %}</h3>
 
     <br />
-    <a href="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}">Return to {{exam.get_human_type}} list.</a>
+    <a href="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}">{% blocktrans with get_human_type=exam.get_human_type %}Return to {{get_human_type}} list.{% endblocktrans %}</a>
 
 {% else %}
 
     <style>
-    #exam-pane label {clear: both; display: block; width:100%;}
+    #exam-pane label {clear: both; display: block;}
     #exam-pane label input {float: left; margin-right: 1em;}
     #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
     h3 {clear:both;}
@@ -121,9 +119,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         
     .correct {color: #090;}
     .incorrect {color: #900;}
-        .timer_container {float:right; position:relative; right:0px; padding:2px; margin:0px; font-size:16px; background:white; border: 1px solid transparent;}
-        .timer_container.fixed { padding:2px; margin:0px; position: fixed; top:5px; right:5px; z-index:11; background:white; border-radius: 4px; border: 1px solid #DDCF99;}
-        
+    .timer_container {float:right; position:relative; right:0px; padding:2px; margin:0px; font-size:16px; background:white; border: 1px solid transparent;}
+    .timer_container.fixed { padding:2px; margin:0px; position: fixed; top:5px; right:5px; z-index:11; background:white; border-radius: 4px; border: 1px solid #DDCF99;}
+    input[type="checkbox"] {margin-top: 4px;}
+    
+    p {padding-bottom: 0px; }
+    fieldset {margin-bottom: 2em;}
+    select {margin-bottom: 2em; }
+
+
     </style>
 
     {% if videotest %}
@@ -140,39 +144,39 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines %}
 
-       <h3>This exam was closed on {{ exam.partial_credit_deadline }} PST.  Submissions are disabled. </h3>
+       <h3>{% trans 'This exam was closed on' %} {{ exam.partial_credit_deadline|date:"N d Y, P T" }}.  {% trans 'Submissions are disabled.' %} </h3>
     
     {% endif %}
     {% if endtime %}
         {% if timeopened < endtime %}
             <div class="timer_container" id="countdown">
-            <b style="color:green">End: {{ endtime|date:"N d, P T" }}. About <span id="timeremaining">00:00:00</span> left</b>
+            <b style="color:green">{% trans 'End:' %} {{ endtime|date:"N d, P T" }}. {% trans 'About' context "approximate" %} <span id="timeremaining">00:00:00</span> {% trans 'left' context "time remaining" %}</b>
             </div>
             
         {% else %}
-            <h3> <b style="color:red"> Your time on the exam expired at {{ endtime|date:"N d Y, P T" }}. </b></h3><br />
+            <h3> <b style="color:red"> {% trans 'Your time on the exam expired at' %} {{ endtime|date:"N d Y, P T" }}. </b></h3><br />
         {% endif %}
 
     {% endif %}
     {% if too_many_attempts %}
     
-        <h3>You've made too many attempts. Submissions are disabled.</h3>
+        <h3>{% blocktrans %}You've made too many attempts. Submissions are disabled.{% endblocktrans %}</h3>
 
     {% endif %}
 
     
     
     {% if score %}
-    <h4><b style="color:red">Score: {{score}}/{{exam.total_score}}</b></h4>
+    <h4><b style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</b></h4>
     {% endif %}
 
     {% if raw_score %}
-    <h4><b style="color:red">Raw Score (without late or resubmission penalties): {{raw_score}}</b></h4>
+    <h4><b style="color:red">{% trans 'Raw Score (without late or resubmission penalties)' %}: {{raw_score}}</b></h4>
     {% endif %}
 
 
     <noscript>
-    <div class="alert alert-error">Your browser does not have JavaScript enabled. Please enable it before taking this exam</div>
+    <div class="alert alert-error">{% trans 'Your browser does not have JavaScript enabled. Please enable it before taking this exam' %}</div>
     </noscript>
 
     <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
@@ -184,21 +188,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             {% if single_question %}
             {% comment %} Only for formative/one-question-at-a-time {% endcomment %}
             <div id="problemset-nav">
-                <input type="button" id="next-question" class="btn question-nav" value="Next Question" />
-                <input type="button" id="prev-question" class="btn question-nav" value="Previous Question" />
+                <button type="button" id="next-question" class="btn question-nav" value="{% trans 'Next Question' %}" title="{% trans 'Next Question' %}"><em class="icon-arrow-right"></em></button>
+                <button type="button" id="prev-question" class="btn question-nav" value="{% trans 'Previous Question' %}" title="{% trans 'Previous Question' %}"><em class="icon-arrow-left"></em></button>
             </div>
             {% endif %}
 
-            {% comment %}
-            {##% if not videotest %} 
-                {##% comment %} Regular exam/problem set submit button, when no video is present {##% endcomment %}
-                <input class="btn" type="submit" value="Submit" />
-            {##% elif exam.exam_type == "survey" and exam.invideo %}
-                {##% comment %} Only for in-video surveys, provide special-cased submit button {##% endcomment %}
-                <input class="btn" id="survey-submit" type="submit" value="Submit" />
-            {##% endif %}
-            {% endcomment %}
-            <input class="btn" id="submit-button" type="submit" value="Submit Answers" />
+            <input class="btn btn-primary pull-right" id="submit-button" type="submit" value="{% trans 'Submit Answers' %}" />
         </div>
 
 
@@ -292,11 +287,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 var key = (name != undefined) ? name.trim() : "";
                 // keep track of number of inputs with same name
                 // for possible later use 
-                if (key != "" && uniqueFormElements[key] == undefined) {
-                    uniqueFormElements[key] = 1;
-                    totalUniqueFormEls += 1;
-                } else {
-                    uniqueFormElements[key] += 1;
+                if (key != "") {
+                    if (uniqueFormElements[key] == undefined) {
+                        if (this.tagName == "SELECT") {
+                            uniqueFormElements[key] = $(this).find('option').length;
+                        } else {
+                            uniqueFormElements[key] = 1;
+                        }
+                        totalUniqueFormEls += 1;
+                    } else {
+                        uniqueFormElements[key] += 1;
+                    }
                 }
                 if (($(this).prop('type') == 'checkbox' || $(this).prop('type') == 'radio')
                      && $(this).get(0).checked == true) {
@@ -323,6 +324,17 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                     tmpObj.report = $(this).attr('data-report');
                     tmpObj.questionreport = $(this).closest('.question').attr('data-report');
                     userSelections[key]=tmpObj;
+                } else if (this.tagName == "SELECT") {
+                    var questionreport = $(this).attr('data-report');
+                    userSelections[key] = [];
+                    $(this).find("option").filter(":selected").each(function () {
+                        var tmpObj = {};
+                        tmpObj.questionreport = questionreport;
+                        tmpObj.value = $(this).val();
+                        tmpObj.report = $(this).attr('data-report');
+                        tmpObj.associatedText = $(this).text().trim().substr(0,40);
+                        userSelections[key].push(tmpObj);
+                    });
                 }
             });
 
@@ -350,10 +362,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             
             if ($(this).attr('data-status') == 'Show' && $(assocQ).find('.explanation').css('display') == 'block') {
                 $(this).attr('data-status', 'Hide');
-                $(this).val('Hide Explanation');
+                $(this).val('{% trans 'Hide Explanation' %}');
             } else {
                 $(this).attr('data-status', 'Show');
-                $(this).val('Show Explanation');
+                $(this).val('{% trans 'Show Explanation' %}');
             } 
     
         }; 
@@ -377,19 +389,21 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             } else if (newIdx < 0) {
                 localQuestionIdx -= 1;
             }
+                      
+            //enable both as initialization
+            $('#next-question').removeAttr('disabled');
+            $('#prev-question').removeAttr('disabled');
 
             if (localQuestionIdx >= ($('.question').length - 1)) {
                 // no longer cycle through; stop at last question
                 $('#next-question').attr('disabled', 'disabled');
                 localQuestionIdx = $('.question').length - 1;
-            } else if (localQuestionIdx <= 0) {
+            }
+            if (localQuestionIdx <= 0) {
                 // no longer cycle through; stop at first question
                 $('#prev-question').attr('disabled', 'disabled');
                 localQuestionIdx = 0;
-            } else {
-                $('#next-question').removeAttr('disabled');
-                $('#prev-question').removeAttr('disabled');
-            }
+            } 
 
             return localQuestionIdx;
         }
@@ -418,7 +432,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         var quickCheck = function () {
             if ($(this).hasClass('quick-check')) {
-                $(this).val('Checking...');
+                $(this).val("{% trans 'Checking...' %}");
+                $(this).attr('disabled', 'disabled');           /* disallow while checking */
             }
 
             var checkBtnID = $(this).attr('id');
@@ -434,7 +449,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
             var checkBtn = $(this);
             var getAllUserAnswers = function () {
-                var inputCollection = $(checkBtn).closest('.question').find('input,textarea');
+                var inputCollection = $(checkBtn).closest('.question').find('input,textarea,select');
                 var userAnswersObj = window.collectUserAnswers(inputCollection);
                 return userAnswersObj.userSelections;
             };
@@ -525,7 +540,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             // for use in any "Check Answer" exercise
             var resetButtonText = function (buttonId) {
                 return function (xhr, status) {
-                    $('#' + buttonId).val('Check Answer');
+                    $('#' + buttonId).val("{% trans 'Check Answer' %}");
+                    $('#' + buttonId).removeAttr('disabled');   /* allow saving again on reset */
                 }
             }
 
@@ -543,7 +559,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
                 var HTMLAnswerError = function (jqXHR, textStatus, errorThrown) {
                     var resultsArea = getResultsArea();
-                    $(resultsArea).append("There was an error contacting the grader service, try again later.");
+                    $(resultsArea).append("{% trans 'There was an error contacting the grader service, try again later' %}.");
                     if (textStatus != "null") {
                         $(resultsArea).append("   (" + textStatus + ")");
                     }
@@ -605,9 +621,9 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             $(checkBtn).attr('id','quickCheck_' + idx);
             $(checkBtn).addClass('btn').addClass('quick-check');
             if (__exam_type == "interactive_exercise") {
-                $(checkBtn).attr('value', 'Check Answer');
+                $(checkBtn).attr('value', '{% trans 'Check Answer' %}');
             } else {
-                $(checkBtn).attr('value', 'Check Answers');
+                $(checkBtn).attr('value', '{% trans 'Check Answers' %}');
             }
             $(perQButtonDiv).append($(checkBtn));
 
@@ -618,7 +634,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 $(toggleExplBtn).attr('id','toggleExplanation_' + idx);
                 $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
                 $(toggleExplBtn).attr('data-status', 'Show');
-                $(toggleExplBtn).attr('value', 'Show Explanation');
+                $(toggleExplBtn).attr('value', '{% trans 'Show Explanation' %}');
                 $(toggleExplBtn).attr('disabled', 'disabled');
                 $(perQButtonDiv).append($(toggleExplBtn));
             }
@@ -628,8 +644,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         $('.quick-check').click(quickCheck);
 
         $('.toggle-explanation').click(toggleExplanation);
-        {% endif %}
-    {% endif %}
+        {% endif %} {# exam.invideo or exam.exam_type == "interactive_exercise" #}
+    {% endif %} {# single_question #}
 
     {% comment %}
     SUBMISSION_RETURN_URL tells us where to go after user is done with the exam 
@@ -661,8 +677,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var returnToListLink = document.createElement('a');
         $(returnToListLink).attr('id', 'returnToListLink');
         $(returnToListLink).attr('href', SUBMISSION_RETURN_URL);
-        $(returnToListLink).attr('title', 'Click to return to the submissions list without submitting this form');
-        $(returnToListLink).text('View Previous Submissions (Without Submitting Form)');
+        $(returnToListLink).attr('title', '{% trans 'Click to return to the submissions list without submitting this form' %}');
+        $(returnToListLink).text('{% trans 'View Previous Submissions (Without Submitting Form)' %}');
         $(returnToListLink).mouseover(function (ev) {
             $(userNote).show();
         }).mouseout(function (ev) {
@@ -679,66 +695,70 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         var userNote = document.createElement('em');
         $(userNote).addClass('userNote');
-        $(userNote).text('Note: Leaving this page without submitting form will cause you to lose changes');
+        $(userNote).text('{% trans 'Note: Leaving this page without submitting form will cause you to lose changes' %}');
         $(returnToListLink).after($(userNote));
         $(userNote).hide();
     {% endif %}
                       
-    $('#nojswarn').remove();
-                      
     /********* Save Work Button (not submitting as complete) ********/
                       
     {% if not videotest and editable %}
-    var saveWorkBtn = document.createElement('button');
-    $(saveWorkBtn).text('Save Answers')
-                  .addClass('btn')
-                  .attr('id','saveWorkBtn');
-    var submitBtn = $('#submit-button');
-    submitBtn.after($(saveWorkBtn));
-
-    $(saveWorkBtn).click(function () {
-        var fieldCollection = $('#exam-pane').find('input,textarea');
-        var userAnswerObj = window.collectUserAnswers(fieldCollection);
-        var userSelections = userAnswerObj.userSelections; 
-
-        window.myData = JSON.stringify(userSelections);
-
-        var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
-                       {   csrfmiddlewaretoken: "{{ csrf_token }}",
-                           json_data:JSON.stringify(userSelections),
-                           onpage:$(location).attr('href')
-                       });
-                       
-        saveXHR.error(function(xhr, status, msg) {
-                    var dialogDiv = window.getDialog(status.toUpperCase());
-                    var displayText = "Your answers could not be saved!";
-                    if (typeof msg != "undefined" && msg != "") {
-                        displayText += " " + msg;
-                    }
-                    if (typeof xhr.responseText != "undefined" && xhr.responseText != "") {
-                        displayText += xhr.responseText.substr(0,99);
-                    }
-                     $(dialogDiv).find('p').text(displayText);
-                    if (typeof window.myData != "undefined" && window.myData != "" && typeof localStorage != "undefined") {
-                            var storageKey = "{{user.id}}_" + Date.now() + "_{{exam.slug}}";
-                            localStorage[storageKey] = window.myData;
-                    }
-                     $(dialogDiv).dialog({ modal: true,
-                                           buttons: {'Close':function(){$(this).dialog("close");}}
-                                         });
-        });
-
-        saveXHR.success(function(status, msg, xhr) { 
-                var dialogDiv = window.getDialog(msg.toUpperCase());
-                $(dialogDiv).find('p').text("Your answers have been saved, but not submitted!");
-
-                $(dialogDiv).dialog({ modal: true,
-                                   buttons: {'Close':function(){$(this).dialog("close");}}
-                                 });
-        });
+        var saveWorkBtn = document.createElement('button');
+        $(saveWorkBtn).text("{% trans 'Save Answers' %}")
+                      .addClass('btn')
+                      .attr('id','saveWorkBtn');
+                   if ($('#prev-question').length == 0) {
+                       $(saveWorkBtn).insertAfter($('#submit-button'));               
+                   } else {
+                       $(saveWorkBtn).insertAfter($('#prev-question')); 
+                   }
         
-        unsavedChanges = false; //clear flag when save button clicked
-    });
+
+        $(saveWorkBtn).click(function () {
+            $(saveWorkBtn).attr('disabled', 'disabled')         /* Disallow saving while saving */
+            var fieldCollection = $('#exam-pane').find('input,textarea,select');
+            var userAnswerObj = window.collectUserAnswers(fieldCollection);
+            var userSelections = userAnswerObj.userSelections; 
+
+            window.myData = JSON.stringify(userSelections);
+
+            var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
+                           {   csrfmiddlewaretoken: "{{ csrf_token }}",
+                               json_data:JSON.stringify(userSelections),
+                               onpage:$(location).attr('href')
+                           });
+                           
+            saveXHR.error(function(xhr, status, msg) {
+                        $(saveWorkBtn).removeAttr('disabled');   /* Saving failed; allow saving again */
+                        var dialogDiv = window.getDialog(status.toUpperCase());
+                        var displayText = "{% trans 'Your answers could not be saved!' %}";
+                        if (typeof msg != "undefined" && msg != "") {
+                            displayText += " " + msg;
+                        }
+                        if (typeof xhr.responseText != "undefined" && xhr.responseText != "") {
+                            displayText += xhr.responseText.substr(0,99);
+                        }
+                         $(dialogDiv).find('p').text(displayText);
+                        if (typeof window.myData != "undefined" && window.myData != "" && typeof localStorage != "undefined") {
+                                var storageKey = "{{user.id}}_" + Date.now() + "_{{exam.slug}}";
+                                localStorage[storageKey] = window.myData;
+                        }
+                         $(dialogDiv).dialog({ modal: true,
+                                               buttons: {'Close':function(){$(this).dialog("close");}}
+                                             });
+            });
+
+            saveXHR.success(function(status, msg, xhr) { 
+                    $(saveWorkBtn).removeAttr('disabled'); /* allow saving again on dialog close */
+                    var dialogDiv = window.getDialog(msg.toUpperCase());
+                    $(dialogDiv).find('p').text("{% trans 'Your answers have been saved, but not submitted!' %}");
+                    $(dialogDiv).dialog({ modal: true,
+                                          buttons: {"{% trans 'Close' %}": function() { $(this).dialog("close"); } }
+                                        });
+            });
+            
+            unsavedChanges = false; //clear flag when save button clicked
+        });
 
 
     {% endif %}
@@ -754,6 +774,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         //$('textarea').text('');
         $('input[type|="checkbox"]').removeAttr('checked');
         $('input[type|="radio"]').removeAttr('checked');
+        $('select').val('');
 
         // calling repopulateForm without an arg just wipes all data and returns 
         if (!jsonStr) {
@@ -765,7 +786,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
 
         // iterate through named form inputs
         for (member in dataObj) {
-            
+
             if ($.type(dataObj[member]) == "object") {
                 // it's a text input/textarea
                 $('input[name|=' + member + ']').val(dataObj[member].value);
@@ -776,26 +797,32 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 };
                 
             } else {
+                // it's multiple choice/select, therefore an array
                 if (scores.hasOwnProperty(member)) {
                       //Label the closet div enclosing the choices with the score (probably want fieldset instead)
                       $('input[name|=' + member + ']').first().closest('fieldset').before("<b style='color:red'> " + scores[member]+" </b> ");
+                      $('select[name|=' + member + ']').before("<b style='color:red'> " + scores[member]+" </b> ");
                 }
-                // it's multiple choice, therefore an array
-                $('input[name|=' + member + ']').removeAttr('checked');
+                if ($('select[name|=' + member + ']').length) {
+                    var selectValues = $.map(dataObj[member], function(val, idex) {
+                               return val.value;
+                    });
+                    $('select[name|=' + member + ']').val(selectValues);
+                } else {
+                    $('input[name|=' + member + ']').removeAttr('checked');
                       
-                var selectedValues = $.map(dataObj[member], function(val, idex) {
-                                           return 'input[value="' + val.value + '"]';
-                                           });
+                    var selectedValues = $.map(dataObj[member], function(val, idex) {
+                                               return 'input[value="' + val.value + '"]';
+                                               });
                       
                       //check all inputs
-                var selector =  selectedValues.join(",");
-                      
+                    var selector =  selectedValues.join(",");
+
                       //console.log('input[name|=' + member + ']');
                       //console.log(selector);
-                $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
-
-            } 
-
+                    $('input[name|=' + member + ']').filter(selector).attr('checked','checked');
+                }
+            }
         }
 
         var enabled = ('{{editable}}' == 'True') ? true : false;
@@ -803,6 +830,7 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             // disable all inputs
             $('#main-content input').attr('disabled','disabled');
             $('#main-content textarea').attr('disabled','disabled');
+            $('#main-content select').attr('disabled', 'disabled');
 
             // hide submit button
             var submitBtn = $('#submit-button');
@@ -813,98 +841,22 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
             var reEnableBtn = document.createElement('input');
             $(reEnableBtn).attr('id', 'reEnableForm');
             $(reEnableBtn).attr('type', 'button');
-            $(reEnableBtn).attr('title', 'Click to re-enable answers for re-submission of this exam');
+            $(reEnableBtn).attr('title', '{% trans 'Click to re-enable answers for re-submission of this exam' %}');
             $(reEnableBtn).addClass('btn btn-spaced');
-            $(reEnableBtn).val('Click to Re-Enable Answers');
+            $(reEnableBtn).val('{% trans 'Click to Re-Enable Answers' %}');
             submitBtn.before($(reEnableBtn));
             $(reEnableBtn).click(function (ev) {
                 $('input').removeAttr('disabled');
                 $('textarea').removeAttr('disabled');
+                $('select').removeAttr('disabled');
                 submitBtn.show();
             });
         }
     };
 
-    window.displayQuestionExplanation = function(questionMD){
-        //This function takes a DOM object of the metadata and displays the question explanation after the
-        //question with the corresponding id
-        var mySolution = $(questionMD).find('solution');
-        var assocQID = $(questionMD).attr('id');
-        var explArea = $('#' + assocQID + '-expl');
-        if (explArea.length == 0) {
-            explArea = document.createElement('div');
-            $(explArea).attr('id', assocQID + '-expl');
-            $(explArea).addClass('explanation');
-        }
-        $(explArea).empty();
-        if ($('#' + assocQID + ' .toggle-explanation').length == 0) {
-            var toggleExplBtn = document.createElement('input');
-            $(toggleExplBtn).attr('type','button');
-            //$(toggleExplBtn).attr('id','toggleExplanation_' + idx);
-            $(toggleExplBtn).addClass('btn').addClass('toggle-explanation');
-            $(toggleExplBtn).attr('data-status', 'Show');
-            $(toggleExplBtn).attr('value', 'Show Explanation');
-            $(toggleExplBtn).click(toggleExplanation);
-        }
-        $(explArea).hide();
-        $('#' + assocQID + ' .toggle-explanation').attr('data-status', 'Show');
-        $('#' + assocQID + ' .toggle-explanation').val("Show explanation");
-        //$(explArea).append("<h4>Explanation</h4>");
-        $(mySolution).contents().each(function(){
-            //nodeName according to DOM spec:  http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html
-            if (this.nodeName=="#cdata-section" || this.nodeName=="#text") {
-                $(explArea).append($(this).text());
-            }
-            else { //for DOM nodes that are elements
-                $(explArea).append($(this).clone());
-            }
-        });
-        $('div.question#' + assocQID ).append($(explArea));
-        $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
-    };
-
-    window.displayChoiceExplanations = function(questionMD) {
-        //This function takes a DOM object of the metadata and displays the choice explanations
-        //for question with the corresponding id, if that question is multiple choice
+    {# factored out into separate file for code sharing #}
+    {% include "exams/displayExplanation.js" %}
                       
-        var createInlineExp = function (targetEl) {
-            var tmpInlineExpl = document.createElement('span');
-            $(tmpInlineExpl).addClass('inline-explanation');
-            $(tmpInlineExpl).attr('id', $(targetEl).find('input:first').attr('id') + '-expl');
-            $(targetEl).append($(tmpInlineExpl));
-
-            return $(tmpInlineExpl);
-        };
-                      
-        var responses = $(questionMD).find('response');
-        responses.each(function () {
-            var responseType = $(this).attr('answertype');
-            if (responseType == "multiplechoiceresponse") {
-                var choices = $(this).find('choice');
-                var response = this;
-                choices.each(function () {
-                    var choiceInput = $('input[name|="' + $(response).attr('name') + '"]')
-                                      .filter('input[value|="' + $(this).attr('value') + '"]');
-                    if(choiceInput.attr('checked')){
-                        var choiceLabel = $(choiceInput).closest('label');
-                        //console.log(choiceLabel.length);
-                        //console.log($(choiceLabel).find('.inline-explanation').length);
-                        var inlineExpl = $(choiceLabel).find('.inline-explanation');
-                        if (inlineExpl.length == 0) {
-                            inlineExpl = createInlineExp($(choiceLabel));
-                        }
-                        //console.log(inlineExpl);
-                        if ($(this).attr('correct') && $(this).attr('correct') == 'true') {
-                            $(inlineExpl).addClass('correct');
-                        }
-                        $(inlineExpl).empty();
-                        $(inlineExpl).append($(this).find('explanation').text());
-                    }
-                });
-        }});
-        
-    };
-
     window.showCorrections = function (correxObj) {
         //This function marks the user answer correct or wrong and then
         //shows the question level explanations as well as relevant choice-level explanations
@@ -966,6 +918,10 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         var questionMD = $(examMD).find('question_metadata');
         $(questionMD).each(function(){displayQuestionExplanation(this);
                          displayChoiceExplanations(this);});
+        {% if exam.load_mathjax %}
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub,"exam-pane"]);
+        {% endif %}
+
 
     };
 
@@ -1001,11 +957,11 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                       
     $('#submit-button').click(function () {
         $('#submit-button').attr('disabled','disabled');
-        var fieldCollection = $('#exam-pane').find('input,textarea');
+        var fieldCollection = $('#exam-pane').find('input,textarea,select');
         var userAnswerObj = window.collectUserAnswers(fieldCollection);
 
         if (__exam_type != "survey" && !userAnswerObj.answeredAll) {
-            var userProceed = confirm("This will submit the entire {{ exam.get_human_type }} and you haven't answered all questions. Still submit?");
+            var userProceed = confirm("{% blocktrans with get_human_type=exam.get_human_type %}This will submit the entire {{ get_human_type }} and you haven't answered all questions. Still submit?{% endblocktrans %}");
             if (!userProceed) {
                 $('#submit-button').removeAttr('disabled');
                 return;
@@ -1034,12 +990,12 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
                 var title="";
 
                 if (__exam_type == "exam")
-                    { message = "Your submission has been saved.  \nPlease check back after {{exam.due_date|date:'D M d Y'}} for your score.";
-                      confirmText = "See My Submissions"; 
-                      title = "Submission complete.";}
+                    { message = "{% trans 'Your submission has been saved.' %}  \n{% blocktrans with due_date=exam.due_date|date:'D M d Y' %}Please check back after {{due_date}} for your score.{% endblocktrans %}";
+                      confirmText = "{% trans 'See My Submissions' %}"; 
+                      title = "{% trans 'Submission complete' %}.";}
                 else if (__exam_type == "survey")
-                    { message = "Thanks!";
-                      title= "Survey complete.";}
+                    { message = "{% trans 'Thanks' %}!";
+                      title= "{% trans 'Survey complete' %}.";}
                       
                 var dialogDiv = window.getDialog(title);
                 
@@ -1078,11 +1034,15 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         unsavedChanges = true; //denote keystroke and register unsaved changes
     });
     
+    {% if not videotest %}
+                      
     $(window).on('beforeunload', function(){
         if (unsavedChanges) {
            return 'You have unsaved changes!';
         }
     });
+                      
+    {% endif %}
                       
     // Make sure pre-pop is in a properly-escaped string 
     var prePopData = JSON.stringify({% autoescape off %}{{json_pre_pop}}{% endautoescape %});
@@ -1184,8 +1144,8 @@ You don't have Javascript enabled or jQuery was not loaded.  This page won't wor
         // questionTimes from parsed XML metadata 
         var questionTimes = JSON.parse('{{question_times|escapejs}}');
 
-	var video_rec_id = {{ video_rec.id }}
-	var csrf_token = '{{ csrf_token }}'
+    var video_rec_id = {{ video_rec.id }}
+    var csrf_token = '{{ csrf_token }}'
     {% include 'exams/videotest.js' %} 
 {% if not video.url %}
     $('#demoplayer').hide();

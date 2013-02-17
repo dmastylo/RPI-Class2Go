@@ -1,3 +1,4 @@
+{% load i18n %}
 <!-- section -->
 <h3 class="course-section-heading">{{section_structure.section.title}}</h3>
 {% if section_structure.section.subtitle %}
@@ -32,7 +33,7 @@
     </li>
 {% empty %}
     <li class="course-list-item {{ stripecolor }}">
-        <p style='margin: 20px;'>No items have been added to this section</p>
+        <p style='margin: 20px;'>{% trans 'No items have been added to this section' %}</p>
     </li>
 {% endfor %}
 </ul>

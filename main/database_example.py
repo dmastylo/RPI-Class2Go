@@ -1,3 +1,5 @@
+import os
+
 # Don't forget to actually create the database named NAME
 DATABASES = {
     'default': {
@@ -10,9 +12,18 @@ DATABASES = {
     },
     'celery': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/opt/class2go/celery/celerydb.sqlite',
+        'NAME': 'celerydb.sqlite',
     },
-
+    # uncomment this section if you have a read-only replica that you'd like
+    # to use for reporting.
+    #'readonly': {
+    #    'ENGINE': 'django.db.backends.mysql', 
+    #    'NAME': '',                      
+    #    'USER': '',                      
+    #    'PASSWORD': '',                  
+    #    'HOST': '',                      
+    #    'PORT': '',                      
+    # },
 }
 
 SECRET_KEY = ''
@@ -21,6 +32,12 @@ SECRET_KEY = ''
 PRODUCTION = False
 # Set this this to true if you want to show our maint page as root
 MAINTENANCE_LANDING_PAGE = False
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+
+LOGGING_DIR = os.path.join(PROJECT_ROOT, "logs")
+LOCAL_CACHE_LOCATION = os.path.join(PROJECT_ROOT, "cache-default")
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
 
 # The instance is the group of servers correspond to a C2G stack.  Some good 
 # values for this are:

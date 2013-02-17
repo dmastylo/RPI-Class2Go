@@ -1,3 +1,4 @@
+locale
 database.py
 database_util.py
 *.pyc

@@ -1,8 +1,9 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 {% block course_page_title %}
-{% if edit_mode %} Edit {% else %} Creation {% endif %} Form
+{% if edit_mode %} {% trans 'Edit' %} {% else %} {% trans 'Creation' %} {% endif %} {% trans 'Form' %}
 {% endblock course_page_title %}
 
 {% block mode_switcher %}{% endblock mode_switcher %}
@@ -53,7 +54,7 @@
     textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
     #preview-pane label {clear: both; display: block; min-width:200px;}
     #preview-pane label input {float: left; margin-right: 1em;}
-    #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 1em;}
+    #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 0em;}
     .problem {border:1px solid #999; border-radius: 5px; margin: 1em 0; padding: 1em;}
     .picker {position:relative; z-index:10;}
     h3 {clear:both;}
@@ -71,45 +72,54 @@
     div.question textarea { width:70%; height:100px; }
     div.preamble {margin-bottom: 2em; }
     div.postamble {margin-top: 2em; }
-
+    p {padding-bottom: 0px; }
+    fieldset {margin-bottom: 2em;}
+    select {margin-bottom: 2em; }
+    input[type="checkbox"] {margin-top: 3px;}
+    .explanation {background: #fff; border: 1px solid black; border-radius: 3px; clear: both; margin: 1em; padding: 1em;}
+    .explanation .toggle-expl {cursor: pointer;}
+    #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
+    #staging-area .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
+    #staging-area .inline-explanation.correct{color: #090;}
 
 </style>
 
 <div class="well create-exam-form">
     <h2>
     {% if edit_mode %}
-        Edit an 
+        {% trans 'Edit an' %} 
     {% else %}    
-        Create a new
+        {% trans 'Create a new' %}
     {% endif %}
-    Exam / ProblemSet / Survey</h2>
+    {% trans 'Exam / ProblemSet / Survey' %}</h2>
 
 
     
     <div class="control-group">
-        <input type="button" id="xml-entry-btn" class="btn" value="Import XML" title="Click to import XML" />
+        <input type="button" id="xml-entry-btn" class="btn" value="{% trans 'Import XML' %}" title="{% trans 'Click to import XML' %}" />
+        <input type="button" id="quizdown-entry-btn" class="btn" value="{% trans 'Import Quizdown' %}" title="{% trans 'Click to import Quizdown' %}" />
     </div>
 
     <div class="control-group">
         <div class="atomic-unit well">
-            <label class="control-label" for="assessment_type">Select Type:</label>
+            <label class="control-label" for="assessment_type">{% trans 'Select Type' %}:</label>
             <select id="assessment_type" name="assessment_type">
-                <option value="formative">Formative Problem Set</option>
-                <option value="summative">Summative Problem Set</option>
-                <option value="interactive">External Grader</option>
-                <option value="exam-autograde">Exam (auto-graded)</option>
-                <option value="exam-csv">Exam (csv-graded)</option>
-                <option value="survey">Survey</option>
+                <option value="formative">{% trans 'Formative Problem Set' %}</option>
+                <option value="summative">{% trans 'Summative Problem Set' %}</option>
+                <option value="interactive">{% trans 'External Grader' %}</option>
+                <option value="exam-autograde">{% trans 'Exam (auto-graded)' %}</option>
+                <option value="exam-csv">{% trans 'Exam (csv-graded)' %}</option>
+                <option value="survey">{% trans 'Survey' %}</option>
             </select>
-            <label for="exam_title" class="control-label">Title:*</label><input id="exam_title" name="exam_title" type="text" />
-            <label for="exam_slug" class="control-label">URL Identifier:*</label><input id="exam_slug" name="exam_slug" type="text" />
+            <label for="exam_title" class="control-label">{% trans 'Title' %}:*</label><input id="exam_title" name="exam_title" type="text" />
+            <label for="exam_slug" class="control-label">{% trans 'URL Identifier' %}:*</label><input id="exam_slug" name="exam_slug" type="text" />
         </div>
         <div class="atomic-unit well">
-            <label class="control-label" for="description">Assignment Description:</label>
+            <label class="control-label" for="description">{% trans 'Assignment Description' %}:</label>
             <textarea id="description"></textarea>
         </div>
         <div class="atomic-unit well">
-            <label for="id_section" class="control-label">Section:</label>
+            <label for="id_section" class="control-label">{% trans 'Section' %}:</label>
             <select id="id_section">
                 {% for section in sections %}
                     {% if exam_section.id == section.id %}
@@ -120,30 +130,30 @@
                 {% endfor %}
             </select>
 
-            <label for="parent_id" class="control-label">Parent:</label>
+            <label for="parent_id" class="control-label">{% trans 'Parent' %}:</label>
             <select name="parent" id="parent_id">
                 <!-- filled in by prefill_children() -->
             </select>
 
-            <label for="invideo_id" class="control-label">In-Video?</label>
+            <label for="invideo_id" class="control-label">{% trans 'In-Video?' %}</label>
             <input name="invideo" id="invideo_id" type="checkbox" />
 
         </div>
 
         <div class="atomic-unit well">
-            <label class="control-label" for="due_date">Due Date:*</label>
+            <label class="control-label" for="due_date">{% trans 'Due Date' %}:*</label>
             <input id="due_date" class="picker" type="text" name="due_date" value="" data-datetimepicker>
-            <label class="control-label" for="grace_period">Grace Period End:*</label>
+            <label class="control-label" for="grace_period">{% trans 'Grace Period End' %}:*</label>
             <input id="grace_period" class="picker"  type="text" name="grace_period" value="" data-datetimepicker>
-            <label class="control-label" for="hard_deadline">Hard Deadline:*</label>
+            <label class="control-label" for="hard_deadline">{% trans 'Hard Deadline' %}:*</label>
             <input id="hard_deadline" class="picker"  type="text" name="hard_deadline" value="" data-datetimepicker>
         </div>
         <div class="atomic-unit well" id="penalties" >
-            <label class="control-label" for="late_penalty">Late Penalty:*</label>
+            <label class="control-label" for="late_penalty">{% trans 'Late Penalty' %}:*</label>
             <input id="late_penalty" name="late_penalty" type="text" value="0"/>
-            <label class="control-label" for="num_subs_permitted">Number of Submissions Allowed:*</label>
+            <label class="control-label" for="num_subs_permitted">{% trans 'Number of Submissions Allowed' %}:*</label>
             <input id="num_subs_permitted" name="num_subs_permitted" type="text" value="999"/>
-            <label class="control-label" for="resubmission_penalty">Penalty Per Submission After First:*</label>
+            <label class="control-label" for="resubmission_penalty">{% trans 'Penalty Per Submission After First' %}:*</label>
             <input id="resubmission_penalty" name="resubmission_penalty" type="text" value="0" />
         </div>
     </div>
@@ -152,14 +162,14 @@
        
     <div class="well control-group">
         <ul class="nav nav-tabs" id="myTab">
-            <li class="active"><a id="preview-tab" href="#preview-content">Preview</a></li>
-            <li><a id="enter-xml-tab" href="#enter-content-xml">Edit XML Metadata</a></li>
-            <li><a id="enter-html-tab" href="#enter-content-html">Edit HTML</a></li>
+            <li class="active"><a id="preview-tab" href="#preview-content">{% trans 'Preview' %}</a></li>
+            <li><a id="enter-xml-tab" href="#enter-content-xml">{% trans 'Edit XML Metadata' %}</a></li>
+            <li><a id="enter-html-tab" href="#enter-content-html">{% trans 'Edit HTML' %}</a></li>
         </ul>
 
         <div class="tab-content">
             <div class="tab-pane" id="enter-content-xml">
-                <h4>Edit Exam MetaData XML below:</h4>
+                <h4>{% trans 'Edit Exam MetaData XML below' %}:</h4>
                 <textarea id="ace_metadata_proxy" style="display:none"></textarea>
                 <div class="editor_container" id="metadata_editor_container">
                     <div id="metadata_editor"></div>
@@ -167,7 +177,7 @@
                 
             </div>
 			<div class="tab-pane" id="enter-content-html">
-				<h4>Edit Exam HTML below:</h4>
+				<h4>{% trans 'Edit Exam HTML below' %}:</h4>
                 <textarea id="ace_proxy" style="display:none"></textarea>
                 <div class="editor_container" id="editor_container">
                     <div id="editor"></div>
@@ -175,7 +185,7 @@
 			</div>
             <div class="tab-pane active" id="preview-content">
                 <div id="preview-pane">
-                    <h4>Preview Exam HTML</h4>
+                    <h4>{% trans 'Preview Exam HTML' %}</h4>
                     <div id="staging-area"></div>
                 </div>
             </div>
@@ -184,22 +194,174 @@
     </div>
     
     <div class="control-group">
-        <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">Wrap</a>
+        <a href="javascript:" class="btn toggle" data-toggle="button" id="wrap">{% trans 'Wrap' %}</a>
 
-        <input class="btn" type="button" id="check_metadata" value="Check Metadata XML" />
+        <input class="btn" type="button" id="check_metadata" value="{% trans 'Check Metadata XML' %}" />
 
-        <input type="button" id="exercise_submit_and_close" class="btn" value="Save to Server &amp; Close" /> 
-        <input type="button" id="exercise_submit" class="btn" value="Save to Server"/> 
-        <a class="btn" href={{returnURL}}> Close </a>
+        <input type="button" id="exercise_submit_and_close" class="btn" value="{% trans 'Save to Server &amp; Close' %}" /> 
+        <input type="button" id="exercise_submit" class="btn" value="{% trans 'Save to Server' %}"/> 
+        <a class="btn" href={{returnURL}}> {% trans 'Close' %} </a>
 
     </div>
 
 </div>
 
-<div id="dialog-form" title="Paste Your XML">
+<div id="quizdown-form" title="{% trans 'Paste Your Quizdown' %}">
     <form>
     <fieldset>
-        <label for="xml-entry" id="xml-import-label">Import your XML here.  This will overwrite the HTML and XML Metadata editors.</label>
+        <label for="quizdown-entry" id="quizdown-import-label">{% trans 'Import your Quizdown here.  This will overwrite the HTML and XML Metadata editors.' %}</label>
+        <textarea name="quizdown-entry" id="quizdown-entry" class="text ui-widget-content ui-corner-all">
+title:  Example assessment
+description:  This is an example assessment
+assessment-type: summative
+due-date: 12/29/2013 00:00
+grace-period: 12/29/2013 00:00
+hard-deadline: 12/29/2013 00:00
+late-penalty: 10
+num-subs-permitted: 9999
+resubmission-penalty: 10
+section: Test Videos
+invideo: true
+
+            
+This is the exam preamble.  You could put data common to all of the problems here.  I think that MathJax should survive the conversion
+            $$a + b = c$$.
+<!-- Markdown preserves HTML comments.  So this comment should not show up in the rendered problem.  It does show up in the HTML source of the question, though -->
+            
+Arbitrary stuff here.
+
+Colors in the natural world
+======================
+![spectrum](http://www.giangrandi.ch/optics/spectrum/visible-a.jpg)
+
+Select the Color with the longest wavelength:
+            
+1. Blue
+2. Green
+3. Yellow
+4. Red
+5. Orange
+6. Purple
+            
+Answer
+-----
+1. Wrong. 
+2. Wrong.
+3. Wrong.
+4. Correct.
+5. Wrong.
+6. Wrong.
+            
+
+On days without clouds, what *color* does the sky **most** resemble?
+
+1. Blue
+2. Red
+3. Purple
+4. Green
+
+Answer
+------
+1. Correct. This is the color of the sky.  +10.5/-3 points
+2. Wrong. Only dirt is red.
+3. Wrong. Sort of half-right.
+4. Wrong. Green Day?
+
+            
+####What color is snow?
+
+* Blue
+* White
+* Pink
+* Yellow
+
+Answer
+--------
+* Wrong.  There must have been a slurpee spilled.
+* Correct.  This is the color of snow.
+* Wrong.  Pink snow is good for unicorns.
+* Wrong.  Well.  Yellow snow is bad news.
+
+Explanation
+------
+Of the choices, Red has the longest wavelength.
+            
+Sunlight reaches Earth's atmosphere and is scattered in all directions by all the gases and particles in the air. Blue light is scattered in all directions by the tiny molecules of air in Earth's atmosphere. Blue is scattered more than other colors because it travels as shorter, smaller waves. This is why we see a blue sky most of the time.
+
+Snow is white because it reflects sunlight instead of absorbing a certain part of the spectrum, making it white.
+            
+            
+Testing your common sense
+=====================
+Please answer these common sense questions.  This might be useful to tell us that you’re not a robot.
+
+How many eyes do most people have? [Number][eyes]
+
+How many fingers do people have? [Number][fingers]
+
+Hamlet said: To be or not to [Text][hamlet].
+            
+A regex question on a new line.  Type some text that begins with 's':
+            
+[Regex][regexq]
+            
+Answer
+-------
+[eyes]: (2            +1.5/-1 points)
+[fingers]: (10 +- 2   +1.3/-1 points)
+[hamlet]: (be)
+[regexq]: (^s)
+            
+Explanation
+------
+2 is usually the case, unless you’re a pirate.
+
+10, unless you’re a polydactyl then it’s 12.  We don’t support asymmetrical tolerance, so 8 is okay too.  Besides, you might be a Simpson (not OJ).
+
+Hamlet is confused, to be.
+            
+Lots of words begin with 's'
+            
+Favorite Animal
+===============
+Which of these are amongst your favorite animals?
+            
+* Dog
+* Cat
+* Rat
+* Bat
+* Other
+            
+If other, please specify. <!-- An ungraded textarea causes the need for an answer section, unfortunately.  Make sure the [id] is in brackets in the answer section **and** followed by empty parens ()  -->
+
+[Textarea][surveyother]
+
+Answer
+------
+[surveyother]: ()
+            
+Video Times
+===========
+
+video1
+------
+Colors in the natural world: 4.5 sec
+Testing your common sense: 10 sec
+
+video2
+------
+Colors in the natural world: 8 sec
+Testing your common sense: 15.6 sec
+        </textarea>
+    </fieldset>
+    </form>
+</div>
+
+
+<div id="dialog-form" title="{% trans 'Paste Your XML' %}">
+    <form>
+    <fieldset>
+        <label for="xml-entry" id="xml-import-label">{% trans 'Import your XML here.  This will overwrite the HTML and XML Metadata editors.' %}</label>
         <textarea name="xml-entry" id="xml-entry" class="text ui-widget-content ui-corner-all"> 
 <problemset data-report="EXAMPLE" type="survey" title="problemset1" url-identifier="test343">
     <!-- possible types are: "formative" / "summative" / "interactive" / "exam-autograde" / "exam-csv" / "survey" -->
@@ -417,9 +579,10 @@ age: 20,
         modal: true,
         close: function() {
             if (!__xml_saved)  $('#xml-entry').val(__saved_import_xml);
+            __xml_saved=false;
         },
         buttons: [{
-                    text:"Import XML",
+                    text:"{% trans 'Import XML' %}",
                     id:"import-xml-button",
                     click: function() {
                         c2gXMLParse.renderMarkup($('#xml-entry'), "");
@@ -431,19 +594,54 @@ age: 20,
                         }
                   },
                   {
-                    text:"Cancel",
+                    text:"{% trans 'Cancel' %}",
                     click: function() {
                         $( this ).dialog( "close" );
                         }
                   }],
     });
-                               
+    var __saved_quizdown="";
+    var __quizdown_saved=false;
+    
+    $( "#quizdown-form" ).dialog({
+        autoOpen: false,
+        height: 500,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__quizdown_saved)  $('#quizdown-entry').val(__saved_quizdown);
+            __quizdown_saved=false;
+        },
+        buttons: [{
+                    text:"Import",
+                    id:"import-quizdown-button",
+                    click: function() {
+                        __quizdown_saved=true;
+                        c2gXMLParse.parseQuizDown();
+                        $( this ).dialog( "close" );
+                    }
+                  },
+                  {
+                    text:"Cancel",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                    }
+                  }],
+        });
 
     $('#xml-entry-btn').click(function() {
         __saved_import_xml=$('#xml-entry').val();
         $( "#dialog-form" ).dialog( "open" );
     });
-    $("#import-xml-button").before("<span class='warning' id='clobber-warning'>Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.</span>");
+
+    $('#quizdown-entry-btn').click(function() {
+        __saved_quizdown = $('#quizdown-entry').val();
+        $( "#quizdown-form" ).dialog( "open" );
+    });
+
+    
+    $("#import-xml-button").before("<span class='warning' id='clobber-warning'>{% trans 'Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.' %}</span>");
+
     $("#clobber-warning").hide();
     $("#import-xml-button").hover(function(){$("#clobber-warning").show();},
                                 function(){$("#clobber-warning").hide();});
@@ -461,8 +659,11 @@ age: 20,
     metadata_editor.getSession().setUseWrapMode(true);
     
     var questionIdx = 0;
-      
+    
+    {% include "exams/displayExplanation.js" %}
     {% include "exams/renderPreview.js" %}
+    {% include "exams/quizdown.js" %}
+    
 
     $(function() {
         {% if edit_mode %}
@@ -500,7 +701,8 @@ age: 20,
                        invideo:$('input#invideo_id')[0].checked,
                        metaXMLContent:metadata_editor.getValue(),
                        htmlContent:editor.getValue(),
-                       xmlImported:$('#xml-entry').val()
+                       xmlImported:$('#xml-entry').val(),
+                       quizdown:$('#quizdown-entry').val()
                },
                error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
                success: function(data,textStatus,jqXHR) {
@@ -534,8 +736,8 @@ age: 20,
     var toggleWrap = function () {
         editor.getSession().setUseWrapMode(next);
         metadata_editor.getSession().setUseWrapMode(next);
-        if (next) { $('#wrap').text('Wrap');}
-        else {$('#wrap').text('No Wrap');}
+        if (next) { $('#wrap').text('{% trans 'Wrap' %}');}
+        else {$('#wrap').text('{% trans 'No Wrap' %}');}
         next = !next;
     }
     
@@ -545,7 +747,10 @@ age: 20,
       
     $('#wrap').click(toggleWrap);
     $('#wrap').click();
-      
+    
+    $('#exam_title').keyup(function() {
+        $('#exam_slug').val(c2gXMLParse.slugify($('#exam_title').val()));
+    });
       
     //$('#preview-btn').click(c2gXMLParse.renderPreview);
     $('#preview-tab').click(c2gXMLParse.renderPreview);
@@ -572,7 +777,9 @@ age: 20,
         metadata_editor.setValue(prepop.metadata);
         editor.setValue(prepop.htmlContent);
         $('#xml-entry').val(prepop.xmlImported);
+        $('#quizdown-entry').val(prepop.quizdown);
 
+        c2gXMLParse.renderPreview();
     }
 
       
@@ -586,7 +793,7 @@ age: 20,
         // everywhere and make all parent/child aware items' calls the same 
         var id = $('#id_section').val(); //.val() more cross browser than .value
         var pelement = $('#parent_id');
-        pelement.html('<option value="none,none">(this is a top level item)</option>');
+        pelement.html('<option value="none,none">({% trans 'this is a top level item' %})</option>');
         return jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
             for (var i=0; i < data.length; i++) {
                 // For the moment we filter out objects of other types, per the spec.

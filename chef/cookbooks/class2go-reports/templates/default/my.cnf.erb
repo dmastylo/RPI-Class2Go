@@ -1,6 +1,6 @@
 [client]
-    user=<%= @node[:report][:database_user] %>
-    database=<%= @node[:report][:database_instance] %>
-    password=<%= @node[:report][:database_password] %>
-    host=<%= @node[:report][:database_host] %>
+    user=<%= @node[:aws][:readonly_database_user] %>
+    database=<%= @node[:aws][:readonly_database_instance] %>
+    password=<%= @node[:aws][:readonly_database_password] %>
+    host=<%= @node[:aws][:readonly_database_host] %>
     

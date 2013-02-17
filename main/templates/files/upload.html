@@ -1,15 +1,16 @@
 {% extends "course_base.html" %}
+{% load i18n %}
 {% block mode_switcher %}{% endblock %}
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
-  <h3>Upload File</h3>
+  <h3>{% trans 'Upload File' %}</h3>
   <form action="{% url reverseview %}" method="POST" onsubmit="return checkFilename();" enctype="multipart/form-data">
     <fieldset class="well">
       {% for field in form %}
         <div class="fieldWrapper">
           {{ field.errors }}
           {% if field.name == "live_datetime" %}
-            <strong>Set Live Date</strong> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
+            <strong>{% trans 'Set Live Date' %}</strong> <input type="checkbox" name="set_live_date" value="1" onchange="showLiveDate(this.checked)"/>
             <div id="live_date" style="display:none">{{ field }}</div>
           {% else %}
             {{ field.label_tag }}
@@ -21,7 +22,7 @@
         </div>
       {% endfor %}
       <div class="fieldWrapper">
-        <label for="parent_id">Parent</label>
+        <label for="parent_id">{% trans 'Parent' %}</label>
         <select name="parent" id="parent_id"></select> <!-- filled in by prefill_children() -->
       </div>
     </fieldset>
@@ -29,7 +30,7 @@
     <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
     <input type="hidden" name="file_id" value="{{file.id}}" />
     {% csrf_token %}
-    <input type="submit" value="Submit" class="btn"/>
+    <input type="submit" value="{% trans 'Submit' %}" class="btn"/>
   </form>
 </div>
 {% endblock m_column_content %}
@@ -42,7 +43,7 @@ $('#id_section').ready(function() { prefill_children($('#parent_id')[0]) });
 function prefill_children(element) {
     var id = $('#id_section')[0].value
     var pelement = $('#parent_id');
-    pelement.html('<option value="none,none">(this is a top level page)</option>');
+    pelement.html('<option value="none,none">({% trans 'this is a top level page' %})</option>');
     jQuery.getJSON('/content_section/get_children_as_contentgroup_parents/'+id, function(data) {
         for (var i=0; i < data.length; i++) {
             // For the moment we filter out objects of other types, per the spec.
@@ -69,7 +70,7 @@ function checkFilename() {
         data: {filename:filename, csrfmiddlewaretoken:'{{ csrf_token }}'},
         success: function(data) {
             if (data == "File name already exists!") {
-                r=confirm("WARNING: A file with this name already exists. If you proceed with the upload it will be overwritten. Please rename your file if you do not wish to overwrite.");
+                r=confirm("{% trans 'WARNING' %}: {% trans 'A file with this name already exists. If you proceed with the upload it will be overwritten. Please rename your file if you do not wish to overwrite.' %}");
             }
         }
     });

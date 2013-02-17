@@ -63,13 +63,18 @@ class ListEmailAdmin(admin.ModelAdmin):
 class CourseEmailAdmin(admin.ModelAdmin):
     readonly_fields = ('sender',)
 
+class StudentExamStartAdmin(admin.ModelAdmin):
+    search_fields = ('student__username',)
+    list_display = ('__unicode__', 'time_created','last_updated')
+    readonly_fields = ('student','exam')
+
 #class ExamAdmin(reversion.VersionAdmin):
 #    pass
 
 
 #admin.site.register(Exam, ExamAdmin)
 
-
+admin.site.register(StudentExamStart, StudentExamStartAdmin)
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(GroupProxy, GroupAdmin)
 admin.site.register(ExamRecord, ExamRecordAdmin)

@@ -1,7 +1,9 @@
 from c2g.models import *
 from django.contrib.auth.models import User,Group
 from courses.reports.generation.C2GReportWriter import *
+from c2g.readonly import use_readonly_database
 
+@use_readonly_database
 def gen_class_roster(ready_course, save_to_s3=False):
     dt = datetime.now()
     course_prefix = ready_course.handle.split('--')[0]
@@ -26,4 +28,4 @@ def gen_class_roster(ready_course, save_to_s3=False):
     
     report_content = rw.writeout()
     return {'name': "%02d_%02d_%02d__%02d_%02d_%02d-%s-Class-Roster.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix), 'content': report_content, 'path': s3_filepath}
-    
+

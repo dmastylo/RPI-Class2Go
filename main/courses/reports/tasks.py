@@ -4,13 +4,14 @@ from courses.reports.generation.gen_course_dashboard_report import *
 from courses.reports.generation.gen_quiz_summary_report import *
 from courses.reports.generation.gen_quiz_full_report import *
 from courses.reports.generation.gen_class_roster import *
-from settings import SERVER_EMAIL
 
 from django.core.mail import EmailMessage
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-@task()
+@task
+@use_readonly_database
 def generate_and_email_reports(username, course_handle, requested_reports, email_title, email_message, attach_reports_to_email = True):
     # Generates the list of reports in requested_reports, and sends it to the staff of the given course.
     ready_course = Course.objects.get(handle=course_handle, mode='ready')
@@ -159,29 +160,31 @@ def generate_and_email_reports(username, course_handle, requested_reports, email
             reports.append(report)
             logger.info("Assessment student scores report for course %s generated successfully for user %s." % (course_handle, username))            
             
-    # Email Generated Reports
-    staff_email = ready_course.contact
-    if not staff_email:
-        logger.info("Failed to email reports for course %s -- Missing course contact email" % (course_handle))
-    else:
-        if len(reports) == 0:
-            logger.info("Not sending reports email to %s, because no reports were generated." % staff_email)
-            return
-            
-        email = EmailMessage(
-            email_title, # Title
-            email_message, # Message
-            SERVER_EMAIL, # From
-            [staff_email, ],  # To
-        )
-        if attach_reports_to_email:
-            for report in reports:
-                if report['type'] in ['problemset_summary', 'video_summary']:
-                    report_name = report['name'][:-4] + '_summary.csv'
-                else:
-                    report_name = report['name']
-                    
-                email.attach(report_name, report['content'], 'text/csv')
-            
-        email.send()
+    send_emails = getattr(settings, 'EMAIL_NIGHTLY_REPORTS', False)
+    if send_emails:
+        # Email Generated Reports
+        staff_email = ready_course.contact
+        if not staff_email:
+            logger.info("Failed to email reports for course %s -- Missing course contact email" % (course_handle))
+        else:
+            if len(reports) == 0:
+                logger.info("Not sending reports email to %s, because no reports were generated." % staff_email)
+                return
+                
+            email = EmailMessage(
+                email_title,             # Title
+                email_message,           # Message
+                settings.SERVER_EMAIL,   # From
+                [staff_email, ],         # To
+            )
+            if attach_reports_to_email:
+                for report in reports:
+                    if report['type'] in ['problemset_summary', 'video_summary']:
+                        report_name = report['name'][:-4] + '_summary.csv'
+                    else:
+                        report_name = report['name']
+                        
+                    email.attach(report_name, report['content'], 'text/csv')
+                
+            email.send()
         
