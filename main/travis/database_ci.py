@@ -27,6 +27,7 @@ AWS_SECRET_ACCESS_KEY = 'local'
 AWS_STORAGE_BUCKET_NAME = 'local'
 
 MEDIA_ROOT = '/tmp/media_root'
+LOGGING_DIR = '/tmp'
 
 PIAZZA_ENDPOINT = "https://piazza.com/basic_lti"
 PIAZZA_KEY = "class2go.testing"
