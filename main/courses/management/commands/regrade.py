@@ -88,6 +88,10 @@ class Command(BaseCommand):
                         rawscore_after += float(regrade[prob]['score'])
             
                 is_late = er.time_created > exam_obj.grace_period
+                if er.attempt_number == 0:
+                    print "ERROR: examrecord %d: skip, attempt_number=0" % er.id
+                    errors += 1
+                    next
                 score_after = compute_penalties(rawscore_after, er.attempt_number,
                                                 exam_obj.resubmission_penalty,
                                                 is_late, exam_obj.late_penalty)
