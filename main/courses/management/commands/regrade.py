@@ -6,7 +6,7 @@ from dateutil import parser
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from c2g.models import ExamRecord, Exam, ExamScore
+from c2g.models import ExamRecord, Exam, ExamScore, ExamRecordScore
 from courses.exams.autograder import *
 from courses.exams.views import compute_penalties
 
