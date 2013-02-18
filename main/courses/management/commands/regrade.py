@@ -17,6 +17,8 @@ class Command(BaseCommand):
     option_list = (
         make_option("-u", "--update", action="store_false", dest="dryrun", default=True,
             help="update regraded rows in database (default is dry run)"),
+        make_option("-s", "--student", dest="student_ids", 
+            help="comma-separated list of students, identified by ids"),
         make_option("--start", dest="start_time",
             help="consider entries no earlier than X, eg \"2/17/2013\" or \"1/1/2012 14:40\". We use the python dateutil parser on dates, see http://labix.org/python-dateutil"),
         make_option("--end", dest="end_time",
@@ -32,21 +34,23 @@ class Command(BaseCommand):
            raise CommandError("exam id is required")
         examid = args[0]
 
-        start = parser.parse("1/1/1970")
-        if 'start_time' in options and options['start_time']:
-            start = parser.parse(options['start_time'])
-        end = parser.parse("1/1/2038")  # almost the end of unix time
-        if 'end_time' in options and options['end_time']:
-            end = parser.parse(options['end_time'])
-
         exam_obj = Exam.objects.get(id__exact=examid) 
         autograder = AutoGrader(exam_obj.xml_metadata)
 
-        examRecords = ExamRecord.objects\
-                .select_related('examrecordscore', 'student')\
-                .filter(exam_id__exact=examid, complete=True)\
-                .filter(time_created__gt=start)\
-                .filter(time_created__lt=end)
+        examRecords = ExamRecord.objects \
+                .select_related('examrecordscore', 'student') \
+                .filter(exam_id__exact=examid, complete=True)
+        if options['start_time']:
+            start = parser.parse(options['start_time'])
+            examRecords = examRecords.filter(time_created__gt=start)
+        if options['end_time']:
+            end = parser.parse(options['end_time'])
+            examRecords = examRecords.filter(time_created__lt=end)
+        if options['student_ids']:
+            sidlist = string.split(options['student_ids'], ',')
+            examRecords = examRecords.filter(student__in=sidlist)
+
+        # this executes the query
         if len(examRecords) == 0:
             print "warning: no exam records found, is that what you intended?"
             return
