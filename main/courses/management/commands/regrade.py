@@ -17,7 +17,7 @@ class Command(BaseCommand):
     option_list = (
         make_option("-u", "--update", action="store_false", dest="dryrun", default=True,
             help="update regraded rows in database (default is dry run)"),
-        make_option("-s", "--student", dest="student_ids", 
+        make_option("-s", "--student", dest="student_ids",
             help="comma-separated list of students, identified by ids"),
         make_option("--start", dest="start_time",
             help="consider entries no earlier than X, eg \"2/17/2013\" or \"1/1/2012 14:40\". We use the python dateutil parser on dates, see http://labix.org/python-dateutil"),
@@ -57,7 +57,11 @@ class Command(BaseCommand):
 
         count = 1
         for er in examRecords:
+            ers_created = False
             ers = er.examrecordscore
+            if ers is None:
+                ers = ExamRecordScore(record=er, raw_score=0.0)
+                ers_created = True
             print "ExamRecord %d, %d of %d" % (er.id, count, len(examRecords))
             count += 1
             try:
@@ -119,7 +123,7 @@ class Command(BaseCommand):
                         er.late = is_late
                         er.save()
                         updates += 1
-                    if rawscore_before != rawscore_after:
+                    if ers_created or rawscore_before != rawscore_after:
                         ers.raw_score = rawscore_after
                         ers.save()
                         updates += 1
