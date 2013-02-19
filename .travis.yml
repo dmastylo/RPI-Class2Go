@@ -3,13 +3,16 @@ python:
   - "2.7"
 install:
   - "pip install -r requirements.txt --use-mirrors"
+  - "apt-get install google-chrome-stable"
 env:
   - DB=mysql
 before_script:
   - bash main/travis/setup.sh
   - mysql -e 'create database class2go'
 script: 
-  - cd main; python manage.py test -v 2
+  # for now don't run selenium tests until we can figure out how 
+  # - cd main; python manage.py test -v 2 --attr='!selenium'
+  - cd main; python manage.py test -v 2 
 notifications:
   irc:
     channels: "irc.freenode.org#class2go-internal"
