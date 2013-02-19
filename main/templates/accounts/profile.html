@@ -67,7 +67,7 @@
             {% endif %}
             
         {% else %}
-        <h3> {% trans 'Please login to see profile information' %}': </h3>
+        <h3> {% trans 'Please login to see profile information' %}: </h3>
             <p>
                 <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">{% trans 'Stanford WebAuth' %}</a>
                 <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">{% trans 'Class2Go Login (Public course students)' %}</a>

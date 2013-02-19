@@ -1,0 +1,35 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% block title %}Reports | {{ common_page_data.course.title }}{% endblock title %}
+
+{% block m_column_content %}
+<div id="c2g_layout_m_column">
+    <h3 class="section-headline">Assessment Summary Report for {{  exam.title  }}</h3>
+    <div class="container">  
+    <div class="row">  
+
+      {% if we_have_data %}
+          <br/>
+          <table class="table table-striped" style="overflow: auto;">
+          <tr style="font-weight: bold">
+          {% for heading in headings %}
+              <td>{{heading}}</td>
+          {% endfor %}
+          </tr>
+          {% for row in rows %}
+              <tr>
+              {% for data in row %}
+                  <td>{{data}}</td>
+              {% endfor %}
+              </tr>
+          {% endfor %}
+          </table>
+      {% else %}
+          <p>No data for this assessment.</p>        
+      {% endif %}
+
+    </div>
+    </div>
+</div>
+
+{% endblock m_column_content %}

@@ -1,25 +1,21 @@
 # Create your views here.
 from courses.email_members.forms import EmailForm
 from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response
 from courses.actions import auth_is_course_admin_view_wrapper
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail, send_mass_mail, EmailMultiAlternatives, get_connection
-from django.template.loader import render_to_string
 from c2g.models import CourseEmail, EmailAddr
 import courses.email_members.tasks
-import pdb
 import datetime
 from hashlib import md5
 
 
 def optout(request,code):
-    """Opts mailing list members out of email we sent
-    """
-    email=""
+    """Opts mailing list members out of email we sent"""
     email_list=[]
     addr_qset=EmailAddr.objects.filter(optout_code=code)
     for addr in addr_qset.iterator():
@@ -29,18 +25,12 @@ def optout(request,code):
     return render_to_response('email/optout.html',
                           {'email_list': email_list,},
                           context_instance=RequestContext(request))
-
-
     
 @sensitive_post_parameters()
 @csrf_protect
 @auth_is_course_admin_view_wrapper
 def email_members(request, course_prefix, course_suffix):
-    """
-    Displays the email form and handles email actions
-    Right now this is blocking and does not do any batching.
-    Will have to make it better
-    """
+    """Display the email form and handles email actions"""
     error_msg=""
     success_msg=""
     form = EmailForm()
@@ -51,7 +41,6 @@ def email_members(request, course_prefix, course_suffix):
     if request.method == "POST":
         form = EmailForm(data=request.POST)
         if form.is_valid():
-            course = request.common_page_data['course']
             email = CourseEmail(course=request.common_page_data['course'],
                                 sender=request.user,
                                 to=form.cleaned_data['to'],

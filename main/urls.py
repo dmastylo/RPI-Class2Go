@@ -254,7 +254,6 @@ urlpatterns = patterns('',
     url(r'^get_video_exercises/?$', 'courses.videos.views.get_video_exercises'),
 
     #Problem Sets
-                       #These commented out ones are above
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets_old/?$', 'problemsets.views.listAll'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/problemsets_old/(?P<pset_slug>[a-zA-Z0-9_-]+)?$', 'problemsets.views.show'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/createproblemset/?$', 'problemsets.views.create_form'),
@@ -303,6 +302,7 @@ urlpatterns = patterns('',
     
     #In-line Reports
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/generate_in_line_report/?$', 'courses.reports.views.generate_in_line_report'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/summary_report/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.reports.views.summary_report'),
     
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),

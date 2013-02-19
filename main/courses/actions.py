@@ -1,22 +1,21 @@
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse
-from django.db.models import Q
-from django.shortcuts import render, render_to_response, redirect
-from django.template import Context, loader
-from django.template import RequestContext
-from django.contrib.auth.models import User,Group
-from courses.course_materials import get_course_materials
-from courses.common_page_data import get_common_page_data
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_protect
-from django.contrib import messages
-from courses.forms import *
-from c2g.models import *
-from random import randrange
 from datetime import datetime
 from os.path import basename
 
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import Group
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect
+from django.contrib import messages
 from django.utils.functional import wraps
+
+from courses.course_materials import get_course_materials
+from courses.common_page_data import get_common_page_data
+from courses.forms import *
+from c2g.models import *
+import settings
 
 
 def auth_view_wrapper(view):
@@ -27,12 +26,16 @@ def auth_view_wrapper(view):
 
         if user.is_authenticated() and not is_member_of_course(course, user):
             messages.add_message(request,messages.ERROR, 'You must be a member of the course to view the content you chose.')      
-            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)) + "?join_next=" + request.path)
 
         if not user.is_authenticated():
             messages.add_message(request,messages.ERROR, 'You must be logged-in to view the content you chose.')
-
-            return HttpResponseRedirect(reverse('courses.views.main', args=(request.common_page_data['course_prefix'], request.common_page_data['course_suffix'],)))
+            if settings.SITE_NAME_SHORT == "Stanford":
+                if course.institution_only:
+                    return HttpResponseRedirect(reverse('shib_login') + "?next=" + request.path)
+                else:
+                    return HttpResponseRedirect(reverse('auth_login') + "?next=" + request.path)                        
+            return HttpResponseRedirect(reverse('default_login') + "?next=" + request.path)
 
         return view(request, *args, **kw)
     return inner
@@ -94,23 +97,37 @@ def create_contentgroup_entries_from_post(request, postparam, ready_obj, ready_o
 @require_POST
 @auth_can_switch_mode_view_wrapper
 def switch_mode(request):
-    
-    common_page_data = request.common_page_data
     request.session['course_mode'] = request.POST.get('to_mode')
     return redirect(request.META['HTTP_REFERER'])
 
+def always_switch_mode(view):
+    """Check whether we're in draft mode, and if we're not, switch to it."""
+    # Sadly the wrapper name is a bit of a misnomer, should be 'always_draft_mode'
+    wrapped_function_path = '.'.join((view.__module__, view.__name__))
+    @wraps(view)
+    def do_mode_switch(request, *args, **kw):
+        current_mode = request.session.get('course_mode', 'unknown state')
+        if current_mode == 'draft':
+            return view(request, *args, **kw)
+        request.session['course_mode'] = 'draft'
+        course_prefix = kw.get('course_prefix', None) or request.POST.get('course_prefix', None) or request.common_page_data.get('course_prefix', '')
+        course_suffix = kw.get('course_suffix', None) or request.POST.get('course_suffix', None) or request.common_page_data.get('course_suffix', '')
+        if course_prefix == '' or course_suffix == '':
+            print "WARNING: empty course_prefix or course_suffix in view decorator always_switch_mode, wrapping %s." % wrapped_function_path
+        request.common_page_data = get_common_page_data(request, course_prefix, course_suffix)
+        return view(request, *args, **kw)
+    return do_mode_switch
+
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # not strictly necessary, but good for consistency
 def add_section(request):
-    course_prefix = request.POST.get("course_prefix")
-    course_suffix = request.POST.get("course_suffix")
     common_page_data = request.common_page_data
 
     index = len(ContentSection.objects.filter(course=common_page_data['course']))
 
     draft_section = ContentSection(course=common_page_data['draft_course'], title=request.POST.get("title"), index=index, mode='draft')
     draft_section.save()
-
     draft_section.create_ready_instance()
 
     return redirect(request.META['HTTP_REFERER'])
