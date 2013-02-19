@@ -1,9 +1,8 @@
 {% load i18n %}
 
 <div class="announcement">
-    <h4>{{announcement.title}}</h4>
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-        <div class="announcement-actions">
+        <div class="announcement-actions pull-right">
             <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><em class="icon-edit icon-large"></em> {% trans 'Edit' %}</a>
             <a href="javascript:DeleteAnnouncement('{{announcement.id}}')"><em class="icon-trash icon-large"></em> {% trans 'Delete' %}</a>
         </div>
@@ -12,6 +11,7 @@
             <a class="announcement-collapse">Show</a>
         </div>
     {% endif %}
+    <h4 class="pull-left">{{announcement.title}}</h4>
     <small class="date"> {{announcement.last_updated}}</small>
     <div {% if common_page_data.course_mode != 'draft' %}class="announcement-content"{% endif %}>
         {% autoescape off %}{{announcement.description}}{% endautoescape %}

@@ -377,6 +377,7 @@ small.date {
     font-style:italic;
     display:block;
     margin-bottom:.5em;
+    clear: left;
 }
 #showHideAll {
     display: none;
@@ -405,11 +406,6 @@ small.date {
 .announcement .badge {
     display:inline-block;
     margin-top:7px;
-}
-.announcement .announcement-actions {
-    position:absolute;
-    top:15px;
-    right:15px;
 }
 .announcement .announcement-actions .announcement-collapse {
     display: none;
