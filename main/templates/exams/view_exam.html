@@ -876,7 +876,7 @@
                         if (rightChoiceObj.siblings('span.feedback').length == 0) {
                             rightChoiceObj.after('<span class="feedback correct"> &#10004; </span>');
                         } else {
-                            rightChoiceObj.siblings('span.feedback').html(' &#10004; ');
+                            rightChoiceObj.siblings('span.feedback').html(' &#10004; ').removeClass('incorrect').addClass('correct');
                         }
                     }
                     for (wrongChoice in curq.wrong_choices) {
@@ -889,7 +889,7 @@
                             if (wrongChoiceObj.siblings('span.feedback').length == 0) {
                                 wrongChoiceObj.after('<span class="feedback incorrect"> &#10006; </span>');
                             } else {
-                                wrongChoiceObj.siblings('span.feedback').html(' &#10006; ');
+                                wrongChoiceObj.siblings('span.feedback').html(' &#10006; ').removeClass('correct').addClass('incorrect');
                             }
                         }
                     }
@@ -899,13 +899,13 @@
                         if ($(formEl).siblings('span.feedback').length == 0) {
                             $(formEl).after('<span class="feedback correct"> &#10004; </span>');
                         } else {
-                            $(formEl).siblings('span.feedback:first').html(' &#10004; ');
+                            $(formEl).siblings('span.feedback:first').html(' &#10004; ').removeClass('incorrect').addClass('correct');
                         }
                     } else {
                         if ($(formEl).siblings('span.feedback').length == 0) {
                             $(formEl).after('<span class="feedback incorrect"> &#10006; </span>');
                         } else {
-                            $(formEl).siblings('span.feedback:first').html(' &#10006; ');
+                            $(formEl).siblings('span.feedback:first').html(' &#10006; ').removeClass('correct').addClass('incorrect');
                         }
                     }
                 }
