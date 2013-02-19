@@ -410,6 +410,7 @@ small.date {
 }
 .announcement .announcement-actions .announcement-collapse {
     display: none;
+    cursor: pointer;
 }
 #new_announcement_div {
     clear:left;
