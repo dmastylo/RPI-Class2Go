@@ -84,6 +84,8 @@ def confirm(request, course_prefix, course_suffix, exam_slug):
     allowed_timedelta = datetime.timedelta(minutes=minutesallowed)
 
     endtime = datetime.datetime.now() + allowed_timedelta
+    
+    endtime = min(endtime, exam.partial_credit_deadline)
 
     return render_to_response('exams/confirm.html',
                               {'common_page_data':request.common_page_data, 'course': course, 'exam':exam, 'ready_section':ready_section,
@@ -141,6 +143,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     if exam.timed:
         startobj, created = StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
         endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
+        endtime = min(endtime, exam.partial_credit_deadline)
         
         if timeopened > endtime :
             editable = False
@@ -218,7 +221,8 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     if exam.timed:
         startobj, created=StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
         endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
-        
+        endtime = min(endtime, exam.partial_credit_deadline)
+
         if timeopened > endtime :
             editable = False
             allow_submit = False
@@ -436,6 +440,9 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             pass #somehow we didn't record a start time for the student.  So we just let them submit.
 
     attempt_number = exam.num_of_student_records(user)+1
+
+    if attempt_number > exam.submissions_permitted:
+        return HttpResponseBadRequest("Sorry!  Your submission #%d has exceed the maximum allowed: %d" % (attempt_number, exam.submissions_permitted))
 
     onpage = request.POST.get('onpage','')
     
