@@ -18,8 +18,11 @@ else
     cp -n main/travis/database_ci.py main/database.py
 fi
 
-for d in storage logs static cache; do
-if [[ ! -e /tmp/$d ]]; 
-    mkdir /tmp/$d
-fi
+for l in storage logs static cache; do
+    d = "/tmp/$l"
+    if [[ ! -e $d ]]; 
+        echo "creating $d"
+        mkdir $d
+    fi
+done
 

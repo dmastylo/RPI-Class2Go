@@ -6,9 +6,9 @@ install:
 env:
   - DB=mysql
 before_script:
+  - bash main/travis/setup.sh
   - mysql -e 'create database class2go'
 script: 
-  - bash main/travis/setup.sh
   - python main/manage.py test -v 2
 notifications:
   irc:
