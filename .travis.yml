@@ -9,7 +9,7 @@ before_script:
   - bash main/travis/setup.sh
   - mysql -e 'create database class2go'
 script: 
-  - python main/manage.py test -v 2
+  - cd main; python manage.py test -v 2
 notifications:
   irc:
     channels: "irc.freenode.org#class2go-internal"
