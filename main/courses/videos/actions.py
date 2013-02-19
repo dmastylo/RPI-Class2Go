@@ -12,7 +12,7 @@ from django.template import RequestContext
 from django.views.decorators.http import require_POST
 
 from c2g.models import Exam, Video, VideoActivity, VideoDownload
-from courses.actions import auth_is_course_admin_view_wrapper
+from courses.actions import always_switch_mode, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.videos.forms import *
 import kelvinator.tasks
@@ -28,6 +28,7 @@ def switch_quiz_mode(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # Not strictly necessary but good for consistency
 def add_video(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -57,13 +58,12 @@ def add_video(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def edit_video(request, course_prefix, course_suffix, slug):
     common_page_data = request.common_page_data
     video = common_page_data['course'].video_set.all().get(slug=slug)
     exam_id = request.POST.get("exam_id")
 
-    print '*** live_datetime is...'
-    print request.POST.get('live_datetime')
     action = request.POST['action']
     form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=video)
     if form.is_valid():
@@ -72,7 +72,6 @@ def edit_video(request, course_prefix, course_suffix, slug):
         if action == "Save and Set as Ready":
             video.commit()
 
-                
         if exam_id:
             try:
                 exam = Exam.objects.get(id=exam_id)
@@ -86,7 +85,7 @@ def edit_video(request, course_prefix, course_suffix, slug):
             except Exam.DoesNotExist:
                 raise Http404
 
-        #Make sure slug is same for draft and ready versions
+        # Make sure slug is same for draft and ready versions
         if video.slug != video.image.slug:
             video.image.slug = video.slug
             video.image.save()
@@ -100,6 +99,7 @@ def edit_video(request, course_prefix, course_suffix, slug):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def reset_video(request, course_prefix, course_suffix, slug):
     common_page_data = request.common_page_data
     video = common_page_data['course'].video_set.all().get(slug=slug)
@@ -113,6 +113,7 @@ def reset_video(request, course_prefix, course_suffix, slug):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def delete_video(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -217,6 +218,7 @@ def GetOAuth2Url(request, video):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def upload(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -228,7 +230,6 @@ def upload(request):
     if request.method == 'POST':
         request.session['video_privacy'] = request.POST.get("video_privacy")
 
-    
         # Need partial instance with course for form slug validation
         new_video = Video(course=common_page_data['course'])
         form = S3UploadForm(request.POST, request.FILES, course=common_page_data['course'], instance=new_video)
@@ -250,8 +251,6 @@ def upload(request):
                     exam.image.live_datetime = new_video.live_datetime
                     exam.image.save()
 
-        
-        
             # Bit of jiggery pokery to so that the id is set when the upload_path function is called.
             # Now storing file with id appended to the file path so that thumbnail and associated manifest files
             # are easily associated with the video by putting them all in the same directory.
@@ -261,10 +260,6 @@ def upload(request):
             new_video.file = form.cleaned_data['file']
             new_video.save()
             new_video.commit()
-            #print new_video.file.url
-
-            
-            
 
             # kick off remote jobs
             kelvinator.tasks.kelvinate.delay(new_video.file.name)
@@ -277,9 +272,6 @@ def upload(request):
             authUrl = GetOAuth2Url(request, new_video)
             #eventually should store an access token, so they don't have to give permission everytime
             return redirect(authUrl)
-        #    return redirect("http://" + request.META['HTTP_HOST'])
-
-
     else:
         form = S3UploadForm(course=common_page_data['course'])
     data['form'] = form
