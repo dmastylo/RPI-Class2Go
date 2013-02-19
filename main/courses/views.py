@@ -94,7 +94,6 @@ def get_upcoming_exams(course):
     due_date__lte = end_date, 
     live_datetime__lte = datetime.datetime.today()
     ).order_by('due_date')
-  print "exams" + exams
   return exams
 
 
