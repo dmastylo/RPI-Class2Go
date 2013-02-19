@@ -391,7 +391,7 @@ small.date {
     -khtml-border-radius: 5px;
     -o-border-radius: 5px;
     position:relative;
-    clear:left;
+    clear: both;
 }
 .announcement p {
     margin-bottom:0;
