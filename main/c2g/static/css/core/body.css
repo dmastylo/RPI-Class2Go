@@ -376,6 +376,7 @@ small.date {
     color:#999;
     font-style:italic;
     display:block;
+    margin-bottom:.5em;
 }
 .announcement {
     margin-bottom:1em;
@@ -393,7 +394,7 @@ small.date {
     margin-bottom:0;
 }
 .announcement h4 {
-    margin-bottom:.5em;
+    margin-bottom:0;
 }
 .fakelink {
     cursor:pointer;
@@ -406,6 +407,9 @@ small.date {
     position:absolute;
     top:15px;
     right:15px;
+}
+.announcement .announcement-actions .announcement-collapse {
+    display: none;
 }
 #new_announcement_div {
     clear:left;

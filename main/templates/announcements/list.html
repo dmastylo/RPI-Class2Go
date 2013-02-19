@@ -7,10 +7,10 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span12">
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-    <div>
-        <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
-    </div>
-    {% include "announcements/delete_announcement_form.html" %}
+	<div>
+	    <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
+	</div>
+	{% include "announcements/delete_announcement_form.html" %}
     {% endif %}
     
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
@@ -21,9 +21,10 @@
         {% include "announcements/announcement.html" %}
     {% empty %}
         <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
-	{% endfor %}
+    {% endfor %}
 
 </div>
+
 {% endblock m_column_content %}
 
 {% if common_page_data.is_course_admin  and common_page_data.course_mode == 'draft' %}
