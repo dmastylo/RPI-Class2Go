@@ -19,7 +19,7 @@ else
 fi
 
 for l in storage logs static cache; do
-    d = "/tmp/$l"
+    d="/tmp/$l"
     if [[ ! -e $d ]]; then
         echo "creating $d"
         mkdir $d
