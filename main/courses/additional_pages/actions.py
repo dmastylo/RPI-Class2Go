@@ -6,15 +6,14 @@ from django.views.decorators.http import require_POST
 
 from c2g.models import *
 from courses.common_page_data import get_common_page_data
-from courses.actions import auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
+from courses.actions import always_switch_mode, auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # Not strictly necessary, but good for consistency
 def add(request):
-    
     def redirectWithError(warn_msg):
-        url = request.get_full_path()
         messages.add_message(request,messages.ERROR, warn_msg)
         return redirect(request.META['HTTP_REFERER'])
     
@@ -67,9 +66,9 @@ def add(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # Not strictly necessary, but good for consistency
 def save(request):
     def redirectWithError(warn_msg):
-        url = request.get_full_path()
         messages.add_message(request,messages.ERROR, warn_msg)
         return redirect(request.META['HTTP_REFERER'])
     
@@ -81,7 +80,6 @@ def save(request):
     if request.POST.get("revert") == '1':
         page.revert()
     else:
-
         #Validate manually, b/c we didn't use django forms here since we missed it
         try:
             validate_slug(request.POST.get("slug"))
@@ -150,6 +148,7 @@ def save(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def save_order(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     if not common_page_data['is_course_admin']:
@@ -167,6 +166,7 @@ def save_order(request):
     
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # Not strictly necessary, but good for consistency
 def delete(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     if not common_page_data['is_course_admin']:
@@ -181,5 +181,7 @@ def delete(request):
     if page.image:
         page.image.delete()
     
-    return redirect(request.META['HTTP_REFERER'])
-
+    if request.POST.get("menu_slug") == "":
+        return redirect('courses.views.course_materials', course_prefix, course_suffix)
+    else:
+        return redirect(request.META['HTTP_REFERER'])

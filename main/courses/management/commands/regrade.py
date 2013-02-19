@@ -6,7 +6,7 @@ from dateutil import parser
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from c2g.models import ExamRecord, Exam, ExamScore
+from c2g.models import ExamRecord, Exam, ExamScore, ExamRecordScore
 from courses.exams.autograder import *
 from courses.exams.views import compute_penalties
 
@@ -17,6 +17,8 @@ class Command(BaseCommand):
     option_list = (
         make_option("-u", "--update", action="store_false", dest="dryrun", default=True,
             help="update regraded rows in database (default is dry run)"),
+        make_option("-s", "--student", dest="student_ids",
+            help="comma-separated list of students, identified by ids"),
         make_option("--start", dest="start_time",
             help="consider entries no earlier than X, eg \"2/17/2013\" or \"1/1/2012 14:40\". We use the python dateutil parser on dates, see http://labix.org/python-dateutil"),
         make_option("--end", dest="end_time",
@@ -32,28 +34,34 @@ class Command(BaseCommand):
            raise CommandError("exam id is required")
         examid = args[0]
 
-        start = parser.parse("1/1/1970")
-        if 'start_time' in options and options['start_time']:
-            start = parser.parse(options['start_time'])
-        end = parser.parse("1/1/2038")  # almost the end of unix time
-        if 'end_time' in options and options['end_time']:
-            end = parser.parse(options['end_time'])
-
         exam_obj = Exam.objects.get(id__exact=examid) 
         autograder = AutoGrader(exam_obj.xml_metadata)
 
-        examRecords = ExamRecord.objects\
-                .select_related('examrecordscore', 'student')\
-                .filter(exam_id__exact=examid, complete=True)\
-                .filter(time_created__gt=start)\
-                .filter(time_created__lt=end)
+        examRecords = ExamRecord.objects \
+                .select_related('examrecordscore', 'student') \
+                .filter(exam_id__exact=examid, complete=True)
+        if options['start_time']:
+            start = parser.parse(options['start_time'])
+            examRecords = examRecords.filter(time_created__gt=start)
+        if options['end_time']:
+            end = parser.parse(options['end_time'])
+            examRecords = examRecords.filter(time_created__lt=end)
+        if options['student_ids']:
+            sidlist = string.split(options['student_ids'], ',')
+            examRecords = examRecords.filter(student__in=sidlist)
+
+        # this executes the query
         if len(examRecords) == 0:
             print "warning: no exam records found, is that what you intended?"
             return
 
         count = 1
         for er in examRecords:
+            ers_created = False
             ers = er.examrecordscore
+            if ers is None:
+                ers = ExamRecordScore(record=er, raw_score=0.0)
+                ers_created = True
             print "ExamRecord %d, %d of %d" % (er.id, count, len(examRecords))
             count += 1
             try:
@@ -80,6 +88,10 @@ class Command(BaseCommand):
                         rawscore_after += float(regrade[prob]['score'])
             
                 is_late = er.time_created > exam_obj.grace_period
+                if er.attempt_number == 0:
+                    print "ERROR: examrecord %d: skip, attempt_number=0" % er.id
+                    errors += 1
+                    next
                 score_after = compute_penalties(rawscore_after, er.attempt_number,
                                                 exam_obj.resubmission_penalty,
                                                 is_late, exam_obj.late_penalty)
@@ -115,7 +127,7 @@ class Command(BaseCommand):
                         er.late = is_late
                         er.save()
                         updates += 1
-                    if rawscore_before != rawscore_after:
+                    if ers_created or rawscore_before != rawscore_after:
                         ers.raw_score = rawscore_after
                         ers.save()
                         updates += 1

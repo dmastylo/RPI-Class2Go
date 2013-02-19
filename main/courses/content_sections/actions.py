@@ -5,13 +5,14 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 
 from c2g.models import *
-from courses.actions import auth_is_course_admin_view_wrapper
+from courses.actions import always_switch_mode, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
 
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # not strictly necessary, but good for consistency
 def save_order(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     if not common_page_data['is_course_admin']:
@@ -30,6 +31,7 @@ def save_order(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def rename(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -49,6 +51,7 @@ def rename(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # not strictly necessary, but good for consistency
 def delete_content_section(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -67,6 +70,7 @@ def delete_content_section(request):
      
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def save_content_order(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))

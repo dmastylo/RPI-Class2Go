@@ -339,10 +339,6 @@ def save_exercises(request):
     if request.method != 'POST':
         return redirect(request.META['HTTP_REFERER'])
 
-    course_prefix = request.POST['course_prefix']
-    course_suffix = request.POST['course_suffix']
-    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
- 
     #don't catch video DoesNotExist here because we want some tangible error action to happen if
     #the video id changes in form submission, like mailing us
     video = Video.objects.get(id=request.POST['video_id'])

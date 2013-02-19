@@ -1,15 +1,16 @@
-# Create your views here.
-import json
-import operator
-import logging
-import settings
-import datetime
-import csv
-import HTMLParser
-from django.db.models import Max, F
 import copy
+import csv
+import datetime
+import HTMLParser
+import json
+import logging
 import markdown
+import operator
 from pytz import timezone
+
+from django.db.models import Max, F
+
+import settings
 
 FILE_DIR = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
 AWS_ACCESS_KEY_ID = getattr(settings, 'AWS_ACCESS_KEY_ID', '')
@@ -18,17 +19,16 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import ContentGroup, Exercise, Video, VideoToExercise, ProblemSet, ProblemSetToExercise, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata, StudentExamStart
+from c2g.models import ContentGroup, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata, StudentExamStart
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.template import Context, loader
 from django.template import RequestContext
 from django.core.validators import validate_slug, ValidationError
-from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
+from courses.actions import always_switch_mode, auth_view_wrapper, auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
 from django.views.decorators.http import require_POST
 from django.core.urlresolvers import reverse
-from courses.exams.autograder import AutoGrader, AutoGraderException, AutoGraderGradingException
+from courses.exams.autograder import AutoGrader, AutoGraderGradingException 
 from courses.course_materials import get_course_materials
 from storages.backends.s3boto import S3BotoStorage
 from django.utils.timezone import get_default_timezone_name
@@ -84,6 +84,8 @@ def confirm(request, course_prefix, course_suffix, exam_slug):
     allowed_timedelta = datetime.timedelta(minutes=minutesallowed)
 
     endtime = datetime.datetime.now() + allowed_timedelta
+    
+    endtime = min(endtime, exam.partial_credit_deadline)
 
     return render_to_response('exams/confirm.html',
                               {'common_page_data':request.common_page_data, 'course': course, 'exam':exam, 'ready_section':ready_section,
@@ -141,6 +143,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     if exam.timed:
         startobj, created = StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
         endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
+        endtime = min(endtime, exam.partial_credit_deadline)
         
         if timeopened > endtime :
             editable = False
@@ -218,7 +221,8 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     if exam.timed:
         startobj, created=StudentExamStart.objects.get_or_create(student=request.user, exam=exam)
         endtime = startobj.time_created + datetime.timedelta(minutes=exam.minutesallowed)
-        
+        endtime = min(endtime, exam.partial_credit_deadline)
+
         if timeopened > endtime :
             editable = False
             allow_submit = False
@@ -307,9 +311,6 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav}, RequestContext(request))
 
-
-
-
 @auth_view_wrapper
 def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
     course = request.common_page_data['course']
@@ -336,7 +337,6 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
 
     return render_to_response('exams/view_my_submissions.html', {'common_page_data':request.common_page_data, 'exam':exam, 'my_subs':my_subs,
                               'score_fields':json.dumps(score_fields), 'score':score}, RequestContext(request) )
-
 
 def my_subs_helper(s):
     """Helper function to handle badly formed JSON stored in the database"""
@@ -406,7 +406,6 @@ def parse_val(v):
         except TypeError, AttributeError:
             return str(v)
 
-
 @require_POST
 @auth_view_wrapper
 def collect_data(request, course_prefix, course_suffix, exam_slug):
@@ -441,6 +440,9 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
             pass #somehow we didn't record a start time for the student.  So we just let them submit.
 
     attempt_number = exam.num_of_student_records(user)+1
+
+    if attempt_number > exam.submissions_permitted:
+        return HttpResponseBadRequest("Sorry!  Your submission #%d has exceed the maximum allowed: %d" % (attempt_number, exam.submissions_permitted))
 
     onpage = request.POST.get('onpage','')
     
@@ -559,7 +561,9 @@ def edit_exam_ajax_wrapper(request, course_prefix, course_suffix, exam_slug):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create", old_slug=""):
+
     course = request.common_page_data['course']
     if course.mode == "ready":
         course = course.image
