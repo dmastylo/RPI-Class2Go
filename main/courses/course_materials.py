@@ -61,13 +61,8 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
         item = preModeSensitive(item)
         if common_page_data['course_mode'] == 'ready':
             key = (label, obj.id)
-            item['children'] = parentchilds.get(key, {}).get('group_children', [])  # TODO TEST THIS
-            item = postReadyModeWithChildren(item)                                  # TODO TEST THIS: if downstream gets children does it filter them properly?
-            #if parentchilds.has_key(key):
-            #    item['children'] = parentchilds[key]['group_children']
-            #    item = postReadyModeWithChildren(item)
-            #else:
-            #    return [] # Ready mode doesn't put children in items, it puts them in children
+            item['children'] = parentchilds.get(key, {}).get('group_children', [])
+            item = postReadyModeWithChildren(item) 
         else:
             key = (label, obj.image.id)
             parent = childparents.get(key, False)
@@ -78,7 +73,7 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
         item = postModeSensitiveBeforeAppend(item)
         return item
 
-    def _video_helper_calc_completion(item): # FIXME: 'video' not in this context?
+    def _video_helper_calc_completion(item):
         # Calculate video completion percentage and attach record
         print "DEBUG", video.id
         download_count = video_downloads.get(video.id, 0)
@@ -91,12 +86,12 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
                 item['completed_percent'] = 100.0 * max(video_rec['start_seconds'], video_rec['max_end_seconds'])/ video.duration if video.duration else 0
         return item
 
-    def _video_helper_add_numQuestions(item): # FIXME: 'video' not in this context?
+    def _video_helper_add_numQuestions(item):
         # Attach number of exam questions to video
         item['numQuestions'] = videoToExs.get(video.id, 0)
         return item
 
-    def _exam_helper_get_set_score(item): # FIXME: 'exam' not in this context?
+    def _exam_helper_get_set_score(item):
         try:
             scoreobj = ExamScore.objects.filter(course=COURSE, exam=exam, student=USER).latest('time_created')
             has_score = True
