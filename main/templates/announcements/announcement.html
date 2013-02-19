@@ -1,17 +1,19 @@
 {% load i18n %}
 
 <div class="announcement">
-    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-    <small class="date"> {{announcement.last_updated}}</small>
-    <div class="announcement-actions">
-        <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><em class="icon-edit icon-large"></em> {% trans 'Edit' %}</a>
-        <a href="javascript:DeleteAnnouncement('{{announcement.id}}')"><em class="icon-trash icon-large"></em> {% trans 'Delete' %}</a>
+    <div class="announcement-actions pull-right">
+        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
+            <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><em class="icon-edit icon-large"></em> {% trans 'Edit' %}</a>
+            <a href="javascript:DeleteAnnouncement('{{announcement.id}}')"><em class="icon-trash icon-large"></em> {% trans 'Delete' %}</a>
+        {% else %}
+            <a class="announcement-collapse">Show</a>
+        {% endif %}
     </div>
-    {% else %}
-        <small class="date"> {{announcement.last_updated}}</small>
-    {% endif %}
-    <h4>{{announcement.title}}</h4>
-    {% autoescape off %}<p>{{announcement.description}}</p>{% endautoescape %}
+    <h4 class="pull-left">{{announcement.title}}</h4>
+    <small class="date"> {{announcement.last_updated}}</small>
+    <div {% if common_page_data.course_mode != 'draft' %}class="announcement-content"{% endif %}>
+        {% autoescape off %}{{announcement.description}}{% endautoescape %}
+    </div>
 
     {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
         {% if announcement.is_synced %}
