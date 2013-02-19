@@ -73,6 +73,7 @@ $(document).ready(function(){
                                                  c2g.installLeftNavChevron();
                                                  });
     var numVisibleAnnouncements = 2;
+    $('#showHideAll').show();
     $('.announcement-content').each(function(){
 	if (numVisibleAnnouncements <= 0) {
 	    $(this).closest('.announcement').find('.announcement-actions .announcement-collapse').show();
@@ -93,12 +94,12 @@ $(document).ready(function(){
     
     $('#showHideAll').toggle(function(){
 	$(this).text('Hide All').parent().siblings('.announcement').each(function(){
-	    $(this).find('.announcement-content').show();
+	    $(this).find('.announcement-content').slideDown(250);
 	    $(this).find('.announcement-actions .announcement-collapse').text('Hide');
 	});
     }, function() {
 	$(this).text('Show All').parent().siblings('.announcement').each(function(){
-	    $(this).find('.announcement-content').hide();
+	    $(this).find('.announcement-content').slideUp(250);
 	    $(this).find('.announcement-actions .announcement-collapse').text('Show');
 	});
     });
