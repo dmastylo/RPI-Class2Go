@@ -14,7 +14,6 @@ from django.views.decorators.http import require_POST
 from courses.forms import *
 from django.contrib import messages
 from django.db import connection
-from courses.course_materials import filename_in_deleted_list
 from courses.views import get_full_contentsection_list
 
 # Filters all ProblemActivities by problem set and student. For each problem set, finds out how
@@ -39,6 +38,13 @@ def listAll(request, course_prefix, course_suffix):
 @auth_view_wrapper
 def show(request, course_prefix, course_suffix, pset_slug):
     
+    def filename_in_deleted_list(filename, problem_set_id, deleted_exercise_list):
+        """Used by course_materials templates for filtering"""
+        for item in deleted_exercise_list:
+            if item['filename'] == filename and item['problemset_id'] == problem_set_id:
+                return True
+        return False
+
     common_page_data = request.common_page_data 
     try:
         ps = ProblemSet.objects.getByCourse(course=common_page_data['course']).get(slug=pset_slug)
@@ -48,7 +54,6 @@ def show(request, course_prefix, course_suffix, pset_slug):
     except ProblemSet.MultipleObjectsReturned:
         messages.add_message(request,messages.ERROR, 'We found multiple problem sets with the same slug.  Please try to delete one.  This most likely happened due to copying content from another course.')
         return HttpResponseRedirect(reverse('problemsets.views.listAll', args=(course_prefix, course_suffix)))
-
 
     if not common_page_data['is_course_admin']:
         visit_log = PageVisitLog(
@@ -126,7 +131,6 @@ def show(request, course_prefix, course_suffix, pset_slug):
                 activity_item = ProblemActivity.objects.get(id=first_correct_answer)
                 
             activity_list.append((activity_item, number))
-
 
     course = common_page_data['course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
@@ -417,8 +421,6 @@ def add_existing_exercises(request):
         else:
             psetToEx = ProblemSetToExercise(problemSet=pset, exercise=exercise, number=ProblemSetToExercise.objects.getByProblemset(pset).count(), is_deleted=0, mode='draft')
             psetToEx.save()
-            
-            
     return HttpResponseRedirect(reverse('problemsets.views.manage_exercises', args=(request.POST['course_prefix'], request.POST['course_suffix'], pset.slug,)))
 
 @require_POST
@@ -462,7 +464,6 @@ def save_exercises(request):
             pset.commit()
         return HttpResponseRedirect(reverse('problemsets.views.listAll', args=(request.POST['course_prefix'], request.POST['course_suffix'])))
 
-
 @auth_view_wrapper
 def read_exercise(request, course_prefix, course_suffix, exercise_name):
     try:
@@ -479,7 +480,6 @@ def read_exercise(request, course_prefix, course_suffix, exercise_name):
     #
     # TODO: put exception handling around this, figure out how to handle S3 errors
     # (file not there...)
-    
     return HttpResponse(exercise.file.file)
 
 
