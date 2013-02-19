@@ -18,7 +18,8 @@ else
     cp -n main/travis/database_ci.py main/database.py
 fi
 
-if [[ ! -e /tmp/media_root ]]; 
-    mkdir /tmp/media_root
+for d in storage logs static cache; do
+if [[ ! -e /tmp/$d ]]; 
+    mkdir /tmp/$d
 fi
 
