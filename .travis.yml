@@ -14,6 +14,4 @@ script:
   # for now don't run selenium tests until we can figure out how 
   - cd main; python manage.py test -v 2 --attr='!selenium'
 notifications:
-  irc:
-    channels: "irc.freenode.org#class2go-internal"
-    on_failure: change
+  irc: "irc.freenode.org#class2go-internal"
