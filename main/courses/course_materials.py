@@ -190,7 +190,7 @@ def collect_contentgroup_data(course, user=None):
             return 0
 
     parent2child = {}
-    cdild2parent = {}
+    child2parent = {}
     if course.mode == 'draft':
         course = course.image
     for cgroup_parent_ref in ContentGroup.objects.getByCourseAndLevel(course, 1):
@@ -212,7 +212,7 @@ def collect_contentgroup_data(course, user=None):
             # Filter deleted children without worrying about who their parent is
             if target.is_deleted == 1:
                 continue 
-            cdild2parent[(cttag, target.id)] = parent_target
+            child2parent[(cttag, target.id)] = parent_target
             # Filter non-live mode children from parent2child because it's child list is only iterated in ready mode
             if not target.is_live():
                 continue
@@ -228,7 +228,7 @@ def collect_contentgroup_data(course, user=None):
         for display in info['group_children']:
             info['group_children'][display] = sorted(sorted(info['group_children'][display], type_sorter), name_sorter)
         parent2child[parent_key_tuple] = info 
-    return (parent2child, cdild2parent)
+    return (parent2child, child2parent)
 
 def child_data_to_dict(groupobj, cgtype, ref, user=None):
     # TODO: what we're doing here is abominable and can be considerably cleaned
