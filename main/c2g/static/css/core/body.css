@@ -376,6 +376,11 @@ small.date {
     color:#999;
     font-style:italic;
     display:block;
+    margin-bottom:.5em;
+    clear: left;
+}
+#showHideAll {
+    display: none;
 }
 .announcement {
     margin-bottom:1em;
@@ -387,13 +392,13 @@ small.date {
     -khtml-border-radius: 5px;
     -o-border-radius: 5px;
     position:relative;
-    clear:left;
+    clear: both;
 }
 .announcement p {
     margin-bottom:0;
 }
 .announcement h4 {
-    margin-bottom:.5em;
+    margin-bottom:0;
 }
 .fakelink {
     cursor:pointer;
@@ -402,10 +407,9 @@ small.date {
     display:inline-block;
     margin-top:7px;
 }
-.announcement .announcement-actions {
-    position:absolute;
-    top:15px;
-    right:15px;
+.announcement .announcement-actions .announcement-collapse {
+    display: none;
+    cursor: pointer;
 }
 #new_announcement_div {
     clear:left;
