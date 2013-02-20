@@ -3,13 +3,10 @@ python:
   - "2.7"
 install:
   - "pip install -r requirements.txt --use-mirrors"
-  # doesn't work, returns with 100, don't know why
-  # - "sudo apt-get install google-chrome-stable"
-  #
-  # jrbl experimenting to try to get selenium tests working
+  # install a bunch of junk needed by selenium testing
   - sudo apt-get install chromium-browser xvfb xserver-xephyr unzip
   - pip install pyvirtualdisplay
-  - cd /tmp && curl -O http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip && \
+  - cd /tmp && curl -O http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip && 
     unzip chromedriver_linux32_23.0.1240.0.zip && mv chromedriver /usr/local/bin && cd -
 env:
   - DB=mysql
@@ -19,6 +16,7 @@ before_script:
 script: 
   # for now don't run selenium tests until we can figure out how 
   #- cd main; python manage.py test -v 2 --attr='!selenium'
+  # Run with selenium tests in headless mode
   - cd main; C2G_HEADLESS_TESTS=1 python manage.py test -v 2
 notifications:
   irc: "irc.freenode.org#class2go-internal"
