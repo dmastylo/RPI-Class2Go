@@ -75,7 +75,6 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
 
     def _video_helper_calc_completion(item):
         # Calculate video completion percentage and attach record
-        print "DEBUG", video.id
         download_count = video_downloads.get(video.id, 0)
         if download_count > 0:
             item['completed_percent'] = 100.0
