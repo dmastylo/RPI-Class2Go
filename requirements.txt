@@ -1,18 +1,16 @@
-Django
+Django>=1.4.1
 MySQL-python
-#psycopg2
-PIL
 South
-django-storages
-boto
-gdata
-numpy
+django-storages>=1.1.6
+boto>= 2.7.0
+gdata==2.0.17
 elementtree
 pysqlite
+markdown
+
+# RESTful interfaces libraries
 djangorestframework
 PySimpleSOAP
-xhtml2pdf
-markdown
 
 # celery dependencies
 django-celery
@@ -25,5 +23,5 @@ nose
 django_nose
 django_coverage
 lxml
-selenium
+selenium>=2.30
 selenose

@@ -1,10 +1,10 @@
-#!/usr/bin/env python
-
+try:
+    from dateutil import parser
+except ImportError, msg:
+    parser = False
 from optparse import make_option
-from dateutil import parser
 
 from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
 
 from c2g.models import ExamRecord, Exam, ExamScore, ExamRecordScore
 from courses.exams.autograder import *
@@ -40,6 +40,8 @@ class Command(BaseCommand):
         examRecords = ExamRecord.objects \
                 .select_related('examrecordscore', 'student') \
                 .filter(exam_id__exact=examid, complete=True)
+        if not parser and (options['start_time'] or options['end_time']):
+            raise CommandError("Can't parse start and end times without having 'dateutil' installed.\nSee http://labix.org/python-dateutil")
         if options['start_time']:
             start = parser.parse(options['start_time'])
             examRecords = examRecords.filter(time_created__gt=start)
