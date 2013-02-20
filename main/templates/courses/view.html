@@ -50,7 +50,7 @@
     {% empty %}
         <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
 	{% endfor %}
-
+    <a class="btn pull-right" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}</a>
 </div>
 {% endblock m_column_content %}
 
