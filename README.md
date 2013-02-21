@@ -27,6 +27,19 @@ https://groups.google.com/forum/#!forum/class2go-users.
 If you are interested in reaching the team email us at 
 <c2g-contact@class.stanford.edu>.
 
+If you are interested in evaluating the Class2Go platform, you can explore Class2Go
+through 2 courses we have created. The [Introduction to Class2Go][howto] 
+course highlights the major features of the platform and includes guides 
+for adding content to a Class2Go course and templates for creating problem sets, 
+exams, or surveys. 
+[howto]: http://class2go.stanford.edu/class2go/howto/
+
+The [Class2Go Sandbox][sandbox] course allows access to the administrator 
+features of the Class2Go platform. You are welcome to access this course 
+to test adding and updating course materials through the admin interface. 
+The public login (username: class2go, password: class2go) gives access to 
+both courses.
+[sandbox]: http://class2go.stanford.edu/sandbox/C2G/
 
 Philosophy 
 ----------
@@ -144,6 +157,18 @@ pretty quickly on their local machine.
 Send us mail at <c2g-contact@class.stanford.edu> and we can give
 you an idea what would be involved.
 
+If you are interested in evaluating the Class2Go platform before trying to stand 
+up your own instance, you can explore Class2Go through 2 courses 
+we have created. The [Introduction to Class2Go][howto] course highlights the major 
+features of the platform and includes guides for adding content to a Class2Go course 
+and templates for creating problem sets, exams, or surveys. 
+[howto]: http://class2go.stanford.edu/class2go/howto/
+
+The [Class2Go Sandbox][sandbox] course allows access to the administrator features 
+of the Class2Go platform. You are welcome to access this course to test adding and 
+updating course materials through the admin interface. The public login 
+(username: class2go, password: class2go) gives access to both courses.
+[sandbox]: http://class2go.stanford.edu/sandbox/C2G/
 
 
 License
