@@ -227,6 +227,14 @@ CACHES = {
             'MAX_ENTRIES': 1000
             }
     },
+    'grader_store': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': LOCAL_CACHE_LOCATION + "/cache-grader",
+        'TIMEOUT': 7200,  # two hours
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+            }
+    },
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': LOCAL_CACHE_LOCATION + "/cache-default",
