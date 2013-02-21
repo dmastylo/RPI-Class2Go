@@ -69,7 +69,6 @@ class fake_remote_grader_fails(fake_remote_grader):
         super(fake_remote_grader_fails, self).__init__(answer)
 
     def fake_response(self, req):
-        # import ipdb; ipdb.set_trace()
         grader_endpoint = getattr(settings, 'GRADER_ENDPOINT', 'localhost')
         if req.get_full_url() == grader_endpoint:
             if (self.fail_for > 0 and self.failures < self.fail_for) \
