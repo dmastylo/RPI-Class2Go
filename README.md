@@ -4,9 +4,9 @@ Class2Go
 [![Build Status](https://travis-ci.org/Stanford-Online/class2go.png?branch=master)](https://travis-ci.org/Stanford-Online/class2go)
 
 Class2Go is Stanford's internal open-source platform for on-line
-education. A team of eight built the first version over the summer
+education. A team of eight built the first version over the Summer
 2012, and it is still under active development.  Class2Go launched
-this Fall for six on-campus classes and two "massive open online 
+in Fall 2012 for six on-campus classes and two "massive open online 
 courses" (MOOC's): [Computer Networking][net] and 
 [Solar Cells, Fuel Cells, and Batteries][sol].
   [net]: http://networking.class.stanford.edu/
