@@ -368,88 +368,57 @@ Testing your common sense: 15.6 sec
     </form>
 </div>
 
-<div id="single-choice-form" title="{% trans 'New Single Choice Question' %}">
+<div id="single-choice-form" title="{% trans 'New Select Question' %}">
 	<form>
 		<label for="single-choice-entry-question-text" id="single-choice-entry-label-question-text">{% trans 'Enter the text for this question' %}</label>
-		<textarea name="single-choice-entry-question-text" id="single-choice-entry-question-text" class="text ui-widget-content ui-corner-all">This is a single choice question and therefore should only have one correct answer.</textarea>
+		<textarea name="single-choice-entry-question-text" id="single-choice-entry-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
+		<label for="single-choice-entry-correct-points" id="single-choice-entry-label-correct-points">{% trans 'Correct Points' %} <input type="number" name="single-choice-entry-correct-points" id="single-choice-entry-correct-points" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-wrong-points" id="single-choice-entry-label-wrong-points">{% trans 'Wrong Points' %} <input type="number" name="single-choice-entry-wrong-points" id="single-choice-entry-wrong-points" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-question-explanation" id="single-choice-entry-label-question-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
+		<textarea name="single-choice-entry-question-explanation" id="single-choice-entry-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
 		<p> {% trans 'Solution #1' %} </p>
 		<label for="single-choice-entry-answer1" id="single-choice-entry-label-answer1">{% trans 'Solution #1 Display Value' %} <input type="text" name="single-choice-entry-answer1" id="single-choice-entry-answer1" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="single-choice-entry-value-answer1" id="single-choice-entry-label-value-answer1">{% trans 'Solution #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer1" id="single-choice-entry-label-correctness-answer1">{% trans 'Solution #1 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer1" id="single-choice-entry-correctness-answer1" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="single-choice-entry-explanation-answer1" id="single-choice-entry-label-explanation-answer1">{% trans 'Solution #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer1" id="single-choice-entry-explanation-answer1" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<p> {% trans 'Solution #2' %} </p>
-		<label for="single-choice-entry-answer2" id="single-choice-entry-label-answer2">{% trans 'Solution #1 Display Value' %} <input type="text" name="single-choice-entry-answer2" id="single-choice-entry-answer2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer2" id="single-choice-entry-label-value-answer2">{% trans 'Solution #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer2" id="single-choice-entry-value-answer2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer2" id="single-choice-entry-label-explanation-answer2">{% trans 'Solution #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer2" id="single-choice-entry-explanation-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="single-choice-entry-answer2" id="single-choice-entry-label-answer2">{% trans 'Solution #2 Display Value' %} <input type="text" name="single-choice-entry-answer2" id="single-choice-entry-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer2" id="single-choice-entry-label-value-answer2">{% trans 'Solution #2 Submit Value' %} <input type="text" name="single-choice-entry-value-answer2" id="single-choice-entry-value-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer2" id="single-choice-entry-label-correctness-answer2">{% trans 'Solution #2 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer2" id="single-choice-entry-correctness-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer2" id="single-choice-entry-label-explanation-answer2">{% trans 'Solution #2 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer2" id="single-choice-entry-explanation-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<p> {% trans 'Solution #3' %} </p>
-		<label for="single-choice-entry-answer3" id="single-choice-entry-label-answer3">{% trans 'Solution #1 Display Value' %} <input type="text" name="single-choice-entry-answer3" id="single-choice-entry-answer3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer3" id="single-choice-entry-label-value-answer3">{% trans 'Solution #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer3" id="single-choice-entry-value-answer3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer3" id="single-choice-entry-label-explanation-answer3">{% trans 'Solution #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer3" id="single-choice-entry-explanation-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="single-choice-entry-answer3" id="single-choice-entry-label-answer3">{% trans 'Solution #3 Display Value' %} <input type="text" name="single-choice-entry-answer3" id="single-choice-entry-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer3" id="single-choice-entry-label-value-answer3">{% trans 'Solution #3 Submit Value' %} <input type="text" name="single-choice-entry-value-answer3" id="single-choice-entry-value-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer3" id="single-choice-entry-label-correctness-answer3">{% trans 'Solution #3 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer3" id="single-choice-entry-correctness-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer3" id="single-choice-entry-label-explanation-answer3">{% trans 'Solution #3 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer3" id="single-choice-entry-explanation-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<p> {% trans 'Solution #4' %} </p>
-		<label for="single-choice-entry-answer4" id="single-choice-entry-label-answer4">{% trans 'Solution #1 Display Value' %} <input type="text" name="single-choice-entry-answer4" id="single-choice-entry-answer4" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer4" id="single-choice-entry-label-value-answer4">{% trans 'Solution #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer4" id="single-choice-entry-value-answer4" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer4" id="single-choice-entry-label-explanation-answer4">{% trans 'Solution #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer4" id="single-choice-entry-explanation-answer4" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="single-choice-entry-answer4" id="single-choice-entry-label-answer4">{% trans 'Solution #4 Display Value' %} <input type="text" name="single-choice-entry-answer4" id="single-choice-entry-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer4" id="single-choice-entry-label-value-answer4">{% trans 'Solution #4 Submit Value' %} <input type="text" name="single-choice-entry-value-answer4" id="single-choice-entry-value-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer4" id="single-choice-entry-label-correctness-answer4">{% trans 'Solution #4 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer4" id="single-choice-entry-correctness-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer4" id="single-choice-entry-label-explanation-answer4">{% trans 'Solution #4 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer4" id="single-choice-entry-explanation-answer4" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<p> {% trans 'Solution #5' %} </p>
-		<label for="single-choice-entry-answer5" id="single-choice-entry-label-answer5">{% trans 'Solution #1 Display Value' %} <input type="text" name="single-choice-entry-answer5" id="single-choice-entry-answer5" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer5" id="single-choice-entry-label-value-answer5">{% trans 'Solution #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer5" id="single-choice-entry-value-answer5" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer5" id="single-choice-entry-label-explanation-answer5">{% trans 'Solution #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer5" id="single-choice-entry-explanation-answer5" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="single-choice-entry-answer5" id="single-choice-entry-label-answer5">{% trans 'Solution #5 Display Value' %} <input type="text" name="single-choice-entry-answer5" id="single-choice-entry-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer5" id="single-choice-entry-label-value-answer5">{% trans 'Solution #5 Submit Value' %} <input type="text" name="single-choice-entry-value-answer5" id="single-choice-entry-value-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer5" id="single-choice-entry-label-correctness-answer5">{% trans 'Solution #5 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer5" id="single-choice-entry-correctness-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer5" id="single-choice-entry-label-explanation-answer5">{% trans 'Solution #5 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer5" id="single-choice-entry-explanation-answer5" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<p> {% trans 'Solution #6' %} </p>
-		<label for="single-choice-entry-answer6" id="single-choice-entry-label-answer6">{% trans 'Solution #1 Display Value' %} <input type="text" name="single-choice-entry-answer6" id="single-choice-entry-answer6" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer6" id="single-choice-entry-label-value-answer6">{% trans 'Solution #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer6" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer6" id="single-choice-entry-label-explanation-answer6">{% trans 'Solution #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer6" id="single-choice-entry-explanation-answer6" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="single-choice-entry-answer6" id="single-choice-entry-label-answer6">{% trans 'Solution #6 Display Value' %} <input type="text" name="single-choice-entry-answer6" id="single-choice-entry-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer6" id="single-choice-entry-label-value-answer6">{% trans 'Solution #6 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer6" id="single-choice-entry-label-correctness-answer6">{% trans 'Solution #6 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer6" id="single-choice-entry-correctness-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer6" id="single-choice-entry-label-explanation-answer6">{% trans 'Solution #6 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer6" id="single-choice-entry-explanation-answer6" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<textarea name="single-choice-entry-html" id="single-choice-entry-html" class="text ui-widget-content ui-corner-all hidden">
-			<div class="question" id="problem_1" data-report="Apple Competitor Question">
-		    <h3 class="questionNumber">Question 1</h3>
-			<div class="question_text">
-		    <p>A multiple choice problem presents radio buttons or checkboxes for student input.
-		        If a question has exactly <b>one</b> correct choice, radio buttons will be presented,
-		        and students can only select a single choice. Otherwise checkboxes will be presented
-		        and students can select zero-or-more choices. Multiple Choice questions have been
-		        the subject of many areas of research due to the early invention and adoption of
-		        bubble sheets.</p>
-		    <p>One of the main elements that goes into a good multiple choice question is the existence
-		        of good distractors. That is, each of the alternate responses presented to the student
-		        should be the result of a plausible mistake that a student might make.</p>
-		    <p>Handy numbers: $$R = 8.314\ {\rm J/mole\ K}\ \ \ \ \ \ F = 96500\ {\rm C/mole}\
-		        \ \ \ \ k_B = 1.38\times 10^{-23}\ {\rm J/K} = 8.62\times 10^{-5}\ {\rm eV/K}\ \
-		        \ \ \ \hbar = 1.055 \times 10^{-34}\ {\rm J\ s} = 6.58 \times 10^{-16}\ {\rm eV\
-		        s}\\ m = 9.11 \times 10^{-31} {\rm kg}\ \ \ \ \ 1\ {\rm eV} = 1.602 \times 10^{-19}\
-		        {\rm J}$$</p>
-		    <p>The pythagorean theorem: \[ a^2 + b^2 = c^2 \]</p>
-		    <p>What Apple device competed with the portable CD player?</p>
+			<div class="question" id="problem_1" data-report="">
+		    	<h3 class="questionNumber"></h3>
+				<div class="question_text"></div>
+		    	<fieldset></fieldset>
 			</div>
-		    <fieldset>
-		    </fieldset>
-		</div>
         </textarea>
-		<textarea name="single-choice-entry-xml" id="single-choice-entry-xml" class="text ui-widget-content ui-corner-all hidden"><question_metadata id="problem_1" data-report="Apple Competitor Question">
+		<textarea name="single-choice-entry-xml" id="single-choice-entry-xml" class="text ui-widget-content ui-corner-all hidden">
+			<question_metadata id="problem_1" data-report="">
 		        <solution>
-		            <div class="detailed-solution">
-		                <p>Explanation</p>
-		                <p>The release of the iPod allowed consumers to carry their entire music library with
-		                    them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
-		            </div>
+		            <div class="detailed-solution"></div>
 		        </solution>
-		        <response name="q1f" answertype="multiplechoiceresponse" data-report="Apple Competitors"
-		        correct-points="10" wrong-points="-2">
-		            <choice value="ipad" data-report="iPad" correct="false">
-		                <explanation>Try again</explanation>
-		            </choice>
-		            <choice value="napster" data-report="Napster" correct="false">
-		                <explanation>Try again</explanation>
-		            </choice>
-		            <choice value="ipod" data-report="iPod" correct="true">
-		                <explanation>This is right!</explanation>
-		            </choice>
-		            <choice value="peeler" data-report="Vegetable Peeler" correct="false">
-		                <explanation>Try again</explanation>
-		            </choice>
-		            <choice value="android" data-report="Android" correct="false">
-		                <explanation>Try again</explanation>
-		            </choice>
-		            <choice value="beatles" data-report="The Beatles" correct="false">
-		                <explanation>Try again</explanation>
-		            </choice>
-		        </response>
+		        <response name="need_to_change" answertype="multiplechoiceresponse" data-report="" correct-points="10" wrong-points="-2"></response>
 		    </question_metadata>
         </textarea>
 	</form>
@@ -715,7 +684,7 @@ age: 20,
                     id:"add-single-choice-button",
                     click: function() {
                         __xml_saved_single_choice=true;
-						c2gXMLParse.addRadioButtonQuestion($('#single-choice-entry-html').val(), $('#single-choice-entry-xml').val(), $('#single-choice-entry-question-text').val())
+						c2gXMLParse.addRadioButtonQuestion($('#single-choice-entry-html').val(), $('#single-choice-entry-xml').val(), question_type)
                         $( this ).dialog( "close" );
                         }
                   },
@@ -766,12 +735,14 @@ age: 20,
     });
 
 	$('#radio-buttons-btn').click(function() {
+		question_type = 0; 
        __saved_import_single_choice_xml=$('#xml-entry').val();
        $( "#single-choice-form" ).dialog( "open" );	})
 
     $('#checkboxes-btn').click(function() {
-		alert("checkboxes-btn clicked"); 
-	})
+	   question_type = 1; 
+       __saved_import_single_choice_xml=$('#xml-entry').val();
+       $( "#single-choice-form" ).dialog( "open" );	})
 	
 	$('#numerical-btn').click(function() {
 		alert("numerical buttons clicked"); 

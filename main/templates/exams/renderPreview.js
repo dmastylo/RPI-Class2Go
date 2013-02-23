@@ -40,19 +40,28 @@ var c2gXMLParse = (function() {
             
         },
         
+        assignCorrectNames : function(mDOM) {
+            var questionMD = $(mDOM).find('question_metadata');
+            for(i = 0; i < questionMD.length; i++) { 
+                response = $(questionMD[i]).find('response')[0];
+                response.setAttribute('name', questionMD[i].getAttribute('id') + '_name'); 
+            } 
+        },
+        
         createBaseXML: function(mDOM) {
             return $.parseXML('<exam_metadata></exam_metadata>');
         }, 
             
-        addRadioButtonQuestion: function(html, xml, question_text) {
+        addRadioButtonQuestion: function(html, xml, type) {              
               editor_value = editor.getValue(); 
               
               editHtml = $(html); 
               
               //Text of question
+              providedText = $('#single-choice-entry-question-text').val(); 
               questionText = $(editHtml.find('div.question_text')[0]); 
               questionTextParagraph = $(document.createElement('p')); 
-              questionTextParagraph.text(question_text); 
+              questionTextParagraph.text(providedText); 
               questionText.empty(); 
               questionText.append(questionTextParagraph); 
               
@@ -63,22 +72,22 @@ var c2gXMLParse = (function() {
                   //Add to the HTMl                             
                 sol1display = $('#single-choice-entry-answer' + i).val(); 
                 sol1submit = $('#single-choice-entry-value-answer' + i).val(); 
-                sol1explanation = $('#single-choice-entry-explanation-answer' + i).val(); 
                 if(sol1display && sol1submit) {
                     sol1label = document.createElement('label'); 
                     sol1input = document.createElement('input'); 
-                    sol1input.setAttribute('type', 'radio'); 
+                    if(type == 0) {
+                        sol1input.setAttribute('type', 'radio'); 
+                    } else {
+                        sol1input.setAttribute('type', 'checkbox'); 
+                    }
                     sol1input.setAttribute('value', sol1submit);
                     sol1label.appendChild(sol1input); 
                     sol1displaycontainer = document.createElement('span'); 
                     sol1displaycontainer.innerText = sol1display; 
                     sol1label.appendChild(sol1displaycontainer); 
                     fieldset.appendChild(sol1label); 
-                }
-                
-                
+                }                
               }
-              
               
               
               editor_value = editor_value + editHtml[0].outerHTML; 
@@ -95,9 +104,45 @@ var c2gXMLParse = (function() {
               }
               var exam_metadata = $(mDOM).find('exam_metadata'); 
               exam_metadata = exam_metadata[0];
-              var questionMeta= $(xml); //document.createElement('question_metadata');
+              var questionMeta= $(xml);
+              response = $(questionMeta.find('response')[0])[0]; 
+              
+              //Points
+              correct_points = $('#single-choice-entry-correct-points')[0]; 
+              wrong_points = $('#single-choice-entry-wrong-points')[0];
+              response.setAttribute('correct-points', correct_points.value); 
+              response.setAttribute('wrong-points', wrong_points.value) 
+              
+              //Answer Choices
+              for(i = 1; i < 7; i++) {  
+                  //Add to the XML                             
+                sol1display = $('#single-choice-entry-answer' + i).val(); 
+                sol1submit = $('#single-choice-entry-value-answer' + i).val(); 
+                sol1explanation = $('#single-choice-entry-explanation-answer' + i).val(); 
+                sol1correctness = $('#single-choice-entry-correctness-answer' + i)[0].checked; 
+                if(sol1display && sol1submit) {
+                    sol1choice = document.createElement('choice'); 
+                    sol1expl = document.createElement('explanation'); 
+                    sol1expl.innerText = sol1explanation; 
+                    sol1choice.setAttribute('value', sol1submit);
+                    sol1choice.setAttribute('correct', sol1correctness); 
+                    sol1choice.setAttribute('data-report', sol1display);
+                    sol1choice.appendChild(sol1expl); 
+                    response.appendChild(sol1choice); 
+                }                
+              }
+              
+              //Detailed Explanation
+              detailed_explanation = $('#single-choice-entry-question-explanation').val(); 
+              solution = $(questionMeta.find('solution')[0])[0]; 
+              div = $(solution).find('div')[0];
+              textElement = document.createElement('p'); 
+              textElement.innerHTML = detailed_explanation; 
+              div.appendChild(textElement); 
+              
               $(exam_metadata).append(questionMeta);
               c2gXMLParse.assignCorrectIds(mDOM, true); 
+              c2gXMLParse.assignCorrectNames(mDOM); 
               
               metadata_value = (new XMLSerializer()).serializeToString(mDOM);
               metadata_editor.setValue(style_html(metadata_value, {'max_char':80}));
