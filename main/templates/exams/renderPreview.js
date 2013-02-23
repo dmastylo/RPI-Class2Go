@@ -16,6 +16,96 @@ var c2gXMLParse = (function() {
                    
         specialNodes: "dbinteractiveresponse,multiplechoiceresponse,numericalresponse,stringresponse,regexresponse,optionresponse,solution",
         
+        assignCorrectIds : function(mDOM, isXML) { 
+            if(isXML) { 
+                var questionMD = $(mDOM).find('question_metadata');
+                for(i = 0; i < questionMD.length; i++) { 
+                    $(questionMD[i]).attr('id', 'question_' + (i+1));
+                }
+            } else { 
+                v = 1; 
+                allHTML = ""; 
+                for(i = 0; i < mDOM.length; i++) { 
+                    if(mDOM[i].tagName == "DIV") {
+                        $(mDOM[i]).attr('id', 'question_' + v);
+                        $(mDOM[i]).attr('number', v);
+                        v = v+1; 
+                        allHTML = allHTML + mDOM[i].outerHTML; 
+                    } else { 
+                            console.log(mDOM[i]); 
+                    }
+                }
+                return allHTML;  
+            }
+            
+        },
+        
+        createBaseXML: function(mDOM) {
+            return $.parseXML('<exam_metadata></exam_metadata>');
+        }, 
+            
+        addRadioButtonQuestion: function(html, xml, question_text) {
+              editor_value = editor.getValue(); 
+              
+              editHtml = $(html); 
+              
+              //Text of question
+              questionText = $(editHtml.find('div.question_text')[0]); 
+              questionTextParagraph = $(document.createElement('p')); 
+              questionTextParagraph.text(question_text); 
+              questionText.empty(); 
+              questionText.append(questionTextParagraph); 
+              
+              fieldset = $(editHtml.find('fieldset')[0])[0]; 
+
+              //Answer Choices
+              for(i = 1; i < 7; i++) {  
+                  //Add to the HTMl                             
+                sol1display = $('#single-choice-entry-answer' + i).val(); 
+                sol1submit = $('#single-choice-entry-value-answer' + i).val(); 
+                sol1explanation = $('#single-choice-entry-explanation-answer' + i).val(); 
+                if(sol1display && sol1submit) {
+                    sol1label = document.createElement('label'); 
+                    sol1input = document.createElement('input'); 
+                    sol1input.setAttribute('type', 'radio'); 
+                    sol1input.setAttribute('value', sol1submit);
+                    sol1label.appendChild(sol1input); 
+                    sol1displaycontainer = document.createElement('span'); 
+                    sol1displaycontainer.innerText = sol1display; 
+                    sol1label.appendChild(sol1displaycontainer); 
+                    fieldset.appendChild(sol1label); 
+                }
+                
+                
+              }
+              
+              
+              
+              editor_value = editor_value + editHtml[0].outerHTML; 
+              
+              
+              mDOM = $(editor_value); 
+              editor_value = c2gXMLParse.assignCorrectIds(mDOM, false); 
+              editor.setValue(style_html(editor_value, {'max_char':80}));
+
+              radio_button_xml = xml;
+              mDOM=$.parseXML(metadata_editor.getValue());
+              if(!mDOM) {
+                  mDOM = c2gXMLParse.createBaseXML();
+              }
+              var exam_metadata = $(mDOM).find('exam_metadata'); 
+              exam_metadata = exam_metadata[0];
+              var questionMeta= $(xml); //document.createElement('question_metadata');
+              $(exam_metadata).append(questionMeta);
+              c2gXMLParse.assignCorrectIds(mDOM, true); 
+              
+              metadata_value = (new XMLSerializer()).serializeToString(mDOM);
+              metadata_editor.setValue(style_html(metadata_value, {'max_char':80}));
+
+
+              this.renderPreview();   
+          },
+              
         renderPreview: function() {
             $('#staging-area').empty();
             $('#staging-area').append(editor.getValue());
@@ -39,6 +129,10 @@ var c2gXMLParse = (function() {
             var numberingDiv = $(elem).find('h3.questionNumber');
             if (numberingDiv.length == 0){
                 $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
+            } else { 
+                h3Tag = $(numberingDiv[0]); 
+                parentDiv = h3Tag.parent(); 
+                h3Tag.text("Question " + parentDiv.attr('number')); 
             }
         },
                    
@@ -55,7 +149,6 @@ var c2gXMLParse = (function() {
         },
                    
         renderMarkup: function(sourceEl, targetEl) {
-
             if (typeof targetEl == "undefined" || targetEl == "") {
                 targetEl = $('#ace_proxy');
                 editor.setValue(""); 

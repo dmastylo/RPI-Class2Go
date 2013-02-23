@@ -365,6 +365,10 @@ body.home {
     float:left;
 }
 
+.hidden {
+    visibility:none;
+}
+
 /* Common
 -------------------------------------------------- */
 .section-title {
