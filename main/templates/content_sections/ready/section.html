@@ -7,30 +7,27 @@
 <div class="course-section">
 <ul class="unstyled course-list">
 {% for item in section_structure.items %}
-    {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
-    <li class="course-list-item {{ stripecolor }}">
-        {% ifequal item.type 'additional_page' %}
-            {% include "additional_pages/ready/additional_page_list_item.html" %}
-        {% endifequal %}
+    {# Children are displayed explicitly below, so get filtered out here #}
+    {% if not item.is_child %}
+        {% cycle 'zebra_light' 'zebra_dark' as stripecolor silent %}
+        <li class="course-list-item {{ stripecolor }}">
+            {% ifequal item.type 'additional_page' %}
+                {% include "additional_pages/ready/additional_page_list_item.html" %}
+            {% endifequal %}
+            {% ifequal item.type 'video' %}
+                {% include "videos/ready/video_list_item.html" %}
+            {% endifequal %}
+            {% ifequal item.type 'file' %}
+                {% include "files/ready/file_list_item.html" %}
+            {% endifequal %}
+            {% ifequal item.type 'exam' %}
+                {% include "exams/ready/exam_list_item.html" %}
+            {% endifequal %}
 
-        {% comment %}
-        {% ifequal item.type 'problem_set' %}
-            {% include "problemsets/ready/problemset_list_item.html" %}
-        {% endifequal %}
-        {% endcomment %}
-
-        {% ifequal item.type 'video' %}
-            {% include "videos/ready/video_list_item.html" %}
-        {% endifequal %}
-        {% ifequal item.type 'file' %}
-            {% include "files/ready/file_list_item.html" %}
-        {% endifequal %}
-        {% ifequal item.type 'exam' %}
-            {% include "exams/ready/exam_list_item.html" %}
-        {% endifequal %}
-
-        {% include "content_groups/display.html" %}
-    </li>
+            {# Explicitly display the children of this parent #}
+            {% include "content_groups/display.html" %}
+        </li>
+    {% endif %}
 {% empty %}
     <li class="course-list-item {{ stripecolor }}">
         <p style='margin: 20px;'>{% trans 'No items have been added to this section' %}</p>
