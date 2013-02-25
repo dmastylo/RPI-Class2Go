@@ -45,7 +45,6 @@ class InstructorVideoTest(InstructorBase):
 
 class StudentVideoTest(StudentBase):
 
-    @attr('breaks_travis-ci')
     @attr('selenium')
     @attr(user='student')
     def test_course_video(self):

@@ -222,12 +222,13 @@ def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
 
     store_path must be the full path to the video file, not just to its parent folder.
     """
-    if not np:
-        print "WARNING"
-        print "The python library 'numpy' is not installed, so this cannot run."
-        sys.exit(127)
 
     notify_buf = []
+
+    if not np:
+        sys.stderr.write("WARNING\nThe python library 'numpy' is not installed, so kelvinate function cannot run.\n")
+        infoLog(notify_buf, "Kelvinate terminated: numpy not installed.")
+        return False
 
     infoLog(notify_buf, "Kelvinate: extracting %s" % store_path_raw)
 
