@@ -1,3 +1,11 @@
+try:
+    import Image as PILImportTest
+except ImportError, msg:
+    PILImportTest = False
+try:
+    import numpy as numpyImportTest
+except ImportError, msg:
+    numpyImportTest = False
 from optparse import make_option
 
 from django.conf import settings
@@ -42,6 +50,10 @@ class Command(BaseCommand):
             raise CommandError("Wrong number of arguments, %d instead of 3" % len(args))
         if options['force_local'] and options['force_remote']:
             raise CommandError("Can't run both local and remote")
+        if not PILImportTest:
+            raise CommandError("Can't continue without having 'PIL' installed")
+        if not numpyImportTest:
+            raise CommandError("Can't continue without having 'numpy' installed")
         arg_prefix=args[0]
         arg_suffix=args[1]
         handle=arg_prefix+"--"+arg_suffix
@@ -68,5 +80,4 @@ class Command(BaseCommand):
         else:
             kelvinator.tasks.kelvinate.delay(video.file.name, options['target_frames'], options['notify_addr'])
             print "Kelvination queued (%s): %s" % (instance, video.file.name)
-
 

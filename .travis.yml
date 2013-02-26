@@ -1,22 +1,19 @@
 language: python
 python:
   - "2.7"
-install:
-  - "pip install -r requirements.txt --use-mirrors"
-  # install a bunch of junk needed by selenium testing
-  - sudo apt-get install chromium-browser xvfb xserver-xephyr unzip
-  - pip install pyvirtualdisplay
-  #- curl -O http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip && 
-  #  unzip chromedriver_linux32_23.0.1240.0.zip && sudo mv chromedriver /usr/local/bin
 env:
-  - DB=mysql
+  - DB=mysql C2G_SELENIUM_WEBDRIVER=firefox C2G_HEADLESS_TESTS=1 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq unzip flashplugin-installer 
+install:
+  - pip install pyvirtualdisplay
+  - pip install -r requirements.txt --use-mirrors
 before_script:
   - bash main/travis/setup.sh
   - mysql -e 'create database class2go'
+  - cd main
 script: 
-  # for now don't run selenium tests until we can figure out how 
-  - cd main; python manage.py test -v 2 --attr='!selenium'
-  # Run with selenium tests in headless mode
-  #- cd main; C2G_HEADLESS_TESTS=1 python manage.py test -v 2
+  - python manage.py test -v 2
 notifications:
   irc: "irc.freenode.org#class2go-internal"

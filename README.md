@@ -4,9 +4,9 @@ Class2Go
 [![Build Status](https://travis-ci.org/Stanford-Online/class2go.png?branch=master)](https://travis-ci.org/Stanford-Online/class2go)
 
 Class2Go is Stanford's internal open-source platform for on-line
-education. A team of eight built the first version over the Summer
+education. A team of eight built the first version over Summer
 2012, and it is still under active development.  Class2Go launched
-in Fall 2012 for six on-campus classes and two "massive open online 
+Fall 2012 for six on-campus classes and two "massive open online 
 courses" (MOOC's): [Computer Networking][net] and 
 [Solar Cells, Fuel Cells, and Batteries][sol].
   [net]: http://networking.class.stanford.edu/
@@ -127,17 +127,17 @@ Contributing
 We welcome others contributing to Class2Go.  Begin by checking out
 our source from here and using README_SETUP.md to get a development
 environment set up.  There are also some docs available on the
-Project Wiki here on GitHub.
+Project Wiki on GitHub.
 
 Before sending unsolicited pull requests it is often best to discuss your
 intentions with the core dev team. Send us mail: <c2g-contact@class.stanford.edu>.
 
 If you want to get an idea of the kinds of things to do on the project,
 check out our
-<a href="https://github.com/Stanford-Online/class2go/issues?state=open">issue list right here on GitHub</a>.  
+<a href="https://github.com/Stanford-Online/class2go/issues?state=open">issue list on GitHub</a>.  
 We keep it here for all to see.  Feel free to comment on bugs and make 
-suggestions.  If you want to fix a bug, go ahead fork, fix, test, and send 
-a pull request.
+suggestions.  If you want to fix a bug, go ahead and fork, fix, test, and 
+send a pull request.
 
 
 Using Class2Go Yourself
