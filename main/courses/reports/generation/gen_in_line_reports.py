@@ -67,7 +67,7 @@ def gen_spec_in_line_report(report_name, course, username, green_param, blue_par
         exams, student_scores = get_student_scores(course, username)
         scores_dict = construct_scores_dict(student_scores)
         
-        titles = ["", "Title"]
+        titles = ["Username", "Title"]
         max_scores = ["", "Max Score"]
         for exam in exams:
             titles += [exam['title']]
