@@ -7,34 +7,37 @@
 # Requirements:
 # 1. ffmpeg 
 # 2. x264 for transcoding
-# 3. Python Imaging: PIL, or Image
+# 3. Python Imaging: Install PIL
+# 4. Python linear algebra: numpy
 #
 # For more info on transcoding, see: 
 # - http://ffmpeg.org/trac/ffmpeg/wiki/x264EncodingGuide
 # size abbreviations: 
 # - http://linuxers.org/tutorial/how-extract-images-video-using-ffmpeg
 
-import sys
-import os
-import subprocess
+try: 
+    import Image
+except ImportError, msg:
+    Image = False
+try:
+    import numpy as np
+except ImportError, msg:
+    np = False
 import math
+import os
 import operator
-import time
-import numpy as np
 import shutil
+import subprocess
+import sys
 
 from django.core.files.storage import default_storage
 from django.conf import settings
 from celery import task
 
-import Image
-
 from utility import *
 
-##
 ##  KELVINATOR
 ##
-
 def extract(notify_buf, working_dir, jpeg_dir, video_file, start_offset, extraction_frame_rate):
     infoLog(notify_buf, "Kicking off ffmpeg, hold onto your hats")
     cmdline = [ ffmpeg_cmd() ]
@@ -57,10 +60,12 @@ def extract(notify_buf, working_dir, jpeg_dir, video_file, start_offset, extract
 
 
 def difference(notify_buf, working_dir, jpeg_dir, extraction_frame_rate, frames_per_minute_target):
-    """
-    Sherif's method for figuring out what frames to keep from the candidate
-    set to reach the targeted number of slides.
-    """
+    """Select targeted number of slides from candidate set of frames"""
+    # It is an error to call this method without having numpy installed
+    if not np:
+        raise VideoError("Could not extract keyframes from video file without numpy")
+    if not Image:
+        raise VideoError("Could not extract keyframes from video file without PIL (Image)")
 
     # from http://mail.python.org/pipermail/image-sig/1997-March/000223.html
     def computeDiff(file1, file2):
@@ -209,7 +214,6 @@ def put_thumbs(notify_buf, jpeg_dir, prefix, suffix, video_id, store_loc):
 
 
 # Main Kelvinator Task (CELERY)
-
 @task()
 def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
     """
@@ -220,6 +224,11 @@ def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
     """
 
     notify_buf = []
+
+    if not np:
+        sys.stderr.write("WARNING\nThe python library 'numpy' is not installed, so kelvinate function cannot run.\n")
+        infoLog(notify_buf, "Kelvinate terminated: numpy not installed.")
+        return False
 
     infoLog(notify_buf, "Kelvinate: extracting %s" % store_path_raw)
 
@@ -251,12 +260,8 @@ def kelvinate(store_path_raw, frames_per_minute_target=2, notify_addr=None):
     cleanup_working_dir(notify_buf, work_dir)
     notify("Kelvinator", notify_buf, notify_addr, course_prefix, course_suffix, video_filename, store_path)
 
-
-
-
 ##
 ##  RESIZE
-##
 
 # video sizes we support: key is size name (used for target subdirectory) and value
 # are the parameters (as a list) that we'll pass to ffmpeg.
@@ -313,7 +318,6 @@ def upload(notify_buf, target_dir, target_part, prefix, suffix, video_id, video_
 
 
 # Main Resize Task (CELERY)
-
 @task()
 def resize(store_path_raw, target_raw, notify_addr=None):
     """

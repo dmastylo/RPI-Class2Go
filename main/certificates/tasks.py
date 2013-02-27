@@ -3,7 +3,10 @@ import os
 from shutil import rmtree as util_rmtree
 from storages.backends.s3boto import S3BotoStorage
 import tempfile
-from xhtml2pdf import pisa
+try:
+    from xhtml2pdf import pisa
+except ImportError, msg:
+    pisa = False
 
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -15,18 +18,6 @@ from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAG
 release_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
 
 
-def calculate_basepath(asset_prefix, asset_path):
-    if not asset_prefix:
-        base = release_file_storage.url('/'+asset_path+'/')
-        asset_prefix = '/'
-    else:
-        base = asset_prefix + asset_path + '/'
-    argstart = base.rfind('?')
-    if argstart > 0:
-        base = base[:argstart]
-    if base[-1] != '/': base += '/'
-    return base
-
 def working_file():
     base = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', '/tmp')
     return tempfile.mkstemp(prefix='tmpcert-', suffix='.pdf', dir=base)
@@ -35,8 +26,6 @@ def render_template(firstname, lastname, asset_prefix, asset_path, cert_type):
     infile_name = 'certificate-' + cert_type + '.html'
     if not asset_prefix: asset_prefix = '/'      # NB: force local asset delivery
     render_context = Context({'student_name': firstname + ' ' + lastname,
-                              #'basepath': calculate_basepath(asset_prefix, asset_path),
-                              #'basepath': release_file_storage.url('/'+asset_path+'/'),
                               'basepath':     asset_prefix + '/' + asset_path + '/',
                              })
     if asset_prefix:              # Local storage
@@ -70,6 +59,9 @@ def upload_certificate(tmp_path, outpath_prefix, path, outfile_name):
 def certify(path_prefix, course, certificate, student):
     if not certificate.assets or not certificate.storage:
         raise ValueError("Certificate %s incorrectly specified; bad file paths" % str(certificate))
+    # It is an error to call this method without xhtml2pdf installed
+    if not pisa:
+        raise ValueError("Certification cannot proceed without xhtml2pdf installed.")
 
     # Asset prefix forced to local b/c xhtml2pdf can't read out of s3
     asset_prefix = getattr(settings, 'MEDIA_ROOT', '/')

@@ -11,7 +11,7 @@ DATABASES = {
     }
 }
 
-SECRET_KEY = ''
+SECRET_KEY = 'travis-ci-class2go'
 
 # When PRODUCTION=True we don't show stackdumps on errors
 PRODUCTION = False
