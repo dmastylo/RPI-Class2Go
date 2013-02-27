@@ -1,4 +1,4 @@
-Django==1.4.1
+Django==1.4.1    # believe 1.4.x should work, haven't tested 1.5
 MySQL-python
 South
 django-storages>=1.1.6
