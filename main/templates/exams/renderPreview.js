@@ -19,8 +19,10 @@ var c2gXMLParse = (function() {
         assignCorrectIds : function(mDOM, isXML) { 
             if(isXML) { 
                 var questionMD = $(mDOM).find('question_metadata');
-                for(i = 0; i < questionMD.length; i++) { 
-                    $(questionMD[i]).attr('id', 'question_' + (i+1));
+                if(questionMD) {
+                    for(i = 0; i < questionMD.length; i++) { 
+                        $(questionMD[i]).attr('id', 'question_' + (i+1));
+                    }
                 }
             } else { 
                 v = 1; 
@@ -42,30 +44,152 @@ var c2gXMLParse = (function() {
         
         assignCorrectNames : function(mDOM) {
             var questionMD = $(mDOM).find('question_metadata');
-            for(i = 0; i < questionMD.length; i++) { 
-                response = $(questionMD[i]).find('response')[0];
-                response.setAttribute('name', questionMD[i].getAttribute('id') + '_name'); 
-            } 
+            if(questionMD) {
+                for(var i = 0; i < questionMD.length; i++) { 
+                    responses = $(questionMD[i]).find('response');
+                    for(var m = 0; m < responses.length; m++)
+                    {
+                        responses[m].setAttribute('name', questionMD[i].getAttribute('id') + '_name' + m); 
+                    }
+                    //responses[0].setAttribute('name', questionMD[i].getAttribute('id') + '_name'); 
+                } 
+            }
         },
         
         createBaseXML: function(mDOM) {
             return $.parseXML('<exam_metadata></exam_metadata>');
         }, 
+        
+        addNumericalResponseQuestion: function(html, xml)
+        {
+            editHtml = $(html); 
+            var editor_value = editor.getValue(); 
+            var editID = $( "#numerical-response-question-edit" )[0].value; 
             
-        addRadioButtonQuestion: function(html, xml, type) {              
-              editor_value = editor.getValue(); 
+            
+            //Text of Question
+            var providedText = $('#numerical-response-question-text').val(); 
+            var questionText = $(editHtml.find('div.question_text')[0]); 
+            var questionTextParagraph = $(document.createElement('p')); 
+            questionTextParagraph.text(providedText); 
+            questionText.empty(); 
+            questionText.append(questionTextParagraph);
+            
+            //Sub-questions
+            for(i = 1; i < 4; i++) {  
+                  //Add to the HTMl
+                var subquestionText = $('#numerical-response-question-answer' + i)[0].value; 
+                if(subquestionText) {
+                    p_element = document.createElement('p'); 
+                    var input = document.createElement('input'); 
+                    var span = document.createElement('span'); 
+                    input.setAttribute('type', 'text'); 
+                    input.setAttribute('data-report', subquestionText); 
+                    input.setAttribute('size', '20'); 
+                    span.innerText = subquestionText; 
+                    p_element.appendChild(span); 
+                    p_element.appendChild(input); 
+                    editHtml[0].appendChild(p_element); 
+                }                
+              }
               
-              editHtml = $(html); 
+            if(editID != "") {
+              var container = document.createElement('div');
+              container.innerHTML = editor_value;
+              var assocHTML = $(container).find('#' + editID)[0]; 
+              assocHTML.innerHTML = editHtml[0].innerHTML; 
+              editor_value = container.innerHTML;
+            } else {
+              editor_value = editor_value + editHtml[0].outerHTML;                   
+            }
+                
+            //Add HTML 
+            var mDOM = $(editor_value); 
+            editor_value = c2gXMLParse.assignCorrectIds(mDOM, false); 
+            editor.setValue(style_html(editor_value, {'max_char':80}));
+            editor.onChangeMode();
+            
+            mDOM=$.parseXML(metadata_editor.getValue());
+            if(!mDOM) {
+                mDOM = c2gXMLParse.createBaseXML();
+            }
+            var exam_metadata = $(mDOM).find('exam_metadata'); 
+            exam_metadata = exam_metadata[0];
+            questionMeta= $(xml);
+            
+            //create responses - correct/wrong points associated with response!! 
+            //Sub-questions
+            for(i = 1; i < 4; i++) {  
+                  //Add to the XML
+                  var subquestionText = $('#numerical-response-question-answer' + i)[0].value; 
+                  if(subquestionText) {
+                    var response = document.createElement('response'); 
+                    response.setAttribute('answertype', 'numericalresponse'); 
+                    answer = $('#numerical-response-question-actual-answer' + i).val(); 
+                    response.setAttribute('answer', answer); 
+                    var correct = $('#numerical-response-question-correct-points' + i).val(); 
+                    var wrong = $('#numerical-response-question-wrong-points' + i).val();
+                    response.setAttribute('correct-points', correct); 
+                    response.setAttribute('wrong-points', wrong); 
+                    var responseparam = document.createElement('responseparam'); 
+                    responseparam.setAttribute('type', 'tolerance'); 
+                    var defaulttolerance = $('#numerical-response-question-tolerance-answer' + i).val(); 
+                    if(defaulttolerance != "")
+                    {
+                        defaulttolerance = defaulttolerance + "%";
+                    } else {
+                        defaulttolerance = '0%'; 
+                    }
+                    responseparam.setAttribute('default', defaulttolerance); 
+                    response.appendChild(responseparam); 
+                    questionMeta[0].appendChild(response);                    
+                  }       
+              }
+              
+            //Detailed Explanation
+            var detailed_explanation = $('#numerical-response-question-explanation').val(); 
+            var solution = $(questionMeta.find('solution')[0])[0]; 
+            var div = $(solution).find('div')[0];
+            var textElement = document.createElement('p'); 
+            textElement.innerHTML = detailed_explanation; 
+            div.appendChild(textElement);
+            
+            //Add to XML
+            if(editID != "") {
+                assocXML = $(exam_metadata).find('#' + assocQID)[0]; 
+                assocXML.innerHTML = questionMeta[0].innerHTML; 
+            } else {
+                $(exam_metadata).append(questionMeta);                  
+            }
+                        
+            //Finish up
+            c2gXMLParse.assignCorrectIds(mDOM, true); 
+            c2gXMLParse.assignCorrectNames(mDOM); 
+              
+            metadata_value = (new XMLSerializer()).serializeToString(mDOM);
+            metadata_editor.setValue(style_html(metadata_value, {'max_char':80}));
+            metadata_editor.onChangeMode(); 
+
+            this.renderPreview();
+        }, 
+            
+        addRadioButtonQuestion: function(html, xml, type) {
+              if(!type) {
+                  type = 0; 
+              }
+              var editID = $( "#single-choice-entry-edit" )[0].value; 
+              var editor_value = editor.getValue(); 
+              var editHtml = $(html); 
               
               //Text of question
-              providedText = $('#single-choice-entry-question-text').val(); 
-              questionText = $(editHtml.find('div.question_text')[0]); 
-              questionTextParagraph = $(document.createElement('p')); 
+              var providedText = $('#single-choice-entry-question-text').val(); 
+              var questionText = $(editHtml.find('div.question_text')[0]); 
+              var questionTextParagraph = $(document.createElement('p')); 
               questionTextParagraph.text(providedText); 
               questionText.empty(); 
               questionText.append(questionTextParagraph); 
               
-              fieldset = $(editHtml.find('fieldset')[0])[0]; 
+              var fieldset = $(editHtml.find('fieldset')[0])[0]; 
 
               //Answer Choices
               for(i = 1; i < 7; i++) {  
@@ -89,13 +213,20 @@ var c2gXMLParse = (function() {
                 }                
               }
               
-              
-              editor_value = editor_value + editHtml[0].outerHTML; 
-              
+              if(editID != "") {
+                  var container = document.createElement('div');
+                  container.innerHTML = editor_value;
+                  var assocHTML = $(container).find('#' + editID)[0]; 
+                  assocHTML.innerHTML = editHtml[0].innerHTML; 
+                  editor_value = container.innerHTML;
+              } else {
+                  editor_value = editor_value + editHtml[0].outerHTML;                   
+              }
               
               mDOM = $(editor_value); 
               editor_value = c2gXMLParse.assignCorrectIds(mDOM, false); 
               editor.setValue(style_html(editor_value, {'max_char':80}));
+              editor.onChangeMode(); 
 
               radio_button_xml = xml;
               mDOM=$.parseXML(metadata_editor.getValue());
@@ -104,7 +235,7 @@ var c2gXMLParse = (function() {
               }
               var exam_metadata = $(mDOM).find('exam_metadata'); 
               exam_metadata = exam_metadata[0];
-              var questionMeta= $(xml);
+              questionMeta= $(xml);
               response = $(questionMeta.find('response')[0])[0]; 
               
               //Points
@@ -140,13 +271,18 @@ var c2gXMLParse = (function() {
               textElement.innerHTML = detailed_explanation; 
               div.appendChild(textElement); 
               
-              $(exam_metadata).append(questionMeta);
+              if(editID != "") {
+                  assocXML = $(exam_metadata).find('#' + assocQID)[0]; 
+                  assocXML.innerHTML = questionMeta[0].innerHTML; 
+              } else {
+                  $(exam_metadata).append(questionMeta);                  
+              }
               c2gXMLParse.assignCorrectIds(mDOM, true); 
               c2gXMLParse.assignCorrectNames(mDOM); 
               
               metadata_value = (new XMLSerializer()).serializeToString(mDOM);
               metadata_editor.setValue(style_html(metadata_value, {'max_char':80}));
-
+              metadata_editor.onChangeMode(); 
 
               this.renderPreview();   
           },
@@ -154,8 +290,8 @@ var c2gXMLParse = (function() {
         renderPreview: function() {
             $('#staging-area').empty();
             $('#staging-area').append(editor.getValue());
-            var psetQuestions = $('#staging-area div.question');
-            if (psetQuestions.length > 1) {
+            psetQuestions = $('#staging-area div.question');
+            if (psetQuestions.length > 0) {
                 var qQumx = 1;
                 $(psetQuestions).each(function () {
                     c2gXMLParse.addNumberToQuestionDiv(this,qQumx);
@@ -166,18 +302,23 @@ var c2gXMLParse = (function() {
             var questionMD = $(mDOM).find('question_metadata');
             $(questionMD).each(function(){displayQuestionExplanation(this);
                               displayChoiceExplanations(this, true);});
+            $(questionMD).each(function(){displayEditQuestion(this);});
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
 
         },
                    
         addNumberToQuestionDiv: function(elem, num) {
-            var numberingDiv = $(elem).find('h3.questionNumber');
+            numberingDiv = $(elem).find('h3.questionNumber');
             if (numberingDiv.length == 0){
                 $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
             } else { 
                 h3Tag = $(numberingDiv[0]); 
                 parentDiv = h3Tag.parent(); 
-                h3Tag.text("Question " + parentDiv.attr('number')); 
+                if(parentDiv.attr('number')) {
+                    h3Tag.text("Question " + parentDiv.attr('number'));                     
+                } else { 
+                    h3Tag.text("Question " + num); 
+                }
             }
         },
                    

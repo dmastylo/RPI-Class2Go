@@ -2,6 +2,7 @@
 {% trans "Show Explanation" as show_explanation_trans %}
 {% trans "Hide Explanation" as hide_explanation_trans %}
 
+
 window.displayQuestionExplanation = function(questionMD){
     //This function takes a DOM object of the metadata and displays the question explanation after the
     //question with the corresponding id
@@ -36,6 +37,7 @@ window.displayQuestionExplanation = function(questionMD){
             $(explArea).append($(this).clone());
         }
     });
+    console.log($('div.question#' + assocQID )); 
     $('div.question#' + assocQID ).append($(explArea));
     $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
 };

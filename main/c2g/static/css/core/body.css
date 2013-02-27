@@ -956,6 +956,11 @@ ul.ui-sortable li:hover {
     list-style-type:none;
 }
 
+.edit-button { 
+    float:right;
+    color:red;
+}
+
 /* jQuery UI
 -------------------------------------------------- */
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }

@@ -368,6 +368,48 @@ Testing your common sense: 15.6 sec
     </form>
 </div>
 
+<div id="numerical-response-form" title="{% trans 'New Numerical Response Question' %}">
+	<form>
+		<label for="numerical-response-question-text" id="numerical-response-label-question-text">{% trans 'Enter the text for this question' %}</label>
+		<textarea name="numerical-response-question-text" id="numerical-response-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
+		<label for="numerical-response-question-explanation" id="numerical-response-question-label-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
+		<textarea name="numerical-response-question-explanation" id="numerical-response-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
+		<p> {% trans 'Sub-problem #1' %} </p>
+		<label for="numerical-response-question-correct-points1" id="numerical-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points1" id="numerical-response-question-correct-points1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-wrong-points1" id="numerical-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points1" id="numerical-response-question-wrong-points1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-answer1" id="numerical-response-question-label-answer1">{% trans 'Sub-problem text' %} <textarea type="text" name="numerical-response-question-answer1" id="numerical-response-question-answer1" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-actual-answer1" id="numerical-response-question-label-actual-answer1">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer1" id="numerical-response-question-actual-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer1" id="numerical-response-question-label-tolerance-answer1">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer1" id="numerical-response-question-tolerance-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Sub-problem #2' %} </p>
+		<label for="numerical-response-question-correct-points2" id="numerical-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points2" id="numerical-response-question-correct-points2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-wrong-points2" id="numerical-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points2" id="numerical-response-question-wrong-points2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-answer2" id="numerical-response-question-label-answer2">{% trans 'Sub-problem #2 Display Value' %} <textarea type="text" name="numerical-response-question-answer2" id="numerical-response-question-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-actual-answer2" id="numerical-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer2" id="numerical-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer2" id="numerical-response-question-label-tolerance-answer2">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer2" id="numerical-response-question-tolerance-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Solution #3' %} </p>
+		<label for="numerical-response-question-correct-points3" id="numerical-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points3" id="numerical-response-question-correct-points3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-wrong-points3" id="numerical-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points3" id="numerical-response-question-wrong-points3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-answer3" id="numerical-response-question-label-answer3">{% trans 'Sub-problem #3 Display Value' %} <textarea type="text" name="numerical-response-question-answer3" id="numerical-response-question-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-actual-answer3" id="numerical-response-question-label-actual-answer3">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer3" id="numerical-response-question-actual-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer3" id="numerical-response-question-label-tolerance-answer3">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer3" id="numerical-response-question-tolerance-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<input name="numerical-response-question-edit" id="numerical-response-question-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
+		<textarea name="numerical-response-question-html" id="numerical-response-question-html" class="text ui-widget-content ui-corner-all hidden">
+			<div class="question" id="problem_4" data-report="Short-answer2">
+			    <h3 class="questionNumber"></h3>
+				<div class="question_text"></div>
+			</div>
+        </textarea>
+		<textarea name="numerical-response-question-xml" id="numerical-response-question-xml" class="text ui-widget-content ui-corner-all hidden">
+			<question_metadata id="problem_4" data-report="Short-answer2">
+			        <solution>
+			            <div class="detailed-solution">
+			            </div>
+			        </solution>
+			</question_metadata>
+        </textarea>
+	</form>
+</div>
+
 <div id="single-choice-form" title="{% trans 'New Select Question' %}">
 	<form>
 		<label for="single-choice-entry-question-text" id="single-choice-entry-label-question-text">{% trans 'Enter the text for this question' %}</label>
@@ -406,6 +448,7 @@ Testing your common sense: 15.6 sec
 		<label for="single-choice-entry-value-answer6" id="single-choice-entry-label-value-answer6">{% trans 'Solution #6 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer6" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="single-choice-entry-correctness-answer6" id="single-choice-entry-label-correctness-answer6">{% trans 'Solution #6 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer6" id="single-choice-entry-correctness-answer6" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="single-choice-entry-explanation-answer6" id="single-choice-entry-label-explanation-answer6">{% trans 'Solution #6 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer6" id="single-choice-entry-explanation-answer6" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<input name="single-choice-entry-edit" id="single-choice-entry-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
 		<textarea name="single-choice-entry-html" id="single-choice-entry-html" class="text ui-widget-content ui-corner-all hidden">
 			<div class="question" id="problem_1" data-report="">
 		    	<h3 class="questionNumber"></h3>
@@ -667,9 +710,35 @@ age: 20,
                         }
                   }],
     });
-					    
-    var __saved_import_single_choice_xml="";
-    var __xml_saved_single_choice=false;
+	
+	var __saved_import_single_choice_xml="";
+	var __xml_saved_single_choice=false;	
+	$( "#numerical-response-form" ).dialog({
+        autoOpen: false,
+        height: 800,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__xml_saved_single_choice)  $('#xml-entry').val(__saved_import_single_choice_xml);
+            __xml_saved_single_choice=false;
+        },
+        buttons: [{
+                    text:"{% trans 'Add Question' %}",
+                    id:"add-numerical-response-button",
+                    click: function() {
+                        __xml_saved_single_choice=true;
+						c2gXMLParse.addNumericalResponseQuestion($('#numerical-response-question-html').val(), $('#numerical-response-question-xml').val())
+                        $( this ).dialog( "close" );
+                        }
+                  },
+                  {
+                    text:"{% trans 'Cancel' %}",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                        }
+                  }],
+    });
+				    
     $( "#single-choice-form" ).dialog({
         autoOpen: false,
         height: 800,
@@ -737,15 +806,21 @@ age: 20,
 	$('#radio-buttons-btn').click(function() {
 		question_type = 0; 
        __saved_import_single_choice_xml=$('#xml-entry').val();
+	   $( "#single-choice-entry-edit" )[0].value = null; 
+	   $("#add-single-choice-button")[0].textContent = "{% trans 'Add Question' %}";
        $( "#single-choice-form" ).dialog( "open" );	})
 
     $('#checkboxes-btn').click(function() {
 	   question_type = 1; 
        __saved_import_single_choice_xml=$('#xml-entry').val();
+	   $( "#single-choice-entry-edit" )[0].value = null;
+	   $("#add-single-choice-button")[0].textContent = "{% trans 'Add Question' %}"; 
        $( "#single-choice-form" ).dialog( "open" );	})
 	
 	$('#numerical-btn').click(function() {
-		alert("numerical buttons clicked"); 
+		$( "#numerical-response-question-edit" )[0].value = null;
+		$("#add-numerical-response-button")[0].textContent = "{% trans 'Add Question' %}";
+		$( "#numerical-response-form" ).dialog( "open" ); 
 	})
 	
     $("#import-xml-button").before("<span class='warning' id='clobber-warning'>{% trans 'Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.' %}</span>");
@@ -769,6 +844,7 @@ age: 20,
     var questionIdx = 0;
     
     {% include "exams/displayExplanation.js" %}
+    {% include "exams/displayEdit.js" %}
     {% include "exams/renderPreview.js" %}
     {% include "exams/quizdown.js" %}
     
