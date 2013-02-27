@@ -33,6 +33,7 @@ General Instructions:
 * Set-up Python's virtual env
 * Set-up Django
 * Set-up Mysql
+* Set-up test suite
 
 For MAC OS-X Lion: Instructions mainly taken from
 http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-and-homebrew/
@@ -144,62 +145,22 @@ But if you want to do it with:
     You can tell this because is puts an environment indicator at
     the beginning of your prompt.
 
-Install all the dependencies with this command::
+1. Install all the dependencies with this command:
 
     pip install -r requirements.txt
 
-Or if you want to install them manually, you can do so using the following.
+And subsequently all of the optional dependencies with this command:
+ 
+    pip install -r suggested_requirements.txt
 
-1. Install django itself (this will be inside the virtualenv)
+If you aren't using pip or want to install packages manually, just open the
+requirements files and run the local equivalent of 
 
-        pip install django
+        pip install <packagename>
 
-1. Install MySQL-python (this will be inside the virtualenv)
+for each package listed therein.
 
-        pip install MySQL-python
-
-1. Install python image library (this will be inside the virtualenv)
-
-        pip install PIL
-
-1. Install South, the database schema migration tool: (this will be inside the virtualenv)
-
-        pip install South
-
-1. Install modules for Amazon S3
-
-        pip install django-storages
-        pip install boto
-
-1. Install GData (2.0.17)
-
-        pip install gdata
-
-1. Install numpy
-
-        pip install numpy
-
-1. Install Celery ecosystem
-
-        pip install django-celery django-celery-email pytz
-
-1. RESTful interfaces
-
-        pip install djangorestframework pysimplesoap
-
-1. PDF generation libraries for statements of accomplishment
-       
-        pip install xhtml2pdf
-
-1. Install test environment dependencies:
-
-        pip install mock nose django_nose django_coverage lxml
-
-1. Install test dependencies for Selenium based testing:
-
-        pip install selenium selenose
-
-1. Install chrome for Selenium testing
+1. [Nota Bene] [Optional] Install chrome for Selenium testing
 
         # chromedriver - list of options available here:
         # https://code.google.com/p/chromedriver/downloads/list
@@ -208,6 +169,10 @@ Or if you want to install them manually, you can do so using the following.
         # move onto your path
         sudo mv ./chromedriver /usr/local/bin/
         # install Chrome -- download from https://www.google.com/intl/en/chrome/browser/
+
+[NB:] If instead you wish to use firefox, you can use the default Selenium firefox
+driver by setting the environment variable C2G_SELENIUM_WEBDRIVER=firefox. For 
+flash tests to pass, you will have to have the flash player plugin installed. 
 
 1. [Optional] Install dependenices to run selenium tests "headless"
 
@@ -269,6 +234,10 @@ and edit the DATABASES strings as follows substituting proper values for your sy
 For Windows
 ----------------
 
+[NB] While we try to keep these instructions up to date, the majority of the
+developers working on Class2Go are using MacOS or Linux. You may have the 
+best luck if you follow the directions in one of those sections in parallel 
+with the directions here.
 
 Eclipse Users and/or WAMP users:
 
@@ -286,10 +255,9 @@ Steps:
 2. Install Eclipse
 
 2. Install Egit and configure it to the github repos (https://github.com/Stanford-Online/class2go)
-    For this you would need Jason to set you up with access to this repos.
+    For this you would need someone to set you up with access to this repos.
     Note, when configuring the Remote Push Url you'll need to add ".git" on the end:
     (git clone https://github.com/Stanford-Online/class2go.git)
-
 
 **Requirements**
 
@@ -305,6 +273,8 @@ Steps:
 
 2. Install South, the database schema migration tool: (this will be inside the virtualenv)
     easy_install South
+
+2. Install the other libraries listed in the requirements.txt and suggested_requirements.txt
 
 2. Create a database called c2g (for example).
 
@@ -343,7 +313,10 @@ For Linux
 This assumes you have mysql and python installed.  These instructions
 also include info for virtualenvwrapper, which contains useful tools
 for virtualenv. virtualenvwrapper can also be installed for Mac (and
-probably Windows too).
+probably Windows too).  If you will be using the Firefox driver for
+Selenium web tests, make sure you have the Flash plugin installed. If you 
+wish to install the Chrome driver, instructions for doing so can be found
+below.
 
 3. Create the database (perhaps with different username and password):
 
@@ -431,48 +404,22 @@ probably Windows too).
 
         sudo apt-get install python-dev
 
-3. Install python hooks for MySQL:
+3. Install all the dependencies with this command:
 
-        pip install MySQL-python
+    pip install -r requirements.txt
 
-3. Install Python Imaging Lib:
+And subsequently all of the optional dependencies with this command:
+ 
+    pip install -r suggested_requirements.txt
 
-        pip install PIL
+If you aren't using pip or want to install packages manually, just open the
+requirements files and run the local equivalent of 
 
-3. Install South db stuff:
+        pip install <packagename>
 
-        pip install South
+for each package listed therein.
 
-3. Install modules for Amazon S3
-
-        pip install django_storages
-        pip install boto
-
-3. Install GData (2.0.17)
-
-        pip install gdata
-
-3. Install numpy for video thumbnailer:
-
-        pip install numpy
-
-3. Install Celery ecosystem
-
-        pip install django-celery django-celery-email pytz
-
-3. PDF generation libraries for statements of accomplishment
-
-        pip install xhtml2pdf
-       
-3. Install test environment dependencies:
-
-        pip install mock nose django_nose django_coverage lxml
-
-3. Install test dependencies for Selenium based testing:
-
-        pip install selenium selenose
-
-3. Install chrome for Selenium testing
+3. [Nota Bene] [Optional] Install chrome for Selenium testing
 
         # chromedriver - list of options available here:
         # https://code.google.com/p/chromedriver/downloads/list
@@ -482,10 +429,17 @@ probably Windows too).
         sudo mv ./chromedriver /usr/local/bin/
         # install Chrome -- download from https://www.google.com/intl/en/chrome/browser/
 
+[NB:] If instead you wish to use firefox, you can use the default Selenium firefox
+driver by setting the environment variable C2G_SELENIUM_WEBDRIVER=firefox. For 
+flash tests to pass, you will have to have the flash player installed. On recent 
+64-bit Ubuntus, this comes from 'flashplugin-installer'
+
 3. [Optional] Install dependenices to run selenium tests "headless"
 
         pip install pyvirtualdisplay
         sudo apt-get install xvfb xserver-xephyr
+
+Note that to use this, you will have to set the environment variable C2G_HEADLESS_TESTS=1.
 
 3. Go to "main" dir and copy over database settings file:
 

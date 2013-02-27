@@ -61,21 +61,20 @@ def get_course_materials(common_page_data, get_video_content=False, get_pset_con
         item = preModeSensitive(item)
         if common_page_data['course_mode'] == 'ready':
             key = (label, obj.id)
-            item['children'] = parentchilds.get(key, {}).get('group_children', [])
             item = postReadyModeWithChildren(item) 
         else:
             key = (label, obj.image.id)
-            parent = childparents.get(key, False)
-            if parent:
-                item['is_child']   = True
-                item['parent']     = parent
             item['visible_status'] = get_live_datetime_for(obj)
+        parent = childparents.get(key, False)
+        if parent:
+            item.update({'is_child': True, 'parent': parent, 'children': []})
+        else:
+            item.update({'is_child': False, 'parent': None, 'children': parentchilds.get(key, {}).get('group_children', [])})
         item = postModeSensitiveBeforeAppend(item)
         return item
 
     def _video_helper_calc_completion(item):
         # Calculate video completion percentage and attach record
-        print "DEBUG", video.id
         download_count = video_downloads.get(video.id, 0)
         if download_count > 0:
             item['completed_percent'] = 100.0

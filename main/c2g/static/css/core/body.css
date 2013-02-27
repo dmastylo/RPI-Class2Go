@@ -504,14 +504,13 @@ small.date {
     display:block;
 }
 
-.top-nav #clock em {
-    font-size: 28px;
-    padding-top: 6px;
-    color: white;
+.top-nav #clock #clockHours {
+    font-size: 20px;
 }
 .top-nav #clock #clock-bubble {
     display: none;
     position: absolute;
+    font-size: 16px;
 }
 
 #c2g_layout_topbar .navbar {
