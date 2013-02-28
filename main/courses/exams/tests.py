@@ -808,12 +808,38 @@ class SimpleTest(TestCase):
 
         for i in range(3):
             # up to four attempts are allowed
-            fails_allowed = i+1
-            with fake_remote_grader_fails_n_times('{"score":0, "feedback":%s}' % fbstr, 
-                    fails_allowed):
+            with fake_remote_grader_fails('{"score":0, "feedback":%s}' % fbstr, fail_for=i+1):
                 g = ag.grade("q1b", "should eventually score, incorrectly")
                 self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
-        with fake_remote_grader_fails_n_times('{"score":0, "feedback":%s}' % fbstr, 4):
+        with fake_remote_grader_fails('{"score":0, "feedback":%s}' % fbstr, fail_for=4):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should eventually score, incorrectly")
+
+
+    def test_grader_caching(self):
+        """interactive autograder caching
+        
+        This test relies on the fake grader that will succeed only n times.
+        this can test if we are hitting the cache or not.
+        """
+
+        fb = [{"user_answer": "user-input", "explanation": "grader-output", "score": 0}]
+        fbstr = json.dumps(fb)
+        ag = AutoGrader(self.interactive_xml)
+
+        # this one should succeed: grade twice, same key, cache hit
+        with fake_remote_grader_fails('{"score":0, "feedback":%s}' % fbstr, fail_after=1):
+            g = ag.grade("q1b", "same thing twice, should work because second hits the cache")
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
+
+            g = ag.grade("q1b", "same thing twice, should work because second hits the cache")
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
+
+        # this one should fail: grade twice, different keys, cache miss
+        with fake_remote_grader_fails('{"score":0, "feedback":%s}' % fbstr, fail_after=1):
+            g = ag.grade("q1b", "normal request")
+            self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
+
+            with self.assertRaises(AutoGraderGradingException):
+                g = ag.grade("q1b", "another request, different cache key = cache miss")
