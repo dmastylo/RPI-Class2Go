@@ -6,12 +6,11 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, render_to_response, redirect, HttpResponseRedirect
 from django.template import RequestContext
 
-from c2g.models import ContentGroup, ContentSection, Exam, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise, videos_in_exam_metadata
+from c2g.models import ContentGroup, ContentSection, Exam, ExamRecord, Exercise, PageVisitLog, ProblemActivity, Video, VideoActivity, VideoToExercise, videos_in_exam_metadata
 from courses.actions import auth_view_wrapper, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
-from courses.course_materials import get_course_materials, get_children, get_contentgroup_data
+from courses.course_materials import get_course_materials
 from courses.videos.forms import *
-from courses.views import get_full_contentsection_list
 from courses.forms import *
 
 
@@ -340,10 +339,6 @@ def save_exercises(request):
     if request.method != 'POST':
         return redirect(request.META['HTTP_REFERER'])
 
-    course_prefix = request.POST['course_prefix']
-    course_suffix = request.POST['course_suffix']
-    common_page_data = get_common_page_data(request, course_prefix, course_suffix)
- 
     #don't catch video DoesNotExist here because we want some tangible error action to happen if
     #the video id changes in form submission, like mailing us
     video = Video.objects.get(id=request.POST['video_id'])
@@ -408,3 +403,97 @@ def load_video_problem_set(request, course_prefix, course_suffix, video_id):
         file_names.append(vex.exercise.fileName[:-5])
     # assessment type is hard-coded because all in-video exercises are formative
     return render_to_response('problemsets/load_problem_set.html',{'file_names': file_names, 'assessment_type': 'formative'},context_instance=RequestContext(request))
+
+####
+# Extra utility methods not used by get_course_materials 
+####
+def get_contentgroup_data(course):
+    """Old method of memoizing ContentGroup."""
+    # TODO: figure out how to remove this and all its children
+    l1_items = {}
+    l2_items = {}
+    for cgtype, cgtid, cgref, target, level, display in [__get_group_item_data(x, selfref=True) for x in 
+                                                            ContentGroup.objects.getByCourse(course=course)]:
+        if not target.is_live() or target.is_deleted:
+            continue
+        if level == 2:
+            l2_items[(cgtype, cgtid)] = (cgref, target, level, display)
+        else:
+            l1_items[(cgtype, cgtid)] = cgref.group_id
+    return l1_items, l2_items
+
+def __get_group_item_data(group_item, selfref=False):
+    ctype   = group_item.get_content_type()
+    level   = group_item.level
+    display = group_item.display_style or 'list'
+    target  = getattr(group_item, ctype)
+    cgid    = target.id
+    if not selfref:
+        return ctype, cgid, target, level, display
+    return ctype, cgid, group_item, target, level, display
+
+def get_children(key, level1_items, level2_items, user=None):
+
+    def type_sorter(ci1, ci2):
+        ci1_type = ci1['type']
+        ci2_type = ci2['type']
+        ci1_title = ci1['title']
+        ci2_title = ci2['title']
+        if ci1_type < ci2_type:
+            return -1
+        elif ci1_type > ci2_type:
+            return +1
+        else:
+            # equal types, go by title
+            if ci1_title < ci2_title:
+                return -1
+            elif ci1_title > ci2_title:
+                return +1
+            else:
+                return 0
+
+    def name_sorter(ci1, ci2):
+        ci1_name = ci1['name']
+        ci2_name = ci2['name']
+        ci1_ext = ci1['ext']
+        ci2_ext = ci2['ext']
+        if ci1_name and ci2_name:
+            if ci1_ext < ci2_ext:
+                return -1
+            elif ci1_ext > ci2_ext:
+                return +1
+            else:
+                # equal extensions, go by filename
+                if ci1_name < ci2_name:
+                    return -1
+                elif ci1_name > ci2_name:
+                    return +1
+                else:
+                    return 0
+        else:
+            return 0
+
+    children = []
+    if level1_items.has_key(key):
+        group_id = level1_items[key]
+        children.extend([__augment_child_data(k, v, user) for k,v in level2_items.items() if v[0].group_id == group_id])
+        children = sorted(sorted(children, type_sorter), name_sorter)
+    return children
+
+def __augment_child_data(key, value, user=None):
+    class NoFile():
+        name = ''
+    cgtype = key[0]
+    ref    = value[1]
+    tmp_f  = getattr(ref, 'file', NoFile())
+    name   = tmp_f.name.split('/').pop()
+    ext    = name.split('.').pop().lower()
+
+    #              target             target        this entry    target ref  
+    child_data = {'type': cgtype, 'id': key[1], 'self': value[0], 'ref': ref, 'display': value[3], 'ext': ext,
+                  'name': name, 'title': ref.title, 'url': ref.get_url(), 'index': ref.index, 'children': None, }
+    child_data[cgtype] = ref      # TODO: set 'exam':exam - remove after making templates use 'ref'
+    if cgtype == "exam" and user: # TODO: per-type special cases belong somewhere else?
+        child_data['records'] = ExamRecord.objects.filter(course=ref.course, student=user, complete=True, exam=ref)
+    return child_data
+    

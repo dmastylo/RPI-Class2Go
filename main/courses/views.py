@@ -85,14 +85,14 @@ def main(request, course_prefix, course_suffix):
             context_instance=RequestContext(request))
 
 def get_upcoming_exams(course):
-  end_date = datetime.date.today() + datetime.timedelta(weeks=2)
+  end_date = datetime.datetime.today() + datetime.timedelta(weeks=2)
   exams = Exam.objects.filter(
     course=course, 
     mode='ready',
     is_deleted=0,
-    due_date__gte = datetime.date.today(),
+    due_date__gte = datetime.datetime.today(),
     due_date__lte = end_date, 
-    live_datetime__lte = datetime.date.today()
+    live_datetime__lte = datetime.datetime.today()
     ).order_by('due_date')
   return exams
 

@@ -1162,7 +1162,7 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         mystore = self.file.storage
         if is_storage_local():
             # FIXME: doesn't work on local sites yet
-            print "DEBUG: Multiple download links don't work on local sites yet, sorry." 
+            print "WARNING: Multiple download links don't work on local sites yet, sorry." 
             return [('large', get_site_url() + mystore.url(myname), self.file.size, '')]
         else:
             # XXX: very S3 specific
@@ -2545,11 +2545,16 @@ class CurrentTermMap(TimestampMixin, models.Model):
 class StudentExamStart(TimestampMixin, models.Model):
     student = models.ForeignKey(User)
     exam = models.ForeignKey(Exam)
-
+    
+    def __unicode__(self):
+        return (self.student.username + " ||| " + unicode(self.exam.course) + " ||| " + unicode(self.exam))
 
 class ContentGroupManager(models.Manager):
     def getByCourse(self, course):
         return self.filter(course=course).order_by('group_id','level')
+
+    def getByCourseAndLevel(self, course, level):
+        return self.filter(course=course, level=level).order_by('group_id')
 
     def getByFieldnameAndId(self, fieldname, fieldid):
         """Use the type tag (video, etc.) and id to dereference an entry.
@@ -2557,10 +2562,7 @@ class ContentGroupManager(models.Manager):
         Returns the ContentGroup entry for this item."""
         # TODO: cache this
         this = ContentGroup.groupable_types[fieldname].objects.get(id=fieldid)
-        retset = this.contentgroup_set.get()
-        if len(retset) == 1:
-            return retset[0]
-        else: return retset
+        return this.contentgroup_set.get()
 
     def getChildrenByGroupId(self, group_id):
         return self.filter(level=2, group_id=group_id).order_by('display_style')
@@ -2820,16 +2822,12 @@ class ContentGroup(models.Model):
     def get_content_type(self):
         """This is linear in the number of content types supported for grouping
         
-        TODO: Replace with a column lookup storing our type explicitly? Not
-              nice to store the same information twice, but constant time
-              lookups are awfully nice...
-              Compromise is to use django cache table
+        TODO: Cache this
         """
         for keyword in ContentGroup.groupable_types.keys():
             if getattr(self, keyword+'_id', False):
                 return keyword
         return None
-    
     
     @classmethod
     def get_tag_from_classname(thisclass, classname):
@@ -2838,7 +2836,6 @@ class ContentGroup(models.Model):
             if ContentGroup.groupable_types[keyword]==classname:
                 return keyword
         return None
-
     
     @classmethod
     def has_children(thisclass, obj, types=list(groupable_types.keys())):
@@ -2863,7 +2860,7 @@ class ContentGroup(models.Model):
     def is_child(thisclass, obj):
         """ Is obj a child? """
         return obj.contentgroup_set.all().filter(level=2).exists()
-    
+
     def __repr__(self):
         s = "ContentGroup(group_id=" + str(self.group_id) + ", "
         s += 'course=' + str(self.course.id) + ', ' 

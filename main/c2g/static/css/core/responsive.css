@@ -132,6 +132,17 @@ width: auto;
     *padding-top:5px;
     margin-right: -10px !important;
   }
+  
+  .top-nav #clock #clock-bubble {
+    width: 120px;
+    left: -15px;
+    top: 34px;
+  }
+  .top-nav #clock #clock-bubble strong,
+  .top-nav #clock #clock-bubble span {
+    color: #555;
+  }
+  
   body {
     width:auto;
   }
@@ -942,6 +953,17 @@ width: auto;
 }
 
 @media (min-width: 481px) {
+  .top-nav #clock em {
+    color: white;
+  }
+  .top-nav #clock #clock-bubble {
+    padding: 0;
+    left: -107px;
+    top: 0;
+    font-weight: bold;
+    opacity: 1;
+  }
+  
   ul.nav li.dropdown ul.dropdown-menu {
     margin-top:0px;
     margin-left:-1px;

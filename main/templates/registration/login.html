@@ -13,6 +13,25 @@
 </div>
 {% endif %}
 
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'success' in message.tags %}
+                <div class="alert alert-success"><em class="icon-ok"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+            {% endif %}
+            {% if 'error' in message.tags %}
+                <div class="alert alert-error"><em class="icon-fire"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+            {% endif %}
+            {% if 'warning' in message.tags %}
+                <div class="alert alert-warning"><em class="icon-warning-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+            {% endif %}
+            {% if 'info' in message.tags %}
+                <div class="alert alert-info"><em class="icon-info-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
+
 
 {% if user.is_authenticated %}
 

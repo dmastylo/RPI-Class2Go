@@ -10,6 +10,7 @@ from courses.reports.tasks import generate_and_email_reports
 from storages.backends.s3boto import S3BotoStorage
 from settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SECURE_STORAGE_BUCKET_NAME
 from courses.reports.generation.gen_in_line_reports import *
+from courses.reports.generation.gen_quiz_summary_report import WriteAssessmentSummaryReportContent
 
 secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
 re_prog = re.compile(r'([\d]{4})_([\d]{2})_([\d]{2})__([\d]{2})_([\d]{2})_([\d]{2})')
@@ -89,6 +90,7 @@ def generate_report(request):
     report_type = request.POST["type"]
     course_handle = request.POST["course_handle"]
     course_handle_pretty = course_handle.replace('--','-')
+    url_suffix = ''
     
     email_message = "The report is attached. You can also download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
     attach_reports_to_email = True
@@ -96,6 +98,7 @@ def generate_report(request):
     if report_type == 'dashboard':
         email_title = "[Class2Go] Dashboard Report for %s" % course_handle_pretty
         req_reports = [{'type': 'dashboard'}]
+        url_suffix = '#' + 'dashboard'
         
     elif report_type == 'video_full':
         slug = request.POST["slug"]
@@ -104,20 +107,24 @@ def generate_report(request):
         attach_reports_to_email = False
         email_message = "The report has been generated. You can download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
         req_reports = [{'type': 'video_full', 'slug': slug}]
+        url_suffix = '#' + 'videos_full'
         
     elif report_type == 'video_summary':
         slug = request.POST["slug"]
         email_title = "[Class2Go] Video Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'video_summary', 'slug': slug}]
+        url_suffix = '#' + 'videos_summary'
         
     elif report_type == 'class_roster':
         email_title = "[Class2Go] Class Roster for %s" % (course_handle_pretty)
         req_reports = [{'type': 'class_roster'}]
+        url_suffix = '#' + 'class_roster'
     
     #Reports for the new assessments
     elif report_type == 'course_assessments':
         email_title = "[Class2Go] Course Assessments Report for %s" % course_handle_pretty
         req_reports = [{'type': 'course_assessments'}]
+        url_suffix = '#' + 'aggregated_attempts_by_a'
     
     elif report_type == 'assessment_full':
         slug = request.POST["slug"]
@@ -126,24 +133,28 @@ def generate_report(request):
         attach_reports_to_email = False
         email_message = "The report has been generated. You can download it by going to the reports page under Course Administration->Reports, or by visiting https://class.stanford.edu/%s/browse_reports." % course_handle.replace('--', '/')
         req_reports = [{'type': 'assessment_full', 'slug': slug}]
+        url_suffix = '#' + 'individual_student_scores_q'
     
     elif report_type == 'assessment_summary':
         slug = request.POST["slug"]
         email_title = "[Class2Go] Assessment Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'assessment_summary', 'slug': slug}]
+        url_suffix = '#' + 'aggregated_attempts_by_q'
         
     elif report_type == 'survey_summary':
         slug = request.POST["slug"]
         email_title = "[Class2Go] Survey Summary Report for %s %s" % (course_handle_pretty, slug)
         req_reports = [{'type': 'survey_summary', 'slug': slug}]
+        url_suffix = '#' + 'survey_summary'
     
     elif report_type == 'assessment_student_scores':
         email_title = "[Class2Go] Assessment Student Scores Report for %s" % (course_handle_pretty)
-        req_reports = [{'type': 'assessment_student_scores'}]    
+        req_reports = [{'type': 'assessment_student_scores'}]
+        url_suffix = '#' + 'individual_student_scores_a'
     
     generate_and_email_reports.delay(request.user.username, course_handle, req_reports, email_title, email_message, attach_reports_to_email)
     
-    return redirect(request.META.get('HTTP_REFERER', None))
+    return redirect(request.META.get('HTTP_REFERER', None) + url_suffix)
 
 
 @auth_is_course_admin_view_wrapper  
@@ -198,14 +209,25 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     else:
         report_name = ''
     
-    if request.POST.get("filter", False):
+    if request.POST.get("filter", False) and request.POST["filter"] != 'None':
         username = request.POST["filter"]
     else:
         username = None
         
+    if request.POST.get("green_param", False):
+        green_param = request.POST["green_param"]
+    else:
+        green_param = 67
+        
+    if request.POST.get("blue_param", False):
+        blue_param = request.POST["blue_param"]
+    else:
+        blue_param = 34
+        
     course = request.common_page_data['ready_course']
     
     report_label = None
+    explanation = ""
     report_data = {}
     headings = {}
     max_scores = {}
@@ -219,10 +241,11 @@ def generate_in_line_report(request, course_prefix, course_suffix):
     rows = {}
     
     we_have_data = False
+    report_data = gen_spec_in_line_report(report_name, course, username, green_param, blue_param)
     if report_name == 'quizzes_summary':
-        report_data = gen_spec_in_line_report(report_name, course, username)
         if report_data:
             report_label = "Quizzes Summary"
+            explanation = "Number of students whose best score, compared against maximum possible score, falls into each given category"
             headings = report_data['headings']
             column1 = report_data['exam_titles']
             column2 = report_data['count_lt_34']
@@ -232,9 +255,9 @@ def generate_in_line_report(request, course_prefix, course_suffix):
             we_have_data = True
 
     elif report_name == 'student_scores':
-        report_data = gen_spec_in_line_report(report_name, course, username)
         if report_data:
             report_label = "Student Scores"
+            explanation = "Student's best score for each assessment"
             headings = report_data['headings']
             max_scores = report_data['max_scores']
             rows = report_data['rows']
@@ -244,6 +267,7 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'common_page_data':request.common_page_data,
         'we_have_data':we_have_data,
         'report_label':report_label,
+        'explanation':explanation,
         'report_name':report_name,
         'headings':headings,
         'column1':column1,
@@ -253,9 +277,33 @@ def generate_in_line_report(request, course_prefix, course_suffix):
         'column5':column5,
         'column6':column6,
         'row_color':row_color,
+        'green_param':green_param,
+        'blue_param':blue_param,
         'username':username,
         'max_scores':max_scores,
         'rows':rows
         
     }, context_instance=RequestContext(request))
+    
+    
+@auth_is_course_admin_view_wrapper    
+def summary_report(request, course_prefix, course_suffix, exam_slug):
+        
+    course = request.common_page_data['ready_course']
+    exam = Exam.objects.get(course=course, slug=exam_slug)
+ 
+    we_have_data = False
+    headings, rows = WriteAssessmentSummaryReportContent(exam, None, False, False)
+    if rows:
+        we_have_data = True
+    
+    return render_to_response('reports/drill_downs/assessment_summary.html', {
+        'we_have_data':we_have_data,
+        'common_page_data':request.common_page_data,
+        'headings':headings,
+        'rows':rows,
+        'exam':exam
+        
+    }, context_instance=RequestContext(request))
+    
     

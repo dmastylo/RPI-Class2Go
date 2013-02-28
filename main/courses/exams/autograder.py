@@ -1,16 +1,17 @@
 import re, collections
-import urllib,urllib2
+import urllib, urllib2
 import json
 import logging
 import random 
-import string
-from datetime import datetime
 import time
+from datetime import datetime
+from xml.dom.minidom import parseString
 
 from django.conf import settings
+from django.core.cache import get_cache
 from django.utils import encoding
 
-from xml.dom.minidom import parseString
+from c2g.models import CacheStat
 
 
 logger = logging.getLogger(__name__)
@@ -469,13 +470,28 @@ class AutoGrader():
 
                 We have a blacklist of words that we watch for and consider them failures
                 as well, like "time out".
+
+                We maintain a cache of successfully-graded answers.  We *do not* do
+                negative caching, since we want to retry external graders.
                 """
 
-                def retry_delay(n):
+                def retry_delay(step):
                     """Simple little exponential backoff function.
                             retry_delay(0) = 0.5 - 1.0   retry_delay(1) = 1.0 - 2.0
                             retry_delay(2) = 2.0 - 4.0   retry_delay(3) = 4.0 - 8.0"""
-                    return 2**(n-1 + random.random())
+                    step = max(step, 1)
+                    return 2**(step-1 + random.random())
+
+                post_data = urllib.urlencode(post_params)
+
+                gradercache = get_cache("grader_store")
+                # post_data may be > 240 chars, so can't use directly as cache key, use hash
+                gradercache_key = hash(post_data)
+                gradercache_hit = gradercache.get(gradercache_key)
+                if gradercache_hit:
+                    CacheStat.report('hit', 'grader_store')
+                    return gradercache_hit
+                CacheStat.report('miss', 'grader_store')
 
                 grader_timeout = 45    # seconds
                 retry_limit = 4        # after this many attempts, don't retry
@@ -483,7 +499,6 @@ class AutoGrader():
                 watchwords = ['', 'time out', 'timed out', 'timeout error', 'failure']
                 while attempt <= retry_limit:
                     try:
-                        post_data = urllib.urlencode(post_params)
                         time_before = datetime.now()
                         grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
                         time_after = datetime.now()
@@ -503,11 +518,10 @@ class AutoGrader():
                                         and 'explanation' in graded['feedback'][0] \
                                         and graded['feedback'][0]['explanation'].lower() == ww:
                                     if ww == "":
-                                        errmsg="Fail with empty explanation"
-                                    else:
-                                        errmsg="Fail with \"%s\" explanation" % ww
-                                    raise AutoGraderGradingException(errmsg)
+                                        raise AutoGraderGradingException("Fail with empty explanation")
+                                    raise AutoGraderGradingException("Fail with \"%s\" explanation" % ww)
 
+                        gradercache.set(gradercache_key, graded)
                         return graded
 
                     except Exception as e:

@@ -7,12 +7,12 @@ from courses.reports.generation.get_quiz_data import get_student_scores
 from courses.reports.generation.gen_quiz_summary_report import construct_scores_dict
 
 @use_readonly_database
-def gen_spec_in_line_report(report_name, course, username):
+def gen_spec_in_line_report(report_name, course, username, green_param, blue_param):
 
     if report_name == 'quizzes_summary': 
         
         now = datetime.now()       
-        exams = Exam.objects.values('title').filter(~Q(exam_type='survey'), course=course, is_deleted=0, section__is_deleted=0, live_datetime__lt=now, invideo=0).order_by('title')
+        exams = Exam.objects.values('title', 'slug').filter(~Q(exam_type='survey'), course=course, is_deleted=0, section__is_deleted=0, live_datetime__lt=now, invideo=0).order_by('title')
 
         headings = {}
         count_gt_67 = {}
@@ -43,10 +43,12 @@ def gen_spec_in_line_report(report_name, course, username):
             
             total_gt_67 = count_gt_67.setdefault(exam['title'], 0)
             
-            if total_gt_67 > 0 and (total_gt_67/total)*100 >=50:
+            if (total < 20):
+                row_color[exam['title']] = "grey"
+            elif (total_gt_67 > 0) and ((total_gt_67/total)*100 >= int(green_param)):
                 row_color[exam['title']] = "green"
-            elif (total_gt_67 > 0) and ((total_gt_67/total)*100 >=40):
-                row_color[exam['title']] = "orange"
+            elif (total_gt_67 > 0) and ((total_gt_67/total)*100 >= int(blue_param)):
+                row_color[exam['title']] = "blue"
             else:
                 row_color[exam['title']] = "red"
         
@@ -65,7 +67,7 @@ def gen_spec_in_line_report(report_name, course, username):
         exams, student_scores = get_student_scores(course, username)
         scores_dict = construct_scores_dict(student_scores)
         
-        titles = ["", "Title"]
+        titles = ["Username", "Title"]
         max_scores = ["", "Max Score"]
         for exam in exams:
             titles += [exam['title']]

@@ -1,3 +1,5 @@
+import os
+
 # Don't forget to actually create the database named NAME
 DATABASES = {
     'default': {
@@ -8,19 +10,20 @@ DATABASES = {
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
-    'readonly': {                        # optional section, DB to use for reporting
-        'ENGINE': 'django.db.backends.mysql', 
-        'NAME': '',                      
-        'USER': '',                      
-        'PASSWORD': '',                  
-        'HOST': '',                      
-        'PORT': '',                      
-     },        
     'celery': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'celerydb.sqlite',
     },
-
+    # uncomment this section if you have a read-only replica that you'd like
+    # to use for reporting.
+    #'readonly': {
+    #    'ENGINE': 'django.db.backends.mysql', 
+    #    'NAME': '',                      
+    #    'USER': '',                      
+    #    'PASSWORD': '',                  
+    #    'HOST': '',                      
+    #    'PORT': '',                      
+    # },
 }
 
 SECRET_KEY = ''

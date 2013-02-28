@@ -1,20 +1,13 @@
-"""
-Forms and validation code for user registration.
-
-"""
-
-
-from django.contrib.auth.models import User
-from django import forms
-from django.utils.translation import ugettext_lazy as _
-from django.forms.extras.widgets import Select
-
+"""Forms and validation code for user registration."""
 
 import datetime
 import logging
 logger = logging.getLogger('form')
  
+from django import forms
 from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 
 # I put this on all required fields, because it's easier to pick up
 # on them with CSS or JavaScript if they have a class of "required"
@@ -40,7 +33,7 @@ class RegistrationForm(forms.Form):
                                 max_length=30,
                                 widget=forms.TextInput(attrs=dict(attrs_dict,placeholder='')),
                                 label=_("Choose a Username*"),
-                                error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.  No spaces.")})
+                                error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters. No spaces.")})
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
                              label=_("E-mail*"))
@@ -60,41 +53,49 @@ class RegistrationForm(forms.Form):
     last_year=datetime.date.today().year-min_age
     YEARS=map(lambda y: (str(y),str(y)), range(last_year, first_year, -1))
     YEARS.insert(0,('decline',''))
-    birth_year = forms.ChoiceField(choices=YEARS,label=_("Year of birth"))
-    gender = forms.ChoiceField(label=_("Gender"), choices=(('decline',''),
-                                                                ("Female","Female"),
-                                                                ("Male","Male"),
-                                                                ("Non-Traditional","Non-Traditional")))
-    education = forms.ChoiceField(label=_("Highest degree received"), choices=(('decline',''),
-                                                                            ('Doctorate','Doctorate'),
-                                                                            ('MastersOrProfessional','Masters or Professional'),
-                                                                            ('Bachelors','Bachelors'),
-                                                                            ('Associate','Associate'),
-                                                                            ('HighSchool','Secondary/High School'),
-                                                                            ('Middle','Middle school/Jr. High'),
-                                                                            ('Elementary','Elementary'),
-                                                                            ('None','None'),
-                                                                            ('Other','Other'),))
-    work = forms.ChoiceField(label=_("I am currently"), choices=(  ('decline',''),
-                                                                   ('undergrad','An undergraduate'),
-                                                                   ('gradStudent','A graduate student'),
-                                                                   ('HSStudent','A high school (or younger) student'),
-                                                                   ('Unemployed','Unemployed'),
-                                                                   ('Retired','Retired'),
-                                                                   ('----','-------------------'),
-                                                                   ('Software','In the software industry'),
-                                                                   ('Hardware','In the hardware industry'),
-                                                                   ('Legal','In the legal industry'),
-                                                                   ('K12','In K-12 education'),
-                                                                   ('PostSecondary','In post-secondary education'),
-                                                                   ('ArtsDesignArchEntertainment','In the arts, design, architecture or entertainment industries'),
-                                                                   ('LifePhysSci','In the life or physical sciences'),
-                                                                   ('Healthcare','In the healthcare industry'),
-                                                                   ('SocialServices','In social services'),
-                                                                   ('RetailServicesTransportationFood','In the retail service, transportation or food industries'),
-                                                                   ('ManufacturingConstruction','In manufacturing or construction'),
-                                                                   ('AnotherIndustry','In another industry'),
-                                                                   ('Other','Other'),))
+    birth_year = forms.ChoiceField(label=_("Year of birth"),
+                                   required=False,
+                                   choices=YEARS)
+    gender = forms.ChoiceField(label=_("Gender"), 
+                               required=False,
+                               choices=(('decline',''),
+                                        ("Female","Female"),
+                                        ("Male","Male"),
+                                        ("Non-Traditional","Non-Traditional")))
+    education = forms.ChoiceField(label=_("Highest degree received"), 
+                                  required=False,
+                                  choices=(('decline',''),
+                                           ('Doctorate','Doctorate'),
+                                           ('MastersOrProfessional','Masters or Professional'),
+                                           ('Bachelors','Bachelors'),
+                                           ('Associate','Associate'),
+                                           ('HighSchool','Secondary/High School'),
+                                           ('Middle','Middle school/Jr. High'),
+                                           ('Elementary','Elementary'),
+                                           ('None','None'),
+                                           ('Other','Other'),))
+    work = forms.ChoiceField(label=_("I am currently"), 
+                             required=False,
+                             choices=(('decline',''),
+                                      ('undergrad','An undergraduate'),
+                                      ('gradStudent','A graduate student'),
+                                      ('HSStudent','A high school (or younger) student'),
+                                      ('Unemployed','Unemployed'),
+                                      ('Retired','Retired'),
+                                      ('----','-------------------'),
+                                      ('Software','In the software industry'),
+                                      ('Hardware','In the hardware industry'),
+                                      ('Legal','In the legal industry'),
+                                      ('K12','In K-12 education'),
+                                      ('PostSecondary','In post-secondary education'),
+                                      ('ArtsDesignArchEntertainment','In the arts, design, architecture or entertainment industries'),
+                                      ('LifePhysSci','In the life or physical sciences'),
+                                      ('Healthcare','In the healthcare industry'),
+                                      ('SocialServices','In social services'),
+                                      ('RetailServicesTransportationFood','In the retail service, transportation or food industries'),
+                                      ('ManufacturingConstruction','In manufacturing or construction'),
+                                      ('AnotherIndustry','In another industry'),
+                                      ('Other','Other'),))
 
     password1 = forms.RegexField(regex=r'(?=.*\d)',
                                  min_length=6,
@@ -113,30 +114,36 @@ class RegistrationForm(forms.Form):
     
     
     def clean_username(self):
-        """
-        Validate that the username is alphanumeric and is not already
-        in use.
-        
-        """
+        """Verify username is alphanumeric and not already in use."""
         existing = User.objects.filter(username__iexact=self.cleaned_data['username'])
         if existing.exists():
             raise forms.ValidationError(_("A user with that username already exists."))
         else:
             return self.cleaned_data['username']
 
-    def clean(self):
-        """
-        Verifiy that the values entered into the two password fields
-        match. Note that an error here will end up in
-        ``non_field_errors()`` because it doesn't apply to a single
-        field.
-        
-        """
-        #logger.info(self.cleaned_data['first_name'])
-        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
-            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-                raise forms.ValidationError(_("The two password fields didn't match."))
-        return self.cleaned_data
+    def clean_password2(self):
+        """Verify both password fields match."""
+        password1 = self.cleaned_data.get('password1', '')
+        password2 = self.cleaned_data.get('password2', '')
+        if not password2:
+            raise forms.ValidationError(_("You must confirm your password."))
+        if password1 != password2:
+            raise forms.ValidationError(_("The two password fields didn't match."))
+        return password2
+
+#    def clean(self):
+#        """
+#        Verifiy that the values entered into the two password fields
+#        match. Note that an error here will end up in
+#        ``non_field_errors()`` because it doesn't apply to a single
+#        field.
+#        
+#        """
+#        #logger.info(self.cleaned_data['first_name'])
+#        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
+#            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+#                raise forms.ValidationError(_("The two password fields didn't match."))
+#        return self.cleaned_data
 
 
 class RegistrationFormTermsOfService(RegistrationForm):
@@ -163,7 +170,7 @@ class RegistrationFormUniqueEmail(RegistrationForm):
         
         """
         if User.objects.filter(email__iexact=self.cleaned_data['email']):
-            raise forms.ValidationError(_("This email address is already in use."))
+            raise forms.ValidationError(_("This email address is already in use. Please supply a different email address."))
         return self.cleaned_data['email']
 
 
