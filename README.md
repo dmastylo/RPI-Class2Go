@@ -4,9 +4,9 @@ Class2Go
 [![Build Status](https://travis-ci.org/Stanford-Online/class2go.png?branch=master)](https://travis-ci.org/Stanford-Online/class2go)
 
 Class2Go is Stanford's internal open-source platform for on-line
-education. A team of eight built the first version over the summer
+education. A team of eight built the first version over Summer
 2012, and it is still under active development.  Class2Go launched
-this Fall for six on-campus classes and two "massive open online 
+Fall 2012 for six on-campus classes and two "massive open online 
 courses" (MOOC's): [Computer Networking][net] and 
 [Solar Cells, Fuel Cells, and Batteries][sol].
   [net]: http://networking.class.stanford.edu/
@@ -27,6 +27,19 @@ https://groups.google.com/forum/#!forum/class2go-users.
 If you are interested in reaching the team email us at 
 <c2g-contact@class.stanford.edu>.
 
+If you are interested in evaluating the Class2Go platform, you can explore Class2Go
+through 2 courses we have created. The [Introduction to Class2Go][howto] 
+course highlights the major features of the platform and includes guides 
+for adding content to a Class2Go course and templates for creating problem sets, 
+exams, or surveys. 
+[howto]: http://class2go.stanford.edu/class2go/howto/
+
+The [Class2Go Sandbox][sandbox] course allows access to the administrator 
+features of the Class2Go platform. You are welcome to access this course 
+to test adding and updating course materials through the admin interface. 
+The public login (username: class2go, password: class2go) gives access to 
+both courses.
+[sandbox]: http://class2go.stanford.edu/sandbox/C2G/
 
 Philosophy 
 ----------
@@ -114,17 +127,17 @@ Contributing
 We welcome others contributing to Class2Go.  Begin by checking out
 our source from here and using README_SETUP.md to get a development
 environment set up.  There are also some docs available on the
-Project Wiki here on GitHub.
+Project Wiki on GitHub.
 
 Before sending unsolicited pull requests it is often best to discuss your
 intentions with the core dev team. Send us mail: <c2g-contact@class.stanford.edu>.
 
 If you want to get an idea of the kinds of things to do on the project,
 check out our
-<a href="https://github.com/Stanford-Online/class2go/issues?state=open">issue list right here on GitHub</a>.  
+<a href="https://github.com/Stanford-Online/class2go/issues?state=open">issue list on GitHub</a>.  
 We keep it here for all to see.  Feel free to comment on bugs and make 
-suggestions.  If you want to fix a bug, go ahead fork, fix, test, and send 
-a pull request.
+suggestions.  If you want to fix a bug, go ahead and fork, fix, test, and 
+send a pull request.
 
 
 Using Class2Go Yourself
@@ -144,6 +157,18 @@ pretty quickly on their local machine.
 Send us mail at <c2g-contact@class.stanford.edu> and we can give
 you an idea what would be involved.
 
+If you are interested in evaluating the Class2Go platform before trying to stand 
+up your own instance, you can explore Class2Go through 2 courses 
+we have created. The [Introduction to Class2Go][howto] course highlights the major 
+features of the platform and includes guides for adding content to a Class2Go course 
+and templates for creating problem sets, exams, or surveys. 
+[howto]: http://class2go.stanford.edu/class2go/howto/
+
+The [Class2Go Sandbox][sandbox] course allows access to the administrator features 
+of the Class2Go platform. You are welcome to access this course to test adding and 
+updating course materials through the admin interface. The public login 
+(username: class2go, password: class2go) gives access to both courses.
+[sandbox]: http://class2go.stanford.edu/sandbox/C2G/
 
 
 License

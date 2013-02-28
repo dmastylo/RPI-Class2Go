@@ -19,6 +19,7 @@ run_list(
     "recipe[class2go-logging]",
     "recipe[class2go-ops-dns]",
     "recipe[class2go-database-config]",
+    "recipe[class2go-database-setup]",
     "recipe[class2go-collectstatic]",
     "recipe[class2go-apache-restart]"
 )

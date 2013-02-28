@@ -1,4 +1,8 @@
 from optparse import make_option
+try:
+    import xhtml2pdf as xhtml2pdfImportTest
+except ImportError, msg:
+    xhtml2pdfImportTest = False
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -43,6 +47,8 @@ class Command(BaseCommand):
             raise CommandError("Wrong number of arguments, %d instead of 2" % len(args))
         if options['force_local'] and options['force_remote']:
             raise CommandError("Can't run both local and remote.")
+        if not xhtml2pdfImportTest:
+            raise CommandError("Can't issue certificates without python library xhtml2pdf being installed")
         course_handle = args[0].strip()
         username      = args[1].strip()
         if len(username) == 0:

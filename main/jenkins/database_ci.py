@@ -15,7 +15,7 @@ DATABASES = {
     }
 }
 
-SECRET_KEY = ''
+SECRET_KEY = 'jenkins-test-secret-class2go'
 
 # When PRODUCTION=True we don't show stackdumps on errors
 PRODUCTION = False

@@ -1,0 +1,15 @@
+# If you want to run Selenium tests headless, pyvirtualdisplay makes it lots 
+# easier.
+pyvirtualdisplay
+
+# Kelvinator uses numpy and PIL for key frame analysis
+numpy
+PIL
+
+# Certificates infrastructure uses xhtml2pdf to create templated PDFs
+# WARNING: also installs reportlab, and takes a while
+xhtml2pdf
+
+# Exam regrading uses dateutil for date parsing
+# Probably already installed by celery, but recorded here for completeness
+dateutil
