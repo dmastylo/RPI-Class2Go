@@ -856,6 +856,7 @@ h3.course-section-heading {
 
 fieldset label {
     padding: 0 2em !important;
+    position: relative !important;
 }
 fieldset label input {
     position: absolute !important;
