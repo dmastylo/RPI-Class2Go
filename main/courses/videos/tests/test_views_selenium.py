@@ -3,7 +3,7 @@ from lxml import etree
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 from test_harness.test_base_selenium import InstructorBase, StudentBase
-
+from time import sleep
 
 def DEBUG(s):
     """A useful method for adding tracing to help figure out why tests go bad
@@ -71,5 +71,5 @@ class StudentVideoTest(StudentBase):
         WebDriverWait(browser, 15).until(lambda browser : browser.find_element_by_tag_name('iframe'))
         # switch to the iframe for the youtube player and find the embeded player
         browser.switch_to_frame(browser.find_element_by_tag_name('iframe'))
-        self.assertTrue(browser.find_element_by_xpath('//embed[@id="video-player-flash"]'))
+        self.assertTrue(browser.find_element_by_xpath('//embed[@id="video-player"]'))
 
