@@ -3,7 +3,7 @@ from lxml import etree
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 from test_harness.test_base_selenium import InstructorBase, StudentBase
-from time import sleep
+
 
 def DEBUG(s):
     """A useful method for adding tracing to help figure out why tests go bad
