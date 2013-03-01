@@ -958,7 +958,14 @@ ul.ui-sortable li:hover {
 
 .edit-button { 
     float:right;
+    color:green;
+    margin:5px;
+}
+
+.delete-button { 
+    float:right;
     color:red;
+    margin:5px;
 }
 
 /* jQuery UI

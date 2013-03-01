@@ -6,25 +6,14 @@ window.displayEditQuestion = function(questionMD){
     //question with the corresponding id
     var mySolution = $(questionMD).find('solution');
     var assocQID = $(questionMD).attr('id');
-    var explArea = $('#' + assocQID + '-edit');
-    if (explArea.length == 0) {
-        explArea = document.createElement('div');
-        $(explArea).attr('id', assocQID + '-edit');
-        $(explArea).addClass('edit');
-    }
-    $(explArea).empty();
-    if ($('#' + assocQID + ' .edit').length == 0) {
-        var toggleExplBtn = document.createElement('input');
-        $(toggleExplBtn).attr('type','button');
-        $(toggleExplBtn).addClass('btn').addClass('edit-button'); 
-        $(toggleExplBtn).attr('data-status', 'Show');
-        $(toggleExplBtn).attr('value', 'Edit');
-        $(toggleExplBtn).click(function() { edit(questionMD); });
-    }
-    $('div.question#' + assocQID ).append($(explArea));
-    $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
+    var toggleExplBtn = document.createElement('input');
+    $(toggleExplBtn).attr('type','button');
+    $(toggleExplBtn).addClass('btn').addClass('edit-button'); 
+    $(toggleExplBtn).attr('data-status', 'Show');
+    $(toggleExplBtn).attr('value', 'Edit');
+    $(toggleExplBtn).click(function() { edit(questionMD); });
+    $('div.question#' + assocQID ).append($(toggleExplBtn));
 };
-
 
 window.edit = function(questionMD) { 
     assocQID = $(questionMD).attr('id'); 

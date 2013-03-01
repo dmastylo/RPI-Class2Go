@@ -51,7 +51,9 @@
     h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
     #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
     #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 600px; padding: 1em;}
-    textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
+    textarea {height: 100px; overflow: auto; width: 100%;}
+   	#xml-entry {height: 400px; overflow: auto; width: 100%;}
+   	#staging-area {height: 400px; overflow: auto; width: 100%;}
     #preview-pane label {clear: both; display: block; min-width:200px;}
     #preview-pane label input {float: left; margin-right: 1em;}
     #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 0em;}
@@ -195,6 +197,7 @@
 					        <input type="button" id="radio-buttons-btn" class="btn" value="{% trans 'New Radio Buttons Question' %}" title="{% trans 'New Radio Buttons Question' %}" />
 					        <input type="button" id="checkboxes-btn" class="btn" value="{% trans 'New Checkboxes Question' %}" title="{% trans 'New Checkboxes Question' %}" />
 							<input type="button" id="numerical-btn" class="btn" value="{% trans 'New Numerical Tolerance Question' %}" title="{% trans 'New Numerical Tolerance Question' %}" />
+							<input type="button" id="regex-btn" class="btn" value="{% trans 'New Regex Question' %}" title="{% trans 'New Regex Question' %}" />
 					    </div>
 					</div>
                     <div id="staging-area"></div>
@@ -386,7 +389,7 @@ Testing your common sense: 15.6 sec
 		<label for="numerical-response-question-answer2" id="numerical-response-question-label-answer2">{% trans 'Sub-problem #2 Display Value' %} <textarea type="text" name="numerical-response-question-answer2" id="numerical-response-question-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="numerical-response-question-actual-answer2" id="numerical-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer2" id="numerical-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-tolerance-answer2" id="numerical-response-question-label-tolerance-answer2">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer2" id="numerical-response-question-tolerance-answer2" class="text ui-widget-content ui-corner-all"></input></label>
-		<p> {% trans 'Solution #3' %} </p>
+		<p> {% trans 'Sub-problem #3' %} </p>
 		<label for="numerical-response-question-correct-points3" id="numerical-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points3" id="numerical-response-question-correct-points3" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-wrong-points3" id="numerical-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points3" id="numerical-response-question-wrong-points3" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-answer3" id="numerical-response-question-label-answer3">{% trans 'Sub-problem #3 Display Value' %} <textarea type="text" name="numerical-response-question-answer3" id="numerical-response-question-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
@@ -394,13 +397,13 @@ Testing your common sense: 15.6 sec
 		<label for="numerical-response-question-tolerance-answer3" id="numerical-response-question-label-tolerance-answer3">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer3" id="numerical-response-question-tolerance-answer3" class="text ui-widget-content ui-corner-all"></input></label>
 		<input name="numerical-response-question-edit" id="numerical-response-question-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
 		<textarea name="numerical-response-question-html" id="numerical-response-question-html" class="text ui-widget-content ui-corner-all hidden">
-			<div class="question" id="problem_4" data-report="Short-answer2">
+			<div class="question" id="problem_4">
 			    <h3 class="questionNumber"></h3>
 				<div class="question_text"></div>
 			</div>
         </textarea>
 		<textarea name="numerical-response-question-xml" id="numerical-response-question-xml" class="text ui-widget-content ui-corner-all hidden">
-			<question_metadata id="problem_4" data-report="Short-answer2">
+			<question_metadata id="problem_4">
 			        <solution>
 			            <div class="detailed-solution">
 			            </div>
@@ -845,6 +848,7 @@ age: 20,
     
     {% include "exams/displayExplanation.js" %}
     {% include "exams/displayEdit.js" %}
+    {% include "exams/displayDelete.js" %}
     {% include "exams/renderPreview.js" %}
     {% include "exams/quizdown.js" %}
     

@@ -60,16 +60,12 @@ var c2gXMLParse = (function() {
             return $.parseXML('<exam_metadata></exam_metadata>');
         }, 
         
-        addNumericalResponseQuestion: function(html, xml)
-        {
-            editHtml = $(html); 
+        addHTMLForInputQuestions: function(baseHTML, baseID, editID) {
             var editor_value = editor.getValue(); 
-            var editID = $( "#numerical-response-question-edit" )[0].value; 
-            
             
             //Text of Question
-            var providedText = $('#numerical-response-question-text').val(); 
-            var questionText = $(editHtml.find('div.question_text')[0]); 
+            var providedText = $('#' + baseID + '-text').val(); 
+            var questionText = $(baseHTML.find('div.question_text')[0]); 
             var questionTextParagraph = $(document.createElement('p')); 
             questionTextParagraph.text(providedText); 
             questionText.empty(); 
@@ -78,7 +74,7 @@ var c2gXMLParse = (function() {
             //Sub-questions
             for(i = 1; i < 4; i++) {  
                   //Add to the HTMl
-                var subquestionText = $('#numerical-response-question-answer' + i)[0].value; 
+                var subquestionText = $('#' + baseID + '-answer' + i)[0].value; 
                 if(subquestionText) {
                     p_element = document.createElement('p'); 
                     var input = document.createElement('input'); 
@@ -89,7 +85,7 @@ var c2gXMLParse = (function() {
                     span.innerText = subquestionText; 
                     p_element.appendChild(span); 
                     p_element.appendChild(input); 
-                    editHtml[0].appendChild(p_element); 
+                    baseHTML[0].appendChild(p_element); 
                 }                
               }
               
@@ -97,10 +93,10 @@ var c2gXMLParse = (function() {
               var container = document.createElement('div');
               container.innerHTML = editor_value;
               var assocHTML = $(container).find('#' + editID)[0]; 
-              assocHTML.innerHTML = editHtml[0].innerHTML; 
+              assocHTML.innerHTML = baseHTML[0].innerHTML; 
               editor_value = container.innerHTML;
             } else {
-              editor_value = editor_value + editHtml[0].outerHTML;                   
+              editor_value = editor_value + baseHTML[0].outerHTML;                   
             }
                 
             //Add HTML 
@@ -108,6 +104,14 @@ var c2gXMLParse = (function() {
             editor_value = c2gXMLParse.assignCorrectIds(mDOM, false); 
             editor.setValue(style_html(editor_value, {'max_char':80}));
             editor.onChangeMode();
+        }, 
+        
+        addNumericalResponseQuestion: function(html, xml)
+        {
+            editHtml = $(html); 
+            var editID = $( "#numerical-response-question-edit" )[0].value; 
+            
+            c2gXMLParse.addHTMLForInputQuestions(editHtml, "numerical-response-question", editID); 
             
             mDOM=$.parseXML(metadata_editor.getValue());
             if(!mDOM) {
@@ -303,6 +307,7 @@ var c2gXMLParse = (function() {
             $(questionMD).each(function(){displayQuestionExplanation(this);
                               displayChoiceExplanations(this, true);});
             $(questionMD).each(function(){displayEditQuestion(this);});
+            $(questionMD).each(function(){displayDeleteQuestion(this);});
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
 
         },
