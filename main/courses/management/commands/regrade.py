@@ -2,6 +2,7 @@ try:
     from dateutil import parser
 except ImportError, msg:
     parser = False
+import string
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
