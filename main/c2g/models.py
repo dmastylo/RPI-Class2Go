@@ -129,7 +129,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     outcomes = models.TextField(blank=True)
     faq = models.TextField(blank=True)
     logo = models.FileField(upload_to=get_file_path,null=True)
- 
+    twitter_tag = models.CharField(max_length=64, null = True, blank=True)
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
     # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
