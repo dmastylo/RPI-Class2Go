@@ -4,7 +4,6 @@ South
 django-storages>=1.1.6
 boto>= 2.7.0
 gdata==2.0.17
-elementtree
 pysqlite
 markdown
 
