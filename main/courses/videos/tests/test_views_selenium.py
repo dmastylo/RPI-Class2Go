@@ -71,5 +71,5 @@ class StudentVideoTest(StudentBase):
         WebDriverWait(browser, 15).until(lambda browser : browser.find_element_by_tag_name('iframe'))
         # switch to the iframe for the youtube player and find the embeded player
         browser.switch_to_frame(browser.find_element_by_tag_name('iframe'))
-        self.assertTrue(browser.find_element_by_xpath('//embed[@id="video-player-flash"]'))
+        self.assertTrue(browser.find_element_by_xpath('//embed[@id="video-player"]'))
 
