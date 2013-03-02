@@ -821,6 +821,14 @@ age: 20,
        $( "#single-choice-form" ).dialog( "open" );	})
 	
 	$('#numerical-btn').click(function() {
+		question_type = 0; 
+		$( "#numerical-response-question-edit" )[0].value = null;
+		$("#add-numerical-response-button")[0].textContent = "{% trans 'Add Question' %}";
+		$( "#numerical-response-form" ).dialog( "open" ); 
+	})
+	
+	$('#regex-btn').click(function() {
+		question_type = 1; 
 		$( "#numerical-response-question-edit" )[0].value = null;
 		$("#add-numerical-response-button")[0].textContent = "{% trans 'Add Question' %}";
 		$( "#numerical-response-form" ).dialog( "open" ); 

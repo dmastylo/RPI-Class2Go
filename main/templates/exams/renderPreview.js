@@ -106,7 +106,7 @@ var c2gXMLParse = (function() {
             editor.onChangeMode();
         }, 
         
-        addNumericalResponseQuestion: function(html, xml)
+        addNumericalResponseQuestion: function(html, xml, type)
         {
             editHtml = $(html); 
             var editID = $( "#numerical-response-question-edit" )[0].value; 
@@ -121,7 +121,6 @@ var c2gXMLParse = (function() {
             exam_metadata = exam_metadata[0];
             questionMeta= $(xml);
             
-            //create responses - correct/wrong points associated with response!! 
             //Sub-questions
             for(i = 1; i < 4; i++) {  
                   //Add to the XML
@@ -134,7 +133,7 @@ var c2gXMLParse = (function() {
                     var correct = $('#numerical-response-question-correct-points' + i).val(); 
                     var wrong = $('#numerical-response-question-wrong-points' + i).val();
                     response.setAttribute('correct-points', correct); 
-                    response.setAttribute('wrong-points', wrong); 
+                    response.setAttribute('wrong-points', wrong);
                     var responseparam = document.createElement('responseparam'); 
                     responseparam.setAttribute('type', 'tolerance'); 
                     var defaulttolerance = $('#numerical-response-question-tolerance-answer' + i).val(); 

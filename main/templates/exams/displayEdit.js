@@ -56,6 +56,18 @@ window.edit = function(questionMD) {
             $("#single-choice-entry-explanation-answer" + x)[0].value = explanation.innerText;                  
             
         }
+        
+        //Appropriately update the question_type
+        question_type = 0; 
+        var inputs = $(fieldset).find('input'); 
+        if(inputs.length > 0) {
+            var input = inputs[0]; 
+            if(input.getAttribute('type') == "checkbox")
+            {
+                question_type = 1; 
+            }
+        }
+        
   	    $( "#single-choice-entry-edit" )[0].value = assocQID;
   	    $("#add-single-choice-button")[0].textContent = '{{ save_trans }}';          
         $( "#single-choice-form" ).dialog( "open" );	
@@ -64,7 +76,7 @@ window.edit = function(questionMD) {
         
         var solution = $($(assocXML).find('solution')[0])[0]; 
         var div = $(solution).find('div')[0];
-        $("#numerical-response-question-explanation")[0].value = $(div).find('p')[0].innerText 
+        $("#numerical-response-question-explanation")[0].value = $(div).find('p')[0].innerText; 
         
         var responses = $(assocXML).find('response'); 
         var p_elements = $(assocHTML).find('p'); 
