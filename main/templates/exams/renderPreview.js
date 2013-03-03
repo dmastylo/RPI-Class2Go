@@ -60,6 +60,79 @@ var c2gXMLParse = (function() {
             return $.parseXML('<exam_metadata></exam_metadata>');
         }, 
         
+        addRegexResponseQuestion: function(html, xml)
+        {
+            editHtml = $(html); 
+            var editID = $( "#regex-response-question-edit" )[0].value; 
+            
+            c2gXMLParse.addHTMLForInputQuestions(editHtml, "regex-response-question", editID); 
+            
+            mDOM=$.parseXML(metadata_editor.getValue());
+            if(!mDOM) {
+                mDOM = c2gXMLParse.createBaseXML();
+            }
+            var exam_metadata = $(mDOM).find('exam_metadata'); 
+            exam_metadata = exam_metadata[0];
+            questionMeta= $(xml);
+            
+            //Sub-questions
+            for(i = 1; i < 4; i++) {  
+                  //Add to the XML
+                  var subquestionText = $('#regex-response-question-text' + i)[0].value; 
+                  if(subquestionText) {
+                    var response = document.createElement('response'); 
+                    response.setAttribute('answertype', 'regexresponse'); 
+                    answer = $('#regex-response-question-actual-answer' + i).val(); 
+                    response.setAttribute('answer', answer); 
+                    var correct = $('#regex-response-question-correct-points' + i).val(); 
+                    var wrong = $('#regex-response-question-wrong-points' + i).val();
+                    response.setAttribute('correct-points', correct); 
+                    response.setAttribute('wrong-points', wrong);
+                    var multilineChecked = $('#regex-response-question-multiline' + i)[0].checked; 
+                    var ignorecaseChecked = $('#regex-response-question-ignorecase' + i)[0].checked; 
+                    if(multilineChecked)
+                    {
+                        var responseparam = document.createElement('responseparam'); 
+                        responseparam.setAttribute('flag', 'MULTILINE'); 
+                        response.appendChild(responseparam); 
+                    }
+                    if(ignorecaseChecked)
+                    {
+                        var responseparam2 = document.createElement('responseparam'); 
+                        responseparam2.setAttribute('flag', 'IGNORECASE'); 
+                        response.appendChild(responseparam2); 
+                    }
+                    questionMeta[0].appendChild(response);                    
+                  }       
+              }
+              
+            //Detailed Explanation
+            var detailed_explanation = $('#regex-response-question-explanation').val(); 
+            var solution = $(questionMeta.find('solution')[0])[0]; 
+            var div = $(solution).find('div')[0];
+            var textElement = document.createElement('p'); 
+            textElement.innerHTML = detailed_explanation; 
+            div.appendChild(textElement);
+            
+            //Add to XML
+            if(editID != "") {
+                assocXML = $(exam_metadata).find('#' + editID)[0]; 
+                assocXML.innerHTML = questionMeta[0].innerHTML; 
+            } else {
+                $(exam_metadata).append(questionMeta);                  
+            }
+                        
+            //Finish up
+            c2gXMLParse.assignCorrectIds(mDOM, true); 
+            c2gXMLParse.assignCorrectNames(mDOM); 
+              
+            metadata_value = (new XMLSerializer()).serializeToString(mDOM);
+            metadata_editor.setValue(style_html(metadata_value, {'max_char':80}));
+            metadata_editor.onChangeMode(); 
+
+            this.renderPreview();
+        }, 
+        
         addHTMLForInputQuestions: function(baseHTML, baseID, editID) {
             var editor_value = editor.getValue(); 
             
@@ -74,7 +147,7 @@ var c2gXMLParse = (function() {
             //Sub-questions
             for(i = 1; i < 4; i++) {  
                   //Add to the HTMl
-                var subquestionText = $('#' + baseID + '-answer' + i)[0].value; 
+                var subquestionText = $('#' + baseID + '-text' + i)[0].value; 
                 if(subquestionText) {
                     p_element = document.createElement('p'); 
                     var input = document.createElement('input'); 
@@ -106,7 +179,7 @@ var c2gXMLParse = (function() {
             editor.onChangeMode();
         }, 
         
-        addNumericalResponseQuestion: function(html, xml, type)
+        addNumericalResponseQuestion: function(html, xml)
         {
             editHtml = $(html); 
             var editID = $( "#numerical-response-question-edit" )[0].value; 
@@ -124,7 +197,7 @@ var c2gXMLParse = (function() {
             //Sub-questions
             for(i = 1; i < 4; i++) {  
                   //Add to the XML
-                  var subquestionText = $('#numerical-response-question-answer' + i)[0].value; 
+                  var subquestionText = $('#numerical-response-question-text' + i)[0].value; 
                   if(subquestionText) {
                     var response = document.createElement('response'); 
                     response.setAttribute('answertype', 'numericalresponse'); 
@@ -139,7 +212,7 @@ var c2gXMLParse = (function() {
                     var defaulttolerance = $('#numerical-response-question-tolerance-answer' + i).val(); 
                     if(defaulttolerance != "")
                     {
-                        defaulttolerance = defaulttolerance + "%";
+                        defaulttolerance = defaulttolerance;
                     } else {
                         defaulttolerance = '0%'; 
                     }
@@ -159,7 +232,7 @@ var c2gXMLParse = (function() {
             
             //Add to XML
             if(editID != "") {
-                assocXML = $(exam_metadata).find('#' + assocQID)[0]; 
+                assocXML = $(exam_metadata).find('#' + editID)[0]; 
                 assocXML.innerHTML = questionMeta[0].innerHTML; 
             } else {
                 $(exam_metadata).append(questionMeta);                  
@@ -275,7 +348,7 @@ var c2gXMLParse = (function() {
               div.appendChild(textElement); 
               
               if(editID != "") {
-                  assocXML = $(exam_metadata).find('#' + assocQID)[0]; 
+                  assocXML = $(exam_metadata).find('#' + editID)[0]; 
                   assocXML.innerHTML = questionMeta[0].innerHTML; 
               } else {
                   $(exam_metadata).append(questionMeta);                  

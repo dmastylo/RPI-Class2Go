@@ -371,7 +371,52 @@ Testing your common sense: 15.6 sec
     </form>
 </div>
 
-<div id="numerical-response-form" title="{% trans 'New Numerical Response Question' %}">
+<div id="regex-response-form" title="{% trans 'Regex Question' %}">
+	<form>
+		<label for="regex-response-question-text" id="regex-response-label-question-text">{% trans 'Enter the text for this question' %}</label>
+		<textarea name="regex-response-question-text" id="regex-response-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
+		<label for="regex-response-question-explanation" id="regex-response-question-label-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
+		<textarea name="regex-response-question-explanation" id="regex-response-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
+		<p> {% trans 'Sub-problem #1' %} </p>
+		<label for="regex-response-question-correct-points1" id="regex-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points1" id="regex-response-question-correct-points1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-wrong-points1" id="regex-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points1" id="regex-response-question-wrong-points1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-text1" id="regex-response-question-label-text1">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text1" id="regex-response-question-text1" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="regex-response-question-actual-answer1" id="regex-response-question-label-actual-answer1">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer1" id="regex-response-question-actual-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-ignorecase1" id="regex-response-question-label-ignorecase1">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase1" id="regex-response-question-ignorecase1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-multiline1" id="regex-response-question-label-multiline1">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline1" id="regex-response-question-multiline1" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Sub-problem #2' %} </p>
+		<label for="regex-response-question-correct-points2" id="regex-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points2" id="regex-response-question-correct-points2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-wrong-points2" id="regex-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points2" id="regex-response-question-wrong-points2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-text2" id="regex-response-question-label-text2">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text2" id="regex-response-question-text2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="regex-response-question-actual-answer2" id="regex-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer2" id="regex-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-ignorecase2" id="regex-response-question-label-ignorecase2">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase2" id="regex-response-question-ignorecase2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-multiline2" id="regex-response-question-label-multiline2">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline2" id="regex-response-question-multiline2" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Sub-problem #3' %} </p>
+		<label for="regex-response-question-correct-points3" id="regex-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points3" id="regex-response-question-correct-points3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-wrong-points3" id="regex-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points3" id="regex-response-question-wrong-points3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-text3" id="regex-response-question-label-text3">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text3" id="regex-response-question-text3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="regex-response-question-actual-answer3" id="regex-response-question-label-actual-answer3">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer3" id="regex-response-question-actual-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-ignorecase3" id="regex-response-question-label-ignorecase3">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase3" id="regex-response-question-ignorecase3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-multiline3" id="regex-response-question-label-multiline3">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline3" id="regex-response-question-multiline3" class="text ui-widget-content ui-corner-all"></input></label>
+		<input name="regex-response-question-edit" id="regex-response-question-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
+		<textarea name="regex-response-question-html" id="regex-response-question-html" class="text ui-widget-content ui-corner-all hidden">
+			<div class="question" id="problem_4">
+			    <h3 class="questionNumber"></h3>
+				<div class="question_text"></div>
+			</div>
+        </textarea>
+		<textarea name="regex-response-question-xml" id="regex-response-question-xml" class="text ui-widget-content ui-corner-all hidden">
+			<question_metadata id="problem_4">
+			        <solution>
+			            <div class="detailed-solution">
+			            </div>
+			        </solution>
+			</question_metadata>
+        </textarea>
+	</form>
+</div>
+
+<div id="numerical-response-form" title="{% trans 'Numerical Response Question' %}">
 	<form>
 		<label for="numerical-response-question-text" id="numerical-response-label-question-text">{% trans 'Enter the text for this question' %}</label>
 		<textarea name="numerical-response-question-text" id="numerical-response-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
@@ -380,21 +425,21 @@ Testing your common sense: 15.6 sec
 		<p> {% trans 'Sub-problem #1' %} </p>
 		<label for="numerical-response-question-correct-points1" id="numerical-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points1" id="numerical-response-question-correct-points1" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-wrong-points1" id="numerical-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points1" id="numerical-response-question-wrong-points1" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-answer1" id="numerical-response-question-label-answer1">{% trans 'Sub-problem text' %} <textarea type="text" name="numerical-response-question-answer1" id="numerical-response-question-answer1" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-text1" id="numerical-response-question-label-text1">{% trans 'Sub-problem text' %} <textarea type="text" name="numerical-response-question-text1" id="numerical-response-question-text1" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="numerical-response-question-actual-answer1" id="numerical-response-question-label-actual-answer1">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer1" id="numerical-response-question-actual-answer1" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-tolerance-answer1" id="numerical-response-question-label-tolerance-answer1">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer1" id="numerical-response-question-tolerance-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer1" id="numerical-response-question-label-tolerance-answer1">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer1" id="numerical-response-question-tolerance-answer1" class="text ui-widget-content ui-corner-all"></input></label>
 		<p> {% trans 'Sub-problem #2' %} </p>
 		<label for="numerical-response-question-correct-points2" id="numerical-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points2" id="numerical-response-question-correct-points2" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-wrong-points2" id="numerical-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points2" id="numerical-response-question-wrong-points2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-answer2" id="numerical-response-question-label-answer2">{% trans 'Sub-problem #2 Display Value' %} <textarea type="text" name="numerical-response-question-answer2" id="numerical-response-question-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-text2" id="numerical-response-question-label-text2">{% trans 'Sub-problem #2 Display Value' %} <textarea type="text" name="numerical-response-question-text2" id="numerical-response-question-text2" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="numerical-response-question-actual-answer2" id="numerical-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer2" id="numerical-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-tolerance-answer2" id="numerical-response-question-label-tolerance-answer2">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer2" id="numerical-response-question-tolerance-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer2" id="numerical-response-question-label-tolerance-answer2">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer2" id="numerical-response-question-tolerance-answer2" class="text ui-widget-content ui-corner-all"></input></label>
 		<p> {% trans 'Sub-problem #3' %} </p>
 		<label for="numerical-response-question-correct-points3" id="numerical-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points3" id="numerical-response-question-correct-points3" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-wrong-points3" id="numerical-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points3" id="numerical-response-question-wrong-points3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-answer3" id="numerical-response-question-label-answer3">{% trans 'Sub-problem #3 Display Value' %} <textarea type="text" name="numerical-response-question-answer3" id="numerical-response-question-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-text3" id="numerical-response-question-label-text3">{% trans 'Sub-problem #3 Display Value' %} <textarea type="text" name="numerical-response-question-text3" id="numerical-response-question-text3" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="numerical-response-question-actual-answer3" id="numerical-response-question-label-actual-answer3">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer3" id="numerical-response-question-actual-answer3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-tolerance-answer3" id="numerical-response-question-label-tolerance-answer3">{% trans 'Amount of Tolerance (in percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer3" id="numerical-response-question-tolerance-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer3" id="numerical-response-question-label-tolerance-answer3">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer3" id="numerical-response-question-tolerance-answer3" class="text ui-widget-content ui-corner-all"></input></label>
 		<input name="numerical-response-question-edit" id="numerical-response-question-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
 		<textarea name="numerical-response-question-html" id="numerical-response-question-html" class="text ui-widget-content ui-corner-all hidden">
 			<div class="question" id="problem_4">
@@ -413,7 +458,7 @@ Testing your common sense: 15.6 sec
 	</form>
 </div>
 
-<div id="single-choice-form" title="{% trans 'New Select Question' %}">
+<div id="single-choice-form" title="{% trans 'Select Question' %}">
 	<form>
 		<label for="single-choice-entry-question-text" id="single-choice-entry-label-question-text">{% trans 'Enter the text for this question' %}</label>
 		<textarea name="single-choice-entry-question-text" id="single-choice-entry-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
@@ -770,6 +815,32 @@ age: 20,
     var __saved_quizdown="";
     var __quizdown_saved=false;
     
+	$( "#regex-response-form" ).dialog({
+        autoOpen: false,
+        height: 800,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__xml_saved_single_choice)  $('#xml-entry').val(__saved_import_single_choice_xml);
+            __xml_saved_single_choice=false;
+        },
+        buttons: [{
+                    text:"{% trans 'Add Question' %}",
+                    id:"add-regex-response-button",
+                    click: function() {
+                        __xml_saved_single_choice=true;
+						c2gXMLParse.addRegexResponseQuestion($('#regex-response-question-html').val(), $('#regex-response-question-xml').val())
+                        $( this ).dialog( "close" );
+                        }
+                  },
+                  {
+                    text:"{% trans 'Cancel' %}",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                        }
+                  }],
+    });
+
     $( "#quizdown-form" ).dialog({
         autoOpen: false,
         height: 500,
@@ -829,9 +900,9 @@ age: 20,
 	
 	$('#regex-btn').click(function() {
 		question_type = 1; 
-		$( "#numerical-response-question-edit" )[0].value = null;
-		$("#add-numerical-response-button")[0].textContent = "{% trans 'Add Question' %}";
-		$( "#numerical-response-form" ).dialog( "open" ); 
+		$( "#regex-response-question-edit" )[0].value = null;
+		$("#add-regex-response-button")[0].textContent = "{% trans 'Add Question' %}";
+		$( "#regex-response-form" ).dialog( "open" ); 
 	})
 	
     $("#import-xml-button").before("<span class='warning' id='clobber-warning'>{% trans 'Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.' %}</span>");

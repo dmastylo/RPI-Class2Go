@@ -37,7 +37,6 @@ window.displayQuestionExplanation = function(questionMD){
             $(explArea).append($(this).clone());
         }
     });
-    console.log($('div.question#' + assocQID )); 
     $('div.question#' + assocQID ).append($(explArea));
     $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
 };
