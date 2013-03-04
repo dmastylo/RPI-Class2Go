@@ -585,6 +585,12 @@ small.date {
     margin-right:15px;
     padding-bottom:0px;
 }
+#left-nav h3 a {
+    color: #333;
+}
+#left-nav h3 a:hover {
+    text-decoration: none;
+}
 
 /* Thumbnails
 -------------------------------------------------- */

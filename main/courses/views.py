@@ -142,25 +142,26 @@ def leftnav(request, course_prefix, course_suffix):
     course = request.common_page_data['ready_course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('left_nav.html',
-                              {
-                              'PREFIX':              course_prefix,
-                              'SUFFIX':              course_suffix,
-                              'contentsection_list': full_contentsection_list,
-                              'full_index_list':     full_index_list,
-                              },
-                              context_instance=RequestContext(request))
+        {
+            'PREFIX':              course_prefix,
+            'SUFFIX':              course_suffix,
+            'contentsection_list': full_contentsection_list,
+            'full_index_list':     full_index_list,
+        },
+    context_instance=RequestContext(request))
 
 
 @cache_page(60*60, cache="view_store")
 def rightnav(request, course_prefix, course_suffix):
-  course = request.common_page_data['ready_course']
-  exams = get_upcoming_exams(course)
-  exams = [exam for exam in exams if not exam.is_child()]
-  return render_to_response('right_nav.html',
-                            {'common_page_data':   request.common_page_data,
-                            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
-                            },
-                            context_instance=RequestContext(request))
+    course = request.common_page_data['ready_course']
+    exams = get_upcoming_exams(course)
+    exams = [exam for exam in exams if not exam.is_child()]
+    return render_to_response('right_nav.html',
+        {
+            'common_page_data':   request.common_page_data,
+            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
+        },
+    context_instance=RequestContext(request))
 
 
 @auth_view_wrapper
