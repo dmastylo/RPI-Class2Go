@@ -586,6 +586,21 @@ small.date {
     padding-bottom:0px;
 }
 
+/* Right Column
+-------------------------------------------------- */
+/* Twitter Feed */
+#twitterWidget .twtr-widget .twtr-doc {
+    border: 1px solid #bdb7a1;
+}
+#twitterWidget .twtr-widget .twtr-tweets {
+    padding: 0 5px;
+}
+#twitterWidget .twtr-widget .twtr-tweet {
+    border-top: 1px dotted #aca68d;
+    border-bottom: none !important;
+}
+
+
 /* Thumbnails
 -------------------------------------------------- */
 .thumbnails {
