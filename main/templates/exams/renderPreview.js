@@ -33,8 +33,6 @@ var c2gXMLParse = (function() {
                         $(mDOM[i]).attr('number', v);
                         v = v+1; 
                         allHTML = allHTML + mDOM[i].outerHTML; 
-                    } else { 
-                            console.log(mDOM[i]); 
                     }
                 }
                 return allHTML;  
@@ -51,7 +49,6 @@ var c2gXMLParse = (function() {
                     {
                         responses[m].setAttribute('name', questionMD[i].getAttribute('id') + '_name' + m); 
                     }
-                    //responses[0].setAttribute('name', questionMD[i].getAttribute('id') + '_name'); 
                 } 
             }
         },
@@ -62,6 +59,9 @@ var c2gXMLParse = (function() {
         
         addRegexResponseQuestion: function(html, xml)
         {
+            if(!c2gXMLParse.inputQuestionsValidation("regex-response-question")) {
+                return false; 
+            }
             editHtml = $(html); 
             var editID = $( "#regex-response-question-edit" )[0].value; 
             
@@ -77,7 +77,7 @@ var c2gXMLParse = (function() {
             
             //Sub-questions
             for(i = 1; i < 4; i++) {  
-                  //Add to the XML
+                  //Add to the XML if and only if you have text for your question
                   var subquestionText = $('#regex-response-question-text' + i)[0].value; 
                   if(subquestionText) {
                     var response = document.createElement('response'); 
@@ -131,6 +131,7 @@ var c2gXMLParse = (function() {
             metadata_editor.onChangeMode(); 
 
             this.renderPreview();
+            return true;
         }, 
         
         addHTMLForInputQuestions: function(baseHTML, baseID, editID) {
@@ -177,10 +178,35 @@ var c2gXMLParse = (function() {
             editor_value = c2gXMLParse.assignCorrectIds(mDOM, false); 
             editor.setValue(style_html(editor_value, {'max_char':80}));
             editor.onChangeMode();
-        }, 
+        },
+        
+        inputQuestionsValidation: function(baseID)
+        {
+            var hasOneSubQuestion = false; 
+            for(var i = 1; i < 4; i++)
+            {
+                var subquestionText = $('#' + baseID + '-text' + i)[0].value; 
+                var subquestionActualAnswer = $('#' + baseID + '-actual-answer' + i)[0].value; 
+                if(subquestionText && subquestionActualAnswer)
+                {
+                    hasOneSubQuestion = true; 
+                    break; 
+                }
+            }
+            
+            if(!hasOneSubQuestion)
+            {
+                alert("Please include text and an answer value for at least one subquestion."); 
+                return false; 
+            }
+            return true; 
+        },
         
         addNumericalResponseQuestion: function(html, xml)
         {
+            if(!c2gXMLParse.inputQuestionsValidation("numerical-response-question")) {
+                return false; 
+            }
             editHtml = $(html); 
             var editID = $( "#numerical-response-question-edit" )[0].value; 
             
@@ -247,9 +273,44 @@ var c2gXMLParse = (function() {
             metadata_editor.onChangeMode(); 
 
             this.renderPreview();
+            return true;
         }, 
+        
+        radioButtonValidation: function()
+        {
+            //This function makes sure that all the required fields are filled out. If there are not, it alerts the user. 
+            var providedText = $('#single-choice-entry-question-text').val(); 
+            var hasOneAnswerChoice = false; 
+            for(var i = 1; i<7; i++)
+            {
+                var soldisplay = $('#single-choice-entry-answer' + i).val(); 
+                var solsubmit = $('#single-choice-entry-value-answer' + i).val();
+                if(soldisplay && solsubmit)
+                {
+                    hasOneAnswerChoice = true; 
+                    break;
+                }
+            }
+            if(!providedText)
+            {
+                alert("Please fill out the text for the question."); 
+                return false; 
+            } else {
+                if(!hasOneAnswerChoice)
+                {
+                    alert("Please fill out a submit and display value for at least one answer choice.");
+                    return false;  
+                }
+            }
+            return true; 
+        },
             
         addRadioButtonQuestion: function(html, xml, type) {
+            //This function adds a radio button or checkbox question to the XML and HTML editors. 
+            //Return value: whether the dialog should be closed. 
+              if(!c2gXMLParse.radioButtonValidation()) {
+                  return false; 
+              }
               if(!type) {
                   type = 0; 
               }
@@ -360,7 +421,8 @@ var c2gXMLParse = (function() {
               metadata_editor.setValue(style_html(metadata_value, {'max_char':80}));
               metadata_editor.onChangeMode(); 
 
-              this.renderPreview();   
+              this.renderPreview(); 
+              return true; 
           },
               
         renderPreview: function() {

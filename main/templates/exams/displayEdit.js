@@ -2,7 +2,7 @@
 {% trans "Save" as save_trans %}
 
 window.displayEditQuestion = function(questionMD){
-    //This function takes a DOM object of the metadata and displays the question explanation after the
+    //This function takes a DOM object of the metadata and displays the edit button after the
     //question with the corresponding id
     var mySolution = $(questionMD).find('solution');
     var assocQID = $(questionMD).attr('id');
@@ -28,9 +28,15 @@ window.edit = function(questionMD) {
     var mDOM=$.parseXML(metadata_editor.getValue());
     var assocXML = $(mDOM).find('#' + assocQID)[0]; 
     var response = $(assocXML).find('response')[0]; 
+    var answerType = "Not Found"; 
     if(response) {
-        var answerType = response.getAttribute('answertype'); 
+        answerType = response.getAttribute('answertype'); 
     }
+    
+    //various static values that are necessary until dynamic adding of subfields implemented
+    var SINGLE_CHOICE_ENTRY_CHOICES = 6; 
+    var NUMERICAL_RESPONSE_SUBQUESTIONS = 3; 
+    var REGEX_RESPONSE_SUBQUESTIONS = 3; 
     
     switch (answerType) {
         case 'multiplechoiceresponse':
@@ -44,7 +50,7 @@ window.edit = function(questionMD) {
 
             var choices = $(response).find('choice'); 
             var labels = $(fieldset).find('label'); 
-            for(var i = 0; i < 6; i++)
+            for(var i = 0; i < SINGLE_CHOICE_ENTRY_CHOICES; i++)
             {
                 if(i < choices.length) {
                     var choice = choices[i]; 
@@ -91,7 +97,7 @@ window.edit = function(questionMD) {
 
             var responses = $(assocXML).find('response'); 
             var p_elements = $(assocHTML).find('p'); 
-            for(var m = 0; m < 3; m++)
+            for(var m = 0; m < NUMERICAL_RESPONSE_SUBQUESTIONS; m++)
             {
                 if(m < responses.length) {
                     var response = responses[m]; 
@@ -130,17 +136,18 @@ window.edit = function(questionMD) {
 
             var responses = $(assocXML).find('response'); 
             var p_elements = $(assocHTML).find('p'); 
-            for(var m = 0; m < 3; m++)
+            for(var m = 0; m < REGEX_RESPONSE_SUBQUESTIONS; m++)
             {
                 if(m < responses.length) {
-                    var response = responses[m]; 
+                    var response = responses[m];
+                     
                     $("#regex-response-question-correct-points" + (m+1))[0].value = response.getAttribute('correct-points'); 
                     $("#regex-response-question-wrong-points" + (m+1))[0].value = response.getAttribute('wrong-points');
                     var span_element = $(p_elements[m+1]).find('span')[0]; 
                     $("#regex-response-question-text" + (m+1))[0].value = span_element.innerText;
                     $("#regex-response-question-actual-answer" + (m+1))[0].value = response.getAttribute('answer');                         
-                    responseparams = $(response).find('responseparam'); 
                     
+                    responseparams = $(response).find('responseparam'); 
                     for(var i = 0; i < responseparams.length; i++)
                     {
                         var responseparam = responseparams[i]; 

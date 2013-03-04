@@ -1,5 +1,5 @@
 window.displayDeleteQuestion = function(questionMD){
-    //This function takes a DOM object of the metadata and displays the question explanation after the
+    //This function takes a DOM object of the metadata and displays the delete after the
     //question with the corresponding id
     var mySolution = $(questionMD).find('solution');
     var assocQID = $(questionMD).attr('id');
@@ -13,13 +13,16 @@ window.displayDeleteQuestion = function(questionMD){
 };
 
 window.askDelete = function(questionMD) {
+    //This function pops up a confirmation for the delete and calls the actual delete function on success. 
     var confirmDelete = confirm('Are you sure you want to delete this question?'); 
     if(confirmDelete)
     {
         window.delete(questionMD); 
     }
 }
+
 window.delete = function(questionMD) { 
+    //This function finds the XML and HTML representing the question and removes it. 
     var assocQID = $(questionMD).attr('id'); 
     //Find HTML 
     var editor_value = editor.getValue(); 

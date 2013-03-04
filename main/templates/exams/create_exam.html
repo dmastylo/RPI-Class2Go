@@ -374,26 +374,26 @@ Testing your common sense: 15.6 sec
 <div id="regex-response-form" title="{% trans 'Regex Question' %}">
 	<form>
 		<label for="regex-response-question-text" id="regex-response-label-question-text">{% trans 'Enter the text for this question' %}</label>
-		<textarea name="regex-response-question-text" id="regex-response-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
+		<textarea name="regex-response-question-text" id="regex-response-question-text" placeholder="Replace this with the text of your question." 	class="text ui-widget-content ui-corner-all"></textarea>
 		<label for="regex-response-question-explanation" id="regex-response-question-label-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
 		<textarea name="regex-response-question-explanation" id="regex-response-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
 		<p> {% trans 'Sub-problem #1' %} </p>
-		<label for="regex-response-question-correct-points1" id="regex-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points1" id="regex-response-question-correct-points1" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="regex-response-question-wrong-points1" id="regex-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points1" id="regex-response-question-wrong-points1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-correct-points1" id="regex-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points1" id="regex-response-question-correct-points1" value="1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-wrong-points1" id="regex-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points1" id="regex-response-question-wrong-points1" class="text ui-widget-content ui-corner-all" value="0" ></input></label>
 		<label for="regex-response-question-text1" id="regex-response-question-label-text1">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text1" id="regex-response-question-text1" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="regex-response-question-actual-answer1" id="regex-response-question-label-actual-answer1">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer1" id="regex-response-question-actual-answer1" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="regex-response-question-ignorecase1" id="regex-response-question-label-ignorecase1">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase1" id="regex-response-question-ignorecase1" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="regex-response-question-multiline1" id="regex-response-question-label-multiline1">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline1" id="regex-response-question-multiline1" class="text ui-widget-content ui-corner-all"></input></label>
 		<p> {% trans 'Sub-problem #2' %} </p>
-		<label for="regex-response-question-correct-points2" id="regex-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points2" id="regex-response-question-correct-points2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="regex-response-question-wrong-points2" id="regex-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points2" id="regex-response-question-wrong-points2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-correct-points2" id="regex-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points2" id="regex-response-question-correct-points2" value="1"  class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-wrong-points2" id="regex-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points2" id="regex-response-question-wrong-points2" value="0" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="regex-response-question-text2" id="regex-response-question-label-text2">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text2" id="regex-response-question-text2" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="regex-response-question-actual-answer2" id="regex-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer2" id="regex-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="regex-response-question-ignorecase2" id="regex-response-question-label-ignorecase2">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase2" id="regex-response-question-ignorecase2" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="regex-response-question-multiline2" id="regex-response-question-label-multiline2">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline2" id="regex-response-question-multiline2" class="text ui-widget-content ui-corner-all"></input></label>
 		<p> {% trans 'Sub-problem #3' %} </p>
-		<label for="regex-response-question-correct-points3" id="regex-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points3" id="regex-response-question-correct-points3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="regex-response-question-wrong-points3" id="regex-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points3" id="regex-response-question-wrong-points3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-correct-points3" id="regex-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points3" id="regex-response-question-correct-points3" value="1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-wrong-points3" id="regex-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points3" id="regex-response-question-wrong-points3" value="0" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="regex-response-question-text3" id="regex-response-question-label-text3">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text3" id="regex-response-question-text3" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="regex-response-question-actual-answer3" id="regex-response-question-label-actual-answer3">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer3" id="regex-response-question-actual-answer3" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="regex-response-question-ignorecase3" id="regex-response-question-label-ignorecase3">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase3" id="regex-response-question-ignorecase3" class="text ui-widget-content ui-corner-all"></input></label>
@@ -419,24 +419,24 @@ Testing your common sense: 15.6 sec
 <div id="numerical-response-form" title="{% trans 'Numerical Response Question' %}">
 	<form>
 		<label for="numerical-response-question-text" id="numerical-response-label-question-text">{% trans 'Enter the text for this question' %}</label>
-		<textarea name="numerical-response-question-text" id="numerical-response-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
+		<textarea name="numerical-response-question-text" id="numerical-response-question-text" class="text ui-widget-content ui-corner-all" placeholder="Replace this with the text of your question."></textarea>
 		<label for="numerical-response-question-explanation" id="numerical-response-question-label-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
 		<textarea name="numerical-response-question-explanation" id="numerical-response-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
 		<p> {% trans 'Sub-problem #1' %} </p>
-		<label for="numerical-response-question-correct-points1" id="numerical-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points1" id="numerical-response-question-correct-points1" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-wrong-points1" id="numerical-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points1" id="numerical-response-question-wrong-points1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-correct-points1" id="numerical-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points1" id="numerical-response-question-correct-points1" value="1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-wrong-points1" id="numerical-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points1" id="numerical-response-question-wrong-points1" value="0" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-text1" id="numerical-response-question-label-text1">{% trans 'Sub-problem text' %} <textarea type="text" name="numerical-response-question-text1" id="numerical-response-question-text1" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="numerical-response-question-actual-answer1" id="numerical-response-question-label-actual-answer1">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer1" id="numerical-response-question-actual-answer1" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-tolerance-answer1" id="numerical-response-question-label-tolerance-answer1">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer1" id="numerical-response-question-tolerance-answer1" class="text ui-widget-content ui-corner-all"></input></label>
 		<p> {% trans 'Sub-problem #2' %} </p>
-		<label for="numerical-response-question-correct-points2" id="numerical-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points2" id="numerical-response-question-correct-points2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-wrong-points2" id="numerical-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points2" id="numerical-response-question-wrong-points2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-correct-points2" id="numerical-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points2" id="numerical-response-question-correct-points2" value="1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-wrong-points2" id="numerical-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points2" id="numerical-response-question-wrong-points2" value="0" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-text2" id="numerical-response-question-label-text2">{% trans 'Sub-problem #2 Display Value' %} <textarea type="text" name="numerical-response-question-text2" id="numerical-response-question-text2" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="numerical-response-question-actual-answer2" id="numerical-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer2" id="numerical-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-tolerance-answer2" id="numerical-response-question-label-tolerance-answer2">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer2" id="numerical-response-question-tolerance-answer2" class="text ui-widget-content ui-corner-all"></input></label>
 		<p> {% trans 'Sub-problem #3' %} </p>
-		<label for="numerical-response-question-correct-points3" id="numerical-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points3" id="numerical-response-question-correct-points3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="numerical-response-question-wrong-points3" id="numerical-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points3" id="numerical-response-question-wrong-points3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-correct-points3" id="numerical-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points3" id="numerical-response-question-correct-points3" value="1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-wrong-points3" id="numerical-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points3" id="numerical-response-question-wrong-points3" value="0" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-text3" id="numerical-response-question-label-text3">{% trans 'Sub-problem #3 Display Value' %} <textarea type="text" name="numerical-response-question-text3" id="numerical-response-question-text3" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<label for="numerical-response-question-actual-answer3" id="numerical-response-question-label-actual-answer3">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer3" id="numerical-response-question-actual-answer3" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="numerical-response-question-tolerance-answer3" id="numerical-response-question-label-tolerance-answer3">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer3" id="numerical-response-question-tolerance-answer3" class="text ui-widget-content ui-corner-all"></input></label>
@@ -461,41 +461,41 @@ Testing your common sense: 15.6 sec
 <div id="single-choice-form" title="{% trans 'Select Question' %}">
 	<form>
 		<label for="single-choice-entry-question-text" id="single-choice-entry-label-question-text">{% trans 'Enter the text for this question' %}</label>
-		<textarea name="single-choice-entry-question-text" id="single-choice-entry-question-text" class="text ui-widget-content ui-corner-all">Replace this with the text of your question.</textarea>
-		<label for="single-choice-entry-correct-points" id="single-choice-entry-label-correct-points">{% trans 'Correct Points' %} <input type="number" name="single-choice-entry-correct-points" id="single-choice-entry-correct-points" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-wrong-points" id="single-choice-entry-label-wrong-points">{% trans 'Wrong Points' %} <input type="number" name="single-choice-entry-wrong-points" id="single-choice-entry-wrong-points" class="text ui-widget-content ui-corner-all"></input></label>
+		<textarea name="single-choice-entry-question-text" id="single-choice-entry-question-text" class="text ui-widget-content ui-corner-all" placeholder="Replace this with the text of your question."></textarea>
+		<label for="single-choice-entry-correct-points" id="single-choice-entry-label-correct-points">{% trans 'Correct Points' %} <input type="number" name="single-choice-entry-correct-points" id="single-choice-entry-correct-points" value="1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-wrong-points" id="single-choice-entry-label-wrong-points">{% trans 'Wrong Points' %} <input type="number" name="single-choice-entry-wrong-points" id="single-choice-entry-wrong-points" value="0" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="single-choice-entry-question-explanation" id="single-choice-entry-label-question-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
 		<textarea name="single-choice-entry-question-explanation" id="single-choice-entry-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
-		<p> {% trans 'Solution #1' %} </p>
-		<label for="single-choice-entry-answer1" id="single-choice-entry-label-answer1">{% trans 'Solution #1 Display Value' %} <input type="text" name="single-choice-entry-answer1" id="single-choice-entry-answer1" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer1" id="single-choice-entry-label-value-answer1">{% trans 'Solution #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer1" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-correctness-answer1" id="single-choice-entry-label-correctness-answer1">{% trans 'Solution #1 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer1" id="single-choice-entry-correctness-answer1" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer1" id="single-choice-entry-label-explanation-answer1">{% trans 'Solution #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer1" id="single-choice-entry-explanation-answer1" class="text ui-widget-content ui-corner-all"></textarea></label>
-		<p> {% trans 'Solution #2' %} </p>
-		<label for="single-choice-entry-answer2" id="single-choice-entry-label-answer2">{% trans 'Solution #2 Display Value' %} <input type="text" name="single-choice-entry-answer2" id="single-choice-entry-answer2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer2" id="single-choice-entry-label-value-answer2">{% trans 'Solution #2 Submit Value' %} <input type="text" name="single-choice-entry-value-answer2" id="single-choice-entry-value-answer2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-correctness-answer2" id="single-choice-entry-label-correctness-answer2">{% trans 'Solution #2 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer2" id="single-choice-entry-correctness-answer2" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer2" id="single-choice-entry-label-explanation-answer2">{% trans 'Solution #2 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer2" id="single-choice-entry-explanation-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
-		<p> {% trans 'Solution #3' %} </p>
-		<label for="single-choice-entry-answer3" id="single-choice-entry-label-answer3">{% trans 'Solution #3 Display Value' %} <input type="text" name="single-choice-entry-answer3" id="single-choice-entry-answer3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer3" id="single-choice-entry-label-value-answer3">{% trans 'Solution #3 Submit Value' %} <input type="text" name="single-choice-entry-value-answer3" id="single-choice-entry-value-answer3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-correctness-answer3" id="single-choice-entry-label-correctness-answer3">{% trans 'Solution #3 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer3" id="single-choice-entry-correctness-answer3" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer3" id="single-choice-entry-label-explanation-answer3">{% trans 'Solution #3 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer3" id="single-choice-entry-explanation-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
-		<p> {% trans 'Solution #4' %} </p>
-		<label for="single-choice-entry-answer4" id="single-choice-entry-label-answer4">{% trans 'Solution #4 Display Value' %} <input type="text" name="single-choice-entry-answer4" id="single-choice-entry-answer4" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer4" id="single-choice-entry-label-value-answer4">{% trans 'Solution #4 Submit Value' %} <input type="text" name="single-choice-entry-value-answer4" id="single-choice-entry-value-answer4" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-correctness-answer4" id="single-choice-entry-label-correctness-answer4">{% trans 'Solution #4 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer4" id="single-choice-entry-correctness-answer4" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer4" id="single-choice-entry-label-explanation-answer4">{% trans 'Solution #4 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer4" id="single-choice-entry-explanation-answer4" class="text ui-widget-content ui-corner-all"></textarea></label>
-		<p> {% trans 'Solution #5' %} </p>
-		<label for="single-choice-entry-answer5" id="single-choice-entry-label-answer5">{% trans 'Solution #5 Display Value' %} <input type="text" name="single-choice-entry-answer5" id="single-choice-entry-answer5" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-value-answer5" id="single-choice-entry-label-value-answer5">{% trans 'Solution #5 Submit Value' %} <input type="text" name="single-choice-entry-value-answer5" id="single-choice-entry-value-answer5" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-correctness-answer5" id="single-choice-entry-label-correctness-answer5">{% trans 'Solution #5 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer5" id="single-choice-entry-correctness-answer5" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer5" id="single-choice-entry-label-explanation-answer5">{% trans 'Solution #5 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer5" id="single-choice-entry-explanation-answer5" class="text ui-widget-content ui-corner-all"></textarea></label>
-		<p> {% trans 'Solution #6' %} </p>
-		<label for="single-choice-entry-answer6" id="single-choice-entry-label-answer6">{% trans 'Solution #6 Display Value' %} <input type="text" name="single-choice-entry-answer6" id="single-choice-entry-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Choice #1' %} </p>
+		<label for="single-choice-entry-answer1" id="single-choice-entry-label-answer1">{% trans 'Choice #1 Display Value' %} <input type="text" name="single-choice-entry-answer1" id="single-choice-entry-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer1" id="single-choice-entry-label-value-answer1">{% trans 'Choice #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer1" id="single-choice-entry-label-correctness-answer1">{% trans 'Choice #1 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer1" id="single-choice-entry-correctness-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer1" id="single-choice-entry-label-explanation-answer1">{% trans 'Choice #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer1" id="single-choice-entry-explanation-answer1" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #2' %} </p>
+		<label for="single-choice-entry-answer2" id="single-choice-entry-label-answer2">{% trans 'Choice #2 Display Value' %} <input type="text" name="single-choice-entry-answer2" id="single-choice-entry-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer2" id="single-choice-entry-label-value-answer2">{% trans 'Choice #2 Submit Value' %} <input type="text" name="single-choice-entry-value-answer2" id="single-choice-entry-value-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer2" id="single-choice-entry-label-correctness-answer2">{% trans 'Choice #2 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer2" id="single-choice-entry-correctness-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer2" id="single-choice-entry-label-explanation-answer2">{% trans 'Choice #2 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer2" id="single-choice-entry-explanation-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #3' %} </p>
+		<label for="single-choice-entry-answer3" id="single-choice-entry-label-answer3">{% trans 'Choice #3 Display Value' %} <input type="text" name="single-choice-entry-answer3" id="single-choice-entry-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer3" id="single-choice-entry-label-value-answer3">{% trans 'Choice #3 Submit Value' %} <input type="text" name="single-choice-entry-value-answer3" id="single-choice-entry-value-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer3" id="single-choice-entry-label-correctness-answer3">{% trans 'Choice #3 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer3" id="single-choice-entry-correctness-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer3" id="single-choice-entry-label-explanation-answer3">{% trans 'Choice #3 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer3" id="single-choice-entry-explanation-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #4' %} </p>
+		<label for="single-choice-entry-answer4" id="single-choice-entry-label-answer4">{% trans 'Choice #4 Display Value' %} <input type="text" name="single-choice-entry-answer4" id="single-choice-entry-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer4" id="single-choice-entry-label-value-answer4">{% trans 'Choice #4 Submit Value' %} <input type="text" name="single-choice-entry-value-answer4" id="single-choice-entry-value-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer4" id="single-choice-entry-label-correctness-answer4">{% trans 'Choice #4 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer4" id="single-choice-entry-correctness-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer4" id="single-choice-entry-label-explanation-answer4">{% trans 'Choice #4 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer4" id="single-choice-entry-explanation-answer4" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #5' %} </p>
+		<label for="single-choice-entry-answer5" id="single-choice-entry-label-answer5">{% trans 'Choice #5 Display Value' %} <input type="text" name="single-choice-entry-answer5" id="single-choice-entry-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer5" id="single-choice-entry-label-value-answer5">{% trans 'Choice #5 Submit Value' %} <input type="text" name="single-choice-entry-value-answer5" id="single-choice-entry-value-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer5" id="single-choice-entry-label-correctness-answer5">{% trans 'Choice #5 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer5" id="single-choice-entry-correctness-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer5" id="single-choice-entry-label-explanation-answer5">{% trans 'Choice #5 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer5" id="single-choice-entry-explanation-answer5" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #6' %} </p>
+		<label for="single-choice-entry-answer6" id="single-choice-entry-label-answer6">{% trans 'Choice #6 Display Value' %} <input type="text" name="single-choice-entry-answer6" id="single-choice-entry-answer6" class="text ui-widget-content ui-corner-all"></input></label>
 		<label for="single-choice-entry-value-answer6" id="single-choice-entry-label-value-answer6">{% trans 'Solution #6 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer6" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-correctness-answer6" id="single-choice-entry-label-correctness-answer6">{% trans 'Solution #6 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer6" id="single-choice-entry-correctness-answer6" class="text ui-widget-content ui-corner-all"></input></label>
-		<label for="single-choice-entry-explanation-answer6" id="single-choice-entry-label-explanation-answer6">{% trans 'Solution #6 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer6" id="single-choice-entry-explanation-answer6" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="single-choice-entry-correctness-answer6" id="single-choice-entry-label-correctness-answer6">{% trans 'Choice #6 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer6" id="single-choice-entry-correctness-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer6" id="single-choice-entry-label-explanation-answer6">{% trans 'Choice #6 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer6" id="single-choice-entry-explanation-answer6" class="text ui-widget-content ui-corner-all"></textarea></label>
 		<input name="single-choice-entry-edit" id="single-choice-entry-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
 		<textarea name="single-choice-entry-html" id="single-choice-entry-html" class="text ui-widget-content ui-corner-all hidden">
 			<div class="question" id="problem_1" data-report="">
@@ -775,8 +775,10 @@ age: 20,
                     id:"add-numerical-response-button",
                     click: function() {
                         __xml_saved_single_choice=true;
-						c2gXMLParse.addNumericalResponseQuestion($('#numerical-response-question-html').val(), $('#numerical-response-question-xml').val())
-                        $( this ).dialog( "close" );
+						var shouldClose = c2gXMLParse.addNumericalResponseQuestion($('#numerical-response-question-html').val(), $('#numerical-response-question-xml').val())
+						if(shouldClose) {
+                        	$( this ).dialog( "close" );
+						}
                         }
                   },
                   {
@@ -801,8 +803,10 @@ age: 20,
                     id:"add-single-choice-button",
                     click: function() {
                         __xml_saved_single_choice=true;
-						c2gXMLParse.addRadioButtonQuestion($('#single-choice-entry-html').val(), $('#single-choice-entry-xml').val(), question_type)
-                        $( this ).dialog( "close" );
+						var shouldClose = c2gXMLParse.addRadioButtonQuestion($('#single-choice-entry-html').val(), $('#single-choice-entry-xml').val(), question_type); 
+						if(shouldClose) {
+	                        $( this ).dialog( "close" );							
+						}
                         }
                   },
                   {
@@ -829,8 +833,10 @@ age: 20,
                     id:"add-regex-response-button",
                     click: function() {
                         __xml_saved_single_choice=true;
-						c2gXMLParse.addRegexResponseQuestion($('#regex-response-question-html').val(), $('#regex-response-question-xml').val())
-                        $( this ).dialog( "close" );
+						var shouldClose = c2gXMLParse.addRegexResponseQuestion($('#regex-response-question-html').val(), $('#regex-response-question-xml').val())
+						if(shouldClose) {
+                        	$( this ).dialog( "close" );
+						}
                         }
                   },
                   {
