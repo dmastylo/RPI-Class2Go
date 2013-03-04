@@ -66,9 +66,11 @@ def main(request, course_prefix, course_suffix):
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
         many_announcements = True
+        announcement_overflow = len(announcement_list) - 10
         announcement_list = announcement_list[0:10]
     else:
         many_announcements = False
+        announcement_overflow = 0
     
     if request.user.is_authenticated():
         is_logged_in = 1
@@ -79,6 +81,7 @@ def main(request, course_prefix, course_suffix):
             {'common_page_data':    common_page_data,
              'course':              course,
              'announcement_list':   announcement_list,
+             'announcement_overflow': announcement_overflow,
              'many_announcements':  many_announcements,
              'is_logged_in':        is_logged_in
              },
