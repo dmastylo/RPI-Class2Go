@@ -299,6 +299,27 @@
         stickyFooter();
         */
         
+        /*******************************************************************************************
+	Accessibility toggle
+	*/
+        $(document).ready(function (){
+            var collapsed = ", collapsed, click to expand";
+            var expanded = ", expanded, click to collapse";
+            var toggleText = "";
+            
+            $('.dropdown .dropdown-toggle').focus(function(){
+                $('.hidden-accessible').text(collapsed);
+                
+                $('.dropdown .dropdown-toggle').click(function(){
+                    toggleText = expanded;
+                    if ($(this).siblings('dropdown-menu').hasClass('open')) {
+                        toggleText = collapsed;
+                    }
+                    $('.hidden-accessible', this).text(toggleText);
+                });
+            });
+        });
+        
     </script>
     {% endblock bottom_scripts %}
     <script type="text/javascript">

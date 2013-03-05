@@ -247,6 +247,7 @@ a.thumbnail:hover {
 .navbar .nav li.dropdown.open ul.dropdown-menu a:hover {
     color: #333;
 }
+
 .progress {
     margin-bottom:8px;
     background:#fff;
