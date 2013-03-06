@@ -1,6 +1,6 @@
 
 ----
-This email was automatically sent from Stanford Online to {{first_name}} {{last_name}}. 
-You are receiving this email at address {{ email }} because you are enrolled in {{ course_title }} 
+This email was automatically sent from {{ site_title }} to {{first_name}} {{last_name}}.
+You are receiving this email at address {{ email }} because you are enrolled in {{ course_title }}
 (URL: {{url}} ).
-To stop receiving email like this, update your account settings at https://class2go.stanford.edu/accounts/profile/
+To stop receiving email like this, update your account settings at {{site_url}}/accounts/profile/
