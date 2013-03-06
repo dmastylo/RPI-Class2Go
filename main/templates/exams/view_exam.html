@@ -188,8 +188,8 @@
             {% if single_question %}
             {% comment %} Only for formative/one-question-at-a-time {% endcomment %}
             <div id="problemset-nav">
-                <button type="button" id="next-question" class="btn question-nav" value="{% trans 'Next Question' %}" title="{% trans 'Next Question' %}"><em class="icon-arrow-right"></em></button>
                 <button type="button" id="prev-question" class="btn question-nav" value="{% trans 'Previous Question' %}" title="{% trans 'Previous Question' %}"><em class="icon-arrow-left"></em></button>
+                <button type="button" id="next-question" class="btn question-nav" value="{% trans 'Next Question' %}" title="{% trans 'Next Question' %}"><em class="icon-arrow-right"></em></button>
             </div>
             {% endif %}
 
@@ -708,9 +708,9 @@
                       .addClass('btn')
                       .attr('id','saveWorkBtn');
                    if ($('#prev-question').length == 0) {
-                       $(saveWorkBtn).insertAfter($('#submit-button'));               
+                       $(saveWorkBtn).insertBefore($('#submit-button'));               
                    } else {
-                       $(saveWorkBtn).insertAfter($('#prev-question')); 
+                       $(saveWorkBtn).insertAfter($('#next-question')); 
                    }
         
 
