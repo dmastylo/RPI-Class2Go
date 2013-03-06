@@ -302,18 +302,28 @@
         /*******************************************************************************************
 	Accessibility toggle
 	*/
+        
         $(document).ready(function (){
             var collapsed = ", collapsed, click to expand";
             var expanded = ", expanded, click to collapse";
             var toggleText = "";
             
-            $('.dropdown .dropdown-toggle').focus(function(){
+            $('.dropdown .dropdown-toggle, #left-nav .accordion-group .leftnav-title').focus(function(){
                 $('.hidden-accessible').text(collapsed);
                 
                 $('.dropdown .dropdown-toggle').click(function(){
                     toggleText = expanded;
                     if ($(this).siblings('dropdown-menu').hasClass('open')) {
                         toggleText = collapsed;
+                    }
+                    $('.hidden-accessible', this).text(toggleText);
+                });
+                
+                $('#left-nav .accordion-group .leftnav-title').click(function(){
+                    event.preventDefault();
+                    toggleText = collapsed;
+                    if ($(this).parent().siblings('.nav-list.collapse').hasClass('in')) {
+                        toggleText = expanded;
                     }
                     $('.hidden-accessible', this).text(toggleText);
                 });
