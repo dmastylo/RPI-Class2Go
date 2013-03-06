@@ -7,7 +7,7 @@
             {% with contentsection_id=content_section.id %}
                 <li class="accordion-group">
                     <h3 id="sidebar-nav-heading-{{ contentsection_id }}" class="nav-header" data-toggle="collapse" data-target="#sidebar-nav-{{ contentsection_id }}" data-parent="#left-nav">
-                        <a class="leftnav-title">{{content_section.title}}</a>
+                        <a href="#" onclick="event.preventDefault();" class="leftnav-title">{{content_section.title}}</a>
                     </h3>
                     <ul class="nav nav-list collapse" id="sidebar-nav-{{ contentsection_id }}">
                         {% if content_section.subtitle %}
@@ -68,4 +68,3 @@
             <li><a href="/accounts/profile">{% trans 'My profile' %}</a></li>
         </ul>
     </ul>
-
