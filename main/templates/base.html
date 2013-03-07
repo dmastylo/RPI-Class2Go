@@ -306,27 +306,30 @@
         $(document).ready(function (){
             var collapsed = ", collapsed, click to expand";
             var expanded = ", expanded, click to collapse";
-            var toggleText = "";
+            var toggleText;
+            var firstFocus; 
             
-            $('.dropdown .dropdown-toggle, #left-nav .accordion-group .leftnav-title, .accordion-heading a.attempts').focus(function(){
-                $('.hidden-accessible').text(collapsed);
-                
-                $('.dropdown .dropdown-toggle').click(function(){
+            $('.dropdown .dropdown-toggle, .accordion-heading a').focus(function(){
+                if (firstFocus) {
                     toggleText = expanded;
-                    if ($(this).siblings('dropdown-menu').hasClass('open')) {
-                        toggleText = collapsed;
-                    }
-                    $('.hidden-accessible', this).text(toggleText);
-                });
-                
-                $('#left-nav .accordion-group .leftnav-title, .accordion-heading a.attempts').click(function(){
-                    event.preventDefault();
+                }
+                firstFocus = false;
+            });
+            
+            $('.dropdown, .accordion-heading').click(function(){
+                $('.hidden-accessible', this).text(toggleText);
+                toggleText = $('.hidden-accessible', this).text();
+                if (expanded == toggleText) {
                     toggleText = collapsed;
-                    if ($(this).parent().siblings('.collapse').hasClass('in')) {
-                        toggleText = expanded;
-                    }
-                    $('.hidden-accessible', this).text(toggleText);
-                });
+                } else {
+                    toggleText = expanded;
+                }
+                firstFocus = false;
+            });
+            
+            $('.dropdown .dropdown-toggle, .accordion-heading a').blur(function(){
+                $('.hidden-accessible', this).text(collapsed);
+                firstFocus = true;
             });
         });
         

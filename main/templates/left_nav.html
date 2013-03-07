@@ -6,7 +6,7 @@
         {% for content_section in contentsection_list %}
             {% with contentsection_id=content_section.id %}
                 <li class="accordion-group">
-                    <h3 id="sidebar-nav-heading-{{ contentsection_id }}" class="nav-header" data-toggle="collapse" data-target="#sidebar-nav-{{ contentsection_id }}" data-parent="#left-nav">
+                    <h3 id="sidebar-nav-heading-{{ contentsection_id }}" class="nav-header accordion-heading" data-toggle="collapse" data-target="#sidebar-nav-{{ contentsection_id }}" data-parent="#left-nav">
                         <a href="#" onclick="event.preventDefault();" class="leftnav-title">
                             {{content_section.title}}
                             <span class="hidden-accessible">, collapsed, click to expand</span>
