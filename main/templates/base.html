@@ -308,7 +308,7 @@
             var expanded = ", expanded, click to collapse";
             var toggleText = "";
             
-            $('.dropdown .dropdown-toggle, #left-nav .accordion-group .leftnav-title').focus(function(){
+            $('.dropdown .dropdown-toggle, #left-nav .accordion-group .leftnav-title, .accordion-heading a.attempts').focus(function(){
                 $('.hidden-accessible').text(collapsed);
                 
                 $('.dropdown .dropdown-toggle').click(function(){
@@ -319,10 +319,10 @@
                     $('.hidden-accessible', this).text(toggleText);
                 });
                 
-                $('#left-nav .accordion-group .leftnav-title').click(function(){
+                $('#left-nav .accordion-group .leftnav-title, .accordion-heading a.attempts').click(function(){
                     event.preventDefault();
                     toggleText = collapsed;
-                    if ($(this).parent().siblings('.nav-list.collapse').hasClass('in')) {
+                    if ($(this).parent().siblings('.collapse').hasClass('in')) {
                         toggleText = expanded;
                     }
                     $('.hidden-accessible', this).text(toggleText);
