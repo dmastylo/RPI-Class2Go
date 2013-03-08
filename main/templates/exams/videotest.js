@@ -95,8 +95,8 @@
                 C2G.videoSetup.slideIndices[idxTime].displayDiv = tempDiv;
                 tempDiv.appendChild(slideImg);
                 tempDiv.onclick=(function (time) {return function(evt) {
-                    window.popcornVideo.play();
-                    window.popcornVideo.currentTime(time)
+                    window.popcornVideo.currentTime(time);
+                    window.popcornVideo.pause();
                     C2G.videoSetup.selectSlide(time);
                 };})(idxTime);
                 $(tempDiv).append('<div class="thumbnailTime">'+C2G.videoSetup.getMS(idxTime)+'</div>');
@@ -201,6 +201,7 @@
                 //console.log(popcornVideo.currentTime());
                 var timeInSec = window.popcornVideo.currentTime().toFixed(1);
                 C2G.videoSetup.selectSlide(timeInSec);
+                window.popcornVideo.play();
                 /*
                 if ($.inArray(timeInSec, window.slideMap) != -1) {
                     $('.divInIndex.selected').removeClass('selected');
