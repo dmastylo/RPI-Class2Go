@@ -12,6 +12,12 @@ from django.contrib import messages
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.mail import send_mail
+
+import settings
+import re
 
 @auth_is_course_admin_view_wrapper
 def listAll(request, course_prefix, course_suffix):
@@ -78,7 +84,7 @@ def unenroll_student(request, course_prefix, course_suffix):
 def enroll_students(request, course_prefix, course_suffix):
     """This view allows course admins to enroll a single or a csv-batch of students"""
     course = request.common_page_data['course']
-    send_email = request.GET.get('send_email')
+    send_email = request.POST.get('send_email')
 
     #If it's a CSV-file batch, use the helper
     if request.FILES:
@@ -106,18 +112,40 @@ def enroll_students(request, course_prefix, course_suffix):
             if not is_member_of_course(course, student):
                 course.student_group.user_set.add(student)
                 if send_email:
-                    email_existing_student_enrollment(course, student)
+                    email_existing_student_enrollment(request, course, student)
                 messages.add_message(request, messages.INFO, 'Successfully enrolled student %s in course' % student.username)
             else:
                 messages.add_message(request, messages.WARNING, 'User %s is already a course member' % student.username)
 
-
-
     return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]))
 
 
-def email_existing_student_enrollment(course, user):
-    pass
+def email_existing_student_enrollment(request, course, user):
+    email_text = render_to_string('member_management/existing_student_enroll.txt',
+                                  {'user':user,
+                                   'title':course.title,
+                                   'url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
+                                   'institution':settings.SITE_TITLE,
+                                  })
+    email_html = render_to_string('member_management/existing_student_enroll.html',
+                                  {'user':user,
+                                  'title':course.title,
+                                  'url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
+                                  'institution':settings.SITE_TITLE,
+                                  })
+    subject = "You have been enrolled in " + course.title
+
+    staff_email = 'noreply@class2go.stanford.edu'
+    course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
+    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
+
+    connection = get_connection() #get connection from settings
+    connection.open()
+    msg = EmailMultiAlternatives(subject, email_text, from_addr, [user.email], connection=connection)
+    msg.attach_alternative(email_html,'text/html')
+    connection.send_messages([msg])
+    connection.close()
+
 
 def csv_enroll_helper(request, course):
     return HTTPReponse('OK')
