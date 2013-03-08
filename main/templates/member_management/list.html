@@ -1,0 +1,101 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% load i18n %}
+{% block title %}{% trans 'Manage Course Membership' %}   | {{ common_page_data.course.title }}{% endblock title %}
+{% block course_page_title %}{% trans 'Manage Course Membership' %} | <a href="{% url 'course_main' common_page_data.course_prefix common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>{% endblock course_page_title %}
+{% block admin_link_class %}active{% endblock admin_link_class %}
+
+{% block addl_stylesheets %}
+<style>
+    
+form {margin: 0px}
+</style>
+{% endblock addl_stylesheets %}
+
+
+{% block mode_switcher %}{% endblock mode_switcher %}
+{% block m_column_content %}
+<details><summary><b>{% trans 'Instructors' %}</b><br /></summary>
+{% for instructor in instructors %}
+    {{ instructor.username }}<br />
+{% endfor %}
+</details>
+<details><summary><b>{% trans 'TAs' %}</b><br /></summary>
+{% for ta in tas %}
+    {{ ta.username }}<br />
+{% endfor %}
+</details>
+<details {% if 'student_filter' in request.get_full_path %}open{% endif %}>
+<summary><b>{% trans 'Enrolled Students' %}</b><br /></summary>
+<h4>{% trans "Search for a part of the student's username or email address" %}</h4>
+<form>
+<input type="text" name="student_filter" value="{{student_filter}}">
+<input type="submit" />
+</form>    
+<table id="student_member_table">
+<thead>
+<th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th>
+</thead>
+<tbody>
+{% for student in student_page %}
+    <tr><td>{{ student.username }}</td><td>{{student.email}}</td><td>
+    <form method="POST" action="{% url 'courses.member_management.views.unenroll_student' common_page_data.course_prefix common_page_data.course_suffix %}">
+        <input type="hidden" name="remove_username" value="{{ student.username }}" />
+        {% csrf_token %}
+        <input class="btn-small" value="{% blocktrans with username=student.username %}Remove {{username}} from course{% endblocktrans %}" type="submit" onclick="return confirmation('{{student.username}}');" />
+    </form>
+    </td></tr>
+{% endfor %}
+</tbody>
+</table>
+    
+<div class="pagination">
+    <span class="step-links">
+        {% if student_page.has_previous %}
+        <a class="btn" href="?student_filter={{student_filter}}&per_page={{per_page}}&page={{ student_page.previous_page_number }}"><em class="icon-arrow-left"></em></a>
+        {% endif %}
+        
+        <span class="current">
+            {% trans 'Page' %} {{ student_page.number }} {% trans 'of' %} {{ student_page.paginator.num_pages }}
+        </span>
+        
+        {% if student_page.has_next %}
+        <a class="btn" href="?student_filter={{student_filter}}&per_page={{per_page}}&page={{ student_page.next_page_number }}"><em class="icon-arrow-right"></em></a>
+        {% endif %}
+    </span>
+</div>
+    
+</details>
+<details>
+<summary><b>{% trans 'Invited (but not enrolled) Students' %}</b><br /></summary>
+</details>
+
+<details open="open">
+    <summary><b>{% trans 'Add Students' %}</b><br /></summary>
+    <p>
+    {% trans 'Enter the email address of the new student <b>or</b> select a CSV file' %}
+    </p>
+    <form method="POST" action="{% url 'courses.member_management.views.enroll_students' common_page_data.course_prefix common_page_data.course_suffix %}">
+        {% csrf_token %}
+        <label for="new_email">{% trans 'Email Address' %}</label>
+        <input id="new_email" type="text" name="new_email" />
+        <label for="new_user_file">{% trans 'CSV file of new users.  Each line should contain a single email address' %}</label>
+        <input id="new_user_file" type="file" name="new_user_file" />
+        <label for="send_email">{% trans 'Send notification email to the student(s)?' %}</label>
+        <input id="send_email" type="checkbox" name="send_email" checked="True" />
+        <br /><br />
+        <input class="btn" type="submit" />
+    </form>
+</details>
+{% endblock %}
+
+
+{% block addl_scripts %}
+<script>
+    function confirmation(username) {
+        var yn = confirm("{% trans 'Are you sure you want to unenroll '%}" + username + "?");
+        return yn;
+    }
+    
+</script>
+{% endblock %}
