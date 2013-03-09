@@ -1,7 +1,7 @@
 # Create your views here.
 from c2g.models import *
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect, HttpRequest
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from courses.actions import auth_is_course_admin_view_wrapper, is_member_of_course
@@ -12,12 +12,8 @@ from django.contrib import messages
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.template.loader import render_to_string
-from django.core.mail import EmailMultiAlternatives, get_connection
-from django.core.mail import send_mail
-
-import settings
-import re
+from courses.member_management.tasks import add_student_task, email_new_student_invite
+import csv
 
 @auth_is_course_admin_view_wrapper
 def listAll(request, course_prefix, course_suffix):
@@ -104,6 +100,32 @@ def unenroll_student(request, course_prefix, course_suffix):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+def resend_invite(request, course_prefix, course_suffix):
+    """This view allows course admins to resend invitation emails"""
+    course = request.common_page_data['course']
+    email = request.POST.get('resend_email')
+    invites = StudentInvitation.objects.filter(course=course, email=email)
+    for invite in invites:
+        email_new_student_invite(request, invite)
+        messages.add_message(request, messages.INFO, 'Re-sent invitation email to %s' % email)
+    return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]) + "#invited")
+
+@require_POST
+@auth_is_course_admin_view_wrapper
+def uninvite(request, course_prefix, course_suffix):
+    """This view allows course admins to rescind invitations"""
+    course = request.common_page_data['course']
+    email = request.POST.get('uninvite_email')
+    invites = StudentInvitation.objects.filter(course=course, email=email)
+    for invite in invites:
+        invite.delete()
+        messages.add_message(request, messages.INFO, 'The invitation for %s to join this course has been rescinded' % email)
+    return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]) + "#invited")
+
+
+
+@require_POST
+@auth_is_course_admin_view_wrapper
 def enroll_students(request, course_prefix, course_suffix):
     """This view allows course admins to enroll a single or a csv-batch of students"""
     course = request.common_page_data['course']
@@ -111,7 +133,7 @@ def enroll_students(request, course_prefix, course_suffix):
 
     #If it's a CSV-file batch, use the helper
     if request.FILES:
-        return csv_enroll_helper(request, course)
+        return csv_enroll_helper(request, course, send_email)
 
     #a little bit of validation
     new_student_email = request.POST.get('new_email')
@@ -127,88 +149,53 @@ def enroll_students(request, course_prefix, course_suffix):
         messages.add_message(request, messages.ERROR, 'Please enter a valid email for the new student')
         return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]))
 
-    #now actually add the student(s).  First search for matching students
-    new_students = User.objects.filter(Q(username__iexact=new_student_email) | Q(email__iexact=new_student_email))
-    if new_students.exists():
-        #this is the case where we don't need to create users
-        for student in new_students:
-            if not is_member_of_course(course, student):
-                course.student_group.user_set.add(student)
-                if send_email:
-                    email_existing_student_enrollment(request, course, student)
-                messages.add_message(request, messages.INFO, 'Successfully enrolled student %s in course' % student.username)
-            else:
-                messages.add_message(request, messages.WARNING, 'User %s is already a course member' % student.username)
-    else:
-        #this is the case where there is no existing user, so we send an invitation
-        invite, created = StudentInvitation.objects.get_or_create(course=course, email=new_student_email)
-        if created:
-            messages.add_message(request, messages.INFO, 'Successfully invited student %s to create a Class2Go account for the course' \
-                                 % new_student_email)
-        else:
-            messages.add_message(request, messages.WARNING, '%s has already been invited to the course.  A new invitation email has been sent' \
-                                 % new_student_email)
+    #now actually add the student(s).
+    add_student_task(request, course, new_student_email, send_email)
 
-        email_new_student_invite(request,invite)
-                    
     return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]))
 
 
-def email_new_student_invite(request, invite):
-    course = invite.course
-    email_text = render_to_string('member_management/student_invite.txt',
-                                  {'title':course.title,
-                                  'registration_url':request.build_absolute_uri(reverse('registration_register')) \
-                                        + "?invite=%s" % invite.email,
-                                  'course_url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
-                                  'institution':settings.SITE_TITLE,
-                                  'email':invite.email,
-                                  })
-    email_html = render_to_string('member_management/student_invite.html',
-                                  {'title':course.title,
-                                  'registration_url':request.build_absolute_uri(reverse('registration_register')) \
-                                        + "?invite=%s" % invite.email,
-                                  'course_url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
-                                  'institution':settings.SITE_TITLE,
-                                  'email':invite.email,
-                                  })
-    subject = "You have invited to register for " + course.title
+def csv_enroll_helper(request, course, send_email):
+    """This helper function handles batch enrollment/inviting via a CSV file"""
     
-    staff_email = 'noreply@class2go.stanford.edu'
-    course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
-    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
-    email_helper(subject, email_text, email_html, from_addr, invite.email)
-
-
-
-def email_existing_student_enrollment(request, course, user):
-    email_text = render_to_string('member_management/existing_student_enroll.txt',
-                                  {'user':user,
-                                   'title':course.title,
-                                   'url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
-                                   'institution':settings.SITE_TITLE,
-                                  })
-    email_html = render_to_string('member_management/existing_student_enroll.html',
-                                  {'user':user,
-                                  'title':course.title,
-                                  'url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
-                                  'institution':settings.SITE_TITLE,
-                                  })
-    subject = "You have been enrolled in " + course.title
-
-    staff_email = 'noreply@class2go.stanford.edu'
-    course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
-    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
-    email_helper(subject, email_text, email_html, from_addr, user.email)
+    dummy_request = HttpRequest()
+    dummy_request.META['HTTP_HOST'] = request.META['HTTP_HOST']
     
-def email_helper(subject, email_text, email_html, from_addr, to_addr):
-    connection = get_connection() #get connection from settings
-    connection.open()
-    msg = EmailMultiAlternatives(subject, email_text, from_addr, [to_addr], connection=connection)
-    msg.attach_alternative(email_html,'text/html')
-    connection.send_messages([msg])
-    connection.close()
+    if request.FILES:
+        good_count=0;
+        #We build up the records to be saved as a dict
+        for f in request.FILES.itervalues():
+            row_count=0;
+            reader = csv.reader(f)
+            for row in reader:  # each row should be: "<new_student_email>"
+                row_count += 1
+                valid, output = validate_row(row, row_count)
+                if not valid:
+                    messages.add_message(request, messages.WARNING, output)
+                else:
+                    add_student_task.delay(dummy_request, course, output, send_email, batched=True)
+                    good_count += 1
+
+        messages.add_message(request, messages.INFO, "Successfully queued %d students to be added" % good_count)
+    return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course.prefix, course.suffix]))
 
 
-def csv_enroll_helper(request, course):
-    return HTTPReponse('OK')
+def validate_row(row, row_num):
+    """
+        Helper function to validate a row read in from CSV.
+        If validation fails, returns tuple of (False, error message).
+        If validation succeeds, returns tuple of (True, email)
+    """
+
+    if not isinstance(row, list):
+        return (False, "Badly formatted CSV row %d" % row_num)
+    
+    try:
+        validate_email(row[0].strip())
+    except ValidationError:
+        return (False, "CSV row %d contains invalid email address: %s" % (row_num,row[0]))
+                
+    return (True, row[0].strip())
+
+
+

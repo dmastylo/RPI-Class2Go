@@ -31,7 +31,7 @@ form {margin: 0px}
         <p>
         {% trans 'Enter the email address of the new student <b>or</b> select a CSV file' %}
         </p>
-        <form method="POST" action="{% url 'courses.member_management.views.enroll_students' common_page_data.course_prefix common_page_data.course_suffix %}">
+        <form method="POST" action="{% url 'courses.member_management.views.enroll_students' common_page_data.course_prefix common_page_data.course_suffix %}" enctype="multipart/form-data">
             {% csrf_token %}
             <label for="new_email">{% trans 'Email Address' %}</label>
             <input id="new_email" type="text" name="new_email" />
@@ -109,17 +109,26 @@ form {margin: 0px}
                 </form>
         <table id="invite_table">
             <thead>
-                <th>{% trans 'Email' %}</th><th></th>
+                <th>{% trans 'Email' %}</th><th></th><th></th>
             </thead>
             <tbody>
                 {% for invite in invite_page %}
-                <tr><td>{{ invite.email }}</td><td>
-                    <form method="POST" action="">
-                        <input type="hidden" name="resend_email" value="{{ invite.email }}" />
-                        {% csrf_token %}
-                        <input class="btn-small" value="{% blocktrans with email=invite.email %}Resend invite to {{email}}{% endblocktrans %}" type="submit" />
-                    </form>
-                </td></tr>
+                <tr><td>{{ invite.email }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.resend_invite' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="resend_email" value="{{ invite.email }}" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with email=invite.email %}Resend invite email to {{email}}{% endblocktrans %}" type="submit" />
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.uninvite' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="uninvite_email" value="{{ invite.email }}" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with email=invite.email %}Revoke invite to {{email}}{% endblocktrans %}" type="submit" />
+                        </form>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
