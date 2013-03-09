@@ -29,8 +29,10 @@ def listAll(request, course_prefix, course_suffix):
     instructors = course.instructor_group.user_set.all()
     tas = course.tas_group.user_set.all()
     students = course.get_all_students().order_by('username')
+    invites = StudentInvitation.objects.filter(course=course)
     per_page_str = request.GET.get('per_page', '25')
     page_str = request.GET.get('page')
+    invite_page_str = request.GET.get('invite_page')
     
     try:
         per_page = int(per_page_str)
@@ -42,6 +44,8 @@ def listAll(request, course_prefix, course_suffix):
     if student_filter:
         students = students.filter(Q(username__icontains=student_filter) | Q(email__icontains=student_filter))
 
+    num_students = students.count()
+
     paginator = Paginator(students, per_page)
 
     try:
@@ -51,13 +55,32 @@ def listAll(request, course_prefix, course_suffix):
     except EmptyPage:
         student_page = paginator.page(paginator.num_pages)
 
+    invite_filter = request.GET.get('invite_filter', '')
+    if invite_filter:
+        invites = invites.filter(email__icontains=invite_filter)
+
+    num_invites = invites.count()
+
+    invite_paginator = Paginator(invites, per_page)
+
+    try:
+        invite_page = invite_paginator.page(invite_page_str)
+    except PageNotAnInteger:
+        invite_page = invite_paginator.page(1)
+    except EmptyPage:
+        invite_page = invite_paginator.page(invite_paginator.num_pages)
+
     return render_to_response('member_management/list.html',
                                 {'common_page_data':request.common_page_data,
                                  'course':course,
                                  'instructors':instructors,
                                  'tas':tas,
+                                 'num_students':num_students,
                                  'student_page':student_page,
                                  'student_filter':student_filter,
+                                 'num_invites':num_invites,
+                                 'invite_page':invite_page,
+                                 'invite_filter':invite_filter,
                                  'per_page':per_page},
                                context_instance=RequestContext(request))
 
@@ -76,7 +99,7 @@ def unenroll_student(request, course_prefix, course_suffix):
     except User.DoesNotExist, User.MultipObjectsReturned:
         pass
 
-    return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]))
+    return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]) + "#students")
 
 
 @require_POST
@@ -116,8 +139,46 @@ def enroll_students(request, course_prefix, course_suffix):
                 messages.add_message(request, messages.INFO, 'Successfully enrolled student %s in course' % student.username)
             else:
                 messages.add_message(request, messages.WARNING, 'User %s is already a course member' % student.username)
+    else:
+        #this is the case where there is no existing user, so we send an invitation
+        invite, created = StudentInvitation.objects.get_or_create(course=course, email=new_student_email)
+        if created:
+            messages.add_message(request, messages.INFO, 'Successfully invited student %s to create a Class2Go account for the course' \
+                                 % new_student_email)
+        else:
+            messages.add_message(request, messages.WARNING, '%s has already been invited to the course.  A new invitation email has been sent' \
+                                 % new_student_email)
 
+        email_new_student_invite(request,invite)
+                    
     return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]))
+
+
+def email_new_student_invite(request, invite):
+    course = invite.course
+    email_text = render_to_string('member_management/student_invite.txt',
+                                  {'title':course.title,
+                                  'registration_url':request.build_absolute_uri(reverse('registration_register')) \
+                                        + "?invite=%s" % invite.email,
+                                  'course_url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
+                                  'institution':settings.SITE_TITLE,
+                                  'email':invite.email,
+                                  })
+    email_html = render_to_string('member_management/student_invite.html',
+                                  {'title':course.title,
+                                  'registration_url':request.build_absolute_uri(reverse('registration_register')) \
+                                        + "?invite=%s" % invite.email,
+                                  'course_url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
+                                  'institution':settings.SITE_TITLE,
+                                  'email':invite.email,
+                                  })
+    subject = "You have invited to register for " + course.title
+    
+    staff_email = 'noreply@class2go.stanford.edu'
+    course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
+    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
+    email_helper(subject, email_text, email_html, from_addr, invite.email)
+
 
 
 def email_existing_student_enrollment(request, course, user):
@@ -138,10 +199,12 @@ def email_existing_student_enrollment(request, course, user):
     staff_email = 'noreply@class2go.stanford.edu'
     course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
-
+    email_helper(subject, email_text, email_html, from_addr, user.email)
+    
+def email_helper(subject, email_text, email_html, from_addr, to_addr):
     connection = get_connection() #get connection from settings
     connection.open()
-    msg = EmailMultiAlternatives(subject, email_text, from_addr, [user.email], connection=connection)
+    msg = EmailMultiAlternatives(subject, email_text, from_addr, [to_addr], connection=connection)
     msg.attach_alternative(email_html,'text/html')
     connection.send_messages([msg])
     connection.close()

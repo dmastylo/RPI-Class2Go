@@ -272,6 +272,11 @@ def signup_with_course(request, course_prefix, course_suffix):
     if request.user.is_authenticated() and (not is_member_of_course(course, request.user)):
         student_group = Group.objects.get(id=course.student_group_id)
         student_group.user_set.add(request.user)
+        #now remove any invitations
+        draft_course = course if course.mode == "draft" else course.image
+        invites = StudentInvitation.objects.filter(course=draft_course, email=request.user.email)
+        for invite in invites:
+            invite.delete()
     if (request.GET.__contains__('redirect_to')):
             return redirect(request.GET.get('redirect_to'))
     return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))

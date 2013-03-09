@@ -2880,4 +2880,9 @@ class ContentGroup(models.Model):
         db_table = u'c2g_content_group'
         
 
+class StudentInvitation(TimestampMixin, models.Model):
+    email = models.CharField(max_length=192, db_index=True)
+    course = models.ForeignKey(Course, db_index=True)
+
+
 
