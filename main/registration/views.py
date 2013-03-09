@@ -205,9 +205,10 @@ def register(request, backend, success_url=None, form_class=None,
             num_classes = 0
             try:
                 course = Course.objects.get(handle=request.POST.get('course_prefix')+"--"+request.POST.get('course_suffix'), mode='draft')
-                course.student_group.user_set.add(new_user)
-                course_main = reverse('courses.views.main', args=[request.POST.get('course_prefix'), request.POST.get('course_suffix')])
-                num_classes += 1
+                if not course.preenroll_only:
+                    course.student_group.user_set.add(new_user)
+                    course_main = reverse('courses.views.main', args=[request.POST.get('course_prefix'), request.POST.get('course_suffix')])
+                    num_classes += 1
             except Course.DoesNotExist:
                 pass
         

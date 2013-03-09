@@ -122,6 +122,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     handle = models.CharField(max_length=255, null=True, db_index=True)
     preview_only_mode = models.BooleanField(default=True)
     institution_only = models.BooleanField(default=False)
+    preenroll_only = models.BooleanField(default=False)
     share_to = models.ManyToManyField("self",symmetrical=False,related_name='share_from',null=True, blank=True)
     short_description = models.TextField(blank=True)
     prerequisites = models.TextField(blank=True)

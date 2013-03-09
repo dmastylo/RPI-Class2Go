@@ -35,7 +35,7 @@ form {margin: 0px}
             {% csrf_token %}
             <label for="new_email">{% trans 'Email Address' %}</label>
             <input id="new_email" type="text" name="new_email" />
-            <label for="new_user_file">{% trans 'CSV file of new users.  Each line should contain a single email address' %}</label>
+            <label for="new_user_file">{% trans 'CSV file of new users.  Each line should contain a single email address and nothing else' %}</label>
             <input id="new_user_file" type="file" name="new_user_file" />
             <label for="send_email">{% trans 'Send notification email to the student(s)?' %}</label>
             <input id="send_email" type="checkbox" name="send_email" checked="True" />

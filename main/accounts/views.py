@@ -251,15 +251,16 @@ def shib_login(request):
             user = User.objects.get(username=shib['REMOTE_USER'])
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             auth_login(request, user)
-            #determine whether to clear any "you must log in" messages
-            clear_msgs = False
-            storage = messages.get_messages(request)
-            for message in storage:
-                if "You must be logged-in" in message.message:
-                    clear_msgs = True
-            storage.used = clear_msgs
 
-            messages.add_message(request,messages.SUCCESS, 'You have successfully logged in!')
+        #determine whether to clear any "you must log in" messages
+        clear_msgs = False
+        storage = messages.get_messages(request)
+        for message in storage:
+            if "You must be logged-in" in message.message:
+                clear_msgs = True
+        storage.used = clear_msgs
+
+        messages.add_message(request,messages.SUCCESS, 'You have successfully logged in!')
 
     else:
         messages.add_message(request,messages.ERROR, 'WebAuth did not return your identity to us!  Please try logging in again.  If the problem continues please contact c2g-techsupport@class.stanford.edu')
