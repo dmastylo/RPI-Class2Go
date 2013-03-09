@@ -71,7 +71,7 @@ def email_new_student_invite(request, invite):
                                   'institution':settings.SITE_TITLE,
                                   'email':invite.email,
                                   })
-    subject = "You have invited to register for " + course.title
+    subject = "You have been invited to register for " + course.title
     
     staff_email = 'noreply@class2go.stanford.edu'
     course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
