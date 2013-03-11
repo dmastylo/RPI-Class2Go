@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+{% block title %} Chat for {{course.title}}{% endblock title %}
+{% load template_utils %}
+
+{% block m_column_content %}
+    <div id="c2g_layout_m_column" class="span12">
+
+    <div id="candy"></div>
+        
+    </div>
+{% endblock m_column_content %}
+
+{% block addl_stylesheets %}
+<link rel="stylesheet" href="{{ STATIC_URL }}candy_res/default.css" />
+{% endblock addl_stylesheets %}
+
+{% block addl_scripts %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/libs/libs.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/candy.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+                Candy.init('http://{{jabber_base}}:5280/http-bind/', {
+                core: { debug: true, autojoin: ['{{course_prefix}}_class@conference.{{jabber_base}}'] },
+                view: { resources: '{{ STATIC_URL }}candy_res/' }
+			});
+            /* Candy.Core.connect('{{jabber_base}}', null, '{{nick}}'); */
+            Candy.Core.connect('{{nick}}', '{{nick}}'); /* FIXME: use established sessions */
+		});
+	</script>
+{% endblock addl_scripts %}
