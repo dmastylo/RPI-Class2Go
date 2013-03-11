@@ -39,6 +39,13 @@ def profile(request):
     user = request.user
     group_list = user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
+    course_completions = {}
+    for course in courses:
+        if course.calendar_start != None and course.calendar_end != None:
+            duration = course.calendar_end - course.calendar_start
+            progress = date.today() - course.calendar_start
+            course_completion = int((float(progress.days) / float(duration.days)) * 100)
+            course_completions[course.id] = course_completion
     
     user_profile = None
     is_student_list = []
@@ -67,6 +74,7 @@ def profile(request):
                               {
                                   'request': request,
                                   'courses': courses,
+                                  'course_completions': course_completions,
                                   'is_student_list': is_student_list,
                                   'has_webauth': has_webauth,
                                   'user_profile': user_profile,
