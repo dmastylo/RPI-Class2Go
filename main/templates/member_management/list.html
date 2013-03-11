@@ -1,14 +1,15 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% load i18n %}
+
 {% block title %}{% trans 'Manage Course Membership' %}   | {{ common_page_data.course.title }}{% endblock title %}
 {% block course_page_title %}{% trans 'Manage Course Membership' %} | <a href="{% url 'course_main' common_page_data.course_prefix common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>{% endblock course_page_title %}
 {% block admin_link_class %}active{% endblock admin_link_class %}
 
 {% block addl_stylesheets %}
 <style>
-    
-form {margin: 0px}
+    form {margin: 0px}
+    td .btn-small {width: 100%}
 </style>
 {% endblock addl_stylesheets %}
 
@@ -16,12 +17,19 @@ form {margin: 0px}
 {% block mode_switcher %}{% endblock mode_switcher %}
 {% block m_column_content %}
 
+{% trans 'Are you sure you want to unenroll this user' as unenroll_msg %}
+{% trans 'Are you sure you want to make this user a TA' as ta_msg %}
+{% trans 'Are you sure you want to make this user an Instructor' as instructor_msg %}
+{% trans 'Are you sure you want to make this user a Student' as student_msg %}
+
+
+
 <ul id="management_tabs" class="nav nav-tabs">
     <li><a href="#add-students" data-toggle="tab">{% trans 'Add Students' %}</a></li>
     <li><a href="#instructors" data-toggle="tab">{% trans 'Instructors' %}</a></li>
     <li><a href="#tas" data-toggle="tab">{% trans 'TAs' %}</a></li>
     <li><a href="#students" data-toggle="tab">{% trans 'Students' %}</a></li>
-    <li><a href="#invited" data-toggle="tab">{% trans 'Invited Students (not enrolled)' %}</a></li>
+    <li><a href="#invited" data-toggle="tab">{% trans 'Invited Students (not yet enrolled)' %}</a></li>
 
 </ul>
 <div class="tab-content well">
@@ -46,16 +54,48 @@ form {margin: 0px}
 
     <div id="instructors" class="tab-pane">
         <h3>{% trans 'Instructors' %}</h3>
-        {% for instructor in instructors %}
-            {{ instructor.username }}<br />
-        {% endfor %}
+        <table id="instructor_member_table">
+            <thead>
+                <th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th>
+            </thead>
+            <tbody>
+                {% for instructor in instructors %}
+                <tr><td>{{ instructor.username }}</td><td>{{ instructor.email }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ instructor.username }}" />
+                            <input type="hidden" name="to_group" value="students" />
+                            {% csrf_token %}
+                            <input class="btn-small alert-error" value="{% blocktrans with username=instructor.username %}Demote {{username}} to student{% endblocktrans %}" type="submit" onclick="return confirmation('{{student_msg}}', '{{instructor.username}}');" />
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     
     <div id="tas" class="tab-pane">
         <h3>{% trans 'TAs' %}</h3>
-        {% for ta in tas %}
-        {{ ta.username }}<br />
-        {% endfor %}
+        <table id="ta_member_table">
+            <thead>
+                <th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th>
+            </thead>
+            <tbody>
+                {% for ta in tas %}
+                <tr><td>{{ ta.username }}</td><td>{{ ta.email }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ ta.username }}" />
+                            <input type="hidden" name="to_group" value="students" />
+                            {% csrf_token %}
+                            <input class="btn-small alert-error" value="{% blocktrans with username=ta.username %}Demote {{username}} to student{% endblocktrans %}" type="submit" onclick="return confirmation('{{student_msg}}', '{{ta.username}}');" />
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
         
     <div id="students" class="tab-pane" >
@@ -67,17 +107,35 @@ form {margin: 0px}
         </form>
         <table id="student_member_table">
             <thead>
-                <th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th>
+                <th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th><th></th><th></th>
             </thead>
             <tbody>
             {% for student in student_page %}
-                <tr><td>{{ student.username }}</td><td>{{student.email}}</td><td>
-                <form method="POST" action="{% url 'courses.member_management.views.unenroll_student' common_page_data.course_prefix common_page_data.course_suffix %}">
-                    <input type="hidden" name="remove_username" value="{{ student.username }}" />
-                    {% csrf_token %}
-                    <input class="btn-small" value="{% blocktrans with username=student.username %}Remove {{username}} from course{% endblocktrans %}" type="submit" onclick="return confirmation('{{student.username}}');" />
-                </form>
-                </td></tr>
+                <tr><td>{{ student.username }}</td><td>{{student.email}}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ student.username }}" />
+                            <input type="hidden" name="to_group" value="tas" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with username=student.username %}Make {{username}} a TA{% endblocktrans %}" type="submit" onclick="return confirmation('{{ta_msg}}', '{{student.username}}');" />
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ student.username }}" />
+                            <input type="hidden" name="to_group" value="instructors" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with username=student.username %}Make {{username}} an Instructor{% endblocktrans %}" type="submit" onclick="return confirmation('{{instructor_msg}}', '{{student.username}}');" />
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.unenroll_student' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="remove_username" value="{{ student.username }}" />
+                            {% csrf_token %}
+                            <input class="btn-small  alert-error" value="{% blocktrans with username=student.username %}Remove {{username}} from course{% endblocktrans %}" type="submit" onclick="return confirmation('{{unenroll_msg}}', '{{student.username}}');" />
+                        </form>
+                    </td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>
@@ -101,7 +159,7 @@ form {margin: 0px}
     </div>
 
     <div id="invited" class="tab-pane">
-        <h3>{% trans 'Invited (but not enrolled) Students' %}</h3>
+        <h3>{% trans 'Invited (but not yet enrolled) Students' %}</h3>
         <form>
             <label for="invite_filter">{% trans "Search for a part of the invitee's email address" %}</label>
             <input id="invite_filter" type="text" name="invite_filter" value="{{invite_filter}}">
@@ -158,28 +216,29 @@ form {margin: 0px}
 
 {% block addl_scripts %}
 <script>
-    function confirmation(username) {
-        var yn = confirm("{% trans 'Are you sure you want to unenroll '%}" + username + "?");
+    function confirmation(message, username) {
+        var yn = confirm("" + message + " : " + username + "?");
         return yn;
     }
     $(document).ready(function () {
-      
-      {% if 'student_filter' in request.get_full_path %}
-            $('#management_tabs a[href="#students"]').tab('show');
-      {% endif %}
-                      
-      {% if 'invite_filter' in request.get_full_path %}
-            $('#management_tabs a[href="#invited"]').tab('show');
-      {% endif %}
-      
+    
+      {# Defaults #}
       if (document.location.hash == "#students" ||
           document.location.hash == "#add-students" ||
           document.location.hash == "#instructors" ||
           document.location.hash == "#tas" ||
-          document.location.hash == "#invited" ||
-          document.location.hash == "#students") {
+          document.location.hash == "#invited" ) {
             $('#management_tabs a[href="' + document.location.hash + '"]').tab('show');
       }
+                      
+      {# Overrides #}
+      {% if 'student_filter' in request.get_full_path %}
+      $('#management_tabs a[href="#students"]').tab('show');
+      {% endif %}
+      
+      {% if 'invite_filter' in request.get_full_path %}
+      $('#management_tabs a[href="#invited"]').tab('show');
+      {% endif %}
     });
 </script>
 {% endblock %}

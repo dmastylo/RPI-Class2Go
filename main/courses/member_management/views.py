@@ -100,6 +100,48 @@ def unenroll_student(request, course_prefix, course_suffix):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+def reclassify_member(request, course_prefix, course_suffix):
+    """This view allows course admins to reclassify a course member as a student/ta/readonly-ta/instructor"""
+    course = request.common_page_data['course']
+    username = request.POST.get('username')
+    # will be one of "student", "instructor", "ta", "readonly_ta"
+    to_group = request.POST.get('to_group')
+    
+    #validate username
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        messages.add_message(request, messages.ERROR, 'Username "%s" does not correspond to a user in the system' % username)
+        return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]) + "#students")
+    if not is_member_of_course(course, user):
+        messages.add_message(request, messages.ERROR, 'User "%s" is not a member of this course!' % username)
+        return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]) + "#students")
+
+    #validate to_group
+    poss_groups = { "students" : course.student_group,
+                    "instructors" : course.instructor_group,
+                    "tas" : course.tas_group,
+                    "readonly_tas" : course.readonly_tas_group
+                  }
+
+    if to_group not in poss_groups:
+        messages.add_message(request, messages.ERROR, 'You have specified an invalid course role for this course member %s' % username)
+        return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]) + "#students")
+
+    for desc, group in poss_groups.iteritems():
+        if to_group == desc:
+            group.user_set.add(user)
+        else:
+            group.user_set.remove(user)
+
+    messages.add_message(request, messages.INFO, 'Successfully made %s a %s for %s' % (username, to_group, course.title))
+    return HttpResponseRedirect(reverse('courses.member_management.views.listAll', args=[course_prefix, course_suffix]) + "#" + to_group)
+
+
+
+
+@require_POST
+@auth_is_course_admin_view_wrapper
 def resend_invite(request, course_prefix, course_suffix):
     """This view allows course admins to resend invitation emails"""
     course = request.common_page_data['course']
