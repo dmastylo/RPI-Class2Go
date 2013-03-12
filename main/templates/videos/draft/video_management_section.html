@@ -3,48 +3,9 @@
 <div class="container-fluid">
     <a href="javascript:selectAll()">{% trans 'Select all' %}</a> / <a href="javascript:unselectAll()">{% trans 'Unselect all' %}</a>
     <div style="width:700px; float: right;margin-left: 20px;">
-        <form name="commit_form" action="{% url 'courses.actions.commit' %}" method="POST">
-            <input type="hidden" id="commit_ids" name="commit_ids" value="" />
-            <input type="button" value="{% trans 'Make Ready' %}" class="btn" style='width: 150px; margin-right: 10px;' onclick="commit_clicked()"/>{% trans 'Copy the draft version of selected items to ready' %}
-            <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-            <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-            {% csrf_token %}
-        </form>
-        <script type="text/javascript">
-        function commit_clicked() {
-            document.getElementById("commit_ids").value = getCheckedIds();
-            if (document.getElementById("commit_ids").value == '') {
-                alert('{% trans 'Nothing selected to commit.' %}');
-                return;
-            }
-            document.forms.commit_form.submit();
-        }        
-        </script>
-        <form name="revert_form" action="{% url 'courses.actions.revert' %}" method="POST">
-            <input type="hidden" id="revert_ids" name="revert_ids" value="" />
-            <input type="button" value="{% trans 'Reset to Ready' %}" class="btn" style='width: 150px; margin-right: 10px;' onclick="revert_clicked()"/>{% trans 'Reset the draft version of selected items back to ready' %}
-            <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-            <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-            {% csrf_token %}
-        </form>
-        <script type="text/javascript">
-        function revert_clicked() {
-            document.getElementById("revert_ids").value = getCheckedIds();
-            if (document.getElementById("revert_ids").value == '') {
-                alert('{% trans 'Nothing selected to reset.' %}');
-                return;
-            }
-            
-            r = confirm("{% trans 'Resetting any item will cause any changes to the draft version to be discarded. Are you sure you want to reset all of the selected items?' %}")
-            if (!r) return;
-            
-            document.forms.revert_form.submit();
-        }
-        </script>
         <form name="change_live_datetime_form" action="{% url 'courses.actions.change_live_datetime' %}" method="POST" onsubmit="return apply_clicked()">
             <input type="hidden" id="change_live_datetime_ids" name="change_live_datetime_ids" value="" />
-	    <input type="submit" name="action" value="{% trans 'Make Ready and Go Live' %}" class="btn" style='margin-bottom: 9px' onclick="clicked=this.value"/>
-            <label for="id_live_datetime" style="display:inline">{% trans 'or go live' %}</label>
+            <label for="id_live_datetime" style="display:inline">{% trans 'Go live' %}</label>
 	    {{ form.live_datetime }}
             <input type="submit" name="action" value="{% trans 'Set Live Date' %}" class="btn" style='margin: 0 0 9px 0' onclick="clicked=this.value"/>
 	    {% trans 'or' %}
@@ -60,10 +21,7 @@
         function apply_clicked() {
             document.getElementById("change_live_datetime_ids").value = getCheckedIds();
             if (document.getElementById("change_live_datetime_ids").value == '') {
-	        if (clicked == "{% trans 'Make Ready and Go Live' %}") {
-                    alert('{% trans 'Nothing selected to make ready and go live.' %}');
-	        }
-	        else if (clicked == "{% trans 'Set Live Date' %}") {
+	        if (clicked == "{% trans 'Set Live Date' %}") {
 	            alert('{% trans 'Nothing selected to set the live date for.' %}');
 	        }
 	        else {
