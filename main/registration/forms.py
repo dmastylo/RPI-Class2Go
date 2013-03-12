@@ -111,7 +111,7 @@ class RegistrationForm(forms.Form):
 
     course_prefix = forms.CharField(widget=forms.HiddenInput(),required=False)
     course_suffix = forms.CharField(widget=forms.HiddenInput(),required=False)
-    
+    invite = forms.CharField(widget=forms.HiddenInput(),required=False)
     
     def clean_username(self):
         """Verify username is alphanumeric and not already in use."""
