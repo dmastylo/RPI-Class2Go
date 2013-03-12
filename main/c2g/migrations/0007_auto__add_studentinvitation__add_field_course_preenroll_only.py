@@ -13,15 +13,23 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
-            ('email', self.gf('django.db.models.fields.CharField')(max_length=192, db_index=True)),
+            ('email', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
         ))
         db.send_create_signal('c2g', ['StudentInvitation'])
+
+        # Adding field 'Course.preenroll_only'
+        db.add_column(u'c2g_courses', 'preenroll_only',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
 
     def backwards(self, orm):
         # Deleting model 'StudentInvitation'
         db.delete_table('c2g_studentinvitation')
+
+        # Deleting field 'Course.preenroll_only'
+        db.delete_column(u'c2g_courses', 'preenroll_only')
 
 
     models = {
@@ -136,6 +144,7 @@ class Migration(SchemaMigration):
             'mode': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'outcomes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'piazza_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'preenroll_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'prerequisites': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'preview_only_mode': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'readonly_tas_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'readonly_tas_group'", 'to': "orm['auth.Group']"}),
@@ -487,7 +496,7 @@ class Migration(SchemaMigration):
         'c2g.studentinvitation': {
             'Meta': {'object_name': 'StudentInvitation'},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'email': ('django.db.models.fields.CharField', [], {'max_length': '192', 'db_index': 'True'}),
+            'email': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})

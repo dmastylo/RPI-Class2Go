@@ -2882,7 +2882,7 @@ class ContentGroup(models.Model):
         
 
 class StudentInvitation(TimestampMixin, models.Model):
-    email = models.CharField(max_length=192, db_index=True)
+    email = models.CharField(max_length=128, db_index=True)
     course = models.ForeignKey(Course, db_index=True)
 
 
