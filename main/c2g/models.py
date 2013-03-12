@@ -1931,7 +1931,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
                         'survey':'Survey',
                         'interactive_exercise':'Interactive Exercise',
                        }
-    
+    Exam_HUMAN_TYPES_PLURAL = {'exam':'Exams',
+                               'problemset':'Quizzes',
+                               'survey':'Surveys',
+                               'interactive_exercise':'Interactive Exercises',
+                              }
+
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)

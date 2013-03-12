@@ -13,6 +13,10 @@ c2gXMLParse.slugify = function (text) {
 	return text.substr(0,100);
 }
 
+c2gXMLParse.dashToSpace = function (text) {
+    return text.replace(/_|-/g, " ");
+}
+
 c2gXMLParse.parseQuizDown = function () {
     var csrftoken = '{{ csrf_token }}';
     $.ajax("{% url 'parse_markdown' %}",
@@ -229,6 +233,7 @@ c2gXMLParse.markdown2quiz = function (html_text) {
         }
         inputElem.attr('id', qname)
                  .attr('name', qname)
+                 .attr('title', c2gXMLParse.dashToSpace(qslug))
                  .attr('data-report', qslug);
         
         $(aElem).before(inputElem);
