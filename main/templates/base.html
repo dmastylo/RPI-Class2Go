@@ -134,7 +134,7 @@
                                     <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">{% trans 'Login' %}</a>
                                 {% endif %}
                             </li>
-                            {% if not common_page_data.ready_course.institution_only %}
+                            {% if not common_page_data.ready_course.institution_only and not common_page_data.ready_course.preenroll_only %}
                             <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">{% trans 'Register' %}</a></li>
                             {% endif %}
                         {% endif %}

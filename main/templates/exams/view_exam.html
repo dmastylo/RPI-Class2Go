@@ -789,8 +789,8 @@
 
             if ($.type(dataObj[member]) == "object") {
                 // it's a text input/textarea
-                $('input[name|=' + member + ']').val(dataObj[member].value);
-                $('textarea[name|=' + member + ']').val(dataObj[member].value);
+                $('input[name|=' + member + ']').val(dataObj[member].value).trigger('repopulate');
+                $('textarea[name|=' + member + ']').val(dataObj[member].value).trigger('repopulate');
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
                       $('input[name|=' + member + ']').before("<b style='color:red'> " + scores[member]+" </b> ");
