@@ -6,6 +6,8 @@
         C2G.videoSetup = {};
         // Key methods
 
+        C2G.videoSetup.resumeVideo = true;
+
         C2G.videoSetup.getMS = function(seconds) {
             var sign = (seconds>=0) ? "" : "-" ;
             seconds=Math.abs(seconds);
@@ -95,9 +97,13 @@
                 C2G.videoSetup.slideIndices[idxTime].displayDiv = tempDiv;
                 tempDiv.appendChild(slideImg);
                 tempDiv.onclick=(function (time) {return function(evt) {
-                    window.popcornVideo.play();
-                    window.popcornVideo.currentTime(time)
-                    C2G.videoSetup.selectSlide(time);
+                    //Some lessons learned here.  We want this pause() here so that
+                    //multiple clicks on the same thumbnail don't trigger stuttering, which
+                    //not pausing would cause.  Because setting currentTime to the slide index time triggers
+                    //the "cue" handler at that time (handleTimeUpdate), we use handleTimeUpdate
+                    //to play() the paused video.
+                    window.popcornVideo.pause();
+                    window.popcornVideo.currentTime(time); //This has the side effect of triggering handleTimeUpdate()
                 };})(idxTime);
                 $(tempDiv).append('<div class="thumbnailTime">'+C2G.videoSetup.getMS(idxTime)+'</div>');
                 $('#slideIndex').append(tempDiv);
@@ -114,10 +120,14 @@
                 $(slideImg).attr('alt', 'Go to quiz at section ' + idxTime);
                 tempDiv.appendChild(slideImg);
                 tempDiv.onclick=(function (time) {return function(evt) {
-                                 //window.popcornVideo.pause();
-                                    window.popcornVideo.currentTime(time);
-                                    C2G.videoSetup.selectSlide(time);
+                                    window.popcornVideo.pause();
+                                    C2G.videoSetup.resumeVideo = false;    //We don't want handleTimeUpdate() to restart the video here.
+                                    window.popcornVideo.currentTime(time); //This has the side effect of triggering handleTimeUpdate()
                                     C2G.videoSetup.questionController.execute(time);
+                                    //Because JS is single-threaded, we know the quiz display (execute(time)) will run before handleTimeUpdate() handler
+                                    //gets called, which will try to play() the video.  So we need to set resumeVideo to false
+                                    //to keep play() from being called while the quiz is displayed.  
+                                 
                 };})(idxTime);
                 $(tempDiv).append('<div class="thumbnailTime">'+C2G.videoSetup.getMS(idxTime)+'</div>');
                 $('#slideIndex').append(tempDiv);
@@ -199,17 +209,17 @@
 
             C2G.videoSetup.handleTimeUpdate = function () {
                 //console.log(popcornVideo.currentTime());
+                //console.log("HandleTimeUpdate");
                 var timeInSec = window.popcornVideo.currentTime().toFixed(1);
                 C2G.videoSetup.selectSlide(timeInSec);
-                /*
-                if ($.inArray(timeInSec, window.slideMap) != -1) {
-                    $('.divInIndex.selected').removeClass('selected');
-                    $('#slideIndex' + timeInSec.replace('.','-') + 's').addClass('selected');
+                if (C2G.videoSetup.resumeVideo) {
+                    window.popcornVideo.play();
                 }
-                */
+                //We always re-enable the default.
+                C2G.videoSetup.resumeVideo = true;
             };
                
-            window.popcornVideo.on('seeked', C2G.videoSetup.handleTimeUpdate);
+            //window.popcornVideo.on('seeked', C2G.videoSetup.handleTimeUpdate);
 
             /*
              Don't need these
