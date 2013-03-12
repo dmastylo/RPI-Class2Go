@@ -109,11 +109,16 @@ class Command(BaseCommand):
                 examscore_after = max(examscore_before, score_after)
                 
                 #raw = raw score, score = with penalties, agg = exam_score, over all attempts
-                status_line =  "%d, \"%s\", \"%s\", %s, %s, %s, raw:%0.1f->%0.1f score:%0.1f->%0.1f agg:%0.1f->%0.1f late:%d->%d" \
-                        % (er.id, s.first_name, s.last_name, s.username, s.email, 
-                           str(er.time_created), rawscore_before, rawscore_after,
-                           score_before, score_after, examscore_before, examscore_after,
-                           er.late, is_late)
+                status_line =  "\"%s\", \"%s\", %s, %s, %s, " \
+                        % (s.first_name, s.last_name, s.username, s.email, str(er.time_created))
+                status_line += "raw[%d]:%0.1f->%0.1f " \
+                        % (ers.id, rawscore_before, rawscore_after)
+                status_line += "score[%d]:%0.1f->%0.1f " \
+                        % (er.id, score_before, score_after)
+                status_line += "agg[%d]:%0.1f->%0.1f " \
+                        % (es.id, examscore_before, examscore_after)
+                status_line += "late:%d->%d" \
+                        % (er.late, is_late)
                         
                 if score_before == score_after and rawscore_before == rawscore_after \
                    and examscore_before == examscore_after and is_late == er.late :
