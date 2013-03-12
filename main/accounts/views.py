@@ -41,9 +41,9 @@ def profile(request):
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
     course_completions = {}
     for course in courses:
-        if course.calendar_start != None and course.calendar_end != None:
+        if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
             duration = course.calendar_end - course.calendar_start
-            progress = date.today() - course.calendar_start
+            progress = min(date.today(), course.calendar_end) - course.calendar_start
             course_completion = int((float(progress.days) / float(duration.days)) * 100)
             course_completions[course.id] = course_completion
     
