@@ -75,12 +75,19 @@ def main(request, course_prefix, course_suffix):
     else:
         is_logged_in = 0
 
+    # Environment prep for jabber chat plugin
+    jabber_configured = False
+    jabber_base_domain = getattr(settings, 'JABBER_DOMAIN', '')
+    if jabber_base_domain:
+        jabber_configured = True
+
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
              'course':              course,
              'announcement_list':   announcement_list,
              'many_announcements':  many_announcements,
-             'is_logged_in':        is_logged_in
+             'is_logged_in':        is_logged_in,
+             'jabber_configured':   jabber_configured,
              },
             context_instance=RequestContext(request))
 

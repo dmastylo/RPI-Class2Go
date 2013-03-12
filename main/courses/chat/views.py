@@ -14,7 +14,7 @@ def prototype(request, course_prefix, course_suffix):
             request.common_page_data = get_common_page_data(request, course_prefix, course_suffix)
         except:
             raise Http404
-    jabber_base = settings.get('JABBER_DOMAIN', '')
+    jabber_base = getattr(settings, 'JABBER_DOMAIN', '')
     if not jabber_base:
         raise Http404
     if user.is_authenticated():

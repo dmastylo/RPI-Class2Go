@@ -5,14 +5,11 @@
  * @author Patrick <patrick.stadler@gmail.com>
  * @copyright 2011 Amiado Group AG, All rights reserved.
  */
-html, body {
-	margin: 0;
-	padding: 0;
-	font-family: Arial, Helvetica, sans-serif;
-}
 
 #candy {
-	position: absolute;
+	margin: 0;
+	padding: 0;
+	/* position: absolute; */
 	top: 0;
 	bottom: 0;
 	right: 0;
