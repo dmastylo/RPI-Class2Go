@@ -265,15 +265,26 @@ def is_member_of_course(course, user):
 @csrf_protect
 def signup_with_course(request, course_prefix, course_suffix):
     course = request.common_page_data['course']
+    draft_course = course if course.mode == "draft" else course.image
+
     if course.institution_only and (course.institution not in request.user.get_profile().institutions.all()):
         messages.add_message(request,messages.ERROR, 'Registration in this course is restricted to ' + course.institution.title + '.  Perhaps you need to logout and login with your '+ course.institution.title + ' credentials?')
+        return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))
+
+    invites = StudentInvitation.objects.filter(course=draft_course, email=request.user.email)
+
+    if course.preenroll_only and not invites.exists():
+        messages.add_message(request,messages.ERROR, 'Sorry!  Registration in this course is restricted, and we did not find your email in the access list.  Please contact the course staff if you believe this to be an error.')
         return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))
 
     if request.user.is_authenticated() and (not is_member_of_course(course, request.user)):
         student_group = Group.objects.get(id=course.student_group_id)
         student_group.user_set.add(request.user)
+        #now remove any invitations
+        for invite in invites:
+            invite.delete()
     if (request.GET.__contains__('redirect_to')):
-            return redirect(request.GET.get('redirect_to'))
+        return redirect(request.GET.get('redirect_to'))
     return redirect(reverse('courses.views.main',args=[course_prefix,course_suffix]))
 
 

@@ -1,0 +1,8 @@
+Dear {{user.first_name}} {{user.last_name}},
+
+You have been enrolled in {{title}} at {{institution}} by a member of the
+course staff.  To start accessing course materials, please visit
+{{url}} with your username {{user.username}}.
+
+----
+This email was automatically sent from {{institution}} to {{user.first_name}} {{user.last_name}}. 

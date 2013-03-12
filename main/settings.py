@@ -285,6 +285,7 @@ INSTALLED_APPS = (
                       'courses.videos',
                       'courses.video_exercises',
                       'courses.email_members',
+                      'courses.member_management',
                       'courses.reports',
                       'problemsets',
                       'django.contrib.flatpages',
@@ -434,7 +435,7 @@ except NameError:
 try:
     SERVER_EMAIL
 except NameError:
-    SERVER_EMAIL = 'noreply@class.stanford.edu'
+    SERVER_EMAIL = 'noreply@class2go.stanford.edu'
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:

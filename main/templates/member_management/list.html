@@ -1,0 +1,245 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{% trans 'Manage Course Membership' %}   | {{ common_page_data.course.title }}{% endblock title %}
+{% block course_page_title %}{% trans 'Manage Course Membership' %} | <a href="{% url 'course_main' common_page_data.course_prefix common_page_data.course_suffix %}">{{ common_page_data.course.title }}</a>{% endblock course_page_title %}
+{% block admin_link_class %}active{% endblock admin_link_class %}
+
+{% block addl_stylesheets %}
+<style>
+    form {margin: 0px}
+    td .btn-small {width: 100%}
+</style>
+{% endblock addl_stylesheets %}
+
+
+{% block mode_switcher %}{% endblock mode_switcher %}
+{% block m_column_content %}
+
+{% trans 'Are you sure you want to unenroll this user' as unenroll_msg %}
+{% trans 'Are you sure you want to make this user a TA' as ta_msg %}
+{% trans 'Are you sure you want to make this user an Instructor' as instructor_msg %}
+{% trans 'Are you sure you want to make this user a Student' as student_msg %}
+
+
+
+<ul id="management_tabs" class="nav nav-tabs">
+    <li><a href="#add-students" data-toggle="tab">{% trans 'Add Students' %}</a></li>
+    <li><a href="#instructors" data-toggle="tab">{% trans 'Instructors' %}</a></li>
+    <li><a href="#tas" data-toggle="tab">{% trans 'TAs' %}</a></li>
+    <li><a href="#students" data-toggle="tab">{% trans 'Students' %}</a></li>
+    <li><a href="#invited" data-toggle="tab">{% trans 'Invited Students (not yet enrolled)' %}</a></li>
+
+</ul>
+<div class="tab-content well">
+    <div id="add-students" class="tab-pane active">
+    
+        <h3>{% trans 'Add Students' %}</h3>
+        <p>
+        {% trans 'Enter the email address of the new student <b>or</b> select a CSV file' %}
+        </p>
+        <form method="POST" action="{% url 'courses.member_management.views.enroll_students' common_page_data.course_prefix common_page_data.course_suffix %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="new_email">{% trans 'Email Address' %}</label>
+            <input id="new_email" type="text" name="new_email" />
+            <label for="new_user_file">{% trans 'CSV file of new users.  Each line should contain a single email address and nothing else' %}</label>
+            <input id="new_user_file" type="file" name="new_user_file" />
+            <label for="send_email">{% trans 'Send notification email to the student(s)?' %}</label>
+            <input id="send_email" type="checkbox" name="send_email" checked="True" />
+            <br /><br />
+            <input class="btn" type="submit" />
+        </form>
+    </div>
+
+    <div id="instructors" class="tab-pane">
+        <h3>{% trans 'Instructors' %}</h3>
+        <table id="instructor_member_table">
+            <thead>
+                <th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th>
+            </thead>
+            <tbody>
+                {% for instructor in instructors %}
+                <tr><td>{{ instructor.username }}</td><td>{{ instructor.email }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ instructor.username }}" />
+                            <input type="hidden" name="to_group" value="students" />
+                            {% csrf_token %}
+                            <input class="btn-small alert-error" value="{% blocktrans with username=instructor.username %}Demote {{username}} to student{% endblocktrans %}" type="submit" onclick="return confirmation('{{student_msg}}', '{{instructor.username}}');" />
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    
+    <div id="tas" class="tab-pane">
+        <h3>{% trans 'TAs' %}</h3>
+        <table id="ta_member_table">
+            <thead>
+                <th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th>
+            </thead>
+            <tbody>
+                {% for ta in tas %}
+                <tr><td>{{ ta.username }}</td><td>{{ ta.email }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ ta.username }}" />
+                            <input type="hidden" name="to_group" value="students" />
+                            {% csrf_token %}
+                            <input class="btn-small alert-error" value="{% blocktrans with username=ta.username %}Demote {{username}} to student{% endblocktrans %}" type="submit" onclick="return confirmation('{{student_msg}}', '{{ta.username}}');" />
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+        
+    <div id="students" class="tab-pane" >
+        <h3>{% trans 'Enrolled Students' %}</h3>
+        <form>
+            <label for="student_filter">{% trans "Search for a part of the student's username or email address" %}</label>
+            <input id="student_filter" type="text" name="student_filter" value="{{student_filter}}">
+            <input type="submit" />
+        </form>
+        <table id="student_member_table">
+            <thead>
+                <th>{% trans 'Username' %}</th><th>{% trans 'Email' %}</th><th></th><th></th><th></th>
+            </thead>
+            <tbody>
+            {% for student in student_page %}
+                <tr><td>{{ student.username }}</td><td>{{student.email}}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ student.username }}" />
+                            <input type="hidden" name="to_group" value="tas" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with username=student.username %}Make {{username}} a TA{% endblocktrans %}" type="submit" onclick="return confirmation('{{ta_msg}}', '{{student.username}}');" />
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.reclassify_member' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="username" value="{{ student.username }}" />
+                            <input type="hidden" name="to_group" value="instructors" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with username=student.username %}Make {{username}} an Instructor{% endblocktrans %}" type="submit" onclick="return confirmation('{{instructor_msg}}', '{{student.username}}');" />
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.unenroll_student' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="remove_username" value="{{ student.username }}" />
+                            {% csrf_token %}
+                            <input class="btn-small  alert-error" value="{% blocktrans with username=student.username %}Remove {{username}} from course{% endblocktrans %}" type="submit" onclick="return confirmation('{{unenroll_msg}}', '{{student.username}}');" />
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <p>{% blocktrans %}{{num_students}} total students found.{% endblocktrans %}</p>
+            <span class="step-links">
+                {% if student_page.has_previous %}
+                <a class="btn" href="?student_filter={{student_filter}}&per_page={{per_page}}&page={{ student_page.previous_page_number }}"><em class="icon-arrow-left"></em></a>
+                {% endif %}
+                
+                <span class="current">
+                    {% trans 'Page' %} {{ student_page.number }} {% trans 'of' %} {{ student_page.paginator.num_pages }}
+                </span>
+                
+                {% if student_page.has_next %}
+                <a class="btn" href="?student_filter={{student_filter}}&per_page={{per_page}}&page={{ student_page.next_page_number }}"><em class="icon-arrow-right"></em></a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div id="invited" class="tab-pane">
+        <h3>{% trans 'Invited (but not yet enrolled) Students' %}</h3>
+        <form>
+            <label for="invite_filter">{% trans "Search for a part of the invitee's email address" %}</label>
+            <input id="invite_filter" type="text" name="invite_filter" value="{{invite_filter}}">
+                <input type="submit" />
+                </form>
+        <table id="invite_table">
+            <thead>
+                <th>{% trans 'Email' %}</th><th></th><th></th>
+            </thead>
+            <tbody>
+                {% for invite in invite_page %}
+                <tr><td>{{ invite.email }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.resend_invite' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="resend_email" value="{{ invite.email }}" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with email=invite.email %}Resend invite email to {{email}}{% endblocktrans %}" type="submit" />
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'courses.member_management.views.uninvite' common_page_data.course_prefix common_page_data.course_suffix %}">
+                            <input type="hidden" name="uninvite_email" value="{{ invite.email }}" />
+                            {% csrf_token %}
+                            <input class="btn-small" value="{% blocktrans with email=invite.email %}Revoke invite to {{email}}{% endblocktrans %}" type="submit" />
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="pagination">
+            <p>{% blocktrans %}{{num_invites}} total invites found.{% endblocktrans %}</p>
+            <span class="step-links">
+                {% if invite_page.has_previous %}
+                <a class="btn" href="?invite_filter={{invite_filter}}&per_page={{per_page}}&invite_page={{ invite_page.previous_page_number }}"><em class="icon-arrow-left"></em></a>
+                {% endif %}
+                
+                <span class="current">
+                    {% trans 'Page' %} {{ invite_page.number }} {% trans 'of' %} {{ invite_page.paginator.num_pages }}
+                </span>
+                
+                {% if invite_page.has_next %}
+                <a class="btn" href="?invite_filter={{invite_filter}}&per_page={{per_page}}&invite_page={{ invite_page.next_page_number }}"><em class="icon-arrow-right"></em></a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block addl_scripts %}
+<script>
+    function confirmation(message, username) {
+        var yn = confirm("" + message + " : " + username + "?");
+        return yn;
+    }
+    $(document).ready(function () {
+    
+      {# Defaults #}
+      if (document.location.hash == "#students" ||
+          document.location.hash == "#add-students" ||
+          document.location.hash == "#instructors" ||
+          document.location.hash == "#tas" ||
+          document.location.hash == "#invited" ) {
+            $('#management_tabs a[href="' + document.location.hash + '"]').tab('show');
+      }
+                      
+      {# Overrides #}
+      {% if 'student_filter' in request.get_full_path %}
+      $('#management_tabs a[href="#students"]').tab('show');
+      {% endif %}
+      
+      {% if 'invite_filter' in request.get_full_path %}
+      $('#management_tabs a[href="#invited"]').tab('show');
+      {% endif %}
+    });
+</script>
+{% endblock %}

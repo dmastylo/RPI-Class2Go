@@ -93,7 +93,7 @@
                         <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">{% trans 'Login' %}</a>
                         {% endif %}
                     </li>
-                    {% if not common_page_data.course.institution_only %}
+                    {% if not common_page_data.course.institution_only and not common_page_data.ready_course.preenroll_only %}
                     <li class="visible-phone">
                         <a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}">{% trans 'Register' %}</a>
                     </li>
@@ -101,12 +101,13 @@
                 {% endif %}
                 {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
                     {% if common_page_data.course_mode == 'draft' %}
-                        <li class="dropdown"{% block course_admin_link %}{% endblock course_admin_link %}>
+                        <li class="dropdown {% block admin_link_class %}{% endblock admin_link_class %}>"{% block course_admin_link %}{% endblock course_admin_link %}>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Course Administration' %}<em class="caret"></em></a>
                             <ul class="dropdown-menu">
                               <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Email Course Members' %}</a></li>
                               <li><a href="{% url 'courses.reports.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Reports' %}</a></li>
                               <li><a href="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'In-line Reports' %}</a></li>
+                                <li><a href="{% url 'courses.member_management.views.listAll' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Member Management' %}</a></li>
                                 {% if common_page_data.course.share_to.exists %}
                               <li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Copy Content To Other Course' %}</a></li>
                                 {% endif %}
