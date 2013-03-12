@@ -73,7 +73,7 @@ def email_new_student_invite(request, invite):
                                   })
     subject = "You have been invited to register for " + course.title
     
-    staff_email = 'noreply@class2go.stanford.edu'
+    staff_email = settings.SERVER_EMAIL
     course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
     email_helper(subject, email_text, email_html, from_addr, invite.email)
@@ -94,7 +94,7 @@ def email_existing_student_enrollment(request, course, user):
                                   })
     subject = "You have been enrolled in " + course.title
     
-    staff_email = 'noreply@class2go.stanford.edu'
+    staff_email = settings.SERVER_EMAIL
     course_title_no_quotes = re.sub(r'"', '', course.title) # strip out all quotes
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
     email_helper(subject, email_text, email_html, from_addr, user.email)
