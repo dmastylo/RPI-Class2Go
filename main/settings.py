@@ -302,7 +302,9 @@ INSTALLED_APPS = (
                       'exception_snippet',
                       'rest_framework',
                        #'reversion',
-                       'certificates',
+                       'tools',
+                       'tools.aws',
+                       'tools.certificates',
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
