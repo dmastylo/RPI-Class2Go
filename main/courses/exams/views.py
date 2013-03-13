@@ -362,7 +362,7 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
 
     generate_submission_csv_task.delay(course.id, exam.id, request.user.email)
 
-    messages.add_message(request, messages.INFO, 'Generating submission CSV for %s.  You should be receiving it via email attachment shortly.' \
+    messages.add_message(request, messages.INFO, 'Generating submission CSV for %s.  You will receive an email when it is ready.' \
                          % exam.title)
 
     return HttpResponseRedirect(reverse(exam.list_view, args=[course_prefix, course_suffix]))
