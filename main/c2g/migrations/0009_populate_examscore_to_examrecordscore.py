@@ -8,17 +8,65 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        db.execute('CREATE TABLE `examscore_pop_new_relation` \
-                  (`student_id` int(11) NOT NULL, \
-                   `exam_id` int(11) NOT NULL, \
-                   `es_score` double default NULL, \
-                   `er_score` double default NULL, \
-                   `er_id` int(11) default NULL, \
-                   `es_id` int(11) NOT NULL default \'0\', \
-                   `ers_id` int(11) default NULL, \
-                   UNIQUE KEY `es_ers_id` (`es_id`) ) ENGINE=innodb')
+        if not db.dry_run:
+            
+            #This migration back populates the c2g_examscore.examrecordscore_id foreign key.
+            #Initially I did this in Django code but the performance was poor so this is much faster but
+            #more in the realms of SQL.
+            
+            #This command creates a temp table to be used later
+            print "This migration back populates the new c2g_examscore.examrecordscore_id relation; it may take a few minutes."
+            print "Creating temp table examscore_pop_new_relation"
+            db.execute('CREATE TABLE `examscore_pop_new_relation` \
+                      (`student_id` int(11) NOT NULL, \
+                       `exam_id` int(11) NOT NULL, \
+                       `es_score` double default NULL, \
+                       `er_score` double default NULL, \
+                       `er_id` int(11) default NULL, \
+                       `es_id` int(11) NOT NULL default \'0\', \
+                       `ers_id` int(11) default NULL, \
+                       UNIQUE KEY `es_ers_id` (`es_id`) ) ENGINE=MyISAM')
         
         
+            #Need to chuck up the inserts into the temp table and do in a transaction as otherwise I run into
+            #exceeding available table locks error.
+            print "Populating the temp table"
+            start = 0
+            while start < 200000:
+                start_val = str(start)
+                end_val = str(start + 500)
+         
+                db.start_transaction()
+                db.execute("insert into examscore_pop_new_relation \
+                          (select er.student_id, \
+                           er.exam_id, \
+                           es.score \"es_score\", \
+                           er.score \"er.score\", \
+                           max(er.id) \"er_id\", \
+                           es.id \"es_id\", \
+                           max(ers.id) \"ers_id\" \
+                           from c2g_examrecord er, c2g_examscore es, c2g_examrecordscore ers \
+                           where er.student_id = es.student_id \
+                           and er.exam_id = es.exam_id \
+                           and er.score = es.score \
+                           and er.complete = 1 \
+                           and ers.record_id = er.id \
+                           and er.student_id > " + start_val + "\
+                           and er.student_id <= " + end_val + "\
+                           group by er.student_id, er.exam_id)")
+            
+                start += 500
+                db.commit_transaction()
+            
+            print "Updating c2g_examscore records"
+            db.execute('update c2g_examscore es, examscore_pop_new_relation espnr \
+                        set es.examrecordscore_id = espnr.ers_id \
+                        where es.id = espnr.es_id')
+            
+            print "Deleting the temp table"
+            db.execute('drop table examscore_pop_new_relation')
+            
+            print "All done."
 
     def backwards(self, orm):
         pass
