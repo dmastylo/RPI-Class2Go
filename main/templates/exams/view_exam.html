@@ -168,12 +168,15 @@
 
     {% endif %}
 
-    
-    {% if score %}
-          <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</strong></h4>
-    {% endif %}
-    {% if raw_score %}
-          <h4><strong style="color:red">{% trans 'Raw Score (without late or resubmission penalties)' %}: {{raw_score}}</strong></h4>
+    {% if score or raw_score %}
+        <div class="score-area">
+            {% if score %}
+                <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</strong></h4>
+            {% endif %}
+            {% if raw_score %}
+                <h4><strong style="color:red">{% trans 'Raw Score (without late or resubmission penalties)' %}: {{raw_score}}</strong></h4>
+            {% endif %}
+        </div>
     {% endif %}
 
     <noscript>
@@ -215,22 +218,24 @@
 {% block r_column_content %}
     {% if score or raw_score %}
     <div id="c2g_layout_r_column" class="span3">                   
-                   <div id="right_nav" class="well nav">
-                       <div class="share-result">
+                   <div id="right_nav" class=" well nav">
+                       <div id="share-result">
                            <h3>Share Your Results!</h3>
                            <ul class="nav nav-tabs">
                                <li class="active"><a href="#twitter-tab" data-toggle="tab">Twitter</a></li>
                                <li><a href="#facebook-tab" data-toggle="tab">Facebook</a></li>
                            </ul>
                            <div class="tab-content">
-                               <div class="tab-pane active" id="twitter-tab">
-                                  <textarea rows="4" cols="35" maxlength="140"></textarea>
-                                  <a class="btn pull-left share-twitter-button" href="" target="_blank">Tweet this Message</a>
-                               </div>
-                               <div class="tab-pane" id="facebook-tab">
-                                  <textarea rows="4" cols="35" maxlength="140"></textarea>
-                                  <a class="btn pull-left share-facebook0button" href="" target="_blank">Share on Facebook</a>
-                               </div>
+                               <form class="tab-pane active" id="twitter-tab">
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ course.twitter_tag }}!</textarea>
+                                  <label for="twitter_show-score"><input type="checkbox" name="show-score" id="twitter_show-score" title="{{score}}/{{exam.total_score}}" /> Share my Score</label>
+                                  <a class="btn pull-left share-twitter-button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
+                               </form>
+                               <form class="tab-pane" id="facebook-tab">
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ course.twitter_tag }}!</textarea>
+                                  <label for="twitter_show-score"><input type="checkbox" name="show-score" id="twitter_show-score" title="{{score}}/{{exam.total_score}}" /> Share my Score</label>
+                                  <a class="btn pull-left share-facebook-button" href="http://www.facebook.com/sharer.php?u=" target="_blank">Share on Facebook!</a>
+                               </form>
                            </div>
                        </div>
                    </div>
@@ -856,9 +861,9 @@
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('#main-content input').attr('disabled','disabled');
-            $('#main-content textarea').attr('disabled','disabled');
-            $('#main-content select').attr('disabled', 'disabled');
+            $('#exam-pane input').attr('disabled','disabled');
+            $('#exam-pane textarea').attr('disabled','disabled');
+            $('#exam-pane select').attr('disabled', 'disabled');
 
             // hide submit button
             var submitBtn = $('#submit-button');
@@ -941,7 +946,7 @@
         }
                       
         var myXML = $.parseXML(correxObj["__metadata__"]);
-        console.log(myXML);
+        //console.log(myXML);
         var examMD = $(myXML).find('exam_metadata');
         var questionMD = $(examMD).find('question_metadata');
         $(questionMD).each(function(){displayQuestionExplanation(this);
@@ -1096,8 +1101,8 @@
     $('#submit-button').attr('disabled','disabled');
     $('#saveWorkBtn').attr('disabled','disabled');
     $('#reEnableForm').remove();
-    $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
-    $('#main-content textarea').attr('disabled','disabled');
+    $('#exam-pane input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
+    $('#exam-pane textarea').attr('disabled','disabled');
                       
     {% endif %}
                       
@@ -1183,5 +1188,24 @@
 </script>
 {% endif %}
 
+
+{% if score or raw_score %}
+     <script>
+          var twitter_pre_href = $('#share-result form a.share-twitter-button').attr('href');
+          var twitter_post_href;
+          var facebook_pre_href = $('#share-result form a.share-facebook-button').attr('href');
+          var facebook_post_href;
+          
+          $('#share-result form input').toggle(function() {
+                   var score_text = " I got a score of: " + $(this).attr('title') + "!";
+                   $(this).siblings('textarea').append(score_text);
+          })
+          
+          $('#share-result form a.share-twitter-button').focus(function() {
+                   twitter_post_href = $(this).siblings('textarea').text();
+                   console.log(twitter_post_href);
+          });
+     </script>
+{% endif %}
 
 {% endblock addl_scripts %}

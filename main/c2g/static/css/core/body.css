@@ -576,6 +576,10 @@ small.date {
     min-height:450px;
 }
 
+.score-area {
+    margin-bottom: 25px;
+}
+
 #left-nav h3.expanded {
     /*background:url(../../graphics/core/icon-minus.png) no-repeat right 7px;*/
     background:url(../../graphics/core/arrow-open.png) no-repeat right 9px;
