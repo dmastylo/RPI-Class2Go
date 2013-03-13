@@ -2456,7 +2456,7 @@ class ExamScore(TimestampMixin, models.Model):
 
     def setScore(self):
         #Set score to max of ExamRecordScore.score for this exam, student
-        exam_records = ExamRecord.objects.values('id').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score')).order_by('-id')[:1]
+        exam_records = ExamRecord.objects.values('id').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score')).order_by('-max_score', '-id')[:1]
         
         if exam_records:
             self.score = exam_records[0]['max_score']
