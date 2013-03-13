@@ -580,6 +580,16 @@ small.date {
     margin-bottom: 25px;
 }
 
+#share-result textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+#share-result .show_score {
+    display: block;
+    clear: both;
+    padding-bottom: 10px;
+}
+
 #left-nav h3.expanded {
     /*background:url(../../graphics/core/icon-minus.png) no-repeat right 7px;*/
     background:url(../../graphics/core/arrow-open.png) no-repeat right 9px;

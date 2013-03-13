@@ -221,22 +221,36 @@
                    <div id="right_nav" class=" well nav">
                        <div id="share-result">
                            <h3>Share Your Results!</h3>
+                           
+                           <form class="tab-pane active" id="twitter-tab">
+                               <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ course.twitter_tag }}!</textarea>
+                               <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                               <a class="btn pull-left share_button" id="twitter_button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
+                           </form>
+                   <!--
                            <ul class="nav nav-tabs">
                                <li class="active"><a href="#twitter-tab" data-toggle="tab">Twitter</a></li>
                                <li><a href="#facebook-tab" data-toggle="tab">Facebook</a></li>
+                               <li><a href="#google-tab" data-toggle="tab">Google+</a></li>
                            </ul>
                            <div class="tab-content">
                                <form class="tab-pane active" id="twitter-tab">
                                   <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ course.twitter_tag }}!</textarea>
-                                  <label for="twitter_show-score"><input type="checkbox" name="show-score" id="twitter_show-score" title="{{score}}/{{exam.total_score}}" /> Share my Score</label>
-                                  <a class="btn pull-left share-twitter-button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
+                                  <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                  <a class="btn pull-left share_button" id="twitter_button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
                                </form>
                                <form class="tab-pane" id="facebook-tab">
-                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ course.twitter_tag }}!</textarea>
-                                  <label for="twitter_show-score"><input type="checkbox" name="show-score" id="twitter_show-score" title="{{score}}/{{exam.total_score}}" /> Share my Score</label>
-                                  <a class="btn pull-left share-facebook-button" href="http://www.facebook.com/sharer.php?u=" target="_blank">Share on Facebook!</a>
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" on Class2Go!</textarea>
+                                  <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                  <a class="btn pull-left share_button" id="facebook_button" href="http://www.facebook.com/sharer.php?u=" target="_blank">Share on Facebook!</a>
+                               </form>
+                               <form class="tab-pane" id="google-tab">
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" on Class2Go!</textarea>
+                                  <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                  <a class="btn pull-left share_button" id="google_button" href="https://m.google.com/app/plus/x/?v=compose&content=" target="_blank">Share on Google+!</a>
                                </form>
                            </div>
+                   -->
                        </div>
                    </div>
     </div>
@@ -1191,19 +1205,34 @@
 
 {% if score or raw_score %}
      <script>
-          var twitter_pre_href = $('#share-result form a.share-twitter-button').attr('href');
+          var twitter_pre_href = $('#share-result form a#twitter_button').attr('href');
           var twitter_post_href;
-          var facebook_pre_href = $('#share-result form a.share-facebook-button').attr('href');
+          var facebook_pre_href = $('#share-result form a#facebook_button').attr('href');
           var facebook_post_href;
+          var google_pre_href = $('#share-result form a#google_button').attr('href');
+          var google_post_href;
           
-          $('#share-result form input').toggle(function() {
-                   var score_text = " I got a score of: " + $(this).attr('title') + "!";
-                   $(this).siblings('textarea').append(score_text);
+          $('#share-result form .show_score').click(function() {
+                   var score_text = $(this).siblings('textarea').val() + " I scored " + $(this).attr('title') + "!";
+                   $(this).siblings('textarea').val(score_text);
           })
           
-          $('#share-result form a.share-twitter-button').focus(function() {
-                   twitter_post_href = $(this).siblings('textarea').text();
-                   console.log(twitter_post_href);
+          $('#share-result form a.share_button').click(function() {
+                   var which_share = $(this).attr('id');
+                   switch(which_share) {
+                            case "twitter_button":
+                                      twitter_post_href = $(this).siblings('textarea').val();
+                                      var twitter_href = twitter_pre_href + twitter_post_href.replace(/\ /g, "%20").replace(/\#/g, '%23');
+                                      $(this).attr('href', twitter_href);
+                                      break;
+                            case "facebook_button":
+                                      break;
+                            case "google_button":
+                                      google_post_href = $(this).siblings('textarea').val();
+                                      var google_href = google_pre_href + google_post_href.replace(/\ /g, "%20");
+                                      $(this).attr('href', google_href);
+                                      break;
+                   }      
           });
      </script>
 {% endif %}
