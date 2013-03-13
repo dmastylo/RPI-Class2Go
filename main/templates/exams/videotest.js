@@ -323,6 +323,7 @@
                     $('#' + firstQuestionId).show(0, C2G.checkSubmitStatus);
                     currentQuestionId = firstQuestionId;
                     $('#exam-pane').fadeTo('fast', 1.0);
+                    C2G.videoSetup.resumeVideo = false;
                 };
             };
               
