@@ -299,7 +299,7 @@ class SimpleTest(TestCase):
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
                 self.assertEqual(response['Location'],"http://class.stanford.edu/%s/WallaWalla%s" % (course, ending))
                 #POST
-                request = self.factory.post('/%s/WallaWalla3%s' % (course, ending))
+                request = self.factory.post('/%s/WallaWalla%s' % (course, ending))
                 request.META['HTTP_HOST']='class.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
