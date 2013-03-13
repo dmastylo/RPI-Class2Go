@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from c2g.models import Course, StudentInvitation
+from urllib import quote_plus
 
 import settings
 import re
@@ -58,7 +59,7 @@ def email_new_student_invite(request, invite):
     email_text = render_to_string('member_management/student_invite.txt',
                                   {'title':course.title,
                                   'registration_url':request.build_absolute_uri(reverse('registration_register')) \
-                                  + "?invite=%s" % invite.email,
+                                  + "?invite=%s" % quote_plus(invite.email),
                                   'course_url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
                                   'institution':settings.SITE_TITLE,
                                   'email':invite.email,
@@ -66,7 +67,7 @@ def email_new_student_invite(request, invite):
     email_html = render_to_string('member_management/student_invite.html',
                                   {'title':course.title,
                                   'registration_url':request.build_absolute_uri(reverse('registration_register')) \
-                                  + "?invite=%s" % invite.email,
+                                  + "?invite=%s" % quote_plus(invite.email),
                                   'course_url':request.build_absolute_uri(reverse('courses.views.main', args=[course.prefix, course.suffix])),
                                   'institution':settings.SITE_TITLE,
                                   'email':invite.email,

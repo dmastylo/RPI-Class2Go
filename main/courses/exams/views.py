@@ -19,7 +19,7 @@ AWS_SECURE_STORAGE_BUCKET_NAME = getattr(settings, 'AWS_SECURE_STORAGE_BUCKET_NA
 
 logger = logging.getLogger(__name__)
 
-from c2g.models import ContentGroup, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, parse_video_exam_metadata, StudentExamStart
+from c2g.models import ContentGroup, Exam, ExamRecord, ExamScore, ExamScoreField, ExamRecordScore, ExamRecordScoreField, ExamRecordFieldLog, ExamRecordScoreFieldChoice, ContentSection, PageVisitLog, parse_video_exam_metadata, StudentExamStart
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseBadRequest, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -113,6 +113,14 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
         and request.GET.get("confirm", "") != "True" and not StudentExamStart.objects.filter(student=request.user, exam=exam).exists():
         return HttpResponseRedirect(reverse('confirm_exam_start', args=(course.prefix, course.suffix, exam.slug)))
 
+    if not request.common_page_data['is_course_admin']:
+        visit_log = PageVisitLog(
+            course = request.common_page_data['ready_course'],
+            user = request.user,
+            page_type = exam.exam_type,
+            object_id = str(exam.id),
+        )
+        visit_log.save()
 
     ready_section = exam.section
     if ready_section and ready_section.mode == "draft":
