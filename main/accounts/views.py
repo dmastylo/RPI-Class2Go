@@ -40,12 +40,6 @@ def profile(request):
     group_list = user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
     course_completions = {}
-    for course in courses:
-        if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
-            duration = course.calendar_end - course.calendar_start
-            progress = min(date.today(), course.calendar_end) - course.calendar_start
-            course_completion = int((float(progress.days) / float(duration.days)) * 100)
-            course_completions[course.id] = course_completion
     
     user_profile = None
     is_student_list = []
@@ -65,6 +59,13 @@ def profile(request):
             else:
                 certs_list[cert.course_id] = [certinfo]
                 if longest_certlist == 0: longest_certlist = 1
+        
+        for course in courses:
+            if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
+                duration = course.calendar_end - course.calendar_start
+                progress = min(date.today(), course.calendar_end) - course.calendar_start
+                course_completion = int((float(progress.days) / float(duration.days)) * 100)
+                course_completions[course.id] = course_completion
 
     has_webauth = False
     if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
