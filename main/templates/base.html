@@ -10,9 +10,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, target-densitydpi=device-dpi">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    {% if SITE_NAME_SHORT == 'Stanford' %}
-        <link rel='shortcut icon' type='image/x-icon' href='{{ STATIC_URL }}graphics/core/stanford-favicon.ico' />
-    {% endif %}
+    <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
     
     {% block top_scripts %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
@@ -21,7 +19,6 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/analogclock.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/{{ SITE_NAME_SHORT }}-styles.css" />
     <!--[if IE 7]>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
     <![endif]-->
