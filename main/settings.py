@@ -94,7 +94,7 @@ except NameError:
     SITE_NAME_SHORT = 'Stanford'
     SITE_NAME_LONG = 'Stanford University'
     SITE_TITLE = 'Stanford Class2Go'
-    SITE_URL = 'https://class2go.stanford.edu'
+    SITE_URL = 'http://class2go.stanford.edu'
 
 
 # If you set this to False, Django will make some optimizations so as not
