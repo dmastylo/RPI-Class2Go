@@ -47,7 +47,7 @@ a:hover {color:#1F5EB7;}
 	overflow:hidden}
 
 .stanford-logo {
-    background-image: url(../../graphics/core/uwa-logo.gif);
+    background-image: url(../../../graphics/sites/UWA/uwa-logo.gif);
     background-repeat: no-repeat;
     background-size: auto auto;
     display: block;
@@ -84,7 +84,7 @@ a:hover {color:#1F5EB7;}
   background: #666;}
 
 .home .hero-header {
-    background-image: url("../../graphics/core/Winthrop-Hall-Yellow-for-Lightbox.png");
+    background-image: url("../../../graphics/sites/UWA/Winthrop-Hall-Yellow-for-Lightbox.png");
     padding-bottom: 40px;
     padding-left: 0px;
     padding-right: 0px;
@@ -109,13 +109,13 @@ MENU
         
         
 #c2g_layout_topbar .navbar .navbar-inner {
-        background-image: url("../../graphics/core/uwa-bg-nav.png") !important;
+        background-image: url("../../../graphics/sites/UWA/uwa-bg-nav.png") !important;
    }
 
 
 
 .navbar .nav .active > a, .navbar .nav .active > a:hover  {
-        background-image: url("../../graphics/core/uwa-bg-nav-selected.png") !important;
+        background-image: url("../../../graphics/sites/UWA/uwa-bg-nav-selected.png") !important;
         color: #000;
    }
 
@@ -258,7 +258,7 @@ FOOTER
 ***********/   
    
    #global-footer {
-    background:url(../../graphics/core/footer-hp-bgrepeat.jpg) repeat-x;}
+    background:url(../../../graphics/core/footer-hp-bgrepeat.jpg) repeat-x;}
     
     .footer ul a {color: #666;}
     

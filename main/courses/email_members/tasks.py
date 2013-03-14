@@ -168,9 +168,14 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
     
     p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
     (plaintext, err_from_stderr) = p.communicate(input=msg.html_message.encode('utf-8')) #use lynx to get plaintext
-    staff_email = 'noreply@class2go.stanford.edu'
-    if course_handle:
-        staff_email = re.sub(r'\--', r'-',course_handle) + '-staff@class2go.stanford.edu'
+
+    if settings.SITE_NAME_SHORT == "Stanford":
+        staff_email = 'noreply@class2go.stanford.edu'
+        if course_handle:
+            staff_email = re.sub(r'\--', r'-',course_handle) + '-staff@class2go.stanford.edu'
+    else:
+        staff_email = settings.SERVER_EMAIL
+
     course_title_no_quotes = re.sub(r'"', '', course_title) # strip out all quotes
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email) #make certain that we quote the name part of the email address
 
@@ -195,6 +200,8 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
                                            'first_name':first_name,
                                            'last_name':last_name,
                                            'email':email,
+                                           'site_title':settings.SITE_TITLE,
+                                           'site_url':settings.SITE_URL,
                                            })
             
             plain_footer = render_to_string('email/email_footer.txt',
@@ -203,6 +210,8 @@ def course_email_with_celery(hash_for_msg, to_list,  throttle=False, course_titl
                                             'first_name':first_name,
                                             'last_name':last_name,
                                             'email':email,
+                                            'site_title':settings.SITE_TITLE,
+                                            'site_url':settings.SITE_URL,
                                             })
             email_msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer.encode('utf-8'), from_addr, [email], connection=connection)
             email_msg.attach_alternative(msg.html_message+html_footer.encode('utf-8'),'text/html')
@@ -272,6 +281,8 @@ def email_with_celery(subject,html_msg,sender,recipient_email_list,course_title=
                                         'first_name':user.first_name,
                                         'last_name':user.last_name,
                                         'email':user.email,
+                                        'site_title':settings.SITE_TITLE,
+                                        'site_url':settings.SITE_URL,
                                         })
     
             plain_footer = render_to_string('email/email_footer.txt',
@@ -280,6 +291,8 @@ def email_with_celery(subject,html_msg,sender,recipient_email_list,course_title=
                                         'first_name':user.first_name,
                                         'last_name':user.last_name,
                                         'email':user.email,
+                                        'site_title':settings.SITE_TITLE,
+                                        'site_url':settings.SITE_URL,
                                         })
         
             msg = EmailMultiAlternatives(msg.subject, plaintext+plain_footer.encode('utf-8'), from_addr, [email], connection=connection)

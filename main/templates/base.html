@@ -185,9 +185,8 @@
         
     </div>
 
-    {% with "sites/"|add:SITE_NAME_SHORT|add:"/footer.html" as footer_include %}
-    {% include  footer_include  %}
-    {% endwith %}
+    {% include  "footer.html"  %}
+
 
     {% block bottom_scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
@@ -303,7 +302,11 @@
     {% endblock bottom_scripts %}
     <script type="text/javascript">
       var _gaq = _gaq || [];
+      {% if SITE_NAME_SHORT == 'Stanford' %}
       _gaq.push(['_setAccount', 'UA-33859275-1']);
+      {% else %}
+      _gaq.push(['_setAccount', 'UA-38369706-1']);
+      {% endif %}
       _gaq.push(['_trackPageview']);
 
       (function() {

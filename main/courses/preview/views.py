@@ -65,7 +65,7 @@ def preview(request, course_prefix, course_suffix):
     # default template, unless there is one in the soruce tree, then use that
     template_name='previews/default.html'
     class_template='previews/'+request.common_page_data['course'].handle+'.html'
-    if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
+    if os.path.isfile(settings.TEMPLATE_DIRS[1]+'/'+class_template):
         template_name=class_template
 
     return render_to_response(template_name,
