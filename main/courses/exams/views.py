@@ -160,6 +160,12 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
     else:
         endtime = None
 
+    
+    #Now we have to figure out which questions to show
+    #First see if there is a choosenquestions parameter
+    
+    #if the student has a saved ExamRecord, use the __renderedQuestions__ field of json_data
+    #otherwise we choose as specified
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
                               'json_pre_pop':incomplete_record.json_data, 'too_recent':too_recent,
@@ -168,6 +174,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
                               'allow_submit':allow_submit, 'too_many_attempts':too_many_attempts,
                               'endtime':endtime, 'timeopened':timeopened,
                               'exam':exam,}, RequestContext(request))
+
 
 def last_completed_record(exam, student, include_contentgroup=False):
     """Helper function to get the last completed record of this exam.
@@ -456,6 +463,10 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     
     record = ExamRecord(course=course, exam=exam, student=user, json_data=postdata, onpage=onpage, attempt_number=attempt_number, late=exam.past_due())
     record.save()
+
+    #now delete any incomplete attempts, since there is now a complete one. (Also so we don't show the same set
+    #of randomized questions again)
+    ExamRecord.objects.filter(course=course, exam=exam, student=user, complete=False).delete()
 
     autograder = None
 

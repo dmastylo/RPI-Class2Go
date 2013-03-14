@@ -5,7 +5,7 @@ import tempfile
 from django.core.files import File as FieldFile
 from test_harness.test_base import SimpleTestBase
 
-from c2g.models import Course
+from c2g.models import Course, Exam
 from c2g.models import File as FileModel
 #from c2g.models import Institution
 
@@ -79,3 +79,42 @@ class C2GUnitTests(SimpleTestBase):
         """
         resp=self.client.get('/')
         self.assertEqual(resp.status_code,200)
+
+    def test_num_questions(self):
+        """
+        Tests the num_questions function in the Exam() class.
+        """
+        badxml1="<"
+        badxml2="<abc>"
+        badxml3="<def />"
+        badxml4="""<exam_metadata choosenquestions="" />"""
+        badxml5="""<exam_metadata choosenquestions="baby" />"""
+        xml1="<exam_metadata />"
+        xml2="""<exam_metadata choosenquestions="3" />"""
+        xml3="""<exam_metadata choosenquestions="542" />"""
+
+        exam = Exam()
+        exam.xml_metadata=badxml1
+        self.assertEqual(exam.num_random_questions(),0)
+        exam.xml_metadata=badxml2
+        self.assertEqual(exam.num_random_questions(),0)
+        exam.xml_metadata=badxml3
+        self.assertEqual(exam.num_random_questions(),0)
+        exam.xml_metadata=badxml4
+        self.assertEqual(exam.num_random_questions(),0)
+        exam.xml_metadata=badxml5
+        self.assertEqual(exam.num_random_questions(),0)
+        exam.xml_metadata=xml1
+        self.assertEqual(exam.num_random_questions(),0)
+        exam.xml_metadata=xml2
+        self.assertEqual(exam.num_random_questions(),3)
+        exam.xml_metadata=xml3
+        self.assertEqual(exam.num_random_questions(),542)
+
+
+###Test cases
+# Bad HTML
+# random
+# question_id
+# random > avail
+# question_id with non-matching

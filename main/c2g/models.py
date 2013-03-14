@@ -5,8 +5,11 @@ import os
 import re
 import sys
 import time
-from xml.dom.minidom import parseString
+import html5lib
 
+from xml.dom.minidom import parseString
+from xml.parsers.expat import ExpatError
+from html5lib import treebuilders
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.cache import get_cache
@@ -2003,7 +2006,92 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if re.search(r"\$\$.*\$\$", self.html_content, re.DOTALL) or re.search(r"\\\[.*\\\]", self.html_content, re.DOTALL):
             return True
         return False
+    
+    def num_random_questions(self):
+        """The number of randomly_selected questions that are specified to be shown
+           Returns 0 if there is no choosenquestions attribute in exam_metadata or
+            if anything fails to parse, etc.
+        """
+        try:
+            md_dom = parseString(encoding.smart_str(self.xml_metadata, encoding='utf-8'))
+        except ExpatError:
+            return 0 
+        exam_md = md_dom.getElementsByTagName('exam_metadata')
+        if not exam_md:
+            return 0
+        else:
+            numstr = exam_md[0].getAttribute('choosenquestions')
+            try:
+                return int(numstr)
+            except ValueError:
+                return 0
+        return 0
+
+    def getHTML(self, question_ids=[]):
+        """ Gets the rendered question HTML, taking into consideration any randomization.
+            The kwarg questions_ids takes a list of pre-selected question ids which
+            will be the only ones rendered (provided they exist).
+            The actual return value is a dict with key 'html' being the html content,
+            'subset' being a boolean if less than the total number of question divs are in html,
+            and 'question_ids' being an array of ids of the included <div class="question">.
+            'question_ids' is only guaranteed be populated if 'subset' is True
+        """
+        #defaults
+        retv = {'html':'', 'chosen':False, 'question_ids':[]}
         
+        numQ = self.num_random_questions()
+        #shortcut case.  We want the html_content as is
+        if not numQ and not question_ids:
+            retv['html'] = self.html_content
+            return retv
+
+        #here, we have to parse the HTML
+        parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder("dom"))
+        #even though we're parsing a fragment, calling parse fills in the
+        #<html><head /><body /></html> structure
+        html_dom = p.parse(self.html_content)  
+        bodys = html_dom.getElementsByTagName('body')
+        if not bodys:
+            retv['html']=self.html_content
+            return retv
+        body = bodys[0]
+        divs = body.getElementsByTagName('div')
+
+        def has_class(attr_str, classname):
+            """helper function to find a particular name in the class attribute"""
+            return re.search(r"\b"+classname+r"\b", attr_str)
+
+        #this is a minidom containing all of the <div class="question">s
+        question_divs = filter(lambda div: has_class(div.getAttribute('class'), 'question'), divs)
+
+        #now break up into 2 cases.  1 if question_ids is specified and 1 picking random divs
+        #b/c we need to use removeChild to manipulate the DOM, have to build up a "removal" list
+        #then actually remove it from the minidom representation of <body>
+        if question_ids:
+            divs_chosen = filter(lambda div: div.getAttribute('id') in question_ids, question_divs)
+            div_to_remove = filter(lambda div: div.getAttribute('id') not in question_ids, question_divs)
+            for div in divs_to_remove:
+                body.removeChild(div)
+        else:
+            divs_chosen = question_divs
+            divs_to_remove = []
+            while len(divs_chosen) > numQ:
+                chx = random.choice(divs_chosen)
+                divs_chosen.remove(chx)
+                divs_to_remove.append(chx)
+            for div in divs_to_remove:
+                body.removeChild(div)
+
+        #now serialize
+        ret_html = ""
+        for child in body.childNodes: #do this so we don't get the <body> tag
+            ret_html += child.toxml()
+        chosen_div_ids = map(lambda div: div.getAttribute('id'), divs_chosen)
+
+        retv['html'] = ret_html
+        retv['subset'] = len(divs_chosen) < len(question_divs)
+        retv['question_ids'] = chosen_div_ids
+        return retv
     
     def create_ready_instance(self):
         ready_instance = Exam(
