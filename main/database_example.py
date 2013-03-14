@@ -52,6 +52,7 @@ SITE_ID = 1
 SITE_NAME_SHORT = 'Stanford'
 SITE_NAME_LONG = 'Stanford University'
 SITE_TITLE = 'Stanford Class2Go'
+SITE_URL = 'https://class2go.stanford.edu'
 
 # Put your name and email address here, so Django serious errors can come to you
 # the trailing comma after the list is important so Python correctly interprets 

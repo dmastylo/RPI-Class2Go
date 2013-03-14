@@ -22,8 +22,7 @@ def landing(request):
         course_list = Course.objects.filter(Q(mode='ready', 
                 institution_only = 0) | Q(mode='ready', institution__id__in=request.user.get_profile().institutions.all()))
         
-    site = getattr(settings, 'SITE_NAME_SHORT')
-    r = render_to_response("sites/%s/landing.html" % site,
+    r = render_to_response("landing.html",
             {'hiring': hiring, 
              'course_list':course_list,
              'display_login': request.GET.__contains__('login')},
@@ -33,5 +32,4 @@ def landing(request):
 
 def hiring(request):
     context = RequestContext(request)
-    site = getattr(settings, 'SITE_NAME_SHORT')
-    return render_to_response("sites/%s/hiring.html" % site, context_instance=context)
+    return render_to_response("hiring.html", context_instance=context)

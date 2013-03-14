@@ -88,11 +88,13 @@ try:
     SITE_NAME_SHORT
     SITE_NAME_LONG
     SITE_TITLE
+    SITE_URL
 except NameError:
     SITE_ID = 1
     SITE_NAME_SHORT = 'Stanford'
     SITE_NAME_LONG = 'Stanford University'
     SITE_TITLE = 'Stanford Class2Go'
+    SITE_URL = 'http://class2go.stanford.edu'
 
 
 # If you set this to False, Django will make some optimizations so as not
@@ -248,7 +250,9 @@ CACHES = {
 
 thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
+    thispath+'/site_templates/'+SITE_NAME_SHORT,
     thispath+'/templates'
+
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -465,7 +469,7 @@ BROKER_TRANSPORT='sqs'
 BROKER_USER = AWS_ACCESS_KEY_ID
 BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
 BROKER_TRANSPORT_OPTIONS = {
-    'region': 'us-west-2', 
+    'region': 'us-west-2',
     'queue_name_prefix' : INSTANCE+'-',
     'visibility_timeout' : 3600*6,
 }
