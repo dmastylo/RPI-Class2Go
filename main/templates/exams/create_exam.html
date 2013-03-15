@@ -818,6 +818,20 @@ age: 20,
     });
     var __saved_quizdown="";
     var __quizdown_saved=false;
+
+	for(var i = 1; i < 7; i++) {
+		var inputName = '#single-choice-entry-answer' + i; 
+		$(inputName)[0].number = i; 
+		var focusOutFunction = function() {
+			var displayVal = $('#single-choice-entry-answer' + this.number)[0].value; 
+			var submitVal = $('#single-choice-entry-value-answer' + this.number).val(); 
+			if(!submitVal)
+			{
+				$('#single-choice-entry-value-answer' + this.number).val(displayVal); 
+			}
+		}; 
+		$('#single-choice-entry-answer' + i).focusout(focusOutFunction); 
+	}
     
 	$( "#regex-response-form" ).dialog({
         autoOpen: false,
