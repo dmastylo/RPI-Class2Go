@@ -31,6 +31,16 @@ var c2gXMLParse = (function() {
                     if(mDOM[i].tagName == "DIV") {
                         $(mDOM[i]).attr('id', 'question_' + v);
                         $(mDOM[i]).attr('number', v);
+                        fieldset = $(mDOM[i]).find('input'); 
+                        if(fieldset)
+                        {
+                            for(var m = 0; m < fieldset.length; m++)
+                            {
+                                $(fieldset[m]).attr('name', 'question_' + v); 
+                                $(fieldset[m]).attr('id', 'question_' + v + '_name' + m); 
+                            } 
+                        }
+
                         v = v+1; 
                         allHTML = allHTML + mDOM[i].outerHTML; 
                     }
