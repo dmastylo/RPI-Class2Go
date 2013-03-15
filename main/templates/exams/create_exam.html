@@ -827,6 +827,8 @@ age: 20,
 			var submitVal = $('#single-choice-entry-value-answer' + this.number).val(); 
 			if(!submitVal)
 			{
+				displayVal = displayVal.toLowerCase(); 
+				displayVal = displayVal.replace(/[^a-zA-Z0-9]+/g,'-');
 				$('#single-choice-entry-value-answer' + this.number).val(displayVal); 
 			}
 		}; 
