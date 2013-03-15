@@ -577,7 +577,7 @@ small.date {
 }
 
 .score-area {
-    margin-bottom: 25px;
+    margin: 0 0 15px 0;
 }
 
 #share-result textarea {
@@ -588,6 +588,24 @@ small.date {
     display: block;
     clear: both;
     padding-bottom: 10px;
+}
+#share-result ul {
+    border-bottom: 1px solid #999 !important;
+}
+#share-result li a {
+    font-size: 18px;
+    background-color: transparent;
+}
+#share-result li.active a,
+#share-result li.active a:hover {
+    border: 1px solid #999;
+    border-bottom: 1px solid #f5f5f5 !important;
+    background-color: transparent;
+}
+#share-result li a:hover {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom: 1px solid #999 !important;
 }
 
 #left-nav h3.expanded {
