@@ -6,6 +6,8 @@ import re
 import sys
 import time
 import html5lib
+import random
+import copy
 
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
@@ -2027,21 +2029,21 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
                 return 0
         return 0
 
-    def getHTML(self, question_ids=[]):
+    def getHTML(self, question_ids=None):
         """ Gets the rendered question HTML, taking into consideration any randomization.
             The kwarg questions_ids takes a list of pre-selected question ids which
             will be the only ones rendered (provided they exist).
             The actual return value is a dict with key 'html' being the html content,
             'subset' being a boolean if less than the total number of question divs are in html,
-            and 'question_ids' being an array of ids of the included <div class="question">.
+            and 'question_ids' being an array of ids of the actually included <div class="question"> in html.
             'question_ids' is only guaranteed be populated if 'subset' is True
         """
         #defaults
-        retv = {'html':'', 'chosen':False, 'question_ids':[]}
+        retv = {'html':'', 'subset':False, 'question_ids':[]}
         
         numQ = self.num_random_questions()
         #shortcut case.  We want the html_content as is
-        if not numQ and not question_ids:
+        if not numQ and question_ids is None:
             retv['html'] = self.html_content
             return retv
 
@@ -2049,7 +2051,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder("dom"))
         #even though we're parsing a fragment, calling parse fills in the
         #<html><head /><body /></html> structure
-        html_dom = p.parse(self.html_content)  
+        html_dom = parser.parse(self.html_content)
         bodys = html_dom.getElementsByTagName('body')
         if not bodys:
             retv['html']=self.html_content
@@ -2067,13 +2069,13 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         #now break up into 2 cases.  1 if question_ids is specified and 1 picking random divs
         #b/c we need to use removeChild to manipulate the DOM, have to build up a "removal" list
         #then actually remove it from the minidom representation of <body>
-        if question_ids:
+        if question_ids is not None:
             divs_chosen = filter(lambda div: div.getAttribute('id') in question_ids, question_divs)
-            div_to_remove = filter(lambda div: div.getAttribute('id') not in question_ids, question_divs)
+            divs_to_remove = filter(lambda div: div.getAttribute('id') not in question_ids, question_divs)
             for div in divs_to_remove:
                 body.removeChild(div)
         else:
-            divs_chosen = question_divs
+            divs_chosen = copy.copy(question_divs)
             divs_to_remove = []
             while len(divs_chosen) > numQ:
                 chx = random.choice(divs_chosen)
