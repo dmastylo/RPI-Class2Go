@@ -51,6 +51,7 @@ class SimpleTest(TestCase):
                                 ('db','Winter2013'),
                                 ('class2go','tutorial'),
                                 ('EE364A','Winter2013'),
+                                ('networking', 'WallaWalla'),
                                 ):
             
             ### Create the new Course ###
@@ -283,6 +284,31 @@ class SimpleTest(TestCase):
                 request.META['HTTP_HOST']='class.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
+            
+            
+            #test the Walla Walla course (Should be old codebase)
+            for course in ('networking',):
+                #GET
+                request = self.factory.get('/%s/WallaWalla%s' % (course, ending))
+                request.META['HTTP_HOST']='class.stanford.edu'
+                response = self.redir.process_request(request)
+                self.assertIsNone(response)
+                request = self.factory.get('/%s/WallaWalla%s' % (course, ending))
+                request.META['HTTP_HOST']='class2go.stanford.edu'
+                response = self.redir.process_request(request)
+                self.assertTrue(isinstance(response,HttpResponseRedirect))
+                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/WallaWalla%s" % (course, ending))
+                #POST
+                request = self.factory.post('/%s/WallaWalla%s' % (course, ending))
+                request.META['HTTP_HOST']='class.stanford.edu'
+                response = self.redir.process_request(request)
+                self.assertIsNone(response)
+                request = self.factory.post('/%s/WallaWalla%s' % (course, ending))
+                request.META['HTTP_HOST']='class2go.stanford.edu'
+                response = self.redir.process_request(request)
+                self.assertTrue(isinstance(response,HttpResponseRedirect))
+                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/WallaWalla%s" % (course, ending))
+
 
             #test that we can redirect to the new codebase based on path
             for course in ('EE364A','db'):

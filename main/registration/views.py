@@ -9,12 +9,11 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from registration.backends import get_backend
-from courses.common_page_data import get_common_page_data
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
-
+from c2g.models import Course, StudentInvitation
 import json
 import settings
 import urlparse
@@ -202,20 +201,45 @@ def register(request, backend, success_url=None, form_class=None,
         if form.is_valid():
             #logger.info(form.cleaned_data['first_name'])
             new_user = backend.register(request, **form.cleaned_data)
+            #register the user in class based on course_prefix course_suffix
+            num_classes = 0
             try:
-                cpd=get_common_page_data(request, request.POST.get('course_prefix'), request.POST.get('course_suffix'))
-                course_group = cpd['course'].student_group
-                course_group.user_set.add(new_user)
-                return redirect(reverse('courses.views.main', args=[request.POST.get('course_prefix'), request.POST.get('course_suffix')]))
-            except:
+                course = Course.objects.get(handle=request.POST.get('course_prefix')+"--"+request.POST.get('course_suffix'), mode='draft')
+                if not course.preenroll_only:
+                    course.student_group.user_set.add(new_user)
+                    course_main = reverse('courses.views.main', args=[request.POST.get('course_prefix'), request.POST.get('course_suffix')])
+                    num_classes += 1
+            except Course.DoesNotExist:
                 pass
+        
+            #register the user based on invites
+            invites = StudentInvitation.objects.filter(email=new_user.email)
+            for invite in invites:
+                invite.course.student_group.user_set.add(new_user)
+                course_main = reverse('courses.views.main', args=[invite.course.prefix, invite.course.suffix])
+                invite.delete()
+                num_classes += 1
+            
+            #now determine where to redirect
+            if num_classes > 1:
+                return redirect('accounts_profile')
+            elif num_classes == 1:
+                return redirect(course_main)
+        
+            #default redirects
             if success_url is None:
                 to, args, kwargs = backend.post_registration_redirect(request, new_user)
                 return redirect(to, *args, **kwargs)
             else:
                 return redirect(success_url)
     else:
-        form = form_class(initial={'course_prefix':request.GET.get('pre'),'course_suffix':request.GET.get('post')})
+        form = form_class(initial={
+                          'course_prefix':request.GET.get('pre'),
+                          'course_suffix':request.GET.get('post'),
+                          'invite':request.GET.get('invite'),
+                          'username':request.GET.get('invite'),
+                          'email':request.GET.get('invite'),
+                          })
     
     if extra_context is None:
         extra_context = {}
@@ -223,7 +247,11 @@ def register(request, backend, success_url=None, form_class=None,
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
 
-    layout = {'m': 800}
+    prefill_username = False
+    if request.GET.get('invite'):
+        prefill_username = True
+
     return render_to_response(template_name,
-                              {'form': form, 'layout': json.dumps(layout)},
+                              {'form': form,
+                               'prefill_username': prefill_username},
                               context_instance=context)

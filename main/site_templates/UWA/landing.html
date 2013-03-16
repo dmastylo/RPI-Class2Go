@@ -21,11 +21,7 @@
     </div>
 
 {% block topnav %}
-{% if SITE_NAME_SHORT == 'Stanford' %}
-    <div class="top-nav" style="top:4px;">
-{% else %}
     <div class="top-nav" style="top:24px;">
-{% endif %}    
 {% if user.is_authenticated %}
        <li>
           <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
@@ -57,7 +53,7 @@
          	<div class="sixcol">
 			<div class="home-unit">
 				{% if course.institution_only = 1 %}
-				<div id="badge"><img src=" {{ STATIC_URL }}graphics/core/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
+				<div id="badge"><img src=" {{ STATIC_URL }}graphics/sites/UWA/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
    			    {% endif %}
    			    <div class="innercontainer">
     				<a href="{% url 'courses.views.main' course.prefix course.suffix %}">
@@ -78,7 +74,7 @@
 			<div class="sixcol last">
 			<div class="home-unit">
 				{% if course.institution_only = 1 %}
-				<div id="badge"><img src=" {{ STATIC_URL }}graphics/core/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
+				<div id="badge"><img src=" {{ STATIC_URL }}graphics/sites/UWA/uwaonly.png" alt="uwaonly" width="118" height="106" /></div>
    			    {% endif %}
    			    <div class="innercontainer">
     				<a href="{% url 'courses.views.main' course.prefix course.suffix %}">
@@ -104,16 +100,8 @@
 
     <div class="container" style="margin-top:30px;margin-bottom:0;">
         <div style="width:315px;margin:0 auto;">
-         {% if SITE_NAME_SHORT == 'Stanford' %}
-            <div class="social-btn facebook"><div class="fb-like" data-href="http://class2go.standford.edu" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
-
-            <div class="social-btn twitter"><a href="https://twitter.com/StanfordC2G" class="twitter-follow-button" data-show-count="false">Follow @StanfordC2G</a></div>
+            <div class="social-btn facebook"><div class="fb-like" data-href="https://www.class2go.uwa.edu.au" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
             <div class="social-btn google"><div class="g-plusone" data-size="medium" data-annotation="none"></div></div>
-        {% else %}
-            <div class="social-btn facebook"><div class="fb-like" data-href="http://www.class2go.uwa.edu.au" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div></div>
-            <div class="social-btn google"><div class="g-plusone" data-size="medium" data-annotation="none"></div></div>
-        
-        {% endif %}
         </div>
     </div>
 </div>
