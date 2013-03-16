@@ -16,6 +16,35 @@ var c2gXMLParse = (function() {
                    
         specialNodes: "dbinteractiveresponse,multiplechoiceresponse,numericalresponse,stringresponse,regexresponse,optionresponse,solution",
         
+        clearInputs: function(formID) {
+            form = $(formID); 
+            var inputs = form.find('input'); 
+            for(var i = 0; i < inputs.length; i++)
+            {
+                var input = inputs[i]; 
+                if(input.type == 'checkbox')
+                {
+                    input.checked = false; 
+                } else {
+                    if(input.getAttribute('default'))
+                    {
+                        input.value = input.getAttribute('default'); 
+                    } else {
+                        input.value = "";                         
+                    }
+                }
+            }
+            var textareas = form.find('textarea'); 
+            for(var i = 0; i < textareas.length; i++)
+            {
+                var textarea = textareas[i]; 
+                if(!textarea.hidden && textarea.value)
+                {
+                    textarea.value = ""; 
+                }
+            }
+        }, 
+        
         assignCorrectIds : function(mDOM, isXML) { 
             if(isXML) { 
                 var questionMD = $(mDOM).find('question_metadata');
