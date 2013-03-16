@@ -968,6 +968,11 @@ ul.ui-sortable li:hover {
     margin:5px;
 }
 
+.move-button {
+    float:right;
+    margin:2px;
+}
+
 /* jQuery UI
 -------------------------------------------------- */
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }

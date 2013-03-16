@@ -491,6 +491,7 @@ var c2gXMLParse = (function() {
                               displayChoiceExplanations(this, true);});
             $(questionMD).each(function(){displayEditQuestion(this);});
             $(questionMD).each(function(){displayDeleteQuestion(this);});
+            $(questionMD).each(function(){displayMoveQuestion(this);});
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,"staging-area"]);
 
         },
