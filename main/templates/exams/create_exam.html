@@ -724,6 +724,8 @@ age: 20,
 	})
     $('#myTab a').click(function (e) {
                         e.preventDefault();
+						editor.renderer.updateText(); 
+						metadata_editor.renderer.updateText(); 
                         $(this).tab('show');
                         })
     

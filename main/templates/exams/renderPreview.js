@@ -31,13 +31,18 @@ var c2gXMLParse = (function() {
                     if(mDOM[i].tagName == "DIV") {
                         $(mDOM[i]).attr('id', 'question_' + v);
                         $(mDOM[i]).attr('number', v);
-                        fieldset = $(mDOM[i]).find('input'); 
-                        if(fieldset)
+                        fieldset = $(mDOM[i]).find('fieldset'); 
+                        var inputs = $(mDOM[i]).find('input'); 
+                        if(inputs)
                         {
-                            for(var m = 0; m < fieldset.length; m++)
+                            for(var m = 0; m < inputs.length; m++)
                             {
-                                $(fieldset[m]).attr('name', 'question_' + v); 
-                                $(fieldset[m]).attr('id', 'question_' + v + '_name' + m); 
+                                if(fieldset.length > 0) {
+                                    $(inputs[m]).attr('name', 'question_' + v);                                     
+                                } else {
+                                    $(inputs[m]).attr('name', 'question_' + v + '_name' + m);  
+                                }
+                                $(inputs[m]).attr('id', 'question_' + v + '_name' + m); 
                             } 
                         }
 
@@ -55,9 +60,13 @@ var c2gXMLParse = (function() {
             if(questionMD) {
                 for(var i = 0; i < questionMD.length; i++) { 
                     responses = $(questionMD[i]).find('response');
-                    for(var m = 0; m < responses.length; m++)
-                    {
-                        responses[m].setAttribute('name', questionMD[i].getAttribute('id') + '_name' + m); 
+                    if(responses.length > 0 && responses[0].getAttribute('answertype') != 'multiplechoiceresponse') {
+                        for(var m = 0; m < responses.length; m++)
+                        {
+                            responses[m].setAttribute('name', questionMD[i].getAttribute('id') + '_name' + m); 
+                        }
+                    } else {
+                        responses[0].setAttribute('name', questionMD[i].getAttribute('id'));                          
                     }
                 } 
             }
@@ -280,9 +289,10 @@ var c2gXMLParse = (function() {
               
             metadata_value = (new XMLSerializer()).serializeToString(mDOM);
             metadata_editor.setValue(style_html(metadata_value, {'max_char':80}));
-            metadata_editor.onChangeMode(); 
 
             this.renderPreview();
+            metadata_editor.renderer.updateText(); 
+            
             return true;
         }, 
         
