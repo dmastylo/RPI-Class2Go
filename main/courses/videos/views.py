@@ -141,7 +141,7 @@ def view(request, course_prefix, course_suffix, slug):
                                'question_times':json.dumps(question_times),
                                'allow_submit':True,
                                'children': downloadable_content,
-                               'exam':exam
+                               'exam':exam,
                               },
                               context_instance=RequestContext(request))
 

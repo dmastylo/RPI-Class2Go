@@ -164,10 +164,10 @@
 
     {% endif %}
 
+
     
-    
-    {% if score %}
-    <h4><b style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</b></h4>
+    {% if score or total_score %}
+    <h4><b style="color:red">{% trans 'Score' %}: {{score}}/{{total_score}}</b></h4>
     {% endif %}
 
     {% if raw_score %}
@@ -181,7 +181,11 @@
 
     <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
         <form>
-        {{ exam.html_content }}
+        {% if rendered_exam_html %}
+            {{ rendered_exam_html }}
+        {% else %}
+            {{ exam.html_content }}
+        {% endif %}
         </form>
 
         <div class="exam-navigation">
@@ -221,6 +225,11 @@
     var __exam_type = "{{exam.exam_type}}";
     var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
 
+    {% if exam.num_random_questions %}
+        c2g.overrideNumbering = true;
+    {% else %}
+        c2g.overrideNumbering = false;
+    {% endif %}
     
     /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
@@ -255,7 +264,8 @@
         /********** Add ordinal numbering if it doesn't already exist *********/
         var addNumberToQuestionDiv = function(elem, num) {
             var numberingDiv = $(elem).find('h3.questionNumber');
-            if (numberingDiv.length == 0){
+            if (numberingDiv.length == 0 || c2g.overrideNumbering){
+              $(elem).find(".questionNumber").remove();
               $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
             }
         };
@@ -272,6 +282,9 @@
                                        addQuestionDivLabel(this, qQumx, psetQuestions.length);
                                        qQumx = qQumx + 1;}
             );
+        }
+        else {
+            $(".questionNumber").remove();
         }
                       
         /************************** end ordinal *******************************/
@@ -725,7 +738,9 @@
             var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                            {   csrfmiddlewaretoken: "{{ csrf_token }}",
                                json_data:JSON.stringify(userSelections),
-                               onpage:$(location).attr('href')
+                               onpage:$(location).attr('href'),
+                               renderedQuestions:JSON.stringify(c2g.rendered_questions)
+
                            });
                            
             saveXHR.error(function(xhr, status, msg) {
@@ -916,8 +931,11 @@
         console.log(myXML);
         var examMD = $(myXML).find('exam_metadata');
         var questionMD = $(examMD).find('question_metadata');
-        $(questionMD).each(function(){displayQuestionExplanation(this);
-                         displayChoiceExplanations(this);});
+        $(questionMD).each(function(){
+                           if ($("div#" + $(this).attr('id')).length){
+                               displayQuestionExplanation(this);
+                               displayChoiceExplanations(this);
+                           }});
         {% if exam.load_mathjax %}
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,"exam-pane"]);
         {% endif %}
@@ -975,7 +993,8 @@
         var examXHR = $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                {   csrfmiddlewaretoken: "{{ csrf_token }}",
                    json_data:JSON.stringify(userSelections),
-                   onpage:$(location).attr('href')
+                   onpage:$(location).attr('href'),
+                   renderedQuestions:JSON.stringify(c2g.rendered_questions)
                }
         );
 
@@ -1062,7 +1081,11 @@
         window.showCorrections(prePopCorrex);
     }
     {% endif %}
-
+          
+    c2g.rendered_questions = "";
+    {% if rendered_questions %}
+        c2g.rendered_questions = JSON.parse('{{rendered_questions|escapejs}}');
+    {% endif %}
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');

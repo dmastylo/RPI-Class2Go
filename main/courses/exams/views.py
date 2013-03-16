@@ -161,18 +161,35 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
         endtime = None
 
     
-    #Now we have to figure out which questions to show
-    #First see if there is a choosenquestions parameter
-    
+
     #if the student has a saved ExamRecord, use the __renderedQuestions__ field of json_data
-    #otherwise we choose as specified
+    #otherwise we choose randomly
+    rendered_questions = incomplete_record.get_rendered_questions()
+
+    if rendered_questions is not None:
+        retv = exam.getHTML(rendered_questions)
+        rendered_exam_html = retv['html']
+        rendered_questions = json.dumps(retv['question_ids'])
+    else:
+        #Now we have to figure out which questions to show
+        #First see if there is a choosenquestions parameter
+        if exam.num_random_questions():
+            retv = exam.getHTML()
+            rendered_exam_html = retv['html']
+            rendered_questions = json.dumps(retv['question_ids'])
+        else:
+            rendered_exam_html = exam.html_content
+            rendered_questions = ""
+
+
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
                               'json_pre_pop':incomplete_record.json_data, 'too_recent':too_recent,
                               'last_record':last_record, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav,
                               'scores':"{}",'editable':editable,'single_question':exam.display_single,'videotest':False,
                               'allow_submit':allow_submit, 'too_many_attempts':too_many_attempts,
-                              'endtime':endtime, 'timeopened':timeopened,
+                              'endtime':endtime, 'timeopened':timeopened, 'rendered_exam_html':rendered_exam_html,
+                              'rendered_questions':rendered_questions,
                               'exam':exam,}, RequestContext(request))
 
 
@@ -244,10 +261,30 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     else:
         endtime = None
 
+    #if the student has a saved ExamRecord, use the __renderedQuestions__ field of json_data
+    #otherwise we choose randomly
+    try:
+        correx_obj = json.loads(json_pre_pop_correx)
+    except ValueError:
+        correx_obj = {}
+
+
+    #Now we have to figure out which questions to show
+    #First see if there is a choosenquestions parameter
+    if isinstance(correx_obj.get('__rendered_questions'), list):
+        retv = exam.getHTML(correx_obj.get('__rendered_questions'))
+        rendered_exam_html = retv['html']
+        rendered_questions = json.dumps(correx_obj.get('__rendered_questions'))
+    else:
+        rendered_exam_html = exam.html_content
+        rendered_questions = ""
+
+
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop,
-                                                       'slug_for_leftnav':slug_for_leftnav, 'ready_section':ready_section,
+                                                       'slug_for_leftnav':slug_for_leftnav, 'ready_section':ready_section, 
                                                        'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable, 'endtime':endtime,
-                                                       'allow_submit':allow_submit, 'timeopened':timeopened, 'too_many_attempts':too_many_attempts},
+                                                       'allow_submit':allow_submit, 'timeopened':timeopened, 'too_many_attempts':too_many_attempts,
+                                                       'rendered_exam_html':rendered_exam_html, 'rendered_questions':rendered_questions,},
                               RequestContext(request))
 
 @auth_view_wrapper
@@ -324,7 +361,21 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
     except ContentGroup.DoesNotExist:
         slug_for_leftnav = exam.slug
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav}, RequestContext(request))
+    #Now we have to figure out which questions to show
+    #First see if there is a choosenquestions parameter
+    if isinstance(correx_obj.get('__rendered_questions'), list):
+        retv = exam.getHTML(correx_obj.get('__rendered_questions'))
+        rendered_exam_html = retv['html']
+        rendered_questions = json.dumps(correx_obj.get('__rendered_questions'))
+        total_score = correx_obj.get('__total_score')
+    else:
+        rendered_exam_html = exam.html_content
+        rendered_questions = ""
+        total_score = exam.total_score
+
+
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'total_score': total_score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav, 'rendered_exam_html':rendered_exam_html,
+        'rendered_questions':rendered_questions,}, RequestContext(request))
 
 @auth_view_wrapper
 def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
@@ -464,6 +515,11 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     record = ExamRecord(course=course, exam=exam, student=user, json_data=postdata, onpage=onpage, attempt_number=attempt_number, late=exam.past_due())
     record.save()
 
+    try:
+        rendered_questions = json.loads(request.POST.get('renderedQuestions'))
+    except ValueError:
+        rendered_questions = None
+
     #now delete any incomplete attempts, since there is now a complete one. (Also so we don't show the same set
     #of randomized questions again)
     ExamRecord.objects.filter(course=course, exam=exam, student=user, complete=False).delete()
@@ -543,6 +599,17 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         #Set raw score for ExamRecordScore
         record_score.raw_score = total_score
         record_score.save()
+
+        #calculate total
+        if rendered_questions is not None:
+            feedback["__rendered_questions"] = rendered_questions
+            ts = 0
+            for q in rendered_questions:
+                ts += autograder.question_points(q.strip())
+            feedback["__total_score"] = ts
+        else:
+            feedback["__rendered_questions"] = "All"
+            feedback["__total_score"] = exam.total_score
 
         #Set penalty inclusive score for ExamRecord
         record.json_score_data = json.dumps(feedback)
@@ -1238,8 +1305,20 @@ def student_save_progress(request, course_prefix, course_suffix, exam_slug):
     except Exam.DoesNotExist:
         raise Http404
 
+    try:
+        rendered_questions = json.loads(request.POST.get('renderedQuestions'))
+    except ValueError:
+        rendered_questions = None
+
+
     exam_rec = get_or_update_incomplete_examrecord(course, exam, request.user)
     exam_rec.json_data = request.POST.get('json_data',"{}")
+
+    if rendered_questions is not None:
+        tmpobj = {}
+        tmpobj['__rendered_questions'] = rendered_questions
+        exam_rec.json_score_data = json.dumps(tmpobj)
+
     exam_rec.save()
     return HttpResponse("OK")
 

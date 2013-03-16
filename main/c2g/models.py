@@ -8,6 +8,7 @@ import time
 import html5lib
 import random
 import copy
+import json
 
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
@@ -2466,6 +2467,28 @@ class ExamRecord(TimestampMixin, models.Model):
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
+
+    def get_rendered_questions(self):
+        try:
+            score_data = json.loads(self.json_score_data)
+        except ValueError:
+            return None
+        rq = score_data.get("__rendered_questions")
+        if isinstance(rq, list):
+            return rq
+        else:
+            return None
+
+    def get_total_score(self):
+        try:
+            score_data = json.loads(self.json_score_data)
+        except ValueError:
+            return self.exam.total_score
+        ts = score_data.get("__total_score")
+        if ts:
+            return ts
+        else:
+            return self.exam.total_score
 
     # Prevent writes to read-only database, fail is better than data loss
     def save(self, *args, **kwargs):
