@@ -2434,6 +2434,7 @@ class ExamScore(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     score = models.FloatField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     csv_imported = models.BooleanField(default=False)
+    examrecordscore = models.ForeignKey('ExamRecordScore', null=True, db_index=True)
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
     #TODO: Add ForeignKey to which ExamRecord is responsible for this score, per GHI #2029
     
@@ -2455,11 +2456,18 @@ class ExamScore(TimestampMixin, models.Model):
 
     def setScore(self):
         #Set score to max of ExamRecordScore.score for this exam, student
-        exam_records = ExamRecord.objects.values('student').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score'))
+        exam_records = ExamRecord.objects.values('id').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score')).order_by('-max_score', '-id')[:1]
         
         if exam_records:
             self.score = exam_records[0]['max_score']
-            self.save()        
+            
+            #We expect to find an associated ExamRecordScore but need to protect against it not being there.
+            exam_record_score = ExamRecordScore.objects.filter(record_id=exam_records[0]['id'])
+            if exam_record_score:
+                self.examrecordscore = exam_record_score[0]
+            
+            self.save()
+                    
 
 # Deprecated
 class ExamScoreField(TimestampMixin, models.Model):

@@ -982,6 +982,7 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
                 else:
                    exam_record_ptr = None
             
+            ers = None 
             if exam_record_ptr:
                 if not created:
                     #Delete the ExamRecordScore, ExamRecordScoreFields and ExamRecordScoreFieldChoices
@@ -1009,6 +1010,10 @@ def post_csv_grades(request, course_prefix, course_suffix, exam_slug):
             #Set score for ExamScore
             user_score.score = total_score
             user_score.csv_imported = True
+            #If ers is None, it means the grades are being set for a student who has not
+            #attempted this exam yet.
+            if ers:
+                user_score.examrecordscore = ers
             user_score.save()
             db_hits += 1
         
