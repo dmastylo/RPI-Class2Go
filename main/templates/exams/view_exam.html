@@ -234,7 +234,7 @@
                                       <span class="facebook_redirect" style="display: none;">&redirect_uri=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}</span>Share on Facebook!
                                   </a>
                                </form>
-                               {% if course.twitter_tag %}
+                               {% if common_page_data.course.twitter_tag %}
                                       <form class="tab-pane" id="twitter-tab">
                                           <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ common_page_data.course.twitter_tag }}!</textarea>
                                           <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
