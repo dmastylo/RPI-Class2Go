@@ -165,7 +165,7 @@ def show_exam(request, course_prefix, course_suffix, exam_slug):
                               'json_pre_pop':incomplete_record.json_data, 'too_recent':too_recent,
                               'last_record':last_record, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav,
                               'scores':"{}",'editable':editable,'single_question':exam.display_single,'videotest':False,
-                              'allow_submit':allow_submit, 'too_many_attempts':too_many_attempts, 'course':course,
+                              'allow_submit':allow_submit, 'too_many_attempts':too_many_attempts,
                               'endtime':endtime, 'timeopened':timeopened,
                               'exam':exam,}, RequestContext(request))
 
@@ -238,7 +238,7 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
         endtime = None
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop,
-                                                       'slug_for_leftnav':slug_for_leftnav, 'ready_section':ready_section, 'course':course,
+                                                       'slug_for_leftnav':slug_for_leftnav, 'ready_section':ready_section,
                                                        'json_pre_pop_correx':json_pre_pop_correx, 'scores':scores, 'editable':editable, 'endtime':endtime,
                                                        'allow_submit':allow_submit, 'timeopened':timeopened, 'too_many_attempts':too_many_attempts},
                               RequestContext(request))
@@ -319,7 +319,7 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
 
     return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
                                                        'exam':exam, 'json_pre_pop':json_pre_pop,
-                                                       'scores':scores_json, 'score':score, 'course':course,
+                                                       'scores':scores_json, 'score':score,
                                                        'json_pre_pop_correx':json_pre_pop_correx,
                                                        'editable':False, 'raw_score':raw_score,
                                                        'allow_submit':False, 'ready_section':ready_section,
@@ -350,7 +350,7 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
         score_fields = {}
 
     return render_to_response('exams/view_my_submissions.html', {'common_page_data':request.common_page_data, 'exam':exam, 'my_subs':my_subs,
-                              'score_fields':json.dumps(score_fields), 'score':score, 'course':course,}, RequestContext(request) )
+                              'score_fields':json.dumps(score_fields), 'score':score,}, RequestContext(request) )
 
 def my_subs_helper(s):
     """Helper function to handle badly formed JSON stored in the database"""
