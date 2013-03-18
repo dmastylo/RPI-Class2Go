@@ -1000,7 +1000,7 @@
 
         examXHR.success(function (evt, xhr, settings) {
             $('#submit-button').removeAttr('disabled');
-            if (__autograde) {
+            if (__autograde && __exam_type != "survey") {
                 document.location = settings.responseText;
             }
             else {

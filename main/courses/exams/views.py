@@ -245,8 +245,8 @@ def show_populated_exam(request, course_prefix, course_suffix, exam_slug):
     except ContentGroup.DoesNotExist:
         slug_for_leftnav = exam.slug
 
-    #if the student has a saved ExamRecord, use the __renderedQuestions__ field of json_data
-    #otherwise we choose randomly
+    #if the student has a saved ExamRecord, use the __renderedQuestions field of json_score_data
+    #in that saved ExamRecord, otherwise we choose randomly
     try:
         correx_obj = json.loads(json_pre_pop_correx)
     except ValueError:
@@ -535,7 +535,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
     autograder = None
 
-    if exam.exam_type == "survey":
+    if exam.exam_type == "survey" and not exam.autograde:
         autograder = AutoGrader("<null></null>", default_return=True) #create a null autograder that always returns the "True" object
     elif exam.autograde:
         try:
@@ -755,6 +755,11 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         exam_type = "exam"
     elif assessment_type == "survey":
         autograde = False
+        display_single = False
+        grade_single = False
+        exam_type = "survey"
+    elif assessment_type == "graded-survey":
+        autograde = True
         display_single = False
         grade_single = False
         exam_type = "survey"

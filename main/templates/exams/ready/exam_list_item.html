@@ -14,7 +14,7 @@
         </h4>
         <span>{{exam.description}}</span>
 
-            {% if exam.autograde %}
+            {% if exam.autograde and exam.exam_type != "survey" %}
 
             <span class="accordion" id="attempts_{{exam.slug}}">
             <span class="accordion-group">
