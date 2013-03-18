@@ -8,6 +8,19 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        """
+        This is a one-time migration to populate the new relation.  It is a bit
+        complicated since we don't know exactly which examrecordscore row we
+        should point to (which is why this relation is valuable) hence the 
+        temporary table and selection logic.
+
+        We special case the celery since we use SQL that's not supported on SQLite.  
+        That's safe too do here since we only want reasonable schemas in our 
+        celery database, not content like exam scores.
+        """
+        if db.db_alias == "celery":
+            return
+
         if not db.dry_run:
             
             #This migration back populates the c2g_examscore.examrecordscore_id foreign key.
