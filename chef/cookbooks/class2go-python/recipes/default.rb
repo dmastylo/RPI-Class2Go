@@ -58,4 +58,4 @@ end
 
 easy_install_package "html5lib" do
     action :install
-
+end
