@@ -307,6 +307,7 @@ class Migration(SchemaMigration):
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
             'csv_imported': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'exam': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Exam']"}),
+            'examrecordscore': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.ExamRecordScore']", 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'score': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
