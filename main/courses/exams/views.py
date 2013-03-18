@@ -677,11 +677,17 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     assessment_type = request.POST.get('assessment_type','')
     section=request.POST.get('section','')
     invideo_val=request.POST.get('invideo','')
+    hide_grades_val=request.POST.get('hide_grades','')
 
     if invideo_val and invideo_val == "true":
         invideo = True
     else:
         invideo = False
+
+    if hide_grades_val and hide_grades_val == "true":
+        hide_grades = True
+    else:
+        hide_grades = False
 
     #########Validation, lots of validation#######
     if not slug:
@@ -796,7 +802,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
                         grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
-                        xml_imported=xmlImported, quizdown=quizdown
+                        xml_imported=xmlImported, quizdown=quizdown, hide_grades=hide_grades
                         )
 
         exam_obj.save()
@@ -846,6 +852,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.display_single=display_single
             exam_obj.grade_single=grade_single
             exam_obj.invideo=invideo
+            exam_obj.hide_grades=hide_grades
             exam_obj.section=contentsection
             exam_obj.save()
             exam_obj.commit()
@@ -924,7 +931,8 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'partial_credit_deadline':datetime.datetime.strftime(exam.partial_credit_deadline, "%m/%d/%Y %H:%M"),
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
-          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported, 'quizdown':exam.quizdown}
+          'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported, 'quizdown':exam.quizdown,
+          'hide_grades':exam.hide_grades}
 
     groupable_exam = exam
     if exam.mode != 'ready':

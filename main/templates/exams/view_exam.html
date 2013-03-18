@@ -224,6 +224,7 @@
 <script>
     var __exam_type = "{{exam.exam_type}}";
     var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
+    var __hide_grades = {% if exam.hide_grades %}true{% else %}false{% endif %};
 
     {% if exam.num_random_questions %}
         c2g.overrideNumbering = true;
@@ -668,7 +669,9 @@
         {% if exam.exam_type == "survey" %}
             SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
         {% else %}
-            {% if exam.autograde %}
+            {% if exam.hide_grades %}
+            var SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
+            {% elif exam.autograde %}
             var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
             {% else %}
             var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
@@ -1000,7 +1003,7 @@
 
         examXHR.success(function (evt, xhr, settings) {
             $('#submit-button').removeAttr('disabled');
-            if (__autograde && __exam_type != "survey") {
+            if (__autograde && __exam_type != "survey" && !__hide_grades) {
                 document.location = settings.responseText;
             }
             else {
@@ -1012,9 +1015,9 @@
                     { message = "{% trans 'Your submission has been saved.' %}  \n{% blocktrans with due_date=exam.due_date|date:'D M d Y' %}Please check back after {{due_date}} for your score.{% endblocktrans %}";
                       confirmText = "{% trans 'See My Submissions' %}"; 
                       title = "{% trans 'Submission complete' %}.";}
-                else if (__exam_type == "survey")
-                    { message = "{% trans 'Thanks' %}!";
-                      title= "{% trans 'Survey complete' %}.";}
+                else if (__exam_type == "survey" || __hide_grades)
+                    { message = "{% trans 'Thanks for your submission!' %}!";
+                      title= "{% trans 'Submission complete' %}.";}
                       
                 var dialogDiv = window.getDialog(title);
                 

@@ -1961,6 +1961,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     autograde = models.BooleanField(default=False)
     display_single = models.BooleanField(default=False)
     grade_single = models.BooleanField(default=False)
+    hide_grades = models.BooleanField(default=False)
     invideo = models.BooleanField(default=False)
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
@@ -2122,6 +2123,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             autograde = self.autograde,
             display_single = self.display_single,
             grade_single = self.grade_single,
+            hide_grades = self.hide_grades,
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
@@ -2179,6 +2181,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.display_single = self.display_single
         if not clone_fields or 'grade_single' in clone_fields:
             ready_instance.grade_single = self.grade_single
+        if not clone_fields or 'hide_grades' in clone_fields:
+            ready_instance.hide_grades = self.hide_grades
         if not clone_fields or 'invideo' in clone_fields:
             ready_instance.invideo = self.invideo
         if not clone_fields or 'timed' in clone_fields:
@@ -2238,6 +2242,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.display_single = ready_instance.display_single 
         if not clone_fields or 'grade_single' in clone_fields:
             self.grade_single = ready_instance.grade_single
+        if not clone_fields or 'hide_grades' in clone_fields:
+            self.hide_grades = ready_instance.hide_grades
         if not clone_fields or 'invideo' in clone_fields:
             self.invideo = ready_instance.invideo 
         if not clone_fields or 'timed' in clone_fields:
@@ -2296,6 +2302,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.display_single != self.image.display_single:
             return False
         if self.grade_single != self.image.grade_single:
+            return False
+        if self.hide_grades != self.image.hide_grades:
             return False
         if self.invideo != self.image.invideo:
             return False
