@@ -190,7 +190,7 @@ c2gXMLParse.markdown2quiz = function (html_text, outer_mDOM) {
         var numCorrect = 0;
         $(answerlist).find("li").each(function(){
             //Get potential points
-            var answerText = $(this).text();
+            var answerText = $(this).html();
             var retobj = parseOutPoints(answerText);
             if (retobj.found) {
                 answerText = retobj.text;
