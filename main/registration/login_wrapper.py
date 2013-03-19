@@ -6,11 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
-from django.http import HttpResponseRedirect
-import urlparse
-import settings
-from django.shortcuts import redirect
-from c2g.util import redirects_use_http, upgrade_to_https_and_downgrade_upon_redirect
+from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import login_required
 

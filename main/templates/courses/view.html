@@ -31,7 +31,14 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h3 class="section-title pull-left">{% trans 'Recent Announcements' %}</h3>
+
+    {# Jabber chat plugin block #}
+    {% if jabber_configured and is_logged_in %}
+    <iframe src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat" style="seamless; clear: both; width: 100%; height: 400px; margin-bottom: 10px;" class="span6"></iframe>
+    {% endif %} {# jabber_configured and is_logged_in #}
+    {# end Jabber chat plugin block #}
+
+    <h3 class="section-title pull-left" style="clear: both;">{% trans 'Recent Announcements' %}</h3>
     <div class="pull-right">
 	<!--
 	{% if many_announcements %}
@@ -112,6 +119,7 @@
 
 <script>
 $(document).ready(function(){
+
     $("#c2g_layout_r_column").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
     $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
                                                  c2g.installLeftNavChevron();
