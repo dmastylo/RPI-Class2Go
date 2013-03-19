@@ -76,10 +76,7 @@ def main(request, course_prefix, course_suffix):
         is_logged_in = 0
 
     # Environment prep for jabber chat plugin
-    jabber_configured = False
-    jabber_base_domain = getattr(settings, 'JABBER_DOMAIN', '')
-    if jabber_base_domain:
-        jabber_configured = True
+    jabber_configured = hasattr(settings, 'JABBER_DOMAIN')
 
     return render_to_response('courses/view.html',
             {'common_page_data':    common_page_data,
