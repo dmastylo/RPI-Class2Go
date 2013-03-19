@@ -34,7 +34,7 @@ execute "/usr/bin/killall epmd" do
     returns [0, 1]
 end
 if WIPE_MNESIA_TABLES
-    execute "/bin/rm -rf /var/lib/ejabberd/*" do
+    execute "/bin/rm /var/lib/ejabberd/*" do
         user "root"
         action :run
         returns [0, 1]
