@@ -288,6 +288,7 @@ INSTALLED_APPS = (
                       'courses.announcements',
                       'courses.videos',
                       'courses.video_exercises',
+                      'courses.exams',
                       'courses.email_members',
                       'courses.member_management',
                       'courses.reports',

@@ -32,6 +32,9 @@ from courses.exams.autograder import AutoGrader, AutoGraderGradingException
 from courses.course_materials import get_course_materials
 from storages.backends.s3boto import S3BotoStorage
 from django.utils.timezone import get_default_timezone_name
+from courses.exams.tasks import generate_submission_csv_task
+from django.contrib import messages
+
 
 @auth_view_wrapper
 def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
@@ -371,54 +374,13 @@ def view_submissions_to_grade(request, course_prefix, course_suffix, exam_slug):
     if exam.mode=="draft":
         exam = exam.image
 
-    submitters = ExamRecord.objects.filter(exam=exam, complete=True, time_created__lt=exam.grace_period).values('student').distinct()
-    fname = course_prefix+"-"+course_suffix+"-"+exam_slug+"-"+datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")+".csv"
-    outfile = open(FILE_DIR+"/"+fname,"w+")
+    generate_submission_csv_task.delay(course.id, exam.id, request.user.email)
 
-    could_not_parse = ""
+    messages.add_message(request, messages.INFO, 'Generating submission CSV for %s.  You will receive an email when it is ready.' \
+                         % exam.title)
 
-    for s in submitters: #yes, there is sql in a loop here.  We'll optimize later
-        latest_sub = ExamRecord.objects.values('student__username', 'time_created', 'json_data').filter(exam=exam, time_created__lt=exam.grace_period, student=s['student']).latest('time_created')
-        try:
-            sub_obj = json.loads(latest_sub['json_data']).iteritems()
-            for k,v in sub_obj:
-                vals = parse_val(v)
-                outstring = '"%s","%s","%s"\n' % (latest_sub['student__username'], k, vals)
-                outfile.write(outstring)
-        except ValueError:
-            could_not_parse += latest_sub['student__username']+ " " #Don't output if the latest submission was erroneous
+    return HttpResponseRedirect(reverse(exam.list_view, args=[course_prefix, course_suffix]))
 
-    outfile.write("\n")
-
-    #if there were items we could not parse
-    if could_not_parse:
-        #write the usernames at the beginning of the file
-        outfile.seek(0)
-        data=outfile.read()
-        outfile.seek(0)
-        outfile.truncate()
-        outfile.write("Could not parse data from the following users: " + could_not_parse + "\n")
-        outfile.write(data)
-
-    #write to S3
-    secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
-    s3file = secure_file_storage.open("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname),'w')
-    outfile.seek(0)
-    s3file.write(outfile.read())
-    s3file.close()
-    outfile.close()
-    return HttpResponseRedirect(secure_file_storage.url_monkeypatched("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname), response_headers={'response-content-disposition': 'attachment'}))
-
-def parse_val(v):
-    """Helper function to parse AJAX submissions"""
-    if isinstance(v,list):
-        sorted_list = sorted(map(lambda li: li['value'], v))
-        return reduce(lambda x,y: x+y+",", sorted_list, "")
-    else:
-        try:
-           return v.get('value', "")
-        except TypeError, AttributeError:
-            return str(v)
 
 @require_POST
 @auth_view_wrapper
