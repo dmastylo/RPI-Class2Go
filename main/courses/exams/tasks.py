@@ -55,10 +55,13 @@ def generate_submission_csv_task(course_id, exam_id, email_to):
     #write to S3
     secure_file_storage = S3BotoStorage(bucket=AWS_SECURE_STORAGE_BUCKET_NAME, access_key=AWS_ACCESS_KEY_ID, secret_key=AWS_SECRET_ACCESS_KEY)
     s3file = secure_file_storage.open("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname),'w')
-    outfile.seek(0)
-    s3file.write(outfile.read())
-    s3file.close()
-    outfile.close()
+    try:
+        outfile.seek(0)
+        s3file.write(outfile.read())
+    finally:
+        s3file.close()
+        outfile.close()
+
     dl_url = secure_file_storage.url_monkeypatched("/%s/%s/reports/exams/%s" % (course_prefix, course_suffix, fname), response_headers={'response-content-disposition': 'attachment'})
 
     email = EmailMessage('%s: Submission CSV for %s' % (course.title, exam.title), "The student submissions CSV for %s is ready.  Because the file can be large, please download it at %s." % (exam.title, dl_url),
