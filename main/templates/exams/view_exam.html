@@ -54,7 +54,11 @@
 {% endblock addl_head_scripts %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span9">
+{% if score or raw_score %}
+  <div id="c2g_layout_m_column" class="span6">
+{% else %}
+  <div id="c2g_layout_m_column" class="span9">
+{% endif %}
 
 {% autoescape off %}
 
@@ -165,15 +169,16 @@
     {% endif %}
 
 
-    
-    {% if score or total_score %}
-    <h4><b style="color:red">{% trans 'Score' %}: {{score}}/{{total_score}}</b></h4>
+    {% if score or raw_score or total_score %}
+        <div class="score-area pull-left">
+            {% if score or total_score %}
+                <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{total_score}}</strong></h4>
+            {% endif %}
+            {% if raw_score %}
+                <h4><strong style="color:red">{% trans 'Raw Score (without penalties)' %}: {{raw_score}}</strong></h4>
+            {% endif %}
+        </div>
     {% endif %}
-
-    {% if raw_score %}
-    <h4><b style="color:red">{% trans 'Raw Score (without late or resubmission penalties)' %}: {{raw_score}}</b></h4>
-    {% endif %}
-
 
     <noscript>
     <div class="alert alert-error">{% trans 'Your browser does not have JavaScript enabled. Please enable it before taking this exam' %}</div>
@@ -213,6 +218,45 @@
 {% endautoescape %}
 </div>
 {% endblock m_column_content %}
+
+
+{% block r_column_content %}
+    {% if score or raw_score %}
+    <div id="c2g_layout_r_column" class="span3">                   
+                   <div id="right_nav" class=" well nav">
+                       <div id="share-result">
+                           <h3>Share Your Results!</h3>                  
+                           <ul class="nav nav-tabs">
+                               <li class="active"><a href="#facebook-tab" data-toggle="tab"><em class="icon-facebook"></em></a></li>
+                               {% if common_page_data.course.twitter_tag %}<li><a href="#twitter-tab" data-toggle="tab"><em class="icon-twitter"></em></a></li>{% endif %}
+                               <li><a href="#google-tab" data-toggle="tab"><em class="icon-google-plus"></em></a></li>
+                           </ul>
+                           <div class="tab-content">
+                               <form class="tab-pane active" id="facebook-tab">
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" on Class2Go!</textarea>
+                                  <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                  <a class="btn pull-left share_button" id="facebook_button" href="https://www.facebook.com/dialog/feed?app_id=218493974879064&link=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}&picture={{course.logo_dl_link}}&name={{ exam.title }}&%20description=" target="_blank">
+                                      <span class="facebook_redirect" style="display: none;">&redirect_uri=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}</span>Share on Facebook!
+                                  </a>
+                               </form>
+                               {% if common_page_data.course.twitter_tag %}
+                                      <form class="tab-pane" id="twitter-tab">
+                                          <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ common_page_data.course.twitter_tag }}!</textarea>
+                                          <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                          <a class="btn pull-left share_button" id="twitter_button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
+                                      </form>
+                               {% endif %}
+                               <form class="tab-pane" id="google-tab">
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" on Class2Go!</textarea>
+                                  <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                  <a class="btn pull-left share_button" id="google_button" href="https://m.google.com/app/plus/x/?v=compose&content=" target="_blank">Share on Google+!</a>
+                               </form>
+                           </div>
+                       </div>
+                   </div>
+    </div>
+    {% endif %}
+{% endblock r_column_content %}
 
 {% block addl_scripts %}
     {% if videotest %}
@@ -846,9 +890,9 @@
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('#main-content input').attr('disabled','disabled');
-            $('#main-content textarea').attr('disabled','disabled');
-            $('#main-content select').attr('disabled', 'disabled');
+            $('#exam-pane input').attr('disabled','disabled');
+            $('#exam-pane textarea').attr('disabled','disabled');
+            $('#exam-pane select').attr('disabled', 'disabled');
 
             // hide submit button
             var submitBtn = $('#submit-button');
@@ -931,7 +975,7 @@
         }
                       
         var myXML = $.parseXML(correxObj["__metadata__"]);
-        console.log(myXML);
+        //console.log(myXML);
         var examMD = $(myXML).find('exam_metadata');
         var questionMD = $(examMD).find('question_metadata');
         $(questionMD).each(function(){
@@ -1094,8 +1138,8 @@
     $('#submit-button').attr('disabled','disabled');
     $('#saveWorkBtn').attr('disabled','disabled');
     $('#reEnableForm').remove();
-    $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
-    $('#main-content textarea').attr('disabled','disabled');
+    $('#exam-pane input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
+    $('#exam-pane textarea').attr('disabled','disabled');
                       
     {% endif %}
                       
@@ -1181,5 +1225,43 @@
 </script>
 {% endif %}
 
+
+{% if score or raw_score %}
+     <script>
+          var facebook_pre_href = $('#share-result form a#facebook_button').attr('href');
+          var facebook_content_href;
+          var facebook_post_href = $('#share-result form a#facebook_button .facebook_redirect').text();
+          var twitter_pre_href = $('#share-result form a#twitter_button').attr('href');
+          var twitter_post_href;
+          var google_pre_href = $('#share-result form a#google_button').attr('href');
+          var google_post_href;
+          
+          $('#share-result form .show_score').click(function() {
+                   var score_text = $(this).siblings('textarea').val() + " I scored " + $(this).attr('title') + "!";
+                   $(this).siblings('textarea').val(score_text);
+          })
+          
+          $('#share-result form a.share_button').click(function() {
+                   var which_share = $(this).attr('id');
+                   switch(which_share) {
+                            case "facebook_button":
+                                      facebook_content_href = $(this).siblings('textarea').val();
+                                      var facebook_href = facebook_pre_href + facebook_content_href.replace(/\ /g, "%20") + facebook_post_href;
+                                      $(this).attr('href', facebook_href);
+                                      break;
+                            case "twitter_button":
+                                      twitter_post_href = $(this).siblings('textarea').val();
+                                      var twitter_href = twitter_pre_href + twitter_post_href.replace(/\ /g, "%20").replace(/\#/g, '%23');
+                                      $(this).attr('href', twitter_href);
+                                      break;
+                            case "google_button":
+                                      google_post_href = $(this).siblings('textarea').val();
+                                      var google_href = google_pre_href + google_post_href.replace(/\ /g, "%20");
+                                      $(this).attr('href', google_href);
+                                      break;
+                   }      
+          });
+     </script>
+{% endif %}
 
 {% endblock addl_scripts %}

@@ -378,8 +378,17 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         total_score = exam.total_score
 
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data, 'exam':exam, 'json_pre_pop':json_pre_pop, 'scores':scores_json, 'score':score, 'total_score': total_score, 'json_pre_pop_correx':json_pre_pop_correx, 'editable':False, 'raw_score':raw_score, 'allow_submit':False, 'ready_section':ready_section, 'slug_for_leftnav':slug_for_leftnav, 'rendered_exam_html':rendered_exam_html,
-        'rendered_questions':rendered_questions,}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
+                                                       'exam':exam, 'json_pre_pop':json_pre_pop,
+                                                       'scores':scores_json, 'score':score,
+                                                       'total_score': total_score,
+                                                       'json_pre_pop_correx':json_pre_pop_correx,
+                                                       'editable':False, 'raw_score':raw_score,
+                                                       'allow_submit':False, 'ready_section':ready_section,
+                                                       'slug_for_leftnav':slug_for_leftnav,
+                                                       'rendered_exam_html':rendered_exam_html,
+                                                       'rendered_questions':rendered_questions,}, RequestContext(request))
+
 
 @auth_view_wrapper
 def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
@@ -406,7 +415,7 @@ def view_my_submissions(request, course_prefix, course_suffix, exam_slug):
         score_fields = {}
 
     return render_to_response('exams/view_my_submissions.html', {'common_page_data':request.common_page_data, 'exam':exam, 'my_subs':my_subs,
-                              'score_fields':json.dumps(score_fields), 'score':score}, RequestContext(request) )
+                              'score_fields':json.dumps(score_fields), 'score':score,}, RequestContext(request) )
 
 def my_subs_helper(s):
     """Helper function to handle badly formed JSON stored in the database"""
