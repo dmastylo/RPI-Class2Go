@@ -26,10 +26,12 @@ class AutoGrader():
 
     def __unicode__(self):
         graders=[]
+        points = []
         for k,v in self.grader_functions.iteritems():
             graders.append(k)
-        return "AutoGrader functions for responses with names: %s.  Total Possible Points: %s" % \
-            (", ".join(sorted(graders)), str(self.points_possible))
+        graders = sorted(graders)
+        return "AutoGrader functions set up for the following response names:\n" + \
+            "\n".join(map(lambda gname: "name: %s | points: %d" % (gname, self.points_dict[gname]), graders))
     
     def __init__(self, xml, default_return=None):
         """
