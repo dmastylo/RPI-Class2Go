@@ -31,6 +31,7 @@ from django.db.models import Q
 from pysimplesoap.client import SoapClient
 from datetime import date
 
+
 def index(request):
     return HttpResponse("Hello, world. You're at the user index.")
 
@@ -40,12 +41,6 @@ def profile(request):
     group_list = user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
     course_completions = {}
-    for course in courses:
-        if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
-            duration = course.calendar_end - course.calendar_start
-            progress = min(date.today(), course.calendar_end) - course.calendar_start
-            course_completion = int((float(progress.days) / float(duration.days)) * 100)
-            course_completions[course.id] = course_completion
     
     user_profile = None
     is_student_list = []
@@ -65,6 +60,13 @@ def profile(request):
             else:
                 certs_list[cert.course_id] = [certinfo]
                 if longest_certlist == 0: longest_certlist = 1
+        
+        for course in courses:
+            if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
+                duration = course.calendar_end - course.calendar_start
+                progress = min(date.today(), course.calendar_end) - course.calendar_start
+                course_completion = int((float(progress.days) / float(duration.days)) * 100)
+                course_completions[course.id] = course_completion
 
     has_webauth = False
     if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
@@ -353,9 +355,19 @@ def standard_preview_login(request, course_prefix, course_suffix):
                           'course': request.common_page_data['course'],
                           'display_login': True},
                           context_instance=context)
-       
 
-    
+
+def is_number(s):
+    """
+       Check if the string is likely to be a student/staff number
+    :param s: username
+    :return: True if numeric
+    """
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 @never_cache
 def ldap_login(request, course_prefix, course_suffix):
@@ -391,8 +403,9 @@ def ldap_login(request, course_prefix, course_suffix):
         is_institution_logon = user.get_profile().site_data == "UWA"
 
     result = 'error'
-    
-    if not user_exists or (user_exists and is_institution_logon):    
+
+   # Check if can be internal i.e. numeric
+    if is_number(request.POST['username']):
         client = SoapClient(wsdl="https://www.socrates.uwa.edu.au/tisi/commonws.asmx?wsdl", trace=True)
         response = client.UserAuth(userName=request.POST['username'],password=request.POST['password'])
         result = response['UserAuthResult']
@@ -406,16 +419,19 @@ def ldap_login(request, course_prefix, course_suffix):
             return HttpResponseRedirect(redir_to)
 
         else:                
-            messages.add_message(request,messages.ERROR, 'WebAuth did not return your identity to us!  Please try logging in again.  If the problem continues please contact c2g-techsupport@class.stanford.edu')
+            # messages.add_message(request,messages.ERROR, 'Error with Username or Password')
             extra_context = {}
             context = RequestContext(request)
             for key, value in extra_context.items():
                 context[key] = callable(value) and value() or value
             layout = {'m': 800}
-        
+
             return render_to_response('registration/login.html',
-                              {'form': form, 'layout': json.dumps(layout)},
-                              context_instance=context)
+                       {'form': form, 'next': request.GET.get('next', '/')},
+                         context_instance=context)
+            #return render_to_response('registration/login.html',
+            #                  {'form': form, 'layout': json.dumps(layout)},
+            #                  context_instance=context)
 
     
     ldapUser = json.loads(result) 
@@ -480,8 +496,8 @@ def ldap_preview_login(request, course_prefix, course_suffix):
         is_institution_logon = user.get_profile().site_data == "UWA"
 
     result = 'error'
-    
-    if not user_exists or (user_exists and is_institution_logon):    
+
+    if is_number(request.POST['username']):
         client = SoapClient(wsdl="https://www.socrates.uwa.edu.au/tisi/commonws.asmx?wsdl", trace=True)
         response = client.UserAuth(userName=request.POST['username'],password=request.POST['password'])
         result = response['UserAuthResult']

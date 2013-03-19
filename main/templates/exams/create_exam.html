@@ -110,6 +110,7 @@
                 <option value="exam-autograde">{% trans 'Exam (auto-graded)' %}</option>
                 <option value="exam-csv">{% trans 'Exam (csv-graded)' %}</option>
                 <option value="survey">{% trans 'Survey' %}</option>
+                <option value="graded-survey">{% trans 'Graded Survey (results not shown to students)' %}</option>
             </select>
             <label for="exam_title" class="control-label">{% trans 'Title' %}:*</label><input id="exam_title" name="exam_title" type="text" />
             <label for="exam_slug" class="control-label">{% trans 'URL Identifier' %}:*</label><input id="exam_slug" name="exam_slug" type="text" />
@@ -155,6 +156,8 @@
             <input id="num_subs_permitted" name="num_subs_permitted" type="text" value="999"/>
             <label class="control-label" for="resubmission_penalty">{% trans 'Penalty Per Submission After First' %}:*</label>
             <input id="resubmission_penalty" name="resubmission_penalty" type="text" value="0" />
+            <label class="control-label" for="hide_grades">Hide grades from students?</label>
+            <input id="hide_grades" type="checkbox" name="hide_grades" />
         </div>
     </div>
 
@@ -699,6 +702,7 @@ age: 20,
                        section:$('select#id_section').val(),
                        parent:$('select#parent_id').val(),
                        invideo:$('input#invideo_id')[0].checked,
+                       hide_grades:$('input#hide_grades')[0].checked,
                        metaXMLContent:metadata_editor.getValue(),
                        htmlContent:editor.getValue(),
                        xmlImported:$('#xml-entry').val(),
@@ -774,6 +778,7 @@ age: 20,
         $('textarea#description').val(prepop.description);
         $('select#id_section').val(prepop.section);
         $('input#invideo_id')[0].checked=prepop.invideo;
+        $('input#hide_grades')[0].checked=prepop.hide_grades;
         metadata_editor.setValue(prepop.metadata);
         editor.setValue(prepop.htmlContent);
         $('#xml-entry').val(prepop.xmlImported);

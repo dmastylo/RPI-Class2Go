@@ -168,10 +168,11 @@
 
     {% endif %}
 
-    {% if score or raw_score %}
+
+    {% if score or raw_score or total_score %}
         <div class="score-area pull-left">
-            {% if score %}
-                <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</strong></h4>
+            {% if score or total_score %}
+                <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{total_score}}</strong></h4>
             {% endif %}
             {% if raw_score %}
                 <h4><strong style="color:red">{% trans 'Raw Score (without penalties)' %}: {{raw_score}}</strong></h4>
@@ -185,7 +186,11 @@
 
     <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
         <form>
-        {{ exam.html_content }}
+        {% if rendered_exam_html %}
+            {{ rendered_exam_html }}
+        {% else %}
+            {{ exam.html_content }}
+        {% endif %}
         </form>
 
         <div class="exam-navigation">
@@ -263,7 +268,13 @@
 <script>
     var __exam_type = "{{exam.exam_type}}";
     var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
+    var __hide_grades = {% if exam.hide_grades %}true{% else %}false{% endif %};
 
+    {% if exam.num_random_questions %}
+        c2g.overrideNumbering = true;
+    {% else %}
+        c2g.overrideNumbering = false;
+    {% endif %}
     
     /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
@@ -298,7 +309,8 @@
         /********** Add ordinal numbering if it doesn't already exist *********/
         var addNumberToQuestionDiv = function(elem, num) {
             var numberingDiv = $(elem).find('h3.questionNumber');
-            if (numberingDiv.length == 0){
+            if (numberingDiv.length == 0 || c2g.overrideNumbering){
+              $(elem).find(".questionNumber").remove();
               $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
             }
         };
@@ -315,6 +327,9 @@
                                        addQuestionDivLabel(this, qQumx, psetQuestions.length);
                                        qQumx = qQumx + 1;}
             );
+        }
+        else {
+            $(".questionNumber").remove();
         }
                       
         /************************** end ordinal *******************************/
@@ -698,7 +713,9 @@
         {% if exam.exam_type == "survey" %}
             SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
         {% else %}
-            {% if exam.autograde %}
+            {% if exam.hide_grades %}
+            var SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
+            {% elif exam.autograde %}
             var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
             {% else %}
             var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
@@ -768,7 +785,9 @@
             var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                            {   csrfmiddlewaretoken: "{{ csrf_token }}",
                                json_data:JSON.stringify(userSelections),
-                               onpage:$(location).attr('href')
+                               onpage:$(location).attr('href'),
+                               renderedQuestions:JSON.stringify(c2g.rendered_questions)
+
                            });
                            
             saveXHR.error(function(xhr, status, msg) {
@@ -959,8 +978,11 @@
         //console.log(myXML);
         var examMD = $(myXML).find('exam_metadata');
         var questionMD = $(examMD).find('question_metadata');
-        $(questionMD).each(function(){displayQuestionExplanation(this);
-                         displayChoiceExplanations(this);});
+        $(questionMD).each(function(){
+                           if ($("div#" + $(this).attr('id')).length){
+                               displayQuestionExplanation(this);
+                               displayChoiceExplanations(this);
+                           }});
         {% if exam.load_mathjax %}
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,"exam-pane"]);
         {% endif %}
@@ -1018,13 +1040,14 @@
         var examXHR = $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                {   csrfmiddlewaretoken: "{{ csrf_token }}",
                    json_data:JSON.stringify(userSelections),
-                   onpage:$(location).attr('href')
+                   onpage:$(location).attr('href'),
+                   renderedQuestions:JSON.stringify(c2g.rendered_questions)
                }
         );
 
         examXHR.success(function (evt, xhr, settings) {
             $('#submit-button').removeAttr('disabled');
-            if (__autograde) {
+            if (__autograde && __exam_type != "survey" && !__hide_grades) {
                 document.location = settings.responseText;
             }
             else {
@@ -1036,9 +1059,9 @@
                     { message = "{% trans 'Your submission has been saved.' %}  \n{% blocktrans with due_date=exam.due_date|date:'D M d Y' %}Please check back after {{due_date}} for your score.{% endblocktrans %}";
                       confirmText = "{% trans 'See My Submissions' %}"; 
                       title = "{% trans 'Submission complete' %}.";}
-                else if (__exam_type == "survey")
-                    { message = "{% trans 'Thanks' %}!";
-                      title= "{% trans 'Survey complete' %}.";}
+                else if (__exam_type == "survey" || __hide_grades)
+                    { message = "{% trans 'Thanks for your submission!' %}!";
+                      title= "{% trans 'Submission complete' %}.";}
                       
                 var dialogDiv = window.getDialog(title);
                 
@@ -1105,7 +1128,11 @@
         window.showCorrections(prePopCorrex);
     }
     {% endif %}
-
+          
+    c2g.rendered_questions = "";
+    {% if rendered_questions %}
+        c2g.rendered_questions = JSON.parse('{{rendered_questions|escapejs}}');
+    {% endif %}
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');

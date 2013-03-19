@@ -6,6 +6,7 @@ boto>= 2.7.0
 gdata==2.0.17
 pysqlite
 markdown
+html5lib
 
 # RESTful interfaces libraries
 djangorestframework

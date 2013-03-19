@@ -14,7 +14,7 @@
         </h4>
         <span>{{exam.description}}</span>
 
-            {% if exam.autograde %}
+            {% if exam.autograde and exam.exam_type != "survey" and not exam.hide_grades %}
 
             <span class="accordion" id="attempts_{{exam.slug}}">
             <span class="accordion-group">
@@ -38,7 +38,7 @@
                                 <a href="{% url exam.record_view common_page_data.course_prefix common_page_data.course_suffix exam.slug record.id %}">
                                     {% trans 'Attempt at' %} {{ record.time_created }}
                                 </a>
-                                :  {% trans 'Score' %} {{record.score}} / {{exam.total_score}}
+                                :  {% trans 'Score' %} {{record.score}} / {{record.get_total_score}}
                                 {% if record.late or record.attempt_number > 1 and exam.resubmission_penalty > 0 %}
                                 ( {% trans 'Raw score' %}: {{ record.examrecordscore.raw_score }} with
                                     {% if record.late %}
