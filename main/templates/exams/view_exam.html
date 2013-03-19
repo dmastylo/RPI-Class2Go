@@ -228,7 +228,7 @@
                            </ul>
                            <div class="tab-content">
                                <form class="tab-pane active" id="facebook-tab">
-                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" on Class2Go!</textarea>
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" in {{ common_page_data.course.twitter_tag|cut:'#'|cut:'@' }}!</textarea>
                                   <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
                                   <a class="btn pull-left share_button" id="facebook_button" href="https://www.facebook.com/dialog/feed?app_id=218493974879064&link=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}&picture={{course.logo_dl_link}}&name={{ exam.title }}&%20description=" target="_blank">
                                       <span class="facebook_redirect" style="display: none;">&redirect_uri=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}</span>Share on Facebook!
@@ -236,13 +236,13 @@
                                </form>
                                {% if common_page_data.course.twitter_tag %}
                                       <form class="tab-pane" id="twitter-tab">
-                                          <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" for #{{ common_page_data.course.twitter_tag }}!</textarea>
+                                          <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" in {{ common_page_data.course.twitter_tag }}!</textarea>
                                           <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
                                           <a class="btn pull-left share_button" id="twitter_button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
                                       </form>
                                {% endif %}
                                <form class="tab-pane" id="google-tab">
-                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" on Class2Go!</textarea>
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" in {{ common_page_data.course.twitter_tag|cut:'#'|cut:'@' }}!</textarea>
                                   <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
                                   <a class="btn pull-left share_button" id="google_button" href="https://m.google.com/app/plus/x/?v=compose&content=" target="_blank">Share on Google+!</a>
                                </form>
