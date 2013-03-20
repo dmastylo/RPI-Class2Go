@@ -66,9 +66,11 @@ def main(request, course_prefix, course_suffix):
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
         many_announcements = True
+        announcement_overflow = len(announcement_list) - 10
         announcement_list = announcement_list[0:10]
     else:
         many_announcements = False
+        announcement_overflow = 0
     
     if request.user.is_authenticated():
         is_logged_in = 1
@@ -82,6 +84,7 @@ def main(request, course_prefix, course_suffix):
             {'common_page_data':    common_page_data,
              'course':              course,
              'announcement_list':   announcement_list,
+             'announcement_overflow': announcement_overflow,
              'many_announcements':  many_announcements,
              'is_logged_in':        is_logged_in,
              'jabber_configured':   jabber_configured,
@@ -146,25 +149,26 @@ def leftnav(request, course_prefix, course_suffix):
     course = request.common_page_data['ready_course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('left_nav.html',
-                              {
-                              'PREFIX':              course_prefix,
-                              'SUFFIX':              course_suffix,
-                              'contentsection_list': full_contentsection_list,
-                              'full_index_list':     full_index_list,
-                              },
-                              context_instance=RequestContext(request))
+        {
+            'PREFIX':              course_prefix,
+            'SUFFIX':              course_suffix,
+            'contentsection_list': full_contentsection_list,
+            'full_index_list':     full_index_list,
+        },
+    context_instance=RequestContext(request))
 
 
 @cache_page(60*60, cache="view_store")
 def rightnav(request, course_prefix, course_suffix):
-  course = request.common_page_data['ready_course']
-  exams = get_upcoming_exams(course)
-  exams = [exam for exam in exams if not exam.is_child()]
-  return render_to_response('right_nav.html',
-                            {'common_page_data':   request.common_page_data,
-                            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
-                            },
-                            context_instance=RequestContext(request))
+    course = request.common_page_data['ready_course']
+    exams = get_upcoming_exams(course)
+    exams = [exam for exam in exams if not exam.is_child()]
+    return render_to_response('right_nav.html',
+        {
+            'common_page_data':   request.common_page_data,
+            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
+        },
+    context_instance=RequestContext(request))
 
 
 @auth_view_wrapper

@@ -21,12 +21,13 @@
                 
                 <span class="accordion-heading attempts">
                     {% if item.records|length != 0 %}
-                    <a class="collapsed attempts" data-toggle="collapse" data-parent="attempts_{{exam.slug}}" href="#collapse_{{exam.slug}}" onclick="c2g.toggleChevron('chevron_{{exam.slug}}')" >
-                    <i id="chevron_{{exam.slug}}"class="icon-chevron-right chevron"></i>
-                    {% endif %}
-                        
-                        <strong>{% trans 'Attempts' %}:</strong> {{item.records|length}}/{{exam.submissions_permitted}}
-                    {% if item.records|length != 0 %}({% trans 'see scores' %})    
+                    <a class="collapsed attempts closed" data-toggle="collapse" data-parent="attempts_{{exam.slug}}" href="#collapse_{{exam.slug}}" onclick="c2g.toggleChevron('chevron_{{exam.slug}}')" >
+                        <i id="chevron_{{exam.slug}}"class="icon-chevron-right chevron"></i>
+                        {% endif %}
+                            
+                            <strong>{% trans 'Attempts' %}:</strong> {{item.records|length}}/{{exam.submissions_permitted}}
+                        {% if item.records|length != 0 %}({% trans 'see scores' %})
+                        <span class="hidden-accessible">, collapsed, click to expand</span>
                     </a>
                     {% endif %}
                 </span>
