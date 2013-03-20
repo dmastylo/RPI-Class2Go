@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 
 from c2g.models import Course, CourseCertificate, UserProfile
 from c2g.util import get_site_url, is_storage_local
-import certificates.tasks
+from tools.certificates import tasks as certificate_tasks
 
 
 def notify(cert_type, firstname, lastname, notify_addr, prefix, suffix):
@@ -70,7 +70,7 @@ class Command(BaseCommand):
         cert_prefix = ''
         if (is_storage_local() or options['force_local']) and not options['force_remote']:
             cert_prefix = getattr(settings, 'MEDIA_ROOT', '')
-        cert_path = certificates.tasks.certify(cert_prefix, course, certificate_info, user)
+        cert_path = certificate_tasks.certify(cert_prefix, course, certificate_info, user)
         #print "Certification complete: %s" % cert_path
         print "Certification complete: %s" % certificate_info.dl_link(user)
 

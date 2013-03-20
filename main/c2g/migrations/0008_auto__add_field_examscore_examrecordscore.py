@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding field 'ExamScore.examrecordscore'
         db.add_column('c2g_examscore', 'examrecordscore',
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.ExamRecordScore'], null=True),
-                      keep_default=False)
+                      keep_default=True)
 
 
     def backwards(self, orm):
