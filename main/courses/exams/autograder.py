@@ -31,7 +31,7 @@ class AutoGrader():
             graders.append(k)
         graders = sorted(graders)
         return "AutoGrader functions set up for the following response names:\n" + \
-            "\n".join(map(lambda gname: "name: %s | points: %d" % (gname, self.points_dict[gname]), graders))
+            "\n".join(map(lambda gname: "name: %s | points: %1.2f" % (gname, self.points_dict[gname]), graders))
     
     def __init__(self, xml, default_return=None):
         """
