@@ -47,12 +47,12 @@ Quizdown Preview Page
     }
     .editor_container {
         position:relative;
-        height:450px;
+        height:540px;
     }
     h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
     #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
-    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 600px; padding: 1em;}
-    textarea, #staging-area {height: 550px; overflow: auto; width: 100%;}
+    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 505px; padding: 1em;}
+    textarea, #staging-area {height: 530px; overflow: auto; width: 100%;}
     #preview-pane label {clear: both; display: block; min-width:200px;}
     #preview-pane label input {float: left; margin-right: 1em;}
     #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 0em;}
@@ -82,21 +82,15 @@ Quizdown Preview Page
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #staging-area .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #staging-area .inline-explanation.correct{color: #090;}
+    #quizdown-form{margin-top: 30px}
 
 </style>
 
 {% endblock %}
 {% block m_column_content %}
 
-<!--
-    <div class="hidden" id="enter-content-xml">
-        <h4>{% trans 'Edit Exam MetaData XML below' %}:</h4>
-        <textarea id="ace_metadata_proxy" style="display:none"></textarea>
-        <div class="editor_container" id="metadata_editor_container">
-            <div id="metadata_editor"></div>
-        </div>
-        
-    </div>
+
+
     <div class="hidden" id="enter-content-html">
         <h4>{% trans 'Edit Exam HTML below' %}:</h4>
         <textarea id="ace_proxy" style="display:none"></textarea>
@@ -104,26 +98,44 @@ Quizdown Preview Page
             <div id="editor"></div>
         </div>
     </div>
- -->
+ 
 
 
 <div class="span4" id="quizdown-form" title="{% trans 'Paste Your Quizdown' %}">
     <form>
     <fieldset>
-        <label for="quizdown-entry" id="quizdown-import-label"><h4>{% trans 'Import your Quizdown here.' %}</h4></label>
+        <label for="quizdown-entry" id="quizdown-import-label"><h4>{% trans 'Input your Quizdown here' %}</h4></label>
         <textarea name="quizdown-entry" id="quizdown-entry" class="text ui-widget-content ui-corner-all"></textarea>
     </fieldset>
     </form>
-    <button class="btn" id="go_preview">Generate Preview</button>
+    <button class="btn" id="go_preview">{% trans 'Generate Preview' %}</button>
+    <button class="btn" id="check_metadata">{% trans 'Check Metadata XML' %}</button>
+
 </div>
 
-<div class="span8" id="preview-content">
-    <div id="preview-pane">
-        <h4>{% trans 'Preview Exam HTML' %}</h4>
-        <div id="staging-area"></div>
+<div class="span7">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a id="preview-tab" href="#preview-content">{% trans 'Preview' %}</a></li>
+        <li><a id="enter-xml-tab" href="#enter-content-xml">{% trans 'XML Metadata' %}</a></li>
+    </ul>
+    
+    <div class="tab-content">
+        <div class="tab-pane" id="enter-content-xml">
+            <textarea id="ace_metadata_proxy" style="display:none"></textarea>
+            <div class="editor_container" id="metadata_editor_container">
+                <div id="metadata_editor"></div>
+            </div>
+            
+        </div>
+        
+        <div class="tab-pane active" id="preview-content">
+            <div id="preview-pane">
+                <div id="staging-area"></div>
+            </div>
+        </div>
     </div>
+    
 </div>
-
 
 {% endblock m_column_content %}
 
@@ -132,103 +144,11 @@ Quizdown Preview Page
 <script src="{{STATIC_URL}}js/core/beautify-html.js"></script>
 
 <script>
-	$('#due_date').focusout(function() {
-		//Update the grace period and hard deadline fields if the due date is after the current grace and hard deadlines
-			var due = $('#due_date').val(); 
-			var dueDate = new Date(due); 
-			var grace = $("#grace_period").val(); 
-			var hard = $("#hard_deadline").val(); 
-			if(!grace || ((new Date(grace)) < dueDate)) {
-				$('#grace_period').val(due); 				
-			}
-			if(!hard || ((new Date(hard)) < dueDate)) {
-				$('#hard_deadline').val(due); 				
-			}
-	})
     $('#myTab a').click(function (e) {
                         e.preventDefault();
                         $(this).tab('show');
-                        })
-    
-    
-    var __saved_import_xml="";
-    var __xml_saved=false;
-    $( "#dialog-form" ).dialog({
-        autoOpen: false,
-        height: 500,
-        width: "90%",
-        modal: true,
-        close: function() {
-            if (!__xml_saved)  $('#xml-entry').val(__saved_import_xml);
-            __xml_saved=false;
-        },
-        buttons: [{
-                    text:"{% trans 'Import XML' %}",
-                    id:"import-xml-button",
-                    click: function() {
-                        c2gXMLParse.renderMarkup($('#xml-entry'), "");
-                        editor.setValue(style_html(editor.getValue(), {'max_char':80}));
-                        metadata_editor.setValue(style_html(metadata_editor.getValue(), {'max_char':80}));
-                        __xml_saved=true;
-                        c2gXMLParse.renderPreview();
-                        $( this ).dialog( "close" );
-                        }
-                  },
-                  {
-                    text:"{% trans 'Cancel' %}",
-                    click: function() {
-                        $( this ).dialog( "close" );
-                        }
-                  }],
-    });
-    var __saved_quizdown="";
-    var __quizdown_saved=false;
-    
-    /*
-    $( "#quizdown-form" ).dialog({
-        autoOpen: false,
-        height: 500,
-        width: "90%",
-        modal: true,
-        close: function() {
-            if (!__quizdown_saved)  $('#quizdown-entry').val(__saved_quizdown);
-            __quizdown_saved=false;
-        },
-        buttons: [{
-                    text:"Import",
-                    id:"import-quizdown-button",
-                    click: function() {
-                        __quizdown_saved=true;
-                        c2gXMLParse.parseQuizDown();
-                        $( this ).dialog( "close" );
-                    }
-                  },
-                  {
-                    text:"Cancel",
-                    click: function() {
-                        $( this ).dialog( "close" );
-                    }
-                  }],
-        });
-     */
-
-    $('#xml-entry-btn').click(function() {
-        __saved_import_xml=$('#xml-entry').val();
-        $( "#dialog-form" ).dialog( "open" );
-    });
-
-    $('#quizdown-entry-btn').click(function() {
-        __saved_quizdown = $('#quizdown-entry').val();
-        $( "#quizdown-form" ).dialog( "open" );
-    });
-
-    
-    $("#import-xml-button").before("<span class='warning' id='clobber-warning'>{% trans 'Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.' %}</span>");
-
-    $("#clobber-warning").hide();
-    $("#import-xml-button").hover(function(){$("#clobber-warning").show();},
-                                function(){$("#clobber-warning").hide();});
-    
+    })
+     
     var editor = ace.edit("editor");
     editor.setValue($('#ace_proxy').val());
     editor.setTheme("ace/theme/eclipse");
@@ -241,39 +161,35 @@ Quizdown Preview Page
     metadata_editor.getSession().setMode("ace/mode/xml");
     metadata_editor.getSession().setUseWrapMode(true);
     
-    var questionIdx = 0;
-    
     {% include "exams/displayExplanation.js" %}
     {% include "exams/renderPreview.js" %}
     {% include "exams/quizdown.js" %}
     
-
     $(function() {
+        $('#go_preview').click(function() {
+             c2gXMLParse.parseQuizDown();
+             });
+        $('#check_metadata').click(function() {
+            checkMetadataXML();
+            });
 
-    
-      
-    var checkMetadataXML = function() {
-        var csrftoken = '{{csrf_token}}';
-        $.ajax("{% url 'courses.exams.views.check_metadata_xml_no_course' %}", {
-             headers: {'X-CSRFToken': csrftoken},
-             type: 'POST',
-             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-             data: { metaXMLContent:metadata_editor.getValue() },
-             error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
-             success: function(data, textStatus, jqXHR) {
-                alert(jqXHR.responseText );
+        var checkMetadataXML = function() {
+            var csrftoken = '{{csrf_token}}';
+            $.ajax("{% url 'courses.exams.views.check_metadata_xml_no_course' %}", {
+                 headers: {'X-CSRFToken': csrftoken},
+                 type: 'POST',
+                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                 data: { metaXMLContent:metadata_editor.getValue() },
+                 error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
+                 success: function(data, textStatus, jqXHR) {
+                    alert(jqXHR.responseText );
 
-             }
-             
-        });
-    };
+                 }
+                 
+            });
+        };
       
-    //$('#preview-btn').click(c2gXMLParse.renderPreview);
-    $('#preview-tab').click(c2gXMLParse.renderPreview);
-      
-
-      
-      });
+    });
     </script>
 
 {% endblock addl_scripts %}
