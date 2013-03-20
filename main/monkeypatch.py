@@ -32,6 +32,11 @@ def s3boto_dlurl(self, name, response_headers=None, querystring_auth=True):
 import storages.backends.s3boto
 storages.backends.s3boto.S3BotoStorage.url_monkeypatched = s3boto_dlurl
 
+### Now a section that pulls in unicode support for RegexField that has been
+### incorporated into django itself (just not the version we run/develop on, 1.4)
+### See https://github.com/django/django/pull/101/files and
+### https://code.djangoproject.com/ticket/18409 for context
+
 from django import forms
 from django.core import validators
 import re
