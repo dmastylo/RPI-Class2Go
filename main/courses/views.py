@@ -58,10 +58,10 @@ def main(request, course_prefix, course_suffix):
     course = common_page_data['course']
     #determine whether to redirect to preview page
     #non-registered students on public courses should be redirected
-    redirect_to_preview = (not course.institution_only) and (not request.user.is_authenticated())
+    redirect_to_preview = course.preview_only_mode or (not course.institution_only) and (not common_page_data['is_course_member'])
     
-    if course.preview_only_mode or redirect_to_preview:
-        if not common_page_data['is_course_admin']:
+    if redirect_to_preview:
+        if not common_page_data['is_course_admin']: #keep this here as the only exception: course admins should be able to create content
             redir = reverse('courses.preview.views.preview',args=[course_prefix, course_suffix])
             if (settings.INSTANCE == 'stage' or settings.INSTANCE == 'prod'):
                 redir = 'https://'+request.get_host()+redir
