@@ -5,8 +5,14 @@ import os
 import re
 import sys
 import time
-from xml.dom.minidom import parseString
+import html5lib
+import random
+import copy
+import json
 
+from xml.dom.minidom import parseString
+from xml.parsers.expat import ExpatError
+from html5lib import treebuilders
 from django import forms
 from django.contrib.auth.models import Group, User
 from django.core.cache import get_cache
@@ -122,6 +128,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     handle = models.CharField(max_length=255, null=True, db_index=True)
     preview_only_mode = models.BooleanField(default=True)
     institution_only = models.BooleanField(default=False)
+    preenroll_only = models.BooleanField(default=False)
     share_to = models.ManyToManyField("self",symmetrical=False,related_name='share_from',null=True, blank=True)
     short_description = models.TextField(blank=True)
     prerequisites = models.TextField(blank=True)
@@ -140,8 +147,8 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
 
         if not self.logo.name or not self.logo.storage.exists(self.logo.name): 
             return settings.STATIC_URL + "graphics/core/class2go.png"
-        
-        url = self.logo.storage.url(self.logo.name)
+
+        url = self.logo.storage.url_monkeypatched(self.logo.name, querystring_auth=False)
         return url
 
 
@@ -763,7 +770,7 @@ class CourseCertificate(TimestampMixin, models.Model):
             if is_storage_local():
                 url = get_site_url() + default_storage.url(asset_path)
             else:
-                url = default_storage.url_monkeypatched(asset_path, response_headers={'response-content-disposition': 'attachement'})
+                url = default_storage.url_monkeypatched(asset_path, response_headers={'response-content-disposition': 'attachment'})
         return url
 
     def __repr__(self):
@@ -1930,7 +1937,12 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
                         'survey':'Survey',
                         'interactive_exercise':'Interactive Exercise',
                        }
-    
+    Exam_HUMAN_TYPES_PLURAL = {'exam':'Exams',
+                               'problemset':'Quizzes',
+                               'survey':'Surveys',
+                               'interactive_exercise':'Interactive Exercises',
+                              }
+
     course = models.ForeignKey(Course, db_index=True)
     section = models.ForeignKey(ContentSection, null=True, db_index=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -1949,6 +1961,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     autograde = models.BooleanField(default=False)
     display_single = models.BooleanField(default=False)
     grade_single = models.BooleanField(default=False)
+    hide_grades = models.BooleanField(default=False)
     invideo = models.BooleanField(default=False)
     timed = models.BooleanField(default=False)
     minutesallowed = models.IntegerField(null=True, blank=True)
@@ -1997,7 +2010,92 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if re.search(r"\$\$.*\$\$", self.html_content, re.DOTALL) or re.search(r"\\\[.*\\\]", self.html_content, re.DOTALL):
             return True
         return False
+    
+    def num_random_questions(self):
+        """The number of randomly_selected questions that are specified to be shown
+           Returns 0 if there is no choosenquestions attribute in exam_metadata or
+            if anything fails to parse, etc.
+        """
+        try:
+            md_dom = parseString(encoding.smart_str(self.xml_metadata, encoding='utf-8'))
+        except ExpatError:
+            return 0 
+        exam_md = md_dom.getElementsByTagName('exam_metadata')
+        if not exam_md:
+            return 0
+        else:
+            numstr = exam_md[0].getAttribute('choosenquestions')
+            try:
+                return int(numstr)
+            except ValueError:
+                return 0
+        return 0
+
+    def getHTML(self, question_ids=None):
+        """ Gets the rendered question HTML, taking into consideration any randomization.
+            The kwarg questions_ids takes a list of pre-selected question ids which
+            will be the only ones rendered (provided they exist).
+            The actual return value is a dict with key 'html' being the html content,
+            'subset' being a boolean if less than the total number of question divs are in html,
+            and 'question_ids' being an array of ids of the actually included <div class="question"> in html.
+            'question_ids' is only guaranteed be populated if 'subset' is True
+        """
+        #defaults
+        retv = {'html':'', 'subset':False, 'question_ids':[]}
         
+        numQ = self.num_random_questions()
+        #shortcut case.  We want the html_content as is
+        if not numQ and question_ids is None:
+            retv['html'] = self.html_content
+            return retv
+
+        #here, we have to parse the HTML
+        parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder("dom"))
+        #even though we're parsing a fragment, calling parse fills in the
+        #<html><head /><body /></html> structure
+        html_dom = parser.parse(self.html_content)
+        bodys = html_dom.getElementsByTagName('body')
+        if not bodys:
+            retv['html']=self.html_content
+            return retv
+        body = bodys[0]
+        divs = body.getElementsByTagName('div')
+
+        def has_class(attr_str, classname):
+            """helper function to find a particular name in the class attribute"""
+            return re.search(r"\b"+classname+r"\b", attr_str)
+
+        #this is a minidom containing all of the <div class="question">s
+        question_divs = filter(lambda div: has_class(div.getAttribute('class'), 'question'), divs)
+
+        #now break up into 2 cases.  1 if question_ids is specified and 1 picking random divs
+        #b/c we need to use removeChild to manipulate the DOM, have to build up a "removal" list
+        #then actually remove it from the minidom representation of <body>
+        if question_ids is not None:
+            divs_chosen = filter(lambda div: div.getAttribute('id') in question_ids, question_divs)
+            divs_to_remove = filter(lambda div: div.getAttribute('id') not in question_ids, question_divs)
+            for div in divs_to_remove:
+                body.removeChild(div)
+        else:
+            divs_chosen = copy.copy(question_divs)
+            divs_to_remove = []
+            while len(divs_chosen) > numQ:
+                chx = random.choice(divs_chosen)
+                divs_chosen.remove(chx)
+                divs_to_remove.append(chx)
+            for div in divs_to_remove:
+                body.removeChild(div)
+
+        #now serialize
+        ret_html = ""
+        for child in body.childNodes: #do this so we don't get the <body> tag
+            ret_html += child.toxml()
+        chosen_div_ids = map(lambda div: div.getAttribute('id'), divs_chosen)
+
+        retv['html'] = ret_html
+        retv['subset'] = len(divs_chosen) < len(question_divs)
+        retv['question_ids'] = chosen_div_ids
+        return retv
     
     def create_ready_instance(self):
         ready_instance = Exam(
@@ -2025,6 +2123,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             autograde = self.autograde,
             display_single = self.display_single,
             grade_single = self.grade_single,
+            hide_grades = self.hide_grades,
             invideo = self.invideo,
             timed = self.timed,
             minutesallowed = self.minutesallowed,
@@ -2082,6 +2181,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.display_single = self.display_single
         if not clone_fields or 'grade_single' in clone_fields:
             ready_instance.grade_single = self.grade_single
+        if not clone_fields or 'hide_grades' in clone_fields:
+            ready_instance.hide_grades = self.hide_grades
         if not clone_fields or 'invideo' in clone_fields:
             ready_instance.invideo = self.invideo
         if not clone_fields or 'timed' in clone_fields:
@@ -2141,6 +2242,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.display_single = ready_instance.display_single 
         if not clone_fields or 'grade_single' in clone_fields:
             self.grade_single = ready_instance.grade_single
+        if not clone_fields or 'hide_grades' in clone_fields:
+            self.hide_grades = ready_instance.hide_grades
         if not clone_fields or 'invideo' in clone_fields:
             self.invideo = ready_instance.invideo 
         if not clone_fields or 'timed' in clone_fields:
@@ -2199,6 +2302,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.display_single != self.image.display_single:
             return False
         if self.grade_single != self.image.grade_single:
+            return False
+        if self.hide_grades != self.image.hide_grades:
             return False
         if self.invideo != self.image.invideo:
             return False
@@ -2371,6 +2476,28 @@ class ExamRecord(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
 
+    def get_rendered_questions(self):
+        try:
+            score_data = json.loads(self.json_score_data)
+        except ValueError:
+            return None
+        rq = score_data.get("__rendered_questions")
+        if isinstance(rq, list):
+            return rq
+        else:
+            return None
+
+    def get_total_score(self):
+        try:
+            score_data = json.loads(self.json_score_data)
+        except ValueError:
+            return self.exam.total_score
+        ts = score_data.get("__total_score")
+        if ts:
+            return ts
+        else:
+            return self.exam.total_score
+
     # Prevent writes to read-only database, fail is better than data loss
     def save(self, *args, **kwargs):
         if get_database_considering_override() == 'readonly':
@@ -2391,8 +2518,8 @@ class Instructor(TimestampMixin, models.Model):
     def photo_dl_link(self):
         if not self.photo.storage.exists(self.photo.name):
             return ""
-        
-        url = self.photo.storage.url(self.photo.name)
+
+        url = self.photo.storage.url_monkeypatched(self.photo.name, querystring_auth=False)
         return url
     
     def __unicode__(self):
@@ -2428,6 +2555,7 @@ class ExamScore(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     score = models.FloatField(null=True, blank=True) #this is the score over the whole exam, with penalities applied
     csv_imported = models.BooleanField(default=False)
+    examrecordscore = models.ForeignKey('ExamRecordScore', null=True, db_index=True)
     #can have subscores corresponding to these, of type ExamScoreField.  Creating new class to do notion of list.
     #TODO: Add ForeignKey to which ExamRecord is responsible for this score, per GHI #2029
     
@@ -2449,11 +2577,18 @@ class ExamScore(TimestampMixin, models.Model):
 
     def setScore(self):
         #Set score to max of ExamRecordScore.score for this exam, student
-        exam_records = ExamRecord.objects.values('student').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score'))
+        exam_records = ExamRecord.objects.values('id').filter(exam=self.exam, student=self.student, complete=1).annotate(max_score=Max('score')).order_by('-max_score', '-id')[:1]
         
         if exam_records:
             self.score = exam_records[0]['max_score']
-            self.save()        
+            
+            #We expect to find an associated ExamRecordScore but need to protect against it not being there.
+            exam_record_score = ExamRecordScore.objects.filter(record_id=exam_records[0]['id'])
+            if exam_record_score:
+                self.examrecordscore = exam_record_score[0]
+            
+            self.save()
+                    
 
 # Deprecated
 class ExamScoreField(TimestampMixin, models.Model):
@@ -2879,5 +3014,10 @@ class ContentGroup(models.Model):
     class Meta:
         db_table = u'c2g_content_group'
         
+
+class StudentInvitation(TimestampMixin, models.Model):
+    email = models.CharField(max_length=128, db_index=True)
+    course = models.ForeignKey(Course, db_index=True)
+
 
 

@@ -8,9 +8,11 @@ education. A team of eight built the first version over Summer
 2012, and it is still under active development.  Class2Go launched
 Fall 2012 for six on-campus classes and two "massive open online 
 courses" (MOOC's): [Computer Networking][net] and 
-[Solar Cells, Fuel Cells, and Batteries][sol].
+[Solar Cells, Fuel Cells, and Batteries][sol]; this Winter 2013 we
+hosted the legendary [Database Course][db].
   [net]: http://networking.class.stanford.edu/
   [sol]: http://solar.class.stanford.edu/
+  [db]: http://db.class2go.stanford.edu/
 
 Class2Go was built to be an open platform for learning and research.
 Professors have access to the classes' data to learn how their

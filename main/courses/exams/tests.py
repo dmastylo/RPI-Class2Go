@@ -103,6 +103,8 @@ class SimpleTest(TestCase):
         self.assertFalse(ag.grader_functions['q1d']([])['correct'])
         self.assertTrue(ag.grade('q1d', ["ipod", "napster"])['correct'])
         self.assertFalse(ag.grade('q1d', ["q1d_1"])['correct'])
+        self.assertEqual(ag.points('q1d'),15)
+        self.assertEqual(ag.question_points('problem_1'),15)
 
             #problem 2
         self.assertEqual(ag.grader_functions['test2'](["b","c"]),{'correct':True,'score':1, 'correct_choices':{'b':True, 'c':True}, 'wrong_choices':{}})
@@ -113,6 +115,13 @@ class SimpleTest(TestCase):
         self.assertFalse(ag.grader_functions['test2']([])['correct'])
         self.assertTrue(ag.grade('test2',["b","c"])['correct'])
         self.assertFalse(ag.grade('test2',["a"])['correct'])
+        self.assertEqual(ag.points('test2'),1)
+        self.assertEqual(ag.question_points('problem_2'),1)
+
+        
+        #problem that doesn't exist
+        self.assertEqual(ag.points('blah'),0)
+        self.assertEqual(ag.question_points('blahblah'),0)
 
             #exception due to using an undefined input name
         with self.assertRaisesRegexp(AutoGraderGradingException, 'Input/Response name="notDef" is not defined in grading template'):
@@ -389,6 +398,13 @@ class SimpleTest(TestCase):
         self.assertFalse(agf.grade('q4d',"3.0")['correct'])
         self.assertFalse(agf.grade('randomDNE',"33")['correct']) #This is the actual test
 
+        #test points function
+        self.assertEqual(ag.points('q4d'),139)
+        self.assertEqual(ag.points('q4e'),1)
+        self.assertEqual(ag.points('q4f'),1)
+        self.assertEqual(ag.points('kadsf'),0)
+        self.assertEqual(ag.question_points('problem_4'),141)
+        self.assertEqual(ag.question_points('DNE'),0)
     
     def test_resubmission_and_late_penalty(self):
         """Unit test for the discount function """

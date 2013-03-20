@@ -5,7 +5,7 @@
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
 {% block course_notification %}
-{% if user.is_authenticated and not common_page_data.is_course_member %}
+{% if user.is_authenticated and not common_page_data.is_course_member and not common_page_data.ready_course.preenroll_only %}
 <div class="alert alert-info inline">
     <em class="icon-info-sign"></em>{% trans 'You are not yet a member in this course.' %} <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}{% if request.GET.join_next %}?redirect_to={{ request.GET.join_next }}{% endif %}" method="POST">
         <input type="submit" id="login_button" class="btn" value="Join" />
@@ -13,6 +13,12 @@
     </form>
 </div>
 {% endif %}
+{% if user.is_authenticated and not common_page_data.is_course_member and common_page_data.ready_course.preenroll_only %}
+<div class="alert alert-error inline">
+    <em class="icon-info-sign"></em>{% trans 'Your account is not on the access list of this restricted course.  Please contact the course staff if you believe this to be in error.' %}
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block l_column_content %}
@@ -25,7 +31,14 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h3 class="section-title pull-left">{% trans 'Recent Announcements' %}</h3>
+
+    {# Jabber chat plugin block #}
+    {% if jabber_configured and is_logged_in %}
+    <iframe src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat" style="seamless; clear: both; width: 100%; height: 400px; margin-bottom: 10px;" class="span6"></iframe>
+    {% endif %} {# jabber_configured and is_logged_in #}
+    {# end Jabber chat plugin block #}
+
+    <h3 class="section-title pull-left" style="clear: both;">{% trans 'Recent Announcements' %}</h3>
     <div class="pull-right">
 	{% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
             <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
@@ -102,6 +115,7 @@
 
 <script>
 $(document).ready(function(){
+
     $("#c2g_layout_r_column").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
     $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
         c2g.installLeftNavChevron();

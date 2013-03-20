@@ -6,6 +6,11 @@
 {% block navbar %} {% endblock navbar %}
 
 {% block m_column_content %}
+{% if user.is_authenticated %}
+
+<p>{% trans 'Welcome' %}, {{ user.username }}. {% blocktrans %}You are already logged in and therefore you already have an account.  Please {% endblocktrans %}<a href="{% url 'auth_logout' %}?next={% url 'registration_register' %}">{% blocktrans %}log out</a> to register for a new account. {% endblocktrans %}</p>
+
+{% else %}
 {% if form.errors %}
     <div class="alert alert-error">
     <button class="close" data-dismiss="alert">×</button>
@@ -36,4 +41,5 @@
 </div>
 </div>
 
+{% endif %}
 {% endblock m_column_content %}

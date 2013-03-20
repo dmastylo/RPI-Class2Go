@@ -10,9 +10,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, target-densitydpi=device-dpi">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    {% if SITE_NAME_SHORT == 'Stanford' %}
-        <link rel='shortcut icon' type='image/x-icon' href='{{ STATIC_URL }}graphics/core/stanford-favicon.ico' />
-    {% endif %}
+    <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
     
     {% block top_scripts %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
@@ -21,7 +19,6 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/analogclock.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/{{ SITE_NAME_SHORT }}-styles.css" />
     <!--[if IE 7]>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
     <![endif]-->
@@ -134,7 +131,7 @@
                                     <a id="login_button" class="btn" href="{% url 'default_login' %}?next={{ request.get_full_path }}">{% trans 'Login' %}</a>
                                 {% endif %}
                             </li>
-                            {% if not common_page_data.ready_course.institution_only %}
+                            {% if not common_page_data.ready_course.institution_only and not common_page_data.ready_course.preenroll_only %}
                             <li class="hidden-phone"><a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" class="btn">{% trans 'Register' %}</a></li>
                             {% endif %}
                         {% endif %}
@@ -185,9 +182,8 @@
         
     </div>
 
-    {% with "sites/"|add:SITE_NAME_SHORT|add:"/footer.html" as footer_include %}
-    {% include  footer_include  %}
-    {% endwith %}
+    {% include  "footer.html"  %}
+
 
     {% block bottom_scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
@@ -337,7 +333,11 @@
     {% endblock bottom_scripts %}
     <script type="text/javascript">
       var _gaq = _gaq || [];
+      {% if SITE_NAME_SHORT == 'Stanford' %}
       _gaq.push(['_setAccount', 'UA-33859275-1']);
+      {% else %}
+      _gaq.push(['_setAccount', 'UA-38369706-1']);
+      {% endif %}
       _gaq.push(['_trackPageview']);
 
       (function() {

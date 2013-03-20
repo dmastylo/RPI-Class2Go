@@ -54,7 +54,11 @@
 {% endblock addl_head_scripts %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span9">
+{% if score or raw_score %}
+  <div id="c2g_layout_m_column" class="span6">
+{% else %}
+  <div id="c2g_layout_m_column" class="span9">
+{% endif %}
 
 {% autoescape off %}
 
@@ -90,7 +94,7 @@
     .explanation .toggle-expl {cursor: pointer;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
-    #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
+    #exam-pane .inline-explanation {border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
     #saveWorkBtn {margin-right: .5em;}
 
@@ -164,16 +168,17 @@
 
     {% endif %}
 
-    
-    
-    {% if score %}
-    <h4><b style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</b></h4>
-    {% endif %}
 
-    {% if raw_score %}
-    <h4><b style="color:red">{% trans 'Raw Score (without late or resubmission penalties)' %}: {{raw_score}}</b></h4>
+    {% if score or raw_score or total_score %}
+        <div class="score-area pull-left">
+            {% if score or total_score %}
+                <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{total_score}}</strong></h4>
+            {% endif %}
+            {% if raw_score %}
+                <h4><strong style="color:red">{% trans 'Raw Score (without penalties)' %}: {{raw_score}}</strong></h4>
+            {% endif %}
+        </div>
     {% endif %}
-
 
     <noscript>
     <div class="alert alert-error">{% trans 'Your browser does not have JavaScript enabled. Please enable it before taking this exam' %}</div>
@@ -181,7 +186,11 @@
 
     <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
         <form>
-        {{ exam.html_content }}
+        {% if rendered_exam_html %}
+            {{ rendered_exam_html }}
+        {% else %}
+            {{ exam.html_content }}
+        {% endif %}
         </form>
 
         <div class="exam-navigation">
@@ -210,6 +219,45 @@
 </div>
 {% endblock m_column_content %}
 
+
+{% block r_column_content %}
+    {% if score or raw_score %}
+    <div id="c2g_layout_r_column" class="span3">                   
+                   <div id="right_nav" class=" well nav">
+                       <div id="share-result">
+                           <h3>Share Your Results!</h3>                  
+                           <ul class="nav nav-tabs">
+                               <li class="active"><a href="#facebook-tab" data-toggle="tab"><em class="icon-facebook"></em></a></li>
+                               {% if common_page_data.course.twitter_tag %}<li><a href="#twitter-tab" data-toggle="tab"><em class="icon-twitter"></em></a></li>{% endif %}
+                               <li><a href="#google-tab" data-toggle="tab"><em class="icon-google-plus"></em></a></li>
+                           </ul>
+                           <div class="tab-content">
+                               <form class="tab-pane active" id="facebook-tab">
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" in {{ common_page_data.course.twitter_tag|cut:'#'|cut:'@' }}!</textarea>
+                                  <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                  <a class="btn pull-left share_button" id="facebook_button" href="https://www.facebook.com/dialog/feed?app_id=218493974879064&link=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}&picture={{course.logo_dl_link}}&name={{ exam.title }}&%20description=" target="_blank">
+                                      <span class="facebook_redirect" style="display: none;">&redirect_uri=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}</span>Share on Facebook!
+                                  </a>
+                               </form>
+                               {% if common_page_data.course.twitter_tag %}
+                                      <form class="tab-pane" id="twitter-tab">
+                                          <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" in {{ common_page_data.course.twitter_tag }}!</textarea>
+                                          <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                          <a class="btn pull-left share_button" id="twitter_button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
+                                      </form>
+                               {% endif %}
+                               <form class="tab-pane" id="google-tab">
+                                  <textarea rows="4" cols="35" maxlength="140">I just completed "{{ exam.title }}" in {{ common_page_data.course.twitter_tag|cut:'#'|cut:'@' }}!</textarea>
+                                  <a href="#" class="show_score" title="{{score}}/{{exam.total_score}}">Show Score</a>
+                                  <a class="btn pull-left share_button" id="google_button" href="https://m.google.com/app/plus/x/?v=compose&content=" target="_blank">Share on Google+!</a>
+                               </form>
+                           </div>
+                       </div>
+                   </div>
+    </div>
+    {% endif %}
+{% endblock r_column_content %}
+
 {% block addl_scripts %}
     {% if videotest %}
      <script src="{{STATIC_URL}}js/popcorn/popcorn-ie8.min.js"></script>
@@ -220,7 +268,13 @@
 <script>
     var __exam_type = "{{exam.exam_type}}";
     var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
+    var __hide_grades = {% if exam.hide_grades %}true{% else %}false{% endif %};
 
+    {% if exam.num_random_questions %}
+        c2g.overrideNumbering = true;
+    {% else %}
+        c2g.overrideNumbering = false;
+    {% endif %}
     
     /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
@@ -255,7 +309,8 @@
         /********** Add ordinal numbering if it doesn't already exist *********/
         var addNumberToQuestionDiv = function(elem, num) {
             var numberingDiv = $(elem).find('h3.questionNumber');
-            if (numberingDiv.length == 0){
+            if (numberingDiv.length == 0 || c2g.overrideNumbering){
+              $(elem).find(".questionNumber").remove();
               $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
             }
         };
@@ -272,6 +327,9 @@
                                        addQuestionDivLabel(this, qQumx, psetQuestions.length);
                                        qQumx = qQumx + 1;}
             );
+        }
+        else {
+            $(".questionNumber").remove();
         }
                       
         /************************** end ordinal *******************************/
@@ -655,7 +713,9 @@
         {% if exam.exam_type == "survey" %}
             SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
         {% else %}
-            {% if exam.autograde %}
+            {% if exam.hide_grades %}
+            var SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
+            {% elif exam.autograde %}
             var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
             {% else %}
             var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
@@ -725,7 +785,9 @@
             var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                            {   csrfmiddlewaretoken: "{{ csrf_token }}",
                                json_data:JSON.stringify(userSelections),
-                               onpage:$(location).attr('href')
+                               onpage:$(location).attr('href'),
+                               renderedQuestions:JSON.stringify(c2g.rendered_questions)
+
                            });
                            
             saveXHR.error(function(xhr, status, msg) {
@@ -789,8 +851,8 @@
 
             if ($.type(dataObj[member]) == "object") {
                 // it's a text input/textarea
-                $('input[name|=' + member + ']').val(dataObj[member].value);
-                $('textarea[name|=' + member + ']').val(dataObj[member].value);
+                $('input[name|=' + member + ']').val(dataObj[member].value).trigger('repopulate');
+                $('textarea[name|=' + member + ']').val(dataObj[member].value).trigger('repopulate');
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
                       $('input[name|=' + member + ']').before("<b style='color:red'> " + scores[member]+" </b> ");
@@ -828,9 +890,9 @@
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('#main-content input').attr('disabled','disabled');
-            $('#main-content textarea').attr('disabled','disabled');
-            $('#main-content select').attr('disabled', 'disabled');
+            $('#exam-pane input').attr('disabled','disabled');
+            $('#exam-pane textarea').attr('disabled','disabled');
+            $('#exam-pane select').attr('disabled', 'disabled');
 
             // hide submit button
             var submitBtn = $('#submit-button');
@@ -913,11 +975,14 @@
         }
                       
         var myXML = $.parseXML(correxObj["__metadata__"]);
-        console.log(myXML);
+        //console.log(myXML);
         var examMD = $(myXML).find('exam_metadata');
         var questionMD = $(examMD).find('question_metadata');
-        $(questionMD).each(function(){displayQuestionExplanation(this);
-                         displayChoiceExplanations(this);});
+        $(questionMD).each(function(){
+                           if ($("div#" + $(this).attr('id')).length){
+                               displayQuestionExplanation(this);
+                               displayChoiceExplanations(this);
+                           }});
         {% if exam.load_mathjax %}
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,"exam-pane"]);
         {% endif %}
@@ -975,13 +1040,14 @@
         var examXHR = $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                {   csrfmiddlewaretoken: "{{ csrf_token }}",
                    json_data:JSON.stringify(userSelections),
-                   onpage:$(location).attr('href')
+                   onpage:$(location).attr('href'),
+                   renderedQuestions:JSON.stringify(c2g.rendered_questions)
                }
         );
 
         examXHR.success(function (evt, xhr, settings) {
             $('#submit-button').removeAttr('disabled');
-            if (__autograde) {
+            if (__autograde && __exam_type != "survey" && !__hide_grades) {
                 document.location = settings.responseText;
             }
             else {
@@ -993,9 +1059,9 @@
                     { message = "{% trans 'Your submission has been saved.' %}  \n{% blocktrans with due_date=exam.due_date|date:'D M d Y' %}Please check back after {{due_date}} for your score.{% endblocktrans %}";
                       confirmText = "{% trans 'See My Submissions' %}"; 
                       title = "{% trans 'Submission complete' %}.";}
-                else if (__exam_type == "survey")
-                    { message = "{% trans 'Thanks' %}!";
-                      title= "{% trans 'Survey complete' %}.";}
+                else if (__exam_type == "survey" || __hide_grades)
+                    { message = "{% trans 'Thanks for your submission!' %}!";
+                      title= "{% trans 'Submission complete' %}.";}
                       
                 var dialogDiv = window.getDialog(title);
                 
@@ -1062,14 +1128,18 @@
         window.showCorrections(prePopCorrex);
     }
     {% endif %}
-
+          
+    c2g.rendered_questions = "";
+    {% if rendered_questions %}
+        c2g.rendered_questions = JSON.parse('{{rendered_questions|escapejs}}');
+    {% endif %}
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');
     $('#saveWorkBtn').attr('disabled','disabled');
     $('#reEnableForm').remove();
-    $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
-    $('#main-content textarea').attr('disabled','disabled');
+    $('#exam-pane input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
+    $('#exam-pane textarea').attr('disabled','disabled');
                       
     {% endif %}
                       
@@ -1155,5 +1225,43 @@
 </script>
 {% endif %}
 
+
+{% if score or raw_score %}
+     <script>
+          var facebook_pre_href = $('#share-result form a#facebook_button').attr('href');
+          var facebook_content_href;
+          var facebook_post_href = $('#share-result form a#facebook_button .facebook_redirect').text();
+          var twitter_pre_href = $('#share-result form a#twitter_button').attr('href');
+          var twitter_post_href;
+          var google_pre_href = $('#share-result form a#google_button').attr('href');
+          var google_post_href;
+          
+          $('#share-result form .show_score').click(function() {
+                   var score_text = $(this).siblings('textarea').val() + " I scored " + $(this).attr('title') + "!";
+                   $(this).siblings('textarea').val(score_text);
+          })
+          
+          $('#share-result form a.share_button').click(function() {
+                   var which_share = $(this).attr('id');
+                   switch(which_share) {
+                            case "facebook_button":
+                                      facebook_content_href = $(this).siblings('textarea').val();
+                                      var facebook_href = facebook_pre_href + facebook_content_href.replace(/\ /g, "%20") + facebook_post_href;
+                                      $(this).attr('href', facebook_href);
+                                      break;
+                            case "twitter_button":
+                                      twitter_post_href = $(this).siblings('textarea').val();
+                                      var twitter_href = twitter_pre_href + twitter_post_href.replace(/\ /g, "%20").replace(/\#/g, '%23');
+                                      $(this).attr('href', twitter_href);
+                                      break;
+                            case "google_button":
+                                      google_post_href = $(this).siblings('textarea').val();
+                                      var google_href = google_pre_href + google_post_href.replace(/\ /g, "%20");
+                                      $(this).attr('href', google_href);
+                                      break;
+                   }      
+          });
+     </script>
+{% endif %}
 
 {% endblock addl_scripts %}

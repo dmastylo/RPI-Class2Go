@@ -177,6 +177,14 @@ urlpatterns = patterns('',
         name='course_materials_by_section'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/admin/?', 'courses.admin_views.admin'),
                        
+    #member management
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/member_management/?', 'courses.member_management.views.listAll'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll_student/?', 'courses.member_management.views.unenroll_student'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/enroll_students/?', 'courses.member_management.views.enroll_students'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/resend_invite/?', 'courses.member_management.views.resend_invite'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/uninvite/?', 'courses.member_management.views.uninvite'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/reclassify_member/?', 'courses.member_management.views.reclassify_member'),
+
                        
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/leftnav/?$', 'courses.views.leftnav'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/rightnav/?$', 'courses.views.rightnav'),
@@ -303,6 +311,10 @@ urlpatterns = patterns('',
     #In-line Reports
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/generate_in_line_report/?$', 'courses.reports.views.generate_in_line_report'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/summary_report/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.reports.views.summary_report'),
+
+    #Chat
+    # FIXME: this should be replaced with a widget embedded in other pages, but giving it its own page lets me get up and testing fast
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/chat/?$', 'courses.chat.views.prototype'),
     
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),
@@ -312,9 +324,9 @@ urlpatterns = patterns('',
 # when testing we get a warning about favicon, silence it by mapping to
 # the location of the file
 if settings.DEBUG and settings.SITE_NAME_SHORT:
-    site=settings.SITE_NAME_SHORT.lower()
-    urlpatterns += patterns('', 
-        url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', 
-            {'url': settings.STATIC_URL+'graphics/core/%s-favicon.ico' % site})
+    site=settings.SITE_NAME_SHORT
+    urlpatterns += patterns('',
+        url(r'^favicon.ico$', 'django.views.generic.simple.redirect_to',
+        {'url': settings.STATIC_URL+'graphics/sites/%s/favicon.ico' % site})
     )
    

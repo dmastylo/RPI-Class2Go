@@ -52,6 +52,7 @@ SITE_ID = 1
 SITE_NAME_SHORT = 'Stanford'
 SITE_NAME_LONG = 'Stanford University'
 SITE_TITLE = 'Stanford Class2Go'
+SITE_URL = 'https://class2go.stanford.edu'
 
 # Put your name and email address here, so Django serious errors can come to you
 # the trailing comma after the list is important so Python correctly interprets 
@@ -133,3 +134,7 @@ GOOGLE_CLIENT_SECRET = "YYYYYYYYYYYYYYYYYYYYYYYY"
 # Specify this if you want to hit this endpoint to do interactive grading. 
 # If left blank, grading has a fallback "localhost" mode with dummy answers.
 # GRADER_ENDPOINT = "nnnnnnnnnnnnnnnnnnnn.us-west-2.elb.amazonaws.com"
+
+# Base domain used for jabber connections in the client; also used to determine
+# whether chat is enabled. Leave unset to not support chat widgets.
+JABBER_DOMAIN=u'' 

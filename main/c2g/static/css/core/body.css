@@ -74,6 +74,14 @@ a:hover {color:#820000;}
     display:block;
 }
 
+.well.jobdesc {
+    margin-right: 0;
+    margin-left: 0;
+}
+.well.jobdesc h1.title {
+    margin-bottom: 10px;
+}
+
 .upcoming {
   padding:10px 0px;
   background:#e9e6df;
@@ -578,6 +586,38 @@ small.date {
     min-height:450px;
 }
 
+.score-area {
+    margin: 0 0 15px 0;
+}
+
+#share-result textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+#share-result .show_score {
+    display: block;
+    clear: both;
+    padding-bottom: 10px;
+}
+#share-result ul {
+    border-bottom: 1px solid #999 !important;
+}
+#share-result li a {
+    font-size: 18px;
+    background-color: transparent;
+}
+#share-result li.active a,
+#share-result li.active a:hover {
+    border: 1px solid #999;
+    border-bottom: 1px solid #f5f5f5 !important;
+    background-color: transparent;
+}
+#share-result li a:hover {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom: 1px solid #999 !important;
+}
+
 #left-nav h3.expanded {
     /*background:url(../../graphics/core/icon-minus.png) no-repeat right 7px;*/
     background:url(../../graphics/core/arrow-open.png) no-repeat right 9px;
@@ -707,6 +747,35 @@ small.date {
     font-size: 18px;
     line-height: 1.5em;
 }
+.profile-courses .course .dates {
+    font-size: 14px;
+}
+.profile-courses .course .profile-progress-wrapper {
+    position: relative;
+    float: right;
+}
+.profile-courses .course .profile-progress-wrapper .profile-progress-endticks {
+    position: absolute;
+    right: 0;
+    width: 196px;
+    height: 1px;
+    padding: 2px 0;
+    border-right: 1px solid #333;
+    border-left: 1px solid #333;
+}
+.profile-courses .course .profile-progress-wrapper .profile-progress-endticks .profile-progress-line {
+    position: relative;
+    width: 100%;
+    height: 1px;
+    background-color: #333;
+}
+.profile-courses .course .profile-progress-wrapper .profile-progress-endticks .profile-progress-bar {
+    position: absolute;
+    height: 3px;
+    left: 0;
+    top: 1px;
+    background-color: #820000;
+}
 .profile-courses .course .btn {
     position: absolute;
     right: 15px;
@@ -715,10 +784,10 @@ small.date {
     font-size: 13px; 
 }
 .profile-courses .course input.btn {
-    width: 195px;
+    width: 198px;
 }
 .profile-courses .course .btn {
-    width: 173px;
+    width: 176px;
 }
 
 /* Video - added by Kevin

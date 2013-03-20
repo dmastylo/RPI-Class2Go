@@ -46,10 +46,19 @@
                         <div class="course">
                             <div class="image"><img alt="Course Image" height="200" width="200" src="{{course.logo_dl_link}}" /></div>
                             <h3><a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></h3>
-                            <p><strong>{{course.calendar_start}} - {{course.calendar_end}}</strong></p>
+                            <p class="dates"><strong>{{ course.calendar_start|date:"M. j, Y" }} - {{ course.calendar_end|date:"M. j, Y" }}</strong></p>
+                            <div class="profile-progress-wrapper">
+                                <div class="profile-progress-endticks">
+                                    <div class="profile-progress-line"></div>
+                                    <div class="profile-progress-bar" style="width: {{course_completions|byKey:course.id}}%"></div>
+                                </div>
+                            </div>
                             {% if certifications|byKey:course.id %}
                                 {% for certinfo in certifications|byKey:course.id %}
-                            <a class="btn" href="{{certinfo.1}}">{{certinfo.0|uscore2space|title}} {% trans 'Accomplished' %}</a>
+                                    <a class="btn" href="{{certinfo.1}}">
+                                        {% trans 'Download '|add:certinfo.0|uscore2space|title %}
+                                        <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+                                    </a>
                                 {% endfor %}
                             {% else %}
                                 {% if course in is_student_list %}
