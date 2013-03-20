@@ -302,30 +302,26 @@
         $(document).ready(function (){
             var collapsed = ", collapsed, click to expand";
             var expanded = ", expanded, click to collapse";
-            var toggleText;
-            var firstFocus; 
             
-            $('.dropdown .dropdown-toggle, .accordion-heading a').focus(function(){
-                if (firstFocus) {
-                    toggleText = expanded;
-                }
-                firstFocus = false;
-            });
-            
-            $('.dropdown, .accordion-heading').click(function(){
-                $('.hidden-accessible', this).text(toggleText);
-                toggleText = $('.hidden-accessible', this).text();
-                if (expanded == toggleText) {
-                    toggleText = collapsed;
+            $('.dropdown a').click(function(){
+                if (!$(this).parent('li').hasClass('open')) {
+                    $('.hidden-accessible', this).text(collapsed);
                 } else {
-                    toggleText = expanded;
+                    $('.hidden-accessible', this).text(expanded);
                 }
-                firstFocus = false;
             });
             
-            $('.dropdown .dropdown-toggle, .accordion-heading a').blur(function(){
+            $('.accordion-heading a').click(function(){
+                console.log($(this).parent().is('.expanded'));
+                if (!$(this).parent().hasClass('expanded')) {
+                    $('.hidden-accessible', this).text(collapsed);
+                } else {
+                    $('.hidden-accessible', this).text(expanded);
+                }
+            });
+            
+            $('.dropdown a, .accordion-heading a').blur(function(){
                 $('.hidden-accessible', this).text(collapsed);
-                firstFocus = true;
             });
         });
         
