@@ -32,4 +32,17 @@ def s3boto_dlurl(self, name, response_headers=None, querystring_auth=True):
 import storages.backends.s3boto
 storages.backends.s3boto.S3BotoStorage.url_monkeypatched = s3boto_dlurl
 
+from django import forms
+from django.core import validators
+import re
 
+def _set_regex_unicode(self, regex):
+    if isinstance(regex, basestring):
+        regex = re.compile(regex, re.UNICODE)
+    self._regex = regex
+    if hasattr(self, '_regex_validator') and self._regex_validator in self.validators:
+        self.validators.remove(self._regex_validator)
+    self._regex_validator = validators.RegexValidator(regex=regex)
+    self.validators.append(self._regex_validator)
+
+forms.RegexField._set_regex = _set_regex_unicode
