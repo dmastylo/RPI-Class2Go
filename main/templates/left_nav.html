@@ -7,7 +7,7 @@
             {% with contentsection_id=content_section.id %}
                 <li class="accordion-group">
                     <h3 id="sidebar-nav-heading-{{ contentsection_id }}" class="nav-header accordion-heading" data-toggle="collapse" data-target="#sidebar-nav-{{ contentsection_id }}" data-parent="#left-nav">
-                        <a href="#" class="leftnav-title">
+                        <a href="#" class="leftnav-title closed">
                             {{content_section.title}}
                             <span class="hidden-accessible">, collapsed, click to expand</span>
                         </a>
@@ -71,3 +71,7 @@
             <li><a href="/accounts/profile">{% trans 'My profile' %}</a></li>
         </ul>
     </ul>
+
+<script>
+    menuVoiceoverSetup();
+</script>
