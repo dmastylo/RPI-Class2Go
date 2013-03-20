@@ -488,8 +488,8 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
     onpage = request.POST.get('onpage','')
 
     try:
-        rendered_questions = json.loads(request.POST.get('renderedQuestions'))
-    except ValueError:
+        rendered_questions = json.loads(request.POST.get('renderedQuestions', ''))
+    except (TypeError, ValueError):
         rendered_questions = None
 
     feedback = {}
