@@ -1328,3 +1328,20 @@ def parse_markdown(request):
     html = md.convert(mkd)
     returnobj = {'html':html, 'meta':md.Meta}
     return HttpResponse(json.dumps(returnobj))
+
+
+def quizdown_preview(request):
+    return render_to_response('exams/qd_preview.html', {}, RequestContext(request))
+
+
+@require_POST
+def check_metadata_xml_no_course(request):
+    xml = request.POST.get('metaXMLContent')
+    if not xml:
+        return HttpResponseBadRequest("No metaXMLContent provided")
+    try:
+        grader = AutoGrader(xml)
+    except Exception as e: #Since this is just a validator, pass back all the exceptions
+        return HttpResponseBadRequest(unicode(e))
+    
+    return HttpResponse("Metadata XML is OK.\n" + unicode(grader) + "\n" )

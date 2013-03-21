@@ -294,6 +294,11 @@ urlpatterns = patterns('',
                                              
     # Landing Page
     url(r'^/?$', 'courses.landing.views.landing'),
+                       
+                       
+    # quizdown preview page
+    url(r'^quizdown_preview/?$', 'courses.exams.views.quizdown_preview'),
+    url(r'^check_exam_metadata/?$', 'courses.exams.views.check_metadata_xml_no_course'),
 
     #Preview
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview/$', 'courses.preview.views.preview'),
