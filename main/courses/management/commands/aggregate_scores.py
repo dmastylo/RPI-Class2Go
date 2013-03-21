@@ -41,6 +41,6 @@ class Command(BaseCommand):
                                                 ScoreAggregator.generate_default_exam_formula(course),
                                                 ScoreAggregator.generate_challenge_db_exercise_formula(course),
                                                 ScoreAggregator.generate_core_db_exercise_formula(course)]))
-        print(agg.max_points())
+        #print(agg.max_points())
         admin = User.objects.get(username='admin')
-        agg.aggregate(admin, tag=tag)
+        agg.aggregate_all(tag=tag)

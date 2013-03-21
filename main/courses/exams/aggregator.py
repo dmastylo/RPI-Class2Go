@@ -22,6 +22,8 @@ class ScoreAggregator():
     
     safe_dict = {'math':math, 'abs':abs, 'divmod':divmod, 'len':len, 'max':max, 'min':min,
         'pow':pow, 'range':range, 'sum':sum, 'map':map, 'filter':filter, 'reduce':reduce, 'list':list}
+    
+    reserved_names = ['__student']
 
     def __init__(self, course, formula):
         """
@@ -47,27 +49,41 @@ class ScoreAggregator():
             try:
                 Exam.objects.get(course=course, slug=var)
             except Exam.DoesNotExist:
-                raise AggregatorFormulaVariableError("{{%s}} is not an assessment item in Course %s" % (var, course))
+                if var in self.reserved_names:
+                    continue
+                else:
+                    raise AggregatorFormulaVariableError("{{%s}} is not an assessment item in Course %s" % (var, course))
         
         #now try out the formula with all variables filled in a 0's, to see if we throw any errors
         #score_dict will become the template context
         #set entire context to return 0
         score_dict = collections.defaultdict(lambda:0)
-       
+        #do reserved names
+        score_dict = self.fill_reserved_word_context(score_dict)
+
         formula = self.fill_formula(score_dict)
+        #print formula
         #if there's a problem, this eval will raise an exception that will get passed on (no try...except)
         self.eval_helper(formula)
 
     def __unicode__(self):
         return self.formula_str + "\nAggregator formula for " + unicode(self.course)
-    
+
+
+    def fill_reserved_word_context(self, context, student_name="student"):
+        context['__student'] = '"""%s"""' % student_name
+        return context
+
     def max_points(self):
         exams = Exam.objects.filter(course=self.course, is_deleted=False, slug__in=self.formula_vars)
         points_dict = collections.defaultdict(lambda:0)
         for exam in exams:
             points_dict[exam.slug] = exam.get_total_score()
+        #do reserved names
+        points_dict = self.fill_reserved_word_context(points_dict)
+
         formula = self.fill_formula(points_dict)
-        print(formula)
+        #print(formula)
         return self.eval_helper(formula)
 
     def fill_formula(self, context):
@@ -90,7 +106,10 @@ class ScoreAggregator():
         for s in scores:
             if s['score'] > score_dict[s['exam__slug']]:
                 score_dict[s['exam__slug']] = s['score']
-        
+
+        #do reserved names
+        score_dict = self.fill_reserved_word_context(score_dict, student_name=student.username)
+
         #default value is still 0, but may be found to be something else
         #for (patt, var) in zip(self.formula_vars_patterns, self.formula_vars):
         #    context[patt] = score_dict[var]
@@ -98,11 +117,11 @@ class ScoreAggregator():
         #score_dict can now be used as a Context to populate formula as an arithmetic expression
         #without any variables
         formula = self.fill_formula(score_dict)
-        print(formula)
+        #print(formula)
         
         #now we can do our restricted eval of our arithmetic expression
         ag_score = self.eval_helper(formula)
-        print(ag_score)
+        #print(ag_score)
         #now write to the DB if tag is a string
         if isinstance(tag, str):
             data, created = CourseStudentData.objects.get_or_create(course=self.course, student=student, tag=tag)
@@ -173,7 +192,7 @@ class ScoreAggregator():
             return "max( %s )" % " , ".join(map(lambda li: "{{%s}}" % li, lst))
 
         strout = " + ".join(map(lambda li: stringify_inner_list(li), all_quiz_groups))
-        print(strout)
+        #print(strout)
         return strout
 
     @classmethod
@@ -187,7 +206,7 @@ class ScoreAggregator():
                         exam_type='exam', invideo=False, is_deleted=False, live_datetime__isnull=False))
 
         strout = "3.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exams))
-        print(strout)
+        #print(strout)
         return strout
 
     @classmethod
@@ -202,7 +221,7 @@ class ScoreAggregator():
                                                                             is_deleted=False, live_datetime__isnull=False))
         
         strout = "2.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
-        print(strout)
+        #print(strout)
         return strout
 
     @classmethod
@@ -218,7 +237,7 @@ class ScoreAggregator():
                                                                     .exclude(Q(slug__icontains="challenge") | Q(slug__icontains="extrapractice")))
         
         strout = "2.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
-        print(strout)
+        #print(strout)
         return strout
 
     @classmethod
@@ -233,7 +252,7 @@ class ScoreAggregator():
                                                                             is_deleted=False, live_datetime__isnull=False))
         
         strout = "2.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
-        print(strout)
+        #print(strout)
         return strout
 
 
