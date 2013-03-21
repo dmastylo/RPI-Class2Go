@@ -1,5 +1,7 @@
 import settings
 import urlparse
+import logging
+
 from datetime import datetime, timedelta
 
 from django.contrib.sites.models import Site
@@ -7,6 +9,8 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.functional import wraps
+
+logger=logging.getLogger(__name__)
 
 
 def is_storage_local():
