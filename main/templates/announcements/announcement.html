@@ -6,7 +6,7 @@
             <a style="margin-right: 20px;" href="{% url 'courses.announcements.views.edit' common_page_data.course_prefix common_page_data.course_suffix announcement.id %}"><em class="icon-edit icon-large"></em> {% trans 'Edit' %}</a>
             <a href="javascript:DeleteAnnouncement('{{announcement.id}}')"><em class="icon-trash icon-large"></em> {% trans 'Delete' %}</a>
         {% else %}
-            <a class="announcement-collapse">Show</a>
+            <a class="announcement-collapse">Expand</a>
         {% endif %}
     </div>
     <h4 class="pull-left">{{announcement.title}}</h4>
