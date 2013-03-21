@@ -26,7 +26,7 @@ class ScoreAggregator():
     def __init__(self, course, formula):
         """
             This function instantiates the aggregator with a course <course> and string <formula>.
-            <course> should be a READY-MODE course.
+            <course> MUST be a READY-MODE course.
             <formula> is a string written in a domain-specific language built on
             django templating and python.  Basically, formula should be a python
             expression that evaluates to a number, with function names in python syntax
@@ -60,6 +60,15 @@ class ScoreAggregator():
 
     def __unicode__(self):
         return self.formula_str + "\nAggregator formula for " + unicode(self.course)
+    
+    def max_points(self):
+        exams = Exam.objects.filter(course=self.course, is_deleted=False, slug__in=self.formula_vars)
+        points_dict = collections.defaultdict(lambda:0)
+        for exam in exams:
+            points_dict[exam.slug] = exam.get_total_score()
+        formula = self.fill_formula(points_dict)
+        print(formula)
+        return self.eval_helper(formula)
 
     def fill_formula(self, context):
         """Fill out the formula pattern with context dict"""
@@ -132,7 +141,7 @@ class ScoreAggregator():
     @classmethod
     def generate_default_quiz_formula(selfclass, course):
         """ 
-            This method will return a default quiz grading formula for the course, WHICH SHOULD BE READY MODE.
+            This method will return a default quiz grading formula for the course, WHICH MUST BE READY MODE.
             The default logic is: 
                 * linear sum of ExamScores, except
                     * take the max of all quizzes in the same Content Group
@@ -170,7 +179,7 @@ class ScoreAggregator():
     @classmethod
     def generate_default_exam_formula(selfclass, course):
         """
-            This method will return a default exam grading formula for the course, WHICH SHOULD BE READY MODE.
+            This method will return a default exam grading formula for the course, WHICH MUST BE READY MODE.
             The default logic is:
             * linear sum of ExamScores, no consideration of groupings
         """
@@ -184,7 +193,7 @@ class ScoreAggregator():
     @classmethod
     def generate_default_exercise_formula(selfclass, course):
         """
-            This method will return a default exam grading formula for the course, WHICH SHOULD BE READY MODE.
+            This method will return a default exam grading formula for the course, WHICH MUST BE READY MODE.
             The default logic is:
             * linear sum of ExamScores, no consideration of groupings
         """
@@ -199,7 +208,7 @@ class ScoreAggregator():
     @classmethod
     def generate_core_db_exercise_formula(selfclass, course):
         """
-            This method will return a default exam grading formula for the course, WHICH SHOULD BE READY MODE.
+            This method will return a default exam grading formula for the course, WHICH MUST BE READY MODE.
             The default logic is:
             * linear sum of ExamScores, no consideration of groupings
             """
@@ -215,7 +224,7 @@ class ScoreAggregator():
     @classmethod
     def generate_challenge_db_exercise_formula(selfclass, course):
         """
-            This method will return a default exam grading formula for the course, WHICH SHOULD BE READY MODE.
+            This method will return a default exam grading formula for the course, WHICH MUST BE READY MODE.
             The default logic is:
             * linear sum of ExamScores, no consideration of groupings
             """

@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.cache import get_cache
 from django.utils import encoding
 
-from c2g.models import CacheStat
+from c2g.util import CacheStat
 
 
 logger = logging.getLogger(__name__)
