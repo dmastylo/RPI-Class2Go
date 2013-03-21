@@ -382,7 +382,7 @@ LOGGING = {
             'class':'django.utils.log.NullHandler',
         },
         'logfile': {
-            'level':'INFO', #making this DEBUG will log _all_ SQL queries.
+            'level':'DEBUG', #making this DEBUG will log _all_ SQL queries.
             'class':'logging.handlers.RotatingFileHandler',
             'formatter':'verbose',
             'filename': LOGGING_DIR+'/'+APP+'-django.log',
