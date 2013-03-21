@@ -36,8 +36,11 @@ window.displayQuestionExplanation = function(questionMD){
             $(explArea).append($(this).clone());
         }
     });
-    $('div.question#' + assocQID ).append($(explArea));
-    $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
+    if ($(explArea).html().trim() != "" &&
+        $(explArea).html().trim() != '<div class="detailed-solution"></div>') {
+        $('div.question#' + assocQID ).append($(explArea));
+        $(explArea).before('<div class="clearing-div"></div>').before($(toggleExplBtn));
+    }
 };
 
 window.displayChoiceExplanations = function(questionMD, showAll) {
@@ -80,7 +83,7 @@ window.displayChoiceExplanations = function(questionMD, showAll) {
                         $(inlineExpl).addClass('correct');
                     }
                     $(inlineExpl).empty();
-                    $(inlineExpl).append($(this).find('explanation').text());
+                    $(inlineExpl).append($(this).find('explanation').contents());
                 }
             });
         }

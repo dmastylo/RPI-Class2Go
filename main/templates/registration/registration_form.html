@@ -30,10 +30,10 @@
 		    {% include 'registration/regforminputs.html' %}
             </fieldset>
 		    <div class="form-actions">
-                <p>
+                <label for="id_tos" style="width: 100%;">
                  {% url 'c2g.views.tos' as tos_url %}
                  {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}'s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
-                </p>
+		</label>
 		    	<input type="submit" value="{% trans 'Register' %}" class="btn btn-primary btn-large" /> &nbsp; {% trans 'Already have an account?' %}  <a href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}"> {% trans 'Login instead' %}</a>
 			</div>
 		</form>        

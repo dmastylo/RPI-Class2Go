@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from c2g.models import UserProfile
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-
 import datetime
 
 class EditUserForm(forms.ModelForm):

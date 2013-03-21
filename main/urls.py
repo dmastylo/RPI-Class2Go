@@ -311,6 +311,10 @@ urlpatterns = patterns('',
     #In-line Reports
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/generate_in_line_report/?$', 'courses.reports.views.generate_in_line_report'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/summary_report/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.reports.views.summary_report'),
+
+    #Chat
+    # FIXME: this should be replaced with a widget embedded in other pages, but giving it its own page lets me get up and testing fast
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/chat/?$', 'courses.chat.views.prototype'),
     
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),

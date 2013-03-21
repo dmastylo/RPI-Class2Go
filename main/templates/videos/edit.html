@@ -6,9 +6,6 @@
 <div id="c2g_layout_m_column" class="span12">
   {% if user.is_authenticated %}
     <h3>{% trans 'Edit video' %}</h3>
-      <form name="reset_form" style="display:none" action="{% url 'courses.videos.actions.reset_video' common_page_data.course_prefix common_page_data.course_suffix slug %}" method="POST">
-        {% csrf_token %}
-      </form>
       <form name="upload_form" action="{% url 'courses.videos.actions.edit_video' common_page_data.course_prefix common_page_data.course_suffix slug %}" method="POST" enctype="multipart/form-data">
 
         {% csrf_token %}
@@ -43,7 +40,7 @@
               {% endif %}
               {{ field }}
 	      {% if field.name == "slug" %}
-	      <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">{% blocktrans %}Changing this also changes the ready version's slug, and will break external references if it is live.{% endblocktrans %}</div>
+	      <div id="slug_warning" style="display:none;margin-bottom:9px;color:#A07000">{% blocktrans %}Changing this will break existing URL references if the video is already live.{% endblocktrans %}</div>
 	      {% endif %}
 	    {% endif %}
 	    {{ field.errors }}
@@ -51,9 +48,7 @@
         {% endfor %}
 	</fieldset>
 	<div class="form-actions">
-	  <input type="submit" name="action" value="{% trans 'Save and Set as Ready' %}" class="btn btn-primary" />
-	  <input type="submit" name="action" value="{% trans 'Save as Draft' %}" class="btn" />
-	  <input type="button" name="action" value="{% trans 'Reset to Ready' %}" class="btn" onclick="document.forms.reset_form.submit()" />
+	  <input type="submit" name="action" value="{% trans 'Save' %}" class="btn btn-primary" />
 	  <a href="{% url 'courses.videos.views.list' common_page_data.course_prefix common_page_data.course_suffix %}" class="btn">{% trans 'Cancel' %}</a>
 	</div>
       </form>

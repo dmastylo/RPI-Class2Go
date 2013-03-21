@@ -10,7 +10,7 @@ override_attributes \
 
 run_list(
     "recipe[class2go-apt-update]",
-    "recipe[gdata]",
+    #"recipe[gdata]",
     "recipe[class2go-base-ubuntu]",
     "recipe[class2go-python]",
     "recipe[class2go-apache]",
@@ -20,6 +20,7 @@ run_list(
     "recipe[class2go-ops-dns]",
     "recipe[class2go-database-config]",
     "recipe[class2go-database-setup]",
+    "recipe[class2go-ejabberd]",
     "recipe[class2go-collectstatic]",
     "recipe[class2go-apache-restart]"
 )

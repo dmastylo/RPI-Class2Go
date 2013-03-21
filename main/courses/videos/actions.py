@@ -69,7 +69,7 @@ def edit_video(request, course_prefix, course_suffix, slug):
     if form.is_valid():
         form.save()
         
-        if action == "Save and Set as Ready":
+        if action == "Save":
             video.commit()
 
         if exam_id:
