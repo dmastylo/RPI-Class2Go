@@ -135,7 +135,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     accompanying_materials = models.TextField(blank=True)
     outcomes = models.TextField(blank=True)
     faq = models.TextField(blank=True)
-    logo = models.FileField(upload_to=get_file_path,null=True)
+    logo = models.FileField(upload_to=get_file_path,null=True, blank=True)
     twitter_tag = models.CharField(max_length=64, null = True, blank=True)
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
@@ -244,7 +244,9 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             accompanying_materials = self.accompanying_materials,
             outcomes = self.outcomes,
             faq = self.faq,
+            twitter_tag = self.twitter_tag,
             logo = self.logo,
+            preenroll_only = self.preenroll_only,
             preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
