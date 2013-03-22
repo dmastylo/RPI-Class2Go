@@ -17,8 +17,3 @@ script:
   - python manage.py test -v 2
 notifications:
   irc: "irc.freenode.org#class2go-internal"
-    template:
-      - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
-      - "Build details : %{build_url}"
-#    use_notice: true
-#    skip_join: true
