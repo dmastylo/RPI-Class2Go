@@ -1,4 +1,5 @@
 window.displayDeleteQuestion = function(questionMD){
+    console.log("adding delete button " + questionMD); 
     //This function takes a DOM object of the metadata and displays the delete after the
     //question with the corresponding id
     var mySolution = $(questionMD).find('solution');

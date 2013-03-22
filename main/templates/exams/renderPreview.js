@@ -703,7 +703,6 @@ var c2gXMLParse = (function() {
                             var correctchoices = $(choices).filter(function() {
                                                                      return isChoiceCorrect(this)
                                                                    });
-                            console.log(correctchoices.length + " correct choice");
                             var inputtype = (correctchoices.length == 1) ? 'radio' : 'checkbox';
                             var probName = 'q' + questionIdx + idx_suffix;
                              

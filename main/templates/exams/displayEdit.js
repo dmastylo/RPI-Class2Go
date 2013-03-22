@@ -12,7 +12,14 @@ window.displayEditQuestion = function(questionMD){
     $(toggleExplBtn).attr('data-status', 'Show');
     $(toggleExplBtn).attr('value', 'Edit');
     $(toggleExplBtn).click(function() { edit(questionMD); });
-    $('div.question#' + assocQID ).append($(toggleExplBtn));
+    var container = document.createElement('div');
+    container.innerHTML = editor.getValue();
+    var assocHTML = $(container).find('#' + assocQID)[0]; 
+    var questionText = $($(assocHTML).find('div.question_text')[0]).find('p'); 
+    if(questionText.length > 0)
+    {
+        $('div.question#' + assocQID ).append($(toggleExplBtn));        
+    }
 };
 
 window.edit = function(questionMD) { 
