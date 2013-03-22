@@ -175,7 +175,7 @@ a:hover [class^="icon-"] {
     cursor: pointer;
 }
 .nav > li, .nav > li.active {
-//    height: 34px;
+/*    height: 34px;  */
 }
 .nav > li.active > a {
     border-bottom: 1px solid #999;
@@ -1026,7 +1026,7 @@ input[type="checkbox"] {
 /* Chat
 -------------------------------------------------- */
 #chat_wrapper {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
     width: 600px;

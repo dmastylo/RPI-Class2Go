@@ -163,10 +163,12 @@ $(document).ready(function(){
 	$(this).siblings().show();
 	$('span', this).text('Close Chat');
 	$('em', this).toggleClass('icon-chevron-up').toggleClass('icon-chevron-down');
+	//Candy.Core.connect('{{ nick }}', '{{ nick }}'); /* FIXME: use something more magical */
     }, function() {
 	$(this).siblings().hide();
 	$('span', this).text('Open Chat');
 	$('em', this).toggleClass('icon-chevron-up').toggleClass('icon-chevron-down');
+	//Candy.Core.disconnect
     });
 });
 </script>
