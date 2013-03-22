@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/analogclock.css" />
     <!--[if IE 7]>
@@ -184,6 +185,7 @@
 
     {% include  "footer.html"  %}
 
+    {% block jabber_block %}{% endblock %}
 
     {% block bottom_scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>

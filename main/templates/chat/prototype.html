@@ -2,14 +2,15 @@
 {% load template_utils %}
 
     <html><head>
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/core/{{ SITE_NAME_SHORT }}-styles.css" />
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome.css" />
+        <link rel="stylesheet" href="{{ STATIC_URL }}css/core/sites/{{ SITE_NAME_SHORT }}/styles.css" />
         <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
         <link rel="stylesheet" href="{{ STATIC_URL }}candy_res/candy_full.css" />
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}js/candy_libs/libs.min.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}js/candy.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/candy_ui.js"></script>
     </head><body>
     <div id="candy"></div>
     </body></html>
