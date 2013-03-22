@@ -41,18 +41,16 @@
     {# end Jabber chat plugin block #}
 -->
 
-    {% if course_ended %}
+    {% if course_ended and course_cert%}
 	<div class="well statement">
-	    <h2>{% trans "Congratulations, you're done!" %}</h2>
+	    <h2>{% trans "Congratulations!" %}</h2>
 	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
-	    {% if course_cert %}
-		<p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
-		<p style="text-align: right;">
-		    <a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download '|add:course_cert.0|uscore2space|title %}
-			<em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-		    </a>
-		</p>
-	    {% endif %}
+	    <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
+	    <p style="text-align: right;">
+		<a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
+		    <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+		</a>
+	    </p>
 	</div>
     {% endif %}
 
@@ -86,49 +84,53 @@
 {% block r_column_content %}
 <div id="c2g_layout_r_column" class="span3">
     
-    {% include "courses/sharing.html" %}
+    <div id="share_wrapper">
+	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden" href="#">Show Share Block</a>{% endif %}
+	{% include "courses/sharing.html" %}
+    </div>
+
     
     <div class="right_nav_wrapper">
 	<!--Skeleton Div to be filled in by rightnav ajax -->
     </div>
     
-</div>
-
-{% if course.twitter_tag %}
-    <div id="twitterWidget" class="span3 pull-right">
-	<script src="http://widgets.twimg.com/j/2/widget.js"></script>
-	<script>
-	    new TWTR.Widget({
-		version: 2,
-		type: 'search',
-		search: '{{ course.twitter_tag|cut:'#'|cut:'@' }}',
-		title: 'Recent Tweets',
-		interval: 1000,
-		width: 'auto',
-		height: 300,
-		theme: {
-		    shell: {
-			background: '#e9e6df',
-			color: '#333333'
+    {% if course.twitter_tag %}
+	<div id="twitterWidget">
+	    <script src="http://widgets.twimg.com/j/2/widget.js"></script>
+	    <script>
+		new TWTR.Widget({
+		    version: 2,
+		    type: 'search',
+		    search: '{{ course.twitter_tag|cut:'#'|cut:'@' }}',
+		    title: 'Recent Tweets',
+		    interval: 1000,
+		    width: 'auto',
+		    height: 300,
+		    theme: {
+			shell: {
+			    background: '#e9e6df',
+			    color: '#333333'
+			},
+			tweets: {
+			    background: '#e9e6df',
+			    color: '#333333',
+			    links: '#820000'
+			}
 		    },
-		    tweets: {
-			background: '#e9e6df',
-			color: '#333333',
-			links: '#820000'
+		    features: {
+			scrollbar: false,
+			loop: true,
+			live: true,
+			hashtags: true,
+			avatars: true,
+			behavior: 'default'
 		    }
-		},
-		features: {
-		    scrollbar: false,
-		    loop: false,
-		    live: true,
-		    hashtags: true,
-		    avatars: true,
-		    behavior: 'default'
-		}
-	    }).render().start();
-	</script>
-    </div>
-{% endif %}
+		}).render().start();
+	    </script>
+	</div>
+    {% endif %}
+    
+</div>
 {% endblock r_column_content %}
 
 {% if common_page_data.is_course_admin %}
@@ -138,10 +140,13 @@
 <script>
 $(document).ready(function(){
 
+    //Sidebar content loading
     $("#c2g_layout_r_column .right_nav_wrapper").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
     $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
         c2g.installLeftNavChevron();
     });
+    
+    //Announcement collapsing code
     var numVisibleAnnouncements = 2;
     if ($('.announcement-content').length > numVisibleAnnouncements) {
 	$('#showHideAll').show();
@@ -175,6 +180,25 @@ $(document).ready(function(){
 	    });
 	});
     }
+    
+    //Show/Hide share block
+    $('#share_wrapper .show_hide_share').hover(function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $('#share_wrapper').animate({ minHeight: "25px" }, 'fast');
+	}
+    }, function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $('#share_wrapper').animate({ minHeight: "0" }, 'slow');
+	}
+    });
+    
+    $('#share_wrapper .show_hide_share').click(function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $(this).text('Hide Share Block').removeClass('share_hidden').addClass('share_visible').siblings('#share-result').slideDown('slow');
+	} else {
+	    $(this).text('Show Share Block').removeClass('share_visible').addClass('share_hidden').siblings('#share-result').slideUp('slow');
+	}
+    });
 });
 </script>
 {% endblock addl_scripts %}

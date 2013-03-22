@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div id="share-result" class="well">
+<div id="share-result" class="well" {% if share_block_type == 'standard' %}style="display: none;"{% endif %}>
     <h3>{% trans share_block_title %}</h3>
     <div id="share-result-content">
         {% if score %}
@@ -43,10 +43,10 @@
             share_content = "I just took '{{ exam.title }}' in {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}!";
             break;
         case 'join':
-            share_content = "I just joined {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}, and you should too!";
+            share_content = "I just joined {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}! Check it out: http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}!";
             break;
         case 'statement':
-            share_content = "I successfully finished a online offering of {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %} ";
+            share_content = "I successfully finished a online offering of {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}!";
             break;
         case 'standard':
             break;
