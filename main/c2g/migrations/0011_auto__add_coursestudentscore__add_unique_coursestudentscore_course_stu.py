@@ -8,28 +8,28 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'CourseStudentData'
-        db.create_table('c2g_coursestudentdata', (
+        # Adding model 'CourseStudentScore'
+        db.create_table('c2g_coursestudentscore', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('time_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('last_updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, auto_now_add=True, blank=True)),
             ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['c2g.Course'])),
             ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('tag', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
-            ('data', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
+            ('score', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
         ))
-        db.send_create_signal('c2g', ['CourseStudentData'])
+        db.send_create_signal('c2g', ['CourseStudentScore'])
 
-        # Adding unique constraint on 'CourseStudentData', fields ['course', 'student', 'tag']
-        db.create_unique('c2g_coursestudentdata', ['course_id', 'student_id', 'tag'])
+        # Adding unique constraint on 'CourseStudentScore', fields ['course', 'student', 'tag']
+        db.create_unique('c2g_coursestudentscore', ['course_id', 'student_id', 'tag'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'CourseStudentData', fields ['course', 'student', 'tag']
-        db.delete_unique('c2g_coursestudentdata', ['course_id', 'student_id', 'tag'])
+        # Removing unique constraint on 'CourseStudentScore', fields ['course', 'student', 'tag']
+        db.delete_unique('c2g_coursestudentscore', ['course_id', 'student_id', 'tag'])
 
-        # Deleting model 'CourseStudentData'
-        db.delete_table('c2g_coursestudentdata')
+        # Deleting model 'CourseStudentScore'
+        db.delete_table('c2g_coursestudentscore')
 
 
     models = {
@@ -189,16 +189,6 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
-        'c2g.coursestudentdata': {
-            'Meta': {'unique_together': "(('course', 'student', 'tag'),)", 'object_name': 'CourseStudentData'},
-            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
-            'data': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
-            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'tag': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
-            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
-        },
         'c2g.coursestudentlist': {
             'Meta': {'object_name': 'CourseStudentList'},
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
@@ -206,6 +196,16 @@ class Migration(SchemaMigration):
             'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'max_completion_level': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'members': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'symmetrical': 'False'}),
+            'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'c2g.coursestudentscore': {
+            'Meta': {'unique_together': "(('course', 'student', 'tag'),)", 'object_name': 'CourseStudentScore'},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
+            'score': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'tag': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
             'time_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'c2g.currenttermmap': {

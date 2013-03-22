@@ -1,10 +1,13 @@
-from c2g.models import ExamRecord, Exam, ExamScore, ExamRecordScore, Course, CourseStudentData, ContentGroup
+from c2g.models import ExamRecord, Exam, ExamScore, ExamRecordScore, Course, CourseStudentScore, ContentGroup
 from django.db.models import Q
 
 import math
 import collections
 import re
+from copy import deepcopy
+import logging
 
+logger = logging.getLogger(__name__)
 
 
 class ScoreAggregator():
@@ -19,16 +22,26 @@ class ScoreAggregator():
     
     var_re = re.compile(r'{{\s*[-\w]+\s*}}', re.UNICODE)
     
+    default_formula_obj = {'str':'', 'var_patterns':[], 'vars':[], 'max_points':0}
     
     safe_dict = {'math':math, 'abs':abs, 'divmod':divmod, 'len':len, 'max':max, 'min':min,
         'pow':pow, 'range':range, 'sum':sum, 'map':map, 'filter':filter, 'reduce':reduce, 'list':list}
     
     reserved_names = ['__student']
 
-    def __init__(self, course, formula):
+    def __init__(self, course, formulas={}):
         """
-            This function instantiates the aggregator with a course <course> and string <formula>.
+            This function instantiates the aggregator with a course <course> and 
+            a dict of where keys are tags and values are formulas, as defined below.
             <course> MUST be a READY-MODE course.
+            """
+        self.course = course
+        self.formulas = collections.defaultdict(lambda: self.default_formula_obj) #initialize instance variable
+        for tag, formula in formulas.iteritems():
+            self.add_formula(tag, formula)
+
+    def add_formula(self, tag, formula):
+        """
             <formula> is a string written in a domain-specific language built on
             django templating and python.  Basically, formula should be a python
             expression that evaluates to a number, with function names in python syntax
@@ -38,16 +51,19 @@ class ScoreAggregator():
             ExamScore on the Exam with slug==exam1.  So an example formula would be
             'max({{exam1a}} ,{{exam1b}})*0.5 + {{exam2}}*0.5'
         """
-        self.course = course
-        self.formula_str = formula
+        self.formulas[tag] = deepcopy(self.default_formula_obj)
+        self.formulas[tag]['str'] = formula
         #get a list variables used in the formula, so we can look them up
-        self.formula_vars_patterns = self.var_re.findall(self.formula_str)
-        self.formula_vars = map(lambda li: li[2:-2].strip(), self.formula_vars_patterns) #yeah yeah, hardcoding.  django templates does it too
+        vars_patterns = self.var_re.findall(formula)
+        vars = map(lambda li: li[2:-2].strip(), vars_patterns)  #yeah yeah, hardcoding.  django templates does it too
+        self.formulas[tag]['vars_patterns'] = vars_patterns
+        self.formulas[tag]['vars'] = vars
+        self.formulas[tag]['max_points'] = self._fill_max_points(tag)
         
         #now we try out the formula_vars to make sure they're all Exam slugs in the course
-        for var in self.formula_vars:
+        for var in vars:
             try:
-                Exam.objects.get(course=course, slug=var)
+                Exam.objects.get(course=self.course, slug=var)
             except Exam.DoesNotExist:
                 if var in self.reserved_names:
                     continue
@@ -60,45 +76,53 @@ class ScoreAggregator():
         score_dict = collections.defaultdict(lambda:0)
         #do reserved names
         score_dict = self.fill_reserved_word_context(score_dict)
-
-        formula = self.fill_formula(score_dict)
+        
+        formula_filled = self.fill_formula(tag, score_dict)
         #print formula
         #if there's a problem, this eval will raise an exception that will get passed on (no try...except)
-        self.eval_helper(formula)
+        self.eval_helper(formula_filled)
+
 
     def __unicode__(self):
-        return self.formula_str + "\nAggregator formula for " + unicode(self.course)
+        return "Aggregator formulas for %s with tags: %s" % (unicode(self.course), ", ".join(self.formulas.keys()))
 
 
     def fill_reserved_word_context(self, context, student_name="student"):
         context['__student'] = '"""%s"""' % student_name
         return context
 
-    def max_points(self):
-        exams = Exam.objects.filter(course=self.course, is_deleted=False, slug__in=self.formula_vars)
+    def max_points(self, tag):
+        print("%s: %1.2f" % (tag, self.formulas[tag]['max_points']))
+        return self.formulas[tag]['max_points']
+
+    def _fill_max_points(self, tag):
+        exams = Exam.objects.filter(course=self.course, is_deleted=False, slug__in=self.formulas[tag]['vars'])
         points_dict = collections.defaultdict(lambda:0)
         for exam in exams:
             points_dict[exam.slug] = exam.get_total_score()
         #do reserved names
         points_dict = self.fill_reserved_word_context(points_dict)
 
-        formula = self.fill_formula(points_dict)
-        #print(formula)
-        return self.eval_helper(formula)
+        formula = self.fill_formula(tag, points_dict)
+        pts = self.eval_helper(formula)
+        print("%s: %1.2f: %s" % (tag,pts,formula))
+        return pts
 
-    def fill_formula(self, context):
+    def fill_formula(self, tag, context):
         """Fill out the formula pattern with context dict"""
-        formula = self.formula_str
-        for var in self.formula_vars:
+        formula = self.formulas[tag]['str']
+        for var in self.formulas[tag]['vars']:
             patt = r'{{\s*%s\s*}}' % re.escape(var)
             formula = re.sub(patt, str(context[var]), formula)
         return formula
     
-    def aggregate(self, student, tag=None):
+    def aggregate(self, student, tags=None, writeDB=False):
         """
             This function aggregates the <student>'s scores on assessments in self.course
-            according to self.formula. (course and formula are set upon instantiation).
-            If kwarg <tag> string is specified, will write result to database table with tag.
+            according to self.formulas using the functions in tags. (course and formulas are set upon instantiation).
+            If kwarg <writeDB> string is true, will write each function result to database table CourseStudentScore labed with
+            appropriate tag.
+            Will use all formulas by default, if no tags kwarg is specified.
         """
         context = {}
         scores = ExamScore.objects.values('exam__slug','score').filter(course=self.course, student=student)
@@ -110,36 +134,41 @@ class ScoreAggregator():
         #do reserved names
         score_dict = self.fill_reserved_word_context(score_dict, student_name=student.username)
 
-        #default value is still 0, but may be found to be something else
-        #for (patt, var) in zip(self.formula_vars_patterns, self.formula_vars):
-        #    context[patt] = score_dict[var]
-    
-        #score_dict can now be used as a Context to populate formula as an arithmetic expression
-        #without any variables
-        formula = self.fill_formula(score_dict)
-        #print(formula)
-        
-        #now we can do our restricted eval of our arithmetic expression
-        ag_score = self.eval_helper(formula)
-        #print(ag_score)
-        #now write to the DB if tag is a string
-        if isinstance(tag, str):
-            data, created = CourseStudentData.objects.get_or_create(course=self.course, student=student, tag=tag)
-            data.data = str(ag_score)
-            data.save()
+        if tags is None:
+            tags = self.formulas.keys()
+
+        for tag in tags:
+            if tag not in self.formulas:
+                logger.warning("Tag %s was not found in the Aggregator's set of functions" % tag)
+                continue
+            
+            #score_dict can now be used as a Context to populate formula as an arithmetic expression
+            #without any variables
+            formula = self.fill_formula(tag, score_dict)
+            #print("%s: %s" % (tag, formula))
+            
+            #now we can do our restricted eval of our arithmetic expression
+            ag_score = self.eval_helper(formula)
+            #print(ag_score)
+            #now write to the DB if writeDB
+            if writeDB:
+                data, created = CourseStudentScore.objects.get_or_create(course=self.course, student=student, tag=tag)
+                data.score = ag_score
+                data.save()
                 
         return ag_score
 
-    def aggregate_all(self, tag=None):
+    def aggregate_all(self, tags=None, writeDB=False):
         """
-            Does grade aggregation for all students in the course.
-            If kwarg <tag> string is specified, will write result to database table with tag.
-            
+            Does grade aggregation for all students in the course, using formulas specified in tags.
+            If kwarg writeDB is specified, will write each formula result to database table CourseStudentScore labeled with appropriate
+            tag.
+            Will use all formulas by default, if no tags kwarg is specified.
         """
         students = self.course.get_all_students()
         processed = 0 
         for student in students:
-            self.aggregate(student, tag=tag)
+            self.aggregate(student, tags=tags, writeDB=writeDB)
             processed += 1
         
             if processed % 100 == 0:
@@ -156,6 +185,12 @@ class ScoreAggregator():
                                  % (e.filename, e.lineno, e.offset, e.text))
         except Exception as e:
             raise AggregatorFormulaError(unicode(e))
+
+    #########################################################################################################
+    ###                                                                                                   ###
+    ### BELOW HERE:  A selection of classmethods that auto-generate commonly-used formulas over a course. ###
+    ###                                                                                                   ###
+    #########################################################################################################
 
     @classmethod
     def generate_default_quiz_formula(selfclass, course):
