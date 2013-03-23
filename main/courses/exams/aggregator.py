@@ -78,10 +78,12 @@ class ScoreAggregator():
         score_dict = self.fill_reserved_word_context(score_dict)
         
         formula_filled = self.fill_formula(tag, score_dict)
-        #print formula
-        #if there's a problem, this eval will raise an exception that will get passed on (no try...except)
+        print "%s: %s" % (tag, formula)
+
+        #if there's a problem, this eval will raise an exception that will get passed on (no try...except here)
         self.eval_helper(formula_filled)
 
+        
 
     def __unicode__(self):
         return "Aggregator formulas for %s with tags: %s" % (unicode(self.course), ", ".join(self.formulas.keys()))
@@ -105,7 +107,7 @@ class ScoreAggregator():
 
         formula = self.fill_formula(tag, points_dict)
         pts = self.eval_helper(formula)
-        print("%s: %1.2f: %s" % (tag,pts,formula))
+        print("%s: MAX-POINTS: %1.2f" % (tag,pts))
         return pts
 
     def fill_formula(self, tag, context):
@@ -149,7 +151,7 @@ class ScoreAggregator():
             
             #now we can do our restricted eval of our arithmetic expression
             ag_score = self.eval_helper(formula)
-            #print(ag_score)
+            #print("(%s,%s,%1.2f)" % (student.username, tag, ag_score))
             #now write to the DB if writeDB
             if writeDB:
                 data, created = CourseStudentScore.objects.get_or_create(course=self.course, student=student, tag=tag)
@@ -240,7 +242,7 @@ class ScoreAggregator():
         exams = list(Exam.objects.values_list("slug", flat=True).filter(course=course,
                         exam_type='exam', invideo=False, is_deleted=False, live_datetime__isnull=False))
 
-        strout = "3.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exams))
+        strout = " + ".join(map(lambda slug: "{{%s}}" % slug, exams))
         #print(strout)
         return strout
 
@@ -255,7 +257,7 @@ class ScoreAggregator():
                                                                             exam_type='interactive_exercise', invideo=False,
                                                                             is_deleted=False, live_datetime__isnull=False))
         
-        strout = "2.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
+        strout = " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
         #print(strout)
         return strout
 
@@ -271,7 +273,7 @@ class ScoreAggregator():
                                                                             is_deleted=False, live_datetime__isnull=False) \
                                                                     .exclude(Q(slug__icontains="challenge") | Q(slug__icontains="extrapractice")))
         
-        strout = "2.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
+        strout = " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
         #print(strout)
         return strout
 
@@ -286,10 +288,22 @@ class ScoreAggregator():
                                                                             exam_type='interactive_exercise', invideo=False,
                                                                             is_deleted=False, live_datetime__isnull=False))
         
-        strout = "2.0 * ( %s )" % " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
+        strout = " + ".join(map(lambda slug: "{{%s}}" % slug, exercises))
         #print(strout)
         return strout
 
+    @classmethod
+    def generate_db_course_formula(selfclass, course):
+        return "%s + 2 * ( %s ) + 3 * ( %s )" % (selfclass.generate_default_quiz_formula(course),
+                                                 selfclass.generate_core_db_exercise_formula(course),
+                                                 selfclass.generate_default_exam_formula(course))
+                                                 
+
+#########################################################################################################
+###                                                                                                   ###
+### BELOW HERE:  Error classes used by the aggregator.                                                ###
+###                                                                                                   ###
+#########################################################################################################
 
 
 class AggregatorError(Exception):
@@ -303,3 +317,4 @@ class AggregatorFormulaError(AggregatorError):
 class AggregatorFormulaVariableError(AggregatorError):
     """ Raised when one of the variables in the formula cannot be de-referenced (i.e. is not an Exam slug in self.course)"""
     pass
+

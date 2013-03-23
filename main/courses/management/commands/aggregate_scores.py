@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from courses.exams.aggregator import ScoreAggregator
 
 class Command(BaseCommand):
-    args = "<course_id>"
-    help = "Aggregates assessment scores (ExamScore) for course <course_id> according to the default course formulas.\nBy default a dry-run unless -u or --update is specified."
+    args = "<course handle>"
+    help = "Aggregates assessment scores (ExamScore) for course <course_handle> according to the default course formulas.\nBy default a dry-run unless -u or --update is specified."
 
     option_list = (
         make_option("-t", "--tag", dest="tag",
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         
         
         try:
-            course = Course.objects.get(id=args[0])
+            course = Course.objects.get(handle=args[0], mode="ready")
             print ("Aggregating grades for %s" % unicode(course))
         except Course.DoesNotExist:
             raise CommandError("The specified course_id %s does not exist." % args[0])
@@ -51,11 +51,17 @@ class Command(BaseCommand):
             agg = ScoreAggregator(course, formulas={tag: formula_str})
             print(unicode(agg))
         else:
+            quiz_formula = ScoreAggregator.generate_default_quiz_formula(course)
+            exam_formula = ScoreAggregator.generate_default_exam_formula(course)
+            core_ex_formula = ScoreAggregator.generate_core_db_exercise_formula(course)
+            challenge_ex_formula = ScoreAggregator.generate_challenge_db_exercise_formula(course)
+            db_formula = ScoreAggregator.generate_db_course_formula(course)
             agg=ScoreAggregator(course, formulas=\
-                                {'quizzes' : ScoreAggregator.generate_default_quiz_formula(course),
-                                 'exams'   : ScoreAggregator.generate_default_exam_formula(course),
-                                 'core-ex' : ScoreAggregator.generate_challenge_db_exercise_formula(course),
-                                 'challenge-ex': ScoreAggregator.generate_core_db_exercise_formula(course)})
+                                {'quizzes' : quiz_formula,
+                                 'exams'   : exam_formula,
+                                 'core-exercises' : core_ex_formula,
+                                 'accomplishment' : db_formula,
+                                 'challenge-exercises': challenge_ex_formula})
             print(unicode(agg))
 
         if student:
