@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from courses.exams.aggregator import ScoreAggregator
 
 class Command(BaseCommand):
-    args = "<course handle>"
-    help = "Aggregates assessment scores (ExamScore) for course <course_handle> according to the default course formulas.\nBy default a dry-run unless -u or --update is specified."
+    args = "<course_handle>"
+    help = "Aggregates assessment scores (ExamScore) for course <course_handle> according to the default course formulas.\nBy default a dry-run unless -u True or --update=True is specified."
 
     option_list = (
         make_option("-t", "--tag", dest="tag",
@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options): 
         if len(args) != 1:
-           raise CommandError("Wrong number of arguments.  Should be exactly 1: <course_id>")
+           raise CommandError("Wrong number of arguments.  Should be exactly 1: <course_handle>")
         
         
         try:
