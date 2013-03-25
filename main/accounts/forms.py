@@ -9,11 +9,11 @@ class EditUserForm(forms.ModelForm):
     first_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   label=_("First Name"),
-                                  error_messages={'invalid': _("This value may contain only letters and dashes")})
+                                  error_messages={'invalid': _("This value may contain only letters, dashes, spaces and apostrophes")})
     last_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   label=_("Last Name"),
-                                  error_messages={'invalid': _("This value may contain only letters and dashes")})
+                                  error_messages={'invalid': _("This value may contain only letters, dashes, spaces and apostrophes")})
 
     class Meta:
         model = User
