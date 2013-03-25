@@ -47,8 +47,15 @@ def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
 
         scores = []
         for e in exams:
-            score = ExamScore.objects.filter(course=course, exam=e, student=request.user)
-            scores.append(score[0].score if score else None)
+            score = ExamScore.objects.filter(course=course, exam=e, student=request.user) #unique_together = ("exam", "student")
+            if score:
+                sc = score[0].score
+                if score[0].examrecordscore:
+                    max_score = score[0].examrecordscore.record.get_total_score() #this is only edit mode, so not gonna optimize
+                else:
+                    max_score = e.max_score
+                pair = (sc, max_score)
+            scores.append(pair if score else None)
 
         return render_to_response('exams/list.html',
                                   {'common_page_data':cpd,
@@ -1341,3 +1348,20 @@ def parse_markdown(request):
     html = md.convert(mkd)
     returnobj = {'html':html, 'meta':md.Meta}
     return HttpResponse(json.dumps(returnobj))
+
+
+def quizdown_preview(request):
+    return render_to_response('exams/qd_preview.html', {}, RequestContext(request))
+
+
+@require_POST
+def check_metadata_xml_no_course(request):
+    xml = request.POST.get('metaXMLContent')
+    if not xml:
+        return HttpResponseBadRequest("No metaXMLContent provided")
+    try:
+        grader = AutoGrader(xml)
+    except Exception as e: #Since this is just a validator, pass back all the exceptions
+        return HttpResponseBadRequest(unicode(e))
+    
+    return HttpResponse("Metadata XML is OK.\n" + unicode(grader) + "\n" )
