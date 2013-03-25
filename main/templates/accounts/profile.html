@@ -50,13 +50,13 @@
                             <div class="profile-progress-wrapper">
                                 <div class="profile-progress-endticks">
                                     <div class="profile-progress-line"></div>
-                                    <div class="profile-progress-bar" style="width: {{course_completions|byKey:course.id}}%"></div>
+                                    <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> <!-- '%' after django tag is necessary for width attribute...-->
                                 </div>
                             </div>
                             {% if certifications|byKey:course.id %}
                                 {% for certinfo in certifications|byKey:course.id %}
                                     <a class="btn" href="{{certinfo.1}}">
-                                        {% trans 'Download '|add:certinfo.0|uscore2space|title %}
+                                        {% trans 'Download Statement' %}
                                         <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
                                     </a>
                                 {% endfor %}
@@ -64,7 +64,7 @@
                                 {% if course in is_student_list %}
                                     <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
                                         {% csrf_token %}
-                                        <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick="return confirm('{% trans 'Do you really want to unenroll?' %}')" />
+                                        <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick='return confirm("{% trans 'Do you really want to unenroll?' %}")' />
                                     </form>
                                 {% else %}
                                 <a class="btn disabled">{% trans 'Staff Member' %}</a>

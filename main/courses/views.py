@@ -15,8 +15,7 @@ from courses.actions import auth_view_wrapper
 
 from c2g.models import CurrentTermMap
 import settings, logging
-import datetime
-
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
@@ -72,34 +71,61 @@ def main(request, course_prefix, course_suffix):
         many_announcements = False
         announcement_overflow = 0
     
+    course_cert = None
+    share_block_title = None
+    share_block_type = 'standard'
+    
     if request.user.is_authenticated():
         is_logged_in = 1
+        
+        # Pass whether people get a cert and what it is to main page for when they finish course.
+        user_certs = request.user.get_profile().certificates.all().filter(course=course)
+        if user_certs:
+            course_cert = (user_certs[0].type, user_certs[0].dl_link(request.user))
+        
+        if course_cert:
+            share_block_title = 'Share your Achievement!'
+            share_block_type = 'statement'
+        else:
+            share_block_title = 'Share Something:'
     else:
         is_logged_in = 0
 
     # Environment prep for jabber chat plugin. Uses '' == False.
     jabber_configured = getattr(settings, 'JABBER_DOMAIN', '')
 
+    if (course.calendar_end < date.today()):
+        course_ended = True
+    else:
+        course_ended = False
+        
+    if (course.calendar_start > date.today()):
+        share_block_type = 'join'
+
     return render_to_response('courses/view.html',
-            {'common_page_data':    common_page_data,
-             'course':              course,
-             'announcement_list':   announcement_list,
-             'announcement_overflow': announcement_overflow,
-             'many_announcements':  many_announcements,
-             'is_logged_in':        is_logged_in,
-             'jabber_configured':   jabber_configured,
-             },
-            context_instance=RequestContext(request))
+        {'common_page_data':       common_page_data,
+        'course':                  course,
+        'announcement_list':       announcement_list,
+        'announcement_overflow':   announcement_overflow,
+        'many_announcements':      many_announcements,
+        'is_logged_in':            is_logged_in,
+        'course_cert':             course_cert,
+        'course_ended':            course_ended,
+        'share_block_title':       share_block_title,
+        'share_block_type':        share_block_type,
+        'jabber_configured':       jabber_configured,
+        },
+        context_instance=RequestContext(request))
 
 def get_upcoming_exams(course):
-  end_date = datetime.datetime.today() + datetime.timedelta(weeks=2)
+  end_date = date.today() + date.timedelta(weeks=2)
   exams = Exam.objects.filter(
     course=course, 
     mode='ready',
     is_deleted=0,
-    due_date__gte = datetime.datetime.today(),
+    due_date__gte = date.today(),
     due_date__lte = end_date, 
-    live_datetime__lte = datetime.datetime.today()
+    live_datetime__lte = date.today()
     ).order_by('due_date')
   return exams
 

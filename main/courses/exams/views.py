@@ -338,6 +338,12 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
         json_pre_pop_correx = json.dumps(correx_obj)
         score = record.score
+        
+        share_block_title = None
+        share_block_type = 'standard'
+        if score:
+            share_block_title = 'Share your Results!'
+            share_block_type = 'score'
 
     except ExamRecord.DoesNotExist:
         raise Http404
@@ -388,16 +394,24 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         total_score = exam.total_score
 
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
-                                                       'exam':exam, 'json_pre_pop':json_pre_pop,
-                                                       'scores':scores_json, 'score':score,
-                                                       'total_score': total_score,
-                                                       'json_pre_pop_correx':json_pre_pop_correx,
-                                                       'editable':False, 'raw_score':raw_score,
-                                                       'allow_submit':False, 'ready_section':ready_section,
-                                                       'slug_for_leftnav':slug_for_leftnav,
-                                                       'rendered_exam_html':rendered_exam_html,
-                                                       'rendered_questions':rendered_questions,}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {
+        'common_page_data':      request.common_page_data,
+        'exam':                  exam,
+        'json_pre_pop':          json_pre_pop,
+        'scores':                scores_json,
+        'score':                 score,
+        'share_block_title':     share_block_title,
+        'share_block_type':      share_block_type,
+        'total_score':           total_score,
+        'json_pre_pop_correx':   json_pre_pop_correx,
+        'editable':              False,
+        'raw_score':             raw_score,
+        'allow_submit':          False,
+        'ready_section':         ready_section,
+        'slug_for_leftnav':      slug_for_leftnav,
+        'rendered_exam_html':    rendered_exam_html,
+        'rendered_questions':    rendered_questions,
+    }, RequestContext(request))
 
 
 @auth_view_wrapper

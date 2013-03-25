@@ -1,0 +1,6 @@
+[client]
+    user={{ readonly_database_user }}
+    database={{ readonly_database_instance }}
+    password={{ readonly_database_password }}
+    host={{ readonly_database_host }}
+
