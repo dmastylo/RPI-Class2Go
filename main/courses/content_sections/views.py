@@ -10,6 +10,7 @@ from courses.actions import auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.content_sections.forms import *
 from courses.copy_content import copySection
+from courses.copy_content import copyCourse
 
 
 @auth_is_course_admin_view_wrapper
@@ -75,7 +76,8 @@ def copy_content(request, course_prefix, course_suffix):
 
     #privileges are okay, do the copy
 
-    copySection(from_section, to_course)
+    #copySection(from_section, to_course)
+    copyCourse(from_section.course, to_course)
 
     messages.add_message(request, messages.SUCCESS, 'Section: %s has been successfully copied to course: %s' %(from_section.title, to_course.title))
 
