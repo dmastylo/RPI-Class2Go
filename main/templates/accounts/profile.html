@@ -50,7 +50,7 @@
                             <div class="profile-progress-wrapper">
                                 <div class="profile-progress-endticks">
                                     <div class="profile-progress-line"></div>
-                                    <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}"></div>
+                                    <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> <!-- '%' after django tag is necessary for width attribute...-->
                                 </div>
                             </div>
                             {% if certifications|byKey:course.id %}
