@@ -71,7 +71,6 @@ class Command(BaseCommand):
         if (is_storage_local() or options['force_local']) and not options['force_remote']:
             cert_prefix = getattr(settings, 'MEDIA_ROOT', '')
         cert_path = certificate_tasks.certify(cert_prefix, course, certificate_info, user)
-        #print "Certification complete: %s" % cert_path
         print "Certification complete: %s" % certificate_info.dl_link(user)
 
         # Attach new certification to user's profile
