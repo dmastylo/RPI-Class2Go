@@ -17,3 +17,5 @@ script:
   - python manage.py test -v 2
 notifications:
   irc: "irc.freenode.org#class2go-internal"
+    use_notice: true
+    skip_join: true
