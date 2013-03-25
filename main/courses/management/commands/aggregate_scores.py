@@ -7,14 +7,14 @@ from courses.exams.aggregator import ScoreAggregator
 
 class Command(BaseCommand):
     args = "<course_handle>"
-    help = "Aggregates assessment scores (ExamScore) for course <course_handle> according to the default course formulas.\nBy default a dry-run unless -u True or --update=True is specified."
+    help = "Aggregates assessment scores (ExamScore) for course <course_handle> according to the default course formulas.\nBy default a dry-run unless you use the -u or --update options."
 
     option_list = (
         make_option("-t", "--tag", dest="tag",
             help="If tag is specified, will aggregate using formula loaded from <file> with tag <tag>.  Must be used in conjuction with -f"),
         make_option("-f", "--file", dest="file",
             help="If file is specified, will aggregate using formula loaded from <file> with tag <tag>.  Must be used in conjuction with -t"),
-        make_option("-u", "--update", dest="update", default=False,
+        make_option("-u", "--update", dest="update", action="store_true",
             help="If update is specified, will write to CourseStudentScore table after the result of aggregation calculations.  The default tags (or the one specified with -t) will be used for the tag column."),
         make_option("-s", "--student", dest="username", default="",
             help="If <student> is specified, only aggregate for student with username=<student>, rather than the entire student roster."),
