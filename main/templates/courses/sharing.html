@@ -49,6 +49,7 @@
             share_content = "I successfully finished a online offering of {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}!";
             break;
         case 'standard':
+            share_content = "{% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}";
             break;
     }
     
@@ -58,11 +59,11 @@
     var facebook_post_href = $('#share-result form a#facebook_button .facebook_redirect').text();
     
     var twitter_content = share_content;
-    $('#share-result form#facebook-tab textarea').val(twitter_content);
+    $('#share-result form#twitter-tab textarea').val(twitter_content);
     var twitter_pre_href = $('#share-result form a#twitter_button').attr('href');
     
     var google_content = share_content.replace('#', '').replace('@', '');
-    $('#share-result form#facebook-tab textarea').val(google_content);
+    $('#share-result form#google-tab textarea').val(google_content);
     var google_pre_href = $('#share-result form a#google_button').attr('href');
     
     {% if score %}

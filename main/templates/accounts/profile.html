@@ -56,7 +56,7 @@
                             {% if certifications|byKey:course.id %}
                                 {% for certinfo in certifications|byKey:course.id %}
                                     <a class="btn" href="{{certinfo.1}}">
-                                        {% trans 'Download '|add:certinfo.0|uscore2space|title %}
+                                        {% trans 'Download Statement' %}
                                         <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
                                     </a>
                                 {% endfor %}
