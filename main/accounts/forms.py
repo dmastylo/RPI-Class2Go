@@ -6,11 +6,11 @@ import datetime
 
 class EditUserForm(forms.ModelForm):
     email = forms.EmailField(label=_("E-mail"), max_length=75)
-    first_name = forms.RegexField(regex=r'^[\w -]+$',
+    first_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   label=_("First Name"),
                                   error_messages={'invalid': _("This value may contain only letters and dashes")})
-    last_name = forms.RegexField(regex=r'^[\w -]+$',
+    last_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   label=_("Last Name"),
                                   error_messages={'invalid': _("This value may contain only letters and dashes")})
@@ -64,7 +64,7 @@ class EditProfileForm(forms.ModelForm):
  
     email_me = forms.BooleanField(label=_("Receive emails from courses"), required=False)
 
-    piazza_name  = forms.RegexField(regex=r'^[\w -]+$',
+    piazza_name  = forms.RegexField(regex=r'^[\w\' -]+$',
                                     required=False,
                                     max_length=50,
                                     label=_("Piazza handle"),

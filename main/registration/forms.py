@@ -37,12 +37,12 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
                              label=_("E-mail*"))
-    first_name = forms.RegexField(regex=r'^[\w -]+$',
+    first_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
                                   label=_("First Name*"),
                                   error_messages={'invalid': _("This value may contain only letters, spaces and dashes.")})
-    last_name = forms.RegexField(regex=r'^[\w -]+$',
+    last_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   widget=forms.TextInput(attrs=attrs_dict),
                                   label=_("Last Name*"),
