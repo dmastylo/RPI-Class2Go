@@ -289,7 +289,9 @@ def init_celery():
         # configure celery init script
 
         t =  loader.get_template('celeryd-init-script.txt')
-        c = Context({ "app_name":app_settings.app_name })
+        c = Context({ "app_name":app_settings.app_name, "admin_home": settings.ADMIN_HOME,
+                      "celery_cpu_total": settings.CELERY_CPU_TOTAL, "celery_timeout": settings.CELERY_TIMEOUT,
+                      "celery_concurrency": settings.CELERY_CONCURRENCY})
 
         file_write("/etc/init.d/celeryd-/"+app_settings.app_name, t.render(c),mode = "00755", owner ="root", group="root", scp=True)
 

@@ -72,6 +72,7 @@ TO = "class2go.stanford.edu/db"
 CELERY_DATABASE = "/opt/class2go/celery/celerydb.sqlite"
 CELERY_TIMEOUT = "7200"
 CELERY_CONCURRENCY = "8"
+CELERY_CPU_TOTAL = 1
 
 # DNS_EDITOR
 ZONE = "c2gops.com"
