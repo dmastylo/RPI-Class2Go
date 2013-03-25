@@ -339,6 +339,7 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         json_pre_pop_correx = json.dumps(correx_obj)
         score = record.score
         
+        share_block_title = None
         share_block_type = 'standard'
         if score:
             share_block_title = 'Share your Results!'
