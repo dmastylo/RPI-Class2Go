@@ -139,7 +139,7 @@ def gen_survey_summary_report(ready_course, survey, save_to_s3=False):
     rw.write(content = ["Survey Summary for %s (%s %d)" % (ready_course.title, ready_course.term.title(), ready_course.year)], nl = 1)
     
     ### 3- Write survey report
-    WriteSurveySummaryReportContent(survey, rw, full=False, csv=True)
+    WriteSurveySummaryReportContent(survey, rw, full=False)
     
     ### 4- Proceed to write out and return
     report_content = rw.writeout()

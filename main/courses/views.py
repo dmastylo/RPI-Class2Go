@@ -16,8 +16,7 @@ from courses.actions import auth_view_wrapper, is_member_of_course
 
 from c2g.models import CurrentTermMap
 import settings, logging
-import datetime
-
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
@@ -71,33 +70,67 @@ def main(request, course_prefix, course_suffix):
     announcement_list = Announcement.objects.getByCourse(course=common_page_data['course']).order_by('-time_created')[:11]
     if len(announcement_list) > 10:
         many_announcements = True
+        announcement_overflow = len(announcement_list) - 10
         announcement_list = announcement_list[0:10]
     else:
         many_announcements = False
+        announcement_overflow = 0
+    
+    course_cert = None
+    share_block_title = None
+    share_block_type = 'standard'
     
     if request.user.is_authenticated():
         is_logged_in = 1
+        
+        # Pass whether people get a cert and what it is to main page for when they finish course.
+        user_certs = request.user.get_profile().certificates.all().filter(course=course)
+        if user_certs:
+            course_cert = (user_certs[0].type, user_certs[0].dl_link(request.user))
+        
+        if course_cert:
+            share_block_title = 'Share your Achievement!'
+            share_block_type = 'statement'
+        else:
+            share_block_title = 'Share Something:'
     else:
         is_logged_in = 0
 
+    if (course.calendar_end < date.today()):
+        course_ended = True
+    else:
+        course_ended = False
+        
+    if (course.calendar_start > date.today()):
+        share_block_type = 'join'
+
+    # Environment prep for jabber chat plugin
+    jabber_configured = hasattr(settings, 'JABBER_DOMAIN')
+
     return render_to_response('courses/view.html',
-            {'common_page_data':    common_page_data,
-             'course':              course,
-             'announcement_list':   announcement_list,
-             'many_announcements':  many_announcements,
-             'is_logged_in':        is_logged_in
-             },
-            context_instance=RequestContext(request))
+        {'common_page_data':       common_page_data,
+        'course':                  course,
+        'announcement_list':       announcement_list,
+        'announcement_overflow':   announcement_overflow,
+        'many_announcements':      many_announcements,
+        'is_logged_in':            is_logged_in,
+        'course_cert':             course_cert,
+        'course_ended':            course_ended,
+        'share_block_title':       share_block_title,
+        'share_block_type':       share_block_type,
+        'jabber_configured':       jabber_configured,
+        },
+        context_instance=RequestContext(request))
 
 def get_upcoming_exams(course):
-  end_date = datetime.datetime.today() + datetime.timedelta(weeks=2)
+  end_date = date.today() + date.timedelta(weeks=2)
   exams = Exam.objects.filter(
     course=course, 
     mode='ready',
     is_deleted=0,
-    due_date__gte = datetime.datetime.today(),
+    due_date__gte = date.today(),
     due_date__lte = end_date, 
-    live_datetime__lte = datetime.datetime.today()
+    live_datetime__lte = date.today()
     ).order_by('due_date')
   return exams
 
@@ -147,25 +180,26 @@ def leftnav(request, course_prefix, course_suffix):
     course = request.common_page_data['ready_course']
     full_contentsection_list, full_index_list = get_full_contentsection_list(course)
     return render_to_response('left_nav.html',
-                              {
-                              'PREFIX':              course_prefix,
-                              'SUFFIX':              course_suffix,
-                              'contentsection_list': full_contentsection_list,
-                              'full_index_list':     full_index_list,
-                              },
-                              context_instance=RequestContext(request))
+        {
+            'PREFIX':              course_prefix,
+            'SUFFIX':              course_suffix,
+            'contentsection_list': full_contentsection_list,
+            'full_index_list':     full_index_list,
+        },
+    context_instance=RequestContext(request))
 
 
 @cache_page(60*60, cache="view_store")
 def rightnav(request, course_prefix, course_suffix):
-  course = request.common_page_data['ready_course']
-  exams = get_upcoming_exams(course)
-  exams = [exam for exam in exams if not exam.is_child()]
-  return render_to_response('right_nav.html',
-                            {'common_page_data':   request.common_page_data,
-                            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
-                            },
-                            context_instance=RequestContext(request))
+    course = request.common_page_data['ready_course']
+    exams = get_upcoming_exams(course)
+    exams = [exam for exam in exams if not exam.is_child()]
+    return render_to_response('right_nav.html',
+        {
+            'common_page_data':   request.common_page_data,
+            'assignments':        exams, #setting to True to get consistent, ok to show anon users links
+        },
+    context_instance=RequestContext(request))
 
 
 @auth_view_wrapper

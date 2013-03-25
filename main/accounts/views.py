@@ -3,6 +3,7 @@ import random
 import string
 import urlparse
 import os
+import re
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
@@ -121,7 +122,8 @@ def save_piazza_opts(request):
     except ValidationError:
         return HttpResponseBadRequest('You did not enter a valid email address.')
     try:
-        nameValidator = RegexValidator(regex=r'^[\w -]+$')
+        regex = re.compile(r'^[\w -]+$', re.U)
+        nameValidator = RegexValidator(regex=regex)
         nameValidator(name.strip())
     except ValidationError:
         return HttpResponseBadRequest('Names on Piazza should only contain letters, numbers, underscores, hyphens, and spaces.')

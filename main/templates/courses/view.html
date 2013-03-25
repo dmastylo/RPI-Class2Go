@@ -1,6 +1,7 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% load i18n %}
+{% load template_utils %}
 {% block title %}{{ SITE_TITLE }} | {{ common_page_data.course.title }}{% endblock title %}
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
@@ -31,20 +32,36 @@
 
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h3 class="section-title pull-left">{% trans 'Recent Announcements' %}</h3>
+
+<!--
+    {# Jabber chat plugin block #}
+    {% if jabber_configured and is_logged_in %}
+    <iframe src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat" style="seamless; clear: both; width: 100%; height: 400px; margin-bottom: 10px;" class="span6"></iframe>
+    {% endif %} {# jabber_configured and is_logged_in #}
+    {# end Jabber chat plugin block #}
+-->
+
+    {% if course_ended and course_cert%}
+	<div class="well statement">
+	    <h2>{% trans "Congratulations!" %}</h2>
+	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
+	    <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
+	    <p style="text-align: right;">
+		<a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
+		    <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+		</a>
+	    </p>
+	</div>
+    {% endif %}
+
+    <h3 class="section-title pull-left" style="clear: both;">{% trans 'Recent Announcements' %}</h3>
     <div class="pull-right">
-	<!--
-	{% if many_announcements %}
-            <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}</a>
-        {% endif %}
-	-->
-        
-        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
+	{% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
             <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
             <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
             {% include "announcements/delete_announcement_form.html" %}
 	{% else %}
-	    <a class="btn" id="showHideAll">Show All</a>
+	    <a class="btn" id="showHideAll">Expand All</a>
         {% endif %}
     </div>
     {% if common_page_data.is_course_admin %}
@@ -55,20 +72,36 @@
         {% include "announcements/announcement.html" %}
     {% empty %}
         <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
-	{% endfor %}
-    <a class="btn pull-right" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}</a>
+    {% endfor %}
+    {% if many_announcements %}
+        <a class="btn pull-right" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}  {% if announcement_overflow != 0 %} ({{announcement_overflow}} {% trans 'more' %}) {% endif %}</a>
+    {% endif %}
 </div>
 {% endblock m_column_content %}
 
-{% block twitter_widget %}
+{% block addl_scripts %}
+
+{% block r_column_content %}
+<div id="c2g_layout_r_column" class="span3">
+    
+    <div id="share_wrapper">
+	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden" href="#">Show Share Block</a>{% endif %}
+	{% include "courses/sharing.html" %}
+    </div>
+
+    
+    <div class="right_nav_wrapper">
+	<!--Skeleton Div to be filled in by rightnav ajax -->
+    </div>
+    
     {% if course.twitter_tag %}
-	<div id="twitterWidget" class="span3 pull-right">
+	<div id="twitterWidget">
 	    <script src="http://widgets.twimg.com/j/2/widget.js"></script>
 	    <script>
 		new TWTR.Widget({
 		    version: 2,
 		    type: 'search',
-		    search: '{{ course.twitter_tag }}',
+		    search: '{{ course.twitter_tag|cut:'#'|cut:'@' }}',
 		    title: 'Recent Tweets',
 		    interval: 1000,
 		    width: 'auto',
@@ -86,7 +119,7 @@
 		    },
 		    features: {
 			scrollbar: false,
-			loop: false,
+			loop: true,
 			live: true,
 			hashtags: true,
 			avatars: true,
@@ -96,13 +129,7 @@
 	    </script>
 	</div>
     {% endif %}
-{% endblock twitter_widget %}
-
-{% block addl_scripts %}
-
-{% block r_column_content %}
-<div id="c2g_layout_r_column" class="span3">
-    <!--Skeleton Div to be filled in by rightnav ajax -->
+    
 </div>
 {% endblock r_column_content %}
 
@@ -112,40 +139,65 @@
 
 <script>
 $(document).ready(function(){
-    $("#c2g_layout_r_column").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
+
+    //Sidebar content loading
+    $("#c2g_layout_r_column .right_nav_wrapper").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
     $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
-                                                 c2g.installLeftNavChevron();
-                                                 });
+        c2g.installLeftNavChevron();
+    });
+    
+    //Announcement collapsing code
     var numVisibleAnnouncements = 2;
-    $('#showHideAll').show();
-    $('.announcement-content').each(function(){
-	if (numVisibleAnnouncements <= 0) {
-	    $(this).closest('.announcement').find('.announcement-actions .announcement-collapse').show();
-	    $(this).hide();
-	} else {
-	    $(this).removeClass('announcement-content');
-	}
-	numVisibleAnnouncements--;
-    });
-    
-    $('.announcement .announcement-actions .announcement-collapse').click(function(){
-	if ($(this).text() == 'Show') {
-	    $(this).text('Hide').closest('.announcement').find('.announcement-content').slideDown(250);
-	} else {
-	    $(this).text('Show').closest('.announcement').find('.announcement-content').slideUp(250);
-	}
-    });
-    
-    $('#showHideAll').toggle(function(){
-	$(this).text('Hide All').parent().siblings('.announcement').each(function(){
-	    $(this).find('.announcement-content').slideDown(250);
-	    $(this).find('.announcement-actions .announcement-collapse').text('Hide');
+    if ($('.announcement-content').length > numVisibleAnnouncements) {
+	$('#showHideAll').show();
+	$('.announcement-content').each(function(){
+	    if (numVisibleAnnouncements <= 0) {
+		$(this).closest('.announcement').find('.announcement-actions .announcement-collapse').show();
+		$(this).hide();
+	    } else {
+		$(this).removeClass('announcement-content');
+	    }
+	    numVisibleAnnouncements--;
 	});
+	
+	$('.announcement .announcement-actions .announcement-collapse').click(function(){
+	    if ($(this).text() == 'Expand') {
+		$(this).text('Collapse').closest('.announcement').find('.announcement-content').slideDown(250);
+	    } else {
+		$(this).text('Expand').closest('.announcement').find('.announcement-content').slideUp(250);
+	    }
+	});
+	
+	$('#showHideAll').toggle(function(){
+	    $(this).text('Collapse All').parent().siblings('.announcement').each(function(){
+		$(this).find('.announcement-content').slideDown(250);
+		$(this).find('.announcement-actions .announcement-collapse').text('Collapse');
+	    });
+	}, function() {
+	    $(this).text('Expand All').parent().siblings('.announcement').each(function(){
+		$(this).find('.announcement-content').slideUp(250);
+		$(this).find('.announcement-actions .announcement-collapse').text('Expand');
+	    });
+	});
+    }
+    
+    //Show/Hide share block
+    $('#share_wrapper .show_hide_share').hover(function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $('#share_wrapper').animate({ minHeight: "25px" }, 'fast');
+	}
     }, function() {
-	$(this).text('Show All').parent().siblings('.announcement').each(function(){
-	    $(this).find('.announcement-content').slideUp(250);
-	    $(this).find('.announcement-actions .announcement-collapse').text('Show');
-	});
+	if ($(this).hasClass('share_hidden')) {
+	    $('#share_wrapper').animate({ minHeight: "0" }, 'slow');
+	}
+    });
+    
+    $('#share_wrapper .show_hide_share').click(function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $(this).text('Hide Share Block').removeClass('share_hidden').addClass('share_visible').siblings('#share-result').slideDown('slow');
+	} else {
+	    $(this).text('Show Share Block').removeClass('share_visible').addClass('share_hidden').siblings('#share-result').slideUp('slow');
+	}
     });
 });
 </script>

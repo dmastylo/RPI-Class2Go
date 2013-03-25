@@ -22,7 +22,10 @@
                 </li>
                 {% if common_page_data.course_mode == 'draft' or common_page_data.course_info_pages|length > 0 %}
                 <li class="dropdown{% block course_info_link_class %}{% endblock course_info_link_class %}">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Course Info' %}<em class="caret"></em></a>
+                    <a href="#" class="dropdown-toggle closed" data-toggle="dropdown">{% trans 'Course Info' %}
+			<em class="caret"></em>
+			<span class="hidden-accessible">, collapsed, click to expand</span>
+		    </a>
                     <ul class="dropdown-menu">
                         {% for page in common_page_data.course_info_pages %}
                             <li><a href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix  page.slug %}">{{page.title}}</a></li>
@@ -36,14 +39,20 @@
                 {% endif %}
 		{% if common_page_data.course_mode = 'draft' or common_page_data.content_sections|length > 0 %}
 		<li {% if common_page_data.course_mode = 'ready' %}class="dropdown{% endif %}{% block course_materials_link_class %}{% endblock course_materials_link_class %}{% if common_page_data.course_mode = 'ready' %}"{% endif %}>
-		    <a href={% if common_page_data.course_mode = 'draft' %}"{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}"{% else %}"#" class="dropdown-toggle" data-toggle="dropdown"{% endif %}>{% trans 'Course Materials' %}{% if common_page_data.course_mode = 'ready' %}<em class="caret"></em>{% endif %}</a>
+		    <a href={% if common_page_data.course_mode = 'draft' %}"{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}"{% else %}"#" class="dropdown-toggle" data-toggle="dropdown"{% endif %}>
+			{% trans 'Course Materials' %}
+			{% if common_page_data.course_mode = 'ready' %}
+			    <em class="caret"></em>
+			    <span class="hidden-accessible">, collapsed, click to expand</span>
+			{% endif %}
+		    </a>
 		    {% if common_page_data.course_mode = 'ready' %}
 		    <ul class="dropdown-menu">
-		      {% for section in common_page_data.content_sections %}
-                  <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
-		      {% endfor %}
-		      <li class="divider"></li>
-		      <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Show all' %}</a></li>
+			{% for section in common_page_data.content_sections %}
+			    <li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix section.id %}">{{section.title}}</a></li>
+			{% endfor %}
+			<li class="divider"></li>
+			<li><a href="{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Show all' %}</a></li>
 		    </ul>
 		    {% endif %}
                 </li>
@@ -104,14 +113,14 @@
                         <li class="dropdown {% block admin_link_class %}{% endblock admin_link_class %}>"{% block course_admin_link %}{% endblock course_admin_link %}>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Course Administration' %}<em class="caret"></em></a>
                             <ul class="dropdown-menu">
-                              <li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Email Course Members' %}</a></li>
-                              <li><a href="{% url 'courses.reports.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Reports' %}</a></li>
-                              <li><a href="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'In-line Reports' %}</a></li>
+				<li><a href="{% url 'courses.email_members.views.email_members' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Email Course Members' %}</a></li>
+				<li><a href="{% url 'courses.reports.views.main' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Reports' %}</a></li>
+				<li><a href="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'In-line Reports' %}</a></li>
                                 <li><a href="{% url 'courses.member_management.views.listAll' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Member Management' %}</a></li>
                                 {% if common_page_data.course.share_to.exists %}
-                              <li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Copy Content To Other Course' %}</a></li>
+				<li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Copy Content To Other Course' %}</a></li>
                                 {% endif %}
-                              <!-- <li><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Coming Soon!</a></li> -->
+				<!-- <li><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Coming Soon!</a></li> -->
                             </ul>
                         </li>
                     {% endif %}
@@ -151,10 +160,8 @@
         {% block l_column_content %}{% endblock %}
         
         {% block m_column_content %}{% endblock %}
-        
-        {% block r_column_content %}{% endblock %}
 	
-	{% block twitter_widget %}{% endblock %}
+        {% block r_column_content %}{% endblock %}
     </div>
 </div>
 {% endblock content %}
