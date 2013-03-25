@@ -59,6 +59,21 @@
             <td style="padding: 10px;">{% trans 'End date' %}</td>
             <td style="padding: 10px;"><input type='text' class='datepicker' name='end_date' id='id_end_date' value="{{date}}" data-date-format="mm-dd-yyyy"></td>
         </tr>
+        <tr>
+            <td style="padding: 10px;">{% trans 'Twitter tag' %}</td>
+            <td style="padding: 10px;"><input type='text' id='id_twitter_tag' name='twitter_tag' /></td>
+        </tr>
+        <tr>
+            <td style="padding: 10px;">{% trans 'Logo filename' %}</td>
+            <td style="padding: 10px;"><input type='text' id='id_logo_filename', name='logo_filename' /></td>
+        <tr>
+            <td style="padding: 10px;">{% trans 'Institution only' %}</td>
+            <td style="padding: 10px;"><input type='checkbox' id='id_institution_only' name='institution_only' /></td>
+            <td style="padding: 10px;">{% trans 'Pre-enroll only' %}</td>
+            <td style="padding: 10px;"><input type='checkbox' id='id_pre_enroll_only' name='pre_enroll_only' /></td>
+            <td style="padding: 10px;">{% trans 'Preview only' %}</td>
+            <td style="padding: 10px;"><input type='checkbox' id='id_preview_only' name='preview_only' /></td>
+        </tr>
     </table>
     
     <!--label class='header'>Institution</label>
@@ -69,9 +84,9 @@
         {% endfor %}
     </select-->
     <input type="hidden" name="institution" value="2" />
-	
-	<input type="button" class="btn" onclick="ValidateAndSubmit()" value="{% trans 'Save' %}" style='padding: 5px; margin-top: 20px;'/>
-	{% csrf_token %}
+        
+        <input type="button" class="btn" onclick="ValidateAndSubmit()" value="{% trans 'Save' %}" style='padding: 5px; margin-top: 20px;'/>
+        {% csrf_token %}
 </form>
 <script type="text/javascript">
 function ValidateAndSubmit() {
@@ -104,6 +119,12 @@ function ValidateAndSubmit() {
         alert("{% trans 'Error: Start and end dates must be on the form MM-DD-YYYY.' %}");
         return;
     }
+    
+    twitter_tag = $("id_twitter_tag").val();
+    logo_filename = $("id_logo_filename").val();
+    institution_only = $("id_institution_only").val();
+    pre_enroll_only = $("id_pre_enroll_only").val();
+    preview_only = $("id_preview_only").val();
     
     document.forms.form_new_course.submit();
 }

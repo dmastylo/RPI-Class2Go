@@ -47,8 +47,15 @@ def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
 
         scores = []
         for e in exams:
-            score = ExamScore.objects.filter(course=course, exam=e, student=request.user)
-            scores.append(score[0].score if score else None)
+            score = ExamScore.objects.filter(course=course, exam=e, student=request.user) #unique_together = ("exam", "student")
+            if score:
+                sc = score[0].score
+                if score[0].examrecordscore:
+                    max_score = score[0].examrecordscore.record.get_total_score() #this is only edit mode, so not gonna optimize
+                else:
+                    max_score = e.max_score
+                pair = (sc, max_score)
+            scores.append(pair if score else None)
 
         return render_to_response('exams/list.html',
                                   {'common_page_data':cpd,
@@ -331,6 +338,12 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
         json_pre_pop_correx = json.dumps(correx_obj)
         score = record.score
+        
+        share_block_title = None
+        share_block_type = 'standard'
+        if score:
+            share_block_title = 'Share your Results!'
+            share_block_type = 'score'
 
     except ExamRecord.DoesNotExist:
         raise Http404
@@ -381,16 +394,24 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         total_score = exam.total_score
 
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
-                                                       'exam':exam, 'json_pre_pop':json_pre_pop,
-                                                       'scores':scores_json, 'score':score,
-                                                       'total_score': total_score,
-                                                       'json_pre_pop_correx':json_pre_pop_correx,
-                                                       'editable':False, 'raw_score':raw_score,
-                                                       'allow_submit':False, 'ready_section':ready_section,
-                                                       'slug_for_leftnav':slug_for_leftnav,
-                                                       'rendered_exam_html':rendered_exam_html,
-                                                       'rendered_questions':rendered_questions,}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {
+        'common_page_data':      request.common_page_data,
+        'exam':                  exam,
+        'json_pre_pop':          json_pre_pop,
+        'scores':                scores_json,
+        'score':                 score,
+        'share_block_title':     share_block_title,
+        'share_block_type':      share_block_type,
+        'total_score':           total_score,
+        'json_pre_pop_correx':   json_pre_pop_correx,
+        'editable':              False,
+        'raw_score':             raw_score,
+        'allow_submit':          False,
+        'ready_section':         ready_section,
+        'slug_for_leftnav':      slug_for_leftnav,
+        'rendered_exam_html':    rendered_exam_html,
+        'rendered_questions':    rendered_questions,
+    }, RequestContext(request))
 
 
 @auth_view_wrapper
@@ -1328,3 +1349,20 @@ def parse_markdown(request):
     html = md.convert(mkd)
     returnobj = {'html':html, 'meta':md.Meta}
     return HttpResponse(json.dumps(returnobj))
+
+
+def quizdown_preview(request):
+    return render_to_response('exams/qd_preview.html', {}, RequestContext(request))
+
+
+@require_POST
+def check_metadata_xml_no_course(request):
+    xml = request.POST.get('metaXMLContent')
+    if not xml:
+        return HttpResponseBadRequest("No metaXMLContent provided")
+    try:
+        grader = AutoGrader(xml)
+    except Exception as e: #Since this is just a validator, pass back all the exceptions
+        return HttpResponseBadRequest(unicode(e))
+    
+    return HttpResponse("Metadata XML is OK.\n" + unicode(grader) + "\n" )

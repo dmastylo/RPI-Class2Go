@@ -32,9 +32,10 @@ def view(request, course_prefix, course_suffix):
     show_confirmation = False
     if (not profile.piazza_name):
         show_confirmation = True
-        lti_params['lis_person_name_full'] = request.user.first_name + " " + request.user.last_name
+        fullname = request.user.first_name + " " + request.user.last_name
+        lti_params['lis_person_name_full'] = fullname.encode("utf-8")
     else:
-        lti_params['lis_person_name_full'] = profile.piazza_name
+        lti_params['lis_person_name_full'] = profile.piazza_name.encode("utf-8")
         
     if (not profile.piazza_email):
         show_confirmation = True

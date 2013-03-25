@@ -4,6 +4,10 @@ from shutil import rmtree as util_rmtree
 from storages.backends.s3boto import S3BotoStorage
 import tempfile
 try:
+    import pdfkit
+except ImportError, msg:
+    pdfkit = False
+try:
     from xhtml2pdf import pisa
 except ImportError, msg:
     pisa = False
@@ -59,9 +63,9 @@ def upload_certificate(tmp_path, outpath_prefix, path, outfile_name):
 def certify(path_prefix, course, certificate, student):
     if not certificate.assets or not certificate.storage:
         raise ValueError("Certificate %s incorrectly specified; bad file paths" % str(certificate))
-    # It is an error to call this method without xhtml2pdf installed
-    if not pisa:
-        raise ValueError("Certification cannot proceed without xhtml2pdf installed.")
+    # It is an error to call this method without an html to pdf renderer installed
+    if not pisa and not pdfkit:
+        raise ValueError("Certification cannot proceed without either xhtml2pdf or pdfkit installed.")
 
     # Asset prefix forced to local b/c xhtml2pdf can't read out of s3
     asset_prefix = getattr(settings, 'MEDIA_ROOT', '/')
@@ -71,11 +75,18 @@ def certify(path_prefix, course, certificate, student):
 
     # create the PDF in a safe temporary location
     tmp_handle, tmp_path = working_file()
-    tmp_handle = os.fdopen(tmp_handle, 'wb')
-    pdf_gen_status = pisa.CreatePDF(src=pdf_src, dest=tmp_handle, path=os.path.join('/', path_prefix, certificate.assets))
-    tmp_handle.close()
-    if pdf_gen_status.err:
-        raise ValueError("PDF generation raised error code %s for user certification %s, %s" % (str(pdf_gen_status.err), student.username, certificate.type))
+    if pdfkit:
+        print "pdfkit with %s" % tmp_path
+        pdf_gen_options = {'page-size': 'a4', 'encoding': 'UTF-8', 'orientation': 'landscape', 'margin-left': '0', 'margin-right': '0', 'margin-top': '0', 'margin-bottom': '0', 'quiet': ''}
+        it_worked = pdfkit.from_string(input=pdf_src, output_path=tmp_path, options=pdf_gen_options)
+        if not it_worked:
+            # Except as far as I can tell, usually pdfkit will throw an exception and we'll die before we get here
+            raise ValueError("PDFKit yielded error for user certification %s, %s" % (str(pdf_gen_status.err), student.username, certificate.type))
+    elif pisa:
+        print "xhtml2pdf"
+        pdf_gen_status = pisa.CreatePDF(src=pdf_src, dest=os.fdopen(tmp_handle, 'wb'), path=os.path.join('/', path_prefix, certificate.assets))
+        if pdf_gen_status.err:
+            raise ValueError("PDF generation raised error code %s for user certification %s, %s" % (str(pdf_gen_status.err), student.username, certificate.type))
 
     # After file creation, move to s3 (or local)
     outfile_name = student.username + '-' + str(student.id) + '-' + course.handle + '-' + certificate.type + '.pdf'

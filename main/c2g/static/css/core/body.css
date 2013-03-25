@@ -590,6 +590,14 @@ small.date {
     margin: 0 0 15px 0;
 }
 
+#share_wrapper {
+    position: relative;
+}
+#share_wrapper .show_hide_share {
+    position: absolute;
+    right: 0;
+    top: -25px;
+}
 #share-result textarea {
     width: 100%;
     box-sizing: border-box;

@@ -25,13 +25,10 @@ class AutoGrader():
     __false_default = {'correct':False, 'score':0}
 
     def __unicode__(self):
-        graders=[]
-        points = []
-        for k,v in self.grader_functions.iteritems():
-            graders.append(k)
+        graders=self.grader_functions.keys()
         graders = sorted(graders)
         return "AutoGrader functions set up for the following response names:\n" + \
-            "\n".join(map(lambda gname: "name: %s | points: %d" % (gname, self.points_dict[gname]), graders))
+            "\n".join(map(lambda gname: "name: %s | points: %1.2f" % (gname, self.points_dict[gname]), graders))
     
     def __init__(self, xml, default_return=None):
         """

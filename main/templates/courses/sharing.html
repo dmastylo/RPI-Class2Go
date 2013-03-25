@@ -1,0 +1,131 @@
+{% load i18n %}
+
+<div id="share-result" class="well" {% if share_block_type == 'standard' %}style="display: none;"{% endif %}>
+    <h3>{% trans share_block_title %}</h3>
+    <div id="share-result-content">
+        {% if score %}
+            <span id="user_score" style="display: none;">{{score}}/{{exam.total_score}}</span>
+        {% endif %}
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#facebook-tab" data-toggle="tab"><em class="icon-facebook"></em></a></li>
+            {% if common_page_data.course.twitter_tag %}<li><a href="#twitter-tab" data-toggle="tab"><em class="icon-twitter"></em></a></li>{% endif %}
+            <li><a href="#google-tab" data-toggle="tab"><em class="icon-google-plus"></em></a></li>
+        </ul>
+        <div class="tab-content">
+            <form class="tab-pane active" id="facebook-tab">
+               <textarea rows="4" cols="35" maxlength="140"></textarea>
+               {% if score %}<a href="#" class="show_score">Show Score</a>{% endif %}
+               <a class="btn pull-left share_button" id="facebook_button" href="https://www.facebook.com/dialog/feed?app_id=218493974879064&link=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}&picture={{course.logo_dl_link}}&name={{ exam.title }}&%20description=" target="_blank">
+                   <span class="facebook_redirect" style="display: none;">&redirect_uri=http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}</span>Share on Facebook!
+               </a>
+            </form>
+            {% if common_page_data.course.twitter_tag %}
+                   <form class="tab-pane" id="twitter-tab">
+                       <textarea rows="4" cols="35" maxlength="140"></textarea>
+                       {% if score %}<a href="#" class="show_score">Show Score</a>{% endif %}
+                       <a class="btn pull-left share_button" id="twitter_button" href="http://twitter.com/share?text=" target="_blank">Tweet this Message!</a>
+                   </form>
+            {% endif %}
+            <form class="tab-pane" id="google-tab">
+               <textarea rows="4" cols="35" maxlength="140"></textarea>
+               {% if score %}<a href="#" class="show_score">Show Score</a>{% endif %}
+               <a class="btn pull-left share_button" id="google_button" href="https://m.google.com/app/plus/x/?v=compose&content=" target="_blank">Share on Google+!</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var share_type = '{{ share_block_type }}';
+    var share_content = '';
+    switch (share_type) {
+        case 'score':
+            share_content = "I just took '{{ exam.title }}' in {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}!";
+            break;
+        case 'join':
+            share_content = "I just joined {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}! Check it out: http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}!";
+            break;
+        case 'statement':
+            share_content = "I have finished an online offering of {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}!";
+            break;
+        case 'standard':
+            share_content = "{% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}";
+            break;
+    }
+    
+    var facebook_content = share_content.replace('#', '').replace('@', '');
+    $('#share-result form#facebook-tab textarea').val(facebook_content);
+    var facebook_pre_href = $('#share-result form a#facebook_button').attr('href');
+    var facebook_post_href = $('#share-result form a#facebook_button .facebook_redirect').text();
+    
+    var twitter_content = share_content;
+    $('#share-result form#twitter-tab textarea').val(twitter_content);
+    var twitter_pre_href = $('#share-result form a#twitter_button').attr('href');
+    
+    var google_content = share_content.replace('#', '').replace('@', '');
+    $('#share-result form#google-tab textarea').val(google_content);
+    var google_pre_href = $('#share-result form a#google_button').attr('href');
+    
+    {% if score %}
+        var userScore = 'I scored ' + $('#share-result #user_score').text() + '!';
+    {% endif %}
+    
+    $('#share-result form textarea').blur(function() {
+        var which_blur = $(this).parent().attr('id');
+        switch(which_blur) {
+            case "facebook-tab":
+                facebook_content = $(this).val();
+                break;
+            case "twitter-tab":
+                twitter_content = $(this).val();
+                break;
+            case "google-tab":
+                google_content = $(this).val();
+                break;
+        }
+    })
+    
+    {% if score %}
+        $('#share-result form .show_score').click(function() {
+            var which_click = $(this).parent().attr('id');
+            var current_content;
+            switch(which_click) {
+                case "facebook-tab":
+                    current_content = facebook_content;
+                    break;
+                case "twitter-tab":
+                    current_content = twitter_content;
+                    break;
+                case "google-tab":
+                    current_content = google_content;
+                    break;
+            }
+            
+            if ($(this).text() === 'Show Score') {
+                $(this).siblings('textarea').val(current_content + ' ' + userScore);
+                $(this).text('Hide Score')
+            } else {
+                $(this).siblings('textarea').val(current_content);
+                $(this).text('Show Score')
+            }
+        });
+    {% endif %}
+    
+    $('#share-result form a.share_button').click(function() {
+        var which_share = $(this).attr('id');
+        switch(which_share) {
+            case "facebook_button":
+                var facebook_href = facebook_pre_href + facebook_content.replace(/\ /g, "%20") + facebook_post_href;
+                $(this).attr('href', facebook_href);
+                break;
+            case "twitter_button":
+                var twitter_href = twitter_pre_href + twitter_content.replace(/\ /g, "%20").replace(/\#/g, '%23');
+                $(this).attr('href', twitter_href);
+                break;
+            case "google_button":
+                var google_href = google_pre_href + google_content.replace(/\ /g, "%20");
+                $(this).attr('href', google_href);
+                break;
+        }      
+    });
+</script>
