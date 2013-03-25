@@ -46,7 +46,7 @@
             share_content = "I just joined {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}! Check it out: http://class2go.stanford.edu{% url 'courses.views.main' common_page_data.course.prefix common_page_data.course.suffix %}!";
             break;
         case 'statement':
-            share_content = "I successfully finished a online offering of {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}!";
+            share_content = "I have finished an online offering of {% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}!";
             break;
         case 'standard':
             share_content = "{% if common_page_data.course.twitter_tag %}{{ common_page_data.course.twitter_tag }}{% else %}{{ course.title }}{% endif %}";
