@@ -7,8 +7,6 @@ gdata==2.0.17
 pysqlite
 markdown
 html5lib
-fabric
-cuisine
 
 # RESTful interfaces libraries
 djangorestframework
