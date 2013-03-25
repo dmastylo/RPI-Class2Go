@@ -30,6 +30,7 @@ c2gXMLParse.parseQuizDown = function () {
                    //console.log(obj.meta);
                    c2gXMLParse.importMeta(obj.meta);
                    c2gXMLParse.markdown2quiz(obj.html);
+                   c2gXMLParse.renderPreview(); 
                }
                
            });

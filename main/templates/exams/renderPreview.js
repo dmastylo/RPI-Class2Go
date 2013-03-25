@@ -489,6 +489,10 @@ var c2gXMLParse = (function() {
             var questionMD = $(mDOM).find('question_metadata');
             $(questionMD).each(function(){displayQuestionExplanation(this);
                               displayChoiceExplanations(this, true);});
+            var container = document.createElement('div');
+            container.innerHTML = editor.getValue();
+            var mDOMHTML = $(container); 
+            questionMD = mDOMHTML.find('div.question'); 
             $(questionMD).each(function(){displayEditQuestion(this);});
             $(questionMD).each(function(){displayDeleteQuestion(this);});
             $(questionMD).each(function(){displayMoveQuestion(this);});

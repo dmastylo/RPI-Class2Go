@@ -9,7 +9,7 @@ window.displayMoveQuestion = function(questionMD){
     $(upMove).attr('data-status', 'Show');
     $(upMove).attr('value', 'Up');
     $(upMove).click(function() { move(questionMD, true); });
-    if(assocQID != 'question_1')
+    if((assocQID != 'question_1') && (assocQID != 'problem_1'))
     {
         questionNumber.append(upMove); 
     }
@@ -19,9 +19,11 @@ window.displayMoveQuestion = function(questionMD){
     $(downMove).attr('data-status', 'Show');
     $(downMove).attr('value', 'Up');
     $(downMove).click(function() { move(questionMD, false); });
-    var mDOM=$.parseXML(metadata_editor.getValue());
-    var numberOfQuestions = $(mDOM).find('question_metadata').length
-    if(assocQID != ('question_' + numberOfQuestions)) {
+    var container = document.createElement('div');
+    container.innerHTML = editor.getValue();
+    var mDOMHTML = $(container); 
+    var numberOfQuestions = mDOMHTML.find('div.question').length; 
+    if((assocQID != ('question_' + numberOfQuestions)) && (assocQID != ('problem_' + numberOfQuestions))) {
         questionNumber.append($(downMove));        
     }
 }
@@ -34,18 +36,22 @@ window.move = function(questionMD, movingUp) {
     var container = document.createElement('div');
     container.innerHTML = editor_value; 
     var assocHTML = $(container).find('#' + assocQID)[0]; 
-    var referencePointHTML = $(assocHTML).prev();  
-    var referencePointHTMLNext = $(assocHTML).next()               
-    assocHTML.remove();
-    if(movingUp) {
-        $(referencePointHTML).before(assocHTML);  
-    } else {
-        if(referencePointHTMLNext) { 
-            $(referencePointHTMLNext).after(assocHTML);  
-        } else { 
-            $(container).append(assocHTML); 
+    if(assocHTML)
+    {
+        var referencePointHTML = $(assocHTML).prev();  
+        var referencePointHTMLNext = $(assocHTML).next()               
+        assocHTML.remove();
+        if(movingUp) {
+            $(referencePointHTML).before(assocHTML);  
+        } else {
+            if(referencePointHTMLNext) { 
+                $(referencePointHTMLNext).after(assocHTML);  
+            } else { 
+                $(container).append(assocHTML); 
+            }
         }
     }
+    
     var mDOM = $(container.innerHTML);
     editor_value = c2gXMLParse.assignCorrectIds(mDOM, false); 
     editor.setValue(style_html(editor_value, {'max_char':80}));
@@ -54,17 +60,20 @@ window.move = function(questionMD, movingUp) {
     //Find XML 
     mDOM=$.parseXML(metadata_editor.getValue());
     var assocXML = $(mDOM).find('#' + assocQID)[0]; 
-    var referencePointXML = $(assocXML).prev(); 
-    var referencePointXMLNext = $(assocXML).next()        
-    assocXML.remove();
-    if(movingUp) {
-        $(referencePointXML).before(assocXML);  
-    } else {
-        if(referencePointXMLNext) { 
-            $(referencePointXMLNext).after(assocXML);  
-        } else { 
-            $(mDOM).append(assocXML); 
-        }
+    if(assocXML)
+    {
+        var referencePointXML = $(assocXML).prev(); 
+        var referencePointXMLNext = $(assocXML).next()        
+        assocXML.remove();
+        if(movingUp) {
+            $(referencePointXML).before(assocXML);  
+        } else {
+            if(referencePointXMLNext) { 
+                $(referencePointXMLNext).after(assocXML);  
+            } else { 
+                $(mDOM).append(assocXML); 
+            }
+        }   
     }
     c2gXMLParse.assignCorrectIds(mDOM, true); 
     c2gXMLParse.assignCorrectNames(mDOM);

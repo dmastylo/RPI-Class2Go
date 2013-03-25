@@ -1,5 +1,4 @@
 window.displayDeleteQuestion = function(questionMD){
-    console.log("adding delete button " + questionMD); 
     //This function takes a DOM object of the metadata and displays the delete after the
     //question with the corresponding id
     var mySolution = $(questionMD).find('solution');
@@ -30,7 +29,9 @@ window.delete = function(questionMD) {
     var container = document.createElement('div');
     container.innerHTML = editor_value; 
     var assocHTML = $(container).find('#' + assocQID)[0]; 
-    assocHTML.remove(); 
+    if(assocHTML) {
+        assocHTML.remove();         
+    }
     var mDOM = $(container.innerHTML);
     editor_value = c2gXMLParse.assignCorrectIds(mDOM, false); 
     editor.setValue(style_html(editor_value, {'max_char':80}));
@@ -39,7 +40,10 @@ window.delete = function(questionMD) {
     //Find XML 
     mDOM=$.parseXML(metadata_editor.getValue());
     var assocXML = $(mDOM).find('#' + assocQID)[0]; 
-    assocXML.remove(); 
+    if(assocXML)
+    {
+        assocXML.remove();         
+    }
     c2gXMLParse.assignCorrectIds(mDOM, true); 
     c2gXMLParse.assignCorrectNames(mDOM);
     metadata_value = (new XMLSerializer()).serializeToString(mDOM);
