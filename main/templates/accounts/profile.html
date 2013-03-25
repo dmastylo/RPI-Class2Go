@@ -61,7 +61,7 @@
                                             <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
                                         </a>
                                     {% else %}
-                                    <a class="btn disabled">{% trans 'generation in progress' %} <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em></a>
+                                    <a class="btn disabled">{% trans 'Generation in progress. Check back soon!' %} <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em></a>
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
