@@ -1,0 +1,50 @@
+<VirtualHost *:80>
+    ServerName {{ server_name }}
+    ServerAlias {{ server_alias }}
+    UseCanonicalName On
+
+    Alias /robots.txt /opt/{{ app_name }}/static/robots.txt
+    Alias /favicon.ico /opt/{{ app_name }}/static/graphics/core/favicon.ico
+
+    Alias /static/ /opt/{{ app_name }}/static/
+
+    <Directory /opt/{{ app_name }}/static>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    WSGIScriptAlias / /home/{{ admin_home }}/{{ app_name }}/main/wsgi.py
+
+    <Directory /home/{{ admin_home }}/{{ app_name }}/main>
+    <Files wsgi.py>
+        Order deny,allow
+        Allow from all
+    </Files>
+    </Directory>
+
+    {% if use_shib %}
+    <Location /Shibboleth.sso>
+        SetHandler shib
+        Satisfy Any
+        Allow from all
+        AuthType None
+        Require all granted
+        ShibRequestSetting applicationId {{ shib_id }}
+    </Location>
+    <Location '/shib-login'>
+        ShibRequestSetting applicationId {{ shib_id }}
+        AuthType shibboleth
+        ShibRequestSetting requireSession 1
+        require valid-user
+    </Location>
+    {% endif %}
+
+    WSGIDaemonProcess {{ app_name }} processes=1 threads=15 maximum-requests=10000 python-path=/home/{{ admin_home }}/{{ app_name }}/main
+    WSGIProcessGroup {{ app_name }}
+
+    ErrorLog ${APACHE_LOG_DIR}/{{ app_name }}-error.log
+
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %D" class2go
+    CustomLog ${APACHE_LOG_DIR}/{{ app_name }}-access.log class2go
+
+</VirtualHost>
