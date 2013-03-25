@@ -33,24 +33,29 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
 
-<!--
     {# Jabber chat plugin block #}
     {% if jabber_configured and is_logged_in %}
-    <iframe src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat" style="seamless; clear: both; width: 100%; height: 400px; margin-bottom: 10px;" class="span6"></iframe>
+        <iframe src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat" style="seamless; clear: both; width: 100%; height: 400px; margin-bottom: 10px;" class="span6"></iframe>
     {% endif %} {# jabber_configured and is_logged_in #}
     {# end Jabber chat plugin block #}
--->
 
     {% if course_ended and course_cert%}
 	<div class="well statement">
 	    <h2>{% trans "Congratulations!" %}</h2>
 	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
-	    <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
-	    <p style="text-align: right;">
-		<a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
-		    <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-		</a>
-	    </p>
+        {% if course_cert.1 %}
+            <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
+            <p style="text-align: right;">
+              <a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
+        {% else %}
+            <p>{% trans 'Statement earned - statement generation in progress. Check back soon!' %}</p>
+            <p style="text-align: right;">
+              <a class="btn disabled">{% trans 'generation in progress' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
+        {% endif %}
 	</div>
     {% endif %}
 
