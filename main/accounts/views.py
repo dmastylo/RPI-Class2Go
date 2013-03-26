@@ -2,6 +2,7 @@ import json
 import random
 import string
 import urlparse
+import os
 import re
 
 from django.conf import settings
@@ -15,10 +16,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 from django.views.decorators.http import require_POST
-from django.contrib.auth import get_backends, REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, authenticate as auth_authenticate
+from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate as auth_authenticate
 from django.contrib import messages
-from django.contrib.auth.models import User, Group
-from c2g.models import Course, Institution,Video, Instructor, CourseInstructor
+from django.contrib.auth.models import User
+from c2g.models import Course, Institution, Video, CourseInstructor
 from accounts.forms import *
 from registration import signals
 from registration.login_wrapper import login as auth_login_view
@@ -27,7 +28,6 @@ from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseBadRequest
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
-from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 from pysimplesoap.client import SoapClient
 from datetime import date
@@ -345,9 +345,16 @@ def standard_preview_login(request, course_prefix, course_suffix):
     
         for ci in course_instructors:
             instructors.append(ci.instructor)
-  
+        
+        # default template, unless there is one in the soruce tree, then use that
         template_name='previews/default.html'
-
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+                
+        
         return render_to_response(template_name,
                          {'form': form,
                           'login_form': login_form,

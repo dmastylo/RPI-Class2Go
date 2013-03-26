@@ -9,9 +9,10 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.cache import cache_page
 
+
 from courses.forms import *
 
-from courses.actions import auth_view_wrapper
+from courses.actions import auth_view_wrapper, is_member_of_course
 
 from c2g.models import CurrentTermMap
 import settings, logging
@@ -52,10 +53,14 @@ def main(request, course_prefix, course_suffix):
     #    raise Http404
 
     common_page_data=request.common_page_data
-    ##JASON 9/5/12###
-    ##For Launch, but I don't think it needs to be removed later##
-    if common_page_data['course'].preview_only_mode:
-        if not common_page_data['is_course_admin']:
+
+    course = common_page_data['course']
+    #determine whether to redirect to preview page
+    #non-registered students on public courses should be redirected
+    redirect_to_preview = course.preview_only_mode or (not course.institution_only) and (not common_page_data['is_course_member'])
+    
+    if redirect_to_preview:
+        if not common_page_data['is_course_admin']: #keep this here as the only exception: course admins should be able to create content
             redir = reverse('courses.preview.views.preview',args=[course_prefix, course_suffix])
             if (settings.INSTANCE == 'stage' or settings.INSTANCE == 'prod'):
                 redir = 'https://'+request.get_host()+redir
@@ -91,6 +96,9 @@ def main(request, course_prefix, course_suffix):
     else:
         is_logged_in = 0
 
+    # Environment prep for jabber chat plugin. Uses '' == False.
+    jabber_configured = getattr(settings, 'JABBER_DOMAIN', '')
+
     if (course.calendar_end < date.today()):
         course_ended = True
     else:
@@ -98,9 +106,6 @@ def main(request, course_prefix, course_suffix):
         
     if (course.calendar_start > date.today()):
         share_block_type = 'join'
-
-    # Environment prep for jabber chat plugin
-    jabber_configured = hasattr(settings, 'JABBER_DOMAIN')
 
     return render_to_response('courses/view.html',
         {'common_page_data':       common_page_data,
@@ -112,7 +117,7 @@ def main(request, course_prefix, course_suffix):
         'course_cert':             course_cert,
         'course_ended':            course_ended,
         'share_block_title':       share_block_title,
-        'share_block_type':       share_block_type,
+        'share_block_type':        share_block_type,
         'jabber_configured':       jabber_configured,
         },
         context_instance=RequestContext(request))
