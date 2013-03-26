@@ -28,29 +28,26 @@
 </div>
 {% endblock l_column_content %}
 
-
-
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-
-<!--
-    {# Jabber chat plugin block #}
-    {% if jabber_configured and is_logged_in %}
-    <iframe src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat" style="seamless; clear: both; width: 100%; height: 400px; margin-bottom: 10px;" class="span6"></iframe>
-    {% endif %} {# jabber_configured and is_logged_in #}
-    {# end Jabber chat plugin block #}
--->
 
     {% if course_ended and course_cert%}
 	<div class="well statement">
 	    <h2>{% trans "Congratulations!" %}</h2>
 	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
-	    <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
-	    <p style="text-align: right;">
-		<a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
-		    <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-		</a>
-	    </p>
+        {% if course_cert.1 %}
+            <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
+            <p style="text-align: right;">
+              <a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
+        {% else %}
+            <p>{% trans 'Statement earned - statement generation in progress. Check back soon!' %}</p>
+            <p style="text-align: right;">
+              <a class="btn disabled">{% trans 'Generation in Progress' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
+        {% endif %}
 	</div>
     {% endif %}
 
@@ -79,13 +76,11 @@
 </div>
 {% endblock m_column_content %}
 
-{% block addl_scripts %}
-
 {% block r_column_content %}
 <div id="c2g_layout_r_column" class="span3">
     
     <div id="share_wrapper">
-	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden" href="#">Share Something!</a>{% endif %}
+	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden btn" href="#">Share Something!</a>{% endif %}
 	{% include "courses/sharing.html" %}
     </div>
 
@@ -130,8 +125,9 @@
 	</div>
     {% endif %}
     
-</div>
 {% endblock r_column_content %}
+
+{% block addl_scripts %}
 
 {% if common_page_data.is_course_admin %}
     {% include "controls/tinymce.html" %}
@@ -181,27 +177,49 @@ $(document).ready(function(){
 	});
     }
     
-    //Show/Hide share block
-    $('#share_wrapper .show_hide_share').hover(function(event) {
-	event.stopImmediatePropagation();
-	if ($(this).hasClass('share_hidden')) {
-	    $('#share_wrapper').animate({ minHeight: "25px" }, 'fast');
-	}
-    }, function(event) {
-	event.stopImmediatePropagation();
-	if ($(this).hasClass('share_hidden')) {
-	    $('#share_wrapper').stop(true, true).animate({ minHeight: "0" }, 'slow');
-	}
-    });
+    //Show/Hide chat block
+    var chatBlockHeight = $('#chat_block').css('height');
+    $('#chat_block').css({height: '0px'}).show();
     
+    $('#chat_wrapper .chat_toggle').toggle(function() {
+	$(this).siblings().animate({height: chatBlockHeight}, 'slow', function() {
+	    $(this).siblings().find('span.openChat').hide();
+	    $(this).siblings().find('span.closeChat').show();
+	});
+	//Candy.Core.connect('{{ nick }}', '{{ nick }}'); /* FIXME: use something more magical */
+    }, function() {
+	$(this).siblings().animate({height: '0px'}, 'slow', function() {
+	    $(this).siblings().find('span.openChat').show();
+	    $(this).siblings().find('span.closeChat').hide();
+	});
+	//Candy.Core.disconnect
+    });
+
+    //Show/Hide share block
     $('#share_wrapper .show_hide_share').click(function() {
 	if ($(this).hasClass('share_hidden')) {
-	    $(this).text('Hide').removeClass('share_hidden').addClass('share_visible').siblings('#share-result').slideDown('slow');
+	    $(this).text('Hide').toggleClass('btn').toggleClass('share_hidden').toggleClass('share_visible').siblings('#share-result').slideDown('slow').parent().css({ marginBottom: "0" });
 	} else {
-	    $(this).text('Share Something!').removeClass('share_visible').addClass('share_hidden').siblings('#share-result').slideUp('slow');
+	    $(this).siblings('#share-result').slideUp('slow', function() {
+		$(this).parent().css({ marginBottom: "0"});
+		$(this).siblings('.show_hide_share').text('Share Something!').toggleClass('btn').toggleClass('share_visible').toggleClass('share_hidden');
+	    });
 	}
     });
 });
 </script>
 {% endblock addl_scripts %}
 
+{% block jabber_block %}
+    <div id="chat_wrapper">
+	<a class="chat_toggle" href="#">
+	    <span class="openChat">Open Chat <em class="icon-chevron-up"></em></span>
+	    <span class="closeChat">Close Chat <em class="icon-chevron-down"></em></span>
+	</a>
+	{# Jabber chat plugin block #}
+	    {% if jabber_configured and is_logged_in %}
+	        <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+	    {% endif %} {# jabber_configured and is_logged_in #}
+	{# end Jabber chat plugin block #}
+    </div>
+{% endblock jabber_block %}

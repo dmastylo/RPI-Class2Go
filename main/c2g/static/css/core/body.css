@@ -592,11 +592,28 @@ small.date {
 
 #share_wrapper {
     position: relative;
+    width: 100%;
+    min-height: 40px;
 }
 #share_wrapper .show_hide_share {
     position: absolute;
+    z-index: 100;
+}
+#share_wrapper .show_hide_share.share_hidden {
     right: 0;
-    top: -25px;
+    top: 0;
+    left: 0;
+}
+#share_wrapper .show_hide_share.share_visible {
+    right: 5px;
+    top: 5px;
+}
+#share-result {
+    z-index: 50;
+    position: relative;
+    float: right;
+    clear: both;
+    padding-top: 10px;
 }
 #share-result textarea {
     width: 100%;
@@ -652,7 +669,16 @@ small.date {
 
 /* Right Column
 -------------------------------------------------- */
+.right_nav_wrapper {
+    position: relative;
+    clear: both;
+}
+
 /* Twitter Feed */
+#twitterWidget {
+    position: relative;
+    clear: both;
+}
 #twitterWidget .twtr-widget .twtr-doc {
     border: 1px solid #bdb7a1;
 }
