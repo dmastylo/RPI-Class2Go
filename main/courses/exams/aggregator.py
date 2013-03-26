@@ -94,7 +94,7 @@ class ScoreAggregator():
         return context
 
     def max_points(self, tag):
-        print("%s: %1.2f" % (tag, self.formulas[tag]['max_points']))
+        #print("%s: %1.2f" % (tag, self.formulas[tag]['max_points']))
         return self.formulas[tag]['max_points']
 
     def _fill_max_points(self, tag):
@@ -156,6 +156,7 @@ class ScoreAggregator():
             if writeDB:
                 data, created = CourseStudentScore.objects.get_or_create(course=self.course, student=student, tag=tag)
                 data.score = ag_score
+                data.total = self.max_points(tag)
                 data.save()
                 
         return ag_score
