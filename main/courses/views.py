@@ -92,7 +92,7 @@ def main(request, course_prefix, course_suffix):
             share_block_title = 'Share your Achievement!'
             share_block_type = 'statement'
         else:
-            share_block_title = 'Share Something:'
+            share_block_title = 'Share Something!'
     else:
         is_logged_in = 0
 
