@@ -37,10 +37,23 @@ ul {
 }
 
 #chat-tabs {
-	margin: 0 200px 0 28px;
+	margin: 0 0 0 28px;
 	padding: 0;
 	overflow: auto;
 	border-left: 1px solid #bdb7a1;
+}
+
+#chat-tabs #chat-expand-arrow {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 27px;
+	height: 15px;
+	padding: 7px 0;
+}
+#chat-tabs #chat-expand-arrow em {
+	font-size: 18px;
+	padding: 0 10px;
 }
 
 #chat-tabs li {
@@ -184,7 +197,7 @@ ul {
 .roster-pane {
 	position: absolute;
 	overflow: auto;
-	top: 0;
+	top: 30px;
 	right: 0;
 	bottom: 0;
 	width: 198px;
@@ -497,6 +510,7 @@ ul {
 	bottom: 0;
 	z-index: 90;
 	background-image: url(img/overlay.png);
+	border-top-left-radius: 8px;
 }
 
 #chat-modal.modal-login {
