@@ -85,7 +85,7 @@
 <div id="c2g_layout_r_column" class="span3">
     
     <div id="share_wrapper">
-	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden" href="#">Show Share Block</a>{% endif %}
+	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden" href="#">Share Something!</a>{% endif %}
 	{% include "courses/sharing.html" %}
     </div>
 
@@ -182,21 +182,23 @@ $(document).ready(function(){
     }
     
     //Show/Hide share block
-    $('#share_wrapper .show_hide_share').hover(function() {
+    $('#share_wrapper .show_hide_share').hover(function(event) {
+	event.stopImmediatePropagation();
 	if ($(this).hasClass('share_hidden')) {
 	    $('#share_wrapper').animate({ minHeight: "25px" }, 'fast');
 	}
-    }, function() {
+    }, function(event) {
+	event.stopImmediatePropagation();
 	if ($(this).hasClass('share_hidden')) {
-	    $('#share_wrapper').animate({ minHeight: "0" }, 'slow');
+	    $('#share_wrapper').stop(true, true).animate({ minHeight: "0" }, 'slow');
 	}
     });
     
     $('#share_wrapper .show_hide_share').click(function() {
 	if ($(this).hasClass('share_hidden')) {
-	    $(this).text('Hide Share Block').removeClass('share_hidden').addClass('share_visible').siblings('#share-result').slideDown('slow');
+	    $(this).text('Hide').removeClass('share_hidden').addClass('share_visible').siblings('#share-result').slideDown('slow');
 	} else {
-	    $(this).text('Show Share Block').removeClass('share_visible').addClass('share_hidden').siblings('#share-result').slideUp('slow');
+	    $(this).text('Share Something!').removeClass('share_visible').addClass('share_hidden').siblings('#share-result').slideUp('slow');
 	}
     });
 });
