@@ -141,6 +141,7 @@ class Command(BaseCommand):
                         updates += 1
                     if examscore_before != examscore_after:
                         es.score = examscore_after
+                        es.examrecordscore = ers
                         es.save()
                         updates += 1
 
