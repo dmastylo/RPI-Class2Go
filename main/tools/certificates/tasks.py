@@ -76,20 +76,18 @@ def certify(path_prefix, course, certificate, student):
     # create the PDF in a safe temporary location
     tmp_handle, tmp_path = working_file()
     if pdfkit:
-        print "pdfkit with %s" % tmp_path
         pdf_gen_options = {'page-size': 'a4', 'encoding': 'UTF-8', 'orientation': 'landscape', 'margin-left': '0', 'margin-right': '0', 'margin-top': '0', 'margin-bottom': '0', 'quiet': ''}
         it_worked = pdfkit.from_string(input=pdf_src, output_path=tmp_path, options=pdf_gen_options)
         if not it_worked:
             # Except as far as I can tell, usually pdfkit will throw an exception and we'll die before we get here
-            raise ValueError("PDFKit yielded error for user certification %s, %s" % (str(pdf_gen_status.err), student.username, certificate.type))
+            raise ValueError("PDFKit yielded error for user certification %s, %s" % (student.username, certificate.type))
     elif pisa:
-        print "xhtml2pdf"
         pdf_gen_status = pisa.CreatePDF(src=pdf_src, dest=os.fdopen(tmp_handle, 'wb'), path=os.path.join('/', path_prefix, certificate.assets))
         if pdf_gen_status.err:
             raise ValueError("PDF generation raised error code %s for user certification %s, %s" % (str(pdf_gen_status.err), student.username, certificate.type))
 
     # After file creation, move to s3 (or local)
-    outfile_name = student.username + '-' + str(student.id) + '-' + course.handle + '-' + certificate.type + '.pdf'
+    outfile_name = certificate.get_filename_by_user(student)
     uploaded_to = upload_certificate(tmp_path, path_prefix, certificate.storage, outfile_name)
 
     return uploaded_to

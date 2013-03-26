@@ -55,10 +55,14 @@
                             </div>
                             {% if certifications|byKey:course.id %}
                                 {% for certinfo in certifications|byKey:course.id %}
-                                    <a class="btn" href="{{certinfo.1}}">
-                                        {% trans 'Download Statement' %}
-                                        <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-                                    </a>
+                                    {% if certinfo.1 %}
+                                        <a class="btn" href="{{certinfo.1}}">
+                                            {% trans 'Download Statement' %}
+                                            <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+                                        </a>
+                                    {% else %}
+                                    <a class="btn disabled">{% trans 'Generation in progress. Check back soon!' %} <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em></a>
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
                                 {% if course in is_student_list %}

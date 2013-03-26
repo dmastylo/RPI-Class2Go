@@ -25,9 +25,10 @@ from django.db.models import Max
 from django.db.models.signals import post_save
 from django.utils import encoding
 
-from c2g.util import is_storage_local, get_site_url
+from c2g.util import is_storage_local, get_site_url, CacheStat
 from c2g.readonly import get_database_considering_override
 from kelvinator.tasks import sizes as video_resize_options 
+from courses.exams.autograder import AutoGrader
 
 logger = logging.getLogger(__name__)
 
@@ -1272,43 +1273,6 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         db_table = u'c2g_videos'
 
 
-class CacheStat():
-    """
-    Gather and report counter-based stats for our simple caches.
-       report('hit', 'video-cache') or
-       report('miss', 'files-cache')
-    """
-    lastReportTime = datetime.now()
-    count = {} 
-    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 60*60)   # hourly
-    reportingInterval = timedelta(seconds=reportingIntervalSec)
-
-    @classmethod
-    def report(cls, op, cache):
-        if op not in ['hit', 'miss']:
-            logger.error("cachestat invalid operation, expected hit or miss")
-            return
-        if cache not in cls.count:
-            cls.count[cache] = {}
-        if op not in cls.count[cache]:
-            cls.count[cache][op] = 0
-        cls.count[cache][op] += 1
-
-        # stat interval expired: print stats and zero out counter
-        if datetime.now() - cls.lastReportTime > cls.reportingInterval:
-            for c in cls.count:
-                hit = cls.count[c].get('hit', 0)
-                miss = cls.count[c].get('miss', 0)
-                if hit + miss == 0:
-                    logger.info("cache stats for %s: hits %d, misses %d" % (c, hit, miss))
-                else:
-                    rate = float(hit) / float(hit + miss) * 100.0
-                    logger.info("cache stats for %s: hits %d, misses %d, rate %2.1f" % (c, hit, miss, rate))
-
-            cls.lastReportTime = datetime.now()
-            cls.count = {}      # zero out the counts
-
-
 class VideoViewTraces(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     video = models.ForeignKey(Video, db_index=True)
@@ -2012,6 +1976,24 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if re.search(r"\$\$.*\$\$", self.html_content, re.DOTALL) or re.search(r"\\\[.*\\\]", self.html_content, re.DOTALL):
             return True
         return False
+    
+    def get_total_score(self):
+        """Considers randomization"""
+        numQ = self.num_random_questions()
+        if numQ == 0:
+            return self.total_score
+        else:
+            md_dom = parseString(encoding.smart_str(self.xml_metadata, encoding='utf-8'))
+            questions = md_dom.getElementsByTagName('question_metadata')
+            ag = AutoGrader(self.xml_metadata)
+                
+            total_score = 0
+            for i in range(numQ):
+                id = questions[i].getAttribute("id")
+                total_score += ag.question_points(id)
+
+            return total_score
+                
     
     def num_random_questions(self):
         """The number of randomly_selected questions that are specified to be shown
@@ -3021,5 +3003,13 @@ class StudentInvitation(TimestampMixin, models.Model):
     email = models.CharField(max_length=128, db_index=True)
     course = models.ForeignKey(Course, db_index=True)
 
+class CourseStudentScore(TimestampMixin, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    tag = models.CharField(max_length=128, db_index=True)
+    score = models.FloatField(null=True, blank=True)
 
+    class Meta:
+        unique_together = ("course", "student", "tag")
 
+    
