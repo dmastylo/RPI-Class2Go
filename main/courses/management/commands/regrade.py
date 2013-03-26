@@ -100,7 +100,7 @@ class Command(BaseCommand):
                 if er.attempt_number == 0:
                     print "ERROR: examrecord %d: skip, attempt_number=0" % er.id
                     errors += 1
-                    next
+                    continue
                 if options['penalties']:
                     score_after = compute_penalties(rawscore_after, er.attempt_number,
                                                     exam_obj.resubmission_penalty,
