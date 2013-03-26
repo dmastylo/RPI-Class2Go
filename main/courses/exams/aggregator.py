@@ -156,6 +156,7 @@ class ScoreAggregator():
             if writeDB:
                 data, created = CourseStudentScore.objects.get_or_create(course=self.course, student=student, tag=tag)
                 data.score = ag_score
+                data.total = self.max_points(tag)
                 data.save()
                 
         return ag_score
