@@ -9,9 +9,10 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.cache import cache_page
 
+
 from courses.forms import *
 
-from courses.actions import auth_view_wrapper
+from courses.actions import auth_view_wrapper, is_member_of_course
 
 from c2g.models import CurrentTermMap
 import settings, logging
@@ -52,10 +53,14 @@ def main(request, course_prefix, course_suffix):
     #    raise Http404
 
     common_page_data=request.common_page_data
-    ##JASON 9/5/12###
-    ##For Launch, but I don't think it needs to be removed later##
-    if common_page_data['course'].preview_only_mode:
-        if not common_page_data['is_course_admin']:
+
+    course = common_page_data['course']
+    #determine whether to redirect to preview page
+    #non-registered students on public courses should be redirected
+    redirect_to_preview = course.preview_only_mode or (not course.institution_only) and (not common_page_data['is_course_member'])
+    
+    if redirect_to_preview:
+        if not common_page_data['is_course_admin']: #keep this here as the only exception: course admins should be able to create content
             redir = reverse('courses.preview.views.preview',args=[course_prefix, course_suffix])
             if (settings.INSTANCE == 'stage' or settings.INSTANCE == 'prod'):
                 redir = 'https://'+request.get_host()+redir
