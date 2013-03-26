@@ -198,10 +198,9 @@ $(document).ready(function(){
     //Show/Hide share block
     $('#share_wrapper .show_hide_share').click(function() {
 	if ($(this).hasClass('share_hidden')) {
-	    $(this).text('Hide').toggleClass('btn').toggleClass('share_hidden').toggleClass('share_visible').siblings('#share-result').slideDown('slow').parent().css({ marginBottom: "0" });
+	    $(this).text('Hide').toggleClass('btn').toggleClass('share_hidden').toggleClass('share_visible').siblings('#share-result').slideDown('slow');
 	} else {
 	    $(this).siblings('#share-result').slideUp('slow', function() {
-		$(this).parent().css({ marginBottom: "0"});
 		$(this).siblings('.show_hide_share').text('Share Something!').toggleClass('btn').toggleClass('share_visible').toggleClass('share_hidden');
 	    });
 	}
