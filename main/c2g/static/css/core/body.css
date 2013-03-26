@@ -618,6 +618,7 @@ small.date {
 #share-result textarea {
     width: 100%;
     box-sizing: border-box;
+    resize: vertical;
 }
 #share-result .show_score {
     display: block;
