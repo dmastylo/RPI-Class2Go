@@ -52,15 +52,14 @@
     {% endif %}
 
     <h3 class="section-title pull-left" style="clear: both;">{% trans 'Recent Announcements' %}</h3>
-    <div class="pull-right">
-	{% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
+	<div class="pull-right">
             <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
             <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
             {% include "announcements/delete_announcement_form.html" %}
-	{% else %}
-	    <a class="btn" id="showHideAll">Expand All</a>
-        {% endif %}
-    </div>
+	</div>
+    {% endif %}
+    
     {% if common_page_data.is_course_admin %}
         {% include "announcements/new_announcement.html" %}
     {% endif %}
@@ -70,6 +69,8 @@
     {% empty %}
         <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
     {% endfor %}
+    
+    <a class="btn pull-right" id="showHideAll" style="margin-left: 10px;">Expand All</a>
     {% if many_announcements %}
         <a class="btn pull-right" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}  {% if announcement_overflow != 0 %} ({{announcement_overflow}} {% trans 'more' %}) {% endif %}</a>
     {% endif %}
@@ -165,12 +166,12 @@ $(document).ready(function(){
 	});
 	
 	$('#showHideAll').toggle(function(){
-	    $(this).text('Collapse All').parent().siblings('.announcement').each(function(){
+	    $(this).text('Collapse All').siblings('.announcement').each(function(){
 		$(this).find('.announcement-content').slideDown(250);
 		$(this).find('.announcement-actions .announcement-collapse').text('Collapse');
 	    });
 	}, function() {
-	    $(this).text('Expand All').parent().siblings('.announcement').each(function(){
+	    $(this).text('Expand All').siblings('.announcement').each(function(){
 		$(this).find('.announcement-content').slideUp(250);
 		$(this).find('.announcement-actions .announcement-collapse').text('Expand');
 	    });
