@@ -53,6 +53,8 @@ class Command(BaseCommand):
             sidlist = string.split(options['student_ids'], ',')
             examRecords = examRecords.filter(student__in=sidlist)
 
+        examRecords = examRecords.order_by('-id')
+        
         # this executes the query
         if len(examRecords) == 0:
             print "warning: no exam records found, is that what you intended?"
