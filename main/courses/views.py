@@ -91,6 +91,9 @@ def main(request, course_prefix, course_suffix):
     else:
         is_logged_in = 0
 
+    # Environment prep for jabber chat plugin. Uses '' == False.
+    jabber_configured = getattr(settings, 'JABBER_DOMAIN', '')
+
     if (course.calendar_end < date.today()):
         course_ended = True
     else:
@@ -98,9 +101,6 @@ def main(request, course_prefix, course_suffix):
         
     if (course.calendar_start > date.today()):
         share_block_type = 'join'
-
-    # Environment prep for jabber chat plugin
-    jabber_configured = hasattr(settings, 'JABBER_DOMAIN')
 
     return render_to_response('courses/view.html',
         {'common_page_data':       common_page_data,
@@ -112,7 +112,7 @@ def main(request, course_prefix, course_suffix):
         'course_cert':             course_cert,
         'course_ended':            course_ended,
         'share_block_title':       share_block_title,
-        'share_block_type':       share_block_type,
+        'share_block_type':        share_block_type,
         'jabber_configured':       jabber_configured,
         },
         context_instance=RequestContext(request))
