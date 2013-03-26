@@ -1,6 +1,7 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% load i18n %}
+{% load template_utils %}
 {% block title %}{{ SITE_TITLE }} | {{ common_page_data.course.title }}{% endblock title %}
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
@@ -32,6 +33,26 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
 
+    {% if course_ended and course_cert%}
+	<div class="well statement">
+	    <h2>{% trans "Congratulations!" %}</h2>
+	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
+        {% if course_cert.1 %}
+            <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
+            <p style="text-align: right;">
+              <a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
+        {% else %}
+            <p>{% trans 'Statement earned - statement generation in progress. Check back soon!' %}</p>
+            <p style="text-align: right;">
+              <a class="btn disabled">{% trans 'Generation in Progress' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
+        {% endif %}
+	</div>
+    {% endif %}
+
     <h3 class="section-title pull-left" style="clear: both;">{% trans 'Recent Announcements' %}</h3>
     <div class="pull-right">
 	{% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
@@ -57,15 +78,27 @@
 </div>
 {% endblock m_column_content %}
 
-{% block twitter_widget %}
+{% block r_column_content %}
+<div id="c2g_layout_r_column" class="span3">
+    
+    <div id="share_wrapper">
+	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden" href="#">Show Share Block</a>{% endif %}
+	{% include "courses/sharing.html" %}
+    </div>
+
+    
+    <div class="right_nav_wrapper">
+	<!--Skeleton Div to be filled in by rightnav ajax -->
+    </div>
+    
     {% if course.twitter_tag %}
-	<div id="twitterWidget" class="span3 pull-right">
+	<div id="twitterWidget">
 	    <script src="http://widgets.twimg.com/j/2/widget.js"></script>
 	    <script>
 		new TWTR.Widget({
 		    version: 2,
 		    type: 'search',
-		    search: '{{ course.twitter_tag }}',
+		    search: '{{ course.twitter_tag|cut:'#'|cut:'@' }}',
 		    title: 'Recent Tweets',
 		    interval: 1000,
 		    width: 'auto',
@@ -83,7 +116,7 @@
 		    },
 		    features: {
 			scrollbar: false,
-			loop: false,
+			loop: true,
 			live: true,
 			hashtags: true,
 			avatars: true,
@@ -93,26 +126,10 @@
 	    </script>
 	</div>
     {% endif %}
-{% endblock twitter_widget %}
-
-{# Jabber chat plugin block #}
-    {% if jabber_configured and is_logged_in %}
-	{% block jabber_block %}
-	    <div id="chat_wrapper">
-		<a href="#" onclick="event.preventDefault();" class="chat_toggle"><span>Open Chat</span> <em class="icon-chevron-up"></em></a>
-		<iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat" style="seamless; clear: both; width: 100%; height: 400px; margin-bottom: 10px;" class="span6"></iframe>
-	    </div>
-    	{% endblock jabber_block %}
-    {% endif %} {# jabber_configured and is_logged_in #}
-{# end Jabber chat plugin block #}
+    
+{% endblock r_column_content %}
 
 {% block addl_scripts %}
-
-{% block r_column_content %}
-<div id="c2g_layout_r_column" class="span3">
-    <!--Skeleton Div to be filled in by rightnav ajax -->
-</div>
-{% endblock r_column_content %}
 
 {% if common_page_data.is_course_admin %}
     {% include "controls/tinymce.html" %}
@@ -121,10 +138,13 @@
 <script>
 $(document).ready(function(){
 
-    $("#c2g_layout_r_column").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
+    //Sidebar content loading
+    $("#c2g_layout_r_column .right_nav_wrapper").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
     $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
         c2g.installLeftNavChevron();
     });
+    
+    //Announcement collapsing code
     var numVisibleAnnouncements = 2;
     if ($('.announcement-content').length > numVisibleAnnouncements) {
 	$('#showHideAll').show();
@@ -159,18 +179,57 @@ $(document).ready(function(){
 	});
     }
     
+    //Show/Hide chat block
+    var chatBlockHeight = $('#chat_block').css('height');
+    $('#chat_block').css({height: '0px'}).show();
+    
     $('#chat_wrapper .chat_toggle').toggle(function() {
-	$(this).siblings().show();
-	$('span', this).text('Close Chat');
-	$('em', this).toggleClass('icon-chevron-up').toggleClass('icon-chevron-down');
+	$(this).siblings().animate({height: chatBlockHeight}, 'slow', function() {
+	    $(this).siblings().find('span.openChat').hide();
+	    $(this).siblings().find('span.closeChat').show();
+	});
+	
 	//Candy.Core.connect('{{ nick }}', '{{ nick }}'); /* FIXME: use something more magical */
     }, function() {
-	$(this).siblings().hide();
-	$('span', this).text('Open Chat');
-	$('em', this).toggleClass('icon-chevron-up').toggleClass('icon-chevron-down');
+	$(this).siblings().animate({height: '0px'}, 'slow', function() {
+	    $(this).siblings().find('span.openChat').show();
+	    $(this).siblings().find('span.closeChat').hide();
+	});
 	//Candy.Core.disconnect
+    });
+
+    //Show/Hide share block
+    $('#share_wrapper .show_hide_share').hover(function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $('#share_wrapper').animate({ minHeight: "25px" }, 'fast');
+	}
+    }, function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $('#share_wrapper').animate({ minHeight: "0" }, 'slow');
+	}
+    });
+    
+    $('#share_wrapper .show_hide_share').click(function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $(this).text('Hide Share Block').removeClass('share_hidden').addClass('share_visible').siblings('#share-result').slideDown('slow');
+	} else {
+	    $(this).text('Show Share Block').removeClass('share_visible').addClass('share_hidden').siblings('#share-result').slideUp('slow');
+	}
     });
 });
 </script>
 {% endblock addl_scripts %}
 
+{% block jabber_block %}
+    <div id="chat_wrapper">
+	<a class="chat_toggle" href="#">
+	    <span class="openChat">Open Chat <em class="icon-chevron-up"></em></span>
+	    <span class="closeChat">Close Chat <em class="icon-chevron-down"></em></span>
+	</a>
+	{# Jabber chat plugin block #}
+	    {% if jabber_configured and is_logged_in %}
+	        <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+	    {% endif %} {# jabber_configured and is_logged_in #}
+	{# end Jabber chat plugin block #}
+    </div>
+{% endblock jabber_block %}

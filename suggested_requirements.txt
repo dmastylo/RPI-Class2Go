@@ -9,7 +9,15 @@ PIL
 # Certificates infrastructure uses xhtml2pdf to create templated PDFs
 # WARNING: also installs reportlab, and takes a while
 xhtml2pdf
+# WARNING: depends on having system package 'wkhtmltopdf' installed, having
+#          Chrome, an embedded xvfb, flashplugin, and fonts. Nice output, but
+#          crazy big dependency chain.
+python-pdfkit
 
 # Exam regrading uses dateutil for date parsing
 # Probably already installed by celery, but recorded here for completeness
 dateutil
+
+# If you are using the fabric installation tools, you need these.
+fabric
+cuisine

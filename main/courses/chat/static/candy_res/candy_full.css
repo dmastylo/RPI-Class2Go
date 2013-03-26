@@ -43,6 +43,13 @@ ul {
 	border-left: 1px solid #bdb7a1;
 }
 
+#chat-pane.collapsed-message-pane #chat-tabs {
+	height: 100%;
+	width: 29px;
+	border-left: 0;
+	margin: 30px 0 0 0;
+}
+
 #chat-tabs #chat-expand-arrow {
 	position: absolute;
 	top: 0;
@@ -76,6 +83,12 @@ ul {
 	border-bottom: 1px solid #bdb7a1;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
+}
+#chat-pane.collapsed-message-pane #chat-tabs li a.label {
+	border-top-right-radius: 0;
+	border-bottom-left-radius: 5px;
+	border-bottom: 0;
+	margin-bottom: 1px;
 }
 
 #chat-tabs li.active a {

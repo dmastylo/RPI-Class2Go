@@ -210,9 +210,10 @@ c2gXMLParse.markdown2quiz = function (html_text, outer_mDOM) {
             choice.append(explanation);
             resp.append(choice);            
         });
-        //If more than 1 correct answer, do multi-select
+        //If more than 1 correct answer, do multi-select and remove blank choice
         if (wrapperElem.is("select") && numCorrect > 1) {
             wrapperElem.attr("multiple", "multiple");
+            wrapperElem.find("#" + qname + "_0").remove()
         }
         //Only if there is a correct answer, add response to question_metadata
         if (numCorrect > 0) {

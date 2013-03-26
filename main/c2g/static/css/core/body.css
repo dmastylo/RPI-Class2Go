@@ -590,6 +590,14 @@ small.date {
     margin: 0 0 15px 0;
 }
 
+#share_wrapper {
+    position: relative;
+}
+#share_wrapper .show_hide_share {
+    position: absolute;
+    right: 0;
+    top: -25px;
+}
 #share-result textarea {
     width: 100%;
     box-sizing: border-box;
@@ -1029,7 +1037,6 @@ input[type="checkbox"] {
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 600px;
     z-index: 1000;
 }
 #chat_wrapper .chat_toggle {
@@ -1048,6 +1055,12 @@ input[type="checkbox"] {
 #chat_wrapper .chat_toggle:hover {
     text-decoration: none;
 }
+#chat_wrapper .chat_toggle span.openChat {
+    display: inline;
+}
+#chat_wrapper .chat_toggle span.closeChat {
+    display: none;
+}
 #chat_wrapper .chat_toggle em {
     position: absolute;
     right: 20px;
@@ -1056,6 +1069,8 @@ input[type="checkbox"] {
 }
 
 #chat_block {
+    position: relative;
+    float: left;
     display: none;
     width: 600px;
     height: 400px;

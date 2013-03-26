@@ -18,6 +18,8 @@ class Command(BaseCommand):
     option_list = (
         make_option("-u", "--update", action="store_false", dest="dryrun", default=True,
             help="update regraded rows in database (default is dry run)"),
+        make_option("-n", "--no_penalties", action="store_false", dest="penalties", default=True,
+            help="don't calculate with late or attempt limit penalties"),
         make_option("-s", "--student", dest="student_ids",
             help="comma-separated list of students, identified by ids"),
         make_option("--start", dest="start_time",
@@ -52,7 +54,11 @@ class Command(BaseCommand):
         if options['student_ids']:
             sidlist = string.split(options['student_ids'], ',')
             examRecords = examRecords.filter(student__in=sidlist)
-
+        # search in reverse ID order so that the latest attempts get precedence.  If two 
+        # attempts have the same score, then want the latest attempt to be the one that 
+        # matters.
+        examRecords = examRecords.order_by('-id')
+        
         # this executes the query
         if len(examRecords) == 0:
             print "warning: no exam records found, is that what you intended?"
@@ -72,8 +78,8 @@ class Command(BaseCommand):
                 rawscore_before = ers.raw_score
                 if score_before == None:     # scores of 0 come back from model as None
                     score_before = 0.0       # not sure why but they do
-                if rawscore_before == None:  # scores of 0 come back from model as None
-                    rawscore_before = 0.0    # not sure why but they do
+                if rawscore_before == None:
+                    rawscore_before = 0.0
                 score_after = 0.0
                 rawscore_after = 0.0
                 submitted = json.loads(er.json_data)
@@ -94,10 +100,13 @@ class Command(BaseCommand):
                 if er.attempt_number == 0:
                     print "ERROR: examrecord %d: skip, attempt_number=0" % er.id
                     errors += 1
-                    next
-                score_after = compute_penalties(rawscore_after, er.attempt_number,
-                                                exam_obj.resubmission_penalty,
-                                                is_late, exam_obj.late_penalty)
+                    continue
+                if options['penalties']:
+                    score_after = compute_penalties(rawscore_after, er.attempt_number,
+                                                    exam_obj.resubmission_penalty,
+                                                    is_late, exam_obj.late_penalty)
+                else:
+                    score_after = rawscore_after
                 s = er.student
 
                 try:
@@ -141,6 +150,7 @@ class Command(BaseCommand):
                         updates += 1
                     if examscore_before != examscore_after:
                         es.score = examscore_after
+                        es.examrecordscore = ers
                         es.save()
                         updates += 1
 
