@@ -16,6 +16,7 @@ from courses.actions import auth_view_wrapper
 from c2g.models import CurrentTermMap
 import settings, logging
 from datetime import date
+from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -118,7 +119,7 @@ def main(request, course_prefix, course_suffix):
         context_instance=RequestContext(request))
 
 def get_upcoming_exams(course):
-  end_date = date.today() + date.timedelta(weeks=2)
+  end_date = date.today() + timedelta(weeks=2)
   exams = Exam.objects.filter(
     course=course, 
     mode='ready',
