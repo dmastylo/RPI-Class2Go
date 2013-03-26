@@ -15,10 +15,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 from django.views.decorators.http import require_POST
-from django.contrib.auth import get_backends, REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, authenticate as auth_authenticate
+from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate as auth_authenticate
 from django.contrib import messages
-from django.contrib.auth.models import User, Group
-from c2g.models import Course, Institution,Video, Instructor, CourseInstructor
+from django.contrib.auth.models import User
+from c2g.models import Course, Institution, Video, CourseInstructor
 from accounts.forms import *
 from registration import signals
 from registration.login_wrapper import login as auth_login_view
@@ -27,7 +27,6 @@ from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseBadRequest
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
-from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 from pysimplesoap.client import SoapClient
 from datetime import date
