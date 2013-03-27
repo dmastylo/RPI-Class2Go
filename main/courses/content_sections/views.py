@@ -46,7 +46,7 @@ def copy_content_form(request, course_prefix, course_suffix):
     draft_course = request.common_page_data['draft_course']
     share_iter = draft_course.share_to.all()
     share_list = map(lambda c: (c if c.mode=='draft' else c.image), list(share_iter)) # Make sure we get the draft version
-  #  draft_sections = ContentSection.objects.filter(is_deleted=False, course=draft_course)
+    
     #create a dynamic form class just for display
     form = SectionPushForm(share_list)
     
