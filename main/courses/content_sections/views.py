@@ -9,7 +9,6 @@ from c2g.models import *
 from courses.actions import auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.content_sections.forms import *
-from courses.copy_content import copySection
 from courses.copy_content import copyCourse
 
 
@@ -47,27 +46,23 @@ def copy_content_form(request, course_prefix, course_suffix):
     draft_course = request.common_page_data['draft_course']
     share_iter = draft_course.share_to.all()
     share_list = map(lambda c: (c if c.mode=='draft' else c.image), list(share_iter)) # Make sure we get the draft version
-    draft_sections = ContentSection.objects.filter(is_deleted=False, course=draft_course)
+  #  draft_sections = ContentSection.objects.filter(is_deleted=False, course=draft_course)
     #create a dynamic form class just for display
-    form = SectionPushForm(list(draft_sections),share_list)
+    form = SectionPushForm(share_list)
     
     return render_to_response('content_sections/push_content_form.html',
-                              {'common_page_data':request.common_page_data, 'sections':draft_sections, 'form':form},
+                              {'common_page_data':request.common_page_data, 'form':form},
                               context_instance=RequestContext(request))
 
 @auth_is_course_admin_view_wrapper
 @require_POST
 @csrf_protect
 def copy_content(request, course_prefix, course_suffix):
+    from_course = request.common_page_data['draft_course']
     try:
         to_course = Course.objects.get(handle=request.POST['linked_class'], mode='draft')
-        from_section = ContentSection.objects.get(id=request.POST['section_choice'])
-        from_section = from_section if from_section.mode=="draft" else from_section.image #make sure we have a draft mode section
     except Course.DoesNotExist:
         messages.add_message(request, messages.ERROR, 'The destination course does not exist.')
-        return redirect('courses.content_sections.views.copy_content_form', course_prefix, course_suffix)
-    except ContentSection.DoesNotExist:
-        messages.add_message(request, messages.ERROR, 'The selected content section does not exist.')
         return redirect('courses.content_sections.views.copy_content_form', course_prefix, course_suffix)
 
     if not request.user in list(to_course.get_all_course_admins()):
@@ -75,11 +70,9 @@ def copy_content(request, course_prefix, course_suffix):
         return redirect('courses.content_sections.views.copy_content_form', course_prefix, course_suffix)
 
     #privileges are okay, do the copy
+    copyCourse(from_course, to_course)
 
-    #copySection(from_section, to_course)
-    copyCourse(from_section.course, to_course)
-
-    messages.add_message(request, messages.SUCCESS, 'Section: %s has been successfully copied to course: %s' %(from_section.title, to_course.title))
+    messages.add_message(request, messages.SUCCESS, 'Course: %s has been successfully copied to course: %s' %(from_course.title, to_course.title))
 
     return redirect('courses.views.main', course_prefix, course_suffix)
 

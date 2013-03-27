@@ -256,41 +256,6 @@ def copyStageableExam(draft, new_draft_course, new_draft_section):
 
     return draft.image.id, newdraft.image.id
 
-def copySection(draft, new_draft_course):
-    """ 
-       Given a draft copy of a ContentSection, copies the content in the ContentSection to the course identified by new_draft_course.
-       If a section with an identical title exists in new_course, uses that as the target section.
-       Otherwise, creates a new section with identical name.
-    """
-    #Figure out whether to create or reuse section.  Either way the result is newdraft
-    if ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=draft.title).exists():
-        newdraft = ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=draft.title)[0]
-    else:
-        index = ContentSection.objects.filter(is_deleted=False, course=new_draft_course).aggregate(Max('index'))['index__max']+1
-        newdraft = ContentSection(course=new_draft_course, title=draft.title)
-        newdraft.index = index
-        newdraft.mode="draft"
-        newdraft.save()
-        newdraft.create_ready_instance()
-
-    #Static Pages
-    for sp in AdditionalPage.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableStaticPage(sp, new_draft_course, newdraft)
-
-    #Files
-    for f in File.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableFile(f, new_draft_course, newdraft)
-
-    #ProblemSets
-    for ps in ProblemSet.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableProblemSet(ps, new_draft_course, newdraft)
-
-    #Videos
-    for v in Video.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableVideo(v, new_draft_course, newdraft)
-
-    newdraft.save()
-    newdraft.commit()
 
 def copyCourse(old_draft_course, new_draft_course):
     """ 
@@ -298,7 +263,7 @@ def copyCourse(old_draft_course, new_draft_course):
        course identified by new_draft_course.
     """
     
-    #Use these dicts to map old entity ids to new entity ids when creating the new ContentGroups.
+    #dicts to map old entity ids to new entity ids when creating the new ContentGroups.
     additionalpage_map = {}
     file_map = {}
     video_map = {}
@@ -307,12 +272,11 @@ def copyCourse(old_draft_course, new_draft_course):
     old_draftcontentsections = ContentSection.objects.filter(is_deleted=False, course=old_draft_course)
     for old_draftcontentsection in old_draftcontentsections:
     
-    #Figure out whether to create or reuse section.  Either way the result is newdraft
+        #Figure out whether to create or reuse section.  Either way the result is newdraft
         if ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=old_draftcontentsection.title).exists():
             new_draftcontentsection = ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=old_draftcontentsection.title)[0]
     
         else:
-        
             index = ContentSection.objects.filter(is_deleted=False, course=new_draft_course).aggregate(Max('index'))['index__max']
             if index == None:
                 index = 0
