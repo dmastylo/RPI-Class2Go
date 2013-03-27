@@ -3008,6 +3008,7 @@ class CourseStudentScore(TimestampMixin, models.Model):
     student = models.ForeignKey(User, db_index=True)
     tag = models.CharField(max_length=128, db_index=True)
     score = models.FloatField(null=True, blank=True)
+    total = models.FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ("course", "student", "tag")
