@@ -2,6 +2,7 @@ import json
 import random
 import string
 import urlparse
+import os
 import re
 
 from django.conf import settings
@@ -344,9 +345,16 @@ def standard_preview_login(request, course_prefix, course_suffix):
     
         for ci in course_instructors:
             instructors.append(ci.instructor)
-  
+        
+        # default template, unless there is one in the soruce tree, then use that
         template_name='previews/default.html'
-
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+                
+        
         return render_to_response(template_name,
                          {'form': form,
                           'login_form': login_form,
