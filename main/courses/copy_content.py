@@ -6,7 +6,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-from django.db.models import Max
+from django.db.models import Max, F
 
 import settings
 
@@ -210,12 +210,10 @@ def copyStageableFile(draft, new_draft_course, new_draft_section):
 
     if found:
         newdraft.file.name = foundfile.file.name
-        newready.file.name = foundfile.file.name
-        
-#ToDo uncomment this        
-#    else:
-#        newdraft.file.save(new_name, ContentFile(draft.file.read()))
-#        newready.file=newdraft.file
+        newready.file.name = foundfile.file.name  
+    else:
+        newdraft.file.save(new_name, ContentFile(draft.file.read()))
+        newready.file=newdraft.file
   
     newdraft.save()    
     newready.save()
@@ -300,7 +298,7 @@ def copyCourse(old_draft_course, new_draft_course):
        course identified by new_draft_course.
     """
     
-    #Use these dicts to map new entity ids to old entity ids when creating the new ContentGroups.
+    #Use these dicts to map old entity ids to new entity ids when creating the new ContentGroups.
     additionalpage_map = {}
     file_map = {}
     video_map = {}
@@ -321,7 +319,7 @@ def copyCourse(old_draft_course, new_draft_course):
             else:
                 index +=1
         
-            new_draftcontentsection = ContentSection(course=draft_new_course, title=old_draftcontentsection.title)
+            new_draftcontentsection = ContentSection(course=new_draft_course, title=old_draftcontentsection.title)
             new_draftcontentsection.index = index
             new_draftcontentsection.mode="draft"
             new_draftcontentsection.save()
@@ -346,7 +344,6 @@ def copyCourse(old_draft_course, new_draft_course):
         for e in Exam.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
             old_ready_id, new_ready_id = copyStageableExam(e, new_draft_course, new_draftcontentsection)
             exam_map[old_ready_id] = new_ready_id
-            print "old : new : " + str(old_ready_id) + " : " + str(new_ready_id)
 
         new_draftcontentsection.save()
         new_draftcontentsection.commit()
@@ -356,24 +353,54 @@ def copyCourse(old_draft_course, new_draft_course):
  
  
 def copyAllContentGroups(old_ready_course_id, new_ready_course_id, additionalpage_map, file_map, video_map, exam_map):
-    print "from ready course_id : " + str(old_ready_course_id)
-    print "to ready course_id : " + str(new_ready_course_id)
-    print exam_map
     
-    #Do the level 1 content groups first  
-    for cg in ContentGroup.objects.filter(course_id = old_ready_course_id, level = 1):
+    #Copy the level 1 content groups first
+    cg_map = {}  
+    for cg in ContentGroup.objects.filter(course_id = old_ready_course_id, level = 1, id = F('group_id')):
         
-        #We need to ignore those groups where id != group_id as
-        #this should never happen. Unfortunately, it did happen.
-        if cg.id == cg.group_id:
+        #Need to protect against situation where entity was not cloned because it's
+        #section was deleted.
+        if not all_entities_null(additionalpage_map, file_map, video_map, exam_map, cg):
+        
+            #Map old cg entity id to new so we can process the level 2's.
+            #Need to protect against any bad data
             new_cg = copyAndSaveModelObj(cg)
             new_cg.group_id = new_cg.id
             new_cg.course_id = new_ready_course_id
             new_cg.video_id = video_map.get(cg.video_id, None)
             new_cg.additional_page_id = additionalpage_map.get(cg.additional_page_id, None)
             new_cg.file_id = file_map.get(cg.file_id, None)
-            new_cg.exam_id = file_map.get(cg.exam_id, None)
+            new_cg.exam_id = exam_map.get(cg.exam_id, None)
             new_cg.save()
+            cg_map[cg.group_id] = new_cg.group_id
         
-   #Now do the level 2's
-
+        
+        
+    #Now copy the level 2's making sure we only pick those with a valid group_id
+    for cg in ContentGroup.objects.filter(course_id = old_ready_course_id, level = 2):
+        
+        #Need to protect against situation where entity was not cloned because it's
+        #section was deleted.
+        if not all_entities_null(additionalpage_map, file_map, video_map, exam_map, cg):
+        
+            if cg_map.get(cg.group_id, False):
+                new_cg = copyAndSaveModelObj(cg)
+                new_cg.group_id = cg_map[cg.group_id]
+                new_cg.course_id = new_ready_course_id
+                new_cg.video_id = video_map.get(cg.video_id, None)
+                new_cg.additional_page_id = additionalpage_map.get(cg.additional_page_id, None)
+                new_cg.file_id = file_map.get(cg.file_id, None)
+                new_cg.exam_id = exam_map.get(cg.exam_id, None)
+                new_cg.save()
+        
+        
+def all_entities_null(additionalpage_map, file_map, video_map, exam_map, cg):
+    
+    if not (video_map.get(cg.video_id, False) 
+         or additionalpage_map.get(cg.additional_page_id, False) 
+         or file_map.get(cg.file_id, False) 
+         or exam_map.get(cg.exam_id, False)):
+        
+        return True
+    else:
+        return False
