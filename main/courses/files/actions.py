@@ -2,12 +2,13 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 
 from c2g.models import ContentGroup
-from courses.actions import auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post
+from courses.actions import auth_is_course_admin_view_wrapper, create_contentgroup_entries_from_post, always_switch_mode
 from courses.common_page_data import get_common_page_data
 from courses.files.forms import *
 
 
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def upload(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -28,17 +29,17 @@ def upload(request):
             create_contentgroup_entries_from_post(request, 'parent', new_file.image, 'file', request.POST.get('display_style','list'))
 
             return redirect('courses.views.course_materials', course_prefix, course_suffix)
-    else:
-        form = FileUploadForm(course=common_page_data['course'])
-    reverseview = 'courses.files.actions.upload'
 
-    return render(request, 'files/upload.html',
-            {'reverseview':reverseview,
-             'common_page_data': common_page_data,
-             'form': form,
-             })
+    form = FileUploadForm(course=common_page_data['course'])
+    reverseview = 'courses.files.actions.upload'
+    return render(request, 
+                  'files/upload.html',
+                  { 'reverseview':      reverseview,
+                    'common_page_data': common_page_data,
+                    'form':             form, } )
 
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def edit(request):
     course_prefix = request.POST.get("course_prefix")
     course_suffix = request.POST.get("course_suffix")
@@ -92,6 +93,7 @@ def edit(request):
                   })
 
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def delete_file(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))

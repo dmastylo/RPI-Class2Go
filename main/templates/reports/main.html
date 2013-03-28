@@ -279,4 +279,14 @@
 </div>
 
 
+<script>
+    $(document).ready(function(){
+	$('.nav-tabs a[href="' + window.location.hash + '"]').tab('show');
+	
+	$('.nav-tabs a').click(function(){
+	    window.location.hash = $(this).attr('href');
+	});
+    })
+</script>
+
 {% endblock m_column_content %}

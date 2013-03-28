@@ -65,8 +65,11 @@ def preview(request, course_prefix, course_suffix):
     # default template, unless there is one in the soruce tree, then use that
     template_name='previews/default.html'
     class_template='previews/'+request.common_page_data['course'].handle+'.html'
-    if os.path.isfile(settings.TEMPLATE_DIRS+'/'+class_template):
-        template_name=class_template
+    dirs = getattr(settings,'TEMPLATE_DIRS', [])
+    for dir in dirs:
+        if os.path.isfile(dir+'/'+class_template):
+            template_name=class_template
+
 
     return render_to_response(template_name,
                               {'form': form,
@@ -98,9 +101,15 @@ def preview_login(request, course_prefix, course_suffix):
         return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
-        context = RequestContext(request)                
-        return render_to_response(#'previews/'+request.common_page_data['course'].handle+'.html',
-                                  'previews/default.html',
+        context = RequestContext(request)
+        # default template, unless there is one in the soruce tree, then use that
+        template_name='previews/default.html'
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+        return render_to_response(template_name,
                                   {'form': form,
                                    'login_form': login_form,
                                    'common_page_data': request.common_page_data,
@@ -129,9 +138,16 @@ def preview_reg(request, course_prefix, course_suffix):
         return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         login_form = AuthenticationForm(data=request.POST)
-        context = RequestContext(request)                
-        return render_to_response(#'previews/'+request.common_page_data['course'].handle+'.html',
-                                  'previews/default.html',
+        context = RequestContext(request)
+        # default template, unless there is one in the soruce tree, then use that
+        template_name='previews/default.html'
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+
+        return render_to_response(template_name,
                                       {'form': form,
                                       'login_form': login_form,
                                       'common_page_data': request.common_page_data,

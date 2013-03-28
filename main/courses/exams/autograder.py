@@ -1,16 +1,17 @@
 import re, collections
-import urllib,urllib2
+import urllib, urllib2
 import json
 import logging
 import random 
-import string
-from datetime import datetime
 import time
+from datetime import datetime
+from xml.dom.minidom import parseString
 
 from django.conf import settings
+from django.core.cache import get_cache
 from django.utils import encoding
 
-from xml.dom.minidom import parseString
+from c2g.util import CacheStat
 
 
 logger = logging.getLogger(__name__)
@@ -24,11 +25,10 @@ class AutoGrader():
     __false_default = {'correct':False, 'score':0}
 
     def __unicode__(self):
-        graders=[]
-        for k,v in self.grader_functions.iteritems():
-            graders.append(k)
-        return "AutoGrader functions for responses with names: %s.  Total Possible Points: %s" % \
-            (", ".join(sorted(graders)), str(self.points_possible))
+        graders=self.grader_functions.keys()
+        graders = sorted(graders)
+        return "AutoGrader functions set up for the following response names:\n" + \
+            "\n".join(map(lambda gname: "name: %s | points: %1.2f" % (gname, self.points_dict[gname]), graders))
     
     def __init__(self, xml, default_return=None):
         """
@@ -39,7 +39,7 @@ class AutoGrader():
             
         """
         self.points_possible=0.0
-        
+                
         if xml == "__testing_bypass":
             return
 
@@ -64,7 +64,13 @@ class AutoGrader():
             self.grader_functions = collections.defaultdict(return_true_default)  #Returns true if key not found
         else:
             self.grader_functions = collections.defaultdict(return_false_default) #Returns false if key not found
-                                 
+
+        #This is a dict that is keyed same as grader_functions and returns the associated total points
+        self.points_dict = collections.defaultdict(lambda:0)
+
+        #This dict is keyed on question_id (can be groups of inputs)
+        #mainly for used to know how to score randomized questions
+        self.question_points_dict = collections.defaultdict(lambda:0)
 
         questions = self.metadata_dom.getElementsByTagName('question_metadata')
         for q in questions:
@@ -141,7 +147,7 @@ class AutoGrader():
         #build up the correct answers
         choices = response_elem.getElementsByTagName('choice')
         if not choices:
-            raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has no <choice> descendants' % (qid,resp_name))
+            raise AutoGraderMetadataException('<question_metadata id="%s">, <response name="%s"> has no <choice> descendants' % (qid,resp_name))
 
         choice_list = [] # This list is really for validation only
         answer_list = [] # This list will build the grader function
@@ -162,6 +168,9 @@ class AutoGrader():
         wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
 
         self.points_possible += correct_pts
+            
+        self.points_dict[resp_name] = correct_pts
+        self.question_points_dict[qid] += correct_pts
                     
         self.grader_functions[resp_name] = self._MC_grader_factory(answer_list, correct_pts=correct_pts, wrong_pts=wrong_pts)
 
@@ -211,12 +220,12 @@ class AutoGrader():
         answer_str = response_elem.getAttribute("answer")
         
         if answer_str == "" :
-            raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
+            raise AutoGraderMetadataException('<question_metadata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
 
         try:
             answer = float(answer_str)
         except ValueError:
-            raise AutoGraderMetadataException('In <question_medata id="%s">, <response name="%s">, cannot convert answer to number' % (qid,resp_name))
+            raise AutoGraderMetadataException('In <question_metadata id="%s">, <response name="%s">, cannot convert answer to number' % (qid,resp_name))
 
         tolerance_str = ""
         
@@ -235,12 +244,15 @@ class AutoGrader():
                 else:
                     tolerance = float(tolerance_str)
             except ValueError:
-                raise AutoGraderMetadataException('In <question_medata id="%s">, <response name="%s">, cannot convert tolerance to number' % (qid,resp_name))
+                raise AutoGraderMetadataException('In <question_metadata id="%s">, <response name="%s">, cannot convert tolerance to number' % (qid,resp_name))
 
         correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
         wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
 
         self.points_possible += correct_pts
+                
+        self.points_dict[resp_name] = correct_pts
+        self.question_points_dict[qid] += correct_pts
 
         self.grader_functions[resp_name] = self._NUM_grader_factory(answer, tolerance, correct_pts=correct_pts, wrong_pts=wrong_pts)
                     
@@ -276,7 +288,7 @@ class AutoGrader():
         answer_str = response_elem.getAttribute("answer")
         
         if answer_str == "" :
-            raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
+            raise AutoGraderMetadataException('<question_metadata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
                 
         search = True
         if response_elem.getAttribute("match"):
@@ -294,12 +306,15 @@ class AutoGrader():
         try:
             compiled_fn = re.compile(answer_str, flags)
         except re.error:
-            raise AutoGraderMetadataException('In <question_medata id="%s">, <response name="%s">, your regular expression could not be compiled' % (qid,resp_name))
+            raise AutoGraderMetadataException('In <question_metadata id="%s">, <response name="%s">, your regular expression could not be compiled' % (qid,resp_name))
                     
         correct_pts = self._get_numeric_attribute_with_default(response_elem,'correct-points',1)
         wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
 
         self.points_possible += correct_pts
+                
+        self.points_dict[resp_name] = correct_pts
+        self.question_points_dict[qid] += correct_pts
 
         self.grader_functions[resp_name] = self._REGEX_grader_factory(compiled_fn, search, correct_pts=correct_pts, wrong_pts=wrong_pts)
 
@@ -340,7 +355,7 @@ class AutoGrader():
         answer_str = response_elem.getAttribute("answer").strip()
         
         if answer_str == "" :
-            raise AutoGraderMetadataException('<question_medata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
+            raise AutoGraderMetadataException('<question_metadata id="%s">, <response name="%s"> has no specified answer' % (qid,resp_name))
         
         ignorecase = False
         if response_elem.getAttribute("ignorecase"):
@@ -350,7 +365,10 @@ class AutoGrader():
         wrong_pts = self._get_numeric_attribute_with_default(response_elem, 'wrong-points',0)
         
         self.points_possible += correct_pts
-        
+                
+        self.points_dict[resp_name] = correct_pts
+        self.question_points_dict[qid] += correct_pts
+
         self.grader_functions[resp_name] = self._STRING_grader_factory(answer_str, ignorecase, correct_pts=correct_pts, wrong_pts=wrong_pts)
     
     def _STRING_grader_factory(self, answer_str, ignorecase, correct_pts=1, wrong_pts=0):
@@ -436,6 +454,9 @@ class AutoGrader():
 
         grader_name = grader_post_params['grader_name'] if 'grader_name' in grader_post_params else "Unknown"
         self.points_possible += 1.0 ## DB exercises are worth 1 point, hardcoded
+        self.points_dict[resp_name] = 1.0
+        self.question_points_dict[qid] += 1.0
+
         self.grader_functions[resp_name] = self._INTERACTIVE_grader_factory(grader_post_params, grader_name)
 
     def _INTERACTIVE_grader_factory(self, post_params, grader_name):
@@ -469,13 +490,28 @@ class AutoGrader():
 
                 We have a blacklist of words that we watch for and consider them failures
                 as well, like "time out".
+
+                We maintain a cache of successfully-graded answers.  We *do not* do
+                negative caching, since we want to retry external graders.
                 """
 
-                def retry_delay(n):
+                def retry_delay(step):
                     """Simple little exponential backoff function.
                             retry_delay(0) = 0.5 - 1.0   retry_delay(1) = 1.0 - 2.0
                             retry_delay(2) = 2.0 - 4.0   retry_delay(3) = 4.0 - 8.0"""
-                    return 2**(n-1 + random.random())
+                    step = max(step, 1)
+                    return 2**(step-1 + random.random())
+
+                post_data = urllib.urlencode(post_params)
+
+                gradercache = get_cache("grader_store")
+                # post_data may be > 240 chars, so can't use directly as cache key, use hash
+                gradercache_key = hash(post_data)
+                gradercache_hit = gradercache.get(gradercache_key)
+                if gradercache_hit:
+                    CacheStat.report('hit', 'grader_store')
+                    return gradercache_hit
+                CacheStat.report('miss', 'grader_store')
 
                 grader_timeout = 45    # seconds
                 retry_limit = 4        # after this many attempts, don't retry
@@ -483,7 +519,6 @@ class AutoGrader():
                 watchwords = ['', 'time out', 'timed out', 'timeout error', 'failure']
                 while attempt <= retry_limit:
                     try:
-                        post_data = urllib.urlencode(post_params)
                         time_before = datetime.now()
                         grader_conn = urllib2.urlopen(grader_url, post_data, grader_timeout)
                         time_after = datetime.now()
@@ -503,11 +538,10 @@ class AutoGrader():
                                         and 'explanation' in graded['feedback'][0] \
                                         and graded['feedback'][0]['explanation'].lower() == ww:
                                     if ww == "":
-                                        errmsg="Fail with empty explanation"
-                                    else:
-                                        errmsg="Fail with \"%s\" explanation" % ww
-                                    raise AutoGraderGradingException(errmsg)
+                                        raise AutoGraderGradingException("Fail with empty explanation")
+                                    raise AutoGraderGradingException("Fail with \"%s\" explanation" % ww)
 
+                        gradercache.set(gradercache_key, graded)
                         return graded
 
                     except Exception as e:
@@ -564,6 +598,14 @@ class AutoGrader():
             return self.grader_functions[input_name](submission)
         except KeyError:
             raise AutoGraderGradingException('Input/Response name="%s" is not defined in grading template' % input_name)
+
+    def points(self, input_name):
+        """Returns the total number of points for the input name"""
+        return self.points_dict[input_name]
+
+    def question_points(self, qid):
+        """Returns the total number of points for the question with id=qid"""
+        return self.question_points_dict[qid]
 
 class AutoGraderException(Exception):
     """Base class for exceptions in this module"""

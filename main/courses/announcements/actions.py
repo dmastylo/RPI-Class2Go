@@ -1,15 +1,14 @@
 from django.contrib import messages
-from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
-from django.template import Context, loader
-from django.template import RequestContext
+from django.http import Http404
+from django.shortcuts import redirect
 from c2g.models import *
 from courses.common_page_data import get_common_page_data
-from courses.actions import auth_is_course_admin_view_wrapper
+from courses.actions import always_switch_mode, auth_is_course_admin_view_wrapper
 from django.views.decorators.http import require_POST
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # Not strictly necessary but good for consistency
 def add_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -45,6 +44,7 @@ def add_announcement(request):
     
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # Not strictly necessary but good for consistency
 def save_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -69,6 +69,7 @@ def save_announcement(request):
     
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def delete_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -88,6 +89,7 @@ def delete_announcement(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def save_announcement_order(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -99,6 +101,7 @@ def save_announcement_order(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def email_announcement(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))

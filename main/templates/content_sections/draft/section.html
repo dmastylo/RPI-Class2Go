@@ -1,73 +1,55 @@
 {% load i18n %}
 
-<div class="row-fluid">
-    <div class="span12">
-        <h3 class="pull-left">{{section_structure.section.title}}</h3>
-        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="javascript:DeleteContentSection('{{section_structure.section.id}}')"><em class="icon-trash icon-large" style="margin-left:10px;"></em>{% trans 'Delete Section' %}</a>
-        <a class="pull-right" style="display:inline-block;margin-top:5px;" href="{% url 'courses.content_sections.views.rename' common_page_data.course_prefix common_page_data.course_suffix section_structure.section.id %}"><em class="icon-edit icon-large" style="margin-right:4px"></em>{% trans 'Rename Section' %}</a>
+{% with PREFIX=common_page_data.course_prefix SUFFIX=common_page_data.course_suffix SECTION_ID=section_structure.section.id %}
+    <div class="row-fluid">
+        <div class="span12">
+            <h3 class="pull-left">{{ section_structure.section.title }}</h3>
+            <a class="pull-right" style="display:inline-block;margin-top:5px;" href="javascript:DeleteContentSection('{{SECTION_ID}}')"><em class="icon-trash icon-large" style="margin-left:10px;"></em>{% trans 'Delete Section' %}</a>
+            <a class="pull-right" style="display:inline-block;margin-top:5px;" href="{% url 'courses.content_sections.views.rename' PREFIX SUFFIX SECTION_ID %}"><em class="icon-edit icon-large" style="margin-right:4px"></em>{% trans 'Rename Section' %}</a>
+        </div>
     </div>
-</div>
 
-{% if section_structure.section.subtitle %}
-<div class="row-fluid">
-    <div class="span12">
-        <h4 class="pull-left">{{section_structure.section.subtitle}}</h4>
+    {% if section_structure.section.subtitle %}
+    <div class="row-fluid">
+        <div class="span12">
+            <h4 class="pull-left">{{section_structure.section.subtitle}}</h4>
+        </div>
     </div>
-</div>
-{% endif %}
-
-
-{% if section_structure.items|length > 0 %}
-<div class="row-fluid">
-    <div class="span12">
-        <a href="javascript:sectionSelectAll('{{section_structure.section.id}}')">{% trans 'Select all in section' %}</a> / <a href="javascript:sectionUnselectAll('{{section_structure.section.id}}')">{% trans 'Unselect all in section' %}</a>
-    </div>
-</div>
-{% endif %}
-
-
-<form action="{% url 'courses.content_sections.actions.save_content_order' %}" method="POST">
-    <ul {% ifequal context 'course_materials' %}data-sortablecontainer{% endifequal %} class="unstyled">
-        {% for item in section_structure.items %}
-            {% ifequal item.type 'additional_page' %}
-                <li id="additional_page_{{item.additional_page.id}}" class="ui-state-default" style="padding: 3px;">
-                    {% include "additional_pages/draft/additional_page_list_item.html" %}
-                    <input type="hidden" name="order_additional_page_{{item.additional_page.id}}" value="{{forloop.counter0}}" />
-                </li>
-            {% endifequal %}
-            {% ifequal item.type 'problem_set' %}
-                <li id="problem_set_{{item.problem_set.id}}" class="ui-state-default" style="padding: 3px;">
-                    {% include "problemsets/draft/problemset_list_item.html" %}
-                    <input type="hidden" name="order_problem_set_{{item.problem_set.id}}" value="{{forloop.counter0}}" />
-                </li>
-            {% endifequal %}
-            {% ifequal item.type 'video' %}
-                <li id="video_{{item.video.id}}" class="ui-state-default" style="padding: 3px;">
-                    {% include "videos/draft/video_list_item.html" %}
-                    <input type="hidden" name="order_video_{{item.video.id}}" value="{{forloop.counter0}}" />
-                </li>
-            {% endifequal %}
-	        {% ifequal item.type 'file' %}
-		        <li id="file_{{item.file.id}}" class="ui-state-default" style="padding: 3px;">
-		            {% include "files/draft/file_list_item.html" %}
-		            <input type="hidden" name="order_file_{{item.file.id}}" value="{{forloop.counter0}}" />
-		        </li>
-	        {% endifequal %}
-	        {% ifequal item.type 'exam' %}
-		        <li id="exam_{{item.exam.id}}" class="ui-state-default" style="padding: 3px;">
-		            {% include "exams/draft/exam_list_item.html" %}
-		            <input type="hidden" name="order_exam_{{item.exam.id}}" value="{{forloop.counter0}}" />
-		        </li>
-	        {% endifequal %}
-        {% empty %}
-            <p style='margin: 20px;'>{% trans 'No items have been added to this section' %}</p>
-        {% endfor %}
-    </ul>
-    {% if context == 'course_materials' and section_structure.items|length > 1 %}
-        <input type="hidden" name="course_prefix" value="{{ common_page_data.course_prefix }}" />
-        <input type="hidden" name="course_suffix" value="{{ common_page_data.course_suffix }}" />
-        <input type="hidden" name="section_id" value="{{ section_structure.section.id }}" />
-        <input type="submit" value="{% trans 'Save order' %}" class="btn" />
-        {% csrf_token %}
     {% endif %}
-</form>
+
+    {% if section_structure.items|length > 0 %}
+    <div class="row-fluid">
+        <div class="span12">
+            <a href="javascript:sectionSelectAll('{{SECTION_ID}}')">{% trans 'Select all in section' %}</a> / <a href="javascript:sectionUnselectAll('{{SECTION_ID}}')">{% trans 'Unselect all in section' %}</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <form action="{% url 'courses.content_sections.actions.save_content_order' %}" method="POST">
+        <ul {% ifequal context 'course_materials' %}data-sortablecontainer{% endifequal %} class="unstyled">
+            {% for item in section_structure.items %}
+
+                {# This monstrosity abuses left associativity to build a string referencing the correct template from item.type #}
+                {# Just try to think of each '|add:' as equivalent to '+' in regular python syntax #}
+                {% with listitem_templatepath=''|add:item.type|add:"s/draft/"|add:item.type|add:"_list_item.html" %}
+                    <li id="{{item.type}}_{{item.self.id}}" class="ui-state-default" style="padding: 3px;">
+                        {% include listitem_templatepath %}
+                        <input type="hidden" name="order_{{item.type}}_{{item.self.id}}" value="{{forloop.counter0}}" />
+                    </li>
+                {% endwith %} {# path #}
+
+            {% empty %}
+                <p style='margin: 20px;'>{% trans 'No items have been added to this section' %}</p>
+            {% endfor %}
+        </ul>
+
+        {% if context == 'course_materials' and section_structure.items|length > 1 %}
+            <input type="hidden" name="course_prefix" value="{{ PREFIX }}" />
+            <input type="hidden" name="course_suffix" value="{{ SUFFIX }}" />
+            <input type="hidden" name="section_id" value="{{ SECTION_ID }}" />
+            <input type="submit" value="{% trans 'Save order' %}" class="btn" />
+            {% csrf_token %}
+        {% endif %}
+    </form>
+
+{% endwith %} {# PREFIX SUFFIX SECTION_ID #}

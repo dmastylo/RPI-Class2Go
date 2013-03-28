@@ -1,11 +1,11 @@
 {% csrf_token %}
-{{form.course_prefix}}{{form.course_suffix}}
+{{form.course_prefix}}{{form.course_suffix}}{{form.invite}}
 
 <div class="control-group">
   <label for="id_username" class="control-label">{{form.username.label}}:</label>
     <div class="controls">
     {{ form.username }}
-    <span class="help-block">Your username is your public identity on this site. You won't be able to change it, so choose a "handle" that you are comfortable with.</span>
+    <span id="handle-text" class="help-block">Your username is your public identity on this site. You won't be able to change it, so choose a "handle" that you are comfortable with.</span>
   </div>
 </div>
 <div class="control-group">
@@ -67,6 +67,12 @@
 <script>
     
         $(function(){
+          
+                 if ($("input[name='invite']").val().length) {
+                     $("input[name='username']").attr('readonly','true');
+                     $("input[name='email']").attr('readonly','true');
+                     $("#handle-text").remove();
+                 }
           
                  function setupPopover(id,title_in,errorMsg){
                       var options = {

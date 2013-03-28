@@ -1,0 +1,76 @@
+import os
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': '{{  database_instance }}',
+        'USER': '{{  database_user }}',
+        'PASSWORD': '{{  database_password }}',
+        'HOST': '{{  database_host }}',
+        'PORT': '',
+    },
+{% if readonly_database_instance != "" %}
+    'readonly': {
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': '{{  readonly_database_instance }}',
+        'USER': '{{  readonly_database_user }}',
+        'PASSWORD': '{{  readonly_database_password }}',
+        'HOST': '{{  readonly_database_host }}',
+        'PORT': '',
+    },
+{% endif %}
+    'celery': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/opt/{{  app_name }}/celery/celerydb.sqlite',
+    },
+}
+
+# When PRODUCTION=True we don't show stackdumps on errors.  Careful, no quotes.
+PRODUCTION = {{  production }}
+MAINTENANCE_LANDING_PAGE = {{  maintenance_landing_page }}
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+
+LOGGING_DIR = os.path.join(PROJECT_ROOT, "logs")
+LOCAL_CACHE_LOCATION = os.path.join(PROJECT_ROOT, "cache-default")
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
+
+INSTANCE = '{{  instance }}'
+APP = '{{  app_name }}'
+
+# full stackdumps go to this address
+ADMINS = (
+        ('{{  admin_name }}', '{{  admin_email }}'),
+        )
+
+# small stackdumps go to this address
+ERROR_SNIPPET_EMAILS = ['{{  snippet_email }}',]
+
+SECRET_KEY = '{{  django_secret }}'
+
+AWS_ACCESS_KEY_ID = '{{  aws_access_key }}'
+AWS_SECRET_ACCESS_KEY = '{{  aws_access_secret }}'
+AWS_STORAGE_BUCKET_NAME = '{{  aws_storage_bucket_name }}'
+
+# don't use ephemeral storage for mediaroot
+MEDIA_ROOT = '/opt/assets'
+
+# use AWS ephemeral storage
+KELVINATOR_WORKING_DIR = '/mnt'
+FILE_UPLOAD_TEMP_DIR = '/mnt'
+LOCAL_CACHE_LOCATION = '/mnt'
+
+PIAZZA_ENDPOINT = '{{  piazza_endpoint }}'
+PIAZZA_KEY = '{{  piazza_key }}'
+PIAZZA_SECRET = '{{  piazza_secret }}'
+
+SES_SMTP_USER = '{{  smtp_user }}'
+SES_SMTP_PASSWD = '{{  smtp_password }}'
+
+YT_SERVICE_DEVELOPER_KEY = '{{  yt_service_developer_key }}'
+GOOGLE_CLIENT_ID = '{{  google_client_id }}'
+GOOGLE_CLIENT_SECRET = '{{  google_client_secret }}'
+
+{% if grader_endpoint != "" %}
+GRADER_ENDPOINT = '{{  grader_endpoint }}'
+{% endif %}

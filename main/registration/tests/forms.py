@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -12,8 +14,8 @@ class RegistrationFormTests(TestCase):
     def setUp(self):
         self.__good_data = {'username':   'FooBar',
                             'email':      'foo@example.com',
-                            'first_name': 'Foobury',
-                            'last_name':  'Barr',
+                            'first_name': 'Foo_bury包',
+                            'last_name':  "B'arr-Warr",
                             'password1':  'foobarbaz0',
                             'password2':  'foobarbaz0',
                             'tos':        'checked',}
@@ -39,7 +41,7 @@ class RegistrationFormTests(TestCase):
                       'last_name':  'bar',
                       'password1':  'foo',
                       'password2':  'foo'},
-              'error': ('first_name', [u"This value may contain only letters, spaces and dashes."])},
+              'error': ('first_name', [u"This value may contain only letters, spaces, dashes, and apostrophes."])},
              # Non-alphabetic last name.
             {'data': {'username':   'foo/bar',
                       'email':      'foo@example.com',
@@ -47,7 +49,7 @@ class RegistrationFormTests(TestCase):
                       'last_name':  'ba}r',
                       'password1':  'foo',
                       'password2':  'foo'},
-              'error': ('last_name', [u"This value may contain only letters, spaces and dashes."])},
+              'error': ('last_name', [u"This value may contain only letters, spaces, dashes, and apostrophes."])},
             # Already-existing username.
             {'data': {'username':   'alice',
                       'email':      'alice@example.com',

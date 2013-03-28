@@ -54,7 +54,11 @@
 {% endblock addl_head_scripts %}
 
 {% block m_column_content %}
-<div id="c2g_layout_m_column" class="span9">
+{% if score or raw_score %}
+  <div id="c2g_layout_m_column" class="span6">
+{% else %}
+  <div id="c2g_layout_m_column" class="span9">
+{% endif %}
 
 {% autoescape off %}
 
@@ -75,7 +79,7 @@
 {% else %}
 
     <style>
-    #exam-pane label {clear: both; display: block; width:100%;}
+    #exam-pane label {clear: both; display: block;}
     #exam-pane label input {float: left; margin-right: 1em;}
     #exam-pane  p {clear: both; display: block; padding: 0 0 1em;}
     h3 {clear:both;}
@@ -90,7 +94,7 @@
     .explanation .toggle-expl {cursor: pointer;}
     #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
     #exam-pane fieldset label {position: relative;}
-    #exam-pane .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
+    #exam-pane .inline-explanation {border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
     #exam-pane .correct {color: #090;}
     #saveWorkBtn {margin-right: .5em;}
 
@@ -164,16 +168,17 @@
 
     {% endif %}
 
-    
-    
-    {% if score %}
-    <h4><b style="color:red">{% trans 'Score' %}: {{score}}/{{exam.total_score}}</b></h4>
-    {% endif %}
 
-    {% if raw_score %}
-    <h4><b style="color:red">{% trans 'Raw Score (without late or resubmission penalties)' %}: {{raw_score}}</b></h4>
+    {% if score or raw_score or total_score %}
+        <div class="score-area pull-left">
+            {% if score or total_score %}
+                <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{total_score}}</strong></h4>
+            {% endif %}
+            {% if raw_score %}
+                <h4><strong style="color:red">{% trans 'Raw Score (without penalties)' %}: {{raw_score}}</strong></h4>
+            {% endif %}
+        </div>
     {% endif %}
-
 
     <noscript>
     <div class="alert alert-error">{% trans 'Your browser does not have JavaScript enabled. Please enable it before taking this exam' %}</div>
@@ -181,15 +186,19 @@
 
     <div id="exam-pane"{% if not single_question %} class="summative"{% endif %}>
         <form>
-        {{ exam.html_content }}
+        {% if rendered_exam_html %}
+            {{ rendered_exam_html }}
+        {% else %}
+            {{ exam.html_content }}
+        {% endif %}
         </form>
 
         <div class="exam-navigation">
             {% if single_question %}
             {% comment %} Only for formative/one-question-at-a-time {% endcomment %}
             <div id="problemset-nav">
-                <button type="button" id="next-question" class="btn question-nav" value="{% trans 'Next Question' %}" title="{% trans 'Next Question' %}"><em class="icon-arrow-right"></em></button>
                 <button type="button" id="prev-question" class="btn question-nav" value="{% trans 'Previous Question' %}" title="{% trans 'Previous Question' %}"><em class="icon-arrow-left"></em></button>
+                <button type="button" id="next-question" class="btn question-nav" value="{% trans 'Next Question' %}" title="{% trans 'Next Question' %}"><em class="icon-arrow-right"></em></button>
             </div>
             {% endif %}
 
@@ -210,6 +219,15 @@
 </div>
 {% endblock m_column_content %}
 
+
+{% block r_column_content %}
+    {% if score or raw_score %}
+    <div id="c2g_layout_r_column" class="span3">                   
+                   {% include "courses/sharing.html" %}
+    </div>
+    {% endif %}
+{% endblock r_column_content %}
+
 {% block addl_scripts %}
     {% if videotest %}
      <script src="{{STATIC_URL}}js/popcorn/popcorn-ie8.min.js"></script>
@@ -220,7 +238,13 @@
 <script>
     var __exam_type = "{{exam.exam_type}}";
     var __autograde = {% if exam.autograde %}true{% else %}false{% endif %};
+    var __hide_grades = {% if exam.hide_grades %}true{% else %}false{% endif %};
 
+    {% if exam.num_random_questions %}
+        c2g.overrideNumbering = true;
+    {% else %}
+        c2g.overrideNumbering = false;
+    {% endif %}
     
     /* Do all the stuff below when page loads (~700 lines!) */
     $(document).ready(function () {
@@ -255,7 +279,8 @@
         /********** Add ordinal numbering if it doesn't already exist *********/
         var addNumberToQuestionDiv = function(elem, num) {
             var numberingDiv = $(elem).find('h3.questionNumber');
-            if (numberingDiv.length == 0){
+            if (numberingDiv.length == 0 || c2g.overrideNumbering){
+              $(elem).find(".questionNumber").remove();
               $(elem).prepend('<h3 class="questionNumber">Question ' + num +'</h3>');
             }
         };
@@ -272,6 +297,9 @@
                                        addQuestionDivLabel(this, qQumx, psetQuestions.length);
                                        qQumx = qQumx + 1;}
             );
+        }
+        else {
+            $(".questionNumber").remove();
         }
                       
         /************************** end ordinal *******************************/
@@ -655,7 +683,9 @@
         {% if exam.exam_type == "survey" %}
             SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
         {% else %}
-            {% if exam.autograde %}
+            {% if exam.hide_grades %}
+            var SUBMISSION_RETURN_URL="{% url exam.list_view common_page_data.course.prefix common_page_data.course.suffix %}";
+            {% elif exam.autograde %}
             var SUBMISSION_RETURN_URL = "{% url exam.graded_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
             {% else %}
             var SUBMISSION_RETURN_URL = "{% url exam.my_submissions_view common_page_data.course.prefix common_page_data.course.suffix exam.slug %}";
@@ -708,9 +738,9 @@
                       .addClass('btn')
                       .attr('id','saveWorkBtn');
                    if ($('#prev-question').length == 0) {
-                       $(saveWorkBtn).insertAfter($('#submit-button'));               
+                       $(saveWorkBtn).insertBefore($('#submit-button'));               
                    } else {
-                       $(saveWorkBtn).insertAfter($('#prev-question')); 
+                       $(saveWorkBtn).insertAfter($('#next-question')); 
                    }
         
 
@@ -725,7 +755,9 @@
             var saveXHR = $.post("{% url 'courses.exams.views.student_save_progress' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                            {   csrfmiddlewaretoken: "{{ csrf_token }}",
                                json_data:JSON.stringify(userSelections),
-                               onpage:$(location).attr('href')
+                               onpage:$(location).attr('href'),
+                               renderedQuestions:JSON.stringify(c2g.rendered_questions)
+
                            });
                            
             saveXHR.error(function(xhr, status, msg) {
@@ -789,8 +821,8 @@
 
             if ($.type(dataObj[member]) == "object") {
                 // it's a text input/textarea
-                $('input[name|=' + member + ']').val(dataObj[member].value);
-                $('textarea[name|=' + member + ']').val(dataObj[member].value);
+                $('input[name|=' + member + ']').val(dataObj[member].value).trigger('repopulate');
+                $('textarea[name|=' + member + ']').val(dataObj[member].value).trigger('repopulate');
                 if (scores.hasOwnProperty(member)) {
                       //Label the input with the score
                       $('input[name|=' + member + ']').before("<b style='color:red'> " + scores[member]+" </b> ");
@@ -828,9 +860,9 @@
         var enabled = ('{{editable}}' == 'True') ? true : false;
         if (!enabled) {
             // disable all inputs
-            $('#main-content input').attr('disabled','disabled');
-            $('#main-content textarea').attr('disabled','disabled');
-            $('#main-content select').attr('disabled', 'disabled');
+            $('#exam-pane input').attr('disabled','disabled');
+            $('#exam-pane textarea').attr('disabled','disabled');
+            $('#exam-pane select').attr('disabled', 'disabled');
 
             // hide submit button
             var submitBtn = $('#submit-button');
@@ -876,7 +908,7 @@
                         if (rightChoiceObj.siblings('span.feedback').length == 0) {
                             rightChoiceObj.after('<span class="feedback correct"> &#10004; </span>');
                         } else {
-                            rightChoiceObj.siblings('span.feedback').html(' &#10004; ');
+                            rightChoiceObj.siblings('span.feedback').html(' &#10004; ').removeClass('incorrect').addClass('correct');
                         }
                     }
                     for (wrongChoice in curq.wrong_choices) {
@@ -889,7 +921,7 @@
                             if (wrongChoiceObj.siblings('span.feedback').length == 0) {
                                 wrongChoiceObj.after('<span class="feedback incorrect"> &#10006; </span>');
                             } else {
-                                wrongChoiceObj.siblings('span.feedback').html(' &#10006; ');
+                                wrongChoiceObj.siblings('span.feedback').html(' &#10006; ').removeClass('correct').addClass('incorrect');
                             }
                         }
                     }
@@ -899,13 +931,13 @@
                         if ($(formEl).siblings('span.feedback').length == 0) {
                             $(formEl).after('<span class="feedback correct"> &#10004; </span>');
                         } else {
-                            $(formEl).siblings('span.feedback:first').html(' &#10004; ');
+                            $(formEl).siblings('span.feedback:first').html(' &#10004; ').removeClass('incorrect').addClass('correct');
                         }
                     } else {
                         if ($(formEl).siblings('span.feedback').length == 0) {
                             $(formEl).after('<span class="feedback incorrect"> &#10006; </span>');
                         } else {
-                            $(formEl).siblings('span.feedback:first').html(' &#10006; ');
+                            $(formEl).siblings('span.feedback:first').html(' &#10006; ').removeClass('correct').addClass('incorrect');
                         }
                     }
                 }
@@ -913,11 +945,14 @@
         }
                       
         var myXML = $.parseXML(correxObj["__metadata__"]);
-        console.log(myXML);
+        //console.log(myXML);
         var examMD = $(myXML).find('exam_metadata');
         var questionMD = $(examMD).find('question_metadata');
-        $(questionMD).each(function(){displayQuestionExplanation(this);
-                         displayChoiceExplanations(this);});
+        $(questionMD).each(function(){
+                           if ($("div#" + $(this).attr('id')).length){
+                               displayQuestionExplanation(this);
+                               displayChoiceExplanations(this);
+                           }});
         {% if exam.load_mathjax %}
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,"exam-pane"]);
         {% endif %}
@@ -975,13 +1010,14 @@
         var examXHR = $.post("{% url 'courses.exams.views.collect_data' common_page_data.course.prefix common_page_data.course.suffix exam.slug %}",
                {   csrfmiddlewaretoken: "{{ csrf_token }}",
                    json_data:JSON.stringify(userSelections),
-                   onpage:$(location).attr('href')
+                   onpage:$(location).attr('href'),
+                   renderedQuestions:JSON.stringify(c2g.rendered_questions)
                }
         );
 
         examXHR.success(function (evt, xhr, settings) {
             $('#submit-button').removeAttr('disabled');
-            if (__autograde) {
+            if (__autograde && __exam_type != "survey" && !__hide_grades) {
                 document.location = settings.responseText;
             }
             else {
@@ -993,9 +1029,9 @@
                     { message = "{% trans 'Your submission has been saved.' %}  \n{% blocktrans with due_date=exam.due_date|date:'D M d Y' %}Please check back after {{due_date}} for your score.{% endblocktrans %}";
                       confirmText = "{% trans 'See My Submissions' %}"; 
                       title = "{% trans 'Submission complete' %}.";}
-                else if (__exam_type == "survey")
-                    { message = "{% trans 'Thanks' %}!";
-                      title= "{% trans 'Survey complete' %}.";}
+                else if (__exam_type == "survey" || __hide_grades)
+                    { message = "{% trans 'Thanks for your submission!' %}!";
+                      title= "{% trans 'Submission complete' %}.";}
                       
                 var dialogDiv = window.getDialog(title);
                 
@@ -1062,14 +1098,18 @@
         window.showCorrections(prePopCorrex);
     }
     {% endif %}
-
+          
+    c2g.rendered_questions = "";
+    {% if rendered_questions %}
+        c2g.rendered_questions = JSON.parse('{{rendered_questions|escapejs}}');
+    {% endif %}
 
     {% if common_page_data.course.mode == "ready" and exam.past_all_deadlines or not allow_submit or too_many_attempts  %}{# 'not's > 'and's > 'or's #}
     $('#submit-button').attr('disabled','disabled');
     $('#saveWorkBtn').attr('disabled','disabled');
     $('#reEnableForm').remove();
-    $('#main-content input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
-    $('#main-content textarea').attr('disabled','disabled');
+    $('#exam-pane input').not('.question-nav').not('.toggle-explanation').attr('disabled','disabled');
+    $('#exam-pane textarea').attr('disabled','disabled');
                       
     {% endif %}
                       
@@ -1147,13 +1187,12 @@
     var video_rec_id = {{ video_rec.id }}
     var csrf_token = '{{ csrf_token }}'
     {% include 'exams/videotest.js' %} 
-{% if not video.url %}
-    $('#demoplayer').hide();
-    $('.question').eq(0).show();
-    $('#exam-pane').fadeTo("slow", 1.0);
-{% endif %} 
+                   {% if not video.url %}
+                       $('#demoplayer').hide();
+                       $('.question').eq(0).show();
+                       $('#exam-pane').fadeTo("slow", 1.0);
+                   {% endif %} 
 </script>
 {% endif %}
-
 
 {% endblock addl_scripts %}

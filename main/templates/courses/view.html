@@ -1,18 +1,25 @@
 {% extends "course_base.html" %}
 {% load url from future %}
 {% load i18n %}
+{% load template_utils %}
 {% block title %}{{ SITE_TITLE }} | {{ common_page_data.course.title }}{% endblock title %}
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
 {% block course_notification %}
-{% if user.is_authenticated and not common_page_data.is_course_member %}
+{% if user.is_authenticated and not common_page_data.is_course_member and not common_page_data.ready_course.preenroll_only %}
 <div class="alert alert-info inline">
-    <em class="icon-info-sign"></em>{% trans 'You are not yet a member in this course.' %} <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}" method="POST">
+    <em class="icon-info-sign"></em>{% trans 'You are not yet a member in this course.' %} <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}{% if request.GET.join_next %}?redirect_to={{ request.GET.join_next }}{% endif %}" method="POST">
         <input type="submit" id="login_button" class="btn" value="Join" />
         {% csrf_token %}
     </form>
 </div>
 {% endif %}
+{% if user.is_authenticated and not common_page_data.is_course_member and common_page_data.ready_course.preenroll_only %}
+<div class="alert alert-error inline">
+    <em class="icon-info-sign"></em>{% trans 'Your account is not on the access list of this restricted course.  Please contact the course staff if you believe this to be in error.' %}
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block l_column_content %}
@@ -21,22 +28,38 @@
 </div>
 {% endblock l_column_content %}
 
-
-
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
-    <h3 class="section-title pull-left">{% trans 'Recent Announcements' %}</h3>
-    <div class="pull-right">
-        {% if many_announcements %}
-            <a class="btn" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}</a>
+
+    {% if course_ended and course_cert%}
+	<div class="well statement">
+	    <h2>{% trans "Congratulations!" %}</h2>
+	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
+        {% if course_cert.1 %}
+            <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
+            <p style="text-align: right;">
+              <a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
+        {% else %}
+            <p>{% trans 'Statement earned - statement generation in progress. Check back soon!' %}</p>
+            <p style="text-align: right;">
+              <a class="btn disabled">{% trans 'Generation in Progress' %}
+                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+              </a></p>
         {% endif %}
-        
-        {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
+	</div>
+    {% endif %}
+
+    <h3 class="section-title pull-left" style="clear: both;">{% trans 'Recent Announcements' %}</h3>
+    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
+	<div class="pull-right">
             <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
             <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
             {% include "announcements/delete_announcement_form.html" %}
-        {% endif %}
-    </div>
+	</div>
+    {% endif %}
+    
     {% if common_page_data.is_course_admin %}
         {% include "announcements/new_announcement.html" %}
     {% endif %}
@@ -45,18 +68,67 @@
         {% include "announcements/announcement.html" %}
     {% empty %}
         <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
-	{% endfor %}
-
+    {% endfor %}
+    
+    <a class="btn pull-right" id="showHideAll" style="margin-left: 10px;">Expand All</a>
+    {% if many_announcements %}
+        <a class="btn pull-right" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}  {% if announcement_overflow != 0 %} ({{announcement_overflow}} {% trans 'more' %}) {% endif %}</a>
+    {% endif %}
 </div>
 {% endblock m_column_content %}
 
-{% block addl_scripts %}
-
 {% block r_column_content %}
 <div id="c2g_layout_r_column" class="span3">
-    <!--Skeleton Div to be filled in by rightnav ajax -->
-</div>
+    
+    <div id="share_wrapper">
+	{% if share_block_type == 'standard' %}<a class="show_hide_share share_hidden btn" href="#">Share Something!</a>{% endif %}
+	{% include "courses/sharing.html" %}
+    </div>
+
+    
+    <div class="right_nav_wrapper">
+	<!--Skeleton Div to be filled in by rightnav ajax -->
+    </div>
+    
+    {% if course.twitter_tag %}
+	<div id="twitterWidget">
+	    <script src="http://widgets.twimg.com/j/2/widget.js"></script>
+	    <script>
+		new TWTR.Widget({
+		    version: 2,
+		    type: 'search',
+		    search: '{{ course.twitter_tag|cut:'#'|cut:'@' }}',
+		    title: 'Recent Tweets',
+		    interval: 1000,
+		    width: 'auto',
+		    height: 300,
+		    theme: {
+			shell: {
+			    background: '#e9e6df',
+			    color: '#333333'
+			},
+			tweets: {
+			    background: '#e9e6df',
+			    color: '#333333',
+			    links: '#820000'
+			}
+		    },
+		    features: {
+			scrollbar: false,
+			loop: true,
+			live: true,
+			hashtags: true,
+			avatars: true,
+			behavior: 'default'
+		    }
+		}).render().start();
+	    </script>
+	</div>
+    {% endif %}
+    
 {% endblock r_column_content %}
+
+{% block addl_scripts %}
 
 {% if common_page_data.is_course_admin %}
     {% include "controls/tinymce.html" %}
@@ -64,11 +136,90 @@
 
 <script>
 $(document).ready(function(){
-    $("#c2g_layout_r_column").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
+
+    //Sidebar content loading
+    $("#c2g_layout_r_column .right_nav_wrapper").load("{% url 'courses.views.rightnav' common_page_data.course_prefix common_page_data.course_suffix  %}");
     $("#c2g_layout_l_column").load("{% url 'courses.views.leftnav' common_page_data.course_prefix common_page_data.course_suffix  %}", function(){
-                                                 c2g.installLeftNavChevron();
-                                                 });
+        c2g.installLeftNavChevron();
+    });
+    
+    //Announcement collapsing code
+    var numVisibleAnnouncements = 2;
+    if ($('.announcement-content').length > numVisibleAnnouncements) {
+	$('#showHideAll').show();
+	$('.announcement-content').each(function(){
+	    if (numVisibleAnnouncements <= 0) {
+		$(this).closest('.announcement').find('.announcement-actions .announcement-collapse').show();
+		$(this).hide();
+	    } else {
+		$(this).removeClass('announcement-content');
+	    }
+	    numVisibleAnnouncements--;
+	});
+	
+	$('.announcement .announcement-actions .announcement-collapse').click(function(){
+	    if ($(this).text() == 'Expand') {
+		$(this).text('Collapse').closest('.announcement').find('.announcement-content').slideDown(250);
+	    } else {
+		$(this).text('Expand').closest('.announcement').find('.announcement-content').slideUp(250);
+	    }
+	});
+	
+	$('#showHideAll').toggle(function(){
+	    $(this).text('Collapse All').siblings('.announcement').each(function(){
+		$(this).find('.announcement-content').slideDown(250);
+		$(this).find('.announcement-actions .announcement-collapse').text('Collapse');
+	    });
+	}, function() {
+	    $(this).text('Expand All').siblings('.announcement').each(function(){
+		$(this).find('.announcement-content').slideUp(250);
+		$(this).find('.announcement-actions .announcement-collapse').text('Expand');
+	    });
+	});
+    }
+    
+    //Show/Hide chat block
+    var chatBlockHeight = $('#chat_block').css('height');
+    $('#chat_block').css({height: '0px'}).show();
+    
+    $('#chat_wrapper .chat_toggle').toggle(function() {
+	$(this).siblings().animate({height: chatBlockHeight}, 'slow', function() {
+	    $(this).siblings().find('span.openChat').hide();
+	    $(this).siblings().find('span.closeChat').show();
+	});
+	//Candy.Core.connect('{{ nick }}', '{{ nick }}'); /* FIXME: use something more magical */
+    }, function() {
+	$(this).siblings().animate({height: '0px'}, 'slow', function() {
+	    $(this).siblings().find('span.openChat').show();
+	    $(this).siblings().find('span.closeChat').hide();
+	});
+	//Candy.Core.disconnect
+    });
+
+    //Show/Hide share block
+    $('#share_wrapper .show_hide_share').click(function() {
+	if ($(this).hasClass('share_hidden')) {
+	    $(this).text('Hide').toggleClass('btn').toggleClass('share_hidden').toggleClass('share_visible').siblings('#share-result').slideDown('slow');
+	} else {
+	    $(this).siblings('#share-result').slideUp('slow', function() {
+		$(this).siblings('.show_hide_share').text('Share Something!').toggleClass('btn').toggleClass('share_visible').toggleClass('share_hidden');
+	    });
+	}
+    });
 });
 </script>
 {% endblock addl_scripts %}
 
+{% block jabber_block %}
+    <div id="chat_wrapper">
+	<a class="chat_toggle" href="#">
+	    <span class="openChat">Open Chat <em class="icon-chevron-up"></em></span>
+	    <span class="closeChat">Close Chat <em class="icon-chevron-down"></em></span>
+	</a>
+	{# Jabber chat plugin block #}
+	    {% if jabber_configured and is_logged_in %}
+	        <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+	    {% endif %} {# jabber_configured and is_logged_in #}
+	{# end Jabber chat plugin block #}
+    </div>
+{% endblock jabber_block %}

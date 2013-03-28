@@ -2,7 +2,14 @@
 <table style="width:100%">
     <tr id="additional_page_{{item.additional_page.id}}">
         <td width="20" align="middle"><input type="checkbox" name="additionalpage_{{item.additional_page.id}}" id="additionalpage_{{item.additional_page.id}}" class="item_selector section_{{item.additional_page.section.id}}_item_selector" /></td>
-        <td><em class="icon-book" style="font-size:16px;opacity:.3;"></em> <h4 style="margin-top:10px;display:inline;"><a id="additionalpage_{{item.additional_page.id}}_title" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a></h4></td>
+        <td><em class="icon-book" style="font-size:16px;opacity:.3;"></em>
+            <h4 style="margin-top:10px;display:inline;">
+                <a id="additionalpage_{{item.additional_page.id}}_title" href="{% url 'courses.additional_pages.views.main' common_page_data.course_prefix common_page_data.course_suffix item.additional_page.slug %}">{{item.additional_page.title}}</a>
+            </h4>
+            {% if item.is_child %}
+                <span style="opacity:.6;">( <em class="icon-sitemap" style="font-size:16px;opacity:.3;"></em>child of {{item.parent.title}} )</span>
+            {% endif %}
+        </td>
         <td width="240">
             {% if item.additional_page.is_synced %}
             <div style="color: #00A000; padding: 0px;">

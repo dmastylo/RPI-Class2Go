@@ -46,16 +46,29 @@
                         <div class="course">
                             <div class="image"><img alt="Course Image" height="200" width="200" src="{{course.logo_dl_link}}" /></div>
                             <h3><a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></h3>
-                            <p><strong>{{course.calendar_start}} - {{course.calendar_end}}</strong></p>
+                            <p class="dates"><strong>{{ course.calendar_start|date:"M. j, Y" }} - {{ course.calendar_end|date:"M. j, Y" }}</strong></p>
+                            <div class="profile-progress-wrapper">
+                                <div class="profile-progress-endticks">
+                                    <div class="profile-progress-line"></div>
+                                    <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> <!-- '%' after django tag is necessary for width attribute...-->
+                                </div>
+                            </div>
                             {% if certifications|byKey:course.id %}
                                 {% for certinfo in certifications|byKey:course.id %}
-                            <a class="btn" href="{{certinfo.1}}">{{certinfo.0|uscore2space|title}} {% trans 'Accomplished' %}</a>
+                                    {% if certinfo.1 %}
+                                        <a class="btn" href="{{certinfo.1}}">
+                                            {% trans 'Download Statement' %}
+                                            <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+                                        </a>
+                                    {% else %}
+                                    <a class="btn disabled">{% trans 'Generation in progress. Check back soon!' %} <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em></a>
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
                                 {% if course in is_student_list %}
                                     <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
                                         {% csrf_token %}
-                                        <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick="return confirm('{% trans 'Do you really want to unenroll?' %}')" />
+                                        <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick='return confirm("{% trans 'Do you really want to unenroll?' %}")' />
                                     </form>
                                 {% else %}
                                 <a class="btn disabled">{% trans 'Staff Member' %}</a>
@@ -67,7 +80,7 @@
             {% endif %}
             
         {% else %}
-        <h3> {% trans 'Please login to see profile information' %}': </h3>
+        <h3> {% trans 'Please login to see profile information' %}: </h3>
             <p>
                 <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">{% trans 'Stanford WebAuth' %}</a>
                 <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">{% trans 'Class2Go Login (Public course students)' %}</a>

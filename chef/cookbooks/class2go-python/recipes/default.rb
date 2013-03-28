@@ -55,3 +55,7 @@ end
 easy_install_package "markdown" do
     action :install
 end
+
+easy_install_package "html5lib" do
+    action :install
+end

@@ -6,8 +6,9 @@ body {
     position: relative;
     width: 100%;
     min-height: 100%;
-    font-family: 'Source Sans Pro', 'Helvetica Neue', helvetica, sans-serif;
     font-size: 1em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: auto !important;
 }
 
 h1,h2,h3,h4 {margin:0;}
@@ -31,15 +32,23 @@ padding-left:7px;
 margin-right:50px;
 }
 
+
+
 .leftnav-subtitle {
     display:block;
     font-size:12px;
     color:#999999;
     margin-top:-5px;
 }
-
 .leftnav-title {
     display:block;
+    color: #333;
+}
+#left-nav .accordion-group .nav-list.collapse {
+    visibility: hidden;
+}
+#left-nav .accordion-group .nav-list.collapse.in {
+    visibility: visible;
 }
 
 
@@ -63,6 +72,14 @@ a:hover {color:#820000;}
     word-wrap:break-word;
     float:left;
     display:block;
+}
+
+.well.jobdesc {
+    margin-right: 0;
+    margin-left: 0;
+}
+.well.jobdesc h1.title {
+    margin-bottom: 10px;
 }
 
 .upcoming {
@@ -192,6 +209,7 @@ a.thumbnail:hover {
     min-height: 35px;
     height: 35px;
 }
+
 .navbar-search {
     position:absolute;
     right:15px;
@@ -246,6 +264,7 @@ a.thumbnail:hover {
 .navbar .nav li.dropdown.open ul.dropdown-menu a:hover {
     color: #333;
 }
+
 .progress {
     margin-bottom:8px;
     background:#fff;
@@ -379,6 +398,11 @@ small.date {
     color:#999;
     font-style:italic;
     display:block;
+    margin-bottom:.5em;
+    clear: left;
+}
+#showHideAll {
+    display: none;
 }
 .announcement {
     margin-bottom:1em;
@@ -390,13 +414,13 @@ small.date {
     -khtml-border-radius: 5px;
     -o-border-radius: 5px;
     position:relative;
-    clear:left;
+    clear: both;
 }
 .announcement p {
     margin-bottom:0;
 }
 .announcement h4 {
-    margin-bottom:.5em;
+    margin-bottom:0;
 }
 .fakelink {
     cursor:pointer;
@@ -405,10 +429,9 @@ small.date {
     display:inline-block;
     margin-top:7px;
 }
-.announcement .announcement-actions {
-    position:absolute;
-    top:15px;
-    right:15px;
+.announcement .announcement-actions .announcement-collapse {
+    display: none;
+    cursor: pointer;
 }
 #new_announcement_div {
     clear:left;
@@ -503,17 +526,13 @@ small.date {
     display:block;
 }
 
-.top-nav #clock em {
-    -webkit-font-smoothing: antialiased;
-    font-smooth: never;
-    font-weight: 100 !important;
-    font-size: 28px;
-    padding-top: 6px;
-    color: white;
+.top-nav #clock #clockHours {
+    font-size: 20px;
 }
 .top-nav #clock #clock-bubble {
     display: none;
     position: absolute;
+    font-size: 16px;
 }
 
 #c2g_layout_topbar .navbar {
@@ -571,6 +590,64 @@ small.date {
     min-height:450px;
 }
 
+.score-area {
+    margin: 0 0 15px 0;
+}
+
+#share_wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 40px;
+}
+#share_wrapper .show_hide_share {
+    position: absolute;
+    z-index: 100;
+}
+#share_wrapper .show_hide_share.share_hidden {
+    right: 0;
+    top: 0;
+    left: 0;
+}
+#share_wrapper .show_hide_share.share_visible {
+    right: 5px;
+    top: 5px;
+}
+#share-result {
+    z-index: 50;
+    position: relative;
+    float: right;
+    clear: both;
+    padding-top: 10px;
+}
+#share-result textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+}
+#share-result .show_score {
+    display: block;
+    clear: both;
+    padding-bottom: 10px;
+}
+#share-result ul {
+    border-bottom: 1px solid #999 !important;
+}
+#share-result li a {
+    font-size: 18px;
+    background-color: transparent;
+}
+#share-result li.active a,
+#share-result li.active a:hover {
+    border: 1px solid #999;
+    border-bottom: 1px solid #f5f5f5 !important;
+    background-color: transparent;
+}
+#share-result li a:hover {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom: 1px solid #999 !important;
+}
+
 #left-nav h3.expanded {
     /*background:url(../../graphics/core/icon-minus.png) no-repeat right 7px;*/
     background:url(../../graphics/core/arrow-open.png) no-repeat right 9px;
@@ -588,6 +665,36 @@ small.date {
     margin-right:15px;
     padding-bottom:0px;
 }
+#left-nav h3 a {
+    color: #333;
+}
+#left-nav h3 a:hover {
+    text-decoration: none;
+}
+
+/* Right Column
+-------------------------------------------------- */
+.right_nav_wrapper {
+    position: relative;
+    clear: both;
+}
+
+/* Twitter Feed */
+#twitterWidget {
+    position: relative;
+    clear: both;
+}
+#twitterWidget .twtr-widget .twtr-doc {
+    border: 1px solid #bdb7a1;
+}
+#twitterWidget .twtr-widget .twtr-tweets {
+    padding: 0 5px;
+}
+#twitterWidget .twtr-widget .twtr-tweet {
+    border-top: 1px dotted #aca68d;
+    border-bottom: none !important;
+}
+
 
 /* Thumbnails
 -------------------------------------------------- */
@@ -679,6 +786,35 @@ small.date {
     font-size: 18px;
     line-height: 1.5em;
 }
+.profile-courses .course .dates {
+    font-size: 14px;
+}
+.profile-courses .course .profile-progress-wrapper {
+    position: relative;
+    float: right;
+}
+.profile-courses .course .profile-progress-wrapper .profile-progress-endticks {
+    position: absolute;
+    right: 0;
+    width: 196px;
+    height: 1px;
+    padding: 2px 0;
+    border-right: 1px solid #333;
+    border-left: 1px solid #333;
+}
+.profile-courses .course .profile-progress-wrapper .profile-progress-endticks .profile-progress-line {
+    position: relative;
+    width: 100%;
+    height: 1px;
+    background-color: #333;
+}
+.profile-courses .course .profile-progress-wrapper .profile-progress-endticks .profile-progress-bar {
+    position: absolute;
+    height: 3px;
+    left: 0;
+    top: 1px;
+    background-color: #820000;
+}
 .profile-courses .course .btn {
     position: absolute;
     right: 15px;
@@ -687,10 +823,10 @@ small.date {
     font-size: 13px; 
 }
 .profile-courses .course input.btn {
-    width: 195px;
+    width: 198px;
 }
 .profile-courses .course .btn {
-    width: 173px;
+    width: 176px;
 }
 
 /* Video - added by Kevin
@@ -736,20 +872,13 @@ h3.course-section-heading {
 
 .course-list-item {
   overflow:hidden;
-  padding:8px 0 4px;
+  padding: 5px;
   border-bottom: 0; 
   /* border-bottom: 1px solid #eee; */
 }
 
 .course-list-item.zebra_light {
-    background-color: #fcfaf5;
-}
-.course-list-item.zebra_dark {
-    background-color: #e9e6df;
-}
-
-.course-list-item.zebra_light {
-    background-color: #fcfaf5;
+    background-color: #FBFBF9;
 }
 .course-list-item.zebra_dark {
     background-color: #e9e6df;
@@ -862,6 +991,17 @@ h3.course-section-heading {
   height: auto;
   line-height: normal;
   margin-bottom: 9px;
+}
+
+fieldset label {
+    padding: 0 2em !important;
+    position: relative !important;
+}
+fieldset label input {
+    position: absolute !important;
+    float: none !important;
+    left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* for datetime fields */

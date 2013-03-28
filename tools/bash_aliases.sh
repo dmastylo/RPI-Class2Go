@@ -47,13 +47,34 @@ function multitail-prod-util {
 }
 
 function c2g {
-    if [ "x$1" == "x" ]; then
-        echo "usage: c2g <host_prefix>"
-        echo "  example: \"c2g app1.prod\" will ssh to app1.prod.c2gops.com"
-        return 1
-    fi
+    help="usage: c2g [-m] [-h] <host_prefix>\n
+\t\t-m\t\tuse mosh instead of ssh to connect\n
+\t\t-h\t\tthis message\n
+\t\t<host_prefix>\tserver and network to connect to\n
+\texample: \"c2g app1.prod\" will ssh to app1.prod.c2gops.com"
+    cmd="ssh"
+    options="-A"
+
+    while :; do
+        case "$1" in 
+            -h|--help)
+                echo -e $help
+                return 0
+                ;;
+            -m|--mosh)
+                cmd="mosh"
+                options=""
+                echo "remember with mosh, no agent forwarding"
+                shift
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
     target="ubuntu@$1.c2gops.com"
-    echo "connecting to $target via ssh"
-    ssh -A $target
+    echo "connecting to $target via $cmd"
+    $cmd $options $target
 }
 

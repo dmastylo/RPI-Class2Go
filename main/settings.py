@@ -88,11 +88,13 @@ try:
     SITE_NAME_SHORT
     SITE_NAME_LONG
     SITE_TITLE
+    SITE_URL
 except NameError:
     SITE_ID = 1
     SITE_NAME_SHORT = 'Stanford'
     SITE_NAME_LONG = 'Stanford University'
     SITE_TITLE = 'Stanford Class2Go'
+    SITE_URL = 'http://class2go.stanford.edu'
 
 
 # If you set this to False, Django will make some optimizations so as not
@@ -120,7 +122,10 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/opt/' + APP + '/static/'
+try:
+    STATIC_ROOT
+except:
+    STATIC_ROOT = '/opt/' + APP + '/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -224,6 +229,14 @@ CACHES = {
             'MAX_ENTRIES': 1000
             }
     },
+    'grader_store': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'grader_cache',
+        'TIMEOUT': 86400,  # one day
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+            }
+    },
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': LOCAL_CACHE_LOCATION + "/cache-default",
@@ -237,7 +250,9 @@ CACHES = {
 
 thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
+    thispath+'/site_templates/'+SITE_NAME_SHORT,
     thispath+'/templates'
+
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -269,12 +284,15 @@ INSTALLED_APPS = (
                       #'kombu.transport.django',
                       'c2g',
                       'courses',
-                      'courses.forums',
                       'courses.announcements',
+                      'courses.chat',
+                      'courses.email_members',
+                      'courses.exams',
+                      'courses.member_management',
+                      'courses.forums',
+                      'courses.reports',
                       'courses.videos',
                       'courses.video_exercises',
-                      'courses.email_members',
-                      'courses.reports',
                       'problemsets',
                       'django.contrib.flatpages',
                       'storages',
@@ -285,7 +303,9 @@ INSTALLED_APPS = (
                       'exception_snippet',
                       'rest_framework',
                        #'reversion',
-                       'certificates',
+                       'tools',
+                       'tools.aws',
+                       'tools.certificates',
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
@@ -423,7 +443,7 @@ except NameError:
 try:
     SERVER_EMAIL
 except NameError:
-    SERVER_EMAIL = 'noreply@class.stanford.edu'
+    SERVER_EMAIL = 'noreply@class2go.stanford.edu'
 
 # For Production, or if override is set, actually send email
 if PRODUCTION or EMAIL_ALWAYS_ACTUALLY_SEND:
@@ -453,7 +473,7 @@ BROKER_TRANSPORT='sqs'
 BROKER_USER = AWS_ACCESS_KEY_ID
 BROKER_PASSWORD = AWS_SECRET_ACCESS_KEY
 BROKER_TRANSPORT_OPTIONS = {
-    'region': 'us-west-2', 
+    'region': 'us-west-2',
     'queue_name_prefix' : INSTANCE+'-',
     'visibility_timeout' : 3600*6,
 }

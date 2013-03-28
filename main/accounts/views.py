@@ -2,6 +2,8 @@ import json
 import random
 import string
 import urlparse
+import os
+import re
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
@@ -14,22 +16,22 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 from django.views.decorators.http import require_POST
-from django.contrib.auth import get_backends, REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, authenticate as auth_authenticate
-from django.contrib.auth.views import login as auth_login_view
+from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate as auth_authenticate
 from django.contrib import messages
-from django.contrib.auth.models import User, Group
-from c2g.models import Course, Institution,Video, Instructor, CourseInstructor
+from django.contrib.auth.models import User
+from c2g.models import Course, Institution, Video, CourseInstructor
 from accounts.forms import *
 from registration import signals
+from registration.login_wrapper import login as auth_login_view
 from registration.forms import RegistrationFormUniqueEmail
 from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseBadRequest
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
-from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 from pysimplesoap.client import SoapClient
 from datetime import date
+
 
 def index(request):
     return HttpResponse("Hello, world. You're at the user index.")
@@ -39,6 +41,7 @@ def profile(request):
     user = request.user
     group_list = user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
+    course_completions = {}
     
     user_profile = None
     is_student_list = []
@@ -58,6 +61,13 @@ def profile(request):
             else:
                 certs_list[cert.course_id] = [certinfo]
                 if longest_certlist == 0: longest_certlist = 1
+        
+        for course in courses:
+            if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
+                duration = course.calendar_end - course.calendar_start
+                progress = min(date.today(), course.calendar_end) - course.calendar_start
+                course_completion = int((float(progress.days) / float(duration.days)) * 100)
+                course_completions[course.id] = course_completion
 
     has_webauth = False
     if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
@@ -67,6 +77,7 @@ def profile(request):
                               {
                                   'request': request,
                                   'courses': courses,
+                                  'course_completions': course_completions,
                                   'is_student_list': is_student_list,
                                   'has_webauth': has_webauth,
                                   'user_profile': user_profile,
@@ -110,7 +121,8 @@ def save_piazza_opts(request):
     except ValidationError:
         return HttpResponseBadRequest('You did not enter a valid email address.')
     try:
-        nameValidator = RegexValidator(regex=r'^[\w -]+$')
+        regex = re.compile(r'^[\w -]+$', re.U)
+        nameValidator = RegexValidator(regex=regex)
         nameValidator(name.strip())
     except ValidationError:
         return HttpResponseBadRequest('Names on Piazza should only contain letters, numbers, underscores, hyphens, and spaces.')
@@ -251,10 +263,20 @@ def shib_login(request):
             user = User.objects.get(username=shib['REMOTE_USER'])
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             auth_login(request, user)
-            messages.add_message(request,messages.SUCCESS, 'You have successfully logged in!')
+
+        #determine whether to clear any "you must log in" messages
+        clear_msgs = False
+        storage = messages.get_messages(request)
+        for message in storage:
+            if "You must be logged-in" in message.message:
+                clear_msgs = True
+        storage.used = clear_msgs
+
+        messages.add_message(request,messages.SUCCESS, 'You have successfully logged in!')
 
     else:
         messages.add_message(request,messages.ERROR, 'WebAuth did not return your identity to us!  Please try logging in again.  If the problem continues please contact c2g-techsupport@class.stanford.edu')
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
     return HttpResponseRedirect(redir_to) 
 
@@ -323,9 +345,16 @@ def standard_preview_login(request, course_prefix, course_suffix):
     
         for ci in course_instructors:
             instructors.append(ci.instructor)
-  
+        
+        # default template, unless there is one in the soruce tree, then use that
         template_name='previews/default.html'
-
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+                
+        
         return render_to_response(template_name,
                          {'form': form,
                           'login_form': login_form,
@@ -335,9 +364,19 @@ def standard_preview_login(request, course_prefix, course_suffix):
                           'course': request.common_page_data['course'],
                           'display_login': True},
                           context_instance=context)
-       
 
-    
+
+def is_number(s):
+    """
+       Check if the string is likely to be a student/staff number
+    :param s: username
+    :return: True if numeric
+    """
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 @never_cache
 def ldap_login(request, course_prefix, course_suffix):
@@ -373,8 +412,9 @@ def ldap_login(request, course_prefix, course_suffix):
         is_institution_logon = user.get_profile().site_data == "UWA"
 
     result = 'error'
-    
-    if not user_exists or (user_exists and is_institution_logon):    
+
+   # Check if can be internal i.e. numeric
+    if is_number(request.POST['username']):
         client = SoapClient(wsdl="https://www.socrates.uwa.edu.au/tisi/commonws.asmx?wsdl", trace=True)
         response = client.UserAuth(userName=request.POST['username'],password=request.POST['password'])
         result = response['UserAuthResult']
@@ -388,16 +428,19 @@ def ldap_login(request, course_prefix, course_suffix):
             return HttpResponseRedirect(redir_to)
 
         else:                
-            messages.add_message(request,messages.ERROR, 'WebAuth did not return your identity to us!  Please try logging in again.  If the problem continues please contact c2g-techsupport@class.stanford.edu')
+            # messages.add_message(request,messages.ERROR, 'Error with Username or Password')
             extra_context = {}
             context = RequestContext(request)
             for key, value in extra_context.items():
                 context[key] = callable(value) and value() or value
             layout = {'m': 800}
-        
+
             return render_to_response('registration/login.html',
-                              {'form': form, 'layout': json.dumps(layout)},
-                              context_instance=context)
+                       {'form': form, 'next': request.GET.get('next', '/')},
+                         context_instance=context)
+            #return render_to_response('registration/login.html',
+            #                  {'form': form, 'layout': json.dumps(layout)},
+            #                  context_instance=context)
 
     
     ldapUser = json.loads(result) 
@@ -462,8 +505,8 @@ def ldap_preview_login(request, course_prefix, course_suffix):
         is_institution_logon = user.get_profile().site_data == "UWA"
 
     result = 'error'
-    
-    if not user_exists or (user_exists and is_institution_logon):    
+
+    if is_number(request.POST['username']):
         client = SoapClient(wsdl="https://www.socrates.uwa.edu.au/tisi/commonws.asmx?wsdl", trace=True)
         response = client.UserAuth(userName=request.POST['username'],password=request.POST['password'])
         result = response['UserAuthResult']

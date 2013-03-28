@@ -12,23 +12,20 @@ class common_data(object):
     request.
     """
     def process_view (self, request, view_func, view_args, view_kwargs):
-        if (('course_prefix' not in view_kwargs) or 
-            ('course_suffix' not in view_kwargs)):
+        if ('course_prefix' in view_kwargs) and \
+           ('course_suffix' in view_kwargs):
+            cp = view_kwargs['course_prefix']
+            cs = view_kwargs['course_suffix']
+        else:
             #No course information in the URL.  There is a special case that has it as a POST parameter (Why?)
             #Handle those here
-            if ((not request.POST.__contains__('course_prefix')) or
-                (not request.POST.get('course_prefix')) or
-                (not request.POST.__contains__('course_suffix')) or
-                (not request.POST.get('course_suffix'))):
-                return None
-            else:
+            if request.POST.get('course_prefix', None) and \
+               request.POST.get('course_suffix', None):
                 #The course info is in the POST in this case
                 cp = request.POST.get('course_prefix')
                 cs = request.POST.get('course_suffix')
-        else:
-            cp = view_kwargs['course_prefix']
-            cs = view_kwargs['course_suffix']
-            
+            else:
+                return None
     
         try:
             request.common_page_data=get_common_page_data(request, cp, cs)

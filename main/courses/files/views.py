@@ -1,9 +1,10 @@
 from django.http import Http404
 from django.shortcuts import render
-from courses.common_page_data import get_common_page_data
+
 from c2g.models import File, ContentGroup
-from courses.files.forms import *
 from courses.actions import auth_is_course_admin_view_wrapper
+from courses.files.forms import *
+
 
 @auth_is_course_admin_view_wrapper
 def upload(request, course_prefix, course_suffix):

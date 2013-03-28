@@ -27,65 +27,56 @@ def gen_course_dashboard_report(ready_course, save_to_s3=False):
     rw.write(content = ["Students", num_stud, "Professors", num_prof, "TAs", num_tas, "Readonly TAs", num_rota], indent = 1, nl = 1)
     
     # Content
-    problem_sets = ProblemSet.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
-    videos = Video.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
-    additional_pages = AdditionalPage.objects.getByCourse(course=ready_course).order_by('section__index', 'index')
-    
-    num_all_formative_problem_sets = ProblemSet.objects.getByCourse(course=ready_course.image).filter(assessment_type="formative").count()
-    num_live_formative_problem_sets = problem_sets.filter(assessment_type="formative").count()
-    num_all_summative_problem_sets = ProblemSet.objects.getByCourse(course=ready_course.image).filter(assessment_type="assessive").count()
-    num_live_summative_problem_sets = problem_sets.filter(assessment_type="assessive").count()
+    live_exam_objects = Exam.objects.getByCourse(course=ready_course)
+    all_exam_objects = Exam.objects.getByCourse(course=ready_course.image)
+    exam_types = [li[0] for li in Exam.EXAM_TYPE_CHOICES]
+    exam_content = {}
+    for exam_type in exam_types:
+        content_tuple = (all_exam_objects.filter(exam_type=exam_type), live_exam_objects.filter(exam_type=exam_type))
+        exam_content[exam_type] = content_tuple
+
+    num_all_formative_problem_sets = exam_content["problemset"][0].filter(assessment_type="formative").count()
+    num_live_formative_problem_sets = exam_content["problemset"][1].filter(assessment_type="formative").count()
+    num_all_summative_problem_sets = exam_content["problemset"][0].filter(assessment_type="summative").count()
+    num_live_summative_problem_sets = exam_content["problemset"][1].filter(assessment_type="summative").count()
     num_all_videos = Video.objects.getByCourse(course=ready_course.image).count()
-    num_live_videos = videos.count()
+    live_videos = Video.objects.getByCourse(course=ready_course)
+    num_live_videos = live_videos.count()
     num_all_pages = AdditionalPage.objects.getByCourse(course=ready_course.image).count()
-    num_live_pages = additional_pages.count()
+    live_additional_pages = AdditionalPage.objects.getByCourse(course=ready_course)
+    num_live_pages = live_additional_pages.count()
     num_all_files = File.objects.getByCourse(course=ready_course.image).count()
     num_live_files = File.objects.getByCourse(course=ready_course).count()
     
     rw.write(content = ["Content"])
-    rw.write(content = ["Formative problem sets", "Summative Problem sets", "Videos", "Content Pages", "Files"], indent = 2)
-    rw.write(content = ["All", num_all_formative_problem_sets, num_all_summative_problem_sets, num_all_videos, num_all_pages, num_all_files], indent = 1)
-    rw.write(content = ["Live", num_live_formative_problem_sets, num_live_summative_problem_sets, num_live_videos, num_live_pages, num_live_files], indent = 1, nl = 1)
+    rw.write(content = ["Formative Quizzes", "Summative Quizzes", "Interactive Exercises", "Exams", "Surveys",  "Videos", "Content Pages", "Files"], indent = 2)
+    rw.write(content = ["All", num_all_formative_problem_sets, num_all_summative_problem_sets, exam_content["interactive_exercise"][0].count(), exam_content["exam"][0].count(), exam_content["survey"][0].count(), num_all_videos, num_all_pages, num_all_files], indent = 1)
+    rw.write(content = ["Live", num_live_formative_problem_sets, num_live_summative_problem_sets, exam_content["interactive_exercise"][1].count(), exam_content["exam"][1].count(), exam_content["survey"][1].count(), num_live_videos, num_live_pages, num_live_files], indent = 1)
     
     # Activity
-    problem_set_visits = get_visit_information(ready_course, problem_sets, 'problemset')
-    video_visits = get_visit_information(ready_course, videos, 'video')
-    additional_page_visits = get_visit_information(ready_course, additional_pages, 'additional_page')
-    forum_visits = get_visit_information(ready_course, None, 'forum')
-    
     rw.write(content = ["Page Visits (Only live items are shown)"], nl = 1)
-    
-    rw.write(content = ["Forum"], indent = 1)
-    rw.write(content = ["", "", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
-    rw.write(content = ["", "", "", forum_visits[0]['past_day_total'], forum_visits[0]['past_day_unique'], "", forum_visits[0]['past_week_total'], forum_visits[0]['past_week_unique'], "", forum_visits[0]['all_time_total'], forum_visits[0]['all_time_unique']], indent = 1, nl = 1)
-    rw.write([""])
-    
-    rw.write(content = ["Problem sets"], indent = 1)
-    if len(problem_set_visits) > 0:
-        rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
-        for item in problem_set_visits:
-            rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
-    else:
-        rw.write(content = ["No live problem sets yet."], indent = 2)
-    rw.write([""])
-    
-    rw.write(content = ["Videos"], indent = 1)
-    if len(video_visits) > 0:
-        rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
-        for item in video_visits:
-            rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
-    else:
-        rw.write(content = ["No live videos yet."], indent = 2)
-    rw.write([""])
-    
-    rw.write(content = ["Content pages"], indent = 1)
-    if len(additional_page_visits) > 0:
-        rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
-        for item in additional_page_visits:
-            rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)
-    else:
-        rw.write(content = ["No live content pages yet."], indent = 2)
-    rw.write([""])
+
+    visits = {}
+    for exam_type in exam_types:
+        visits[Exam.Exam_HUMAN_TYPES_PLURAL[exam_type]] = get_visit_information(ready_course, exam_content[exam_type][1], exam_type)
+    visits["Videos"] = get_visit_information(ready_course, live_videos, 'video')
+    visits["Content pages"] = get_visit_information(ready_course, live_additional_pages, 'additional_page')
+    visits["Forum"] = get_visit_information(ready_course, None, 'forum')
+
+    content_types = ["Forum", "Quizzes", "Interactive Exercises", "Exams", "Surveys", "Videos", "Content pages"]    
+    for content_type in content_types:
+        rw.write(content = [content_type], indent = 1)
+        if content_type == "Forum":
+            rw.write(content = ["", "", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
+            rw.write(content = ["", "", "", visits["Forum"][0]['past_day_total'], visits["Forum"][0]['past_day_unique'], "", visits["Forum"][0]['past_week_total'], visits["Forum"][0]['past_week_unique'], "", visits["Forum"][0]['all_time_total'], visits["Forum"][0]['all_time_unique']], indent = 1)
+        else:
+            if len(visits[content_type]) > 0:
+                rw.write(content = ["URL ID", "Title", "", "Past day total", "Past day unique", "", "Past week total", "Past week unique", "", "all_time_total", "all_time_unique"], indent = 1)
+                for item in visits[content_type]:
+                    rw.write(content = [item['item'].slug, item['item'].title, "", item['past_day_total'], item['past_day_unique'], "", item['past_week_total'], item['past_week_unique'], "", item['all_time_total'], item['all_time_unique']], indent = 1)                
+            else:
+                rw.write(content = ["No live " + content_type.lower() + " yet."], indent = 2)
+        rw.write([""])
     
     report_content = rw.writeout()
     return {'name': "%02d_%02d_%02d__%02d_%02d_%02d-%s-Dashboard.csv" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, course_prefix+'_'+course_suffix), 'content': report_content, 'path': s3_filepath}

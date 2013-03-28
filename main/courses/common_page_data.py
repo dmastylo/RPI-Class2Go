@@ -3,8 +3,8 @@ import logging
 from database import AWS_STORAGE_BUCKET_NAME
 from django.core.cache import get_cache
 
-from c2g.models import AdditionalPage, CacheStat, ContentSection, Course
-
+from c2g.models import AdditionalPage, ContentSection, Course
+from c2g.util import CacheStat
 
 logger=logging.getLogger(__name__)
 

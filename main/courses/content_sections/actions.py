@@ -5,13 +5,14 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 
 from c2g.models import *
-from courses.actions import auth_is_course_admin_view_wrapper
+from courses.actions import always_switch_mode, auth_is_course_admin_view_wrapper
 from courses.common_page_data import get_common_page_data
 from courses.course_materials import get_course_materials
 
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # not strictly necessary, but good for consistency
 def save_order(request):
     common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
     if not common_page_data['is_course_admin']:
@@ -30,6 +31,7 @@ def save_order(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def rename(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -49,6 +51,7 @@ def rename(request):
 
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode     # not strictly necessary, but good for consistency
 def delete_content_section(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -67,6 +70,7 @@ def delete_content_section(request):
      
 @require_POST
 @auth_is_course_admin_view_wrapper
+@always_switch_mode
 def save_content_order(request):
     try:
         common_page_data = get_common_page_data(request, request.POST.get("course_prefix"), request.POST.get("course_suffix"))
@@ -76,43 +80,23 @@ def save_content_order(request):
     if not common_page_data['is_course_admin']:
         return redirect('courses.views.main', request.POST.get("course_prefix"), request.POST.get("course_suffix"))
         
-    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_pset_content=True, get_additional_page_content = True, get_file_content=True, get_exam_content=True)
+    SECTION = ContentSection.objects.get(pk=request.POST.get('section_id'))
+    section_structures = get_course_materials(common_page_data=common_page_data, get_video_content=True, get_additional_page_content = True, get_file_content=True, get_exam_content=True, SECTION=SECTION)
+
+    def set_index_from_POST(item):
+        tag       = item['type']
+        image     = item[tag].image
+        new_index = request.POST.get("order_"+tag+"_"+str(item[tag].id))
+        item[tag].index = new_index
+        item[tag].save()
+        image.index = new_index
+        image.save()
     
     for section_structure in section_structures:
-        if section_structure['section'].id == long(request.POST.get("section_id")):
-            for item in section_structure['items']:
-                if item['type'] == 'video':
-                    item['video'].index = request.POST.get("order_video_"+str(item['video'].id))
-                    item['video'].save()
-                    video_image = item['video'].image
-                    video_image.index = request.POST.get("order_video_"+str(item['video'].id))
-                    video_image.save()
-                elif item['type'] == 'problem_set':
-                    item['problem_set'].index = request.POST.get("order_problem_set_"+str(item['problem_set'].id))
-                    item['problem_set'].save()
-                    problem_set_image = item['problem_set'].image
-                    problem_set_image.index = request.POST.get("order_problem_set_"+str(item['problem_set'].id))
-                    problem_set_image.save()
-                elif item['type'] == 'additional_page':
-                    item['additional_page'].index = request.POST.get("order_additional_page_"+str(item['additional_page'].id))
-                    item['additional_page'].save()
-                    additional_page_image = item['additional_page'].image
-                    additional_page_image.index = request.POST.get("order_additional_page_"+str(item['additional_page'].id))
-                    additional_page_image.save()
-                elif item['type'] == 'file':
-                    item['file'].index = request.POST.get("order_file_"+str(item['file'].id))
-                    item['file'].save()
-                    file_image = item['file'].image
-                    file_image.index = request.POST.get("order_file_"+str(item['file'].id))
-                    file_image.save()
-                elif item['type'] == 'exam':
-                    item['exam'].index = request.POST.get("order_exam_"+str(item['exam'].id))
-                    item['exam'].save()
-                    exam_image = item['exam'].image
-                    exam_image.index = request.POST.get("order_exam_"+str(item['exam'].id))
-                    exam_image.save()
-            break
-            
+
+        for item in section_structure['items']:
+            set_index_from_POST(item)
+
     return redirect(request.META['HTTP_REFERER'])
     
 def get_children(request, section_id, contentgroup_parents_only=False):

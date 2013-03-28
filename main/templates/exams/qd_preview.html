@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block course_page_title %}
+Quizdown Preview Page
+{% endblock course_page_title %}
+
+{% block mode_switcher %}{% endblock mode_switcher %}
+
+{% block addl_head_scripts %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+                       tex2jax: {inlineMath: [['$$','$$']],
+                       displayMath: [['\\[','\\]']]}
+                       });
+    </script>
+    {% if request.is_secure %}
+    <script type="text/javascript"
+        src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% else %}
+    <script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        </script>
+    {% endif %}
+{% endblock addl_head_scripts %}
+
+
+
+{% block addl_stylesheets %}
+
+<style type="text/css" media="screen">
+    #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    #metadata_editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    .editor_container {
+        position:relative;
+        height:540px;
+    }
+    h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
+    #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
+    #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 505px; padding: 1em;}
+    textarea, #staging-area {height: 530px; overflow: auto; width: 100%;}
+    #preview-pane label {clear: both; display: block; min-width:200px;}
+    #preview-pane label input {float: left; margin-right: 1em;}
+    #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 0em;}
+    .problem {border:1px solid #999; border-radius: 5px; margin: 1em 0; padding: 1em;}
+    .picker {position:relative; z-index:10;}
+    h3 {clear:both;}
+    div.question, div.subquestion {float:left; width:95%;}
+    div.problem, div.problem {float:left; width:95%;}
+    .control-group {clear:both; padding:1em; zoom:1;}
+    .control-group .atomic-unit {float:left; margin-right: 1em;}
+    .atomic-unit{min-height:200px;}
+    div#summative {display:none}
+    div.ui-dialog div.ui-widget-header {background: #900;}
+    label pre {margin-left:30px;}
+    #description{width:150px; height:150px;}
+    .warning{color:red;margin-right:5px;}
+    #xml-import-label{font-size:22px;font-weight:bolder;}
+    div.question textarea { width:70%; height:100px; }
+    div.preamble {margin-bottom: 2em; }
+    div.postamble {margin-top: 2em; }
+    p {padding-bottom: 0px; }
+    fieldset {margin-bottom: 2em;}
+    select {margin-bottom: 2em; }
+    input[type="checkbox"] {margin-top: 3px;}
+    .explanation {background: #fff; border: 1px solid black; border-radius: 3px; clear: both; margin: 1em; padding: 1em;}
+    .explanation .toggle-expl {cursor: pointer;}
+    #exam-pane .explanation p {margin: 0; padding: 0 0 1em;}
+    #staging-area .inline-explanation {background-color: #ffc; border-radius: 3px; color: #900; font-size: 90%; margin-left: 10px; padding: 2px;}
+    #staging-area .inline-explanation.correct{color: #090;}
+    #quizdown-form{margin-top: 30px}
+
+</style>
+
+{% endblock %}
+{% block m_column_content %}
+
+
+
+    <div class="hidden" id="enter-content-html">
+        <h4>{% trans 'Edit Exam HTML below' %}:</h4>
+        <textarea id="ace_proxy" style="display:none"></textarea>
+        <div class="editor_container" id="editor_container">
+            <div id="editor"></div>
+        </div>
+    </div>
+ 
+
+
+<div class="span4" id="quizdown-form" title="{% trans 'Paste Your Quizdown' %}">
+    <form>
+    <fieldset>
+        <label for="quizdown-entry" id="quizdown-import-label"><h4>{% trans 'Input your Quizdown here' %}</h4></label>
+        <textarea name="quizdown-entry" id="quizdown-entry" class="text ui-widget-content ui-corner-all"></textarea>
+    </fieldset>
+    </form>
+    <button class="btn" id="go_preview">{% trans 'Generate Preview' %}</button>
+    <button class="btn" id="check_metadata">{% trans 'Check Metadata XML' %}</button>
+
+</div>
+
+<div class="span7">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a id="preview-tab" href="#preview-content">{% trans 'Preview' %}</a></li>
+        <li><a id="enter-xml-tab" href="#enter-content-xml">{% trans 'XML Metadata' %}</a></li>
+    </ul>
+    
+    <div class="tab-content">
+        <div class="tab-pane" id="enter-content-xml">
+            <textarea id="ace_metadata_proxy" style="display:none"></textarea>
+            <div class="editor_container" id="metadata_editor_container">
+                <div id="metadata_editor"></div>
+            </div>
+            
+        </div>
+        
+        <div class="tab-pane active" id="preview-content">
+            <div id="preview-pane">
+                <div id="staging-area"></div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script src="{{STATIC_URL}}js/ace-min/ace.js"></script>
+<script src="{{STATIC_URL}}js/core/beautify-html.js"></script>
+
+<script>
+    $('#myTab a').click(function (e) {
+                        e.preventDefault();
+                        $(this).tab('show');
+    })
+     
+    var editor = ace.edit("editor");
+    editor.setValue($('#ace_proxy').val());
+    editor.setTheme("ace/theme/eclipse");
+    editor.getSession().setMode("ace/mode/html");
+    editor.getSession().setUseWrapMode(true);
+    
+    var metadata_editor = ace.edit("metadata_editor");
+    metadata_editor.setValue($('#ace_metadata_proxy').val());
+    metadata_editor.setTheme("ace/theme/eclipse");
+    metadata_editor.getSession().setMode("ace/mode/xml");
+    metadata_editor.getSession().setUseWrapMode(true);
+    
+    {% include "exams/displayExplanation.js" %}
+    {% include "exams/renderPreview.js" %}
+    {% include "exams/quizdown.js" %}
+    
+    $(function() {
+        $('#go_preview').click(function() {
+             c2gXMLParse.parseQuizDown();
+             });
+        $('#check_metadata').click(function() {
+            checkMetadataXML();
+            });
+
+        var checkMetadataXML = function() {
+            var csrftoken = '{{csrf_token}}';
+            $.ajax("{% url 'courses.exams.views.check_metadata_xml_no_course' %}", {
+                 headers: {'X-CSRFToken': csrftoken},
+                 type: 'POST',
+                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                 data: { metaXMLContent:metadata_editor.getValue() },
+                 error: function(jqXHR, status, errorMsg) { alert(jqXHR.responseText);},
+                 success: function(data, textStatus, jqXHR) {
+                    alert(jqXHR.responseText );
+
+                 }
+                 
+            });
+        };
+      
+    });
+    </script>
+
+{% endblock addl_scripts %}
