@@ -626,7 +626,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         return HttpResponse("Submission has been saved.")
 
 
-def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty):
+def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty, late_hours=0, hourly_late_penalty=0):
     """Helper function to factor out resubmission and late penalty calculations, 
        so I can write a few unit tests for it
     """
@@ -635,6 +635,9 @@ def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, 
     late_discount = max(0.0, 100.0 - late_penalty)/100.0
     if is_late:
         score *= late_discount
+        if late_hours:
+            hourly_discount = pow(max(0.0, (100.0 - hourly_late_penalty)/100.0), late_hours)
+            score *= hourly_discount
     return max(score, 0.0)
 
 @require_POST
