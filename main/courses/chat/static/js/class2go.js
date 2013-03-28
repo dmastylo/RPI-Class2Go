@@ -18,14 +18,18 @@ CandyShop.Class2Go = (function(self, Candy, $) {
         }
         
         Candy.View.Event.Roster.onUpdate = function(rosterUser) {
-            var currentUser = $('#chat-rooms .room-pane .roster-pane .user').attr('data-jid', rosterUser['user']['data']['jid']);
-            var userIcon;
-            if (currentUser.hasClass('me')) {
-                userIcon = 'icon-flag';
+            var currentUserJid = rosterUser['user']['data']['jid'];
+            var meUser = $("#chat-rooms .room-pane .roster-pane .user.me");
+            
+            meUser.find('.label').html('<em class="icon-flag"></em> ' + meUser.find('.label').text());
+            
+            /*
+            if (rosterUser['user']['data']['jid'] == meUser.attr('data-jid')) {
+                var userIcon = 'icon-flag';
+                currentUser.find('.label').html('<em class="' + userIcon + '"></em> ' + currentUser.find('.label').text());
             }
-            currentUser.find('.label').html('<em class="' + userIcon + '"></em> ' + currentUser.find('.label').text());
-        }
+            */
+        }  
     };
-
     return self;
 }(CandyShop.Class2Go || {}, Candy, jQuery));

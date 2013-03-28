@@ -179,11 +179,10 @@ $(document).ready(function(){
     }
     
     //Show/Hide chat block
-    var chatBlockHeight = $('#chat_block').css('height');
     $('#chat_block').css({height: '0px'}).show();
     
     $('#chat_wrapper .chat_toggle').toggle(function() {
-	$(this).siblings().animate({height: chatBlockHeight}, 'slow', function() {
+	$(this).siblings().animate({height: '400px'}, 'slow', function() {
 	    $(this).siblings().find('span.openChat').hide();
 	    $(this).siblings().find('span.closeChat').show();
 	    $('#chatPopup').show();
@@ -209,10 +208,25 @@ $(document).ready(function(){
 	}
     });
     
+    var chatWindow, chatFrameRef, newChatFrame;
     $('#chatPopup').click(function() {
-	$('#chat_wrapper').remove();
-        window.open("/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat", "{{ course.title }}", "width=600, height=400");
-    }); 
+	$('#chat_wrapper').hide();
+	
+	chatFrameRef = $('#chat_block').attr('src');
+	newChatFrame = '<iframe id="chat_block" src="' + chatFrameRef + '"></iframe>';
+	$('#chat_block').remove();
+        chatWindow = window.open(chatFrameRef, "{{ course.title }}", "width=800, height=600");
+	
+	$(chatWindow).unload(function() {
+	    if (this.document.location.href.indexOf(chatFrameRef) >= 0) {
+		$('#chatPopup').before(newChatFrame);
+		$('#chat_block').css({height: '400px'}).show();
+		$('#chat_wrapper').show();
+	    }
+	});
+	
+	//$(chatWindow.document).append($($('#chat_block')[0].contentDocument).find('html'));
+    });
 });
 </script>
 {% endblock addl_scripts %}
