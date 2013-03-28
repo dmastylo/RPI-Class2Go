@@ -37,7 +37,9 @@ class TemplateCache(object):
             infile_name = 'certificate-' + cert_type + '.html'
             if not asset_prefix: asset_prefix = getattr(settings, 'MEDIA_ROOT', '/')
             infile_path = os.path.join(asset_prefix, asset_path, infile_name)
-            unrendered_template = open(infile_path, 'rb').read()
+            template_file = open(infile_path, 'rb')
+            unrendered_template = template_file.read()
+            template_file.close()
             self.__templates[(asset_prefix, asset_path, cert_type)] = unrendered_template
             if GLOBAL_DEBUG: debug_out("Caching template for %s, %s, %s" % (asset_prefix, asset_path, cert_type))
             return unrendered_template
@@ -52,32 +54,14 @@ class CertificateCache(object):
     def __init__(self):
         self.__certs = {}
 
-    def __fetch_or_create_cert(self, course, type_tag):
-        """Fetch cert metadata from the database; if not found, create a cert.
-        
-        NB! this destroys thread-safety, so while the makePDF call (below) can
-        be made a delayed celery task and run across multiple hosts, this
-        cannot.
-        """
-        certs = CourseCertificate.objects.filter(course=course, type=type_tag)
-        if not certs:
-            cert = CourseCertificate.create(course=course, type=type_tag)
-            if cert: 
-                if GLOBAL_DEBUG: debug_out("Creating cert for %s, %s" % (course.handle, type_tag))
-                return cert
-            else:
-                raise CommandError("Problem creating %s cert %s" % (course.handle, type_tag))
-        elif certs and len(certs) == 1:
-            return certs[0]
-        elif certs:
-            raise CommandError("Something wrong in certificates table; multiple returns for %s cert %s" % (course.handle, type_tag))
-
     def get(self, course, type_tag):
         """Return the CourseCertificate database entry for this course and type."""
         # unnecessary if we use a defaultdict?
         # except we'd still need a bit of structure to instantiate missing certs
         if (course, type_tag) not in self.__certs:
-            certificate_info = self.__fetch_or_create_cert(course, type_tag)
+            assets_path = os.path.join(course.prefix, course.suffix, 'certificates', 'assets')
+            storage_path = os.path.join(course.prefix, course.suffix, 'certificates', 'storage')
+            (certificate_info, create_status) = CourseCertificate.objects.get_or_create(course=course, assets=assets_path, storage=storage_path, type=type_tag)
             self.__certs[(course, type_tag)] = certificate_info
             if GLOBAL_DEBUG: debug_out("Caching cert for %s, %s" % (course.handle, type_tag))
             return certificate_info
@@ -134,7 +118,7 @@ To clarify, here are some examples:
     [{'distinction':[['accomplishment', 0.75], ['challenge-exercises', 0.50]], 'accomplishment': [['accomplishment', 0.50]]}]
     ---end second cert_conditions_file example"""
     option_list = ( 
-                   make_option('-s', '--single', dest='single_student', default="''", help="Force run on only <single_student>"),
+                   make_option('-s', '--single', dest='single_student', default="", help="Force run on only <single_student>"),
                    make_option('-P', '--skip-pdf', dest='skip_pdf', action="store_true", default=False, help="Skip PDF generation and attachment"),
                    make_option('-D', '--debug', dest='DEBUG', action="store_true", default=False, help="Describe everything as it happens"),
                   ) + BaseCommand.option_list
@@ -152,6 +136,7 @@ To clarify, here are some examples:
         single_student_username = options.get('single_student', '')
         if single_student_username:
             single_student = User.objects.get(username=single_student_username)
+        global GLOBAL_DEBUG
         if options['DEBUG']:
             GLOBAL_DEBUG = True
         if GLOBAL_DEBUG: debug_out("Option processing complete, memoizing working objects")
