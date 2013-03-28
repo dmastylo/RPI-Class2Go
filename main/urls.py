@@ -289,8 +289,10 @@ urlpatterns = patterns('',
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
                        
     #Content Sharing
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_course/?$', 'courses.content_sections.views.copy_content_form'),
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_course/send/?$', 'courses.content_sections.views.copy_content'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/?$', 'courses.content_sections.views.copy_content_form'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/send/?$', 'courses.content_sections.views.copy_content'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_course/?$', 'courses.content_sections.views.copy_course_form'),
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_course/send/?$', 'courses.content_sections.views.copy_course'),
                                              
     # Landing Page
     url(r'^/?$', 'courses.landing.views.landing'),

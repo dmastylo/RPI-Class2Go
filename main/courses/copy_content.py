@@ -211,9 +211,9 @@ def copyStageableFile(draft, new_draft_course, new_draft_section):
     if found:
         newdraft.file.name = foundfile.file.name
         newready.file.name = foundfile.file.name  
-    else:
-        newdraft.file.save(new_name, ContentFile(draft.file.read()))
-        newready.file=newdraft.file
+#    else:
+#        newdraft.file.save(new_name, ContentFile(draft.file.read()))
+#        newready.file=newdraft.file
   
     newdraft.save()    
     newready.save()
@@ -257,9 +257,10 @@ def copyStageableExam(draft, new_draft_course, new_draft_section):
     return draft.image.id, newdraft.image.id
 
 
-def copyCourse(old_draft_course, new_draft_course):
+def copyCourse(old_draft_course, new_draft_course, from_section = None):
     """ 
-       Given a draft copy of a Course, copies the content in the course identified by old_draft_course to the
+       Given a draft copy of a ContentSection, copies the content in the ContentSection to the course identified by new_draft_course.
+       Given a draft copy of a Course and from_section is None, copies the content in the whole course identified by old_draft_course to the
        course identified by new_draft_course.
     """
     
@@ -268,8 +269,14 @@ def copyCourse(old_draft_course, new_draft_course):
     file_map = {}
     video_map = {}
     exam_map = {}
+    old_draftcontentsections = []
     
-    old_draftcontentsections = ContentSection.objects.filter(is_deleted=False, course=old_draft_course)
+    if from_section == None:        
+        old_draftcontentsections = ContentSection.objects.filter(is_deleted=False, course=old_draft_course)
+    else:
+        old_draftcontentsections.append(from_section)
+        
+        
     for old_draftcontentsection in old_draftcontentsections:
     
         #Figure out whether to create or reuse section.  Either way the result is newdraft

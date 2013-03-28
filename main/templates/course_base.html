@@ -118,7 +118,8 @@
 				<li><a href="{% url 'courses.reports.views.generate_in_line_report' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'In-line Reports' %}</a></li>
                                 <li><a href="{% url 'courses.member_management.views.listAll' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Member Management' %}</a></li>
                                 {% if common_page_data.course.share_to.exists %}
-				<li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Copy Content To Other Course' %}</a></li>
+				<li><a href="{% url 'courses.content_sections.views.copy_course_form' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Copy Course To Other Course' %}</a></li>
+                <li><a href="{% url 'courses.content_sections.views.copy_content_form' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'Copy Section To Other Course' %}</a></li>				
                                 {% endif %}
 				<!-- <li><a href="{% url 'courses.admin_views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Coming Soon!</a></li> -->
                             </ul>
