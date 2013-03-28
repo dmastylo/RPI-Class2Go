@@ -1105,6 +1105,15 @@ input[type="checkbox"] {
     border: none !important;
 }
 
+#chatPopup {
+    position: absolute;
+    display: none;
+    bottom: 5px;
+    right: 5px;
+    font-size: 24px;
+    height: 18px !important;
+    width: 22px;
+}
 
 ul.exercise-list {
     margin:10px 0 !important;

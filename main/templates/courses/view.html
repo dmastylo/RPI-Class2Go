@@ -186,6 +186,7 @@ $(document).ready(function(){
 	$(this).siblings().animate({height: chatBlockHeight}, 'slow', function() {
 	    $(this).siblings().find('span.openChat').hide();
 	    $(this).siblings().find('span.closeChat').show();
+	    $('#chatPopup').show();
 	});
 	//Candy.Core.connect('{{ nick }}', '{{ nick }}'); /* FIXME: use something more magical */
     }, function() {
@@ -193,6 +194,7 @@ $(document).ready(function(){
 	    $(this).siblings().find('span.openChat').show();
 	    $(this).siblings().find('span.closeChat').hide();
 	});
+	$('#chatPopup').hide();
 	//Candy.Core.disconnect
     });
 
@@ -206,6 +208,11 @@ $(document).ready(function(){
 	    });
 	}
     });
+    
+    $('#chatPopup').click(function() {
+	$('#chat_wrapper').remove();
+        window.open("/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat", "{{ course.title }}", "width=600, height=400");
+    }); 
 });
 </script>
 {% endblock addl_scripts %}
@@ -221,5 +228,6 @@ $(document).ready(function(){
 	        <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
 	    {% endif %} {# jabber_configured and is_logged_in #}
 	{# end Jabber chat plugin block #}
+	<a href="#" onclick="event.preventDefault();" title="Popout Chat Window" class="icon-signout" id="chatPopup"></a>
     </div>
 {% endblock jabber_block %}

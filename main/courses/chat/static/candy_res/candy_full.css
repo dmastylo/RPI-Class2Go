@@ -9,7 +9,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 	font-family: Arial, Helvetica, sans-serif;
-} 
+}
 
 #candy {
 	margin: 0;
@@ -18,12 +18,13 @@ html, body {
 	top: 0;
 	bottom: 0;
 	right: 0;
-	width: 598px;
+	width: 100%;
 	background-color: #bdb7a1;
 	color: #333;
 	overflow: hidden;
 	border: 1px solid #bdb7a1;
 	border-top-left-radius: 10px;
+	box-sizing: border-box;
 }
 
 a {
@@ -72,21 +73,20 @@ ul {
 
 #chat-tabs li a {
 	background-color: #e9e6df;
-	padding: 5px 50px 4px 10px;
+	padding: 6px 20px 4px 1px;
 	display: inline-block;
 	color: #999;
-	height: 20px;
+	height: 19px;
+	font-size: 22px;
+	-webkit-font-smoothing: antialiased;
 }
 
 #chat-tabs li a.label {
 	border-right: 1px solid #bdb7a1;
 	border-bottom: 1px solid #bdb7a1;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
 }
+
 #chat-pane.collapsed-message-pane #chat-tabs li a.label {
-	border-top-right-radius: 0;
-	border-bottom-left-radius: 5px;
 	border-bottom: 0;
 	margin-bottom: 1px;
 }
@@ -108,11 +108,11 @@ ul {
 #chat-tabs li a.close {
 	background-color: transparent;
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: 2px;
+	right: 7px;
 	height: auto;
-	padding: 5px;
-	margin: 1px 5px 0 2px;
+	padding: 0;
+	margin: 0;
 	color: #999;
 }
 #chat-tabs li a.close:hover, #chat-tabs li.active a.close:hover {
@@ -121,14 +121,14 @@ ul {
 
 #chat-tabs li .unread {
 	color: white;
-	background-color: #9b1414;
-	padding: 2px 4px;
-	font-weight: bold;
+	background-color: #8C1515;
+	padding: 1px 2px;
+	font-weight: normal;
 	font-size: 10px;
 	position: absolute;
-	top: 6px;
-	right: 22px;
-	border-radius: 3px;
+	top: 12px;
+	right: 30px;
+	border-radius: 5px;
 }
 
 #chat-tabs li.offline a.label {
@@ -212,7 +212,7 @@ ul {
 	overflow: auto;
 	top: 30px;
 	right: 0;
-	bottom: 0;
+	bottom: 30px;
 	width: 198px;
 	margin: 0;
 }
@@ -241,6 +241,7 @@ ul {
 .roster-pane .user.status-ignored {
 	cursor: default;
 	color: #999;
+	opacity: .5 !important;
 }
 .roster-pane .label {
 	float: left;
