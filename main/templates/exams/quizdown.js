@@ -34,6 +34,7 @@ c2gXMLParse.parseQuizDown = function () {
                    //console.log(obj.meta);
                    var outer_mDOM = c2gXMLParse.importMeta(obj.meta);
                    c2gXMLParse.markdown2quiz(obj.html, outer_mDOM);
+                   c2gXMLParse.renderPreview();
                }
                
            });
