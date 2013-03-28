@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
 from c2g.models import Course, CourseCertificate, CourseStudentScore, UserProfile
+import settings
 from tools.certificates import tasks as cert_tasks
 
 
@@ -34,7 +35,7 @@ class TemplateCache(object):
         # probably not necessary if we use a defaultdict?
         if (asset_prefix, asset_path, cert_type) not in self.__templates:
             infile_name = 'certificate-' + cert_type + '.html'
-            if not asset_prefix: asset_prefix = '/'
+            if not asset_prefix: asset_prefix = getattr(settings, 'MEDIA_ROOT', '/')
             infile_path = os.path.join(asset_prefix, asset_path, infile_name)
             unrendered_template = open(infile_path, 'rb').read()
             self.__templates[(asset_prefix, asset_path, cert_type)] = unrendered_template
@@ -189,7 +190,7 @@ To clarify, here are some examples:
                 if GLOBAL_DEBUG and debug_counter % 100 == 0: debug_out(str(debug_counter))
                 yield student
         def __one_student(course):
-            if GLOBAL_DEBUG: debug_out("Processing single student %s" % student.username)
+            if GLOBAL_DEBUG: debug_out("Processing single student %s" % single_student.username)
             yield single_student
         student_generator = __all_students if not single_student_username else __one_student
 
@@ -235,12 +236,15 @@ To clarify, here are some examples:
                 profile.certificates.add(cert_info)
                 profile.save() 
 
-                if options['skip_pdf']:
+                if not options['skip_pdf']:
                     # Fire off worker task to build the pdf and upload it to s3
                     cert_prefix = ''
                     templatestr = templates.get(cert_prefix, cert_info.assets, cert_info.type)
                     #   this is intrinsically parallel - celery.delay it?
-                    cert_path = cert_tasks.makePDF(templatestr, cert_prefix, course, cert_info, student, context=subtotals_d)
+                    context_d = {}
+                    for k,v in subtotals_d.iteritems():
+                        context_d[k.replace('-','_')] = v
+                    cert_path = cert_tasks.makePDF(templatestr, cert_prefix, course, cert_info, student, context_in=context_d)
                     if GLOBAL_DEBUG: debug_out("Attached PDF for %s at %s" % (student.username, cert_path))
 
         print "Certification process complete. Stats:"

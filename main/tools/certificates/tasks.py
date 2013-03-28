@@ -91,7 +91,8 @@ def makePDF(templatestr, path_prefix, course, certificate, student, context_in={
 
     # Render the template for this student name
     asset_prefix = getattr(settings, 'MEDIA_ROOT', '/')
-    context_in.update({'student_name': student.first_name + ' ' + student.last_name,
+    context_in.update({'student': student,
+                    'student_name': student.first_name + ' ' + student.last_name,
                     'basepath':     os.path.join(asset_prefix, certificate.assets, ''), })
     render_context = Context(context_in)
     pdf_src = Template(templatestr).render(render_context)
