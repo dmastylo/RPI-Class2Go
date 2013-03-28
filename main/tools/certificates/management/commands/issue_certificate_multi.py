@@ -141,9 +141,6 @@ To clarify, here are some examples:
             GLOBAL_DEBUG = True
         if GLOBAL_DEBUG: debug_out("Option processing complete, memoizing working objects")
 
-        # declare a type to make it easy to read what we're doing below
-        Score = namedtuple('Score', ['score', 'total'])
-
         # Working object memoization
         if len(course_handle) == 0:
             raise CommandError("Bad course handle: '%s'" % course_handle)
@@ -172,18 +169,23 @@ To clarify, here are some examples:
             debug_counter = 0
             for student in course.get_all_students():
                 debug_counter += 1
-                if GLOBAL_DEBUG and debug_counter % 100 == 0: debug_out(str(debug_counter))
+                if debug_counter % 100 == 0:
+                    print debug_counter
+                #if GLOBAL_DEBUG and debug_counter % 100 == 0: debug_out(str(debug_counter))
                 yield student
         def __one_student(course):
             if GLOBAL_DEBUG: debug_out("Processing single student %s" % single_student.username)
             yield single_student
         student_generator = __all_students if not single_student_username else __one_student
 
-        def __apply_test(test, subtotals):
+        def __apply_test(test, subtotals_d):
             """A 'test' is a pair like ['scoring tag', percentage_that_passes]"""
             # See also documented cert_conditions_file format at EOF
-            testscore = subtotals_d[test[0]]
-            return testscore.score >= (testscore.total * test[1])
+            #testscore = subtotals_d[test[0]]
+            #                       forces failure on missing key
+            testscore = subtotals_d.get(test[0], (0, 100)) 
+            #       score           total       test multiplier
+            return testscore[0] >= (testscore[1] * test[1])
 
         templates = TemplateCache()
         certificates = CertificateCache()
@@ -199,13 +201,13 @@ To clarify, here are some examples:
             subtotals_d = {}
             subtotals = CourseStudentScore.objects.filter(course=course, student=student).values_list('tag', 'score', 'total')
             for sub in subtotals:
-                subtotals_d[sub[0]] = Score(sub[1], sub[2])
+                subtotals_d[sub[0]] = (sub[1], sub[2])
             # ok now do the binning for real
-            earned_certs = {}
+            earned_certs = set()
             for cert_set in binning:
                 for certificate_type, tests in cert_set.iteritems():
-                    if reduce(lambda x,y: x and y, (__apply_test(test, subtotals) for test in tests)):
-                        earned_certs[certificate_type] = subtotals_d
+                    if reduce(lambda x,y: x and y, (__apply_test(test, subtotals_d) for test in tests)):
+                        earned_certs.add(certificate_type)
                         got_certs[certificate_type] += 1
                 if earned_certs:
                     break
@@ -225,12 +227,11 @@ To clarify, here are some examples:
                     # Fire off worker task to build the pdf and upload it to s3
                     cert_prefix = ''
                     templatestr = templates.get(cert_prefix, cert_info.assets, cert_info.type)
-                    #   this is intrinsically parallel - celery.delay it?
                     context_d = {}
                     for k,v in subtotals_d.iteritems():
                         context_d[k.replace('-','_')] = v
-                    cert_path = cert_tasks.makePDF(templatestr, cert_prefix, course, cert_info, student, context_in=context_d)
-                    if GLOBAL_DEBUG: debug_out("Attached PDF for %s at %s" % (student.username, cert_path))
+                    celery_job = cert_tasks.makePDF.delay(templatestr, cert_prefix, course, cert_info, student, context_in=context_d)
+                    if GLOBAL_DEBUG: debug_out("Attached PDF for %s at %s" % (student.username, celery_job))
 
         print "Certification process complete. Stats:"
         pprint.pprint(got_certs)
