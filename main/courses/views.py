@@ -120,7 +120,7 @@ def main(request, course_prefix, course_suffix):
 def get_upcoming_exams(course):
   end_date = date.today() + timedelta(weeks=2)
   exams = Exam.objects.filter(
-    course=course, 
+    course=course,
     mode='ready',
     is_deleted=0,
     due_date__gte = date.today(),
