@@ -1105,18 +1105,25 @@ input[type="checkbox"] {
     border: none !important;
 }
 
-#chatPopup {
-    position: absolute;
+#chatPopout,
+#chatPopin {
     display: none;
     bottom: 5px;
     right: 5px;
     font-size: 24px;
     height: 18px !important;
     width: 22px;
-    color: #333;
+    color: #666;
 }
-#chatPopup:hover {
-    color: #e9e6df;
+#chatPopout {
+    position: absolute;
+}
+#chatPopin {
+    position: fixed;
+}
+#chatPopout:hover,
+#chatPopin:hover {
+    color: #333;
     text-decoration: none;
 }
 

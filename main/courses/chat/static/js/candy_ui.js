@@ -3,6 +3,8 @@ $(window).load(function() {
     
     if (isInIframe) {
         $('#chat-pane #chat-tabs').prepend('<a href="#" id="chat-expand-arrow"><em class="icon-chevron-right"></em></a>');
+    } else {
+        $('#candy').addClass('poppedOut').append('<a href="#" onclick="event.preventDefault();" title="Pop-In Chat Window" class="icon-signin" id="chatPopin"></a>');
     }
     
     var collapseMessageForm = function() {
@@ -27,5 +29,9 @@ $(window).load(function() {
         collapseMessageForm();
     }, function() {
         expandMessageForm();
+    });
+    
+    $('#chatPopin').click(function() {
+       window.close(); 
     });
 });

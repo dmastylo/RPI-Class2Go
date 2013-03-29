@@ -26,6 +26,23 @@ html, body {
 	border-top-left-radius: 10px;
 	box-sizing: border-box;
 }
+#candy.poppedOut {
+	border-top-left-radius: 0 !important;
+}
+
+#chatPopin {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	font-size: 24px;
+	height: 18px !important;
+	width: 22px;
+	color: #666;
+}
+#chatPopin:hover {
+	color: #333;
+	text-decoration: none;
+}
 
 a {
 	color: #333;
