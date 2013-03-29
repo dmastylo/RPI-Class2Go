@@ -4,6 +4,7 @@ from textwrap import wrap
 from collections import namedtuple
 from pprint import pprint
 import sys
+from datetime import datetime
 
 try:
     from dateutil import parser
@@ -40,7 +41,7 @@ class Command(BaseCommand):
         make_option("-c", "--courseid", dest="course_id", type="int", 
             help="Select by course.  If only this option is chosen, all exams " \
                     "for that course will be selected."),
-        make_option("-t", "--type", dest="type", type="string",
+        make_option("-t", "--type", dest="examtype", type="string",
             help="Select by type, valid values are: %s" \
                     % ", ".join(sorted(exam_types))),
 
@@ -57,10 +58,6 @@ class Command(BaseCommand):
 
     ) + BaseCommand.option_list
 
-#        make_option("--start", dest="start_time",
-#            help="consider entries no earlier than X, eg \"2/17/2013\" or \"1/1/2012 14:40\". We use the python dateutil parser on dates, see http://labix.org/python-dateutil"),
-#        make_option("--end", dest="end_time",
-#            help="consider entries no later than X"),
 
     def validate_selector(self, options):
         """
@@ -71,7 +68,7 @@ class Command(BaseCommand):
         if not (options['exam_ids'] or options['course_id']):
             raise CommandError("At least one of exam_ids (-e) or course_id (-c) is required.")
 
-        Selector = namedtuple('Selector', 'exam_ids, course_id, type')
+        Selector = namedtuple('Selector', 'exam_ids, course_id, examtype')
 
         result_exam_id_list = []
         if options['exam_ids']:
@@ -88,16 +85,14 @@ class Command(BaseCommand):
                     raiseCommandError("Exam ID parsing error, %s" % errstr)
                 result_exam_id_list.append(exid)
 
-        result_type = None
-        if options['type']:
-            if options['type'] not in self.exam_types:
+        if options['examtype']:
+            if options['examtype'] not in self.exam_types:
                 raise CommandError("Invalid exam type \"%s\" given, allowed types are: %s"
-                    % (options['type'], ", ".join(sorted(self.exam_types))))
-            result_type = options['type']
+                    % (options['examtype'], ", ".join(sorted(self.exam_types))))
 
         return Selector(exam_ids=result_exam_id_list, 
                 course_id=options['course_id'], 
-                type=result_type)
+                examtype=options['examtype'])
 
 
     def validate_setters(self, options):
@@ -120,7 +115,41 @@ class Command(BaseCommand):
                 raise CommandError("value \"%s\" isn't a valid property of Exam, valid values are %s"
                         % (splitcmd[0], self.exam_attrs))
             resultdict[name] = val
+
         return resultdict
+
+
+    def value_convert(self, comparison_field, new_value):
+        """
+        Given a field to compare with, decide how we want to convert the value
+        we are given.  We have to do here, relatively deep in the processing,
+        since we need a real instance of an Exam record to compare with, the
+        class definition or test insance won't do.
+        """
+
+        # BOOLEAN
+        if isinstance(comparison_field, bool):
+            if new_value.lower() == "false":
+                return False
+            else:
+                return True
+
+        # DATETIME
+        elif isinstance(comparison_field, datetime):
+            if not parser:
+                raise CommandError("cannot use date function without \"dateutil\" installed.")
+            return parser.parse(new_value)
+
+        # NUMBERS
+        elif isinstance(comparison_field, long):
+            return long(new_value)
+        elif isinstance(comparison_field, float):
+            return float(new_value)
+        elif isinstance(comparison_field, int):
+            return int(new_value)
+
+        # STRING (BASE CASE)
+        return new_value
 
 
     def handle(self, *args, **options):
@@ -133,5 +162,43 @@ class Command(BaseCommand):
         sys.stdout.write("Setters = ")
         pprint(setter_dict)
                 
-        
-        
+        exams = Exam.objects.all()
+        if selector.course_id:
+            exams = exams.filter(course=selector.course_id)
+        if selector.exam_ids:
+            exams = exams.filter(id__in=selector.exam_ids)
+        if selector.examtype:
+            exams = exams.filter(exam_type=selector.examtype)
+
+        # execute the query
+        matches = len(exams)
+        changes = 0
+        updates = 0
+
+        for exam in exams:
+            statusline = "Exam %4d, \"%s\"" % (exam.id, exam.title)
+            exam_has_pending_changes = False
+            for (name, val) in setter_dict.iteritems():
+                # val_converted will be the same type as the exam obj attribute
+                val_converted = self.value_convert(exam.__dict__[name], val)
+                if exam.__dict__[name] == val_converted:
+                    print "OK %s, %s --> %s: %s" % (name, exam.__dict__[name], val, statusline)
+                else:
+                    print "CHANGE %s, %s --> %s: %s" % (name, exam.__dict__[name], val, statusline)
+                    changes += 1
+                    exam.__dict__[name] = val_converted
+                    exam_has_pending_changes = True
+
+            if exam_has_pending_changes:
+                if options['dryrun']:
+                    exam.revert()
+                else:
+                    updates += 1
+                    exam.save()
+
+        print
+        print "## Summary"
+        print "# Found exams: %d" % matches
+        print "# Changes:     %d" % changes
+        print "# DB Updates:  %d" % updates
+
