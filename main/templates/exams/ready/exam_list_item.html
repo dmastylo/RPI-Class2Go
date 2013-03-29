@@ -39,11 +39,11 @@
                                 <a href="{% url exam.record_view common_page_data.course_prefix common_page_data.course_suffix exam.slug record.id %}">
                                     {% trans 'Attempt at' %} {{ record.time_created }}
                                 </a>
-                                :  {% trans 'Score' %} {{record.score}} / {{record.get_total_score}}
+                                :  {% trans 'Score' %} {{record.score|floatformat:"-2"}} / {{record.get_total_score|floatformat:"-2"}}
                                 {% if record.late or record.attempt_number > 1 and exam.resubmission_penalty > 0 %}
-                                ( {% trans 'Raw score' %}: {{ record.examrecordscore.raw_score }} with
+                                ( {% trans 'Raw score' %}: {{ record.examrecordscore.raw_score|floatformat:"-2" }} with
                                     {% if record.late %}
-                                        {{exam.late_penalty}}% {% trans 'late penalty' %}
+                                        {{record|getActualLatePenaltyPercent:exam}}% {% trans 'late penalty' %}
                                         {% if record.attempt_number > 1 and exam.resubmission_penalty > 0 %}
                                             {% trans 'and' %}
                                         {% endif %}

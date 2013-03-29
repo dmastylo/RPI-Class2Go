@@ -12,7 +12,6 @@ from courses.exams.autograder import *
 from courses.exams.views import compute_penalties
 from fake_remote_grader import *
 
-@attr('slow')
 class SimpleTest(TestCase):
     def test_multiple_choice_factory_normal(self):
         """
@@ -405,30 +404,42 @@ class SimpleTest(TestCase):
         self.assertEqual(ag.points('kadsf'),0)
         self.assertEqual(ag.question_points('problem_4'),141)
         self.assertEqual(ag.question_points('DNE'),0)
+
+    def float_compare(self, a, b, tolerance=0.001):
+        print "(%f, %f)" % (a,b)
+        return  b * (1-tolerance) <= a and a <= b * (1+tolerance)
+
     
     def test_resubmission_and_late_penalty(self):
         """Unit test for the discount function """
-        def float_compare(a, b, tolerance=0.001):
-            print "(%f, %f)" % (a,b)
-            return  b * (1-tolerance) <= a and a <= b * (1+tolerance)
-        
         #Only resub penalty
-        self.assertTrue(float_compare(compute_penalties(100, 1, 0, False, 0), 100))
-        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, False, 0), 100.0))
-        self.assertTrue(float_compare(compute_penalties(100.0, 2, 15, False, 0), 85.0))
-        self.assertTrue(float_compare(compute_penalties(100.0, 3, 15, False, 0), 72.25))
-        self.assertTrue(float_compare(compute_penalties(100.0, 3, 150, False, 0), 0))
+        self.assertTrue(self.float_compare(compute_penalties(100, 1, 0, False, 0), 100))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, False, 0), 100.0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 2, 15, False, 0), 85.0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 15, False, 0), 72.25))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 150, False, 0), 0))
         #Only late penalty
-        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, True, 50), 50.0))
-        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, False, 50), 100.0))
-        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, True, 150), 0))
-        self.assertTrue(float_compare(compute_penalties(100.0, 1, 0, False, 150), 100.0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 50), 50.0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, False, 50), 100.0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 150), 0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, False, 150), 100.0))
         #Both penalties
-        self.assertTrue(float_compare(compute_penalties(100.0, 2, 15, True, 50), 42.5))
-        self.assertTrue(float_compare(compute_penalties(100.0, 3, 15, True, 50), 36.125))
-        self.assertTrue(float_compare(compute_penalties(100.0, 3, 15, True, 150), 0))
-        self.assertTrue(float_compare(compute_penalties(100.0, 3, 150, True, 50), 0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 2, 15, True, 50), 42.5))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 15, True, 50), 36.125))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 15, True, 150), 0))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 150, True, 50), 0))
 
+    def test_daily_penalty(self):
+        """Unit test for the discount function """
+        #Only daily penalty and late penalty
+        self.assertTrue(self.float_compare(compute_penalties(100, 1, 0, False, 0, late_days=0, daily_late_penalty=0), 100))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 0, late_days=3, daily_late_penalty=10), 100*.9*.9*.9))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 50, late_days=3, daily_late_penalty=10), 100*.5*.9*.9*.9))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, False, 50, late_days=3, daily_late_penalty=10), 100))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 0, late_days=3, daily_late_penalty=110), 0))
+
+        #all penalties
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 15, True, 50, late_days=3, daily_late_penalty=10), 100*.85*.85*.5*.9*.9*.9))
 
     def test_regex_metadata_errors(self):
         """
@@ -784,7 +795,7 @@ class SimpleTest(TestCase):
             g = ag.grade("q1b", unicode_string)
             self.assertEqual(g, {'correct': False, 'score': 0, 'feedback': fb})
 
-
+    @attr('slow')
     def test_interactive_bad_input(self):
         """Interactive autograder error handling, bad input
 
@@ -814,7 +825,7 @@ class SimpleTest(TestCase):
             g = ag.grade("q1b", "should be OK")
             self.assertEqual(g, {'correct': True, 'score': 1.0, 'feedback': [{"explanation": ""}] })
 
-
+    @attr('slow')
     def test_interactive_retries(self):
         """Interactive autograder error handling, retry logic"""
 
@@ -832,7 +843,7 @@ class SimpleTest(TestCase):
             with self.assertRaises(AutoGraderGradingException):
                 g = ag.grade("q1b", "should eventually score, incorrectly")
 
-
+    @attr('slow')
     def test_grader_caching(self):
         """interactive autograder caching
         
