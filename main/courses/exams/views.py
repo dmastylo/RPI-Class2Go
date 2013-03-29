@@ -6,6 +6,7 @@ import json
 import logging
 import markdown
 import operator
+import math
 from pytz import timezone
 
 from django.db.models import Max, F
@@ -611,9 +612,11 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
         #Set penalty inclusive score for ExamRecord
         record.json_score_data = json.dumps(feedback)
-        
+
         #apply penalties
-        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty)
+        late_timedelta = max(datetime.timedelta(0), record.time_created - exam.grace_period)
+        hours_late = math.ceil(late_timedelta.total_seconds() / 3600)
+        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty, late_hours=hours_late, hourly_late_penalty = exam.hourly_late_penalty)
         record.save()
         
         #Set ExamScore.score to max of ExamRecord.score for that student, exam. 
@@ -667,6 +670,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     grace_period = request.POST.get('grace_period', '')
     partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
     late_penalty = request.POST.get('late_penalty', '')
+    hourly_late_penalty = request.POST.get('hourly_late_penalty', '')
     num_subs_permitted = request.POST.get('num_subs_permitted','')
     resubmission_penalty = request.POST.get('resubmission_penalty','')
     assessment_type = request.POST.get('assessment_type','')
@@ -775,6 +779,15 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         except ValueError:
             return HttpResponseBadRequest("A non-numeric late penalty (" + late_penalty  + ") was provided")
 
+    if not hourly_late_penalty:
+        hlp = 0
+    else:
+        try:
+            hlp = int(hourly_late_penalty)
+        except ValueError:
+            return HttpResponseBadRequest("A non-numeric hourly late penalty (" + hourly_late_penalty  + ") was provided")
+
+
     if not num_subs_permitted:
         sp = 999
     else:
@@ -795,7 +808,8 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     if create_or_edit == "create":
         exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent,
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
-                        grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
+                        grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, hourly_late_penalty=hlp, submissions_permitted=sp,
+                        resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
                         xml_imported=xmlImported, quizdown=quizdown, hide_grades=hide_grades
                         )
@@ -840,6 +854,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.grace_period=gp
             exam_obj.partial_credit_deadline=pcd
             exam_obj.late_penalty=lp
+            exam_obj.hourly_late_penalty=hlp
             exam_obj.submissions_permitted=sp
             exam_obj.resubmission_penalty=rp
             exam_obj.exam_type=exam_type
@@ -927,7 +942,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported, 'quizdown':exam.quizdown,
-          'hide_grades':exam.hide_grades}
+          'hide_grades':exam.hide_grades, 'hourly_late_penalty':exam.hourly_late_penalty}
 
     groupable_exam = exam
     if exam.mode != 'ready':

@@ -150,11 +150,13 @@
             <input id="hard_deadline" class="picker"  type="text" name="hard_deadline" value="" data-datetimepicker>
         </div>
         <div class="atomic-unit well" id="penalties" >
-            <label class="control-label" for="late_penalty">{% trans 'Late Penalty' %}:*</label>
+            <label class="control-label" for="late_penalty">{% trans '% Late Penalty (constant)' %}:*</label>
             <input id="late_penalty" name="late_penalty" type="text" value="0"/>
+            <label class="control-label" for="hourly_late_penalty">{% trans '% Late Penalty (per hour)' %}:*</label>
+            <input id="hourly_late_penalty" name="hourly_late_penalty" type="text" value="0"/>
             <label class="control-label" for="num_subs_permitted">{% trans 'Number of Submissions Allowed' %}:*</label>
             <input id="num_subs_permitted" name="num_subs_permitted" type="text" value="999"/>
-            <label class="control-label" for="resubmission_penalty">{% trans 'Penalty Per Submission After First' %}:*</label>
+            <label class="control-label" for="resubmission_penalty">{% trans '% Penalty Per Submission After First' %}:*</label>
             <input id="resubmission_penalty" name="resubmission_penalty" type="text" value="0" />
             <label class="control-label" for="hide_grades">Hide grades from students?</label>
             <input id="hide_grades" type="checkbox" name="hide_grades" />
@@ -696,6 +698,7 @@ age: 20,
                        partial_credit_deadline:$('input#hard_deadline').val(),
                        assessment_type:$('select#assessment_type').val(),
                        late_penalty:$('input#late_penalty').val(),
+                       hourly_late_penalty:$('input#hourly_late_penalty').val(),
                        num_subs_permitted:$('input#num_subs_permitted').val(),
                        resubmission_penalty:$('input#resubmission_penalty').val(),
                        description:$('textarea#description').val(),
@@ -773,6 +776,7 @@ age: 20,
         $('input#hard_deadline').val(prepop.partial_credit_deadline);
         $('select#assessment_type').val(prepop.assessment_type);
         $('input#late_penalty').val(prepop.late_penalty);
+        $('input#hourly_late_penalty').val(prepop.hourly_late_penalty);
         $('input#num_subs_permitted').val(prepop.num_subs_permitted);
         $('input#resubmission_penalty').val(prepop.resubmission_penalty);
         $('textarea#description').val(prepop.description);
