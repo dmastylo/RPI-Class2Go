@@ -31,7 +31,7 @@
 {% block m_column_content %}
 <div id="c2g_layout_m_column" class="span6">
 
-    {% if course_ended and course_cert%}
+    {% if course_cert%}
 	<div class="well statement">
 	    <h2>{% trans "Congratulations!" %}</h2>
 	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
