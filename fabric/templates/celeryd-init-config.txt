@@ -2,7 +2,7 @@
 CELERYD_NODES="{{ app_name }}-default {{ app_name }}-long"
 
 # Where to chdir at start.
-CELERYD_CHDIR={{ admin_home }}/{{ app_name }}/main"
+CELERYD_CHDIR="{{ admin_home }}/{{ app_name }}/main"
 
 # How to call "manage.py celeryd_multi"
 CELERYD_MULTI="$CELERYD_CHDIR/manage.py celeryd_multi"
