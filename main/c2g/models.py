@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from hashlib import md5
 import logging
 import os

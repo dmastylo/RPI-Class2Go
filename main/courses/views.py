@@ -96,14 +96,9 @@ def main(request, course_prefix, course_suffix):
             share_block_title = 'Share Something!'
     else:
         is_logged_in = 0
-
+    
     # Environment prep for jabber chat plugin. Uses '' == False.
     jabber_configured = getattr(settings, 'JABBER_DOMAIN', '')
-
-    if (course.calendar_end < date.today()):
-        course_ended = True
-    else:
-        course_ended = False
         
     if (course.calendar_start > date.today()):
         share_block_type = 'join'
@@ -116,7 +111,6 @@ def main(request, course_prefix, course_suffix):
         'many_announcements':      many_announcements,
         'is_logged_in':            is_logged_in,
         'course_cert':             course_cert,
-        'course_ended':            course_ended,
         'share_block_title':       share_block_title,
         'share_block_type':        share_block_type,
         'jabber_configured':       jabber_configured,

@@ -384,6 +384,10 @@ body.home {
     float:left;
 }
 
+.hidden {
+    visibility:none;
+}
+
 /* Common
 -------------------------------------------------- */
 .section-title {
@@ -1158,6 +1162,23 @@ ul.ui-sortable li:hover {
 }
 .assessment-type ul li {
     list-style-type:none;
+}
+
+.edit-button { 
+    float:right;
+    color:green;
+    margin:5px;
+}
+
+.delete-button { 
+    float:right;
+    color:red;
+    margin:5px;
+}
+
+.move-button {
+    float:right;
+    margin:2px;
 }
 
 /* jQuery UI
