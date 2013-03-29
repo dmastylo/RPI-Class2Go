@@ -1,4 +1,5 @@
 # Django settings for botofab project.
+from os import path
 
 DEBUG = True
 # TEMPLATE_DEBUG = DEBUG
@@ -21,13 +22,14 @@ DATABASES = {
 }
 
 APP_TYPE = "dev"
-VM_TYPE = "EC2"                      # EC2, VAGRANT, LOCALHOST
+VM_TYPE = "VAGRANT"                      # EC2, VAGRANT, LOCALHOST
 
 if APP_TYPE == "dev":
     from dev_settings import *
 elif APP_TYPE == "dev_vagrant":
     from dev_vagrant_settings import *
 elif APP_TYPE == "prod":
+    from prod_settings import *
 elif APP_TYPE == "staging":
     from staging_settings import *
 
@@ -111,17 +113,20 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-ROOT_URLCONF = 'class2go_fabric.urls'
+ROOT_URLCONF = 'urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'class2go_fabric.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
+thispath = path.dirname(path.realpath(__file__))
 TEMPLATE_DIRS = (
-    "/Users/dglance/DevProjects/class2go/class2go_fabric/templates"
+    thispath+'/templates'
+
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
 
 INSTALLED_APPS = (
     'django.contrib.auth',

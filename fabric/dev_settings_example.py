@@ -1,4 +1,5 @@
-
+ADMIN_USER='vagrant'
+ADMIN_HOME='/home/vagrant'
 
 EC2_REGION = "ap-southeast-2"
 EC2_AMI = "ami-e2ba2cd8"
