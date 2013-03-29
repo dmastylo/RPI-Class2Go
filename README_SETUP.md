@@ -443,9 +443,9 @@ Note that to use this, you will have to set the environment variable C2G_HEADLES
 
 3. [Optional] Install wkhtmltopdf for statement generation. xhtmltopdf can be
    used, but it has poor CSS support. For nice CSS support, you can use
-   embedded webkit with wkhtmltopdf:
+   embedded webkit with wkhtmltopdf, and drive it with the python-pdfkit library:
 
-        sudo apt-get install wkhtmltopdf
+        sudo apt-get install wkhtmltopdf xvfb libicu48 libicu-dev
 
 Note that this pulls in number of dependencies. It's generally not recommended
 to install all of this anywhere it's not strictly needed. You will also require

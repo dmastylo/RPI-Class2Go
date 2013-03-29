@@ -116,7 +116,12 @@ To clarify, here are some examples:
     mutual exclusion:
     ---begin second cert_conditions_file example
     [{'distinction':[['accomplishment', 0.75], ['challenge-exercises', 0.50]], 'accomplishment': [['accomplishment', 0.50]]}]
-    ---end second cert_conditions_file example"""
+    ---end second cert_conditions_file example
+    
+    The PDFKti library has a number of system dependencies which cannot be
+    installed from pip. Please check the tools/certificates/README_WKHTML.md
+    and README_SETUP.md for additional notes.
+    """
     option_list = ( 
                    make_option('-s', '--single', dest='single_student', default="", help="Force run on only <single_student>"),
                    make_option('-P', '--skip-pdf', dest='skip_pdf', action="store_true", default=False, help="Skip PDF generation and attachment"),
