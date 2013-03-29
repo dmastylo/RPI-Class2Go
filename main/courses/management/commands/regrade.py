@@ -2,7 +2,6 @@ try:
     from dateutil import parser
 except ImportError, msg:
     parser = False
-import string
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
@@ -52,7 +51,7 @@ class Command(BaseCommand):
             end = parser.parse(options['end_time'])
             examRecords = examRecords.filter(time_created__lt=end)
         if options['student_ids']:
-            sidlist = string.split(options['student_ids'], ',')
+            sidlist = options['student_ids'].split(',')
             examRecords = examRecords.filter(student__in=sidlist)
         # search in reverse ID order so that the latest attempts get precedence.  If two 
         # attempts have the same score, then want the latest attempt to be the one that 
@@ -70,8 +69,11 @@ class Command(BaseCommand):
             ers = er.examrecordscore
             if ers is None:
                 ers = ExamRecordScore(record=er, raw_score=0.0)
+                ers_id_string = "new"
                 ers_created = True
-            print "ExamRecord %d, %d of %d" % (er.id, count, len(examRecords))
+            else:
+                ers_id_string = str(ers.id)
+            print "ExamRecord %d, %d of %d".encode('ascii','ignore') % (er.id, count, len(examRecords))
             count += 1
             try:
                 score_before = er.score
@@ -98,7 +100,8 @@ class Command(BaseCommand):
             
                 is_late = er.time_created > exam_obj.grace_period
                 if er.attempt_number == 0:
-                    print "ERROR: examrecord %d: skip, attempt_number=0" % er.id
+                    print "ERROR: examrecord %d: skip, attempt_number=0".encode('ascii','ignore') \
+                            % er.id
                     errors += 1
                     continue
                 if options['penalties']:
@@ -111,31 +114,33 @@ class Command(BaseCommand):
 
                 try:
                     es = ExamScore.objects.get(exam=exam_obj, student=s)
+                    es_id_string = str(es.id)
                     examscore_before = es.score
                 except ExamScore.DoesNotExist:
                     es = ExamScore(course=er.course, exam=exam_obj, student=s)
+                    es_id_string = "new"
                     examscore_before = -1
                 examscore_after = max(examscore_before, score_after)
                 
                 #raw = raw score, score = with penalties, agg = exam_score, over all attempts
-                status_line =  "\"%s\", \"%s\", %s, %s, %s, " \
-                        % (s.first_name, s.last_name, s.username, s.email, str(er.time_created))
-                status_line += "raw[%d]:%0.1f->%0.1f " \
-                        % (ers.id, rawscore_before, rawscore_after)
-                status_line += "score[%d]:%0.1f->%0.1f " \
+                status_line =  u"\"%s\", \"%s\", %s, %s, %s, " \
+                        % (s.first_name, s.last_name, s.username, s.email, er.time_created)
+                status_line += u"raw[%s]:%0.1f->%0.1f " \
+                        % (ers_id_string, rawscore_before, rawscore_after)
+                status_line += u"score[%d]:%0.1f->%0.1f " \
                         % (er.id, score_before, score_after)
-                status_line += "agg[%d]:%0.1f->%0.1f " \
-                        % (es.id, examscore_before, examscore_after)
-                status_line += "late:%d->%d" \
+                status_line += u"agg[%s]:%0.1f->%0.1f " \
+                        % (es_id_string, examscore_before, examscore_after)
+                status_line += u"late:%d->%d" \
                         % (er.late, is_late)
                         
                 if score_before == score_after and rawscore_before == rawscore_after \
                    and examscore_before == examscore_after and is_late == er.late :
-                    print "OK: " + status_line
+                    print "OK: " +  status_line.encode('ascii','ignore')
                     continue
 
                 regrades += 1
-                print "REGRADE: " + status_line
+                print "REGRADE: " + status_line.encode('ascii','ignore') 
 
                 if not options['dryrun']:
                     if score_before != score_after or is_late != er.late:
@@ -157,7 +162,8 @@ class Command(BaseCommand):
             # exception handler around big ExamRecords loop -- trust me, it lines up
             # this just counts and skips offending rows so we can keep making progress
             except Exception as e:
-                print "ERROR: examrecord %d: cannot regrade: %s" % (er.id, str(e))
+                print u"ERROR: examrecord %d: cannot regrade: %s".encode('ascii','ignore') \
+                        % (er.id, unicode(e))
                 errors += 1
                 continue
 

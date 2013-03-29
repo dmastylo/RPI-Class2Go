@@ -160,6 +160,10 @@ requirements files and run the local equivalent of
 
 for each package listed therein.
 
+1. [Optional] If you want mass-emailing to work, install 'lynx' command-line utility:
+
+    brew install lynx
+
 1. [Nota Bene] [Optional] Install chrome for Selenium testing
 
         # chromedriver - list of options available here:
@@ -270,6 +274,7 @@ Steps:
 		python image library (pip install PIL)
         django_storages
         boto
+        lynx (for mass mailing)
 
 2. Install South, the database schema migration tool: (this will be inside the virtualenv)
     easy_install South
@@ -418,6 +423,10 @@ requirements files and run the local equivalent of
         pip install <packagename>
 
 for each package listed therein.
+
+3. [Optional] If you want mass-email sending to work, install the 'lynx' package:
+
+    sudo apt-get install lynx-cur
 
 3. [Nota Bene] [Optional] Install chrome for Selenium testing
 
