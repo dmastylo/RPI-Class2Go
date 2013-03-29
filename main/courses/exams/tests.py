@@ -429,17 +429,17 @@ class SimpleTest(TestCase):
         self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 15, True, 150), 0))
         self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 150, True, 50), 0))
 
-    def test_hourly_penalty(self):
+    def test_daily_penalty(self):
         """Unit test for the discount function """
-        #Only hourly penalty and late penalty
-        self.assertTrue(self.float_compare(compute_penalties(100, 1, 0, False, 0, late_hours=0, hourly_late_penalty=0), 100))
-        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 0, late_hours=3, hourly_late_penalty=10), 100*.9*.9*.9))
-        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 50, late_hours=3, hourly_late_penalty=10), 100*.5*.9*.9*.9))
-        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, False, 50, late_hours=3, hourly_late_penalty=10), 100))
-        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 0, late_hours=3, hourly_late_penalty=110), 0))
+        #Only daily penalty and late penalty
+        self.assertTrue(self.float_compare(compute_penalties(100, 1, 0, False, 0, late_days=0, daily_late_penalty=0), 100))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 0, late_days=3, daily_late_penalty=10), 100*.9*.9*.9))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 50, late_days=3, daily_late_penalty=10), 100*.5*.9*.9*.9))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, False, 50, late_days=3, daily_late_penalty=10), 100))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 1, 0, True, 0, late_days=3, daily_late_penalty=110), 0))
 
         #all penalties
-        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 15, True, 50, late_hours=3, hourly_late_penalty=10), 100*.85*.85*.5*.9*.9*.9))
+        self.assertTrue(self.float_compare(compute_penalties(100.0, 3, 15, True, 50, late_days=3, daily_late_penalty=10), 100*.85*.85*.5*.9*.9*.9))
 
     def test_regex_metadata_errors(self):
         """

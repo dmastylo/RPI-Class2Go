@@ -584,6 +584,7 @@ var c2gXMLParse = (function() {
                    
                    if (gradingDOM.length) {
                        setValIfDef($('input#late_penalty'), $(gradingDOM).attr('late-penalty'));
+                       setValIfDef($('input#daily_late_penalty'), $(gradingDOM).attr('daily-late-penalty'));
                        setValIfDef($('input#num_subs_permitted'), $(gradingDOM).attr('num-submissions'));
                        setValIfDef($('input#resubmission_penalty'), $(gradingDOM).attr('resubmission-penalty'));
     

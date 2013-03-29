@@ -615,8 +615,8 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
         #apply penalties
         late_timedelta = max(datetime.timedelta(0), record.time_created - exam.grace_period)
-        hours_late = math.ceil(late_timedelta.total_seconds() / 3600)
-        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty, late_hours=hours_late, hourly_late_penalty = exam.hourly_late_penalty)
+        days_late = math.ceil(late_timedelta.total_seconds() / (3600.0*24.0))
+        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty, late_days=days_late, daily_late_penalty = exam.daily_late_penalty)
         record.save()
         
         #Set ExamScore.score to max of ExamRecord.score for that student, exam. 
@@ -629,7 +629,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         return HttpResponse("Submission has been saved.")
 
 
-def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty, late_hours=0, hourly_late_penalty=0):
+def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty, late_days=0, daily_late_penalty=0):
     """Helper function to factor out resubmission and late penalty calculations, 
        so I can write a few unit tests for it
     """
@@ -638,9 +638,9 @@ def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, 
     late_discount = max(0.0, 100.0 - late_penalty)/100.0
     if is_late:
         score *= late_discount
-        if late_hours:
-            hourly_discount = pow(max(0.0, (100.0 - hourly_late_penalty)/100.0), late_hours)
-            score *= hourly_discount
+        if late_days:
+            daily_discount = pow(max(0.0, (100.0 - daily_late_penalty)/100.0), late_days)
+            score *= daily_discount
     return max(score, 0.0)
 
 @require_POST
@@ -670,7 +670,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     grace_period = request.POST.get('grace_period', '')
     partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
     late_penalty = request.POST.get('late_penalty', '')
-    hourly_late_penalty = request.POST.get('hourly_late_penalty', '')
+    daily_late_penalty = request.POST.get('daily_late_penalty', '')
     num_subs_permitted = request.POST.get('num_subs_permitted','')
     resubmission_penalty = request.POST.get('resubmission_penalty','')
     assessment_type = request.POST.get('assessment_type','')
@@ -779,13 +779,13 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         except ValueError:
             return HttpResponseBadRequest("A non-numeric late penalty (" + late_penalty  + ") was provided")
 
-    if not hourly_late_penalty:
-        hlp = 0
+    if not daily_late_penalty:
+        dlp = 0
     else:
         try:
-            hlp = int(hourly_late_penalty)
+            dlp = int(daily_late_penalty)
         except ValueError:
-            return HttpResponseBadRequest("A non-numeric hourly late penalty (" + hourly_late_penalty  + ") was provided")
+            return HttpResponseBadRequest("A non-numeric daily late penalty (" + daily_late_penalty  + ") was provided")
 
 
     if not num_subs_permitted:
@@ -808,7 +808,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     if create_or_edit == "create":
         exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent,
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
-                        grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, hourly_late_penalty=hlp, submissions_permitted=sp,
+                        grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, daily_late_penalty=dlp, submissions_permitted=sp,
                         resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
                         xml_imported=xmlImported, quizdown=quizdown, hide_grades=hide_grades
@@ -854,7 +854,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.grace_period=gp
             exam_obj.partial_credit_deadline=pcd
             exam_obj.late_penalty=lp
-            exam_obj.hourly_late_penalty=hlp
+            exam_obj.daily_late_penalty=dlp
             exam_obj.submissions_permitted=sp
             exam_obj.resubmission_penalty=rp
             exam_obj.exam_type=exam_type
@@ -942,7 +942,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported, 'quizdown':exam.quizdown,
-          'hide_grades':exam.hide_grades, 'hourly_late_penalty':exam.hourly_late_penalty}
+          'hide_grades':exam.hide_grades, 'daily_late_penalty':exam.daily_late_penalty}
 
     groupable_exam = exam
     if exam.mode != 'ready':

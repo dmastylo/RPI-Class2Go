@@ -1922,7 +1922,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     grace_period = models.DateTimeField(null=True, blank=True)
     partial_credit_deadline = models.DateTimeField(null=True, blank=True)
     late_penalty = models.IntegerField(default=0, null=True, blank=True)
-    hourly_late_penalty = models.FloatField(default=0.0, null=True, blank=True)
+    daily_late_penalty = models.FloatField(default=0.0, null=True, blank=True)
     submissions_permitted = models.IntegerField(default=999, null=True, blank=True)
     resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
     autograde = models.BooleanField(default=False)
@@ -2103,7 +2103,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             xml_imported = self.xml_imported,
             partial_credit_deadline = self.partial_credit_deadline,
             late_penalty = self.late_penalty,
-            hourly_late_penalty = self.hourly_late_penalty,
+            daily_late_penalty = self.daily_late_penalty,
             submissions_permitted = self.submissions_permitted,
             resubmission_penalty = self.resubmission_penalty,
             autograde = self.autograde,
@@ -2157,8 +2157,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.partial_credit_deadline = self.partial_credit_deadline
         if not clone_fields or 'late_penalty' in clone_fields:
             ready_instance.late_penalty = self.late_penalty
-        if not clone_fields or 'hourly_late_penalty' in clone_fields:
-            ready_instance.hourly_late_penalty = self.hourly_late_penalty
+        if not clone_fields or 'daily_late_penalty' in clone_fields:
+            ready_instance.daily_late_penalty = self.daily_late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
             ready_instance.submissions_permitted = self.submissions_permitted
         if not clone_fields or 'resubmission_penalty' in clone_fields:
@@ -2220,8 +2220,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             self.partial_credit_deadline = ready_instance.partial_credit_deadline 
         if not clone_fields or 'late_penalty' in clone_fields:
             self.late_penalty = ready_instance.late_penalty
-        if not clone_fields or 'hourly_late_penalty' in clone_fields:
-            self.hourly_late_penalty = ready_instance.hourly_late_penalty
+        if not clone_fields or 'daily_late_penalty' in clone_fields:
+            self.daily_late_penalty = ready_instance.daily_late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
             self.submissions_permitted = ready_instance.submissions_permitted 
         if not clone_fields or 'resubmission_penalty' in clone_fields:
@@ -2283,7 +2283,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             return False
         if self.late_penalty != self.image.late_penalty:
             return False
-        if self.hourly_late_penalty != self.image.hourly_late_penalty:
+        if self.daily_late_penalty != self.image.daily_late_penalty:
             return False
         if self.submissions_permitted != self.image.submissions_permitted:
             return False

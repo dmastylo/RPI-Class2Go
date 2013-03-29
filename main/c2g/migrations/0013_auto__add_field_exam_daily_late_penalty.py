@@ -8,15 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Exam.hourly_late_penalty'
-        db.add_column('c2g_exam', 'hourly_late_penalty',
+        # Adding field 'Exam.daily_late_penalty'
+        db.add_column('c2g_exam', 'daily_late_penalty',
                       self.gf('django.db.models.fields.FloatField')(default=0.0, null=True, blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'Exam.hourly_late_penalty'
-        db.delete_column('c2g_exam', 'hourly_late_penalty')
+        # Deleting field 'Exam.daily_late_penalty'
+        db.delete_column('c2g_exam', 'daily_late_penalty')
 
 
     models = {
@@ -217,6 +217,7 @@ class Migration(SchemaMigration):
             'assessment_type': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
             'autograde': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['c2g.Course']"}),
+            'daily_late_penalty': ('django.db.models.fields.FloatField', [], {'default': '0.0', 'null': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'display_single': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'due_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
@@ -224,7 +225,6 @@ class Migration(SchemaMigration):
             'grace_period': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'grade_single': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'hide_grades': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'hourly_late_penalty': ('django.db.models.fields.FloatField', [], {'default': '0.0', 'null': 'True', 'blank': 'True'}),
             'html_content': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'to': "orm['c2g.Exam']"}),
