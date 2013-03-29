@@ -170,35 +170,14 @@ class Command(BaseCommand):
         if selector.examtype:
             exams = exams.filter(exam_type=selector.examtype)
 
-        # execute the query
-        matches = len(exams)
-        changes = 0
-        updates = 0
+        if options['dryrun']:
+            matches = len(exams)
+            print "dryrun matches = %d" % matches
+        else:
+            updates = exams.update(**setter_dict)
+            print "updated = %d" % updates
 
         for exam in exams:
-            statusline = "Exam %4d, \"%s\"" % (exam.id, exam.title)
-            exam_has_pending_changes = False
-            for (name, val) in setter_dict.iteritems():
-                # val_converted will be the same type as the exam obj attribute
-                val_converted = self.value_convert(exam.__dict__[name], val)
-                if exam.__dict__[name] == val_converted:
-                    print "OK %s, %s --> %s: %s" % (name, exam.__dict__[name], val, statusline)
-                else:
-                    print "CHANGE %s, %s --> %s: %s" % (name, exam.__dict__[name], val, statusline)
-                    changes += 1
-                    exam.__dict__[name] = val_converted
-                    exam_has_pending_changes = True
-
-            if exam_has_pending_changes:
-                if options['dryrun']:
-                    exam.revert()
-                else:
-                    updates += 1
-                    exam.save()
-
-        print
-        print "## Summary"
-        print "# Found exams: %d" % matches
-        print "# Changes:     %d" % changes
-        print "# DB Updates:  %d" % updates
+            sys.stdout.write("%d: " % exam.id)
+            pprint(exam)
 
