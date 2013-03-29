@@ -149,23 +149,13 @@ def copyStageableProblemSet(draft, new_draft_course, new_draft_section):
     return draft.image.id, newdraft.image.id
 
 
-def copyStageableVideo(draft, new_draft_course, new_draft_section):
+def copyStageableVideo(draft, new_draft_course, new_draft_section, draft_exam_map):
     """
        Takes a video and copies the (draft,ready) video pair to new_course, in new_section
        Relies on new_draft_course and new_draft_section already having images.
-       Then copies over all of the _draft_ exercise relationships, and commits the draft to save the ready version.V
+       Then copies over the draft exam relationship, and commits the draft to save the ready version.
     """
     newdraft = copyStageableSectionObj(draft, new_draft_course, new_draft_section)
-    #Copy over exercises, making new S3 copies where appropriate.
-    #We have an idiosyncratic way of deleting video-to-exercise relationships -- we don't actually delete them
-    #but rather set a flag.  It changes the way we search here
-    for vidToEx in VideoToExercise.objects.filter(is_deleted=False, video=draft):
-        exercise = vidToEx.exercise
-        newex = copyExerciseS3(exercise, new_draft_course)
-        newVidToEx = VideoToExercise(video=newdraft, exercise=newex, video_time=vidToEx.video_time, mode='draft')
-        newVidToEx.save()
-    
-    newdraft.save()
 
     #now move over the S3 video assets
     new_prefix=copyS3VideoDataById(draft.id, draft.course.handle, newdraft.id, new_draft_course.handle)
@@ -179,6 +169,10 @@ def copyStageableVideo(draft, new_draft_course, new_draft_section):
         while Video.objects.filter(is_deleted=False, course=new_draft_course, slug=newdraft.slug).exists():  #Now start appending until slug is unique
             newdraft.slug = newdraft.slug + "1"
 
+    #Set the exam_id, if applicable. Hopefully if it is not null, it didn't end up
+    #in a different section; which could be problematic.
+    newdraft.exam_id = draft_exam_map.get(draft.exam_id, None)
+  
     newdraft.save()
     newdraft.commit() #push changes to ready version
 
@@ -211,9 +205,9 @@ def copyStageableFile(draft, new_draft_course, new_draft_section):
     if found:
         newdraft.file.name = foundfile.file.name
         newready.file.name = foundfile.file.name  
-#    else:
-#        newdraft.file.save(new_name, ContentFile(draft.file.read()))
-#        newready.file=newdraft.file
+    else:
+        newdraft.file.save(new_name, ContentFile(draft.file.read()))
+        newready.file=newdraft.file
   
     newdraft.save()    
     newready.save()
@@ -254,7 +248,7 @@ def copyStageableExam(draft, new_draft_course, new_draft_section):
     newdraft.save()
     newdraft.commit()
 
-    return draft.image.id, newdraft.image.id
+    return draft.image.id, newdraft.image.id, draft.id, newdraft.id
 
 
 def copyCourse(old_draft_course, new_draft_course, from_section = None):
@@ -269,6 +263,7 @@ def copyCourse(old_draft_course, new_draft_course, from_section = None):
     file_map = {}
     video_map = {}
     exam_map = {}
+    draft_exam_map = {}
     old_draftcontentsections = []
     
     if from_section == None:        
@@ -306,15 +301,17 @@ def copyCourse(old_draft_course, new_draft_course, from_section = None):
             old_ready_id, new_ready_id = copyStageableFile(f, new_draft_course, new_draftcontentsection)            
             file_map[old_ready_id] = new_ready_id
 
-        #Videos
-        for v in Video.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
-            old_ready_id, new_ready_id = copyStageableVideo(v, new_draft_course, new_draftcontentsection)
-            video_map[old_ready_id] = new_ready_id
-            
         #Exams
         for e in Exam.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
-            old_ready_id, new_ready_id = copyStageableExam(e, new_draft_course, new_draftcontentsection)
+            old_ready_id, new_ready_id, old_draft_id, new_draft_id = copyStageableExam(e, new_draft_course, new_draftcontentsection)
             exam_map[old_ready_id] = new_ready_id
+            draft_exam_map[old_draft_id] = new_draft_id
+
+        #Videos
+        for v in Video.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
+            #Send the draft_exam_map so we can set the video to exam relation.
+            old_ready_id, new_ready_id = copyStageableVideo(v, new_draft_course, new_draftcontentsection, draft_exam_map)
+            video_map[old_ready_id] = new_ready_id
 
         new_draftcontentsection.save()
         new_draftcontentsection.commit()
