@@ -1,16 +1,24 @@
-try:
-    from dateutil import parser
-except ImportError, msg:
-    parser = False
 from optparse import make_option
 import inspect
 from textwrap import wrap
 from collections import namedtuple
+from pprint import pprint
+import sys
+
+try:
+    from dateutil import parser
+except ImportError, msg:
+    parser = False
 
 from django.core.management.base import BaseCommand, CommandError
+
 from c2g.models import Exam
 
+
 class Command(BaseCommand):
+    """
+    Define the edit_exam manamagement command: bulk updates of exam settings.
+    """
 
     # instantiate a dummy exam so we can inspect it
     testexam=Exam()
@@ -38,7 +46,7 @@ class Command(BaseCommand):
 
         # Change
         make_option("-s", "--set", action="append", dest="setlist", 
-            default=[], metavar="COL=\"VAL\"",
+            default=[], metavar="NAME=\"VAL\"",
             help="Set this to that for every exam that matches your search. "  \
                  "Specify this multiple times to update multiple columns. " \
                  "The quotes around the value are optional."),
@@ -54,9 +62,11 @@ class Command(BaseCommand):
 #        make_option("--end", dest="end_time",
 #            help="consider entries no later than X"),
 
-    def validate_options(self, options):
+    def validate_selector(self, options):
         """
-        Validate options and parse into useful data types. Returns a namedtuple.
+        Make sure we have a valid set of things to select on, and if we do,
+        return a named tuple like this:
+          Selector(exam_ids=[840, 841], course_id=11, type='survey')
         """
         if not (options['exam_ids'] or options['course_id']):
             raise CommandError("At least one of exam_ids (-e) or course_id (-c) is required.")
@@ -90,8 +100,38 @@ class Command(BaseCommand):
                 type=result_type)
 
 
+    def validate_setters(self, options):
+        """
+        Decide what we're going to set for each of the exams we select.  Returns
+        a dict with columns and settings for each.
+        """
+        resultdict = {}
+
+        if not options['setlist']:
+            raise CommandError("you must specify at least one set (-s) command")
+
+        for cmd in options['setlist']:
+            splitcmd = cmd.split('=')
+            if len(splitcmd) != 2:
+                raise CommandError("cannot parse \"%s\", commands must be of the form NAME=VAL"
+                        % cmd)
+            (name, val) = splitcmd
+            if name not in self.exam_attrs:
+                raise CommandError("value \"%s\" isn't a valid property of Exam, valid values are %s"
+                        % (splitcmd[0], self.exam_attrs))
+            resultdict[name] = val
+        return resultdict
+
+
     def handle(self, *args, **options):
-        sel = self.validate_options(options)
+        """The actual exam_edit command"""
 
+        selector = self.validate_selector(options)
+        pprint(selector)
 
+        setter_dict = self.validate_setters(options)
+        sys.stdout.write("Setters = ")
+        pprint(setter_dict)
+                
+        
         
