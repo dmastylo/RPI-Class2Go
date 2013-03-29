@@ -2,6 +2,7 @@
 {% trans "Show Explanation" as show_explanation_trans %}
 {% trans "Hide Explanation" as hide_explanation_trans %}
 
+
 window.displayQuestionExplanation = function(questionMD){
     //This function takes a DOM object of the metadata and displays the question explanation after the
     //question with the corresponding id

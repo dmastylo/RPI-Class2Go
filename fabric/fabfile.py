@@ -288,18 +288,21 @@ def init_celery():
 
         # configure celery init script
 
+        num_cpu = run('cat /proc/cpuinfo | grep processor | wc -l')
+
         t =  loader.get_template('celeryd-init-script.txt')
         c = Context({ "app_name":app_settings.app_name, "admin_home": settings.ADMIN_HOME,
-                      "celery_cpu_total": settings.CELERY_CPU_TOTAL, "celery_timeout": settings.CELERY_TIMEOUT,
+                      "celery_cpu_total": num_cpu, "celery_timeout": settings.CELERY_TIMEOUT,
                       "celery_concurrency": settings.CELERY_CONCURRENCY})
 
-        file_write("/etc/init.d/celeryd-/"+app_settings.app_name, t.render(c),mode = "00755", owner ="root", group="root", scp=True)
+        file_write("/tmp/celeryd-"+app_settings.app_name, t.render(c),mode = "00755", owner ="root", group="root", scp=True)
+        run("mv /tmp/celeryd-"+app_settings.app_name + ' /etc/init.d/celeryd-'+app_settings.app_name)
 
         # configure celery config
 
         t =  loader.get_template('celeryd-init-config.txt')
-
-        file_write("/etc/default/celeryd-/"+app_settings.app_name, t.render(c),mode = "00644", owner ="root", group="root", scp=True)
+        file_write("/tmp/celeryd-"+app_settings.app_name, t.render(c),mode = "00644", owner ="root", group="root", scp=True)
+        run("mv /tmp/celeryd-"+app_settings.app_name + ' /etc/default/celeryd-'+app_settings.app_name)
 
         # run celery
 
