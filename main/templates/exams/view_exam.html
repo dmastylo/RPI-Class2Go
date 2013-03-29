@@ -172,10 +172,10 @@
     {% if score or raw_score or total_score %}
         <div class="score-area pull-left">
             {% if score or total_score %}
-                <h4><strong style="color:red">{% trans 'Score' %}: {{score}}/{{total_score}}</strong></h4>
+                <h4><strong style="color:red">{% trans 'Score' %}: {{score|floatformat:"-2"}}/{{total_score|floatformat:"-2"}}</strong></h4>
             {% endif %}
             {% if raw_score %}
-                <h4><strong style="color:red">{% trans 'Raw Score (without penalties)' %}: {{raw_score}}</strong></h4>
+                <h4><strong style="color:red">{% trans 'Raw Score (without penalties)' %}: {{raw_score|floatformat:"-2"}}</strong></h4>
             {% endif %}
         </div>
     {% endif %}

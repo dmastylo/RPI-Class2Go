@@ -105,9 +105,12 @@ class Command(BaseCommand):
                     errors += 1
                     continue
                 if options['penalties']:
+                    days_late = er.days_late(grace_period=exam_obj.grace_period)
                     score_after = compute_penalties(rawscore_after, er.attempt_number,
                                                     exam_obj.resubmission_penalty,
-                                                    is_late, exam_obj.late_penalty)
+                                                    is_late, exam_obj.late_penalty,
+                                                    late_days=days_late,
+                                                    daily_late_penalty=exam_obj.daily_late_penalty)
                 else:
                     score_after = rawscore_after
                 s = er.student

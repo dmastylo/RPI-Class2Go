@@ -9,6 +9,7 @@ import html5lib
 import random
 import copy
 import json
+import math
 
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
@@ -2467,6 +2468,13 @@ class ExamRecord(TimestampMixin, models.Model):
     
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
+
+    
+    def days_late(self, grace_period=None):
+        if grace_period is None:
+            grace_period = self.exam.grace_period
+        late_timedelta = max(timedelta(0), self.time_created - grace_period)
+        return math.ceil(late_timedelta.total_seconds() / (3600.0*24.0))
 
     def get_rendered_questions(self):
         try:

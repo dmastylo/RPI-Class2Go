@@ -614,9 +614,11 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         record.json_score_data = json.dumps(feedback)
 
         #apply penalties
-        late_timedelta = max(datetime.timedelta(0), record.time_created - exam.grace_period)
-        days_late = math.ceil(late_timedelta.total_seconds() / (3600.0*24.0))
-        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty, late_days=days_late, daily_late_penalty = exam.daily_late_penalty)
+        days_late = record.days_late(grace_period=exam.grace_period)
+        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty,
+                                         record.late, exam.late_penalty,
+                                         late_days=days_late,
+                                         daily_late_penalty=exam.daily_late_penalty)
         record.save()
         
         #Set ExamScore.score to max of ExamRecord.score for that student, exam. 
