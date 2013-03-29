@@ -1,15 +1,9 @@
 from optparse import make_option
-import inspect
 from textwrap import wrap
 from collections import namedtuple
 from pprint import pprint
 import sys
 from datetime import datetime
-
-try:
-    from dateutil import parser
-except ImportError, msg:
-    parser = False
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -117,39 +111,6 @@ class Command(BaseCommand):
             resultdict[name] = val
 
         return resultdict
-
-
-    def value_convert(self, comparison_field, new_value):
-        """
-        Given a field to compare with, decide how we want to convert the value
-        we are given.  We have to do here, relatively deep in the processing,
-        since we need a real instance of an Exam record to compare with, the
-        class definition or test insance won't do.
-        """
-
-        # BOOLEAN
-        if isinstance(comparison_field, bool):
-            if new_value.lower() == "false":
-                return False
-            else:
-                return True
-
-        # DATETIME
-        elif isinstance(comparison_field, datetime):
-            if not parser:
-                raise CommandError("cannot use date function without \"dateutil\" installed.")
-            return parser.parse(new_value)
-
-        # NUMBERS
-        elif isinstance(comparison_field, long):
-            return long(new_value)
-        elif isinstance(comparison_field, float):
-            return float(new_value)
-        elif isinstance(comparison_field, int):
-            return int(new_value)
-
-        # STRING (BASE CASE)
-        return new_value
 
 
     def handle(self, *args, **options):
