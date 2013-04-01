@@ -49,13 +49,20 @@ function prefill_children(element) {
             // For the moment we filter out objects of other types, per the spec.
             // In the future this restriction will probably be lifted.
             // See also add_section_page.html
-            if ((data[i][0] === 'video') || (data[i][0] === 'file')) {
+            // 
+            // Also filter out this file from its list of potential parents
+            if (((data[i][0] === 'video') || (data[i][0] === 'file')) && (data[i][0]+','+data[i][1] != 'file,'+{{file.id}})) {
                 pelement.append('<option value="'+data[i][0]+','+data[i][1]+'">'+data[i][2]+'</option>');
             }
         }
         {% if parent_val %}
-        var parent_val = '{{parent_val|escapejs}}';
-        $('select#parent_id').val(parent_val);
+            // disallow pre-selection of self even if self did happen to be in
+            // the dropdown (which it's not) and even if the ajax call does
+            // return a self ref as our parent (which it shouldn't, but has in
+            // the past)
+            var parent_val = '{{parent_val|escapejs}}';
+            if (parent_val != 'file,'+{{file.id}}) $('select#parent_id').val(parent_val);
+            else $('select#parent_id').val('none,none');
         {% endif %}
     });
 }
