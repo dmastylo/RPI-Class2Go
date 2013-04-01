@@ -18,29 +18,34 @@ def gen_spec_in_line_report(report_name, course, username, green_param, blue_par
         count_gt_67 = {}
         count_gt_34 = {}
         count_lt_34 = {}
+        total_students = {}
         row_color = {}
         
-        headings = ['Quiz Title', '# Students <33%', '# Students >33%', '# Students >67%']
+        headings = ['Quiz Title', '# Students <33%', '33%< # Students <67%', '# Students >67%', 'Total # Students']
 
         students_gt_67 = ExamScore.objects.values('exam__title').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now, exam__invideo=0).annotate(num_students=Count('student')).extra(where=["total_score*(66.7/100) <= score"])
         for row in students_gt_67:
             count_gt_67[row['exam__title']] = row['num_students']
         
-        students_gt_34 = ExamScore.objects.values('exam__title').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now, exam__invideo=0).annotate(num_students=Count('student')).extra(where=["total_score*(33.4/100) <= score"])
+        students_gt_34 = ExamScore.objects.values('exam__title').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now, exam__invideo=0).annotate(num_students=Count('student')).extra(where=["total_score*(33.4/100) <= score and total_score*(66.7/100) > score"])
         for row in students_gt_34:
             count_gt_34[row['exam__title']] = row['num_students']
             
-        students_lt_34 = ExamScore.objects.values('exam__title').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now, exam__invideo=0).annotate(num_students=Count('student')).extra(where=["total_score*(33.4/100) >= score"])
+        students_lt_34 = ExamScore.objects.values('exam__title').select_related('student', 'exam').filter(~Q(exam__exam_type='survey'), course=course, exam__is_deleted=0, exam__section__is_deleted=0, exam__live_datetime__lt=now, exam__invideo=0).annotate(num_students=Count('student')).extra(where=["total_score*(33.4/100) > score"])
         for row in students_lt_34:
             count_lt_34[row['exam__title']] = row['num_students']            
         
         for exam in exams:
             total = 0
             total_gt_67 = 0
-                
-            total = count_gt_34.setdefault(exam['title'], 0)
-            total += count_lt_34.setdefault(exam['title'], 0)               
             
+            total = count_gt_67.setdefault(exam['title'], 0)
+            total += count_gt_34.setdefault(exam['title'], 0)
+            total += count_lt_34.setdefault(exam['title'], 0)
+                            
+            #Populate total students dict
+            total_students[exam['title']] = total
+             
             total_gt_67 = count_gt_67.setdefault(exam['title'], 0)
             
             if (total < 20):
@@ -52,12 +57,14 @@ def gen_spec_in_line_report(report_name, course, username, green_param, blue_par
             else:
                 row_color[exam['title']] = "red"
         
+           
         report_results = {}        
         report_results['headings'] = headings
         report_results['exam_titles'] = exams
         report_results['count_gt_67'] = count_gt_67
         report_results['count_gt_34'] = count_gt_34
         report_results['count_lt_34'] = count_lt_34
+        report_results['total_students'] = total_students
         report_results['row_color'] = row_color
         
         return report_results
