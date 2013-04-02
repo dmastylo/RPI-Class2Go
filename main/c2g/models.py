@@ -2831,9 +2831,9 @@ class ContentGroup(models.Model):
             for entry in content_group:
                 if getattr(entry, tag, False) == obj_ref:
                     # If this child is in this group already, return this group
-                    if entry.level == 1:
+                    if entry.level == 1 and entry.id != group_id:
                         # It is an error to make a parent into a child of its own group
-                        # Instead, make a new group, then reassign_membership 
+                        # Instead, make a new group, then reassign_membership()
                         raise ValueError, "ContentGroup "+str(entry.id)+" is the parent of group "+str(group_id)
                     entry.display_style = display_style
                     entry.save()
