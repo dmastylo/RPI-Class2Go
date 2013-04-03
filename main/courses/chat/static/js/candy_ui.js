@@ -2,7 +2,7 @@ $(window).load(function() {
     var isInIframe = (window.location != window.parent.location) ? true : false;
     
     if (isInIframe) {
-        $('#chat-pane #chat-tabs').prepend('<a href="#" id="chat-expand-arrow"><em class="icon-chevron-right"></em></a>');
+        $('#chat-pane #chat-tabs').prepend('<div id="chat-expand-arrow"><em class="icon-chevron-right"></em></div>');
     } else {
         $('#candy').addClass('poppedOut').append('<a href="#" onclick="event.preventDefault();" title="Pop-In Chat Window" class="icon-signin" id="chatPopin"></a>');
     }
@@ -27,7 +27,6 @@ $(window).load(function() {
     }
 
     $('#chat-expand-arrow').click(function() {
-        event.preventDefault();
         if ($('#chat-pane').hasClass('collapsed-message-pane')) {
             expandMessageForm();
             $('#chat-tabs li:first').addClass('active');
