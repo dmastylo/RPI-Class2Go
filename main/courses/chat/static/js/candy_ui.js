@@ -8,7 +8,7 @@ $(window).load(function() {
     }
     
     var collapseMessageForm = function() {
-        $('#candy').animate({width: '227px'}, 'slow', function() {
+        $('#candy').animate({width: '230px'}, 'slow', function() {
             $('#chat-expand-arrow em').toggleClass('icon-chevron-left').toggleClass('icon-chevron-right');
             $('#chat-pane').toggleClass('collapsed-message-pane');
             $('#chat-tabs li').removeClass('active');

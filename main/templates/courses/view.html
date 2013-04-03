@@ -224,7 +224,7 @@ $(document).ready(function(){
 	$(chatWindow).unload(function() {
 	    if (this.document.location.href.indexOf(chatFrameRef) >= 0) {
 		$('#chatPopout').before(newChatFrame);
-		$('#chat_block').css({height: '400px'}).show();
+		$('#chat_block').show();
 		$('#chat_wrapper, #chatPopin').toggle();
 	    }
 	});
