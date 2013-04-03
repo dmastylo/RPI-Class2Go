@@ -177,25 +177,6 @@ $(document).ready(function(){
 	    });
 	});
     }
-    
-    //Show/Hide chat block
-    $('#chat_block').css({height: '0px'}).show();
-    
-    $('#chat_wrapper .chat_toggle').toggle(function() {
-	$(this).siblings().animate({height: '400px'}, 'slow', function() {
-	    $(this).siblings().find('span.openChat').hide();
-	    $(this).siblings().find('span.closeChat').show();
-	    $('#chatPopout').show();
-	});
-	//Candy.Core.connect('{{ nick }}', '{{ nick }}'); /* FIXME: use something more magical */
-    }, function() {
-	$(this).siblings().animate({height: '0px'}, 'slow', function() {
-	    $(this).siblings().find('span.openChat').show();
-	    $(this).siblings().find('span.closeChat').hide();
-	});
-	$('#chatPopout').hide();
-	//Candy.Core.disconnect
-    });
 
     //Show/Hide share block
     $('#share_wrapper .show_hide_share').click(function() {
@@ -205,6 +186,25 @@ $(document).ready(function(){
 	    $(this).siblings('#share-result').slideUp('slow', function() {
 		$(this).siblings('.show_hide_share').text('Share Something!').toggleClass('btn').toggleClass('share_visible').toggleClass('share_hidden');
 	    });
+	}
+    });
+    
+    //Show/Hide chat block
+    $('#chat_wrapper .chat_toggle').click(function() {
+	$('#chat_block').show();
+	if ($(this).hasClass('closed')) {
+	    $('#chat_block').show();
+	    $(this).toggleClass('closed').siblings().animate({height: '400px'}, 'slow', function() {
+		$(this).siblings().find('span.openChat').hide();
+		$(this).siblings().find('span.closeChat').show();
+		$('#chatPopout').show();
+	    });
+	} else {
+	    $(this).toggleClass('closed').siblings().animate({height: '0px'}, 'slow', function() {
+		$(this).siblings().find('span.openChat').show();
+		$(this).siblings().find('span.closeChat').hide();
+	    });
+	    $('#chatPopout').hide();
 	}
     });
     
@@ -223,13 +223,11 @@ $(document).ready(function(){
 	
 	$(chatWindow).unload(function() {
 	    if (this.document.location.href.indexOf(chatFrameRef) >= 0) {
-		$('#chatPopout').before(newChatFrame);
+		$('#chat_frame_wrapper').html(newChatFrame);
 		$('#chat_block').show();
 		$('#chat_wrapper, #chatPopin').toggle();
 	    }
 	});
-	
-	//$(chatWindow.document).append($($('#chat_block')[0].contentDocument).find('html'));
     });
 });
 </script>
@@ -237,10 +235,10 @@ $(document).ready(function(){
 
 {% block jabber_block %}
     <div id="chat_wrapper">
-	<a class="chat_toggle" href="#">
+	<div class="chat_toggle closed">
 	    <span class="openChat">Open Chat <em class="icon-chevron-up"></em></span>
 	    <span class="closeChat">Close Chat <em class="icon-chevron-down"></em></span>
-	</a>
+	</div>
 	{# Jabber chat plugin block #}
 	    {% if jabber_configured and is_logged_in %}
 	        <div id="chat_frame_wrapper">
