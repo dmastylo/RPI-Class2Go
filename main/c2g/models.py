@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 from hashlib import md5
 import logging
 import os
@@ -2518,8 +2518,10 @@ class Instructor(TimestampMixin, models.Model):
     def photo_dl_link(self):
         if not self.photo.storage.exists(self.photo.name):
             return ""
-
-        url = self.photo.storage.url_monkeypatched(self.photo.name, querystring_auth=False)
+        if is_storage_local():
+            url = get_site_url() + self.photo.storage.url(self.photo.name)
+        else:
+            url = self.photo.storage.url_monkeypatched(self.photo.name, querystring_auth=False)
         return url
     
     def __unicode__(self):
