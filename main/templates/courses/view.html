@@ -243,7 +243,9 @@ $(document).ready(function(){
 	</a>
 	{# Jabber chat plugin block #}
 	    {% if jabber_configured and is_logged_in %}
-	        <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+	        <div id="chat_frame_wrapper">
+		    <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+		</div>
 	    {% endif %} {# jabber_configured and is_logged_in #}
 	{# end Jabber chat plugin block #}
 	<a href="#" onclick="event.preventDefault();" title="Pop-Out Chat Window" class="icon-signout" id="chatPopout"></a>

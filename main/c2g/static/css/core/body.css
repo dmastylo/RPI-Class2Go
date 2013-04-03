@@ -1098,13 +1098,20 @@ input[type="checkbox"] {
     top: 12px;
     font-size: 28px !important;
 }
-
-#chat_block {
+#chat_frame_wrapper {
+    height: 0;
+    width: auto;
+    float: left;
     position: relative;
     float: left;
-    display: none;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden;
+}
+#chat_block {
+    position: relative;
     width: 600px;
-    height: 400px;
+    height: 400px !important;
     margin: 0 !important;
     border: none !important;
 }
