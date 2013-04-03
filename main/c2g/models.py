@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 from hashlib import md5
 import logging
 import os
@@ -9,6 +9,7 @@ import html5lib
 import random
 import copy
 import json
+import math
 
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
@@ -1922,6 +1923,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     grace_period = models.DateTimeField(null=True, blank=True)
     partial_credit_deadline = models.DateTimeField(null=True, blank=True)
     late_penalty = models.IntegerField(default=0, null=True, blank=True)
+    daily_late_penalty = models.FloatField(default=0.0, null=True, blank=True)
     submissions_permitted = models.IntegerField(default=999, null=True, blank=True)
     resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
     autograde = models.BooleanField(default=False)
@@ -2102,6 +2104,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             xml_imported = self.xml_imported,
             partial_credit_deadline = self.partial_credit_deadline,
             late_penalty = self.late_penalty,
+            daily_late_penalty = self.daily_late_penalty,
             submissions_permitted = self.submissions_permitted,
             resubmission_penalty = self.resubmission_penalty,
             autograde = self.autograde,
@@ -2155,6 +2158,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.partial_credit_deadline = self.partial_credit_deadline
         if not clone_fields or 'late_penalty' in clone_fields:
             ready_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'daily_late_penalty' in clone_fields:
+            ready_instance.daily_late_penalty = self.daily_late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
             ready_instance.submissions_permitted = self.submissions_permitted
         if not clone_fields or 'resubmission_penalty' in clone_fields:
@@ -2215,7 +2220,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             self.partial_credit_deadline = ready_instance.partial_credit_deadline 
         if not clone_fields or 'late_penalty' in clone_fields:
-            self.late_penalty = ready_instance.late_penalty 
+            self.late_penalty = ready_instance.late_penalty
+        if not clone_fields or 'daily_late_penalty' in clone_fields:
+            self.daily_late_penalty = ready_instance.daily_late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
             self.submissions_permitted = ready_instance.submissions_permitted 
         if not clone_fields or 'resubmission_penalty' in clone_fields:
@@ -2276,6 +2283,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.partial_credit_deadline != self.image.partial_credit_deadline:
             return False
         if self.late_penalty != self.image.late_penalty:
+            return False
+        if self.daily_late_penalty != self.image.daily_late_penalty:
             return False
         if self.submissions_permitted != self.image.submissions_permitted:
             return False
@@ -2460,6 +2469,13 @@ class ExamRecord(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
 
+    
+    def days_late(self, grace_period=None):
+        if grace_period is None:
+            grace_period = self.exam.grace_period
+        late_timedelta = max(timedelta(0), self.time_created - grace_period)
+        return math.ceil(late_timedelta.total_seconds() / (3600.0*24.0))
+
     def get_rendered_questions(self):
         try:
             score_data = json.loads(self.json_score_data)
@@ -2502,8 +2518,10 @@ class Instructor(TimestampMixin, models.Model):
     def photo_dl_link(self):
         if not self.photo.storage.exists(self.photo.name):
             return ""
-
-        url = self.photo.storage.url_monkeypatched(self.photo.name, querystring_auth=False)
+        if is_storage_local():
+            url = get_site_url() + self.photo.storage.url(self.photo.name)
+        else:
+            url = self.photo.storage.url_monkeypatched(self.photo.name, querystring_auth=False)
         return url
     
     def __unicode__(self):
@@ -2815,9 +2833,9 @@ class ContentGroup(models.Model):
             for entry in content_group:
                 if getattr(entry, tag, False) == obj_ref:
                     # If this child is in this group already, return this group
-                    if entry.level == 1:
+                    if entry.level == 1 and entry.id != group_id:
                         # It is an error to make a parent into a child of its own group
-                        # Instead, make a new group, then reassign_membership 
+                        # Instead, make a new group, then reassign_membership()
                         raise ValueError, "ContentGroup "+str(entry.id)+" is the parent of group "+str(group_id)
                     entry.display_style = display_style
                     entry.save()

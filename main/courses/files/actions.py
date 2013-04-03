@@ -63,8 +63,11 @@ def edit(request):
                 parent_type, parent_id = None, None
             if parent_type:
                 parent_ref = ContentGroup.groupable_types[parent_type].objects.get(id=long(parent_id))
-                content_group_groupid = ContentGroup.add_parent(file.image.course, parent_type, parent_ref.image)
-                ContentGroup.add_child(content_group_groupid, 'file', file.image, display_style=request.POST.get('display_style','list'))
+                if parent_ref != file:
+                    # Don't bother updating the ContentGroup if self this is already the parent of the group
+                    # (which is implicitly the case for all non-grouped items)
+                    content_group_groupid = ContentGroup.add_parent(file.image.course, parent_type, parent_ref.image)
+                    ContentGroup.add_child(content_group_groupid, 'file', file.image, display_style=request.POST.get('display_style','list'))
             else: #file should have no parents, so delete its place in a contentgroup if it's a child
                 try:
                     cgobj = file.image.contentgroup_set.get()

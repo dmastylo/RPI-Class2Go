@@ -30,7 +30,7 @@ If you are interested in reaching the team email us at
 <c2g-contact@class.stanford.edu>.
 
 If you are interested in evaluating the Class2Go platform, you can explore Class2Go
-through 2 courses we have created. The [Introduction to Class2Go][howto] 
+through two courses we have created. The [Introduction to Class2Go][howto] 
 course highlights the major features of the platform and includes guides 
 for adding content to a Class2Go course and templates for creating problem sets, 
 exams, or surveys. 
@@ -68,7 +68,7 @@ Key Features
 ------------
 
 To bring this to life we've built a system. Here are some of its
-important and distinguishing features.
+important distinguishing features.
 
 * **Video and Problem Set Management**. Professors (and TA's) can
     upload assets to S3; videos are then uploaded to YouTube.
@@ -101,7 +101,7 @@ important and distinguishing features.
 Leveraging Others
 -----------------
 
-Thanks to all the projects we are relying on to make this work. Some
+Thanks to all the projects we are relying on to make this work. Some are
 commercial, some open source. But a ton of good stuff.
 
 * [YouTube] [yt] and [Popcorn.js] [pop] for video
@@ -151,8 +151,8 @@ to host their own courses.  Unfortunately, the tooling and instructions
 for this aren't turnkey just yet.  We also need to do some development
 to make it less Stanford-specific.  Maybe you can help with that?
 
-If you're interested, your the first step, just like contributing,
-is to stand up a development environment on your own laptop and try
+If you're interested, your first step, just like other contributions,
+is to stand up a development environment on your own machine and try
 it out.  We have people who got this demo-sized Class2Go up and running
 pretty quickly on their local machine.
 
@@ -160,7 +160,7 @@ Send us mail at <c2g-contact@class.stanford.edu> and we can give
 you an idea what would be involved.
 
 If you are interested in evaluating the Class2Go platform before trying to stand 
-up your own instance, you can explore Class2Go through 2 courses 
+up your own instance, you can explore Class2Go through two courses 
 we have created. The [Introduction to Class2Go][howto] course highlights the major 
 features of the platform and includes guides for adding content to a Class2Go course 
 and templates for creating problem sets, exams, or surveys. 

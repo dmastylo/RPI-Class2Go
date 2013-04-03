@@ -1,6 +1,5 @@
 # Create your views here.
 
-from django.http import HttpResponse, Http404
 from registration.forms import RegistrationFormUniqueEmail
 from registration.backends import get_backend
 from django.shortcuts import redirect
@@ -8,21 +7,17 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from registration.backends import get_backend
-from courses.common_page_data import get_common_page_data
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from datetime import date
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import login
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import login as auth_login
 from django.conf import settings
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.views.decorators.debug import sensitive_post_parameters
-from c2g.models import Video, Instructor, CourseInstructor
+from c2g.models import Video, CourseInstructor
 
-import json
-import settings
 import os.path
 
 import logging

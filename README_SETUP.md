@@ -29,19 +29,21 @@ For Mac
 
 General Instructions:
 
-* Set-up Python
-* Set-up Python's virtual env
-* Set-up Django
-* Set-up Mysql
-* Set-up test suite
+* Set up command line tools (`clang`, `make`, etc.)
+* Set up Homebrew, a package manager for Mac
+* Set up MySQL
+* Set up Python
+* Set up Python's virtual env
+* Set up Django
+* Set up test suite
 
-For MAC OS-X Lion: Instructions mainly taken from
+For Mac OS-X Lion: Instructions mainly taken from
 http://www.tlswebsolutions.com/mac-os-x-lion-setting-up-django-pip-virtualenv-and-homebrew/
 
 Some people don't have their normal user set up with write permissions
-for all these commands that modify the environment (brew, easy_install,
-pip).  For all of those you should plan on running your own sudo
-prefix for these.
+for all these commands that modify the environment (`brew`,
+`easy_install`, `pip`).  For all of those you should plan on running
+your own `sudo` prefix for these.
 
 1. Install XCode from the Apple App Store Version 4.5 or later
 
@@ -52,119 +54,151 @@ prefix for these.
 
         /usr/bin/ruby -e "$(curl -fsSkL http://raw.github.com/mxcl/homebrew/go)"
 
+1. Check out your `PATH` to see if `/usr/local/bin` comes before
+`/usr/bin`:
+
+        echo $PATH
+
+    If not, open up your shell's login script (`~/.bashrc` for bash),
+and add the following line to it:
+
+        export PATH=/usr/local/bin:$PATH
+
+    Make sure to source the login script once you're finished so that
+your new `PATH` is loaded:
+
+        source ~/.bashrc
+
+1. Install MySQL
+    1. Download MySQL [here](dev.mysql.com/downloads/mysql)
+    1. Look for the DMG of the latest 64-bit version
+    1. Install the mysql-5.x-osx10.x-x86_64.pkg
+    1. Install the MySQLStartupItem.pkg
+    1. Install the MySQL.prefpane
+        1. Start MySQL Server
+        1. Check Automatically Start on startup
+
+    1. Edit your shell's login script:
+
+            vim ~/.bashrc
+
+    1. ...and add the following:
+
+            export PATH=/usr/local/mysql/bin:$PATH
+            export DYLD_LIBRARY_PATH=/usr/local/mysql/lib:$DYLD_LIBRARY_PATH
+
+    1. Once done, source your login script so that it takes effect:
+
+            source ~/.bashrc
+
+1. [Optional] Install Sequel Pro:
+    
+    www.sequelpro.com
+
+1. Set up a user account and database in MySQL:
+
+        create database class2go;
+        grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';
+        grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';
+
+    [NB:] Remember these values, especially if you change them from these
+defaults, as you'll use them later when setting up Django.
+
 1. Install Python (we are expecting 2.7.x):
 
         brew install readline sqlite gdbm
 
-1. If you plan on running in a virtual environment, then you probably 
-want to instally your own python.  But if not, then you already have 
-python on your machine (in /usr/bin/python), in which case you *shouldn't* 
-install another copy of python (in /usr/local/bin/python).  
+1. If you plan on running in a virtual environment, then you probably
+want to instally your own python.  But if not, then you already have
+python on your machine (in `/usr/bin/python`), in which case you *shouldn't*
+install another copy of python (in `/usr/local/bin/python`).
 But if you want to do it with:
 
         brew install python --universal --framework
 
-1. Install mysql
-
-    Download mysql: dev.mysql.com/downloads/mysql
-    Look for the DMG of the latest 64-bit version (10.6 will work)
-
-    Install the mysql-5.x-osx10.x-x86_64.pkg
-    Install the MySQLStartupItem.pkg
-    Install the MySQL.prefpane
-    – Start MySQL Server
-    – Check Automatically Start on startup
-
-1. Install Sequel Pro (optional)
-    
-    www.sequelpro.com
-
-1. Install pip, a python package manager
+1. Install pip, a python package manager (this command may need `sudo`):
 
         easy_install pip
 
-1. Install python's virtual env 
+1. Install python's virtual env (this command may also need `sudo`):
 
         pip install virtualenv
 
-1. Install virtualenvwrapper: (optional)
+1. Install virtualenvwrapper (`sudo` this too if necessary):
 
-        sudo pip install virtualenvwrapper
+        pip install virtualenvwrapper
 
-    a. Verify installation location of virtualenv and virtualenvwrapper:
+    1. Verify installation location of virtualenv and virtualenvwrapper:
 
-        ls /usr/local/bin/
+            ls /usr/local/bin/
 
-    a. Check out your PATH to see if /usr/local/bin comes before /usr/bin:
+    1. Edit login script:
 
-        echo $PATH
-    (If not, add `export PATH=/usr/local/bin:$PATH` to your .bashrc)
+            vim .bashrc
 
-    a. Edit login script:
+    1. ...and add the following:
 
-        vim .bashrc
+            # virtualenv setup -- use Distribute by default
+            export VIRTUALENV_DISTRIBUTE=true
 
-    a. ...and add the following:
+            # virtualenvwrapper setup (feel free to change project directories)
+            export WORKON_HOME=~/class2go-venv
+            export PROJECT_HOME=~/class2go-projects
+            export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+            export VIRTUALENVWRAPPER_VIRTUALENV=`which virtualenv`
+            source /usr/local/bin/virtualenvwrapper.sh
 
-        # virtualenv setup -- use Distribute by default
-        export VIRTUALENV_DISTRIBUTE=true
+    1. Source login script so env vars take effect:
 
-        # virtualenvwrapper setup
-        export WORKON_HOME=~/class2go-venv
-        export PROJECT_HOME=~/class2go-projects
-        export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-        export VIRTUALENVWRAPPER_VIRTUALENV=`which virtualenv`
-        source /usr/local/bin/virtualenvwrapper.sh
+            source ~/.bashrc
+    [NB:] Sourcing should auto-create your virtual environment base dir)
 
-    a. Source login script so env vars take effect:
+    1. Check out new virtual base directory:
 
-        source ~/.bashrc
-    (Sourcing should auto-create your virtual environment base dir)
+            ls class2go-venv/
 
-    a. Check out new virtual base directory:
+    1. Make sure `PROJECT_HOME` is defined
 
-        ls class2go-venv/
+            echo $PROJECT_HOME
 
-    a. Make sure PROJECT_HOME is defined
+    1. Make new project directory:
 
-        echo $PROJECT_HOME
+            mkdir -p $PROJECT_HOME
 
-    a. Make new project directory:
+    1. Issue command to set up new project subdirectory and link it to virtual env:
 
-        mkdir -p $PROJECT_HOME
+            mkproject class2go
 
-    a. Issue command to set up new project subdirectory and link it to virtual env:
+    1. Clone this repository, or move a copy, into your `PROJECT_HOME` directory:
 
-        mkproject class2go
+            git clone git@github.com:Stanford-Online/class2go.git $PROJECT_HOME/class2go
 
-1. Start using the virtual environment that we just created.
+1. Make sure that you're in the root project directory. Do this whenever
+you want to work on the project so that the virtual environment gets set
+up properly:
 
-        . ./class2go-venv/bin/activate
-
-    WARNING:  You need to do this from whatever shell you're using.
-    You can tell this because is puts an environment indicator at
-    the beginning of your prompt.
+        workon class2go
 
 1. Install all the dependencies with this command:
 
-    pip install -r requirements.txt
+        pip install -r requirements.txt
 
-And subsequently all of the optional dependencies with this command:
+    [Optional] And subsequently all of the optional dependencies with this command:
  
-    pip install -r suggested_requirements.txt
+        pip install -r suggested_requirements.txt
 
-If you aren't using pip or want to install packages manually, just open the
-requirements files and run the local equivalent of 
+    [NB:] If you aren't using pip or want to install packages manually, just open the
+    requirements files and run the local equivalent of
 
         pip install <packagename>
 
-for each package listed therein.
+    for each package listed therein.
 
 1. [Optional] If you want mass-emailing to work, install 'lynx' command-line utility:
 
-    brew install lynx
+        brew install lynx
 
-1. [Nota Bene] [Optional] Install chrome for Selenium testing
+1. [Optional] Install chrome for Selenium testing
 
         # chromedriver - list of options available here:
         # https://code.google.com/p/chromedriver/downloads/list
@@ -174,29 +208,30 @@ for each package listed therein.
         sudo mv ./chromedriver /usr/local/bin/
         # install Chrome -- download from https://www.google.com/intl/en/chrome/browser/
 
-[NB:] If instead you wish to use firefox, you can use the default Selenium firefox
-driver by setting the environment variable C2G_SELENIUM_WEBDRIVER=firefox. For 
-flash tests to pass, you will have to have the flash player plugin installed. 
+    [NB:] If instead you wish to use Firefox, you can use the default Selenium Firefox
+    driver by setting the environment variable C2G_SELENIUM_WEBDRIVER=firefox. For
+    Flash tests to pass, you will have to have the Flash player plugin installed.
 
-1. [Optional] Install dependenices to run selenium tests "headless"
+1. [Optional] Install dependencies to run Selenium tests "headless"
 
         # TODO: Figure out how to run headless on Mac OSX (see Linux section for starters)
 
-1. Setup the account and database in MySql (Sequel Pro)
+1. Head into the main folder of the project:
 
-        create database class2go;
-        grant all on class2go.* to class2go@'localhost' identified by 'class2gopw';
-        grant all on class2go.* to class2go@'127.0.0.1' identified by 'class2gopw';
+        cd main
 
-1. Set up some folders for logs and the celery database.
+1. Set up default folders for logs, the celery SQLite DB, and other
+stuff:
 
-    Put them somewhere writable. Make sure the django settings.py entry for LOGGING_DIR and the database.py entry for DATABASES.celery.NAME match these locations.
+        mkdir cache-default
+        mkdir logs
+        mkdir sqlite3
+        mkdir static
 
-        mkdir /home/account/django-logs/
-        mkdir /home/account/sqlite3/
-
-1. In the main folder, make a copy of database_example.py to database.py
-and edit the DATABASES strings as follows substituting proper values for your system.
+1. In the `main/` folder, make a copy of `database_example.py` to
+`database.py`
+and edit the `DATABASES` strings as follows substituting proper values
+(remember those MySQL values from above??):
 
         DATABASES = {
             'default': {
@@ -209,7 +244,7 @@ and edit the DATABASES strings as follows substituting proper values for your sy
             },
             'celery': {
                 'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': '/Users/account/sqlite3/celerydb.sqlite',
+                'NAME': 'sqlite3/celerydb.sqlite',
             },
         }
 
@@ -225,13 +260,14 @@ and edit the DATABASES strings as follows substituting proper values for your sy
 
         ./manage.py createsuperuser
 
-	Yay. :)
+    Yay. :)
 
-1. From the main folder, run server on whatever port you want:
+1. From the main folder, run server on whatever port you want (default
+is 8000 if you omit 8100):
 
-        python manage.py runserver 8100
+        ./manage.py runserver 8100
 
-1. Visit localhost:8100 in your web browser and confirm that you get a C2G page.
+1. Visit [localhost:8100](localhost:8100) in your web browser and confirm that you get a C2G page.
 
 
 <a name="windows"></a>

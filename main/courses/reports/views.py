@@ -251,6 +251,7 @@ def generate_in_line_report(request, course_prefix, course_suffix):
             column2 = report_data['count_lt_34']
             column3 = report_data['count_gt_34']
             column4 = report_data['count_gt_67']
+            column5 = report_data['total_students']
             row_color = report_data['row_color']
             we_have_data = True
 
