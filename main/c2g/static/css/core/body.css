@@ -1110,6 +1110,7 @@ input[type="checkbox"] {
 }
 #chat_block {
     position: relative;
+    float: left;
     width: 600px;
     height: 400px !important;
     bottom: 0;
