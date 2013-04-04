@@ -44,7 +44,28 @@
                 <div class="profile-courses">
                     {% for course in courses %}
                         <div class="course">
-                            <div class="image"><img alt="Course Image" height="200" width="200" src="{{course.logo_dl_link}}" /></div>
+                            <div class="image">
+                                <img alt="Course Image" height="200" width="200" src="{{course.logo_dl_link}}" />
+                                <div class="score_overlay">
+                                    {% if scores|byKey:course.id %}
+                                        <p><strong>Scores:</strong></p>
+                                        <ul>
+                                            {% for score in scores|byKey:course.id %}
+                                                {% if score.0 != 'accomplishment' %}
+                                                    <li>{{ score.0|dash2space|title }}: <strong>{{ score.1|floatformat:"0" }}/{{ score.2|floatformat:"0" }}</strong></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </ul>
+                                            {% for score in scores|byKey:course.id %}
+                                                {% if score.0 == 'accomplishment' %}
+                                                    <p>Scaled Total: <strong>{{ score.1|floatformat:"0" }}/{{ score.2|floatformat:"0" }}</strong></p>
+                                                {% endif %}
+                                            {% endfor %}
+                                    {% else %}
+                                        <p><strong>{% trans 'No scores were found...' %}</strong></p>
+                                    {% endif %}
+                                </div>
+                            </div>
                             <h3><a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></h3>
                             <p class="dates"><strong>{{ course.calendar_start|date:"M. j, Y" }} - {{ course.calendar_end|date:"M. j, Y" }}</strong></p>
                             <div class="profile-progress-wrapper">
@@ -53,27 +74,34 @@
                                     <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> <!-- '%' after django tag is necessary for width attribute...-->
                                 </div>
                             </div>
-                            {% if certifications|byKey:course.id %}
-                                {% for certinfo in certifications|byKey:course.id %}
-                                    {% if certinfo.1 %}
-                                        <a class="btn" href="{{certinfo.1}}">
-                                            {% trans 'Download Statement' %}
-                                            <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-                                        </a>
-                                    {% else %}
-                                    <a class="btn disabled">{% trans 'Generation in progress. Check back soon!' %} <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em></a>
+                            <div class="buttons">
+                                {% if course.calendar_end < today %}
+                                    <div class="score btn">
+                                        <span class="text">{% trans 'Show Scores' %}</span> <em class="icon-tasks"></em>
+                                    </div>
+                                    {% if certifications|byKey:course.id %}
+                                        {% for certinfo in certifications|byKey:course.id %}
+                                            {% if certinfo.1 %}
+                                                <a class="btn" href="{{certinfo.1}}">
+                                                    {% trans 'Download Statement' %}
+                                                    <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+                                                </a>
+                                            {% else %}
+                                                <a class="btn disabled">{% trans 'Generation in progress. Check back soon!' %} <em class="icon-refresh"></em></a>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                {% if course in is_student_list %}
-                                    <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
-                                        {% csrf_token %}
-                                        <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick='return confirm("{% trans 'Do you really want to unenroll?' %}")' />
-                                    </form>
                                 {% else %}
-                                <a class="btn disabled">{% trans 'Staff Member' %}</a>
+                                    {% if course in is_student_list %}
+                                        <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
+                                            {% csrf_token %}
+                                            <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick='return confirm("{% trans 'Do you really want to unenroll?' %}")' />
+                                        </form>
+                                    {% else %}
+                                        <a class="btn disabled">{% trans 'Staff Member' %}</a>
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
@@ -88,4 +116,21 @@
         {% endif %}
     
     </div>
+    
+    <script>
+        $(document).ready(function() {
+            $('.btn.score').click(function() {
+                if ($(this).hasClass('shown')) {
+                    $('.text', this).text('Show Scores');
+                    $(this).closest('.course').find('.image').find('.score_overlay').hide().siblings('img').fadeTo('fast', 1);
+                } else {
+                    $(this).closest('.course').find('.image').find('img').fadeTo('fast', .05, function() {
+                        $(this).siblings('.score_overlay').show();
+                    });
+                    $('.text', this).text('Hide Scores');
+                }
+                $(this).toggleClass('shown');
+            });
+        });
+    </script>
 {% endblock m_column_content %}
