@@ -2,19 +2,18 @@ from django.contrib.auth.models import User
 from c2g.models import UserProfile
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-
 import datetime
 
 class EditUserForm(forms.ModelForm):
     email = forms.EmailField(label=_("E-mail"), max_length=75)
-    first_name = forms.RegexField(regex=r'^[\w -]+$',
+    first_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   label=_("First Name"),
-                                  error_messages={'invalid': _("This value may contain only letters and dashes")})
-    last_name = forms.RegexField(regex=r'^[\w -]+$',
+                                  error_messages={'invalid': _("This value may contain only letters, dashes, spaces and apostrophes")})
+    last_name = forms.RegexField(regex=r'^[\w\' -]+$',
                                   max_length=30,
                                   label=_("Last Name"),
-                                  error_messages={'invalid': _("This value may contain only letters and dashes")})
+                                  error_messages={'invalid': _("This value may contain only letters, dashes, spaces and apostrophes")})
 
     class Meta:
         model = User
@@ -65,7 +64,7 @@ class EditProfileForm(forms.ModelForm):
  
     email_me = forms.BooleanField(label=_("Receive emails from courses"), required=False)
 
-    piazza_name  = forms.RegexField(regex=r'^[\w -]+$',
+    piazza_name  = forms.RegexField(regex=r'^[\w\' -]+$',
                                     required=False,
                                     max_length=50,
                                     label=_("Piazza handle"),

@@ -6,7 +6,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-from django.db.models import Max
+from django.db.models import Max, F
 
 import settings
 
@@ -146,25 +146,16 @@ def copyStageableProblemSet(draft, new_draft_course, new_draft_section):
     newdraft.save()
     newdraft.commit() #Make the ready version
 
+    return draft.image.id, newdraft.image.id
 
 
-def copyStageableVideo(draft, new_draft_course, new_draft_section):
+def copyStageableVideo(draft, new_draft_course, new_draft_section, draft_exam_map):
     """
        Takes a video and copies the (draft,ready) video pair to new_course, in new_section
        Relies on new_draft_course and new_draft_section already having images.
-       Then copies over all of the _draft_ exercise relationships, and commits the draft to save the ready version.V
+       Then copies over the draft exam relationship, and commits the draft to save the ready version.
     """
     newdraft = copyStageableSectionObj(draft, new_draft_course, new_draft_section)
-    #Copy over exercises, making new S3 copies where appropriate.
-    #We have an idiosyncratic way of deleting video-to-exercise relationships -- we don't actually delete them
-    #but rather set a flag.  It changes the way we search here
-    for vidToEx in VideoToExercise.objects.filter(is_deleted=False, video=draft):
-        exercise = vidToEx.exercise
-        newex = copyExerciseS3(exercise, new_draft_course)
-        newVidToEx = VideoToExercise(video=newdraft, exercise=newex, video_time=vidToEx.video_time, mode='draft')
-        newVidToEx.save()
-    
-    newdraft.save()
 
     #now move over the S3 video assets
     new_prefix=copyS3VideoDataById(draft.id, draft.course.handle, newdraft.id, new_draft_course.handle)
@@ -178,10 +169,15 @@ def copyStageableVideo(draft, new_draft_course, new_draft_section):
         while Video.objects.filter(is_deleted=False, course=new_draft_course, slug=newdraft.slug).exists():  #Now start appending until slug is unique
             newdraft.slug = newdraft.slug + "1"
 
+    #Set the exam_id, if applicable. Hopefully if it is not null, it didn't end up
+    #in a different section; which could be problematic.
+    newdraft.exam_id = draft_exam_map.get(draft.exam_id, None)
+  
     newdraft.save()
     newdraft.commit() #push changes to ready version
 
 
+    return draft.image.id, newdraft.image.id
 
 def copyStageableFile(draft, new_draft_course, new_draft_section):
     """
@@ -208,7 +204,7 @@ def copyStageableFile(draft, new_draft_course, new_draft_section):
 
     if found:
         newdraft.file.name = foundfile.file.name
-        newready.file.name = foundfile.file.name
+        newready.file.name = foundfile.file.name  
     else:
         newdraft.file.save(new_name, ContentFile(draft.file.read()))
         newready.file=newdraft.file
@@ -216,7 +212,7 @@ def copyStageableFile(draft, new_draft_course, new_draft_section):
     newdraft.save()    
     newready.save()
 
-
+    return draft.image.id, newdraft.image.id
 
 def copyStageableStaticPage(draft, new_draft_course, new_draft_section):
     """
@@ -234,42 +230,145 @@ def copyStageableStaticPage(draft, new_draft_course, new_draft_section):
     newdraft.save()
     newdraft.commit()
 
+    return draft.image.id, newdraft.image.id
 
-
-def copySection(draft, new_draft_course):
-    """ 
-       Given a draft copy of a ContentSection, copies the content in the ContentSection to the course identified by new_draft_course.
-       If a section with an identical title exists in new_course, uses that as the target section.
-       Otherwise, creates a new section with identical name.
+def copyStageableExam(draft, new_draft_course, new_draft_section):
     """
-    #Figure out whether to create or reuse section.  Either way the result is newdraft
-    if ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=draft.title).exists():
-        newdraft = ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=draft.title)[0]
-    else:
-        index = ContentSection.objects.filter(is_deleted=False, course=new_draft_course).aggregate(Max('index'))['index__max']+1
-        newdraft = ContentSection(course=new_draft_course, title=draft.title)
-        newdraft.index = index
-        newdraft.mode="draft"
-        newdraft.save()
-        newdraft.create_ready_instance()
+       Takes a draft exam and copies the (draft,ready) pair to new_course, in new_section
+       Relies on new_draft_course and new_draft_section already having images
+    """
+    newdraft = copyStageableSectionObj(draft, new_draft_course, new_draft_section)
+    newready = newdraft.image
 
-    #Static Pages
-    for sp in AdditionalPage.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableStaticPage(sp, new_draft_course, newdraft)
-
-    #Files
-    for f in File.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableFile(f, new_draft_course, newdraft)
-
-    #ProblemSets
-    for ps in ProblemSet.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableProblemSet(ps, new_draft_course, newdraft)
-
-    #Videos
-    for v in Video.objects.filter(is_deleted=False, course=draft.course, section=draft):
-        copyStageableVideo(v, new_draft_course, newdraft)
+    #sanity check to avoid duplicate slugs
+    if Exam.objects.filter(is_deleted=False, course=new_draft_course, slug=newdraft.slug).count() > 1: #There's definitely one, the one we just copied
+        while Exam.objects.filter(is_deleted=False, course=new_draft_course, slug=newdraft.slug).exists():  #Now start appending until slug is unique
+            newdraft.slug = newdraft.slug + "1"
 
     newdraft.save()
     newdraft.commit()
 
+    return draft.image.id, newdraft.image.id, draft.id, newdraft.id
 
+
+def copyCourse(old_draft_course, new_draft_course, from_section = None):
+    """ 
+       Given a draft copy of a ContentSection, copies the content in the ContentSection to the course identified by new_draft_course.
+       Given a draft copy of a Course and from_section is None, copies the content in the whole course identified by old_draft_course to the
+       course identified by new_draft_course.
+    """
+    
+    #dicts to map old entity ids to new entity ids when creating the new ContentGroups.
+    additionalpage_map = {}
+    file_map = {}
+    video_map = {}
+    exam_map = {}
+    draft_exam_map = {}
+    old_draftcontentsections = []
+    
+    if from_section == None:        
+        old_draftcontentsections = ContentSection.objects.filter(is_deleted=False, course=old_draft_course)
+    else:
+        old_draftcontentsections.append(from_section)
+        
+        
+    for old_draftcontentsection in old_draftcontentsections:
+    
+        #Figure out whether to create or reuse section.  Either way the result is newdraft
+        if ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=old_draftcontentsection.title).exists():
+            new_draftcontentsection = ContentSection.objects.filter(is_deleted=False, course=new_draft_course, title=old_draftcontentsection.title)[0]
+    
+        else:
+            index = ContentSection.objects.filter(is_deleted=False, course=new_draft_course).aggregate(Max('index'))['index__max']
+            if index == None:
+                index = 0
+            else:
+                index +=1
+        
+            new_draftcontentsection = ContentSection(course=new_draft_course, title=old_draftcontentsection.title)
+            new_draftcontentsection.index = index
+            new_draftcontentsection.mode="draft"
+            new_draftcontentsection.save()
+            new_draftcontentsection.create_ready_instance()
+
+        #Additional Pages
+        for ap in AdditionalPage.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
+            old_ready_id, new_ready_id = copyStageableStaticPage(ap, new_draft_course, new_draftcontentsection)
+            additionalpage_map[old_ready_id] = new_ready_id
+
+        #Files
+        for f in File.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
+            old_ready_id, new_ready_id = copyStageableFile(f, new_draft_course, new_draftcontentsection)            
+            file_map[old_ready_id] = new_ready_id
+
+        #Exams
+        for e in Exam.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
+            old_ready_id, new_ready_id, old_draft_id, new_draft_id = copyStageableExam(e, new_draft_course, new_draftcontentsection)
+            exam_map[old_ready_id] = new_ready_id
+            draft_exam_map[old_draft_id] = new_draft_id
+
+        #Videos
+        for v in Video.objects.filter(is_deleted=False, course=old_draft_course, section=old_draftcontentsection):
+            #Send the draft_exam_map so we can set the video to exam relation.
+            old_ready_id, new_ready_id = copyStageableVideo(v, new_draft_course, new_draftcontentsection, draft_exam_map)
+            video_map[old_ready_id] = new_ready_id
+
+        new_draftcontentsection.save()
+        new_draftcontentsection.commit()
+    
+    #ContentGroups
+    copyAllContentGroups(old_draft_course.image.id, new_draft_course.image.id, additionalpage_map, file_map, video_map, exam_map)
+ 
+ 
+def copyAllContentGroups(old_ready_course_id, new_ready_course_id, additionalpage_map, file_map, video_map, exam_map):
+    
+    #Copy the level 1 content groups first
+    cg_map = {}  
+    for cg in ContentGroup.objects.filter(course_id = old_ready_course_id, level = 1, id = F('group_id')):
+        
+        #Need to protect against situation where entity was not cloned because it's
+        #section was deleted.
+        if not all_entities_null(additionalpage_map, file_map, video_map, exam_map, cg):
+        
+            #Map old cg entity id to new so we can process the level 2's.
+            #Need to protect against any bad data
+            new_cg = copyAndSaveModelObj(cg)
+            new_cg.group_id = new_cg.id
+            new_cg.course_id = new_ready_course_id
+            new_cg.video_id = video_map.get(cg.video_id, None)
+            new_cg.additional_page_id = additionalpage_map.get(cg.additional_page_id, None)
+            new_cg.file_id = file_map.get(cg.file_id, None)
+            new_cg.exam_id = exam_map.get(cg.exam_id, None)
+            new_cg.save()
+            cg_map[cg.group_id] = new_cg.group_id
+        
+        
+        
+    #Now copy the level 2's making sure we only pick those with a valid group_id
+    for cg in ContentGroup.objects.filter(course_id = old_ready_course_id, level = 2):
+        
+        #Need to protect against situation where entity was not cloned because it's
+        #section was deleted.
+        if not all_entities_null(additionalpage_map, file_map, video_map, exam_map, cg):
+        
+            if cg_map.get(cg.group_id, False):
+                new_cg = copyAndSaveModelObj(cg)
+                new_cg.group_id = cg_map[cg.group_id]
+                new_cg.course_id = new_ready_course_id
+                new_cg.video_id = video_map.get(cg.video_id, None)
+                new_cg.additional_page_id = additionalpage_map.get(cg.additional_page_id, None)
+                new_cg.file_id = file_map.get(cg.file_id, None)
+                new_cg.exam_id = exam_map.get(cg.exam_id, None)
+                new_cg.save()
+        
+        
+def all_entities_null(additionalpage_map, file_map, video_map, exam_map, cg):
+    
+    if not (video_map.get(cg.video_id, False) 
+         or additionalpage_map.get(cg.additional_page_id, False) 
+         or file_map.get(cg.file_id, False) 
+         or exam_map.get(cg.exam_id, False)):
+        
+        return True
+    else:
+        return False

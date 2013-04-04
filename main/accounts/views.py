@@ -2,6 +2,8 @@ import json
 import random
 import string
 import urlparse
+import os
+import re
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
@@ -14,10 +16,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render_to_response
 from django.contrib.auth import logout
 from django.views.decorators.http import require_POST
-from django.contrib.auth import get_backends, REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, authenticate as auth_authenticate
+from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate as auth_authenticate
 from django.contrib import messages
-from django.contrib.auth.models import User, Group
-from c2g.models import Course, Institution,Video, Instructor, CourseInstructor
+from django.contrib.auth.models import User
+from c2g.models import Course, Institution, Video, CourseInstructor, CourseStudentScore
 from accounts.forms import *
 from registration import signals
 from registration.login_wrapper import login as auth_login_view
@@ -26,7 +28,6 @@ from django.core.validators import validate_email, RegexValidator
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseBadRequest
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
-from django.contrib.auth.decorators import permission_required
 from django.db.models import Q
 from pysimplesoap.client import SoapClient
 from datetime import date
@@ -41,6 +42,8 @@ def profile(request):
     group_list = user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
     course_completions = {}
+    score_dict = {}
+    today = date.today()
     
     user_profile = None
     is_student_list = []
@@ -64,9 +67,16 @@ def profile(request):
         for course in courses:
             if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
                 duration = course.calendar_end - course.calendar_start
-                progress = min(date.today(), course.calendar_end) - course.calendar_start
+                progress = min(today, course.calendar_end) - course.calendar_start
                 course_completion = int((float(progress.days) / float(duration.days)) * 100)
                 course_completions[course.id] = course_completion
+                
+                if course.calendar_end < date.today():
+                    score_list = CourseStudentScore.objects.filter(
+                        course=course,
+                        student=user,
+                    ).values_list('tag', 'score', 'total')
+                    score_dict[course.id] = score_list
 
     has_webauth = False
     if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
@@ -81,6 +91,8 @@ def profile(request):
                                   'has_webauth': has_webauth,
                                   'user_profile': user_profile,
                                   'certifications': certs_list,
+                                  'today': today,
+                                  'scores': score_dict,
                                   'longest_certs': range(longest_certlist),
                               },
                               context_instance=RequestContext(request))
@@ -120,7 +132,8 @@ def save_piazza_opts(request):
     except ValidationError:
         return HttpResponseBadRequest('You did not enter a valid email address.')
     try:
-        nameValidator = RegexValidator(regex=r'^[\w -]+$')
+        regex = re.compile(r'^[\w -]+$', re.U)
+        nameValidator = RegexValidator(regex=regex)
         nameValidator(name.strip())
     except ValidationError:
         return HttpResponseBadRequest('Names on Piazza should only contain letters, numbers, underscores, hyphens, and spaces.')
@@ -343,9 +356,16 @@ def standard_preview_login(request, course_prefix, course_suffix):
     
         for ci in course_instructors:
             instructors.append(ci.instructor)
-  
+        
+        # default template, unless there is one in the soruce tree, then use that
         template_name='previews/default.html'
-
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+                
+        
         return render_to_response(template_name,
                          {'form': form,
                           'login_form': login_form,

@@ -384,6 +384,10 @@ body.home {
     float:left;
 }
 
+.hidden {
+    visibility:none;
+}
+
 /* Common
 -------------------------------------------------- */
 .section-title {
@@ -590,9 +594,35 @@ small.date {
     margin: 0 0 15px 0;
 }
 
+#share_wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 40px;
+}
+#share_wrapper .show_hide_share {
+    position: absolute;
+    z-index: 100;
+}
+#share_wrapper .show_hide_share.share_hidden {
+    right: 0;
+    top: 0;
+    left: 0;
+}
+#share_wrapper .show_hide_share.share_visible {
+    right: 5px;
+    top: 5px;
+}
+#share-result {
+    z-index: 50;
+    position: relative;
+    float: right;
+    clear: both;
+    padding-top: 10px;
+}
 #share-result textarea {
     width: 100%;
     box-sizing: border-box;
+    resize: vertical;
 }
 #share-result .show_score {
     display: block;
@@ -644,7 +674,16 @@ small.date {
 
 /* Right Column
 -------------------------------------------------- */
+.right_nav_wrapper {
+    position: relative;
+    clear: both;
+}
+
 /* Twitter Feed */
+#twitterWidget {
+    position: relative;
+    clear: both;
+}
 #twitterWidget .twtr-widget .twtr-doc {
     border: 1px solid #bdb7a1;
 }
@@ -743,12 +782,27 @@ small.date {
     width: 200px;
     margin-right: 10px;
 }
+.profile-courses .course .image .score_overlay {
+    position: absolute;
+    display: none;
+    width: 200px;
+    height: 200px;
+    left: 0;
+    top: 0;
+}
 .profile-courses .course h3 {
     font-size: 18px;
     line-height: 1.5em;
 }
 .profile-courses .course .dates {
     font-size: 14px;
+}
+.profile-courses .course .score_overlay ul {
+    font-size: 14px;
+    margin-left: 18px;
+}
+.profile-courses .course .score_overlay ul li {
+    line-height: 150%;
 }
 .profile-courses .course .profile-progress-wrapper {
     position: relative;
@@ -776,12 +830,17 @@ small.date {
     top: 1px;
     background-color: #820000;
 }
-.profile-courses .course .btn {
+.profile-courses .course .buttons {
     position: absolute;
     right: 15px;
     bottom: 15px;
+}
+.profile-courses .course .buttons .btn {
     padding: 5px 10px;
-    font-size: 13px; 
+    font-size: 13px;
+    float: right;
+    clear: both;
+    margin-top: 5px;
 }
 .profile-courses .course input.btn {
     width: 198px;
@@ -1055,6 +1114,23 @@ ul.ui-sortable li:hover {
 }
 .assessment-type ul li {
     list-style-type:none;
+}
+
+.edit-button { 
+    float:right;
+    color:green;
+    margin:5px;
+}
+
+.delete-button { 
+    float:right;
+    color:red;
+    margin:5px;
+}
+
+.move-button {
+    float:right;
+    margin:2px;
 }
 
 /* jQuery UI

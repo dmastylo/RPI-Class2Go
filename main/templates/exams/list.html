@@ -85,7 +85,7 @@
 
             {% endif %}
             {% if score %}
-            <b><a href="{% url exam.graded_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{% trans 'Score' %}: {{score}}/{{exam.total_score}} </a></b>
+            <b><a href="{% url exam.graded_view common_page_data.course_prefix common_page_data.course_suffix exam.slug %}">{% trans 'Score' %}: {{score.0}}/{{score.1}} </a></b>
             &nbsp;
             {% endif %}
             {% if exam.exam_type == "exam" %}

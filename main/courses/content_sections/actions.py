@@ -110,7 +110,7 @@ def get_children(request, section_id, contentgroup_parents_only=False):
         item    = child['item']
         typetag = child['type']
         if contentgroup_parents_only:
-            if item.mode != u'ready':
+            if item.mode != 'ready':
                 item = item.image
             if item.id in l2_kids.get(typetag, []):
                 continue

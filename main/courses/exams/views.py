@@ -6,6 +6,7 @@ import json
 import logging
 import markdown
 import operator
+import math
 from pytz import timezone
 
 from django.db.models import Max, F
@@ -47,8 +48,15 @@ def listAll(request, course_prefix, course_suffix, show_types=["exam",]):
 
         scores = []
         for e in exams:
-            score = ExamScore.objects.filter(course=course, exam=e, student=request.user)
-            scores.append(score[0].score if score else None)
+            score = ExamScore.objects.filter(course=course, exam=e, student=request.user) #unique_together = ("exam", "student")
+            if score:
+                sc = score[0].score
+                if score[0].examrecordscore:
+                    max_score = score[0].examrecordscore.record.get_total_score() #this is only edit mode, so not gonna optimize
+                else:
+                    max_score = e.max_score
+                pair = (sc, max_score)
+            scores.append(pair if score else None)
 
         return render_to_response('exams/list.html',
                                   {'common_page_data':cpd,
@@ -331,6 +339,12 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         correx_obj['__metadata__'] = exam.xml_metadata if exam.xml_metadata else "<empty></empty>"
         json_pre_pop_correx = json.dumps(correx_obj)
         score = record.score
+        
+        share_block_title = None
+        share_block_type = 'standard'
+        if score:
+            share_block_title = 'Share your Results!'
+            share_block_type = 'score'
 
     except ExamRecord.DoesNotExist:
         raise Http404
@@ -381,16 +395,24 @@ def show_graded_record(request, course_prefix, course_suffix, exam_slug, record_
         total_score = exam.total_score
 
 
-    return render_to_response('exams/view_exam.html', {'common_page_data':request.common_page_data,
-                                                       'exam':exam, 'json_pre_pop':json_pre_pop,
-                                                       'scores':scores_json, 'score':score,
-                                                       'total_score': total_score,
-                                                       'json_pre_pop_correx':json_pre_pop_correx,
-                                                       'editable':False, 'raw_score':raw_score,
-                                                       'allow_submit':False, 'ready_section':ready_section,
-                                                       'slug_for_leftnav':slug_for_leftnav,
-                                                       'rendered_exam_html':rendered_exam_html,
-                                                       'rendered_questions':rendered_questions,}, RequestContext(request))
+    return render_to_response('exams/view_exam.html', {
+        'common_page_data':      request.common_page_data,
+        'exam':                  exam,
+        'json_pre_pop':          json_pre_pop,
+        'scores':                scores_json,
+        'score':                 score,
+        'share_block_title':     share_block_title,
+        'share_block_type':      share_block_type,
+        'total_score':           total_score,
+        'json_pre_pop_correx':   json_pre_pop_correx,
+        'editable':              False,
+        'raw_score':             raw_score,
+        'allow_submit':          False,
+        'ready_section':         ready_section,
+        'slug_for_leftnav':      slug_for_leftnav,
+        'rendered_exam_html':    rendered_exam_html,
+        'rendered_questions':    rendered_questions,
+    }, RequestContext(request))
 
 
 @auth_view_wrapper
@@ -590,9 +612,13 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
 
         #Set penalty inclusive score for ExamRecord
         record.json_score_data = json.dumps(feedback)
-        
+
         #apply penalties
-        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty, record.late, exam.late_penalty)
+        days_late = record.days_late(grace_period=exam.grace_period)
+        record.score = compute_penalties(total_score, attempt_number, exam.resubmission_penalty,
+                                         record.late, exam.late_penalty,
+                                         late_days=days_late,
+                                         daily_late_penalty=exam.daily_late_penalty)
         record.save()
         
         #Set ExamScore.score to max of ExamRecord.score for that student, exam. 
@@ -605,7 +631,7 @@ def collect_data(request, course_prefix, course_suffix, exam_slug):
         return HttpResponse("Submission has been saved.")
 
 
-def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty):
+def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, late_penalty, late_days=0, daily_late_penalty=0):
     """Helper function to factor out resubmission and late penalty calculations, 
        so I can write a few unit tests for it
     """
@@ -614,6 +640,9 @@ def compute_penalties(raw_score, attempt_number, resubmission_penalty, is_late, 
     late_discount = max(0.0, 100.0 - late_penalty)/100.0
     if is_late:
         score *= late_discount
+        if late_days:
+            daily_discount = pow(max(0.0, (100.0 - daily_late_penalty)/100.0), late_days)
+            score *= daily_discount
     return max(score, 0.0)
 
 @require_POST
@@ -643,6 +672,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     grace_period = request.POST.get('grace_period', '')
     partial_credit_deadline =  request.POST.get('partial_credit_deadline', '')
     late_penalty = request.POST.get('late_penalty', '')
+    daily_late_penalty = request.POST.get('daily_late_penalty', '')
     num_subs_permitted = request.POST.get('num_subs_permitted','')
     resubmission_penalty = request.POST.get('resubmission_penalty','')
     assessment_type = request.POST.get('assessment_type','')
@@ -751,6 +781,15 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
         except ValueError:
             return HttpResponseBadRequest("A non-numeric late penalty (" + late_penalty  + ") was provided")
 
+    if not daily_late_penalty:
+        dlp = 0
+    else:
+        try:
+            dlp = int(daily_late_penalty)
+        except ValueError:
+            return HttpResponseBadRequest("A non-numeric daily late penalty (" + daily_late_penalty  + ") was provided")
+
+
     if not num_subs_permitted:
         sp = 999
     else:
@@ -771,7 +810,8 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
     if create_or_edit == "create":
         exam_obj = Exam(course=course, slug=slug, title=title, description=description, html_content=htmlContent, xml_metadata=metaXMLContent,
                         due_date=dd, assessment_type=assessment_type, mode="draft", total_score=total_score, grade_single=grade_single,
-                        grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, submissions_permitted=sp, resubmission_penalty=rp,
+                        grace_period=gp, partial_credit_deadline=pcd, late_penalty=lp, daily_late_penalty=dlp, submissions_permitted=sp,
+                        resubmission_penalty=rp,
                         exam_type=exam_type, autograde=autograde, display_single=display_single, invideo=invideo, section=contentsection,
                         xml_imported=xmlImported, quizdown=quizdown, hide_grades=hide_grades
                         )
@@ -816,6 +856,7 @@ def save_exam_ajax(request, course_prefix, course_suffix, create_or_edit="create
             exam_obj.grace_period=gp
             exam_obj.partial_credit_deadline=pcd
             exam_obj.late_penalty=lp
+            exam_obj.daily_late_penalty=dlp
             exam_obj.submissions_permitted=sp
             exam_obj.resubmission_penalty=rp
             exam_obj.exam_type=exam_type
@@ -903,7 +944,7 @@ def edit_exam(request, course_prefix, course_suffix, exam_slug):
           'assessment_type':exam.assessment_type, 'late_penalty':exam.late_penalty, 'num_subs_permitted':exam.submissions_permitted,
           'resubmission_penalty':exam.resubmission_penalty, 'description':exam.description, 'section':exam.section.id,'invideo':exam.invideo,
           'metadata':exam.xml_metadata, 'htmlContent':exam.html_content, 'xmlImported':exam.xml_imported, 'quizdown':exam.quizdown,
-          'hide_grades':exam.hide_grades}
+          'hide_grades':exam.hide_grades, 'daily_late_penalty':exam.daily_late_penalty}
 
     groupable_exam = exam
     if exam.mode != 'ready':
@@ -1328,3 +1369,20 @@ def parse_markdown(request):
     html = md.convert(mkd)
     returnobj = {'html':html, 'meta':md.Meta}
     return HttpResponse(json.dumps(returnobj))
+
+
+def quizdown_preview(request):
+    return render_to_response('exams/qd_preview.html', {}, RequestContext(request))
+
+
+@require_POST
+def check_metadata_xml_no_course(request):
+    xml = request.POST.get('metaXMLContent')
+    if not xml:
+        return HttpResponseBadRequest("No metaXMLContent provided")
+    try:
+        grader = AutoGrader(xml)
+    except Exception as e: #Since this is just a validator, pass back all the exceptions
+        return HttpResponseBadRequest(unicode(e))
+    
+    return HttpResponse("Metadata XML is OK.\n" + unicode(grader) + "\n" )

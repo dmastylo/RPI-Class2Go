@@ -26,6 +26,8 @@ admin.site.register(CourseStudentList)
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'gender', 'birth_year', 'education', 'work', 'client_ip_first', 'user_agent_first', 'referrer_first', 'accept_language_first')
+    readonly_fields = ('user',)
+    search_fields = ('user__username',)
 
 class GroupProxy(Group):
     class Meta:
@@ -67,6 +69,7 @@ class StudentExamStartAdmin(admin.ModelAdmin):
     search_fields = ('student__username',)
     list_display = ('__unicode__', 'time_created','last_updated')
     readonly_fields = ('student','exam')
+
 
 #class ExamAdmin(reversion.VersionAdmin):
 #    pass

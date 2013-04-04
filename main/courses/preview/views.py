@@ -1,6 +1,5 @@
 # Create your views here.
 
-from django.http import HttpResponse, Http404
 from registration.forms import RegistrationFormUniqueEmail
 from registration.backends import get_backend
 from django.shortcuts import redirect
@@ -8,21 +7,17 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from registration.backends import get_backend
-from courses.common_page_data import get_common_page_data
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from datetime import date
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import login
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import login as auth_login
 from django.conf import settings
 from c2g.util import upgrade_to_https_and_downgrade_upon_redirect
 from django.views.decorators.debug import sensitive_post_parameters
-from c2g.models import Video, Instructor, CourseInstructor
+from c2g.models import Video, CourseInstructor
 
-import json
-import settings
 import os.path
 
 import logging
@@ -65,8 +60,11 @@ def preview(request, course_prefix, course_suffix):
     # default template, unless there is one in the soruce tree, then use that
     template_name='previews/default.html'
     class_template='previews/'+request.common_page_data['course'].handle+'.html'
-    if os.path.isfile(settings.TEMPLATE_DIRS[1]+'/'+class_template):
-        template_name=class_template
+    dirs = getattr(settings,'TEMPLATE_DIRS', [])
+    for dir in dirs:
+        if os.path.isfile(dir+'/'+class_template):
+            template_name=class_template
+
 
     return render_to_response(template_name,
                               {'form': form,
@@ -98,9 +96,15 @@ def preview_login(request, course_prefix, course_suffix):
         return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         form = form_class(initial={'course_prefix':course_prefix,'course_suffix':course_suffix})
-        context = RequestContext(request)                
-        return render_to_response(#'previews/'+request.common_page_data['course'].handle+'.html',
-                                  'previews/default.html',
+        context = RequestContext(request)
+        # default template, unless there is one in the soruce tree, then use that
+        template_name='previews/default.html'
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+        return render_to_response(template_name,
                                   {'form': form,
                                    'login_form': login_form,
                                    'common_page_data': request.common_page_data,
@@ -129,9 +133,16 @@ def preview_reg(request, course_prefix, course_suffix):
         return redirect(reverse(redirect_to, args=[course_prefix, course_suffix]))
     else:
         login_form = AuthenticationForm(data=request.POST)
-        context = RequestContext(request)                
-        return render_to_response(#'previews/'+request.common_page_data['course'].handle+'.html',
-                                  'previews/default.html',
+        context = RequestContext(request)
+        # default template, unless there is one in the soruce tree, then use that
+        template_name='previews/default.html'
+        class_template='previews/'+request.common_page_data['course'].handle+'.html'
+        dirs = getattr(settings,'TEMPLATE_DIRS', [])
+        for dir in dirs:
+            if os.path.isfile(dir+'/'+class_template):
+                template_name=class_template
+
+        return render_to_response(template_name,
                                       {'form': form,
                                       'login_form': login_form,
                                       'common_page_data': request.common_page_data,

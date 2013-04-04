@@ -9,14 +9,15 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.cache import cache_page
 
+
 from courses.forms import *
 
-from courses.actions import auth_view_wrapper
+from courses.actions import auth_view_wrapper, is_member_of_course
 
 from c2g.models import CurrentTermMap
 import settings, logging
-import datetime
-
+from datetime import date
+from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -53,10 +54,14 @@ def main(request, course_prefix, course_suffix):
     #    raise Http404
 
     common_page_data=request.common_page_data
-    ##JASON 9/5/12###
-    ##For Launch, but I don't think it needs to be removed later##
-    if common_page_data['course'].preview_only_mode:
-        if not common_page_data['is_course_admin']:
+
+    course = common_page_data['course']
+    #determine whether to redirect to preview page
+    #non-registered students on public courses should be redirected
+    redirect_to_preview = course.preview_only_mode or (not course.institution_only) and (not common_page_data['is_course_member'])
+    
+    if redirect_to_preview:
+        if not common_page_data['is_course_admin']: #keep this here as the only exception: course admins should be able to create content
             redir = reverse('courses.preview.views.preview',args=[course_prefix, course_suffix])
             if (settings.INSTANCE == 'stage' or settings.INSTANCE == 'prod'):
                 redir = 'https://'+request.get_host()+redir
@@ -72,34 +77,55 @@ def main(request, course_prefix, course_suffix):
         many_announcements = False
         announcement_overflow = 0
     
+    course_cert = None
+    share_block_title = None
+    share_block_type = 'standard'
+    
     if request.user.is_authenticated():
         is_logged_in = 1
+        
+        # Pass whether people get a cert and what it is to main page for when they finish course.
+        user_certs = request.user.get_profile().certificates.all().filter(course=course)
+        if user_certs:
+            course_cert = (user_certs[0].type, user_certs[0].dl_link(request.user))
+        
+        if course_cert:
+            share_block_title = 'Share your Achievement!'
+            share_block_type = 'statement'
+        else:
+            share_block_title = 'Share Something!'
     else:
         is_logged_in = 0
-
-    # Environment prep for jabber chat plugin
-    jabber_configured = hasattr(settings, 'JABBER_DOMAIN')
+    
+    # Environment prep for jabber chat plugin. Uses '' == False.
+    jabber_configured = getattr(settings, 'JABBER_DOMAIN', '')
+        
+    if (course.calendar_start > date.today()):
+        share_block_type = 'join'
 
     return render_to_response('courses/view.html',
-            {'common_page_data':    common_page_data,
-             'course':              course,
-             'announcement_list':   announcement_list,
-             'announcement_overflow': announcement_overflow,
-             'many_announcements':  many_announcements,
-             'is_logged_in':        is_logged_in,
-             'jabber_configured':   jabber_configured,
-             },
-            context_instance=RequestContext(request))
+        {'common_page_data':       common_page_data,
+        'course':                  course,
+        'announcement_list':       announcement_list,
+        'announcement_overflow':   announcement_overflow,
+        'many_announcements':      many_announcements,
+        'is_logged_in':            is_logged_in,
+        'course_cert':             course_cert,
+        'share_block_title':       share_block_title,
+        'share_block_type':        share_block_type,
+        'jabber_configured':       jabber_configured,
+        },
+        context_instance=RequestContext(request))
 
 def get_upcoming_exams(course):
-  end_date = datetime.datetime.today() + datetime.timedelta(weeks=2)
+  end_date = date.today() + timedelta(weeks=2)
   exams = Exam.objects.filter(
-    course=course, 
+    course=course,
     mode='ready',
     is_deleted=0,
-    due_date__gte = datetime.datetime.today(),
+    due_date__gte = date.today(),
     due_date__lte = end_date, 
-    live_datetime__lte = datetime.datetime.today()
+    live_datetime__lte = date.today()
     ).order_by('due_date')
   return exams
 
@@ -125,16 +151,17 @@ def course_materials(request, course_prefix, course_suffix, section_id=None):
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True, SECTION=section)
 
         #Get prev/next nav links
+        cur_index = None
         sections = request.common_page_data['content_sections']
         for index, item in enumerate(sections):
             if item == section:
                 cur_index = index
                 break
-
-        if cur_index > 0:
-            prev_section = sections[cur_index-1]
-        if cur_index < len(sections) - 1:
-            next_section = sections[cur_index+1]
+        if cur_index:
+            if cur_index > 0:
+                prev_section = sections[cur_index-1]
+            if cur_index < len(sections) - 1:
+                next_section = sections[cur_index+1]
     else:
         section_structures = get_course_materials(common_page_data=request.common_page_data, get_video_content=True, get_pset_content=False, get_additional_page_content=True, get_file_content=True, get_exam_content=True)
 

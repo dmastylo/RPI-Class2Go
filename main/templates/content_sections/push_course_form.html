@@ -1,0 +1,32 @@
+{% extends "course_base.html" %}
+{% load url from future %}
+
+
+{% block m_column_content %}
+<h3>Copy this course to a linked course</h3>
+<ul>
+    <li><b>Please use this functionality with caution</b>. </li>
+    <li>This course will be copied to the destination course, but only if you have course admin privileges for both courses.</li>
+    <li>The destination course list is populated by entering rows into the c2g_courses_share_to table.
+    <li>If a section with a matching name already exists in the destination course, the material will be added to that section.</li>
+    <li>This action might take several minutes to complete due to all of the copy operations, so please do not click submit more than once.</li>
+</ul>
+<div id="c2g_layout_m_column" class="span12">
+    <form id="cpform" method="POST" action="{% url 'courses.content_sections.views.copy_course' common_page_data.course_prefix common_page_data.course_suffix %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p>  <input id="formsub" type="submit" /> </p>
+    </form>
+</div>
+
+{% endblock m_column_content %}
+
+{% block addl_scripts %}
+<script>
+$(function() {
+    $("#cpform").submit(function(){
+        $("#formsub").attr('disabled','disabled');
+        return true;});
+});
+</script>
+{% endblock addl_scripts %}

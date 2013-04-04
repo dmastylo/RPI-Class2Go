@@ -51,7 +51,10 @@
     h2 {color: #444; font-family: Arial, Helvetica, sans-serif; margin-bottom: .2em;}
     #input-pane, #preview-pane {float: left; margin-right: 1em; width: 90%;}
     #preview-pane #staging-area {background-color: #eee; border: 1px solid #ddd; height: 600px; padding: 1em;}
-    textarea, #staging-area {height: 400px; overflow: auto; width: 100%;}
+    textarea {height: 100px; overflow: auto; width: 100%;}
+   	#xml-entry {height: 400px; overflow: auto; width: 100%;}
+   	#quizdown-entry {height: 400px; overflow: auto; width: 100%;}
+   	#staging-area {height: 400px; overflow: auto; width: 100%;}
     #preview-pane label {clear: both; display: block; min-width:200px;}
     #preview-pane label input {float: left; margin-right: 1em;}
     #preview-pane #staging-area p {clear: both; display: block; padding: 0 0 0em;}
@@ -150,11 +153,13 @@
             <input id="hard_deadline" class="picker"  type="text" name="hard_deadline" value="" data-datetimepicker>
         </div>
         <div class="atomic-unit well" id="penalties" >
-            <label class="control-label" for="late_penalty">{% trans 'Late Penalty' %}:*</label>
+            <label class="control-label" for="late_penalty">{% trans '% Late Penalty (constant)' %}:*</label>
             <input id="late_penalty" name="late_penalty" type="text" value="0"/>
+            <label class="control-label" for="daily_late_penalty">{% trans '% Late Penalty (per 24 hrs)' %}:*</label>
+            <input id="daily_late_penalty" name="daily_late_penalty" type="text" value="0"/>
             <label class="control-label" for="num_subs_permitted">{% trans 'Number of Submissions Allowed' %}:*</label>
             <input id="num_subs_permitted" name="num_subs_permitted" type="text" value="999"/>
-            <label class="control-label" for="resubmission_penalty">{% trans 'Penalty Per Submission After First' %}:*</label>
+            <label class="control-label" for="resubmission_penalty">{% trans '% Penalty Per Submission After First' %}:*</label>
             <input id="resubmission_penalty" name="resubmission_penalty" type="text" value="0" />
             <label class="control-label" for="hide_grades">Hide grades from students?</label>
             <input id="hide_grades" type="checkbox" name="hide_grades" />
@@ -165,9 +170,13 @@
        
     <div class="well control-group">
         <ul class="nav nav-tabs" id="myTab">
-            <li class="active"><a id="preview-tab" href="#preview-content">{% trans 'Preview' %}</a></li>
+		    {% if edit_mode %}
+            <li class="active"><a id="create-tab" href="#create-content">{% trans 'Edit Exam Content' %}</a></li>
+		    {% else %}    
+            <li class="active"><a id="create-tab" href="#create-content">{% trans 'Create Exam Content' %}</a></li>
+		    {% endif %}
             <li><a id="enter-xml-tab" href="#enter-content-xml">{% trans 'Edit XML Metadata' %}</a></li>
-            <li><a id="enter-html-tab" href="#enter-content-html">{% trans 'Edit HTML' %}</a></li>
+            <li><a id="enter-html-tab" href="#enter-content-html">{% trans 'Edit HTML' %}</a></li>	
         </ul>
 
         <div class="tab-content">
@@ -186,9 +195,17 @@
                     <div id="editor"></div>
                 </div>
 			</div>
-            <div class="tab-pane active" id="preview-content">
-                <div id="preview-pane">
-                    <h4>{% trans 'Preview Exam HTML' %}</h4>
+			<div class="tab-pane active" id="create-content">
+                <div id="create-pane">
+                    <h4>{% trans 'Create Exam' %}</h4>
+					<div>
+					    <div class="control-group">
+					        <input type="button" id="radio-buttons-btn" class="btn" value="{% trans 'New Radio Buttons Question' %}" title="{% trans 'New Radio Buttons Question' %}" />
+					        <input type="button" id="checkboxes-btn" class="btn" value="{% trans 'New Checkboxes Question' %}" title="{% trans 'New Checkboxes Question' %}" />
+							<input type="button" id="numerical-btn" class="btn" value="{% trans 'New Numerical Tolerance Question' %}" title="{% trans 'New Numerical Tolerance Question' %}" />
+							<input type="button" id="regex-btn" class="btn" value="{% trans 'New Regex Question' %}" title="{% trans 'New Regex Question' %}" />
+					    </div>
+					</div>
                     <div id="staging-area"></div>
                 </div>
             </div>
@@ -221,6 +238,7 @@ due-date: 12/29/2013 00:00
 grace-period: 12/29/2013 00:00
 hard-deadline: 12/29/2013 00:00
 late-penalty: 10
+daily-late-penalty: 0
 num-subs-permitted: 9999
 resubmission-penalty: 10
 section: Test Videos
@@ -360,6 +378,150 @@ Testing your common sense: 15.6 sec
     </form>
 </div>
 
+<div id="regex-response-form" title="{% trans 'Regex Question' %}">
+	<form>
+		<label for="regex-response-question-text" id="regex-response-label-question-text">{% trans 'Enter the text for this question' %}</label>
+		<textarea name="regex-response-question-text" id="regex-response-question-text" placeholder="Replace this with the text of your question." 	class="text ui-widget-content ui-corner-all"></textarea>
+		<label for="regex-response-question-explanation" id="regex-response-question-label-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
+		<textarea name="regex-response-question-explanation" id="regex-response-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
+		<p> {% trans 'Sub-problem #1' %} </p>
+		<label for="regex-response-question-correct-points1" id="regex-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points1" id="regex-response-question-correct-points1" value="1" class="text ui-widget-content ui-corner-all" default="1"></input></label>
+		<label for="regex-response-question-wrong-points1" id="regex-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points1" id="regex-response-question-wrong-points1" class="text ui-widget-content ui-corner-all" value="0" default="0" ></input></label>
+		<label for="regex-response-question-text1" id="regex-response-question-label-text1">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text1" id="regex-response-question-text1" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="regex-response-question-actual-answer1" id="regex-response-question-label-actual-answer1">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer1" id="regex-response-question-actual-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-ignorecase1" id="regex-response-question-label-ignorecase1">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase1" id="regex-response-question-ignorecase1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-multiline1" id="regex-response-question-label-multiline1">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline1" id="regex-response-question-multiline1" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Sub-problem #2' %} </p>
+		<label for="regex-response-question-correct-points2" id="regex-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points2" id="regex-response-question-correct-points2" value="1"  class="text ui-widget-content ui-corner-all" default="1"></input></label>
+		<label for="regex-response-question-wrong-points2" id="regex-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points2" id="regex-response-question-wrong-points2" value="0" class="text ui-widget-content ui-corner-all" default="0"></input></label>
+		<label for="regex-response-question-text2" id="regex-response-question-label-text2">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text2" id="regex-response-question-text2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="regex-response-question-actual-answer2" id="regex-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer2" id="regex-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-ignorecase2" id="regex-response-question-label-ignorecase2">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase2" id="regex-response-question-ignorecase2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-multiline2" id="regex-response-question-label-multiline2">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline2" id="regex-response-question-multiline2" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Sub-problem #3' %} </p>
+		<label for="regex-response-question-correct-points3" id="regex-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="regex-response-question-correct-points3" id="regex-response-question-correct-points3" value="1" class="text ui-widget-content ui-corner-all" default="1"></input></label>
+		<label for="regex-response-question-wrong-points3" id="regex-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="regex-response-question-wrong-points3" id="regex-response-question-wrong-points3" value="0" class="text ui-widget-content ui-corner-all" default="0"></input></label>
+		<label for="regex-response-question-text3" id="regex-response-question-label-text3">{% trans 'Sub-problem text' %} <textarea type="text" name="regex-response-question-text3" id="regex-response-question-text3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="regex-response-question-actual-answer3" id="regex-response-question-label-actual-answer3">{% trans 'Answer' %} <input type="text" name="regex-response-question-actual-answer3" id="regex-response-question-actual-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-ignorecase3" id="regex-response-question-label-ignorecase3">{% trans 'Ignore case? ' %} <input type="checkbox" name="regex-response-question-ignorecase3" id="regex-response-question-ignorecase3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="regex-response-question-multiline3" id="regex-response-question-label-multiline3">{% trans 'Multiline? ' %} <input type="checkbox" name="regex-response-question-multiline3" id="regex-response-question-multiline3" class="text ui-widget-content ui-corner-all"></input></label>
+		<input name="regex-response-question-edit" id="regex-response-question-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
+		<textarea name="regex-response-question-html" id="regex-response-question-html" class="text ui-widget-content ui-corner-all hidden" hidden="true">
+			<div class="question" id="problem_4">
+			    <h3 class="questionNumber"></h3>
+				<div class="question_text"></div>
+			</div>
+        </textarea>
+		<textarea name="regex-response-question-xml" id="regex-response-question-xml" class="text ui-widget-content ui-corner-all hidden" hidden="true">
+			<question_metadata id="problem_4">
+			        <solution>
+			            <div class="detailed-solution">
+			            </div>
+			        </solution>
+			</question_metadata>
+        </textarea>
+	</form>
+</div>
+
+<div id="numerical-response-form" title="{% trans 'Numerical Response Question' %}">
+	<form>
+		<label for="numerical-response-question-text" id="numerical-response-label-question-text">{% trans 'Enter the text for this question' %}</label>
+		<textarea name="numerical-response-question-text" id="numerical-response-question-text" class="text ui-widget-content ui-corner-all" placeholder="Replace this with the text of your question."></textarea>
+		<label for="numerical-response-question-explanation" id="numerical-response-question-label-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
+		<textarea name="numerical-response-question-explanation" id="numerical-response-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
+		<p> {% trans 'Sub-problem #1' %} </p>
+		<label for="numerical-response-question-correct-points1" id="numerical-response-question-label-correct-points1">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points1" id="numerical-response-question-correct-points1" value="1" class="text ui-widget-content ui-corner-all" default="1"></input></label>
+		<label for="numerical-response-question-wrong-points1" id="numerical-response-question-label-wrong-points1">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points1" id="numerical-response-question-wrong-points1" value="0" class="text ui-widget-content ui-corner-all" default="0"></input></label>
+		<label for="numerical-response-question-text1" id="numerical-response-question-label-text1">{% trans 'Sub-problem text' %} <textarea type="text" name="numerical-response-question-text1" id="numerical-response-question-text1" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-actual-answer1" id="numerical-response-question-label-actual-answer1">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer1" id="numerical-response-question-actual-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer1" id="numerical-response-question-label-tolerance-answer1">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer1" id="numerical-response-question-tolerance-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Sub-problem #2' %} </p>
+		<label for="numerical-response-question-correct-points2" id="numerical-response-question-label-correct-points2">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points2" id="numerical-response-question-correct-points2" value="1" class="text ui-widget-content ui-corner-all" default="1"></input></label>
+		<label for="numerical-response-question-wrong-points2" id="numerical-response-question-label-wrong-points2">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points2" id="numerical-response-question-wrong-points2" value="0" class="text ui-widget-content ui-corner-all" default="0"></input></label>
+		<label for="numerical-response-question-text2" id="numerical-response-question-label-text2">{% trans 'Sub-problem #2 Display Value' %} <textarea type="text" name="numerical-response-question-text2" id="numerical-response-question-text2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-actual-answer2" id="numerical-response-question-label-actual-answer2">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer2" id="numerical-response-question-actual-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer2" id="numerical-response-question-label-tolerance-answer2">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer2" id="numerical-response-question-tolerance-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<p> {% trans 'Sub-problem #3' %} </p>
+		<label for="numerical-response-question-correct-points3" id="numerical-response-question-label-correct-points3">{% trans 'Correct Points' %} <input type="number" name="numerical-response-question-correct-points3" id="numerical-response-question-correct-points3" value="1" class="text ui-widget-content ui-corner-all" default="1"></input></label>
+		<label for="numerical-response-question-wrong-points3" id="numerical-response-question-label-wrong-points3">{% trans 'Wrong Points' %} <input type="number" name="numerical-response-question-wrong-points3" id="numerical-response-question-wrong-points3" value="0" class="text ui-widget-content ui-corner-all" default="0"></input></label>
+		<label for="numerical-response-question-text3" id="numerical-response-question-label-text3">{% trans 'Sub-problem #3 Display Value' %} <textarea type="text" name="numerical-response-question-text3" id="numerical-response-question-text3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<label for="numerical-response-question-actual-answer3" id="numerical-response-question-label-actual-answer3">{% trans 'Answer' %} <input type="text" name="numerical-response-question-actual-answer3" id="numerical-response-question-actual-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="numerical-response-question-tolerance-answer3" id="numerical-response-question-label-tolerance-answer3">{% trans 'Amount of Tolerance (add % for percentage)' %} <input type="text" name="numerical-response-question-tolerance-answer3" id="numerical-response-question-tolerance-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<input name="numerical-response-question-edit" id="numerical-response-question-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
+		<textarea name="numerical-response-question-html" id="numerical-response-question-html" class="text ui-widget-content ui-corner-all hidden" hidden="true">
+			<div class="question" id="problem_4">
+			    <h3 class="questionNumber"></h3>
+				<div class="question_text"></div>
+			</div>
+        </textarea>
+		<textarea name="numerical-response-question-xml" id="numerical-response-question-xml" class="text ui-widget-content ui-corner-all hidden" hidden="true">
+			<question_metadata id="problem_4">
+			        <solution>
+			            <div class="detailed-solution">
+			            </div>
+			        </solution>
+			</question_metadata>
+        </textarea>
+	</form>
+</div>
+
+<div id="single-choice-form" title="{% trans 'Select Question' %}">
+	<form>
+		<label for="single-choice-entry-question-text" id="single-choice-entry-label-question-text">{% trans 'Enter the text for this question' %}</label>
+		<textarea name="single-choice-entry-question-text" id="single-choice-entry-question-text" class="text ui-widget-content ui-corner-all" placeholder="Replace this with the text of your question."></textarea>
+		<label for="single-choice-entry-correct-points" id="single-choice-entry-label-correct-points">{% trans 'Correct Points' %} <input type="number" name="single-choice-entry-correct-points" id="single-choice-entry-correct-points" value="1" class="text ui-widget-content ui-corner-all" default="1"></input></label>
+		<label for="single-choice-entry-wrong-points" id="single-choice-entry-label-wrong-points">{% trans 'Wrong Points' %} <input type="number" name="single-choice-entry-wrong-points" id="single-choice-entry-wrong-points" value="0" default="0" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-question-explanation" id="single-choice-entry-label-question-explanation">{% trans 'Enter the detailed explanation for this question' %}</label>
+		<textarea name="single-choice-entry-question-explanation" id="single-choice-entry-question-explanation" class="text ui-widget-content ui-corner-all"></textarea>
+		<p> {% trans 'Choice #1' %} </p>
+		<label for="single-choice-entry-answer1" id="single-choice-entry-label-answer1">{% trans 'Choice #1 Display Value' %} <input type="text" name="single-choice-entry-answer1" id="single-choice-entry-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer1" id="single-choice-entry-label-value-answer1">{% trans 'Choice #1 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer1" id="single-choice-entry-label-correctness-answer1">{% trans 'Choice #1 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer1" id="single-choice-entry-correctness-answer1" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer1" id="single-choice-entry-label-explanation-answer1">{% trans 'Choice #1 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer1" id="single-choice-entry-explanation-answer1" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #2' %} </p>
+		<label for="single-choice-entry-answer2" id="single-choice-entry-label-answer2">{% trans 'Choice #2 Display Value' %} <input type="text" name="single-choice-entry-answer2" id="single-choice-entry-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer2" id="single-choice-entry-label-value-answer2">{% trans 'Choice #2 Submit Value' %} <input type="text" name="single-choice-entry-value-answer2" id="single-choice-entry-value-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer2" id="single-choice-entry-label-correctness-answer2">{% trans 'Choice #2 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer2" id="single-choice-entry-correctness-answer2" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer2" id="single-choice-entry-label-explanation-answer2">{% trans 'Choice #2 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer2" id="single-choice-entry-explanation-answer2" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #3' %} </p>
+		<label for="single-choice-entry-answer3" id="single-choice-entry-label-answer3">{% trans 'Choice #3 Display Value' %} <input type="text" name="single-choice-entry-answer3" id="single-choice-entry-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer3" id="single-choice-entry-label-value-answer3">{% trans 'Choice #3 Submit Value' %} <input type="text" name="single-choice-entry-value-answer3" id="single-choice-entry-value-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer3" id="single-choice-entry-label-correctness-answer3">{% trans 'Choice #3 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer3" id="single-choice-entry-correctness-answer3" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer3" id="single-choice-entry-label-explanation-answer3">{% trans 'Choice #3 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer3" id="single-choice-entry-explanation-answer3" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #4' %} </p>
+		<label for="single-choice-entry-answer4" id="single-choice-entry-label-answer4">{% trans 'Choice #4 Display Value' %} <input type="text" name="single-choice-entry-answer4" id="single-choice-entry-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer4" id="single-choice-entry-label-value-answer4">{% trans 'Choice #4 Submit Value' %} <input type="text" name="single-choice-entry-value-answer4" id="single-choice-entry-value-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer4" id="single-choice-entry-label-correctness-answer4">{% trans 'Choice #4 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer4" id="single-choice-entry-correctness-answer4" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer4" id="single-choice-entry-label-explanation-answer4">{% trans 'Choice #4 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer4" id="single-choice-entry-explanation-answer4" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #5' %} </p>
+		<label for="single-choice-entry-answer5" id="single-choice-entry-label-answer5">{% trans 'Choice #5 Display Value' %} <input type="text" name="single-choice-entry-answer5" id="single-choice-entry-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer5" id="single-choice-entry-label-value-answer5">{% trans 'Choice #5 Submit Value' %} <input type="text" name="single-choice-entry-value-answer5" id="single-choice-entry-value-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer5" id="single-choice-entry-label-correctness-answer5">{% trans 'Choice #5 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer5" id="single-choice-entry-correctness-answer5" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer5" id="single-choice-entry-label-explanation-answer5">{% trans 'Choice #5 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer5" id="single-choice-entry-explanation-answer5" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<p> {% trans 'Choice #6' %} </p>
+		<label for="single-choice-entry-answer6" id="single-choice-entry-label-answer6">{% trans 'Choice #6 Display Value' %} <input type="text" name="single-choice-entry-answer6" id="single-choice-entry-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-value-answer6" id="single-choice-entry-label-value-answer6">{% trans 'Solution #6 Submit Value' %} <input type="text" name="single-choice-entry-value-answer1" id="single-choice-entry-value-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-correctness-answer6" id="single-choice-entry-label-correctness-answer6">{% trans 'Choice #6 is correct? ' %} <input type="checkbox" name="single-choice-entry-correctness-answer6" id="single-choice-entry-correctness-answer6" class="text ui-widget-content ui-corner-all"></input></label>
+		<label for="single-choice-entry-explanation-answer6" id="single-choice-entry-label-explanation-answer6">{% trans 'Choice #6 Explanation' %} <textarea type="text" name="single-choice-entry-explanation-answer6" id="single-choice-entry-explanation-answer6" class="text ui-widget-content ui-corner-all"></textarea></label>
+		<input name="single-choice-entry-edit" id="single-choice-entry-edit" class="text ui-widget-content ui-corner-all hidden"></input>		
+		<textarea name="single-choice-entry-html" id="single-choice-entry-html" hidden="true" class="text ui-widget-content ui-corner-all hidden">
+			<div class="question" id="problem_1" data-report="">
+		    	<h3 class="questionNumber"></h3>
+				<div class="question_text"></div>
+		    	<fieldset></fieldset>
+			</div>
+        </textarea>
+		<textarea name="single-choice-entry-xml" id="single-choice-entry-xml" hidden="true" class="text ui-widget-content ui-corner-all hidden">
+			<question_metadata id="problem_1" data-report="">
+		        <solution>
+		            <div class="detailed-solution"></div>
+		        </solution>
+		        <response name="need_to_change" answertype="multiplechoiceresponse" data-report="" correct-points="10" wrong-points="-2"></response>
+		    </question_metadata>
+        </textarea>
+	</form>
+</div>
+
 
 <div id="dialog-form" title="{% trans 'Paste Your XML' %}">
     <form>
@@ -370,7 +532,7 @@ Testing your common sense: 15.6 sec
     <!-- possible types are: "formative" / "summative" / "interactive" / "exam-autograde" / "exam-csv" / "survey" -->
     <description>This is the problem set description.</description>
     <dates due-date="12/29/2012 00:00" grace-period="12/29/2012 00:00" hard-deadline="12/29/2012 00:00" />
-    <grading late-penalty="10" num-submissions="9999" resubmission-penalty="10" />
+    <grading late-penalty="10" daily-late-penalty="1" num-submissions="9999" resubmission-penalty="10" />
     <section section="Problem set templates" parent="Example formative multiple choice (checkbox)" />
     <problem data-report="Apple Competitor Question">
         <p>
@@ -569,10 +731,12 @@ age: 20,
 	})
     $('#myTab a').click(function (e) {
                         e.preventDefault();
+						editor.renderer.updateText(); 
+						metadata_editor.renderer.updateText(); 
                         $(this).tab('show');
                         })
     
-    
+
     var __saved_import_xml="";
     var __xml_saved=false;
     $( "#dialog-form" ).dialog({
@@ -603,9 +767,111 @@ age: 20,
                         }
                   }],
     });
+	
+	var __saved_import_single_choice_xml="";
+	var __xml_saved_single_choice=false;	
+	$( "#numerical-response-form" ).dialog({
+        autoOpen: false,
+        height: 800,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__xml_saved_single_choice)  $('#xml-entry').val(__saved_import_single_choice_xml);
+            __xml_saved_single_choice=false;
+        },
+        buttons: [{
+                    text:"{% trans 'Add Question' %}",
+                    id:"add-numerical-response-button",
+                    click: function() {
+                        __xml_saved_single_choice=true;
+						var shouldClose = c2gXMLParse.addNumericalResponseQuestion($('#numerical-response-question-html').val(), $('#numerical-response-question-xml').val())
+						if(shouldClose) {
+                        	$( this ).dialog( "close" );
+						}
+                        }
+                  },
+                  {
+                    text:"{% trans 'Cancel' %}",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                        }
+                  }],
+    });
+				    
+    $( "#single-choice-form" ).dialog({
+        autoOpen: false,
+        height: 800,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__xml_saved_single_choice)  $('#xml-entry').val(__saved_import_single_choice_xml);
+            __xml_saved_single_choice=false;
+        },
+        buttons: [{
+                    text:"{% trans 'Add Question' %}",
+                    id:"add-single-choice-button",
+                    click: function() {
+                        __xml_saved_single_choice=true;
+						var shouldClose = c2gXMLParse.addRadioButtonQuestion($('#single-choice-entry-html').val(), $('#single-choice-entry-xml').val(), question_type); 
+						if(shouldClose) {
+	                        $( this ).dialog( "close" );							
+						}
+                        }
+                  },
+                  {
+                    text:"{% trans 'Cancel' %}",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                        }
+                  }],
+    });
     var __saved_quizdown="";
     var __quizdown_saved=false;
+
+	for(var i = 1; i < 7; i++) {
+		var inputName = '#single-choice-entry-answer' + i; 
+		$(inputName)[0].number = i; 
+		var focusOutFunction = function() {
+			var displayVal = $('#single-choice-entry-answer' + this.number)[0].value; 
+			var submitVal = $('#single-choice-entry-value-answer' + this.number).val(); 
+			if(!submitVal)
+			{
+				displayVal = displayVal.toLowerCase(); 
+				displayVal = displayVal.replace(/[^a-zA-Z0-9]+/g,'-');
+				$('#single-choice-entry-value-answer' + this.number).val(displayVal); 
+			}
+		}; 
+		$('#single-choice-entry-answer' + i).focusout(focusOutFunction); 
+	}
     
+	$( "#regex-response-form" ).dialog({
+        autoOpen: false,
+        height: 800,
+        width: "90%",
+        modal: true,
+        close: function() {
+            if (!__xml_saved_single_choice)  $('#xml-entry').val(__saved_import_single_choice_xml);
+            __xml_saved_single_choice=false;
+        },
+        buttons: [{
+                    text:"{% trans 'Add Question' %}",
+                    id:"add-regex-response-button",
+                    click: function() {
+                        __xml_saved_single_choice=true;
+						var shouldClose = c2gXMLParse.addRegexResponseQuestion($('#regex-response-question-html').val(), $('#regex-response-question-xml').val())
+						if(shouldClose) {
+                        	$( this ).dialog( "close" );
+						}
+                        }
+                  },
+                  {
+                    text:"{% trans 'Cancel' %}",
+                    click: function() {
+                        $( this ).dialog( "close" );
+                        }
+                  }],
+    });
+
     $( "#quizdown-form" ).dialog({
         autoOpen: false,
         height: 500,
@@ -642,7 +908,38 @@ age: 20,
         $( "#quizdown-form" ).dialog( "open" );
     });
 
-    
+	$('#radio-buttons-btn').click(function() {
+		c2gXMLParse.clearInputs('#single-choice-form'); 
+		question_type = 0; 
+       __saved_import_single_choice_xml=$('#xml-entry').val();
+	   $( "#single-choice-entry-edit" )[0].value = null; 
+	   $("#add-single-choice-button")[0].textContent = "{% trans 'Add Question' %}";
+       $( "#single-choice-form" ).dialog( "open" );	})
+
+    $('#checkboxes-btn').click(function() {
+	   c2gXMLParse.clearInputs('#single-choice-form'); 
+	   question_type = 1; 
+       __saved_import_single_choice_xml=$('#xml-entry').val();
+	   $( "#single-choice-entry-edit" )[0].value = null;
+	   $("#add-single-choice-button")[0].textContent = "{% trans 'Add Question' %}"; 
+       $( "#single-choice-form" ).dialog( "open" );	})
+	
+	$('#numerical-btn').click(function() {
+		c2gXMLParse.clearInputs('#numerical-response-form'); 
+		question_type = 0; 
+		$( "#numerical-response-question-edit" )[0].value = null;
+		$("#add-numerical-response-button")[0].textContent = "{% trans 'Add Question' %}";
+		$( "#numerical-response-form" ).dialog( "open" ); 
+	})
+	
+	$('#regex-btn').click(function() {
+		c2gXMLParse.clearInputs('#regex-response-form'); 
+		question_type = 1; 
+		$( "#regex-response-question-edit" )[0].value = null;
+		$("#add-regex-response-button")[0].textContent = "{% trans 'Add Question' %}";
+		$( "#regex-response-form" ).dialog( "open" ); 
+	})
+	
     $("#import-xml-button").before("<span class='warning' id='clobber-warning'>{% trans 'Warning! Importing this XML overwrites the HTML and XML Metadata in the editors below.' %}</span>");
 
     $("#clobber-warning").hide();
@@ -664,6 +961,9 @@ age: 20,
     var questionIdx = 0;
     
     {% include "exams/displayExplanation.js" %}
+    {% include "exams/displayEdit.js" %}
+    {% include "exams/displayDelete.js" %}
+    {% include "exams/displayMove.js" %}
     {% include "exams/renderPreview.js" %}
     {% include "exams/quizdown.js" %}
     
@@ -696,6 +996,7 @@ age: 20,
                        partial_credit_deadline:$('input#hard_deadline').val(),
                        assessment_type:$('select#assessment_type').val(),
                        late_penalty:$('input#late_penalty').val(),
+                       daily_late_penalty:$('input#daily_late_penalty').val(),
                        num_subs_permitted:$('input#num_subs_permitted').val(),
                        resubmission_penalty:$('input#resubmission_penalty').val(),
                        description:$('textarea#description').val(),
@@ -773,6 +1074,7 @@ age: 20,
         $('input#hard_deadline').val(prepop.partial_credit_deadline);
         $('select#assessment_type').val(prepop.assessment_type);
         $('input#late_penalty').val(prepop.late_penalty);
+        $('input#daily_late_penalty').val(prepop.daily_late_penalty);
         $('input#num_subs_permitted').val(prepop.num_subs_permitted);
         $('input#resubmission_penalty').val(prepop.resubmission_penalty);
         $('textarea#description').val(prepop.description);

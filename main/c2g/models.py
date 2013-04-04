@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime,timedelta
 from hashlib import md5
 import logging
 import os
@@ -9,6 +9,7 @@ import html5lib
 import random
 import copy
 import json
+import math
 
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
@@ -25,9 +26,10 @@ from django.db.models import Max
 from django.db.models.signals import post_save
 from django.utils import encoding
 
-from c2g.util import is_storage_local, get_site_url
+from c2g.util import is_storage_local, get_site_url, CacheStat
 from c2g.readonly import get_database_considering_override
 from kelvinator.tasks import sizes as video_resize_options 
+from courses.exams.autograder import AutoGrader
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +137,7 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     accompanying_materials = models.TextField(blank=True)
     outcomes = models.TextField(blank=True)
     faq = models.TextField(blank=True)
-    logo = models.FileField(upload_to=get_file_path,null=True)
+    logo = models.FileField(upload_to=get_file_path,null=True, blank=True)
     twitter_tag = models.CharField(max_length=64, null = True, blank=True)
     
     # Since all environments (dev, draft, prod) go against ready piazza, things will get
@@ -244,7 +246,9 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
             accompanying_materials = self.accompanying_materials,
             outcomes = self.outcomes,
             faq = self.faq,
+            twitter_tag = self.twitter_tag,
             logo = self.logo,
+            preenroll_only = self.preenroll_only,
             preview_only_mode = self.preview_only_mode,
         )
         ready_instance.save()
@@ -1270,43 +1274,6 @@ class Video(TimestampMixin, Stageable, Sortable, Deletable, models.Model):
         db_table = u'c2g_videos'
 
 
-class CacheStat():
-    """
-    Gather and report counter-based stats for our simple caches.
-       report('hit', 'video-cache') or
-       report('miss', 'files-cache')
-    """
-    lastReportTime = datetime.now()
-    count = {} 
-    reportingIntervalSec = getattr(settings, 'CACHE_STATS_INTERVAL', 60*60)   # hourly
-    reportingInterval = timedelta(seconds=reportingIntervalSec)
-
-    @classmethod
-    def report(cls, op, cache):
-        if op not in ['hit', 'miss']:
-            logger.error("cachestat invalid operation, expected hit or miss")
-            return
-        if cache not in cls.count:
-            cls.count[cache] = {}
-        if op not in cls.count[cache]:
-            cls.count[cache][op] = 0
-        cls.count[cache][op] += 1
-
-        # stat interval expired: print stats and zero out counter
-        if datetime.now() - cls.lastReportTime > cls.reportingInterval:
-            for c in cls.count:
-                hit = cls.count[c].get('hit', 0)
-                miss = cls.count[c].get('miss', 0)
-                if hit + miss == 0:
-                    logger.info("cache stats for %s: hits %d, misses %d" % (c, hit, miss))
-                else:
-                    rate = float(hit) / float(hit + miss) * 100.0
-                    logger.info("cache stats for %s: hits %d, misses %d, rate %2.1f" % (c, hit, miss, rate))
-
-            cls.lastReportTime = datetime.now()
-            cls.count = {}      # zero out the counts
-
-
 class VideoViewTraces(TimestampMixin, models.Model):
     course = models.ForeignKey(Course, db_index=True)
     video = models.ForeignKey(Video, db_index=True)
@@ -1956,6 +1923,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
     grace_period = models.DateTimeField(null=True, blank=True)
     partial_credit_deadline = models.DateTimeField(null=True, blank=True)
     late_penalty = models.IntegerField(default=0, null=True, blank=True)
+    daily_late_penalty = models.FloatField(default=0.0, null=True, blank=True)
     submissions_permitted = models.IntegerField(default=999, null=True, blank=True)
     resubmission_penalty = models.IntegerField(default=0, null=True, blank=True)
     autograde = models.BooleanField(default=False)
@@ -2010,6 +1978,24 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if re.search(r"\$\$.*\$\$", self.html_content, re.DOTALL) or re.search(r"\\\[.*\\\]", self.html_content, re.DOTALL):
             return True
         return False
+    
+    def get_total_score(self):
+        """Considers randomization"""
+        numQ = self.num_random_questions()
+        if numQ == 0:
+            return self.total_score
+        else:
+            md_dom = parseString(encoding.smart_str(self.xml_metadata, encoding='utf-8'))
+            questions = md_dom.getElementsByTagName('question_metadata')
+            ag = AutoGrader(self.xml_metadata)
+                
+            total_score = 0
+            for i in range(numQ):
+                id = questions[i].getAttribute("id")
+                total_score += ag.question_points(id)
+
+            return total_score
+                
     
     def num_random_questions(self):
         """The number of randomly_selected questions that are specified to be shown
@@ -2118,6 +2104,7 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             xml_imported = self.xml_imported,
             partial_credit_deadline = self.partial_credit_deadline,
             late_penalty = self.late_penalty,
+            daily_late_penalty = self.daily_late_penalty,
             submissions_permitted = self.submissions_permitted,
             resubmission_penalty = self.resubmission_penalty,
             autograde = self.autograde,
@@ -2171,6 +2158,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
             ready_instance.partial_credit_deadline = self.partial_credit_deadline
         if not clone_fields or 'late_penalty' in clone_fields:
             ready_instance.late_penalty = self.late_penalty
+        if not clone_fields or 'daily_late_penalty' in clone_fields:
+            ready_instance.daily_late_penalty = self.daily_late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
             ready_instance.submissions_permitted = self.submissions_permitted
         if not clone_fields or 'resubmission_penalty' in clone_fields:
@@ -2231,7 +2220,9 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if not clone_fields or 'partial_credit_deadline' in clone_fields:
             self.partial_credit_deadline = ready_instance.partial_credit_deadline 
         if not clone_fields or 'late_penalty' in clone_fields:
-            self.late_penalty = ready_instance.late_penalty 
+            self.late_penalty = ready_instance.late_penalty
+        if not clone_fields or 'daily_late_penalty' in clone_fields:
+            self.daily_late_penalty = ready_instance.daily_late_penalty
         if not clone_fields or 'submissions_permitted' in clone_fields:
             self.submissions_permitted = ready_instance.submissions_permitted 
         if not clone_fields or 'resubmission_penalty' in clone_fields:
@@ -2292,6 +2283,8 @@ class Exam(TimestampMixin, Deletable, Stageable, Sortable, models.Model):
         if self.partial_credit_deadline != self.image.partial_credit_deadline:
             return False
         if self.late_penalty != self.image.late_penalty:
+            return False
+        if self.daily_late_penalty != self.image.daily_late_penalty:
             return False
         if self.submissions_permitted != self.image.submissions_permitted:
             return False
@@ -2476,6 +2469,13 @@ class ExamRecord(TimestampMixin, models.Model):
     def __unicode__(self):
         return (self.student.username + ":" + self.course.title + ":" + self.exam.title)
 
+    
+    def days_late(self, grace_period=None):
+        if grace_period is None:
+            grace_period = self.exam.grace_period
+        late_timedelta = max(timedelta(0), self.time_created - grace_period)
+        return math.ceil(late_timedelta.total_seconds() / (3600.0*24.0))
+
     def get_rendered_questions(self):
         try:
             score_data = json.loads(self.json_score_data)
@@ -2518,8 +2518,10 @@ class Instructor(TimestampMixin, models.Model):
     def photo_dl_link(self):
         if not self.photo.storage.exists(self.photo.name):
             return ""
-
-        url = self.photo.storage.url_monkeypatched(self.photo.name, querystring_auth=False)
+        if is_storage_local():
+            url = get_site_url() + self.photo.storage.url(self.photo.name)
+        else:
+            url = self.photo.storage.url_monkeypatched(self.photo.name, querystring_auth=False)
         return url
     
     def __unicode__(self):
@@ -2831,9 +2833,9 @@ class ContentGroup(models.Model):
             for entry in content_group:
                 if getattr(entry, tag, False) == obj_ref:
                     # If this child is in this group already, return this group
-                    if entry.level == 1:
+                    if entry.level == 1 and entry.id != group_id:
                         # It is an error to make a parent into a child of its own group
-                        # Instead, make a new group, then reassign_membership 
+                        # Instead, make a new group, then reassign_membership()
                         raise ValueError, "ContentGroup "+str(entry.id)+" is the parent of group "+str(group_id)
                     entry.display_style = display_style
                     entry.save()
@@ -3019,5 +3021,14 @@ class StudentInvitation(TimestampMixin, models.Model):
     email = models.CharField(max_length=128, db_index=True)
     course = models.ForeignKey(Course, db_index=True)
 
+class CourseStudentScore(TimestampMixin, models.Model):
+    course = models.ForeignKey(Course, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    tag = models.CharField(max_length=128, db_index=True)
+    score = models.FloatField(null=True, blank=True)
+    total = models.FloatField(null=True, blank=True)
 
+    class Meta:
+        unique_together = ("course", "student", "tag")
 
+    
