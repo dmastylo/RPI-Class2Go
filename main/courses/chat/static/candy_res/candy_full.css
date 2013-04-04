@@ -223,7 +223,7 @@ ul {
 }
 
 .room-pane {
-	display: none;
+	/* display: none; */
 }
 .roster-pane {
 	position: absolute;
@@ -240,7 +240,7 @@ ul {
 	padding: 6px 5%;
 	font-size: 14px;
 	margin: 0;
-	display: none;
+	/* display: none; */
 	color: #666;
 	float: left;
 	clear: both;
