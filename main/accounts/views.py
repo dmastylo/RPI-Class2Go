@@ -81,10 +81,6 @@ def profile(request):
     has_webauth = False
     if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
         has_webauth = True
-    
-        exams = Exam.objects.filter(
-            course=course,
-            ).order_by('due_date')
 
     return render_to_response('accounts/profile.html',
                               {

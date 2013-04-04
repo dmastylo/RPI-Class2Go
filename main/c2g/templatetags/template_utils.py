@@ -16,6 +16,6 @@ def uscore2space(s):
     return s.replace('_', ' ')
 
 @register.filter(name='dash2space')
-def uscore2space(s):
+def dash2space(s):
     """Return s with dashes turned into spaces"""
     return s.replace('-', ' ')
