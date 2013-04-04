@@ -66,19 +66,19 @@
             <p>{% autoescape off %}{{common_page_data.course.accompanying_materials}}{% endautoescape %}</p>
             {% endifnotequal %}
 
+            {% if instructor_list %}
+                <h3>{% trans 'Biographies' %}</h3>
 
-            <h3>{% trans 'Biographies' %}</h3>
-
-            {% for instructor in instructor_list %}
+                {% for instructor in instructor_list %}
                     <h3>{{ instructor.name }}</h3>
-                <div>
-                    <div style="float: left; margin-right: 20px;">
-                        <img style="width:200px;height:220px;" src="{{instructor.photo_dl_link}}">
+                    <div class="instructor-box">
+                        <div>
+                            <img src="{{instructor.photo_dl_link}}">
+                        </div>
+                        <p>{{instructor.biography}}</p>
                     </div>
-                    <p>{{instructor.biography}}</p>
-                </div>
-
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         {% endif %}
 	
 	
