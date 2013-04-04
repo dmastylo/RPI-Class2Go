@@ -37,6 +37,14 @@ def auth_view_wrapper(view):
                     return HttpResponseRedirect(reverse('auth_login') + "?next=" + request.path)                        
             return HttpResponseRedirect(reverse('default_login') + "?next=" + request.path)
 
+        headless = request.GET.get('headless')
+        if headless is not None:
+            if headless == '1':
+                request.session['headless'] = headless
+            elif headless == '0':
+                #headless explicitly turned off
+                request.session['headless'] = None
+
         return view(request, *args, **kw)
     return inner
 

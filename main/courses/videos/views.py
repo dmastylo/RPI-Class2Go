@@ -21,8 +21,6 @@ def list(request, course_prefix, course_suffix):
     except:
         raise Http404
 
-    request.session['headless'] = request.GET.get('headless')
-
     if 'id' in request.GET:
         #process Video model instance with this youtube id
         #and other stuff
