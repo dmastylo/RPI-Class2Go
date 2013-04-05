@@ -234,19 +234,19 @@ $(document).ready(function(){
 {% endblock addl_scripts %}
 
 {% block jabber_block %}
-    <div id="chat_wrapper">
-	<div class="chat_toggle closed">
-	    <span class="openChat">Open Chat <em class="icon-chevron-up"></em></span>
-	    <span class="closeChat">Close Chat <em class="icon-chevron-down"></em></span>
-	</div>
 	{# Jabber chat plugin block #}
-	    {% if jabber_configured and is_logged_in %}
-	        <div id="chat_frame_wrapper">
-		    <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
-		</div>
-	    {% endif %} {# jabber_configured and is_logged_in #}
+    {% if jabber_configured and is_logged_in %}
+        <div id="chat_wrapper">
+        <div class="chat_toggle closed">
+            <span class="openChat">Open Chat <em class="icon-chevron-up"></em></span>
+            <span class="closeChat">Close Chat <em class="icon-chevron-down"></em></span>
+        </div>
+        <div id="chat_frame_wrapper">
+            <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+        </div>
+        <a href="#" onclick="event.preventDefault();" title="Pop-Out Chat Window" class="icon-signout" id="chatPopout"></a>
+        </div>
+        <a href="#" onclick="event.preventDefault();" title="Pop-In Chat Window" class="icon-signin" id="chatPopin"></a>
+    {% endif %} {# jabber_configured and is_logged_in #}
 	{# end Jabber chat plugin block #}
-	<a href="#" onclick="event.preventDefault();" title="Pop-Out Chat Window" class="icon-signout" id="chatPopout"></a>
-    </div>
-    <a href="#" onclick="event.preventDefault();" title="Pop-In Chat Window" class="icon-signin" id="chatPopin"></a>
 {% endblock jabber_block %}
