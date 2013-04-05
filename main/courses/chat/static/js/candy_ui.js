@@ -11,7 +11,6 @@ $(window).load(function() {
         $('#candy').animate({width: '230px'}, 'slow', function() {
             $('#chat-expand-arrow em').toggleClass('icon-chevron-left').toggleClass('icon-chevron-right');
             $('#chat-pane').toggleClass('collapsed-message-pane');
-            $('#chat-tabs li').removeClass('active');
         });
         $('#chat-pane .roster-pane').animate({top: '0px'}, 'slow');
         $('#chat-rooms .message-pane-wrapper, #chat-rooms .message-form-wrapper, form.message-form').fadeOut('slow');
@@ -26,17 +25,20 @@ $(window).load(function() {
         $('#chat-rooms .message-pane-wrapper, #chat-rooms .message-form-wrapper, form.message-form').fadeIn('slow');
     }
 
+    var activeTab;
     $('#chat-expand-arrow').click(function() {
         if ($('#chat-pane').hasClass('collapsed-message-pane')) {
+            activeTab.addClass('active');
             expandMessageForm();
-            $('#chat-tabs li:first').addClass('active');
         } else {
+            activeTab = $('#chat-tabs li.active');
+            $('#chat-tabs li').removeClass('active');
             collapseMessageForm();
         }
     });
     
-    $('#chat-tabs').click(function() {
-        if ($('#chat-pane').hasClass('collapsed-message-pane')) {
+    $('#chat-tabs').click(function(event) {
+        if ($(this).has(event.target).length && $('#chat-pane').hasClass('collapsed-message-pane')) {
             expandMessageForm();
         }
     });

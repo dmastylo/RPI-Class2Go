@@ -263,7 +263,7 @@ ul {
 }
 .roster-pane .label {
 	float: left;
-	width: 110px;
+	width: 125px;
 	overflow: hidden;
 	white-space: nowrap;
 }

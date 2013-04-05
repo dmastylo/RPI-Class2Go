@@ -1,35 +1,38 @@
 var CandyShop = (function(self) { return self; }(CandyShop || {}));
 
 CandyShop.Class2Go = (function(self, Candy, $) {
-    //var _numColors;
 
     self.init = function() {
         Candy.View.Event.Room.onAdd = function(roomPane) {
+            var roomJid = roomPane['roomJid'];
             var roomType = roomPane['type'];
+            
             var roomTabClass;
             if (roomType === 'groupchat') {
                 roomTabClass = 'icon-group';
+                roomTabCloseClass = 'hidden';
             } else {
                 roomTabClass = 'icon-user';
+                roomTabCloseClass = '';
             }
-            var roomTab = $('#chat-tabs li').attr('data-roomjid', roomPane['roomJid']).find('.label');
             
-            roomTab.addClass(roomTabClass).attr('title', roomTab.text()).html('');
+            var roomTab = $('#chat-tabs li[data-roomjid="' + roomJid + '"]').find('.label');
+            roomTab.attr('title', roomTab.text()).html('<em class="' + roomTabClass + '"></em>');
         }
-        
-        Candy.View.Event.Roster.onUpdate = function(rosterUser) {
-            var currentUserJid = rosterUser['user']['data']['jid'];
-            var meUser = $("#chat-rooms .room-pane .roster-pane .user.me");
+    
+        Candy.View.Event.Roster.onUpdate = function(vars) {
+            var roomJid = vars['roomJid'];
+            var userNick = vars['user']['data']['nick'];
+            var userJid = vars['user']['data']['jid'];
             
-            meUser.find('.label').html('<em class="icon-flag"></em> ' + meUser.find('.label').text());
+            var userObject = $('#chat-rooms .room-pane[data-roomjid="' + roomJid + '"] .roster-pane .user[data-jid="' + userJid + '"]');
             
-            /*
-            if (rosterUser['user']['data']['jid'] == meUser.attr('data-jid')) {
-                var userIcon = 'icon-flag';
-                currentUser.find('.label').html('<em class="' + userIcon + '"></em> ' + currentUser.find('.label').text());
+            if ($(userObject).hasClass('me')) {
+                $(userObject).find('.label').html('<em class="icon-flag"></em> ' + userNick);
+                $('#chat-rooms .room-pane[data-roomjid="' + roomJid + '"] .roster-pane').prepend($(userObject));
             }
-            */
-        }  
+        }
     };
     return self;
+
 }(CandyShop.Class2Go || {}, Candy, jQuery));
