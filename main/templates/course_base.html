@@ -39,7 +39,7 @@
                 {% endif %}
 		{% if common_page_data.course_mode = 'draft' or common_page_data.content_sections|length > 0 %}
 		<li {% if common_page_data.course_mode = 'ready' %}class="dropdown{% endif %}{% block course_materials_link_class %}{% endblock course_materials_link_class %}{% if common_page_data.course_mode = 'ready' %}"{% endif %}>
-		    <a href={% if common_page_data.course_mode = 'draft' %}"{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}"{% else %}"#" class="dropdown-toggle" data-toggle="dropdown"{% endif %}>
+		    <a href={% if common_page_data.course_mode = 'draft' %}"{% url 'courses.views.course_materials' common_page_data.course_prefix common_page_data.course_suffix %}"{% else %}"#" class="dropdown-toggle closed" data-toggle="dropdown"{% endif %}>
 			{% trans 'Course Materials' %}
 			{% if common_page_data.course_mode = 'ready' %}
 			    <em class="caret"></em>

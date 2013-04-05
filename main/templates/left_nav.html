@@ -1,7 +1,7 @@
 {% load url from future %}
 {% load template_utils %}
 {% load i18n %}
-
+    <h2 id="sidebar-nav-heading-0" class="hidden-accessible">{% trans 'Course Navigation' %}</h2>
     <ul id="left-nav" class="well tight nav" role="navigation" aria-labelledby="sidebar-nav-heading-0">
         {% for content_section in contentsection_list %}
             {% with contentsection_id=content_section.id %}
@@ -71,7 +71,3 @@
             <li><a href="/accounts/profile">{% trans 'My profile' %}</a></li>
         </ul>
     </ul>
-
-<script>
-    menuVoiceoverSetup();
-</script>
