@@ -1,0 +1,27 @@
+**************
+Instructor  boxes
+****************/
+
+.instructor-box {
+}
+
+div.instructor-box  {
+    overflow:hidden;
+    padding-bottom: 20px;
+}
+
+.instructor-box img {
+    float: left;
+    position: relative;
+
+    margin-right: 20px;
+    height: 160px;
+    width: 120px;
+}
+
+
+.instructor-box p {
+    padding-top:2px;
+    font-size:1em;
+    margin: 5px;
+}
