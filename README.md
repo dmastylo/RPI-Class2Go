@@ -21,9 +21,8 @@ instance and using it for Stanford MOOC's, on-campus classes,
 distance learners, and educational research.  EdX will be released
 under the AGPL open-source license by June 1st.**
 
-**The Class2Go project is in maintenance mode and is no longer being
-actively developed.  For more information about this, see 
-the [announcement][ann-f] on the Class2Go Forum.**
+**The Class2Go project is in maintenance mode.  For more information, 
+see the [announcement][ann-f] on the Class2Go Forum.**
   [ann-s]: http://news.stanford.edu/news/2013/april/edx-collaborate-platform-030313.html
   [ann-f]: https://groups.google.com/forum/?fromgroups=#!topic/class2go-users/lPGL4R74HPE
 
