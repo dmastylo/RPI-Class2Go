@@ -175,44 +175,32 @@ margin-right: 0px !important;
 
 
 **************
-Instructor  boxes 
+Instructor  boxes
 ****************/
 
 .instructor-box {
 }
 
-.instructor-box .row {
-	background-color: #FCFCFC;
-	border: 1px solid #EEEEEE;
-	box-shadow: 0px 1px 2px 0 #999999;
-	padding-top: 0px;
-	margin-left:0px;
+div.instructor-box  {
+    overflow:hidden;
+    padding-bottom: 20px;
 }
 
 .instructor-box img {
-	float: left;
-	position: relative;
-	padding-right: 10px;
-	height: 200px;
-	width: 120px;
+    float: left;
+    position: relative;
+
+    margin-right: 20px;
+    height: 160px;
+    width: 120px;
 }
 
 
 .instructor-box p {
-	padding-top:2px; 
-	font-size:1em;
-	margin: 5px;
+    padding-top:2px;
+    font-size:1em;
+    margin: 5px;
 }
-
-
-
-
-
-
-/**************
-end Instructor  boxes 
-****************/
-
 
 
 /*********
