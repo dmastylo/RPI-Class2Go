@@ -23,17 +23,19 @@
 {% block m_column_content %}
 <div class="home-unit home-primary" style="background:#fff">
     <div class="container">
+	<div class="row">
+	    <div class="well span12">
+		<h3>Class2Go is Merging With the edX Platform!</h3>
+    <p style="margin-bottom: 0;">We are now working together with edX to build the world's best open education platform. EdX will be released under the AGPL license by June 1st. Class2Go is now in maintenance mode. Check out the <a href="http://news.stanford.edu/news/2013/april/edx-collaborate-platform-030313.html">announcement</a> and the <a href="https://groups.google.com/forum/?fromgroups=#!topic/class2go-users/lPGL4R74HPE">forum post</a>.</p>
+	    </div>
+	</div>
         <div class="row">
             <div class="span6">
                 <h3>Welcome to Class2Go! We're Stanford Online's internal platform, designed to be an open platform for online learning and research.</h3>
-		<p>Coming Winter, 2013, free to the world:
+		<p>We have offered three classes, free to the world:
 		<ul>
 		    <li><a href="{% url 'courses.views.main' 'db' 'Winter2013' %}">Introduction to Databases</a> with Jennifer Widom</li>
-		</ul>
-		</p>
-                <p>Fall 2012, we offered two free courses: 
-                <ul>
-                    <li><a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">Computer Networking</a> with Nick McKeown &amp; Philip Levis</li> 
+		    <li><a href="{% url 'courses.views.main' 'networking' 'Fall2012' %}">Computer Networking</a> with Nick McKeown &amp; Philip Levis</li> 
                     <li><a href="{% url 'courses.views.main' 'solar' 'Fall2012' %}">Solar Cells, Fuel Cells, &amp; Batteries</a> with Bruce Clemens</li>
                 </ul>
                 <h4>Here's what you will like about Class2Go:</h4>

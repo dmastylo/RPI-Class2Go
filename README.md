@@ -4,15 +4,29 @@ Class2Go
 [![Build Status](https://travis-ci.org/Stanford-Online/class2go.png?branch=master)](https://travis-ci.org/Stanford-Online/class2go)
 
 Class2Go is Stanford's internal open-source platform for on-line
-education. A team of eight built the first version over Summer
-2012, and it is still under active development.  Class2Go launched
-Fall 2012 for six on-campus classes and two "massive open online 
-courses" (MOOC's): [Computer Networking][net] and 
-[Solar Cells, Fuel Cells, and Batteries][sol]; this Winter 2013 we
-hosted the legendary [Database Course][db].
+education. A team of eight built the first version over Summer 2012.
+Class2Go launched Fall 2012 and since then we've hosted several
+"massive open online courses" (MOOC's) and on-campus classes.  The
+big MOOC's we hosted were [Computer Networking][net] and [Solar
+Cells, Fuel Cells, and Batteries][sol] in Fall 2012, and [Introduction
+to Databases][db] in Winter 2013.
   [net]: http://networking.class.stanford.edu/
   [sol]: http://solar.class.stanford.edu/
   [db]: http://db.class2go.stanford.edu/
+
+**On April 3rd [we announced][ann-s] that Class2Go is merging with
+the edX platform.  The Stanford Online engineering team is now
+working on the edX code base with the goal of standing up our own
+instance and using it for Stanford MOOC's, on-campus classes,
+distance learners, and educational research.  EdX will be released
+under the AGPL open-source license by June 1st.**
+
+**The Class2Go project is in maintenance mode.  For more information, 
+see the [announcement][ann-f] on the Class2Go Forum.**
+  [ann-s]: http://news.stanford.edu/news/2013/april/edx-collaborate-platform-030313.html
+  [ann-f]: https://groups.google.com/forum/?fromgroups=#!topic/class2go-users/lPGL4R74HPE
+
+----------------------------------------------------------------
 
 Class2Go was built to be an open platform for learning and research.
 Professors have access to the classes' data to learn how their
@@ -34,14 +48,14 @@ through two courses we have created. The [Introduction to Class2Go][howto]
 course highlights the major features of the platform and includes guides 
 for adding content to a Class2Go course and templates for creating problem sets, 
 exams, or surveys. 
-[howto]: http://class2go.stanford.edu/class2go/howto/
+  [howto]: http://class2go.stanford.edu/class2go/howto/
 
 The [Class2Go Sandbox][sandbox] course allows access to the administrator 
 features of the Class2Go platform. You are welcome to access this course 
 to test adding and updating course materials through the admin interface. 
 The public login (username: class2go, password: class2go) gives access to 
 both courses.
-[sandbox]: http://class2go.stanford.edu/sandbox/C2G/
+  [sandbox]: http://class2gosandbox.com/sandbox/C2G
 
 Philosophy 
 ----------
