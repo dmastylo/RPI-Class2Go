@@ -10,8 +10,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, target-densitydpi=device-dpi">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
-    
+    <link rel='shortcut icon' type='image/x-icon' href='{{ STATIC_URL }}graphics/sites/{{ SITE_NAME_SHORT }}/favicon.ico' />
     {% block top_scripts %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
@@ -20,6 +19,8 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/analogclock.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/sites/{{ SITE_NAME_SHORT }}/styles.css" />
+
     <!--[if IE 7]>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
     <![endif]-->
@@ -50,7 +51,7 @@
                     Stanford University
                 </a>
                 {% else %}
-                <a href="http://www.uwa.edu.au">{{ SITE_NAME_LONG }}</a>
+                <a href="https://{{ SITE_NAME_LONG }}"</a>
                 {% endif %}
             </h1>
             <p id="skip-nav"><a href="#main-content" class="hidden-accessible">{% trans 'Jump to content' %}</a></p>
@@ -301,20 +302,10 @@
 	Accessibility toggle
 	*/
         
-        var menuVoiceoverSetup = function() {
+        $(document).ready(function (){
             var expanded = ", expanded, click to collapse";
             var collapsed = ", collapsed, click to expand";
             
-            /*
-                Initial Setting: collapsed
-            .focus
-                collapsed    1st voiceover - good
-            .keydown
-                expanded    2nd voiceover - !!!!
-            .keypress
-            .click
-                collapsed    3rd voiceover - good
-            */
             $('.dropdown a, .accordion-heading a').keydown(function(event){
                 if ($(this).hasClass('closed')) {
                     $('.hidden-accessible', this).text(expanded);
@@ -328,12 +319,7 @@
                 $('.hidden-accessible', this).text(collapsed);
                 $(this).addClass('closed');
             });
-        }
-        
-        $(document).ready(function (){
-            menuVoiceoverSetup();
         });
-        
     </script>
     {% endblock bottom_scripts %}
     <script type="text/javascript">

@@ -14,3 +14,8 @@ def bykey(d, key_name):
 def uscore2space(s):
     """Return s with underscores turned into spaces"""
     return s.replace('_', ' ')
+
+@register.filter(name='dash2space')
+def dash2space(s):
+    """Return s with dashes turned into spaces"""
+    return s.replace('-', ' ')

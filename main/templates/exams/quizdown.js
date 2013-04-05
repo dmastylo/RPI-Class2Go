@@ -198,7 +198,7 @@ c2gXMLParse.markdown2quiz = function (html_text, outer_mDOM) {
                 resp.attr("correct-points", retobj.correct);
                 resp.attr("wrong-points", retobj.wrong);
             }
-            var regex = /^(correct|right)\./i;
+            var regex = /^(correct|right)/i;
             var correct = regex.test(answerText);
             if (correct) numCorrect += 1;
             choiceOrd += 1;

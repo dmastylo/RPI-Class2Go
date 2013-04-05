@@ -103,6 +103,14 @@ def main(request, course_prefix, course_suffix):
     if (course.calendar_start > date.today()):
         share_block_type = 'join'
 
+    headless = request.GET.get('headless')
+    if headless is not None:
+        if headless == '1':
+            request.session['headless'] = headless
+        elif headless == '0':
+            #headless explicitly turned off
+            request.session['headless'] = None
+
     return render_to_response('courses/view.html',
         {'common_page_data':       common_page_data,
         'course':                  course,

@@ -19,7 +19,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate as auth_authenticate
 from django.contrib import messages
 from django.contrib.auth.models import User
-from c2g.models import Course, Institution, Video, CourseInstructor
+from c2g.models import Course, Institution, Video, CourseInstructor, CourseStudentScore
 from accounts.forms import *
 from registration import signals
 from registration.login_wrapper import login as auth_login_view
@@ -42,6 +42,8 @@ def profile(request):
     group_list = user.groups.all()
     courses = Course.objects.filter(Q(student_group_id__in=group_list, mode='ready') | Q(instructor_group_id__in=group_list, mode='ready') | Q(tas_group_id__in=group_list, mode='ready') | Q(readonly_tas_group_id__in=group_list, mode='ready'))
     course_completions = {}
+    score_dict = {}
+    today = date.today()
     
     user_profile = None
     is_student_list = []
@@ -65,9 +67,16 @@ def profile(request):
         for course in courses:
             if course.calendar_start != None and course.calendar_end != None and course.calendar_start != course.calendar_end:
                 duration = course.calendar_end - course.calendar_start
-                progress = min(date.today(), course.calendar_end) - course.calendar_start
+                progress = min(today, course.calendar_end) - course.calendar_start
                 course_completion = int((float(progress.days) / float(duration.days)) * 100)
                 course_completions[course.id] = course_completion
+                
+                if course.calendar_end < date.today():
+                    score_list = CourseStudentScore.objects.filter(
+                        course=course,
+                        student=user,
+                    ).values_list('tag', 'score', 'total')
+                    score_dict[course.id] = score_list
 
     has_webauth = False
     if user.is_authenticated() and (user_profile.institutions.filter(title='Stanford').exists()):
@@ -82,6 +91,8 @@ def profile(request):
                                   'has_webauth': has_webauth,
                                   'user_profile': user_profile,
                                   'certifications': certs_list,
+                                  'today': today,
+                                  'scores': score_dict,
                                   'longest_certs': range(longest_certlist),
                               },
                               context_instance=RequestContext(request))
