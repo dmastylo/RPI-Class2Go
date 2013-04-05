@@ -177,24 +177,6 @@ $(document).ready(function(){
 	    });
 	});
     }
-    
-    //Show/Hide chat block
-    var chatBlockHeight = $('#chat_block').css('height');
-    $('#chat_block').css({height: '0px'}).show();
-    
-    $('#chat_wrapper .chat_toggle').toggle(function() {
-	$(this).siblings().animate({height: chatBlockHeight}, 'slow', function() {
-	    $(this).siblings().find('span.openChat').hide();
-	    $(this).siblings().find('span.closeChat').show();
-	});
-	//Candy.Core.connect('{{ nick }}', '{{ nick }}'); /* FIXME: use something more magical */
-    }, function() {
-	$(this).siblings().animate({height: '0px'}, 'slow', function() {
-	    $(this).siblings().find('span.openChat').show();
-	    $(this).siblings().find('span.closeChat').hide();
-	});
-	//Candy.Core.disconnect
-    });
 
     //Show/Hide share block
     $('#share_wrapper .show_hide_share').click(function() {
@@ -206,20 +188,65 @@ $(document).ready(function(){
 	    });
 	}
     });
+    
+    //Show/Hide chat block
+    $('#chat_wrapper .chat_toggle').click(function() {
+	$('#chat_block').show();
+	if ($(this).hasClass('closed')) {
+	    $('#chat_block').show();
+	    $(this).toggleClass('closed').siblings().animate({height: '400px'}, 'slow', function() {
+		$(this).siblings().find('span.openChat').hide();
+		$(this).siblings().find('span.closeChat').show();
+		$('#chatPopout').show();
+	    });
+	} else {
+	    $(this).toggleClass('closed').siblings().animate({height: '0px'}, 'slow', function() {
+		$(this).siblings().find('span.openChat').show();
+		$(this).siblings().find('span.closeChat').hide();
+	    });
+	    $('#chatPopout').hide();
+	}
+    });
+    
+    var chatWindow, chatFrameRef, newChatFrame;
+    $('#chatPopout').click(function() {
+	$('#chat_wrapper, #chatPopin').toggle();
+	
+	chatFrameRef = $('#chat_block').attr('src');
+	newChatFrame = '<iframe id="chat_block" src="' + chatFrameRef + '"></iframe>';
+	$('#chat_block').remove();
+        chatWindow = window.open(chatFrameRef, "{{ course.title }}", "width=800, height=600");
+	
+	$('#chatPopin').click(function() {
+	    chatWindow.close();
+	});
+	
+	$(chatWindow).unload(function() {
+	    if (this.document.location.href.indexOf(chatFrameRef) >= 0) {
+		$('#chat_frame_wrapper').html(newChatFrame);
+		$('#chat_block').show();
+		$('#chat_wrapper, #chatPopin').toggle();
+	    }
+	});
+    });
 });
 </script>
 {% endblock addl_scripts %}
 
 {% block jabber_block %}
     <div id="chat_wrapper">
-	<a class="chat_toggle" href="#">
+	<div class="chat_toggle closed">
 	    <span class="openChat">Open Chat <em class="icon-chevron-up"></em></span>
 	    <span class="closeChat">Close Chat <em class="icon-chevron-down"></em></span>
-	</a>
+	</div>
 	{# Jabber chat plugin block #}
 	    {% if jabber_configured and is_logged_in %}
-	        <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+	        <div id="chat_frame_wrapper">
+		    <iframe id="chat_block" src="/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}/chat"></iframe>
+		</div>
 	    {% endif %} {# jabber_configured and is_logged_in #}
 	{# end Jabber chat plugin block #}
+	<a href="#" onclick="event.preventDefault();" title="Pop-Out Chat Window" class="icon-signout" id="chatPopout"></a>
     </div>
+    <a href="#" onclick="event.preventDefault();" title="Pop-In Chat Window" class="icon-signin" id="chatPopin"></a>
 {% endblock jabber_block %}

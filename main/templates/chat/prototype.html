@@ -1,29 +1,34 @@
 {% load url from future %}
 {% load template_utils %}
-
-    <html><head>
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/core/{{ SITE_NAME_SHORT }}-styles.css" />
-        <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
-        <link rel="stylesheet" href="{{ STATIC_URL }}candy_res/candy_full.css" />
-        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}js/candy_libs/libs.min.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}js/candy.min.js"></script>
-    </head><body>
-    <div id="candy"></div>
-    </body></html>
+<html>
+	<head>
+		<link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome.css" />
+		<!--
+		<link rel="stylesheet" href="{{ STATIC_URL }}css/core/sites/{{ SITE_NAME_SHORT }}/styles.css" />
+		-->
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
+		<link rel="stylesheet" href="{{ STATIC_URL }}candy_res/candy_full.css" />
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/candy_libs/libs.min.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/candy.min.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/candy_ui.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/class2go.js"></script>
+	</head>
+	<body>
+		<div id="candy"></div>
+	</body>
+</html>
         
 {% block addl_scripts %}
 	<script type="text/javascript">
-
 		$(document).ready(function() {
-                Candy.init('http://{{jabber_base}}:5280/http-bind/', {
-                core: { debug: true, autojoin: ['{{course_prefix}}_class@conference.{{jabber_base}}'] },
-                view: { resources: '{{ STATIC_URL }}candy_res/' }
+			Candy.init('http://{{jabber_base}}:5280/http-bind/', {
+				core: { debug: true, autojoin: ['{{course_prefix}}_class@conference.{{jabber_base}}'] },
+				view: { resources: '{{ STATIC_URL }}candy_res/' }
 			});
-            Candy.Core.connect('{{nick}}', '{{nick}}'); /* FIXME: use something more magical */
+			CandyShop.Class2Go.init();
+			Candy.Core.connect('{{nick}}', '{{nick}}'); /* FIXME: use something more magical */
 		});
-
 	</script>
 {% endblock addl_scripts %}
