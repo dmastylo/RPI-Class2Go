@@ -139,10 +139,17 @@ class Course(TimestampMixin, Stageable, Deletable, models.Model):
     faq = models.TextField(blank=True)
     logo = models.FileField(upload_to=get_file_path,null=True, blank=True)
     twitter_tag = models.CharField(max_length=64, null = True, blank=True)
-    
-    # Since all environments (dev, draft, prod) go against ready piazza, things will get
-    # confusing if we get collisions on course ID's, so we will use a unique ID for Piazza.
-    # Just use epoch seconds to make it unique.
+
+    # Every course gets a unique ID to identify itself to Piazza.
+    # Technically this shouldn't be needed, since the course handle
+    # should be unique. But if you're using test instances, say,
+    # where there are multiple C2G instances sharing a piazza account
+    # then you could get collisions on course handle.
+    #
+    # Instead this ID gets generated when the course is paired up
+    # with its Piazza instance.  Probably should have done something
+    # truly unique, like some sort of GUID, but this is just the
+    # epoch time which should be sufficient.
     piazza_id = models.IntegerField(null=True, blank=True)
 
     def logo_dl_link(self):
