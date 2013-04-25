@@ -14,14 +14,14 @@
     <div class="container">
         <div class="row hero">
             <h1>Class2Go</h1>
-            <h2>Take Stanford Online Classes. <strong>Anywhere.</strong></h2>
+            <h2>Welcome to our open source platform!</h2>
         </div>
     </div>
 </div>
 {% endblock topcontent %}
 
 {% block m_column_content %}
-<div class="home-unit home-primary" style="background:#fff">
+<div class="home-unit home-primary">
     <div class="container">
 	<div class="row">
 	    <div class="well span12">
@@ -29,6 +29,41 @@
     <p style="margin-bottom: 0;">We are now working together with edX to build the world's best open education platform. EdX will be released under the AGPL license by June 1st. Class2Go is now in maintenance mode. Check out the <a href="http://news.stanford.edu/news/2013/april/edx-collaborate-platform-030313.html">announcement</a> and the <a href="https://groups.google.com/forum/?fromgroups=#!topic/class2go-users/lPGL4R74HPE">forum post</a>.</p>
 	    </div>
 	</div>
+	
+	<div class="row">
+	    <div class="span6">
+		<dl>
+		    <dt>Does the new edX-based platform have a name?</dt><br />
+		    <dd>Not yet.</dd><br /><br />
+		    
+		    <dt>When will Stanford be offering courses on the new platform?</dt><br />
+		    <dd>Starting in June.</dd><br /><br />
+		    
+		    <dt>Does this mean that I can run my own instance of the edX platform after its open source release on June 1?</dt><br />
+		    <dd>Yes.</dd><br /><br />
+		    
+		    <dt>Is Stanford joining the "X" consortium?</dt><br />
+		    <dd>No, we're partnering on the software, but not joining the consortium.</dd>
+		</dl>
+	    </div>
+	    <div class="span6">
+		<dl>
+		    <dt>Can I still access classes on the Class2Go platform?</dt><br />
+		    <dd>Yes!  Until we move these courses over to the new platform, you can access them via the still-running Class2Go platform at:
+			<ul>
+			    <li><a href="http://class2go.stanford.edu/db/Winter2013">Introduction to Databases</a> with Jennifer Widom</li>
+			    <li><a href="http://class2go.stanford.edu/networking/Fall2012">Computer Networking</a> with Nick McKeown &amp; Philip Levis</li> 
+			    <li><a href="http://class2go.stanford.edu/solar/Fall2012">Solar Cells, Fuel Cells, &amp; Batteries</a> with Bruce Clemens</li>
+			</ul>
+		    </dd><br /><br />
+		    
+		    <dt>Does this mean that Stanford thought Class2Go wasn't a good platform?</dt><br />
+		    <dd>No. We wanted to unite the community around a single, non-profit, open-source platform.</dd>
+		</dl>
+	    </div>
+	</div>	
+	
+	{% comment %}
         <div class="row">
             <div class="span6">
                 <h3>Welcome to Class2Go! We're Stanford Online's internal platform, designed to be an open platform for online learning and research.</h3>
@@ -62,8 +97,10 @@
             </div>
         </div>
         {%  endif %}
+	{% endcomment %}
     </div>
 </div>
+{% comment %}
 <div>
     <div class="container" style="margin-top:30px;margin-bottom:0;">
         <div style="width:315px;margin:0 auto;">
@@ -147,5 +184,5 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
   })();
 </script>
-
+{% endcomment %}
 {% endblock m_column_content %}
