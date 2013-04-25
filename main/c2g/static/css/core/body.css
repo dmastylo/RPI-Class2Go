@@ -2,7 +2,7 @@
 -------------------------------------------------- */
 
 body {
-    background-color: #FBFBF9;
+    background-color: #fbfbf9;
     position: relative;
     width: 100%;
     min-height: 100%;
@@ -292,7 +292,7 @@ label.control-label {
 /* Homepage
 -------------------------------------------------- */
 body.home {
-    background:#fbf7f4;
+    background:#fbfbf9;
 }
 .home #c2g_layout_topbar {
     display:none;
