@@ -67,7 +67,7 @@ class convenience_redirector(object):
                 if not Course.objects.filter(handle=path_prefix+'--'+path_suffix).exists(): #only redirect class-related URLs
                     return None
                 if path_suffix == 'Fall2012' or path_suffix == 'WallaWalla': #send requests to Fall2012 classes under the new codebase back to the old codebase
-                    http_host=re.sub(r'class2go\.', 'class.', request.META['HTTP_HOST'], flags=re.I)
+                    http_host=re.sub(r'class2go\.', 'f12.class2go.', request.META['HTTP_HOST'], flags=re.I)
                 else:  #send everyone else to the new codebase
                     http_host=re.sub(r'class\.', 'class2go.', request.META['HTTP_HOST'], flags=re.I)
             
