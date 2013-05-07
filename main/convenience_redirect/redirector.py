@@ -14,7 +14,8 @@ class convenience_redirector(object):
     #domain names are ancestors of each other, like class.stanford.edu, staging.class.stanford.edu, and
     #www.staging.class.stanford.edu
     domain_no_direct = ['class.stanford.edu','staging.class.stanford.edu','www.staging.class.stanford.edu','www.class.stanford.edu',\
-                     'class2go.stanford.edu','staging.class2go.stanford.edu','www.staging.class2go.stanford.edu','www.class2go.stanford.edu']
+                     'class2go.stanford.edu','staging.class2go.stanford.edu','www.staging.class2go.stanford.edu','www.class2go.stanford.edu',\
+                     'f12.class2go.stanford.edu']
     
     #List of regexes of domain names to match against. 
     regex_list = (
