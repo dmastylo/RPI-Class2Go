@@ -480,6 +480,86 @@ xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/></IDPSSODescriptor>
   </md:ContactPerson>
 
 </md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_08b24e473cc8ac4413bc674d5ebcfdcec5ab88db" entityID="https://ccipp03.stanford.edu/shibboleth">
+
+  <md:Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
+  </md:Extensions>
+
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+    <md:Extensions>
+      <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://ccipp03.stanford.edu/Shibboleth.sso/Login"/>
+    </md:Extensions>
+    <md:KeyDescriptor>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:KeyName>ccipp03.stanford.edu</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=ccipp03.stanford.edu,OU=Center for Clinical Informatics,O=Stanford University,L=Stanford,ST=California,C=US</ds:X509SubjectName>
+          <ds:X509Certificate>MIIExDCCA6ygAwIBAgIJAINENTPwf4zCMA0GCSqGSIb3DQEBBQUAMIGcMQswCQYD
+VQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTERMA8GA1UEBxMIU3RhbmZvcmQx
+HDAaBgNVBAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxKDAmBgNVBAsTH0NlbnRlciBm
+b3IgQ2xpbmljYWwgSW5mb3JtYXRpY3MxHTAbBgNVBAMTFGNjaXBwMDMuc3RhbmZv
+cmQuZWR1MB4XDTEyMTExNTA1NDgxN1oXDTIyMTExNTA1NDgxN1owgZwxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTdGFuZm9yZDEc
+MBoGA1UEChMTU3RhbmZvcmQgVW5pdmVyc2l0eTEoMCYGA1UECxMfQ2VudGVyIGZv
+ciBDbGluaWNhbCBJbmZvcm1hdGljczEdMBsGA1UEAxMUY2NpcHAwMy5zdGFuZm9y
+ZC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDDdWdwKSFosqZk
+r6LYJzhAqbfCHhp4fwpiGoQfVw0c7nhL0RHWHbkH8B55iXAcYalAG6dGaE3t9c9Y
+nIH3VFENRvHZwme+16wCdrS6bcmKXrqEK2aUuINAH6M36R+JG/7K5CJfs6me60cy
+rNxcrX1PKLgcOlw/IujxR2NUaY19b8N9VyO9KkSx3Q/lolPYZ86CEbXUPf0hkC36
+aiJ8P3gbwsLs9D6DER3j9t6LrcijjYkzfr+TuDL6ddQTGGvz2G5//mCVNE7dPIB5
+rHh9XcE2n0QvnxI/zfP6ABRI7wHnJsMbvOi9LaBjg675Z/lRjMX9g6TM04wwxv8i
+HU8Yd0NVAgMBAAGjggEFMIIBATAdBgNVHQ4EFgQU+20LuDG17p8wOo4DmdGWKHUf
+PIUwgdEGA1UdIwSByTCBxoAU+20LuDG17p8wOo4DmdGWKHUfPIWhgaKkgZ8wgZwx
+CzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTdGFu
+Zm9yZDEcMBoGA1UEChMTU3RhbmZvcmQgVW5pdmVyc2l0eTEoMCYGA1UECxMfQ2Vu
+dGVyIGZvciBDbGluaWNhbCBJbmZvcm1hdGljczEdMBsGA1UEAxMUY2NpcHAwMy5z
+dGFuZm9yZC5lZHWCCQCDRDUz8H+MwjAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEB
+BQUAA4IBAQBlvF9pZYJ18C33YCwBlFaIin0DldIGT2v1e+3f2YvpvhkNPTF0Z98r
+A3eDnG/bj3D7l7lIvQfuKE5rUFNnd9HXrbmqz+ddQO5778hGHmaYw06yeaI6C795
+jsyvhwwGBBzUCcYkJwvtbyEB+ZD3E4+mtxrZpnxtp3IWbHONY92o/X8Mf9/3TKcH
+03/ffc+Fqihk5P+zlHmwVQuqd9a/2JQEhJUdwNGCK0c35mPsp6XtD1ahg6nLpDyW
+sM75qBg/p6xkwcJJEesbWMZ6nBG9o+Vkh1mhPHlNPDSLb6GC2s1G0Xvx1oQ50w67
++q5PRtYpVONW8r7XVNC7JqHABDoNymCw
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+    </md:KeyDescriptor>
+    <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://ccipp03.stanford.edu/Shibboleth.sso/Artifact/SOAP" index="1"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SLO/SOAP"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SLO/Redirect"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SLO/POST"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SLO/Artifact"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SAML2/POST" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SAML2/Artifact" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SAML2/ECP" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SAML/POST" index="5"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://ccipp03.stanford.edu/Shibboleth.sso/SAML/Artifact" index="6"/>
+  </md:SPSSODescriptor>
+
+  <ContactPerson contactType="technical">
+     <GivenName>Shibboleth Support</GivenName>
+     <EmailAddress>dcs@med.stanford.edu</EmailAddress>
+  </ContactPerson>
+
+</md:EntityDescriptor>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_e4dd909121823735319a916d8bddc7045190236b" entityID="https://cdc-tree.stanford.edu/shibboleth">
 
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
@@ -643,40 +723,38 @@ tQlU+pKv
    <md:KeyDescriptor use="signing">
      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
        <ds:KeyName>cdcapps.stanford.edu</ds:KeyName>
-       <ds:KeyName>www.cdcapps.stanford.edu</ds:KeyName>
        <ds:X509Data>
          <ds:X509SubjectName>CN=cdcapps.stanford.edu</ds:X509SubjectName>
          <ds:X509Certificate>
-MIIFeTCCBGGgAwIBAgIQSERktxDzZ/iqMSlGDB1EtjANBgkqhkiG9w0BAQUFADB/
-MQswCQYDVQQGEwJVUzELMAkGA1UECBMCVVQxFzAVBgNVBAcTDlNhbHQgTGFrZSBD
-aXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxKjAoBgNVBAMTIVVT
-RVJUcnVzdCBMZWdhY3kgU2VjdXJlIFNlcnZlciBDQTAeFw0xMDA0MDIwMDAwMDBa
-Fw0xMzA0MDEyMzU5NTlaMIIBJDELMAkGA1UEBhMCVVMxDjAMBgNVBBETBTk0MzA1
-MRMwEQYDVQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTdGFuZm9yZDEvMC0GA1UE
-CRMmMjQxIFBhbmFtYSBTdHJlZXQsIFBpbmUgSGFsbCwgUm9vbSAxMTUxHDAaBgNV
-BAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxGDAWBgNVBAsTD1N0dWRlbnQgQWZmYWly
-czE5MDcGA1UECxMwSXNzdWVkIHRocm91Z2ggU3RhbmZvcmQgVW5pdmVyc2l0eSBF
-LVBLSSBNYW5hZ2VyMRowGAYDVQQLExFDb21vZG8gSW5zdGFudFNTTDEdMBsGA1UE
-AxMUY2RjYXBwcy5zdGFuZm9yZC5lZHUwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
-AoGBAMUQPvdk3r1ugc64HiOYlQE1cr52NthUHQc4C/F9q5iLbE5Drkk+axAh1NCS
-rhjLxqVNPW5Yqkz9S9h9+xfN2eH0tsFuRfx9GPcu2FwxYXs9lR32PBLuOtgYyEa2
-uNT4Lo3KDH4OBFtCx8j/K9QI63cwV0lSiV/WdKmlzNiq59eBAgMBAAGjggHMMIIB
-yDAfBgNVHSMEGDAWgBSvpECvnxb+qzH9+9WXi/WRoySGFjAdBgNVHQ4EFgQULwLi
-IQi2gxsULiJRKDU78lvaFSUwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAw
-HQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMEIGA1UdIAQ7MDkwNwYMKwYB
-BAGyMQECAQMEMCcwJQYIKwYBBQUHAgEWGWh0dHBzOi8vY3BzLnVzZXJ0cnVzdC5j
-b20wSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC51c2VydHJ1c3QuY29tL1VT
-RVJUcnVzdExlZ2FjeVNlY3VyZVNlcnZlckNBLmNybDB9BggrBgEFBQcBAQRxMG8w
-RgYIKwYBBQUHMAKGOmh0dHA6Ly9jcnQudXNlcnRydXN0LmNvbS9VU0VSVHJ1c3RM
-ZWdhY3lTZWN1cmVTZXJ2ZXJDQS5jcnQwJQYIKwYBBQUHMAGGGWh0dHA6Ly9vY3Nw
-LnVzZXJ0cnVzdC5jb20wOQYDVR0RBDIwMIIUY2RjYXBwcy5zdGFuZm9yZC5lZHWC
-GHd3dy5jZGNhcHBzLnN0YW5mb3JkLmVkdTANBgkqhkiG9w0BAQUFAAOCAQEAmOpD
-m3jHLAUZgQ9cmfSJikq+9wYdmo+w430B+f6bUxqVY630BiU6KqpyGFPMp5m85MEZ
-ZLciIoRCA714nSEnykJbutYX6yEO7c/zmy/IjXLLo5riQ1cDkNWPot4URVBuwyEZ
-hXJvGqqRnGxEtSYRaiMn8vAt18D9zAFLo2MCJn2IOtthYoIMV9Bm2CfLTPdBrlhj
-vPQXI4HEf9tvdvtvI+4jtKVG1gvAORWUZiBTjDvbRexNKZBHpC7yIcNzIV8bf0H8
-HdmmP7kbSbfFBNss/Wx5o1IUVZOFDJ5gmNB25vKFm+D9eIXDFQ8WboxFBgWbeOHH
-s21FpUjKfsSZYExYJA==
+MIIFRzCCBC+gAwIBAgIRAOVHiUphlRkRUKGaVqsuEFMwDQYJKoZIhvcNAQEFBQAw
+UTELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUludGVybmV0MjERMA8GA1UECxMISW5D
+b21tb24xGzAZBgNVBAMTEkluQ29tbW9uIFNlcnZlciBDQTAeFw0xMzAzMDQwMDAw
+MDBaFw0xNjAzMzAyMzU5NTlaMIGtMQswCQYDVQQGEwJVUzEOMAwGA1UEERMFOTQz
+MDUxCzAJBgNVBAgTAkNBMREwDwYDVQQHEwhTdGFuZm9yZDEXMBUGA1UECRMONDUw
+IFNlcnJhIE1hbGwxHDAaBgNVBAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxGDAWBgNV
+BAsTD1N0dWRlbnQgQWZmYWlyczEdMBsGA1UEAxMUY2RjYXBwcy5zdGFuZm9yZC5l
+ZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDowdD8xX5u3qLv1S2k
+Hk8KBXldVLqLm9aJNnHJM45Zl8wPlY/6/obC9NT7BRSqouAU5M9Lh3rYjpUVTE+O
+1720NlpqisjHjUHVxq5S0NMqT568PkEn+6E3Z1GgtVPSHytLbZX265bdnjBx1YOf
+ZMOf2dfwK7169dPixP1giHJwd51QIaunmp4LnaX838LVPN0B1YfHVxTx836ytcfF
+n0k6nEIOFg+hJnUnKMyai7IrRp/l7OFtzD7ePADH1s0UydB2hGZeaiBplNjA61S3
+B7yucE2qY7QYyQdPj1SQBrgcj2QkpF1qjVCWychnzpY7+ybMz5ojVrb8xqFOCeGX
+YBfrAgMBAAGjggG7MIIBtzAfBgNVHSMEGDAWgBRIT1r6L0qaXuBQ82t7VaXe9b40
+XTAdBgNVHQ4EFgQUNNbUTq8aEZDrNfC0D/5l0GfxdQQwDgYDVR0PAQH/BAQDAgWg
+MAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMGcG
+A1UdIARgMF4wUgYMKwYBBAGuIwEEAwEBMEIwQAYIKwYBBQUHAgEWNGh0dHBzOi8v
+d3d3LmluY29tbW9uLm9yZy9jZXJ0L3JlcG9zaXRvcnkvY3BzX3NzbC5wZGYwCAYG
+Z4EMAQICMD0GA1UdHwQ2MDQwMqAwoC6GLGh0dHA6Ly9jcmwuaW5jb21tb24ub3Jn
+L0luQ29tbW9uU2VydmVyQ0EuY3JsMG8GCCsGAQUFBwEBBGMwYTA5BggrBgEFBQcw
+AoYtaHR0cDovL2NlcnQuaW5jb21tb24ub3JnL0luQ29tbW9uU2VydmVyQ0EuY3J0
+MCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5pbmNvbW1vbi5vcmcwHwYDVR0RBBgw
+FoIUY2RjYXBwcy5zdGFuZm9yZC5lZHUwDQYJKoZIhvcNAQEFBQADggEBABloKhm6
+DZvtqrRRzUZEVmbF4nw5n38D5db71ZxQSMi30CfnN4tQN/wGj2jIe82tMEC/g0tO
+v7D01+sWpIvFrohOzNC25nlPnCjdeVPeKEdt1o8UnnVKR/5WxebmekussRA7+56z
+LYBriErfoPrIrQM+jX0hwjTce/eTtKG6MhDNfszaXaJYDSos8uNEP67eGXVURgYE
+8Sp07uMQ84VxqBh+oxdRiCN0dpLCmZpk9uGs0ECnOYeBrHDJWYuDPKomrIXeYeJ3
+L1Wu1QREQyHl3h0CGiogKEkzk5P4iXNssC+e4qIPOje7PHE7rO4NdFGREQosJ3kI
+DfhTFlqPK8zDBuY=
 </ds:X509Certificate>
        </ds:X509Data>
      </ds:KeyInfo>
@@ -684,40 +762,38 @@ s21FpUjKfsSZYExYJA==
    <md:KeyDescriptor use="encryption">
      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
        <ds:KeyName>cdcapps.stanford.edu</ds:KeyName>
-       <ds:KeyName>www.cdcapps.stanford.edu</ds:KeyName>
        <ds:X509Data>
          <ds:X509SubjectName>CN=cdcapps.stanford.edu</ds:X509SubjectName>
          <ds:X509Certificate>
-MIIFeTCCBGGgAwIBAgIQSERktxDzZ/iqMSlGDB1EtjANBgkqhkiG9w0BAQUFADB/
-MQswCQYDVQQGEwJVUzELMAkGA1UECBMCVVQxFzAVBgNVBAcTDlNhbHQgTGFrZSBD
-aXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxKjAoBgNVBAMTIVVT
-RVJUcnVzdCBMZWdhY3kgU2VjdXJlIFNlcnZlciBDQTAeFw0xMDA0MDIwMDAwMDBa
-Fw0xMzA0MDEyMzU5NTlaMIIBJDELMAkGA1UEBhMCVVMxDjAMBgNVBBETBTk0MzA1
-MRMwEQYDVQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTdGFuZm9yZDEvMC0GA1UE
-CRMmMjQxIFBhbmFtYSBTdHJlZXQsIFBpbmUgSGFsbCwgUm9vbSAxMTUxHDAaBgNV
-BAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxGDAWBgNVBAsTD1N0dWRlbnQgQWZmYWly
-czE5MDcGA1UECxMwSXNzdWVkIHRocm91Z2ggU3RhbmZvcmQgVW5pdmVyc2l0eSBF
-LVBLSSBNYW5hZ2VyMRowGAYDVQQLExFDb21vZG8gSW5zdGFudFNTTDEdMBsGA1UE
-AxMUY2RjYXBwcy5zdGFuZm9yZC5lZHUwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
-AoGBAMUQPvdk3r1ugc64HiOYlQE1cr52NthUHQc4C/F9q5iLbE5Drkk+axAh1NCS
-rhjLxqVNPW5Yqkz9S9h9+xfN2eH0tsFuRfx9GPcu2FwxYXs9lR32PBLuOtgYyEa2
-uNT4Lo3KDH4OBFtCx8j/K9QI63cwV0lSiV/WdKmlzNiq59eBAgMBAAGjggHMMIIB
-yDAfBgNVHSMEGDAWgBSvpECvnxb+qzH9+9WXi/WRoySGFjAdBgNVHQ4EFgQULwLi
-IQi2gxsULiJRKDU78lvaFSUwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAw
-HQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMEIGA1UdIAQ7MDkwNwYMKwYB
-BAGyMQECAQMEMCcwJQYIKwYBBQUHAgEWGWh0dHBzOi8vY3BzLnVzZXJ0cnVzdC5j
-b20wSwYDVR0fBEQwQjBAoD6gPIY6aHR0cDovL2NybC51c2VydHJ1c3QuY29tL1VT
-RVJUcnVzdExlZ2FjeVNlY3VyZVNlcnZlckNBLmNybDB9BggrBgEFBQcBAQRxMG8w
-RgYIKwYBBQUHMAKGOmh0dHA6Ly9jcnQudXNlcnRydXN0LmNvbS9VU0VSVHJ1c3RM
-ZWdhY3lTZWN1cmVTZXJ2ZXJDQS5jcnQwJQYIKwYBBQUHMAGGGWh0dHA6Ly9vY3Nw
-LnVzZXJ0cnVzdC5jb20wOQYDVR0RBDIwMIIUY2RjYXBwcy5zdGFuZm9yZC5lZHWC
-GHd3dy5jZGNhcHBzLnN0YW5mb3JkLmVkdTANBgkqhkiG9w0BAQUFAAOCAQEAmOpD
-m3jHLAUZgQ9cmfSJikq+9wYdmo+w430B+f6bUxqVY630BiU6KqpyGFPMp5m85MEZ
-ZLciIoRCA714nSEnykJbutYX6yEO7c/zmy/IjXLLo5riQ1cDkNWPot4URVBuwyEZ
-hXJvGqqRnGxEtSYRaiMn8vAt18D9zAFLo2MCJn2IOtthYoIMV9Bm2CfLTPdBrlhj
-vPQXI4HEf9tvdvtvI+4jtKVG1gvAORWUZiBTjDvbRexNKZBHpC7yIcNzIV8bf0H8
-HdmmP7kbSbfFBNss/Wx5o1IUVZOFDJ5gmNB25vKFm+D9eIXDFQ8WboxFBgWbeOHH
-s21FpUjKfsSZYExYJA==
+MIIFRzCCBC+gAwIBAgIRAOVHiUphlRkRUKGaVqsuEFMwDQYJKoZIhvcNAQEFBQAw
+UTELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUludGVybmV0MjERMA8GA1UECxMISW5D
+b21tb24xGzAZBgNVBAMTEkluQ29tbW9uIFNlcnZlciBDQTAeFw0xMzAzMDQwMDAw
+MDBaFw0xNjAzMzAyMzU5NTlaMIGtMQswCQYDVQQGEwJVUzEOMAwGA1UEERMFOTQz
+MDUxCzAJBgNVBAgTAkNBMREwDwYDVQQHEwhTdGFuZm9yZDEXMBUGA1UECRMONDUw
+IFNlcnJhIE1hbGwxHDAaBgNVBAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxGDAWBgNV
+BAsTD1N0dWRlbnQgQWZmYWlyczEdMBsGA1UEAxMUY2RjYXBwcy5zdGFuZm9yZC5l
+ZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDowdD8xX5u3qLv1S2k
+Hk8KBXldVLqLm9aJNnHJM45Zl8wPlY/6/obC9NT7BRSqouAU5M9Lh3rYjpUVTE+O
+1720NlpqisjHjUHVxq5S0NMqT568PkEn+6E3Z1GgtVPSHytLbZX265bdnjBx1YOf
+ZMOf2dfwK7169dPixP1giHJwd51QIaunmp4LnaX838LVPN0B1YfHVxTx836ytcfF
+n0k6nEIOFg+hJnUnKMyai7IrRp/l7OFtzD7ePADH1s0UydB2hGZeaiBplNjA61S3
+B7yucE2qY7QYyQdPj1SQBrgcj2QkpF1qjVCWychnzpY7+ybMz5ojVrb8xqFOCeGX
+YBfrAgMBAAGjggG7MIIBtzAfBgNVHSMEGDAWgBRIT1r6L0qaXuBQ82t7VaXe9b40
+XTAdBgNVHQ4EFgQUNNbUTq8aEZDrNfC0D/5l0GfxdQQwDgYDVR0PAQH/BAQDAgWg
+MAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMGcG
+A1UdIARgMF4wUgYMKwYBBAGuIwEEAwEBMEIwQAYIKwYBBQUHAgEWNGh0dHBzOi8v
+d3d3LmluY29tbW9uLm9yZy9jZXJ0L3JlcG9zaXRvcnkvY3BzX3NzbC5wZGYwCAYG
+Z4EMAQICMD0GA1UdHwQ2MDQwMqAwoC6GLGh0dHA6Ly9jcmwuaW5jb21tb24ub3Jn
+L0luQ29tbW9uU2VydmVyQ0EuY3JsMG8GCCsGAQUFBwEBBGMwYTA5BggrBgEFBQcw
+AoYtaHR0cDovL2NlcnQuaW5jb21tb24ub3JnL0luQ29tbW9uU2VydmVyQ0EuY3J0
+MCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5pbmNvbW1vbi5vcmcwHwYDVR0RBBgw
+FoIUY2RjYXBwcy5zdGFuZm9yZC5lZHUwDQYJKoZIhvcNAQEFBQADggEBABloKhm6
+DZvtqrRRzUZEVmbF4nw5n38D5db71ZxQSMi30CfnN4tQN/wGj2jIe82tMEC/g0tO
+v7D01+sWpIvFrohOzNC25nlPnCjdeVPeKEdt1o8UnnVKR/5WxebmekussRA7+56z
+LYBriErfoPrIrQM+jX0hwjTce/eTtKG6MhDNfszaXaJYDSos8uNEP67eGXVURgYE
+8Sp07uMQ84VxqBh+oxdRiCN0dpLCmZpk9uGs0ECnOYeBrHDJWYuDPKomrIXeYeJ3
+L1Wu1QREQyHl3h0CGiogKEkzk5P4iXNssC+e4qIPOje7PHE7rO4NdFGREQosJ3kI
+DfhTFlqPK8zDBuY=
 </ds:X509Certificate>
        </ds:X509Data>
      </ds:KeyInfo>
@@ -926,15 +1002,7 @@ wle00diyrg3+8Z396xKS2h8LEmMaPAyP9VXwL0OmWw==
      <EmailAddress>charlie@classowl.com</EmailAddress>
   </ContactPerson>
 
-</md:EntityDescriptor><md:EntityDescriptor entityID="cn174.awmdm.com" ID="_13273072-3643-4757-acce-a3a6eed9ed04" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:SPSSODescriptor ID="_44a1fb0d-c4af-4ee0-a7dd-423e89d65e95" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="false" WantAssertionsSigned="false"><md:KeyDescriptor><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>MIIDLDCCAhSgAwIBAgIQSk11f6Bzw4RDwlYkFUfPwjANBgkqhkiG9w0BAQQFADAaMRgwFgYDVQQDEw9jbjE3NC5hd21kbS5jb20wHhcNMDAwMTAxMDgwMDAwWhcNMzYwMTAxMDgwMDAwWjAaMRgwFgYDVQQDEw9jbjE3NC5hd21kbS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDTNutCIVlLdPu7tr628Ct1CrqafwzjRDeRvFFgdx8WF0t8dIwhk6RBfIYT/JQ1X+qIdgV0Yad59zLX2qEmSH7h6ifMHxL0CziVJO9PXUcx2gWYsTcfKyi/vDXI/cOaePY7AEpypeuOeL4CDNXdPUCsx0h1q/ZprCbnTqJKa2J8pSbEUO2xXZW34tfUq0t3c9SCi6P08mmx3VQ8tn2/Mj1EmV45HHv1WCdQKfQx7HxFeijWY6m1IuWfIM8nijN8u7UY8cVY0rZJPko1+PyypDpHpRoD7nML6dxzG0xYzDn/286VAD5zuBdShWTx6aQMc2LNs+iE1CdCO6vXYXlZ2BDrAgMBAAGjbjBsMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBLBgNVHQEERDBCgBBBDIVEbN9QDrSlWjtfUt0aoRwwGjEYMBYGA1UEAxMPY24xNzQuYXdtZG0uY29tghBKTXV/oHPDhEPCViQVR8/CMA0GCSqGSIb3DQEBBAUAA4IBAQBaL0RRu+pBQLJMMH9YVHBcXczAPk1i5/KWD0fYIgYsbg+o9LyusxzH6VLfQ9+U6gHmdLFBOLadMumnOadIfpSOBsGauu/vB+v9Pik9jBOw7Zj6EaQ1hmpjlFeyrghjze1+jeW2yYVfKg/lzeQerWxgZcJ5R3lgzaD0CfpDrh0wnjoY+hnzv0WsNJKkED+mvT3/IkXoqSw4/iMLOv/FezQCPslLm9D+99Yv/lWOBrzeJHfq4K9d4y02DwtOanmgzaKdFbYrgnYVaHSLP75iACcd/yd0xQn8Q1CX9/hTyELX2OGXxAoHDO2vgCbgZkEnLOMU6gVqt/IGJBZXGk/HK2eb</X509Certificate></X509Data></KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://ds174.awmdm.com/MyDevice/SAML/ArtifactResolver.ashx" index="1" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://ds174.awmdm.com/DeviceManagement/SAML/ArtifactResolver.ashx" index="2" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://cn174.awmdm.com/AirWatch/SAML/ArtifactResolver.ashx" index="3" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://ds174.awmdm.com/Catalog/SAML/ArtifactResolver.ashx" index="4" isDefault="false" /><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</md:NameIDFormat><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ds174.awmdm.com/MyDevice/SAML/AssertionService.ashx?binding=HttpRedirect" index="1" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ds174.awmdm.com/MyDevice/SAML/AssertionService.ashx?binding=HttpPost" index="2" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ds174.awmdm.com/MyDevice/SAML/AssertionService.ashx?binding=HttpArtifact" index="3" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ds174.awmdm.com/DeviceManagement/SAML/AssertionService.ashx?binding=HttpRedirect" index="4" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ds174.awmdm.com/DeviceManagement/SAML/AssertionService.ashx?binding=HttpPost" index="5" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ds174.awmdm.com/DeviceManagement/SAML/AssertionService.ashx?binding=HttpArtifact" index="6" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://cn174.awmdm.com/AirWatch/SAML/AssertionService.ashx?binding=HttpRedirect" index="7" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://cn174.awmdm.com/AirWatch/SAML/AssertionService.ashx?binding=HttpPost" index="8" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://cn174.awmdm.com/AirWatch/SAML/AssertionService.ashx?binding=HttpArtifact" index="9" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ds174.awmdm.com/Catalog/SAML/AssertionService.ashx?binding=HttpRedirect" index="10" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ds174.awmdm.com/Catalog/SAML/AssertionService.ashx?binding=HttpPost" index="11" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ds174.awmdm.com/Catalog/SAML/AssertionService.ashx?binding=HttpArtifact" index="12" isDefault="false" /></md:SPSSODescriptor>
-
-<ContactPerson contactType="support">
-  <GivenName>ITS Infrastructure Delivery Group</GivenName>
-  <EmailAddress>winsystems@lists.stanford.edu</EmailAddress>
-</ContactPerson>
-
-</md:EntityDescriptor>
-<md:EntityDescriptor ID="_8dd900f27da89b1770a4a856190f0016" entityID="https://corp.collegenet.com/shibboleth-sp/" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata">
+</md:EntityDescriptor><md:EntityDescriptor ID="_8dd900f27da89b1770a4a856190f0016" entityID="https://corp.collegenet.com/shibboleth-sp/" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata">
 
 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo>
@@ -1088,8 +1156,8 @@ s9dzzRoIBlbxGPLvYEpzvrrYdp6gOxOVbXg9/n0KwsCtbjbz04R9kMWGnGtc1HUX
 </md:SPSSODescriptor>
 
   <ContactPerson contactType="administrative">
-      <GivenName>Shannon Regan</GivenName>
-      <EmailAddress>slregan@stanford.edu</EmailAddress>
+      <GivenName>Jon Rolph</GivenName>
+      <EmailAddress>jrolph@stanford.edu</EmailAddress>
   </ContactPerson>
   <ContactPerson contactType="technical">
       <GivenName>CollegeNet Support</GivenName>
@@ -1631,11 +1699,18 @@ u2vJbz4GbRWmpOzZfRGt5X2zluhluitBETgfTGY07F15loxuyqWSXmq+5FI/9pjO
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://dor.webchefs.org/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="3"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser" Location="https://dor.webchefs.org/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
   </md:SPSSODescriptor>
-  <md:ContactPerson contactType="technical">
-    <md:GivenName>Robert</md:GivenName>
-    <md:SurName>Ristroph</md:SurName>
-    <md:EmailAddress>ristroph@stanford.edu</md:EmailAddress>
+
+  <md:ContactPerson contactType="administrative">
+    <md:GivenName>Patti</md:GivenName>
+    <md:SurName>McCabe</md:SurName>
+    <md:EmailAddress>pmccabe@stanford.edu</md:EmailAddress>
   </md:ContactPerson>
+  <md:ContactPerson contactType="technical">
+    <md:GivenName>Four Kitchens</md:GivenName>
+    <md:SurName>Stanford DoR Support</md:SurName>
+    <md:EmailAddress>stanford-dor@fourkitchens.com</md:EmailAddress>
+  </md:ContactPerson>
+
 </md:EntityDescriptor>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://doresearch.stanford.edu/simplesaml/module.php/saml/sp/metadata.php/default-sp">
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
@@ -1661,11 +1736,18 @@ u2vJbz4GbRWmpOzZfRGt5X2zluhluitBETgfTGY07F15loxuyqWSXmq+5FI/9pjO
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="http://doresearch.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="3"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser" Location="http://doresearch.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
   </md:SPSSODescriptor>
-  <md:ContactPerson contactType="technical">
-    <md:GivenName>Robert</md:GivenName>
-    <md:SurName>Ristroph</md:SurName>
-    <md:EmailAddress>ristroph@stanford.edu</md:EmailAddress>
+
+  <md:ContactPerson contactType="administrative">
+    <md:GivenName>Patti</md:GivenName>
+    <md:SurName>McCabe</md:SurName>
+    <md:EmailAddress>pmccabe@stanford.edu</md:EmailAddress>
   </md:ContactPerson>
+  <md:ContactPerson contactType="technical">
+    <md:GivenName>Four Kitchens</md:GivenName>
+    <md:SurName>Stanford DoR Support</md:SurName>
+    <md:EmailAddress>stanford-dor@fourkitchens.com</md:EmailAddress>
+  </md:ContactPerson>
+
 </md:EntityDescriptor>
 <md:EntityDescriptor entityID="https://ds156.awmdm.com/" ID="_04504159-eab6-42c8-832c-2b105f5e8cd1" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:SPSSODescriptor ID="_53b94b40-e710-428b-8dea-a69a2f29dce9" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="true" WantAssertionsSigned="false"><md:KeyDescriptor><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>MIIDLDCCAhSgAwIBAgIQAclqXl/bFptGN2CLIDHrRzANBgkqhkiG9w0BAQQFADAaMRgwFgYDVQQDEw9kczE1Ni5hd21kbS5jb20wHhcNMDAwMTAxMDgwMDAwWhcNMzYwMTAxMDgwMDAwWjAaMRgwFgYDVQQDEw9kczE1Ni5hd21kbS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC5Usb1rhwitK0HSqn5V8Upv7W5YUF0LF0RsqyDu9Oi8CVELbJ9j0srIFsyMqPc3al9kRVizxSmWlBOQxS0PQpkXNEMSOwd34pvQmKsEUS1a4T0CRbvMpQKaChX7d0jZ3WwnS/3Fz9wZvLiVrryLRX/ynOl3m9iKu78TP43QUdkwG4n1q51vAul9rB1hM6PGZ1aR8QwO9SBnEa9aeRE41L4KLI6GpUYZULkVXkJ//QrPeVs7cc116QuCWSrzuSzCF1yvAgzlu7aXlPdIMsAo/RyyWDkmPtGyOqEAwPnRbqL4cSVb50tZfHQUCBP8pyMS2Z+ox/Q5lH2DcIRfx/dMY7HAgMBAAGjbjBsMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBLBgNVHQEERDBCgBBKdXAkdMKZU7xkfQY+23IjoRwwGjEYMBYGA1UEAxMPZHMxNTYuYXdtZG0uY29tghAByWpeX9sWm0Y3YIsgMetHMA0GCSqGSIb3DQEBBAUAA4IBAQCrCyHhVzvyhTRPk3FvE2bv9Tvn9DPe54/W/5p7kyNMFC97lvJfae9M6I+VhYOoUmEGPhsXf5m30OQMHU52DSdWwcLlghXg+3LRt6uW8nQ50XN4EyLF0K0SM2Z1S9LB6r057CfVFTKwp9ngfTiwBBvl+58ptRV8D03TH6fv4dejHwtGKOFmdUAM5izDpiqT7wRejuVen/SRdPhqaMQzo7XeXfy7nbSUr3ZDmnFAQLjK7CQ6TX0QUH7uDeLn4vAf3Jt5QUq6zGouAuJ5SvSUuK1+XSvY3+0yzY2+cfk3+5oqFosIBkg7/QYNqG5x6qJK5K8kB8IZk1J0rFMumPXbsLLF</X509Certificate></X509Data></KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ds156.awmdm.com/DeviceServices/SAML/AssertionService.ashx?binding=HttpPost" index="1" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ds156.awmdm.com/DeviceServices/SAML/AssertionService.ashx?binding=HttpArtifact" index="2" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ds156.awmdm.com/MyDevice/SAML/AssertionService.ashx?binding=HttpPost" index="3" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ds156.awmdm.com/MyDevice/SAML/AssertionService.ashx?binding=HttpArtifact" index="4" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ds156.awmdm.com/DeviceManagement/SAML/AssertionService.ashx?binding=HttpPost" index="5" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ds156.awmdm.com/DeviceManagement/SAML/AssertionService.ashx?binding=HttpArtifact" index="6" isDefault="false" /></md:SPSSODescriptor>
 
@@ -2417,15 +2499,27 @@ UAVRHwLYyzA5NogLTa8eDLOjhawqN/TlGrcRzhReNv4Q2s0QlE1cMLmP7w0=
   </ContactPerson>
 
 </md:EntityDescriptor>
-  <EntityDescriptor entityID="https://guestlogin.stanford.edu/shibboleth-sp">
-    <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+<EntityDescriptor entityID="https://guestlogin.stanford.edu/"
+                  xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+                  xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+                  xmlns:shibmd="urn:mace:shibboleth:metadata:1.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-      <!-- Expires Jun 20 2015 GMT -->
-      <KeyDescriptor>
-        <ds:KeyInfo>
-          <ds:KeyName>guestlogin.stanford.edu</ds:KeyName>
-          <ds:X509Data>
-            <ds:X509Certificate>
+    <IDPSSODescriptor protocolSupportEnumeration="urn:mace:shibboleth:1.0 urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+
+        <Extensions>
+            <shibmd:Scope regexp="false">stanford.edu</shibmd:Scope>
+	    <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
+	      <mdui:DisplayName xml:lang="en">Stanford Guest Accounts</mdui:DisplayName>
+	      <mdui:InformationURL xml:lang="en">http://guestaccounts.stanford.edu/</mdui:InformationURL>
+	    </mdui:UIInfo>
+        </Extensions>
+
+        <!-- Expires on 2015/06/20 -->
+        <KeyDescriptor>
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>
 MIIFaDCCBFCgAwIBAgIQfFiuCaLZVxrxz+9khZ4BajANBgkqhkiG9w0BAQUFADBR
 MQswCQYDVQQGEwJVUzESMBAGA1UEChMJSW50ZXJuZXQyMREwDwYDVQQLEwhJbkNv
 bW1vbjEbMBkGA1UEAxMSSW5Db21tb24gU2VydmVyIENBMB4XDTEyMDYyMDAwMDAw
@@ -2455,28 +2549,149 @@ yuzE2etN2IC+SJ2ZQdUi1epWBiNbsUu+/ELOreDqyzcdCmUFfcuewRz/reKjISyS
 3FzgPI/EDwH2Pz7PoVnF7aj5UbEpLDZWcLbrs3eKkryWZMCC+IrBBVi3CZGid5Se
 NE84rOzgUrSOAIuZ0lTznezbUUzV4Wiy9lavqleTmai7tT5hXgxPJM0iokc/T1Ia
 UAVRHwLYyzA5NogLTa8eDLOjhawqN/TlGrcRzhReNv4Q2s0QlE1cMLmP7w0=
-            </ds:X509Certificate>
-          </ds:X509Data>
-        </ds:KeyInfo>
-      </KeyDescriptor>
+                    </ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>                                      
 
-      <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
-      
-      <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML/POST" index="1"/>
-      <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML/Artifact" index="2"/>
-    </SPSSODescriptor>
+        <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" 
+                             Location="https://guestlogin.stanford.edu/idp/profile/Shibboleth/SSO" />
+        
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" 
+                             Location="https://guestlogin.stanford.edu/idp/profile/SAML2/POST/SSO" />
+
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" 
+                             Location="https://guestlogin.stanford.edu/idp/profile/SAML2/POST-SimpleSign/SSO" />
+        
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" 
+                             Location="https://guestlogin.stanford.edu/idp/profile/SAML2/Redirect/SSO" />
+    </IDPSSODescriptor>
+
+    <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+
+        <Extensions>
+            <shibmd:Scope regexp="false">stanford.edu</shibmd:Scope>
+        </Extensions>
+        
+        <!-- Expires on 2015/06/20 -->
+        <KeyDescriptor>
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>
+MIIFaDCCBFCgAwIBAgIQfFiuCaLZVxrxz+9khZ4BajANBgkqhkiG9w0BAQUFADBR
+MQswCQYDVQQGEwJVUzESMBAGA1UEChMJSW50ZXJuZXQyMREwDwYDVQQLEwhJbkNv
+bW1vbjEbMBkGA1UEAxMSSW5Db21tb24gU2VydmVyIENBMB4XDTEyMDYyMDAwMDAw
+MFoXDTE1MDYyMDIzNTk1OVowgawxCzAJBgNVBAYTAlVTMQ4wDAYDVQQREwU5NDMw
+NTELMAkGA1UECBMCQ0ExETAPBgNVBAcTCFN0YW5mb3JkMRcwFQYDVQQJEw40NTAg
+U2VycmEgTWFsbDEcMBoGA1UEChMTU3RhbmZvcmQgVW5pdmVyc2l0eTEUMBIGA1UE
+CxMLSVQgU2VydmljZXMxIDAeBgNVBAMTF2d1ZXN0bG9naW4uc3RhbmZvcmQuZWR1
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA40L4o9LzbzF9iaeCMDAs
+RTQuYL16j7m/5MYPKs4vAIyCz0BoR6WgIUjTcTCQ+NmwZrQu1jjaHJwXdrz9BjnG
+3E6aEcbmqu9+KDIyX/ZGWtajzYPEJ8iBLnb3gxiX0aFbnvI6OYFyLvkc8952RPGb
+X8AOxK/83lPteiSqItIpkgliqFjNtaAUd3ZtGS7IgdnrgKRl5VKdefwvOeAS/dzV
+9o//0ssI4Yx+Ou/bVruqSq7G6hMWTpNLhFM+tLWga31kA0Pz1w3iX3zvA/jHXIrq
+Ee+f8l3Tqu8lHCxNF0ZzpdOuJ0SXdtE1gOzNQ/kFaIM0Jd60EvA1RHUHqbZQtbu3
+mQIDAQABo4IB3jCCAdowHwYDVR0jBBgwFoAUSE9a+i9Kml7gUPNre1Wl3vW+NF0w
+HQYDVR0OBBYEFGZqbahJs2FWuW258+1OX43z4vF+MA4GA1UdDwEB/wQEAwIFoDAM
+BgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBdBgNV
+HSAEVjBUMFIGDCsGAQQBriMBBAMBATBCMEAGCCsGAQUFBwIBFjRodHRwczovL3d3
+dy5pbmNvbW1vbi5vcmcvY2VydC9yZXBvc2l0b3J5L2Nwc19zc2wucGRmMD0GA1Ud
+HwQ2MDQwMqAwoC6GLGh0dHA6Ly9jcmwuaW5jb21tb24ub3JnL0luQ29tbW9uU2Vy
+dmVyQ0EuY3JsMG8GCCsGAQUFBwEBBGMwYTA5BggrBgEFBQcwAoYtaHR0cDovL2Nl
+cnQuaW5jb21tb24ub3JnL0luQ29tbW9uU2VydmVyQ0EuY3J0MCQGCCsGAQUFBzAB
+hhhodHRwOi8vb2NzcC5pbmNvbW1vbi5vcmcwTAYDVR0RBEUwQ4IXZ3Vlc3Rsb2dp
+bi5zdGFuZm9yZC5lZHWCE2d1ZXN0MS5zdGFuZm9yZC5lZHWCE2d1ZXN0Mi5zdGFu
+Zm9yZC5lZHUwDQYJKoZIhvcNAQEFBQADggEBAEH6+rRflbtUlBOY+WZ9hdqsKXnu
+XNxEUIHgTjY9Xn94OhXtUiCkVSXmALVyW2pROqA6Pdlc1DIspV578P2HVL0cAdjJ
+yuzE2etN2IC+SJ2ZQdUi1epWBiNbsUu+/ELOreDqyzcdCmUFfcuewRz/reKjISyS
+3FzgPI/EDwH2Pz7PoVnF7aj5UbEpLDZWcLbrs3eKkryWZMCC+IrBBVi3CZGid5Se
+NE84rOzgUrSOAIuZ0lTznezbUUzV4Wiy9lavqleTmai7tT5hXgxPJM0iokc/T1Ia
+UAVRHwLYyzA5NogLTa8eDLOjhawqN/TlGrcRzhReNv4Q2s0QlE1cMLmP7w0=
+                    </ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+
+        <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                          Location="https://guestlogin.stanford.edu:8443/idp/profile/SAML2/SOAP/AttributeQuery" />
+    </AttributeAuthorityDescriptor>
 
     <Organization>
       <OrganizationName xml:lang="en">Stanford University</OrganizationName>
-      <OrganizationDisplayName xml:lang="en">Guest Production SP</OrganizationDisplayName>
+      <OrganizationDisplayName xml:lang="en">Stanford Guest Accounts</OrganizationDisplayName>
       <OrganizationURL xml:lang="en">http://guestlogin.stanford.edu/</OrganizationURL>
     </Organization>
     <ContactPerson contactType="technical">
-      <GivenName>Shibboleth</GivenName>
-      <SurName>Support</SurName>
+      <GivenName>Shibboleth Support</GivenName>
       <EmailAddress>shibboleth-team@lists.stanford.edu</EmailAddress>
-    </ContactPerson>
-  </EntityDescriptor>
+    </ContactPerson>    
+
+</EntityDescriptor>    
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_131041d40bd690047e3c050a551922b2945e33c3" entityID="https://guestlogin.stanford.edu/shibboleth-sp">
+
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+    <md:Extensions>
+      <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://guestlogin.stanford.edu/Shibboleth.sso/Login"/>
+    </md:Extensions>
+    <md:KeyDescriptor>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:KeyName>guest1.stanford.edu</ds:KeyName>
+        <ds:KeyName>guest2.stanford.edu</ds:KeyName>
+        <ds:KeyName>guestlogin.stanford.edu</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=guestlogin.stanford.edu,OU=IT Services,O=Stanford University,street=450 Serra Mall,L=Stanford,ST=CA,postalCode=94305,C=US</ds:X509SubjectName>
+          <ds:X509Certificate>MIIFaDCCBFCgAwIBAgIQfFiuCaLZVxrxz+9khZ4BajANBgkqhkiG9w0BAQUFADBR
+MQswCQYDVQQGEwJVUzESMBAGA1UEChMJSW50ZXJuZXQyMREwDwYDVQQLEwhJbkNv
+bW1vbjEbMBkGA1UEAxMSSW5Db21tb24gU2VydmVyIENBMB4XDTEyMDYyMDAwMDAw
+MFoXDTE1MDYyMDIzNTk1OVowgawxCzAJBgNVBAYTAlVTMQ4wDAYDVQQREwU5NDMw
+NTELMAkGA1UECBMCQ0ExETAPBgNVBAcTCFN0YW5mb3JkMRcwFQYDVQQJEw40NTAg
+U2VycmEgTWFsbDEcMBoGA1UEChMTU3RhbmZvcmQgVW5pdmVyc2l0eTEUMBIGA1UE
+CxMLSVQgU2VydmljZXMxIDAeBgNVBAMTF2d1ZXN0bG9naW4uc3RhbmZvcmQuZWR1
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA40L4o9LzbzF9iaeCMDAs
+RTQuYL16j7m/5MYPKs4vAIyCz0BoR6WgIUjTcTCQ+NmwZrQu1jjaHJwXdrz9BjnG
+3E6aEcbmqu9+KDIyX/ZGWtajzYPEJ8iBLnb3gxiX0aFbnvI6OYFyLvkc8952RPGb
+X8AOxK/83lPteiSqItIpkgliqFjNtaAUd3ZtGS7IgdnrgKRl5VKdefwvOeAS/dzV
+9o//0ssI4Yx+Ou/bVruqSq7G6hMWTpNLhFM+tLWga31kA0Pz1w3iX3zvA/jHXIrq
+Ee+f8l3Tqu8lHCxNF0ZzpdOuJ0SXdtE1gOzNQ/kFaIM0Jd60EvA1RHUHqbZQtbu3
+mQIDAQABo4IB3jCCAdowHwYDVR0jBBgwFoAUSE9a+i9Kml7gUPNre1Wl3vW+NF0w
+HQYDVR0OBBYEFGZqbahJs2FWuW258+1OX43z4vF+MA4GA1UdDwEB/wQEAwIFoDAM
+BgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBdBgNV
+HSAEVjBUMFIGDCsGAQQBriMBBAMBATBCMEAGCCsGAQUFBwIBFjRodHRwczovL3d3
+dy5pbmNvbW1vbi5vcmcvY2VydC9yZXBvc2l0b3J5L2Nwc19zc2wucGRmMD0GA1Ud
+HwQ2MDQwMqAwoC6GLGh0dHA6Ly9jcmwuaW5jb21tb24ub3JnL0luQ29tbW9uU2Vy
+dmVyQ0EuY3JsMG8GCCsGAQUFBwEBBGMwYTA5BggrBgEFBQcwAoYtaHR0cDovL2Nl
+cnQuaW5jb21tb24ub3JnL0luQ29tbW9uU2VydmVyQ0EuY3J0MCQGCCsGAQUFBzAB
+hhhodHRwOi8vb2NzcC5pbmNvbW1vbi5vcmcwTAYDVR0RBEUwQ4IXZ3Vlc3Rsb2dp
+bi5zdGFuZm9yZC5lZHWCE2d1ZXN0MS5zdGFuZm9yZC5lZHWCE2d1ZXN0Mi5zdGFu
+Zm9yZC5lZHUwDQYJKoZIhvcNAQEFBQADggEBAEH6+rRflbtUlBOY+WZ9hdqsKXnu
+XNxEUIHgTjY9Xn94OhXtUiCkVSXmALVyW2pROqA6Pdlc1DIspV578P2HVL0cAdjJ
+yuzE2etN2IC+SJ2ZQdUi1epWBiNbsUu+/ELOreDqyzcdCmUFfcuewRz/reKjISyS
+3FzgPI/EDwH2Pz7PoVnF7aj5UbEpLDZWcLbrs3eKkryWZMCC+IrBBVi3CZGid5Se
+NE84rOzgUrSOAIuZ0lTznezbUUzV4Wiy9lavqleTmai7tT5hXgxPJM0iokc/T1Ia
+UAVRHwLYyzA5NogLTa8eDLOjhawqN/TlGrcRzhReNv4Q2s0QlE1cMLmP7w0=
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://guestlogin.stanford.edu/Shibboleth.sso/Artifact/SOAP" index="0"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SLO/SOAP"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SLO/Redirect"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SLO/POST"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SLO/Artifact"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML2/POST" index="0"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML2/POST-SimpleSign" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML2/Artifact" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML2/ECP" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML/POST" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://guestlogin.stanford.edu/Shibboleth.sso/SAML/Artifact" index="5"/>
+  </md:SPSSODescriptor>
+
+  <ContactPerson contactType="technical">
+     <GivenName>Shibboleth Support</GivenName>
+     <EmailAddress>shibboleth-team@lists.stanford.edu</EmailAddress>
+  </ContactPerson>
+
+</md:EntityDescriptor>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_f3eff14f95c9f4f5a16dd102a73286e8" entityID="https://hsweb.stanford.edu/">
 
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
@@ -2569,7 +2784,7 @@ lZLZkJIs8dudbZmJrbunhFXxhd8q54/j6afZpq8Rn3ppetvXJqdrw+Qk6jbCzA==
     <ContactPerson contactType="administrative">
       <GivenName>Jose</GivenName>
       <SurName>Rocha</SurName>
-      <EmailAddress>jrocha.stanford.edu</EmailAddress>
+      <EmailAddress>jrocha@stanford.edu</EmailAddress>
     </ContactPerson>
     <ContactPerson contactType="technical">
       <GivenName>Meei-You</GivenName>
@@ -2594,37 +2809,34 @@ lZLZkJIs8dudbZmJrbunhFXxhd8q54/j6afZpq8Rn3ppetvXJqdrw+Qk6jbCzA==
 	    </mdui:UIInfo>
         </Extensions>
 
-        <KeyDescriptor>
-            <ds:KeyInfo>
-                <ds:X509Data>
-                    <ds:X509Certificate>
-MIIEejCCA2KgAwIBAgIJAPMbMDFnqkCHMA0GCSqGSIb3DQEBBQUAMIGEMQswCQYD
-VQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTERMA8GA1UEBxMIU3RhbmZvcmQx
-HDAaBgNVBAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxFDASBgNVBAsTC0lUIFNlcnZp
-Y2VzMRkwFwYDVQQDExBpZHAuc3RhbmZvcmQuZWR1MB4XDTEwMDUxMDIxNTA0NloX
-DTEzMDUxMDIxNTA0NlowgYQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9y
-bmlhMREwDwYDVQQHEwhTdGFuZm9yZDEcMBoGA1UEChMTU3RhbmZvcmQgVW5pdmVy
-c2l0eTEUMBIGA1UECxMLSVQgU2VydmljZXMxGTAXBgNVBAMTEGlkcC5zdGFuZm9y
-ZC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDSNwCMjEKjunxg
-eln73PCrK8Uld1cpFzzXigB8tK25X7kunUgWZh7f8ha8kEwh9zH39I7Hywl1831M
-967hjwX48T00moJsq50vgHrM5Aw7/Av28CDkF7+NfhEFmeE9cUf4skhqKeKjRENi
-d7r4rOb9QBS+kweMHiTuq+O91Lc7T17+ey4bmNlpbp1awKNwBPyXP/P31p5+74lj
-LoJtBdFCD+aBdp7lhneldf68pb0mARafJ7KSA5Xc6WET6R6z2dK5iM0Dj5A07hEB
-q7TArDI9K1740mD9fE+iVt3MsEvmKp6RzrtHekFFi1awJBRNg47CT+snKt3DHkuB
-lfWOLidhAgMBAAGjgewwgekwHQYDVR0OBBYEFDekZm5Mf2wRqthd3OMxJy+EUThw
-MIG5BgNVHSMEgbEwga6AFDekZm5Mf2wRqthd3OMxJy+EUThwoYGKpIGHMIGEMQsw
-CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTERMA8GA1UEBxMIU3RhbmZv
-cmQxHDAaBgNVBAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxFDASBgNVBAsTC0lUIFNl
-cnZpY2VzMRkwFwYDVQQDExBpZHAuc3RhbmZvcmQuZWR1ggkA8xswMWeqQIcwDAYD
-VR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAYUYrYlZPvvWQg3tY3/NO+nb3
-VpMUJwBcuVEBi2NjJ3MM2DMHrwVVCKTEu0Y7QaqFZ55aI4SbcuHdC68+ab3P6roR
-oU+qpQjNJpnnWN9F7XuKhhdY4pCZfn8uGTFg9FG06FbJhb32qhS5NdpMmN0XMXDn
-o+XINbvHkb/5oWXhq/DfbAxH3FWByJs5v7MiIsKhdoXG6iXlRpavA/vO/E4UyWkE
-9zAY7Kw0qegcbVaSibDA2Vkdq3eBrlr3Co/g/Ep78Y/EcPjt9qD+IktLxpP8GI/j
-vgVcMl2afFLgdWZXPpl82ROnnZfgS1IMowmE6SzYCKryvih3o/3vPSJ4SWUFmA==
-                    </ds:X509Certificate>
-                </ds:X509Data>
-            </ds:KeyInfo>
+        <KeyDescriptor use="signing">
+          <ds:KeyInfo>
+          <ds:X509Data>
+          <!-- Serial No. 11060104959520713497, expires on Sun Apr 10 16:31:00 2033 GMT -->
+          <ds:X509Certificate>
+MIIDnzCCAoegAwIBAgIJAJl9YtyaxKsZMA0GCSqGSIb3DQEBBQUAMGYxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMREwDwYDVQQHDAhTdGFuZm9yZDEU
+MBIGA1UECgwLSVQgU2VydmljZXMxGTAXBgNVBAMMEGlkcC5zdGFuZm9yZC5lZHUw
+HhcNMTMwNDEwMTYzMTAwWhcNMzMwNDEwMTYzMTAwWjBmMQswCQYDVQQGEwJVUzET
+MBEGA1UECAwKQ2FsaWZvcm5pYTERMA8GA1UEBwwIU3RhbmZvcmQxFDASBgNVBAoM
+C0lUIFNlcnZpY2VzMRkwFwYDVQQDDBBpZHAuc3RhbmZvcmQuZWR1MIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm6466Bd6mDwNOR2qZZy1WRZdjyrG2/xW
+amGEMekg38fyuoSCIiMcgeA9UIUbiRCpAN87yI9HPcgDEdrmCK3Ena3J2MdFZbRE
+b6fdRt76K+0FSl/CnyW9xaIlAhldXKbsgUDei3Xf/9P8H9Dxkk+PWd9Ha1RZ9Viz
+dOLe2S2iDKc1CJg2kdGQTuQu6mUEGrB9WJmrLHJS7GkGDqy96owFjRL/p0i9KBdR
+kgWG+GFHWkxzeNQ99yrQra3+C9FQXa/xLCdOY+BGOsAG7ej4094NZXRNTyXui4jR
+WCm2GVdIVl7YB9++XSntS7zQEJ9QBnC1D4bS0tljMfdOGAvdUuJY7QIDAQABo1Aw
+TjAdBgNVHQ4EFgQUJk4zcQ4JupEcAp0gEkob4YRDkckwHwYDVR0jBBgwFoAUJk4z
+cQ4JupEcAp0gEkob4YRDkckwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOC
+AQEAKvf9AO4+osJZOmkv6AVhNPm6JKoBSm9dr9NhwpSS5fpro6PrIjDZDLh/L5d/
++CQTDzuVsw3xwDtlm89lrzbqw5rSa2+ghJk79ijysSC0zOcD6ka9c17zauCNmFx9
+lj9iddUw3aYHQcQRktWL8pvI2WCY6lTU+ouNM+owStya7umZ9rBdjg/fQerzaQxF
+T0yV3tYEonL3hXMzSqZxWirwsyZ0TnhWJsgEnqqG9tCFAcFu2p+glwXn1WL2GCRv
+BfuJMPzg7ZB419AEoeYnLktqAWiU+ISnVfbwFOJ+OM/O7VQOeHDm2AeYcwo12CAc
+4GC9KWTs3QtS3GREPKYDlHRNxQ==
+          </ds:X509Certificate>
+          </ds:X509Data>
+          </ds:KeyInfo>
         </KeyDescriptor>
 
         <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
@@ -2652,38 +2864,35 @@ vgVcMl2afFLgdWZXPpl82ROnnZfgS1IMowmE6SzYCKryvih3o/3vPSJ4SWUFmA==
             <shibmd:Scope regexp="false">stanford.edu</shibmd:Scope>
         </Extensions>
 
-        <KeyDescriptor>
-            <ds:KeyInfo>
-                <ds:X509Data>
-                    <ds:X509Certificate>
-MIIEejCCA2KgAwIBAgIJAPMbMDFnqkCHMA0GCSqGSIb3DQEBBQUAMIGEMQswCQYD
-VQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTERMA8GA1UEBxMIU3RhbmZvcmQx
-HDAaBgNVBAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxFDASBgNVBAsTC0lUIFNlcnZp
-Y2VzMRkwFwYDVQQDExBpZHAuc3RhbmZvcmQuZWR1MB4XDTEwMDUxMDIxNTA0NloX
-DTEzMDUxMDIxNTA0NlowgYQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9y
-bmlhMREwDwYDVQQHEwhTdGFuZm9yZDEcMBoGA1UEChMTU3RhbmZvcmQgVW5pdmVy
-c2l0eTEUMBIGA1UECxMLSVQgU2VydmljZXMxGTAXBgNVBAMTEGlkcC5zdGFuZm9y
-ZC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDSNwCMjEKjunxg
-eln73PCrK8Uld1cpFzzXigB8tK25X7kunUgWZh7f8ha8kEwh9zH39I7Hywl1831M
-967hjwX48T00moJsq50vgHrM5Aw7/Av28CDkF7+NfhEFmeE9cUf4skhqKeKjRENi
-d7r4rOb9QBS+kweMHiTuq+O91Lc7T17+ey4bmNlpbp1awKNwBPyXP/P31p5+74lj
-LoJtBdFCD+aBdp7lhneldf68pb0mARafJ7KSA5Xc6WET6R6z2dK5iM0Dj5A07hEB
-q7TArDI9K1740mD9fE+iVt3MsEvmKp6RzrtHekFFi1awJBRNg47CT+snKt3DHkuB
-lfWOLidhAgMBAAGjgewwgekwHQYDVR0OBBYEFDekZm5Mf2wRqthd3OMxJy+EUThw
-MIG5BgNVHSMEgbEwga6AFDekZm5Mf2wRqthd3OMxJy+EUThwoYGKpIGHMIGEMQsw
-CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTERMA8GA1UEBxMIU3RhbmZv
-cmQxHDAaBgNVBAoTE1N0YW5mb3JkIFVuaXZlcnNpdHkxFDASBgNVBAsTC0lUIFNl
-cnZpY2VzMRkwFwYDVQQDExBpZHAuc3RhbmZvcmQuZWR1ggkA8xswMWeqQIcwDAYD
-VR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAYUYrYlZPvvWQg3tY3/NO+nb3
-VpMUJwBcuVEBi2NjJ3MM2DMHrwVVCKTEu0Y7QaqFZ55aI4SbcuHdC68+ab3P6roR
-oU+qpQjNJpnnWN9F7XuKhhdY4pCZfn8uGTFg9FG06FbJhb32qhS5NdpMmN0XMXDn
-o+XINbvHkb/5oWXhq/DfbAxH3FWByJs5v7MiIsKhdoXG6iXlRpavA/vO/E4UyWkE
-9zAY7Kw0qegcbVaSibDA2Vkdq3eBrlr3Co/g/Ep78Y/EcPjt9qD+IktLxpP8GI/j
-vgVcMl2afFLgdWZXPpl82ROnnZfgS1IMowmE6SzYCKryvih3o/3vPSJ4SWUFmA==
-                    </ds:X509Certificate>
-                </ds:X509Data>
-            </ds:KeyInfo>
-        </KeyDescriptor>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <!-- Serial No. 11060104959520713497, expires on Sun Apr 10 16:31:00 2033 GMT -->
+          <ds:X509Certificate>
+MIIDnzCCAoegAwIBAgIJAJl9YtyaxKsZMA0GCSqGSIb3DQEBBQUAMGYxCzAJBgNV
+BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMREwDwYDVQQHDAhTdGFuZm9yZDEU
+MBIGA1UECgwLSVQgU2VydmljZXMxGTAXBgNVBAMMEGlkcC5zdGFuZm9yZC5lZHUw
+HhcNMTMwNDEwMTYzMTAwWhcNMzMwNDEwMTYzMTAwWjBmMQswCQYDVQQGEwJVUzET
+MBEGA1UECAwKQ2FsaWZvcm5pYTERMA8GA1UEBwwIU3RhbmZvcmQxFDASBgNVBAoM
+C0lUIFNlcnZpY2VzMRkwFwYDVQQDDBBpZHAuc3RhbmZvcmQuZWR1MIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm6466Bd6mDwNOR2qZZy1WRZdjyrG2/xW
+amGEMekg38fyuoSCIiMcgeA9UIUbiRCpAN87yI9HPcgDEdrmCK3Ena3J2MdFZbRE
+b6fdRt76K+0FSl/CnyW9xaIlAhldXKbsgUDei3Xf/9P8H9Dxkk+PWd9Ha1RZ9Viz
+dOLe2S2iDKc1CJg2kdGQTuQu6mUEGrB9WJmrLHJS7GkGDqy96owFjRL/p0i9KBdR
+kgWG+GFHWkxzeNQ99yrQra3+C9FQXa/xLCdOY+BGOsAG7ej4094NZXRNTyXui4jR
+WCm2GVdIVl7YB9++XSntS7zQEJ9QBnC1D4bS0tljMfdOGAvdUuJY7QIDAQABo1Aw
+TjAdBgNVHQ4EFgQUJk4zcQ4JupEcAp0gEkob4YRDkckwHwYDVR0jBBgwFoAUJk4z
+cQ4JupEcAp0gEkob4YRDkckwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOC
+AQEAKvf9AO4+osJZOmkv6AVhNPm6JKoBSm9dr9NhwpSS5fpro6PrIjDZDLh/L5d/
++CQTDzuVsw3xwDtlm89lrzbqw5rSa2+ghJk79ijysSC0zOcD6ka9c17zauCNmFx9
+lj9iddUw3aYHQcQRktWL8pvI2WCY6lTU+ouNM+owStya7umZ9rBdjg/fQerzaQxF
+T0yV3tYEonL3hXMzSqZxWirwsyZ0TnhWJsgEnqqG9tCFAcFu2p+glwXn1WL2GCRv
+BfuJMPzg7ZB419AEoeYnLktqAWiU+ISnVfbwFOJ+OM/O7VQOeHDm2AeYcwo12CAc
+4GC9KWTs3QtS3GREPKYDlHRNxQ==
+          </ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
 
         <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" 
                           Location="https://idp.stanford.edu:8443/idp/profile/SAML1/SOAP/AttributeQuery" />
@@ -3436,10 +3645,11 @@ LaUAyHygmTqMEGdx
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser" Location="https://library.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
   </md:SPSSODescriptor>
   <md:ContactPerson contactType="technical">
-    <md:GivenName>Stuart Kaighn Snydman</md:GivenName>
-    <md:EmailAddress>snydman@stanford.edu</md:EmailAddress>
+    <md:GivenName>Library Support</md:GivenName>
+    <md:EmailAddress>sul-dl-webteam@lists.stanford.edu</md:EmailAddress>
   </md:ContactPerson>
-</md:EntityDescriptor><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://librarypreview.stanford.edu/simplesaml/module.php/saml/sp/metadata.php/default-sp">
+</md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://librarypreview.stanford.edu/simplesaml/module.php/saml/sp/metadata.php/default-sp">
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
     <md:KeyDescriptor use="signing">
       <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
@@ -3464,10 +3674,81 @@ LaUAyHygmTqMEGdx
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser" Location="https://librarypreview.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
   </md:SPSSODescriptor>
   <md:ContactPerson contactType="technical">
-    <md:GivenName>Stuart Kaighn Snydman</md:GivenName>
-    <md:EmailAddress>snydman@stanford.edu</md:EmailAddress>
+    <md:GivenName>Library Support</md:GivenName>
+    <md:EmailAddress>sul-dl-webteam@lists.stanford.edu</md:EmailAddress>
   </md:ContactPerson>
-</md:EntityDescriptor><EntityDescriptor ID="_43cbc92b-8d35-4817-b373-7057bf1def9b" entityID="https://ms-sts.stanford.edu/adfs/services/trust" xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#_43cbc92b-8d35-4817-b373-7057bf1def9b"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>Eb+rrnplKkxtdtbSFB26JMGLgpWb66MnMBHBqLKhdv4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>jQVqwtH8V0nhQwv/KQvdPEbyoNWk/eRxzOll8VpZInOmD9Nw369SxIGFnwkIQXs1SKGyXib2PA3EsQOrhsRrzyxxXvTvxc4m1qtSKCg0wia03kbgRWwuOc9kKNqUSYpBEVaVb3Oz+Mqa5P/PxqeMa/DiAtUAMNX3QLxMGcR7lqaPYNS1xN7TIlrBPUYGDP5uOyKOR4LNml3mAHG1f2merKEtnaLls0+3apR/msJqL/+4K72EKtd6qmwtID5bPwi5pWnC8EZpy15Xaomy6kNH9eUimHeRktqltE+RTkPQNMf05WEX61wmuywwkQ8rbBS+wYtkBUvrxIFv91Rx+iergg==</ds:SignatureValue><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></ds:Signature><RoleDescriptor xsi:type="fed:ApplicationServiceType" protocolSupportEnumeration="http://docs.oasis-open.org/ws-sx/ws-trust/200512 http://schemas.xmlsoap.org/ws/2005/02/trust http://docs.oasis-open.org/wsfed/federation/200706" ServiceDisplayName="Stanford Windows Infrastructure (UAT)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fed="http://docs.oasis-open.org/wsfed/federation/200706"><KeyDescriptor use="encryption"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><fed:ClaimTypesRequested><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Given Name</auth:DisplayName><auth:Description>The given name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name</auth:DisplayName><auth:Description>The unique name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>UPN</auth:DisplayName><auth:Description>The user principal name (UPN) of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/CommonName" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Common Name</auth:DisplayName><auth:Description>The common name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/EmailAddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/Group" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group</auth:DisplayName><auth:Description>A group that the user is a member of</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/UPN" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x UPN</auth:DisplayName><auth:Description>The UPN of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Role</auth:DisplayName><auth:Description>A role that the user has</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Surname</auth:DisplayName><auth:Description>The surname of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>PPID</auth:DisplayName><auth:Description>The private identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name ID</auth:DisplayName><auth:Description>The SAML name identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication time stamp</auth:DisplayName><auth:Description>Used to display the time and date that the user was authenticated</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication method</auth:DisplayName><auth:Description>The method used to authenticate the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only group SID</auth:DisplayName><auth:Description>The deny-only group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary SID</auth:DisplayName><auth:Description>The deny-only primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary group SID</auth:DisplayName><auth:Description>The deny-only primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group SID</auth:DisplayName><auth:Description>The group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary group SID</auth:DisplayName><auth:Description>The primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary SID</auth:DisplayName><auth:Description>The primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Windows account name</auth:DisplayName><auth:Description>The domain account name of the user in the form of &lt;domain&gt;\&lt;user&gt;</auth:Description></auth:ClaimType></fed:ClaimTypesRequested><fed:TargetScopes><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/issuedtokenmixedasymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/issuedtokenmixedsymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/13/issuedtokenmixedasymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/13/issuedtokenmixedsymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/ls/</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust</Address></EndpointReference></fed:TargetScopes><fed:ApplicationServiceEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/issuedtokenmixedasymmetricbasic256</Address></EndpointReference></fed:ApplicationServiceEndpoint><fed:PassiveRequestorEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/ls/</Address></EndpointReference></fed:PassiveRequestorEndpoint></RoleDescriptor><RoleDescriptor xsi:type="fed:SecurityTokenServiceType" protocolSupportEnumeration="http://docs.oasis-open.org/ws-sx/ws-trust/200512 http://schemas.xmlsoap.org/ws/2005/02/trust http://docs.oasis-open.org/wsfed/federation/200706" ServiceDisplayName="Stanford Windows Infrastructure (UAT)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fed="http://docs.oasis-open.org/wsfed/federation/200706"><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><fed:TokenTypesOffered><fed:TokenType Uri="urn:oasis:names:tc:SAML:2.0:assertion"/><fed:TokenType Uri="urn:oasis:names:tc:SAML:1.0:assertion"/></fed:TokenTypesOffered><fed:ClaimTypesOffered><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Given Name</auth:DisplayName><auth:Description>The given name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name</auth:DisplayName><auth:Description>The unique name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>UPN</auth:DisplayName><auth:Description>The user principal name (UPN) of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/CommonName" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Common Name</auth:DisplayName><auth:Description>The common name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/EmailAddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/Group" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group</auth:DisplayName><auth:Description>A group that the user is a member of</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/UPN" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x UPN</auth:DisplayName><auth:Description>The UPN of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Role</auth:DisplayName><auth:Description>A role that the user has</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Surname</auth:DisplayName><auth:Description>The surname of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>PPID</auth:DisplayName><auth:Description>The private identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name ID</auth:DisplayName><auth:Description>The SAML name identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication time stamp</auth:DisplayName><auth:Description>Used to display the time and date that the user was authenticated</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication method</auth:DisplayName><auth:Description>The method used to authenticate the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only group SID</auth:DisplayName><auth:Description>The deny-only group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary SID</auth:DisplayName><auth:Description>The deny-only primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary group SID</auth:DisplayName><auth:Description>The deny-only primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group SID</auth:DisplayName><auth:Description>The group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary group SID</auth:DisplayName><auth:Description>The primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary SID</auth:DisplayName><auth:Description>The primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Windows account name</auth:DisplayName><auth:Description>The domain account name of the user in the form of &lt;domain&gt;\&lt;user&gt;</auth:Description></auth:ClaimType></fed:ClaimTypesOffered><fed:SecurityTokenServiceEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/certificatemixed</Address><Metadata><Metadata xmlns="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex"><wsx:MetadataSection Dialect="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns=""><wsx:MetadataReference><Address xmlns="http://www.w3.org/2005/08/addressing">https://ms-sts.stanford.edu/adfs/services/trust/mex</Address></wsx:MetadataReference></wsx:MetadataSection></Metadata></Metadata></EndpointReference></fed:SecurityTokenServiceEndpoint><fed:PassiveRequestorEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/ls/</Address></EndpointReference></fed:PassiveRequestorEndpoint></RoleDescriptor><SPSSODescriptor WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><KeyDescriptor use="encryption"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/"/><NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat><AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/" index="0" isDefault="true"/><AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ms-sts.stanford.edu/adfs/ls/" index="1"/><AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/" index="2"/></SPSSODescriptor><IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><KeyDescriptor use="encryption"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://ms-sts.stanford.edu/adfs/services/trust/artifactresolution" index="0"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/"/><NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/"/><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="E-Mail Address" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Given Name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="UPN" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/CommonName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Common Name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/EmailAddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="AD FS 1.x E-Mail Address" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/Group" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Group" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/UPN" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="AD FS 1.x UPN" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Role" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Surname" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="PPID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Name ID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Authentication time stamp" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Authentication method" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Deny only group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Deny only primary SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Deny only primary group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Primary group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Primary SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Windows account name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/></IDPSSODescriptor>
+</md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_b7834b20fb167cdc95b339da4dca78ee2c74bd70" entityID="https://m.inyourclass.com/secure/">
+
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+    <md:Extensions>
+      <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://m.inyourclass.com/Shibboleth.sso/Login"/>
+      <idpdisc:DiscoveryResponse xmlns:idpdisc="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Location="https://m.inyourclass.com/Shibboleth.sso/Login" index="1"/>
+    </md:Extensions>
+    <md:KeyDescriptor>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:KeyName>ip-0ad235a3</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=ip-0ad235a3</ds:X509SubjectName>
+          <ds:X509Certificate>MIIC6DCCAdCgAwIBAgIJAOdactCsBwS8MA0GCSqGSIb3DQEBBQUAMBYxFDASBgNV
+BAMTC2lwLTBhZDIzNWEzMB4XDTEyMDYxOTIwNDI1NVoXDTIyMDYxNzIwNDI1NVow
+FjEUMBIGA1UEAxMLaXAtMGFkMjM1YTMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
+ggEKAoIBAQDFWr3dK/ZpkwWxtsMIBe4FF92ZOPSq9wPJqFD5A1KPPkC3IIkqbiPO
+/Dfg2e9ex0iJHITI11/eSpWBkKV4jvwjFOS1U2NxDMw3ErZ7J9+9XK9+QcxLefIp
+FIxd8KqFRenq4/ez8vWzDbGCjf6uyzUcVocyYMwywa4m/YVsJoVr6HRPGgyE6Vly
+UgmUXPHdW6zV4GAfKPGXs23HqjA4bdohknmdBCyGlC3dNnda8a22FwPEMMuV0tbZ
+lEI/Xx5zbW5k4Skgnx946mb1NyAT1PogW6h2TK9YkfiHqNSOkH9n7vjZKOEdNnVF
+rzXeXis39oKeJqhFmG12Q1KfZKfnppjPAgMBAAGjOTA3MBYGA1UdEQQPMA2CC2lw
+LTBhZDIzNWEzMB0GA1UdDgQWBBTEjcv0RuMC1ChiUFXszEvM5BdGYzANBgkqhkiG
+9w0BAQUFAAOCAQEAxEHlu82KDmFybF0jtJ7sUBvZoWtkr0Esv/En4pbhjOtcgseo
+d1Bdc7KfiIYCUU+ATVvVQt+7wwm3ZOqGRz1Pq8+e1CWAG/hxNOLSyCsBMf54iofx
+YOMQ4ji6cND1++O+1rYO5LOVEeAbHJGnS9/LPUap/6G2hp92GHuwp1H8l+rxFZux
+tMjyaH/Fd9F6qdLU26iRQB9DXAEZE6HHvrkLuTXx4zS3FrMTCBP2jyHrfkMkiAyr
+VANZgjeDj+J0BELzy4Cu0HXiFujf/Nfaeogp5e0jbDQoJSiHq3sN23VWw5MlJvWv
+1bfSvSZ4Dn/ZxqVITUdQMHvwIBus9lpcFSk/xQ==
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://m.inyourclass.com/Shibboleth.sso/Artifact/SOAP" index="0"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://m.inyourclass.com/Shibboleth.sso/SLO/Artifact"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://m.inyourclass.com/Shibboleth.sso/SLO/POST"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://m.inyourclass.com/Shibboleth.sso/SLO/Redirect"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://m.inyourclass.com/Shibboleth.sso/SLO/SOAP"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://m.inyourclass.com/Shibboleth.sso/NIM/Artifact"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://m.inyourclass.com/Shibboleth.sso/NIM/POST"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://m.inyourclass.com/Shibboleth.sso/NIM/Redirect"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://m.inyourclass.com/Shibboleth.sso/NIM/SOAP"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://m.inyourclass.com/Shibboleth.sso/SAML2/POST" index="0"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://m.inyourclass.com/Shibboleth.sso/SAML2/POST-SimpleSign" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://m.inyourclass.com/Shibboleth.sso/SAML2/Artifact" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://m.inyourclass.com/Shibboleth.sso/SAML2/ECP" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://m.inyourclass.com/Shibboleth.sso/SAML/POST" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://m.inyourclass.com/Shibboleth.sso/SAML/Artifact" index="5"/>
+  </md:SPSSODescriptor>
+
+  <ContactPerson contactType="technical">
+     <GivenName>Shibboleth Support</GivenName>
+     <EmailAddress>Eedresha@inyourclass.com</EmailAddress>
+  </ContactPerson>
+
+</md:EntityDescriptor>
+<md:EntityDescriptor entityID="https://mm-pilot.stanford.edu/" ID="_e2a612d0-1688-4c22-b209-963f0e5668ce" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:SPSSODescriptor ID="_98eaa710-72aa-4ffc-ab2a-c279f43033b5" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="false" WantAssertionsSigned="false"><md:KeyDescriptor><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>MIIDLDCCAhSgAwIBAgIQSk11f6Bzw4RDwlYkFUfPwjANBgkqhkiG9w0BAQQFADAaMRgwFgYDVQQDEw9jbjE3NC5hd21kbS5jb20wHhcNMDAwMTAxMDgwMDAwWhcNMzYwMTAxMDgwMDAwWjAaMRgwFgYDVQQDEw9jbjE3NC5hd21kbS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDTNutCIVlLdPu7tr628Ct1CrqafwzjRDeRvFFgdx8WF0t8dIwhk6RBfIYT/JQ1X+qIdgV0Yad59zLX2qEmSH7h6ifMHxL0CziVJO9PXUcx2gWYsTcfKyi/vDXI/cOaePY7AEpypeuOeL4CDNXdPUCsx0h1q/ZprCbnTqJKa2J8pSbEUO2xXZW34tfUq0t3c9SCi6P08mmx3VQ8tn2/Mj1EmV45HHv1WCdQKfQx7HxFeijWY6m1IuWfIM8nijN8u7UY8cVY0rZJPko1+PyypDpHpRoD7nML6dxzG0xYzDn/286VAD5zuBdShWTx6aQMc2LNs+iE1CdCO6vXYXlZ2BDrAgMBAAGjbjBsMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBLBgNVHQEERDBCgBBBDIVEbN9QDrSlWjtfUt0aoRwwGjEYMBYGA1UEAxMPY24xNzQuYXdtZG0uY29tghBKTXV/oHPDhEPCViQVR8/CMA0GCSqGSIb3DQEBBAUAA4IBAQBaL0RRu+pBQLJMMH9YVHBcXczAPk1i5/KWD0fYIgYsbg+o9LyusxzH6VLfQ9+U6gHmdLFBOLadMumnOadIfpSOBsGauu/vB+v9Pik9jBOw7Zj6EaQ1hmpjlFeyrghjze1+jeW2yYVfKg/lzeQerWxgZcJ5R3lgzaD0CfpDrh0wnjoY+hnzv0WsNJKkED+mvT3/IkXoqSw4/iMLOv/FezQCPslLm9D+99Yv/lWOBrzeJHfq4K9d4y02DwtOanmgzaKdFbYrgnYVaHSLP75iACcd/yd0xQn8Q1CX9/hTyELX2OGXxAoHDO2vgCbgZkEnLOMU6gVqt/IGJBZXGk/HK2eb</X509Certificate></X509Data></KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm-pilot.stanford.edu/MyDevice/SAML/ArtifactResolver.ashx" index="1" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm-pilot.stanford.edu/DeviceManagement/SAML/ArtifactResolver.ashx" index="2" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm-pilot.stanford.edu/AirWatch/SAML/ArtifactResolver.ashx" index="3" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm-pilot.stanford.edu/Catalog/SAML/ArtifactResolver.ashx" index="4" isDefault="false" /><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</md:NameIDFormat><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm-pilot.stanford.edu/MyDevice/SAML/AssertionService.ashx?binding=HttpRedirect" index="1" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm-pilot.stanford.edu/MyDevice/SAML/AssertionService.ashx?binding=HttpPost" index="2" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm-pilot.stanford.edu/MyDevice/SAML/AssertionService.ashx?binding=HttpArtifact" index="3" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm-pilot.stanford.edu/DeviceManagement/SAML/AssertionService.ashx?binding=HttpRedirect" index="4" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm-pilot.stanford.edu/DeviceManagement/SAML/AssertionService.ashx?binding=HttpPost" index="5" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm-pilot.stanford.edu/DeviceManagement/SAML/AssertionService.ashx?binding=HttpArtifact" index="6" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm-pilot.stanford.edu/AirWatch/SAML/AssertionService.ashx?binding=HttpRedirect" index="7" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm-pilot.stanford.edu/AirWatch/SAML/AssertionService.ashx?binding=HttpPost" index="8" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm-pilot.stanford.edu/AirWatch/SAML/AssertionService.ashx?binding=HttpArtifact" index="9" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm-pilot.stanford.edu/Catalog/SAML/AssertionService.ashx?binding=HttpRedirect" index="10" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm-pilot.stanford.edu/Catalog/SAML/AssertionService.ashx?binding=HttpPost" index="11" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm-pilot.stanford.edu/Catalog/SAML/AssertionService.ashx?binding=HttpArtifact" index="12" isDefault="false" /></md:SPSSODescriptor>
+
+<ContactPerson contactType="support">
+  <GivenName>ITS Infrastructure Delivery Group</GivenName>
+  <EmailAddress>winsystems@lists.stanford.edu</EmailAddress>
+</ContactPerson>
+
+</md:EntityDescriptor>
+<md:EntityDescriptor entityID="https://mm.stanford.edu/" ID="_0ccafd8e-8c63-41ac-b210-5d007054af87" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"><md:SPSSODescriptor ID="_200446ad-1369-484c-a8e0-2d7e06d207cf" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" AuthnRequestsSigned="false" WantAssertionsSigned="false"><md:KeyDescriptor><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>MIIDLDCCAhSgAwIBAgIQEKhYjllphKtIWRA3UFjyljANBgkqhkiG9w0BAQQFADAaMRgwFgYDVQQDEw9tbS5zdGFuZm9yZC5lZHUwHhcNMDAwMTAxMDcwMDAwWhcNMzYwMTAxMDcwMDAwWjAaMRgwFgYDVQQDEw9tbS5zdGFuZm9yZC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCseoTRL4wm5vjm86kU3y8fgBo3ppCSGVop0zlJNNyEf9UY00xEYibLD4kha1O0ismNQH3utdjoiJmTYenF73InUWNqfWryEWrQtNuMPNGr4PmuD+3ZiSPbl3r3syggFDXeNhUN7Rxub/s4Ee40ac5A5Bmwb5CQ0uM1B8qH6/Vs8jRkZdrJbKDUyFwxfmLSy/ib2AxljRSYVO1FEs4kvve4wFd+cnph1OsAvpYMoPNkc6VaDAjZX3mpevl15mTVkqyLCE4qDCGRBERYtmffgd2B/hQ893x0dXVK7JUJ85Jkv/uYhGtL6D3r5UOeuaeZLlNUKbNAR94YW0yFASKzVKNhAgMBAAGjbjBsMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjBLBgNVHQEERDBCgBDCAZzH87IROlZamnIt4Rj5oRwwGjEYMBYGA1UEAxMPbW0uc3RhbmZvcmQuZWR1ghAQqFiOWWmEq0hZEDdQWPKWMA0GCSqGSIb3DQEBBAUAA4IBAQAjufNI/n2ufpiwuv3nM7dGm76Xc3uJRVyfDH4jZELMi0OxTlCXDnFCiO6nj51N4lSExH+4yhmYWxt9JaGezyvUDftbaYUpHsBxFRnjCo+M1SH/U9OW/EdiYvUI9i4+V/fMF5/JJbrPS+/fILn90iEw34TeDFqh/V0HEJdRPryG9yUEeLtTO0cwDFCOVR1HkxM4yG+ofNjlDouIYW12hbvjIf36PWNWqBDpxZN3ckwNJZegl6wtgoy+I/jTjzPjishrOmjYlCa8t3UlkxBcITSFlAx84cJe9WpVF4AH3pUbIhx6byOrHkKy6zq+ot/8vfR10wX4ZQ4b77usiSZjc/z1</X509Certificate></X509Data></KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm.stanford.edu/MyDevice/SAML/ArtifactResolver.ashx" index="1" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm.stanford.edu/DeviceManagement/SAML/ArtifactResolver.ashx" index="2" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm-admin.stanford.edu/AirWatch/SAML/ArtifactResolver.ashx" index="3" isDefault="false" /><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://mm.stanford.edu/Catalog/SAML/ArtifactResolver.ashx" index="4" isDefault="false" /><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:entity</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</md:NameIDFormat><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm.stanford.edu/MyDevice/SAML/AssertionService.ashx?binding=HttpRedirect" index="1" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm.stanford.edu/MyDevice/SAML/AssertionService.ashx?binding=HttpPost" index="2" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm.stanford.edu/MyDevice/SAML/AssertionService.ashx?binding=HttpArtifact" index="3" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm.stanford.edu/DeviceManagement/SAML/AssertionService.ashx?binding=HttpRedirect" index="4" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm.stanford.edu/DeviceManagement/SAML/AssertionService.ashx?binding=HttpPost" index="5" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm.stanford.edu/DeviceManagement/SAML/AssertionService.ashx?binding=HttpArtifact" index="6" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm-admin.stanford.edu/AirWatch/SAML/AssertionService.ashx?binding=HttpRedirect" index="7" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm-admin.stanford.edu/AirWatch/SAML/AssertionService.ashx?binding=HttpPost" index="8" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm-admin.stanford.edu/AirWatch/SAML/AssertionService.ashx?binding=HttpArtifact" index="9" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://mm.stanford.edu/Catalog/SAML/AssertionService.ashx?binding=HttpRedirect" index="10" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://mm.stanford.edu/Catalog/SAML/AssertionService.ashx?binding=HttpPost" index="11" isDefault="false" /><md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://mm.stanford.edu/Catalog/SAML/AssertionService.ashx?binding=HttpArtifact" index="12" isDefault="false" /></md:SPSSODescriptor>
+
+<ContactPerson contactType="support">
+  <GivenName>ITS Infrastructure Delivery Group</GivenName>
+  <EmailAddress>winsystems@lists.stanford.edu</EmailAddress>
+</ContactPerson>
+</md:EntityDescriptor>
+<EntityDescriptor ID="_43cbc92b-8d35-4817-b373-7057bf1def9b" entityID="https://ms-sts.stanford.edu/adfs/services/trust" xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#_43cbc92b-8d35-4817-b373-7057bf1def9b"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>Eb+rrnplKkxtdtbSFB26JMGLgpWb66MnMBHBqLKhdv4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>jQVqwtH8V0nhQwv/KQvdPEbyoNWk/eRxzOll8VpZInOmD9Nw369SxIGFnwkIQXs1SKGyXib2PA3EsQOrhsRrzyxxXvTvxc4m1qtSKCg0wia03kbgRWwuOc9kKNqUSYpBEVaVb3Oz+Mqa5P/PxqeMa/DiAtUAMNX3QLxMGcR7lqaPYNS1xN7TIlrBPUYGDP5uOyKOR4LNml3mAHG1f2merKEtnaLls0+3apR/msJqL/+4K72EKtd6qmwtID5bPwi5pWnC8EZpy15Xaomy6kNH9eUimHeRktqltE+RTkPQNMf05WEX61wmuywwkQ8rbBS+wYtkBUvrxIFv91Rx+iergg==</ds:SignatureValue><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></ds:Signature><RoleDescriptor xsi:type="fed:ApplicationServiceType" protocolSupportEnumeration="http://docs.oasis-open.org/ws-sx/ws-trust/200512 http://schemas.xmlsoap.org/ws/2005/02/trust http://docs.oasis-open.org/wsfed/federation/200706" ServiceDisplayName="Stanford Windows Infrastructure (UAT)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fed="http://docs.oasis-open.org/wsfed/federation/200706"><KeyDescriptor use="encryption"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><fed:ClaimTypesRequested><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Given Name</auth:DisplayName><auth:Description>The given name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name</auth:DisplayName><auth:Description>The unique name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>UPN</auth:DisplayName><auth:Description>The user principal name (UPN) of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/CommonName" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Common Name</auth:DisplayName><auth:Description>The common name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/EmailAddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/Group" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group</auth:DisplayName><auth:Description>A group that the user is a member of</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/UPN" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x UPN</auth:DisplayName><auth:Description>The UPN of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Role</auth:DisplayName><auth:Description>A role that the user has</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Surname</auth:DisplayName><auth:Description>The surname of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>PPID</auth:DisplayName><auth:Description>The private identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name ID</auth:DisplayName><auth:Description>The SAML name identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication time stamp</auth:DisplayName><auth:Description>Used to display the time and date that the user was authenticated</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication method</auth:DisplayName><auth:Description>The method used to authenticate the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only group SID</auth:DisplayName><auth:Description>The deny-only group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary SID</auth:DisplayName><auth:Description>The deny-only primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary group SID</auth:DisplayName><auth:Description>The deny-only primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group SID</auth:DisplayName><auth:Description>The group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary group SID</auth:DisplayName><auth:Description>The primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary SID</auth:DisplayName><auth:Description>The primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Windows account name</auth:DisplayName><auth:Description>The domain account name of the user in the form of &lt;domain&gt;\&lt;user&gt;</auth:Description></auth:ClaimType></fed:ClaimTypesRequested><fed:TargetScopes><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/issuedtokenmixedasymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/issuedtokenmixedsymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/13/issuedtokenmixedasymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/13/issuedtokenmixedsymmetricbasic256</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/ls/</Address></EndpointReference><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust</Address></EndpointReference></fed:TargetScopes><fed:ApplicationServiceEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/issuedtokenmixedasymmetricbasic256</Address></EndpointReference></fed:ApplicationServiceEndpoint><fed:PassiveRequestorEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/ls/</Address></EndpointReference></fed:PassiveRequestorEndpoint></RoleDescriptor><RoleDescriptor xsi:type="fed:SecurityTokenServiceType" protocolSupportEnumeration="http://docs.oasis-open.org/ws-sx/ws-trust/200512 http://schemas.xmlsoap.org/ws/2005/02/trust http://docs.oasis-open.org/wsfed/federation/200706" ServiceDisplayName="Stanford Windows Infrastructure (UAT)" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fed="http://docs.oasis-open.org/wsfed/federation/200706"><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><fed:TokenTypesOffered><fed:TokenType Uri="urn:oasis:names:tc:SAML:2.0:assertion"/><fed:TokenType Uri="urn:oasis:names:tc:SAML:1.0:assertion"/></fed:TokenTypesOffered><fed:ClaimTypesOffered><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Given Name</auth:DisplayName><auth:Description>The given name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name</auth:DisplayName><auth:Description>The unique name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>UPN</auth:DisplayName><auth:Description>The user principal name (UPN) of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/CommonName" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Common Name</auth:DisplayName><auth:Description>The common name of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/EmailAddress" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x E-Mail Address</auth:DisplayName><auth:Description>The e-mail address of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/Group" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group</auth:DisplayName><auth:Description>A group that the user is a member of</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/claims/UPN" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>AD FS 1.x UPN</auth:DisplayName><auth:Description>The UPN of the user when interoperating with AD FS 1.1 or ADFS 1.0</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Role</auth:DisplayName><auth:Description>A role that the user has</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Surname</auth:DisplayName><auth:Description>The surname of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>PPID</auth:DisplayName><auth:Description>The private identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Name ID</auth:DisplayName><auth:Description>The SAML name identifier of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication time stamp</auth:DisplayName><auth:Description>Used to display the time and date that the user was authenticated</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Authentication method</auth:DisplayName><auth:Description>The method used to authenticate the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only group SID</auth:DisplayName><auth:Description>The deny-only group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary SID</auth:DisplayName><auth:Description>The deny-only primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Deny only primary group SID</auth:DisplayName><auth:Description>The deny-only primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Group SID</auth:DisplayName><auth:Description>The group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary group SID</auth:DisplayName><auth:Description>The primary group SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Primary SID</auth:DisplayName><auth:Description>The primary SID of the user</auth:Description></auth:ClaimType><auth:ClaimType Uri="http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname" Optional="true" xmlns:auth="http://docs.oasis-open.org/wsfed/authorization/200706"><auth:DisplayName>Windows account name</auth:DisplayName><auth:Description>The domain account name of the user in the form of &lt;domain&gt;\&lt;user&gt;</auth:Description></auth:ClaimType></fed:ClaimTypesOffered><fed:SecurityTokenServiceEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/services/trust/2005/certificatemixed</Address><Metadata><Metadata xmlns="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex"><wsx:MetadataSection Dialect="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns=""><wsx:MetadataReference><Address xmlns="http://www.w3.org/2005/08/addressing">https://ms-sts.stanford.edu/adfs/services/trust/mex</Address></wsx:MetadataReference></wsx:MetadataSection></Metadata></Metadata></EndpointReference></fed:SecurityTokenServiceEndpoint><fed:PassiveRequestorEndpoint><EndpointReference xmlns="http://www.w3.org/2005/08/addressing"><Address>https://ms-sts.stanford.edu/adfs/ls/</Address></EndpointReference></fed:PassiveRequestorEndpoint></RoleDescriptor><SPSSODescriptor WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><KeyDescriptor use="encryption"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/"/><NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat><AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/" index="0" isDefault="true"/><AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://ms-sts.stanford.edu/adfs/ls/" index="1"/><AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/" index="2"/></SPSSODescriptor><IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><KeyDescriptor use="encryption"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></KeyDescriptor><ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://ms-sts.stanford.edu/adfs/services/trust/artifactresolution" index="0"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/"/><NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat><NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://ms-sts.stanford.edu/adfs/ls/"/><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://ms-sts.stanford.edu/adfs/ls/"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="E-Mail Address" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Given Name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="UPN" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/CommonName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Common Name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/EmailAddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="AD FS 1.x E-Mail Address" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/Group" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Group" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/claims/UPN" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="AD FS 1.x UPN" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Role" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Surname" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="PPID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Name ID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Authentication time stamp" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Authentication method" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/denyonlysid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Deny only group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarysid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Deny only primary SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/denyonlyprimarygroupsid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Deny only primary group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/groupsid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarygroupsid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Primary group SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Primary SID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/><Attribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Windows account name" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/></IDPSSODescriptor>
 
 <ContactPerson contactType="support">
   <GivenName>ITS Infrastructure Delivery Group</GivenName>
@@ -4936,10 +5217,10 @@ WiP+jrlBQD2SJmxg7Q==
         <ds:KeyName>sa-ro-tec-6-12.stanford.edu</ds:KeyName>
         <ds:X509Data>
           <ds:X509SubjectName>CN=sa-ro-drup01.stanford.edu,OU=SA,O=Stanford University,streetAddress=450 Serra Mall,L=Stanford,ST=CA,postalCode=94305,C=US</ds:X509SubjectName>
-          <ds:X509Certificate>MIIFYDCCBEigAwIBAgIQb9V9I0jDXEROVJlxMd8niTANBgkqhkiG9w0BAQUFADBR
+          <ds:X509Certificate>MIIFnjCCBIagAwIBAgIQDVQyDAHqhj+7Hmqm5SU4JDANBgkqhkiG9w0BAQUFADBR
 MQswCQYDVQQGEwJVUzESMBAGA1UEChMJSW50ZXJuZXQyMREwDwYDVQQLEwhJbkNv
-bW1vbjEbMBkGA1UEAxMSSW5Db21tb24gU2VydmVyIENBMB4XDTEyMTIxNzAwMDAw
-MFoXDTE1MTIxNzIzNTk1OVowgaUxCzAJBgNVBAYTAlVTMQ4wDAYDVQQREwU5NDMw
+bW1vbjEbMBkGA1UEAxMSSW5Db21tb24gU2VydmVyIENBMB4XDTEzMDIyMDAwMDAw
+MFoXDTE2MDIyMDIzNTk1OVowgaUxCzAJBgNVBAYTAlVTMQ4wDAYDVQQREwU5NDMw
 NTELMAkGA1UECBMCQ0ExETAPBgNVBAcTCFN0YW5mb3JkMRcwFQYDVQQJEw40NTAg
 U2VycmEgTWFsbDEcMBoGA1UEChMTU3RhbmZvcmQgVW5pdmVyc2l0eTELMAkGA1UE
 CxMCU0ExIjAgBgNVBAMTGXNhLXJvLWRydXAwMS5zdGFuZm9yZC5lZHUwggEiMA0G
@@ -4949,7 +5230,7 @@ E2y3xkZ59L/O64gNmCQLTOOmxSXVeS/IOtdQGu+SNJmLej9yJgunM05n1LJfwAjX
 MYxbhDniBTnZERHjl0Fpysa78MfsxTEeVs5zUvWBb0cYGxeva29led41tceyhHyO
 F2M4/BuGYq0+ZzQ6ZizMiSbcjUkCxxQz49FkLB99ltoBmZsOENCwsEjtMqFX/f5F
 ZzM38pjtXdu4d9YiXG4zWcCaXmYpngScHOjFmFQFE/jmjJ1ZACQ1o/CLAgMBAAGj
-ggHdMIIB2TAfBgNVHSMEGDAWgBRIT1r6L0qaXuBQ82t7VaXe9b40XTAdBgNVHQ4E
+ggIbMIICFzAfBgNVHSMEGDAWgBRIT1r6L0qaXuBQ82t7VaXe9b40XTAdBgNVHQ4E
 FgQU9n4j69f5JmiIWbJqecyAWRVLfBcwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB
 /wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMGcGA1UdIARgMF4w
 UgYMKwYBBAGuIwEEAwEBMEIwQAYIKwYBBQUHAgEWNGh0dHBzOi8vd3d3LmluY29t
@@ -4957,14 +5238,16 @@ bW9uLm9yZy9jZXJ0L3JlcG9zaXRvcnkvY3BzX3NzbC5wZGYwCAYGZ4EMAQICMD0G
 A1UdHwQ2MDQwMqAwoC6GLGh0dHA6Ly9jcmwuaW5jb21tb24ub3JnL0luQ29tbW9u
 U2VydmVyQ0EuY3JsMG8GCCsGAQUFBwEBBGMwYTA5BggrBgEFBQcwAoYtaHR0cDov
 L2NlcnQuaW5jb21tb24ub3JnL0luQ29tbW9uU2VydmVyQ0EuY3J0MCQGCCsGAQUF
-BzABhhhodHRwOi8vb2NzcC5pbmNvbW1vbi5vcmcwQQYDVR0RBDowOIIZc2Etcm8t
-ZHJ1cDAxLnN0YW5mb3JkLmVkdYIbc2Etcm8tdGVjLTYtMTIuc3RhbmZvcmQuZWR1
-MA0GCSqGSIb3DQEBBQUAA4IBAQBRPrMHcb1/KXUxy07xS8NytTn4/rb5G7uMY9V1
-qelU3yp9QpI84nUL+LT+3NlDU0VuXiT7Pn1WeGQy2NH8Cqi/BehcxIvWvnRdkOSv
-/Nj+Fxk4mfY0hoxB6oSUuoqGf4uVRhGd6msGfUMZlEqhNK3n732qlGOyjk17NNRS
-I8zpxcyO8kHhPjMFUUddty3JtF29JE+x4cMps7aXZ5kjY0zluo8EzE+jDHqhAqN8
-Ncl+nZ9VCnZ5d2NnXwzYm8VylRqqNTR3SG0XcF4jJ+HmrCrQDr9dYyC4frxrLcTk
-rilBe40XJiXnuBlzsY9oYN3f2T38w+njOwYKaMHwWnMQKNEX
+BzABhhhodHRwOi8vb2NzcC5pbmNvbW1vbi5vcmcwfwYDVR0RBHgwdoIZc2Etcm8t
+ZHJ1cDAxLnN0YW5mb3JkLmVkdYIUY2RjZGV2MS5zdGFuZm9yZC5lZHWCFWhhYXNk
+ZXYxLnN0YW5mb3JkLmVkdYIUb2FlZGV2MS5zdGFuZm9yZC5lZHWCFnZhZGVuZGV2
+MS5zdGFuZm9yZC5lZHUwDQYJKoZIhvcNAQEFBQADggEBAGvDxotGBmdjJYfbOvj8
+DvDmk+cBbxLUm8tUmHxLhVCK6916EUvYpQPOKejFZ3XwHHUAD1iLIxA77S9dsNA4
+fRo56D3W5q8eoMLmpTck2E1eThfQpB5ZI4TUJIHUN3cMD9PcLcG2ds4iNzkXDFsw
+uCBopMs4Y8QVxxDq2m+KoIE2mq1mt2bu53QmmitdJeMQjr58N1cGyFki8qyIzR5a
+BuMcYwEVX538bMynU5zef8ZxUo9A4a3k4Psr5Fz3+6kJbaVFeIPLGkRIh4mwzv4F
+kBcrIUdEG9VH7yuIfRp59pugdupesZoQyCiuq9aMJXZymS/YGT0i0KOHxN4PZXjL
+SHE=
 </ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
@@ -4990,6 +5273,10 @@ rilBe40XJiXnuBlzsY9oYN3f2T38w+njOwYKaMHwWnMQKNEX
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://sa-ro-drup01.stanford.edu/Shibboleth.sso/SAML2/ECP" index="4"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sa-ro-drup01.stanford.edu/Shibboleth.sso/SAML/POST" index="5"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://sa-ro-drup01.stanford.edu/Shibboleth.sso/SAML/Artifact" index="6"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://cdcdev1.stanford.edu/Shibboleth.sso/SAML2/POST" index="7"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://haasdev1.stanford.edu/Shibboleth.sso/SAML2/POST" index="8"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://oaedev1.stanford.edu/Shibboleth.sso/SAML2/POST" index="9"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://vadendev1.stanford.edu/Shibboleth.sso/SAML2/POST" index="10"/>
   </md:SPSSODescriptor>
 
   <ContactPerson contactType="technical">
@@ -5456,7 +5743,93 @@ MEkOj7I=
       <EmailAddress>vpsa-dev-group@lists.stanford.edu</EmailAddress>
   </ContactPerson>
 
-</md:EntityDescriptor><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://samlsp.a.bluejeans.com">
+</md:EntityDescriptor><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_f8591ad2a08756e36a3193ffff7cabb52535a844" entityID="https://saforms.stanford.edu/shibboleth">
+
+  <md:Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
+    <alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
+  </md:Extensions>
+
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+    <md:Extensions>
+      <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://saforms.stanford.edu/Shibboleth.sso/Login"/>
+    </md:Extensions>
+    <md:KeyDescriptor>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:KeyName>saforms.stanford.edu</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=saforms.stanford.edu,OU=Student Affairs,O=Stanford University,streetAddress=450 Serra Mall,L=Stanford,ST=CA,postalCode=94305,C=US</ds:X509SubjectName>
+          <ds:X509Certificate>MIIFPDCCBCSgAwIBAgIQWwkzkL92f4WWdJemvCQLSzANBgkqhkiG9w0BAQUFADBR
+MQswCQYDVQQGEwJVUzESMBAGA1UEChMJSW50ZXJuZXQyMREwDwYDVQQLEwhJbkNv
+bW1vbjEbMBkGA1UEAxMSSW5Db21tb24gU2VydmVyIENBMB4XDTEyMTExNjAwMDAw
+MFoXDTE1MTExNjIzNTk1OVowga0xCzAJBgNVBAYTAlVTMQ4wDAYDVQQREwU5NDMw
+NTELMAkGA1UECBMCQ0ExETAPBgNVBAcTCFN0YW5mb3JkMRcwFQYDVQQJEw40NTAg
+U2VycmEgTWFsbDEcMBoGA1UEChMTU3RhbmZvcmQgVW5pdmVyc2l0eTEYMBYGA1UE
+CxMPU3R1ZGVudCBBZmZhaXJzMR0wGwYDVQQDExRzYWZvcm1zLnN0YW5mb3JkLmVk
+dTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKaUnmBxQdLuQ6V6TftZ
+ZtdQNNPovL2m1aXzLrn66F97Cg8zLJclrbZfcBvcCBBHgt+vyLaLqmLNZgQfO74Q
+QPQSoM//DJKVQtmzvu+pVwxnIa/X4DW/e1qwSvlPJnIdQJPUJdWPCrp3rBf5SPqd
+ZZNQdr0k8XyNwKFQ7TZNkS25VeJZ50CieX2gobycX/YwmAXwpZ9xwVfa/mH3tVDX
+tcBaXQk7ge199R0Aeqf+yimWLmQGkB97ObRyg9nhI4CFtoKOozUpJX3XXtG0X8cS
+mfeAiD/GgIzg93k6uuTNGxOLVHhfUOcBSq6bJrS6MDeyjV64rZ4Bl6E5CrQOpdMA
+JIMCAwEAAaOCAbEwggGtMB8GA1UdIwQYMBaAFEhPWvovSppe4FDza3tVpd71vjRd
+MB0GA1UdDgQWBBQ1/3URrfkq1IYXel2PYMDB0JwbfTAOBgNVHQ8BAf8EBAMCBaAw
+DAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwXQYD
+VR0gBFYwVDBSBgwrBgEEAa4jAQQDAQEwQjBABggrBgEFBQcCARY0aHR0cHM6Ly93
+d3cuaW5jb21tb24ub3JnL2NlcnQvcmVwb3NpdG9yeS9jcHNfc3NsLnBkZjA9BgNV
+HR8ENjA0MDKgMKAuhixodHRwOi8vY3JsLmluY29tbW9uLm9yZy9JbkNvbW1vblNl
+cnZlckNBLmNybDBvBggrBgEFBQcBAQRjMGEwOQYIKwYBBQUHMAKGLWh0dHA6Ly9j
+ZXJ0LmluY29tbW9uLm9yZy9JbkNvbW1vblNlcnZlckNBLmNydDAkBggrBgEFBQcw
+AYYYaHR0cDovL29jc3AuaW5jb21tb24ub3JnMB8GA1UdEQQYMBaCFHNhZm9ybXMu
+c3RhbmZvcmQuZWR1MA0GCSqGSIb3DQEBBQUAA4IBAQCUMufbl6QLcpvnJXDkWPRO
+BeYYPnONANO+nRnJ9gTjrIh55fyu+e5/SDMHis9T7Q2IoQxu5ybBPPkdZEOq5C9P
+XYBL/LgKnRox7efRn13qrYA2wBrpUvYuh7VvpI2rXhxs3FzRHqw39keRvkWhd9YP
+lE+efTU+G4phejt2sVL9RQguKvC0q9n4V7DLNV/VOCuSj0sMBdD8pLRZAv04TTTn
+JOmTGWkeCDb+BxjU7E5NMeX/ZR++BvRUuwTxixyQiPR7t4ZXBU278twb2xdPOdQM
+3adFFjFN7WTeUIFrLm3natOOaMQ0XWGRvdExA70jg5M0CpaNFwjwtph4wSiyOZ02
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
+      <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+    </md:KeyDescriptor>
+    <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://saforms.stanford.edu/Shibboleth.sso/Artifact/SOAP" index="1"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://saforms.stanford.edu/Shibboleth.sso/SLO/SOAP"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://saforms.stanford.edu/Shibboleth.sso/SLO/Redirect"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://saforms.stanford.edu/Shibboleth.sso/SLO/POST"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://saforms.stanford.edu/Shibboleth.sso/SLO/Artifact"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://saforms.stanford.edu/Shibboleth.sso/NIM/SOAP"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://saforms.stanford.edu/Shibboleth.sso/NIM/Redirect"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://saforms.stanford.edu/Shibboleth.sso/NIM/POST"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://saforms.stanford.edu/Shibboleth.sso/NIM/Artifact"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://saforms.stanford.edu/Shibboleth.sso/SAML2/POST" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://saforms.stanford.edu/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://saforms.stanford.edu/Shibboleth.sso/SAML2/Artifact" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://saforms.stanford.edu/Shibboleth.sso/SAML2/ECP" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://saforms.stanford.edu/Shibboleth.sso/SAML/POST" index="5"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://saforms.stanford.edu/Shibboleth.sso/SAML/Artifact" index="6"/>
+  </md:SPSSODescriptor>
+
+  <ContactPerson contactType="technical">
+      <GivenName>VPSA</GivenName>
+      <EmailAddress>vpsa-dev-group@lists.stanford.edu</EmailAddress>
+  </ContactPerson>
+
+</md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://samlsp.a.bluejeans.com">
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
 	<md:NameIDFormat>
       urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
@@ -6091,13 +6464,13 @@ lmxjxcJtDgK5ktdfoYJWArxP5gzdfiOEFA==</ds:X509Certificate>
 
     <!-- manually added ACS URLs for onegsb-dev.stanford.edu alias -->
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" 
-        Location="https://onegsb-dev.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
+        Location="https://onegsb-dev.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post"
-        Location="https://onegsb-dev.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="5"/>
+        Location="https://onegsb-dev.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="5"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
-        Location="https://onegsb-dev.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="6"/>
+        Location="https://onegsb-dev.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="6"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01"
-        Location="https://onegsb-dev.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="7"/>
+        Location="https://onegsb-dev.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="7"/>
 
   </md:SPSSODescriptor>
 
@@ -6129,6 +6502,10 @@ lmxjxcJtDgK5ktdfoYJWArxP5gzdfiOEFA==</ds:X509Certificate>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sfordgsbdev2.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="1"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://sfordgsbdev2.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="2"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://sfordgsbdev2.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://onegsb-dev2.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://onegsb-dev2.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="5"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://onegsb-dev2.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="6"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://onegsb-dev2.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="7"/>
   </md:SPSSODescriptor>
 
   <md:ContactPerson contactType="technical">
@@ -6160,19 +6537,21 @@ lmxjxcJtDgK5ktdfoYJWArxP5gzdfiOEFA==</ds:X509Certificate>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sfordgsbsbox.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="1"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://sfordgsbsbox.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="2"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://sfordgsbsbox.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="3"/>
-    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://onegsb-qa.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
-    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://onegsb-qa.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="5"/>
-    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://onegsb-qa.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="6"/>
-    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://onegsb-qa.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="7"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://onegsb-sandbox.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://onegsb-sandbox.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="5"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://onegsb-sandbox.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="6"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://onegsb-sandbox.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="7"/>
 
   </md:SPSSODescriptor>
 
-  <md:ContactPerson contactType="technical">
-    <md:GivenName>Chris Sadlak</md:GivenName>
-    <md:EmailAddress>csadlak@stanford.edu</md:EmailAddress>
+ <md:ContactPerson contactType="technical">
+    <md:GivenName>Roopesh</md:GivenName>
+    <md:SurName>Naik</md:SurName>
+    <md:EmailAddress>Naik_Roopesh@GSB.Stanford.Edu</md:EmailAddress>
   </md:ContactPerson>
 
-</md:EntityDescriptor><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://sfordgsbstg.prod.acquia-sites.com/simplesaml/module.php/saml/sp/metadata.php/default-sp">
+</md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://sfordgsbstg.prod.acquia-sites.com/simplesaml/module.php/saml/sp/metadata.php/default-sp">
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
     <md:KeyDescriptor use="signing">
       <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
@@ -6194,6 +6573,10 @@ lmxjxcJtDgK5ktdfoYJWArxP5gzdfiOEFA==</ds:X509Certificate>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sfordgsbstg.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="1"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://sfordgsbstg.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="2"/>
     <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://sfordgsbstg.prod.acquia-sites.com/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="3"/>
+   <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://onegsb-stage.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://onegsb-stage.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp" index="5"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://onegsb-stage.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp" index="6"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://onegsb-stage.gsb.stanford.edu/simplesaml/module.php/saml/sp/saml1-acs.php/default-sp/artifact" index="7"/>
   </md:SPSSODescriptor>
 
   <md:ContactPerson contactType="technical">
@@ -6229,9 +6612,9 @@ lmxjxcJtDgK5ktdfoYJWArxP5gzdfiOEFA==</ds:X509Certificate>
   </md:SPSSODescriptor>
 
   <md:ContactPerson contactType="technical">
-    <md:GivenName>Adam</md:GivenName>
-    <md:SurName>Moore</md:SurName>
-    <md:EmailAddress>Adam.Moore@GSB.Stanford.Edu</md:EmailAddress>
+    <md:GivenName>Roopesh</md:GivenName>
+    <md:SurName>Naik</md:SurName>
+    <md:EmailAddress>Naik_Roopesh@GSB.Stanford.Edu</md:EmailAddress>
   </md:ContactPerson>
 
 </md:EntityDescriptor>
@@ -7162,6 +7545,17 @@ pZl6JVhqLXKu2Krn9YWWco9LnSdZcn3wBLDgyw==</ds:Modulus>
         <md:EmailAddress>engineering-it@lists.stanford.edu</md:EmailAddress>
     </md:ContactPerson>
 </md:EntityDescriptor>
+<EntityDescriptor entityID="soeithelp.zendesk.com" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+    <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <AssertionConsumerService index="1" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://soeithelp.zendesk.com/access/saml"/>
+    </SPSSODescriptor>
+
+  <ContactPerson contactType="technical">
+     <GivenName>SoE IT</GivenName>
+     <EmailAddress>engineering-it@lists.stanford.edu</EmailAddress>
+  </ContactPerson>
+
+</EntityDescriptor>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_aa8b8de6a03e07c3eb7541990bebd1287eb45303" entityID="https://staging.class.stanford.edu/shibboleth">
 
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
@@ -7266,6 +7660,57 @@ m+YElxiSPlJQY4PF9zlwY260UMLgJ7sitgFOpM8RxLNTXLLkbyRTLNY7FEm0Fw+T
     <md:GivenName>Jason Bau</md:GivenName>
     <md:EmailAddress>jbau@stanford.edu</md:EmailAddress>
   </md:ContactPerson>
+
+</md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_e66edbd60f1ff55417f7881820d6a4541964d1b4" entityID="https://staging.mycourthouse.com/shibboleth">
+
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+    <md:Extensions>
+      <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://staging.mycourthouse.com/Shibboleth.sso/Login"/>
+      <idpdisc:DiscoveryResponse xmlns:idpdisc="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Location="https://staging.mycourthouse.com/Shibboleth.sso/Login" index="1"/>
+    </md:Extensions>
+    <md:KeyDescriptor>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:KeyName>staging.mycourthouse.com</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=staging.mycourthouse.com,O=MyCourthouse Staging,ST=California,C=US</ds:X509SubjectName>
+          <ds:X509Certificate>MIID6zCCAtOgAwIBAgIJAP2lhLGDa1vZMA0GCSqGSIb3DQEBBQUAMIGLMQswCQYD
+VQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEdMBsGA1UECgwUTXlDb3VydGhv
+dXNlIFN0YWdpbmcxITAfBgNVBAMMGHN0YWdpbmcubXljb3VydGhvdXNlLmNvbTEl
+MCMGCSqGSIb3DQEJARYWc2hvdXRAbXljb3VydGhvdXNlLmNvbTAeFw0xMzAzMTkw
+MDE4MzZaFw0yMzAzMjAwMDE4MzZaMIGLMQswCQYDVQQGEwJVUzETMBEGA1UECAwK
+Q2FsaWZvcm5pYTEdMBsGA1UECgwUTXlDb3VydGhvdXNlIFN0YWdpbmcxITAfBgNV
+BAMMGHN0YWdpbmcubXljb3VydGhvdXNlLmNvbTElMCMGCSqGSIb3DQEJARYWc2hv
+dXRAbXljb3VydGhvdXNlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAPbrMjJPYSjO+R58srWvs2uB/HJC5Q7LR8KGa8B07iYj6DJSOAjOnhA8FWlk
+2bUAche7CofRvNMzVM4SWhSFmQfI2+xDG8SUm8Dk9PHNhimva2nypS4ZUJ9uSnuT
+8/42f2NB5HYjQeJos9XKOqdMxeXJ90BYfhnEYPy0Rd/AGwsK288RkYKvoU96g4+a
+egy/RRMOLn4+imOE0EUV5F/RpQkvM2GCKK8ISyVU+C0hsKEcwM8ScQiMpd8VWqot
+SK9D3quvTlXfEkatMIl4s1I4WdTd6Bxa+fKyOr9Sb/0ewzMmKOXYqQ/wi2405GqG
+JoKkzlaOlkQED3+MyGzkrqqew+ECAwEAAaNQME4wHQYDVR0OBBYEFIG/BCY1Gia8
+0SfJcxXBggYku2VXMB8GA1UdIwQYMBaAFIG/BCY1Gia80SfJcxXBggYku2VXMAwG
+A1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBADRSs8IgGx1jjNuVcZpyEgXl
+ET9ovxNEifDEQ4jJv3jXYD5FWQESf90H/kUgFPO7WCB1SIfvwqBPC9XS0nHiaadr
+EYZWyaWRxN9tuZoN9qb3X4qvPbJklxbeZZCQ5LMOdIr0cn0eakyS7VmmK4AWaetZ
+S7e1eYuVdygaTKRboFdPXPPdg6fsbHsUM4FzFKjFW4ej9U9RWb+1Z3HEWI8RlHwx
+pI0IWFmhoZH8shKYrGHBqOkIk39cAsujF0Mk5Hc3UyNuVY7+U0v7msC3ODmSF9mw
+d/dX5IYWe+JF1ukFXCtcPiJRKknOxIlylYcBIf3jiC/HVS5zl9ld0gpI5toOPdA=
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://staging.mycourthouse.com/Shibboleth.sso/SAML2/POST" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://staging.mycourthouse.com/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://staging.mycourthouse.com/Shibboleth.sso/SAML2/Artifact" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://staging.mycourthouse.com/Shibboleth.sso/SAML2/ECP" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://staging.mycourthouse.com/Shibboleth.sso/SAML/POST" index="5"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://staging.mycourthouse.com/Shibboleth.sso/SAML/Artifact" index="6"/>
+  </md:SPSSODescriptor>
+
+  <ContactPerson contactType="technical">
+     <GivenName>Shibboleth Support</GivenName>
+     <EmailAddress>shout@mycourthouse.com</EmailAddress>
+  </ContactPerson>
 
 </md:EntityDescriptor>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://stanford-cap--sandbox5.cs3.my.salesforce.com" validUntil="2021-03-21T17:09:36.876Z">
@@ -8792,9 +9237,18 @@ XtbG7129VfVgVSQqIsygWgtb+PsJrI4L1D0=
       <OrganizationDisplayName xml:lang="en">BenefitsWeb.COM</OrganizationDisplayName>
       <OrganizationURL xml:lang="en">http://BenefitsWeb.COM/</OrganizationURL>
   </Organization>
+
+  <ContactPerson contactType="administrative">
+      <SurName>Stanford Support</SurName>
+      <EmailAddress>ben_sched_jobs@lists.stanford.edu</EmailAddress>
+  </ContactPerson>
   <ContactPerson contactType="technical">
       <SurName>Support</SurName>
       <EmailAddress>bryan.nazario@acs-inc.com</EmailAddress>
+  </ContactPerson>
+  <ContactPerson contactType="technical">
+      <SurName>Support</SurName>
+      <EmailAddress>Rosemarie.Basile@xerox.com</EmailAddress>
   </ContactPerson>
 
 </EntityDescriptor>
@@ -9021,6 +9475,57 @@ VANZgjeDj+J0BELzy4Cu0HXiFujf/Nfaeogp5e0jbDQoJSiHq3sN23VWw5MlJvWv
   </ContactPerson>
 
 </md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_e66edbd60f1ff55417f7881820d6a4541964d1b4" entityID="https://www.mycourthouse.com/shibboleth">
+
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+        <md:Extensions>
+            <init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://www.mycourthouse.com/Shibboleth.sso/Login"/>
+            <idpdisc:DiscoveryResponse xmlns:idpdisc="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Location="https://www.mycourthouse.com/Shibboleth.sso/Login" index="1"/>
+        </md:Extensions>
+        <md:KeyDescriptor>
+            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                <ds:KeyName>www.mycourthouse.com</ds:KeyName>
+                <ds:X509Data>
+                    <ds:X509SubjectName>CN=www.mycourthouse.com/emailAddress=shout@mycourthouse.com,O=MyCourthouse,ST=California,C=US</ds:X509SubjectName>
+                    <ds:X509Certificate>MIID0TCCArmgAwIBAgIJAN5OC8rIUArzMA0GCSqGSIb3DQEBBQUAMH8xCzAJBgNV
+                        BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRUwEwYDVQQKDAxNeUNvdXJ0aG91
+                        c2UxHTAbBgNVBAMMFHd3dy5teWNvdXJ0aG91c2UuY29tMSUwIwYJKoZIhvcNAQkB
+                        FhZzaG91dEBteWNvdXJ0aG91c2UuY29tMB4XDTEzMDMyODA5MDAwNFoXDTIzMDMy
+                        OTA5MDAwNFowfzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFTAT
+                        BgNVBAoMDE15Q291cnRob3VzZTEdMBsGA1UEAwwUd3d3Lm15Y291cnRob3VzZS5j
+                        b20xJTAjBgkqhkiG9w0BCQEWFnNob3V0QG15Y291cnRob3VzZS5jb20wggEiMA0G
+                        CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/NuuYiOQrI5YjQPHIVCefl2E9bTqv
+                        zmHK/bVROsWEFxHoobyrPfSg4shAPA5sHPRSkj2S1V83t4QImlDZcjMtCq8rNj/3
+                        C4lWI25cO0ph9d0+jzBqm0Kh6V2s7yd2DcHjN+yfNevKNs9TGNiDb7AysFmutioi
+                        6qgL8cQ9NgFL7dMKxYh6byA7Edys+63AKTgOXvZD7cKtSAn5nJ6ZdymVXXyWBD4A
+                        tRddOzIQGzoFkvpGwJLR1R+CzM2jPdMeuSw/IR6RNaL211Hv7ldkEDWHIAVPzU3h
+                        s09r9DpFsgr5LRYeEHWyAuy+VV/GWGLfdG2KPG06O6v3k3bWr2unpjKZAgMBAAGj
+                        UDBOMB0GA1UdDgQWBBSwvFkzpUENtonk2z/87KkI6uZ8hTAfBgNVHSMEGDAWgBSw
+                        vFkzpUENtonk2z/87KkI6uZ8hTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUA
+                        A4IBAQAkfhBaqAQIG623Cw0Ln4dp2RVzsy0G61a7D8fPnfCumc93NSZ/WT1LHpSy
+                        xL1nQJBg6BcD9wLjAKREDb2g/fthL0zGt+vtzOUkLxY4wixCQ62J+eOxSKsx3aAw
+                        5LlRIDOG3raOr4hKqGyhNdSvDPCvCFaE6+boVFR3/+F9THPA/AamL53lDIS3NxWe
+                        G51WfovmXhK9oniQCNjpurIm5rFzw6CE9cWioQLfRNh+n1/6iIFv8bhMJpFWXI05
+                        hEhyMxtQNw1DIT1mbUdc9jdWP6EVRxQJNTgxcoLyacg6l3FTNEJm8ster6CUpF1m
+                        e8q0TqNO5mJlCD7UjnLnCkTuWS8M
+                    </ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </md:KeyDescriptor>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.mycourthouse.com/Shibboleth.sso/SAML2/POST" index="1"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://www.mycourthouse.com/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://www.mycourthouse.com/Shibboleth.sso/SAML2/Artifact" index="3"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://www.mycourthouse.com/Shibboleth.sso/SAML2/ECP" index="4"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www.mycourthouse.com/Shibboleth.sso/SAML/POST" index="5"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://www.mycourthouse.com/Shibboleth.sso/SAML/Artifact" index="6"/>
+    </md:SPSSODescriptor>
+
+  <ContactPerson contactType="technical">
+     <GivenName>Shibboleth Support</GivenName>
+     <EmailAddress>shout@mycourthouse.com</EmailAddress>
+  </ContactPerson>
+
+</md:EntityDescriptor>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_156374f936a4f118594d08ab7e7ed6ea" entityID="https://www.rcpsych-test.org/shibboleth">
 
   <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol urn:oasis:names:tc:SAML:2.0:protocol">
@@ -9215,6 +9720,7 @@ ytoDawbi3W+RHUK9EXc8b1kqp+1bQOhhZ2vyZfSSTZKeHnWxBnw4+7IPsNhnVw==
                                                                                                                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" />
                 
              <md:AssertionConsumerService Location="https://stgstanford.taleo.net/careersection/SamlAssertionConsumerService.jss" index="1" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
+             <md:AssertionConsumerService Location="https://stanford.taleo.net/careersection/SamlAssertionConsumerService.jss" index="2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
   </md:SPSSODescriptor>
   
   <md:Organization>
@@ -9260,8 +9766,7 @@ ytoDawbi3W+RHUK9EXc8b1kqp+1bQOhhZ2vyZfSSTZKeHnWxBnw4+7IPsNhnVw==
     <md:SingleLogoutService Location=" https://stgstanford.taleo.net/smartorg/saml20Soap.jss "  Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" />
                 
     <md:AssertionConsumerService Location="https://stgstanford.taleo.net/smartorg/SamlAssertionConsumerService.jss" index="1" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
-
-                                                                                                                            
+    <md:AssertionConsumerService Location="https://stanford.taleo.net/smartorg/SamlAssertionConsumerService.jss" index="2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
   </md:SPSSODescriptor>
   
   <md:Organization>
