@@ -22,6 +22,7 @@ class convenience_redirector(object):
                     ('staging.class.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.staging\.class\.stanford\.edu$', re.I)),
                     ('class.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.class\.stanford\.edu$', re.I)),
                     ('staging.class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.staging\.class2go\.stanford\.edu$', re.I)),
+                    ('f12.class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.f12.class2go\.stanford\.edu$', re.I)),
                     ('class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.class2go\.stanford\.edu$', re.I)),
                   )
     
