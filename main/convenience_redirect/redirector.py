@@ -13,14 +13,11 @@ class convenience_redirector(object):
     #List of hostnames that will abort redirect if matched.  Need this because we have lots of
     #domain names are ancestors of each other, like class.stanford.edu, staging.class.stanford.edu, and
     #www.staging.class.stanford.edu
-    domain_no_direct = ['class.stanford.edu','staging.class.stanford.edu','www.staging.class.stanford.edu','www.class.stanford.edu',\
-                     'class2go.stanford.edu','staging.class2go.stanford.edu','www.staging.class2go.stanford.edu','www.class2go.stanford.edu',\
+    domain_no_direct = ['class2go.stanford.edu','staging.class2go.stanford.edu','www.staging.class2go.stanford.edu','www.class2go.stanford.edu',\
                      'f12.class2go.stanford.edu']
     
     #List of regexes of domain names to match against. 
     regex_list = (
-                    ('staging.class.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.staging\.class\.stanford\.edu$', re.I)),
-                    ('class.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.class\.stanford\.edu$', re.I)),
                     ('staging.class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.staging\.class2go\.stanford\.edu$', re.I)),
                     ('f12.class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.f12.class2go\.stanford\.edu$', re.I)),
                     ('class2go.stanford.edu',re.compile(r'^(?P<course_prefix>[a-zA-Z0-9_-]*)\.class2go\.stanford\.edu$', re.I)),
@@ -67,9 +64,9 @@ class convenience_redirector(object):
                 if not Course.objects.filter(handle=path_prefix+'--'+path_suffix).exists(): #only redirect class-related URLs
                     return None
                 if path_suffix == 'Fall2012' or path_suffix == 'WallaWalla': #send requests to Fall2012 classes under the new codebase back to the old codebase
-                    http_host=re.sub(r'class2go\.', 'f12.class2go.', request.META['HTTP_HOST'], flags=re.I)
+                    http_host=re.sub(r'^class2go\.', 'f12.class2go.', request.META['HTTP_HOST'], flags=re.I)
                 else:  #send everyone else to the new codebase
-                    http_host=re.sub(r'class\.', 'class2go.', request.META['HTTP_HOST'], flags=re.I)
+                    http_host=re.sub(r'^f12\.class2go\.', 'class2go.', request.META['HTTP_HOST'], flags=re.I)
             
                 if http_host == request.META['HTTP_HOST']: #prevent redirect loop.  Don't redirect if there's no reason to
                     return None
@@ -101,9 +98,9 @@ class convenience_redirector(object):
 
         #Do redirects at the convenience domain name level
         if suffix == 'Fall2012' or suffix == 'WallaWalla': #send requests to Fall2012 classes under the new codebase back to the old codebase
-            host=re.sub(r'class2go\.', 'class.', host, flags=re.I)
+            host=re.sub(r'^class2go\.', 'f12.class2go.', host, flags=re.I)
         else:  #send everyone else to the new codebase
-            host=re.sub(r'class\.', 'class2go.', host, flags=re.I)
+            host=re.sub(r'^f12\.class2go\.', 'class2go.', host, flags=re.I)
 
 
         return HttpResponseRedirect(scheme + '://' + host + port_str + '/' + prefix + '/' + suffix + request.get_full_path())

@@ -71,7 +71,7 @@ class SimpleTest(TestCase):
             c.save()
     
     def test_noop(self):
-        for host in ('class.stanford.edu', 'www.class.stanford.edu', 'staging.class.stanford.edu', 'www.staging.class.stanford.edu' \
+        for host in ('f12.class2go.stanford.edu', \
                      'class2go.stanford.edu', 'www.class2go.stanford.edu', 'staging.class2go.stanford.edu', 'www.staging.class2go.stanford.edu'):
             request = self.factory.get('/')
             request.META['HTTP_HOST']=host
@@ -80,7 +80,7 @@ class SimpleTest(TestCase):
 
     def test_no_redirect_loop1(self):
         for path in self.course_path_endings:
-            for host in ('class.stanford.edu', 'www.class.stanford.edu', 'staging.class.stanford.edu', 'www.staging.class.stanford.edu'):
+            for host in ('f12.class2go.stanford.edu',):
                 request = self.factory.get('/networking/Fall2012%s' % path)
                 request.META['HTTP_HOST']=host
                 response = self.redir.process_request(request)
@@ -106,110 +106,84 @@ class SimpleTest(TestCase):
     def test_class_networking(self):
         #HTTP to '/'
         request = self.factory.get('/')
-        request.META['HTTP_HOST']='networking.class.stanford.edu'
+        request.META['HTTP_HOST']='networking.f12.class2go.stanford.edu'
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://class.stanford.edu/networking/Fall2012/')
+        self.assertEqual(response['Location'],'http://f12.class2go.stanford.edu/networking/Fall2012/')
         #HTTPS
         request.is_secure=lambda: True
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'https://class.stanford.edu/networking/Fall2012/')
+        self.assertEqual(response['Location'],'https://f12.class2go.stanford.edu/networking/Fall2012/')
         #HTTP to '/', should redirect class2go to class
         request = self.factory.get('/')
         request.META['HTTP_HOST']='networking.class2go.stanford.edu'
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://class.stanford.edu/networking/Fall2012/')
+        self.assertEqual(response['Location'],'http://f12.class2go.stanford.edu/networking/Fall2012/')
         #HTTPS should redirect class2go to class
         request.is_secure=lambda: True
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'https://class.stanford.edu/networking/Fall2012/')
+        self.assertEqual(response['Location'],'https://f12.class2go.stanford.edu/networking/Fall2012/')
     
 
     def test_url_paths_and_params(self):
         #path
         request = self.factory.get('/videos/TheInternet/')
-        request.META['HTTP_HOST']='networking.class.stanford.edu'
+        request.META['HTTP_HOST']='networking.f12.class2go.stanford.edu'
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://class.stanford.edu/networking/Fall2012/videos/TheInternet/')
+        self.assertEqual(response['Location'],'http://f12.class2go.stanford.edu/networking/Fall2012/videos/TheInternet/')
         #query param
         request = self.factory.get('/preview/?login=login&cnn=cnn')
-        request.META['HTTP_HOST']='networking.class.stanford.edu'
+        request.META['HTTP_HOST']='networking.f12.class2go.stanford.edu'
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://class.stanford.edu/networking/Fall2012/preview/?login=login&cnn=cnn')
+        self.assertEqual(response['Location'],'http://f12.class2go.stanford.edu/networking/Fall2012/preview/?login=login&cnn=cnn')
         #query param2
         request = self.factory.get('?a=a;b=b')
-        request.META['HTTP_HOST']='networking.class.stanford.edu'
+        request.META['HTTP_HOST']='networking.f12.class2go.stanford.edu'
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://class.stanford.edu/networking/Fall2012/?a=a;b=b')
-
-
-    def test_staging_networking(self):
-        #HTTP to '/'
-        request = self.factory.get('/')
-        request.META['HTTP_HOST']='networking.staging.class.stanford.edu'
-        response = self.redir.process_request(request)
-        self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://staging.class.stanford.edu/networking/Fall2012/')
-        #HTTPS
-        request.is_secure=lambda: True
-        response = self.redir.process_request(request)
-        self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'https://staging.class.stanford.edu/networking/Fall2012/')
-        #HTTP to '/', redirect class2go to class
-        request = self.factory.get('/')
-        request.META['HTTP_HOST']='networking.staging.class2go.stanford.edu'
-        response = self.redir.process_request(request)
-        self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://staging.class.stanford.edu/networking/Fall2012/')
-        #HTTPS redirect class2go to class
-        request.is_secure=lambda: True
-        response = self.redir.process_request(request)
-        self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'https://staging.class.stanford.edu/networking/Fall2012/')
-    
+        self.assertEqual(response['Location'],'http://f12.class2go.stanford.edu/networking/Fall2012/?a=a;b=b')    
     
     def test_ports(self):
         #HTTP 80
         request = self.factory.get('/')
-        request.META['HTTP_HOST']='networking.class.stanford.edu:80'
+        request.META['HTTP_HOST']='networking.class2go.stanford.edu:80'
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://class.stanford.edu/networking/Fall2012/')
+        self.assertEqual(response['Location'],'http://f12.class2go.stanford.edu/networking/Fall2012/')
         #HTTPS 443
         request = self.factory.get('/')
-        request.META['HTTP_HOST']='networking.class.stanford.edu:443'
+        request.META['HTTP_HOST']='networking.class2go.stanford.edu:443'
         request.is_secure=lambda: True
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'https://class.stanford.edu/networking/Fall2012/')
+        self.assertEqual(response['Location'],'https://f12.class2go.stanford.edu/networking/Fall2012/')
         #HTTP 8080
         request = self.factory.get('/')
-        request.META['HTTP_HOST']='networking.class.stanford.edu:8080'
+        request.META['HTTP_HOST']='networking.class2go.stanford.edu:8080'
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'http://class.stanford.edu:8080/networking/Fall2012/')
+        self.assertEqual(response['Location'],'http://f12.class2go.stanford.edu:8080/networking/Fall2012/')
         #HTTPS 4443
         request = self.factory.get('/')
-        request.META['HTTP_HOST']='networking.class.stanford.edu:4443'
+        request.META['HTTP_HOST']='networking.class2go.stanford.edu:4443'
         request.is_secure=lambda: True
         response = self.redir.process_request(request)
         self.assertTrue(isinstance(response,HttpResponseRedirect))
-        self.assertEqual(response['Location'],'https://class.stanford.edu:4443/networking/Fall2012/')
+        self.assertEqual(response['Location'],'https://f12.class2go.stanford.edu:4443/networking/Fall2012/')
 
     def test_active_classes(self):
         for path in self.course_path_endings:
             for course in ('nlp','test','networking','crypto','security','cs144','cs224n','solar','matsci256','psych30','nano','msande111'):
                 request = self.factory.get(path)
-                request.META['HTTP_HOST']=course+'.class.stanford.edu'
+                request.META['HTTP_HOST']=course+'.f12.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
-                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/Fall2012%s" % (course, path))
+                self.assertEqual(response['Location'],"http://f12.class2go.stanford.edu/%s/Fall2012%s" % (course, path))
 
     def test_Fall2012_classes_redir_to_class(self):
         #make request to class2go for fall2012 classes, should end up with class
@@ -219,7 +193,7 @@ class SimpleTest(TestCase):
                 request.META['HTTP_HOST']=course+'.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
-                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/Fall2012%s" % (course, path))
+                self.assertEqual(response['Location'],"http://f12.class2go.stanford.edu/%s/Fall2012%s" % (course, path))
 
     def test_cur_term_map_classes(self):
         for path in self.course_path_endings:
@@ -243,19 +217,19 @@ class SimpleTest(TestCase):
             self.assertEqual(response['Location'],"http://class2go.stanford.edu/class2go/tutorial%s" %path)
             #db--Winter2013, redirect class to class2go
             request = self.factory.get(path)
-            request.META['HTTP_HOST']='db.class.stanford.edu'
+            request.META['HTTP_HOST']='db.f12.class2go.stanford.edu'
             response = self.redir.process_request(request)
             self.assertTrue(isinstance(response,HttpResponseRedirect))
             self.assertEqual(response['Location'],"http://class2go.stanford.edu/db/Winter2013%s" %path)
             #EE364A--Winter2013
             request = self.factory.get(path)
-            request.META['HTTP_HOST']='EE364A.class.stanford.edu'
+            request.META['HTTP_HOST']='EE364A.f12.class2go.stanford.edu'
             response = self.redir.process_request(request)
             self.assertTrue(isinstance(response,HttpResponseRedirect))
             self.assertEqual(response['Location'],"http://class2go.stanford.edu/EE364A/Winter2013%s" %path)
             #class2go--tutorial, redirect class to class2go
             request = self.factory.get(path)
-            request.META['HTTP_HOST']='class2go.class.stanford.edu'
+            request.META['HTTP_HOST']='class2go.f12.class2go.stanford.edu'
             response = self.redir.process_request(request)
             self.assertTrue(isinstance(response,HttpResponseRedirect))
             self.assertEqual(response['Location'],"http://class2go.stanford.edu/class2go/tutorial%s" %path)
@@ -269,9 +243,9 @@ class SimpleTest(TestCase):
                 request.META['HTTP_HOST']='class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
-                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/Fall2012%s" % (course, ending))
+                self.assertEqual(response['Location'],"http://f12.class2go.stanford.edu/%s/Fall2012%s" % (course, ending))
                 request = self.factory.get('/%s/Fall2012%s' % (course, ending))
-                request.META['HTTP_HOST']='class.stanford.edu'
+                request.META['HTTP_HOST']='f12.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
                 #POSTS
@@ -279,9 +253,9 @@ class SimpleTest(TestCase):
                 request.META['HTTP_HOST']='class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
-                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/Fall2012%s" % (course, ending))
+                self.assertEqual(response['Location'],"http://f12.class2go.stanford.edu/%s/Fall2012%s" % (course, ending))
                 request = self.factory.post('/%s/Fall2012%s' % (course, ending))
-                request.META['HTTP_HOST']='class.stanford.edu'
+                request.META['HTTP_HOST']='f12.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
             
@@ -290,24 +264,24 @@ class SimpleTest(TestCase):
             for course in ('networking',):
                 #GET
                 request = self.factory.get('/%s/WallaWalla%s' % (course, ending))
-                request.META['HTTP_HOST']='class.stanford.edu'
+                request.META['HTTP_HOST']='f12.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
                 request = self.factory.get('/%s/WallaWalla%s' % (course, ending))
                 request.META['HTTP_HOST']='class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
-                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/WallaWalla%s" % (course, ending))
+                self.assertEqual(response['Location'],"http://f12.class2go.stanford.edu/%s/WallaWalla%s" % (course, ending))
                 #POST
                 request = self.factory.post('/%s/WallaWalla%s' % (course, ending))
-                request.META['HTTP_HOST']='class.stanford.edu'
+                request.META['HTTP_HOST']='f12.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
                 request = self.factory.post('/%s/WallaWalla%s' % (course, ending))
                 request.META['HTTP_HOST']='class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
-                self.assertEqual(response['Location'],"http://class.stanford.edu/%s/WallaWalla%s" % (course, ending))
+                self.assertEqual(response['Location'],"http://f12.class2go.stanford.edu/%s/WallaWalla%s" % (course, ending))
 
 
             #test that we can redirect to the new codebase based on path
@@ -318,7 +292,7 @@ class SimpleTest(TestCase):
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
                 request = self.factory.get('/%s/Winter2013%s' % (course, ending))
-                request.META['HTTP_HOST']='class.stanford.edu'
+                request.META['HTTP_HOST']='f12.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
                 self.assertEqual(response['Location'],"http://class2go.stanford.edu/%s/Winter2013%s" % (course, ending))
@@ -328,7 +302,7 @@ class SimpleTest(TestCase):
                 response = self.redir.process_request(request)
                 self.assertIsNone(response)
                 request = self.factory.post('/%s/Winter2013%s' % (course, ending))
-                request.META['HTTP_HOST']='class.stanford.edu'
+                request.META['HTTP_HOST']='f12.class2go.stanford.edu'
                 response = self.redir.process_request(request)
                 self.assertTrue(isinstance(response,HttpResponseRedirect))
                 self.assertEqual(response['Location'],"http://class2go.stanford.edu/%s/Winter2013%s" % (course, ending))
@@ -336,7 +310,7 @@ class SimpleTest(TestCase):
                                  
     def test_no_redirect(self):
         for path in self.no_course_paths:
-            for host in ('class.stanford.edu', 'www.class.stanford.edu', 'staging.class.stanford.edu', 'www.staging.class.stanford.edu' \
+            for host in ('f12.class2go.stanford.edu', \
                          'class2go.stanford.edu', 'www.class2go.stanford.edu', 'staging.class2go.stanford.edu', 'www.staging.class2go.stanford.edu'):
                 request = self.factory.get(path)
                 request.META['HTTP_HOST']=host
