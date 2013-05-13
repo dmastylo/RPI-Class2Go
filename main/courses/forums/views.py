@@ -17,7 +17,14 @@ def view(request, course_prefix, course_suffix):
     lti_params = {
         "lti_message_type": "basic-lti-launch-request",
         "lti_version": "LTI-1p0",
+        "lis_person_sourcedid": "class2go:user",
         "resource_link_id": "class2go-forum",
+        "resource_link_title": "Class2Go",
+        "resource_link_description": "Class2Go Forum",
+        "tool_consumer_instance_guid": "class2go guid",
+        "tool_consumer_instance_description": "Class2Go",
+        "oauth_callback": "about:blank",
+        "ext_submit": "Press To Launch"
     }
     lti_params['user_id'] = request.user.id
 
