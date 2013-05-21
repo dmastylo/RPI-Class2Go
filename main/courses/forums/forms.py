@@ -4,10 +4,18 @@ class PiazzaAuthForm(forms.Form):
     # User Info
     user_id = forms.CharField()
     lis_person_contact_email_primary = forms.CharField()
-    lis_person_name_given = forms.CharField()
-    lis_person_name_family = forms.CharField()
+    #lis_person_name_given = forms.CharField()
+    #lis_person_name_family = forms.CharField()
     lis_person_name_full = forms.CharField()
+    lis_person_sourcedid = forms.CharField()
     roles = forms.CharField()
+    resource_link_id = forms.CharField()
+    resource_link_title = forms.CharField()
+    resource_link_description = forms.CharField()
+    tool_consumer_instance_guid = forms.CharField()
+    tool_consumer_instance_description = forms.CharField()
+
+    ext_submit = forms.CharField()
 
     # Class Info
     context_id = forms.CharField()
