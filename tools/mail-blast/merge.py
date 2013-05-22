@@ -13,13 +13,22 @@ def dict_from_file(fname):
     f = open(fname, 'r')
     reader = csv.reader(f)
     for row in reader:
-        if len(row) == 2: 
+        if len(row) == 2:
             (name,email) = row
-            result[email.lower()] = name
-        elif len(row) == 1: 
-            result[row[0].lower()] = ''
+        elif len(row) == 1:
+            email=row[0]
+            name=''
         else:
             skips += 1
+
+        # before using, watch out for nutty characters!
+        try:
+            k=email.lower().encode('ascii')
+            v=name.encode('ascii')
+        except:
+            skips += 1
+        else:
+            result[k] = v
     print "%s:\t read %d\tskipped %d" % (fname, len(result), skips)
     return result 
 
