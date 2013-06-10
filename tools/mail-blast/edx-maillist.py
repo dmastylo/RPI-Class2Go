@@ -160,12 +160,12 @@ and s.course_id = '%s'"""
     random.shuffle(newlist_k)
     
     print_errorseparator()
-    options.checkfreq = math.floor(len(newlist)/CHECK_EMAILS_TO_SEND-2)
+    options.checkfreq = math.floor(len(newlist)/(CHECK_EMAILS_TO_SEND-1))
     written = 0
     checklines = 0
     for k in newlist_k:
         checklines = print_checkline(options, written, checklines)
-        print "%s,%s" % (newlist[k],k)
+        print "\"%s\",\"%s\"" % (newlist[k],k)
         written += 1
     checklines = print_checkline(options, written, checklines, True)
 
