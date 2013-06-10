@@ -55,7 +55,7 @@ the deploy server."""
         (name, domain) = m.group(1,2)
         if options.checknum:
             name += "+%03d"
-        options.checkline = ",%s@%s" % (name, domain)
+        options.checkline = '"","%s@%s"' % (name, domain)
     if options.checknum == False and not options.check:
         parser.error("nonum option valid with check address option")
 
@@ -95,8 +95,9 @@ def dict_from_database(purpose, sql_query, proxy, command_template):
             continue
         try:
             (name,email) = line.split('\t')
-            k=email.lower().encode('ascii')
-            v=remove_diacritic(name)
+            k = email.lower().encode('ascii')
+            v = remove_diacritic(name).strip()
+            v = v.replace(',', '_')   # Class2Go fails on commas in the name
             if v != name:
                 print >> sys.stderr, "WARNING (%s): flattened name \"%s\" to \"%s\"" % (purpose, name, v)
                 warnings += 1
