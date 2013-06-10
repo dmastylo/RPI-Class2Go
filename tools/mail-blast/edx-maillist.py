@@ -109,7 +109,7 @@ def dict_from_database(purpose, sql_query, proxy, command_template):
     return result
 
 
-def print_errorseparator():
+def print_separator_to_stderr():
     print >> sys.stderr 
     print >> sys.stderr, "-------------------------------------------------------"
     print >> sys.stderr 
@@ -141,7 +141,7 @@ and s.course_id = '%s'"""
     students = dict_from_database("enrolled_students", sql_query, proxy, command_template)
 
     # Get Excludes list from Class2Go
-    print_errorseparator()
+    print_separator_to_stderr()
     sql_query = "select 'none',addr from c2g_emailaddr where optout=1"
     proxy = "sef@deploy.dev.c2gops.com"
     command_template = """ssh %s "mysql -e \\"%s\\"" """
@@ -159,7 +159,7 @@ and s.course_id = '%s'"""
     newlist_k = newlist.keys()
     random.shuffle(newlist_k)
     
-    print_errorseparator()
+    # Print final list to stdout
     options.checkfreq = math.floor(len(newlist)/(CHECK_EMAILS_TO_SEND-1))
     written = 0
     checklines = 0
@@ -169,9 +169,12 @@ and s.course_id = '%s'"""
         written += 1
     checklines = print_checkline(options, written, checklines, True)
 
+    # Summary at the end to stderr
+    print_separator_to_stderr()
     print >> sys.stderr, "INFO: found %d" % len(students)
     print >> sys.stderr, "INFO: excluded %d from optout list of %d" % (optouts, len(excludes))
     print >> sys.stderr, "INFO: wrote %d addresses, %d checklines" % (written, checklines)
+
     
 if __name__ == '__main__':
     main()
