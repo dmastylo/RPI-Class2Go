@@ -27,6 +27,7 @@ import unicodedata
 
 DEFAULT_COURSEID="Medicine/HRP258/Statistics_In_Medicine"
 CHECK_EMAILS_TO_SEND = 10
+JUMPBOX_USERNAME="sef"
 
 def parsecommandline():
     usage = """usage: %prog [options]
@@ -137,14 +138,14 @@ where s.user_id = u.id
 and s.user_id = up.user_id
 and s.course_id = '%s'"""
     sql_query = sql_query_template % options.courseid
-    proxy = "sefk@jump"
+    proxy = "%s@jump.prod.class.stanford.edu" % JUMPBOX_USERNAME
     command_template = """ssh %s "mysql -e \\"%s\\"" """
     students = dict_from_database("enrolled_students", sql_query, proxy, command_template)
 
     # Get Excludes list from Class2Go
     print_separator_to_stderr()
     sql_query = "select 'none',addr from c2g_emailaddr where optout=1"
-    proxy = "sef@deploy.dev.c2gops.com"
+    proxy = "%s@deploy.dev.c2gops.com" % JUMPBOX_USERNAME
     command_template = """ssh %s "mysql -e \\"%s\\"" """
     excludes = dict_from_database("excludes", sql_query, proxy, command_template)
 
