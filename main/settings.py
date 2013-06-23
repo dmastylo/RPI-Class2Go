@@ -125,7 +125,7 @@ MEDIA_URL = ''
 try:
     STATIC_ROOT
 except:
-    STATIC_ROOT = '/opt/' + APP + '/static/'
+    STATIC_ROOT = 'static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"

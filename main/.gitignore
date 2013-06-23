@@ -9,3 +9,5 @@ coverage-report
 chromedriver.log*
 selenium-server.log*
 db-dumps
+static/
+logs/
