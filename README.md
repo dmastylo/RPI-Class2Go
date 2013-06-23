@@ -190,12 +190,12 @@ updating course materials through the admin interface. The public login
 Using Class2Go Yourself (cont.)
 -----------------------
 
-Setup an institution via the admin panel found at <your-url-here>/admin
+Setup an institution via the admin panel found at *your-url-here*/admin
 using the superuser credentials created in the installation process
 of Class2Go. (Installation is found in other README docs in this repo.)
 
 Setup instructors via the admin panel, and then create courses at 
-<your-url-here>/courses/new. This will only work if you are logged in as
+*your-url-here*/courses/new. This will only work if you are logged in as
 the superuser.
 
 
