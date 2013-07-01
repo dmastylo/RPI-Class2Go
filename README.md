@@ -187,7 +187,7 @@ updating course materials through the admin interface. The public login
 [sandbox]: http://class2go.stanford.edu/sandbox/C2G/
 
 
-Using Class2Go Yourself (cont.)
+Using Class2Go Yourself (Added by Damian)
 -----------------------
 
 Setup an institution via the admin panel found at *your-url-here*/admin
@@ -197,6 +197,9 @@ of Class2Go. (Installation is found in other README docs in this repo.)
 Setup instructors via the admin panel, and then create courses at 
 *your-url-here*/courses/new. This will only work if you are logged in as
 the superuser.
+
+Make sure you do the "workon class2go" command before trying to run the server,
+otherwise you will run into import errors. Run the server with "python manage.py runserver 8100".
 
 
 License
