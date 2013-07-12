@@ -333,6 +333,6 @@ urlpatterns = patterns('',
 if settings.DEBUG and settings.SITE_NAME_SHORT:
     site=settings.SITE_NAME_SHORT
     urlpatterns += patterns('',
-        url(r'^favicon.ico$', RedirectView.as_view(settings.STATIC_URL+'graphics/sites/%s/favicon.ico' % site))
+        url(r'^favicon.ico$', RedirectView.as_view(url = settings.STATIC_URL+'graphics/sites/%s/favicon.ico'))
     )
 
