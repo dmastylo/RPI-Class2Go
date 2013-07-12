@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import patterns, include, url
-from django.views.generic import RedirectView
+from django.views.generic.simple import redirect_to
 from django.conf import settings
 from rest import views
 
@@ -333,6 +333,7 @@ urlpatterns = patterns('',
 if settings.DEBUG and settings.SITE_NAME_SHORT:
     site=settings.SITE_NAME_SHORT
     urlpatterns += patterns('',
-        url(r'^favicon.ico$', RedirectView.as_view(url = settings.STATIC_URL+'graphics/sites/%s/favicon.ico'))
+        url(r'^favicon.ico$', 'django.views.generic.simple.redirect_to',
+        {'url': settings.STATIC_URL+'graphics/sites/%s/favicon.ico' % site})
     )
 
