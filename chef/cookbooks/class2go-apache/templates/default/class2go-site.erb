@@ -22,7 +22,7 @@
     </Files>
     </Directory>
 
-    <Location /Shibboleth.sso>
+<!--     <Location /Shibboleth.sso>
         SetHandler shib
         Satisfy Any
         Allow from all
@@ -35,7 +35,7 @@
         AuthType shibboleth
         ShibRequestSetting requireSession 1
         require valid-user
-    </Location>
+    </Location> -->
 
     WSGIDaemonProcess <%= @appname %> processes=<%= @node['cpu']['total'] %> threads=15 maximum-requests=10000 python-path=/home/ubuntu/<%= @appname %>/main
     WSGIProcessGroup <%= @appname %>
