@@ -188,7 +188,7 @@ updating course materials through the admin interface. The public login
 
 
 Using Class2Go Yourself (Added by Damian)
------------------------
+------------------------------------------
 
 Setup an institution via the admin panel found at *your-url-here*/admin
 using the superuser credentials created in the installation process
@@ -200,6 +200,18 @@ the superuser.
 
 Make sure you do the "workon class2go" command before trying to run the server,
 otherwise you will run into import errors. Run the server with "python manage.py runserver 8100".
+
+
+Deploying to Production (Added by Damian)
+------------------------------------------
+
+WIP
+
+Create ubuntu 12.04 64 bit EC2 instance.
+Add Elastic IP and associate to that instance.
+Follow instructions here http://adrian.org.ar/django-nginx-green-unicorn-in-an-ubuntu-11-10-ec2-instance/
+
+restart nginx with "sudo fuser -k 80/tcp ; sudo /etc/init.d/nginx restart"
 
 
 License
