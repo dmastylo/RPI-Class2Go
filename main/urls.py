@@ -14,7 +14,7 @@ urlpatterns = patterns('',
     # Health check endpoint.  Used by AWS load balancer.  Want something stable that
     # won't be redirected or change
     url(r'^_health$', 'c2g.views.healthcheck'),
-                       
+
     # Testing the error pages (404 and 500)
     url(r'^_throw500$', 'c2g.views.throw500'),
     url(r'^_throw404$', 'c2g.views.throw404'),
@@ -23,20 +23,20 @@ urlpatterns = patterns('',
     url(r'^rest/login', 'rest.views.rest_login'),
     url(r'^rest/problemactivities', views.ProblemActivities.as_view()),
     url(r'^rest/courses', views.CourseList.as_view()),
-    url(r'^rest/announcements', views.AnnouncementList.as_view()),                                              
-    url(r'^rest/psets', views.ProblemSetList.as_view()),                                              
-    url(r'^rest/psettoexercise', views.ProblemSetToExerciseList.as_view()),  
-    url(r'^rest/exercise', views.ExerciseList.as_view()),  
-    url(r'^rest/contentsection', views.ContentSectionList.as_view()),  
-    url(r'^rest/videotoexercise', views.VideoToExerciseList.as_view()),  
+    url(r'^rest/announcements', views.AnnouncementList.as_view()),
+    url(r'^rest/psets', views.ProblemSetList.as_view()),
+    url(r'^rest/psettoexercise', views.ProblemSetToExerciseList.as_view()),
+    url(r'^rest/exercise', views.ExerciseList.as_view()),
+    url(r'^rest/contentsection', views.ContentSectionList.as_view()),
+    url(r'^rest/videotoexercise', views.VideoToExerciseList.as_view()),
     url(r'^rest/videoactivities', views.VideoActivities.as_view()),
-    url(r'^rest/files', views.FilesList.as_view()),                         
-    url(r'^rest/video', views.VideoList.as_view()),  
+    url(r'^rest/files', views.FilesList.as_view()),
+    url(r'^rest/video', views.VideoList.as_view()),
     url(r'^rest/exams', views.ExamList.as_view()),
     url(r'^rest/examrecords', views.ExamRecordList.as_view()),
     url(r'^rest/examscores', views.ExamScoreList.as_view()),
     url(r'^rest/examscorefields', views.ExamScoreFieldList.as_view()),
-                    
+
     #Testing messages
     url(r'^_test_messages$', 'c2g.views.test_messages'),
 
@@ -49,10 +49,10 @@ urlpatterns = patterns('',
     url(r'^hiring/?$', 'courses.landing.views.hiring'),
 
     url(r'^maint$', 'c2g.views.maintenance'),
-                       
+
     # Get server epoch
     url(r'^server_epoch/?$', 'c2g.views.server_epoch'),
-    
+
     # Get server time
     url(r'^server_time/?$', 'c2g.views.server_time'),
 
@@ -72,12 +72,12 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/get_csv_grades/?$', 'courses.exams.views.view_csv_grades'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/save_student_progress/?$', 'courses.exams.views.student_save_progress'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/exams/(?P<exam_slug>[a-zA-Z0-9_-]+)/confirm/?$', 'courses.exams.views.confirm', name='confirm_exam_start'),
-                    
-                       
-                       
+
+
+
     #The rest of these URLs end up in the location bar of student users.  We should alias them for each exam subtype so that students do not get
     #confused.  Would love to make this DRY, because it's very repetitive, but I don't know how.
-                      
+
     #Exam subtype of exam
     #All subtypes use the same views in this list, so any reversing should be done using the name, i.e. 'exam_list', otherwise it
     #will not return the right URL for the right type
@@ -119,22 +119,22 @@ urlpatterns = patterns('',
 
     #emailoptout
     url(r'^email_optout/(?P<code>[a-zA-Z0-9]+)/?$', 'courses.email_members.views.optout', name='maillist_optout'),
-    
+
     # Commented out the following 2 urls since point to a signup page which is
     # no longer required.
 #    url(r'^courses/?$', 'c2g.views.home', name='c2g_home'),
 #    url(r'^courses/signup/?$', 'courses.actions.signup'),
 
 #    url(r'^class2go/', include('class2go.foo.urls')),
-   
+
     url(r'^default-login/?$', 'accounts.views.default_login', name='default_login'),
     #shibboleth login
     url(r'^shib-login/?$', 'accounts.views.shib_login', name='shib_login'),
-                       
-    
+
+
     #impersonate
     url(r'^impersonate/(?P<username>[\w.@+-]+)/?$', 'accounts.views.impersonate', name='impersonate'),
-                       
+
     #for data collection
     url(r'^videos/save/', 'courses.videos.actions.save_video_progress'),
     url(r'^videos/record_download/', 'courses.videos.actions.record_download'),
@@ -176,7 +176,7 @@ urlpatterns = patterns('',
         'courses.views.course_materials',
         name='course_materials_by_section'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/admin/?', 'courses.admin_views.admin'),
-                       
+
     #member management
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/member_management/?', 'courses.member_management.views.listAll'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/unenroll_student/?', 'courses.member_management.views.unenroll_student'),
@@ -185,7 +185,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/uninvite/?', 'courses.member_management.views.uninvite'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/reclassify_member/?', 'courses.member_management.views.reclassify_member'),
 
-                       
+
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/leftnav/?$', 'courses.views.leftnav'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/rightnav/?$', 'courses.views.rightnav'),
 
@@ -250,7 +250,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/videos/(?P<video_id>[a-zA-Z0-9_-]+)/load_video_problem_set/?$',
         'courses.videos.views.load_video_problem_set',
         name='course_video_pset'),
-    
+
 
 
     # Video Exercises
@@ -287,17 +287,17 @@ urlpatterns = patterns('',
     url(r'^upload_file/?', 'courses.files.actions.upload'),
     url(r'^edit_file/?', 'courses.files.actions.edit'),
     url(r'^delete_file/?', 'courses.files.actions.delete_file'),
-                       
+
     #Content Sharing
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/?$', 'courses.content_sections.views.copy_content_form'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_section/send/?$', 'courses.content_sections.views.copy_content'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_course/?$', 'courses.content_sections.views.copy_course_form'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_course/send/?$', 'courses.content_sections.views.copy_course'),
-                                             
+
     # Landing Page
     url(r'^/?$', 'courses.landing.views.landing'),
-                       
-                       
+
+
     # quizdown preview page
     url(r'^quizdown_preview/?$', 'courses.exams.views.quizdown_preview'),
     url(r'^check_exam_metadata/?$', 'courses.exams.views.check_metadata_xml_no_course'),
@@ -308,13 +308,13 @@ urlpatterns = patterns('',
     # url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'courses.preview.views.preview_login'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/preview_login/$', 'accounts.views.default_preview_login'),
     #Email
-    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),             
-    
+    url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/email_members/$', 'courses.email_members.views.email_members'),
+
     #Reports
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/browse_reports/?$', 'courses.reports.views.main'),
     url(r'^generate_report$', 'courses.reports.views.generate_report'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/reports/(?P<report_subfolder>[a-zA-Z0-9_-]+)/(?P<report_name>.+)$', 'courses.reports.views.download_report'),
-    
+
     #In-line Reports
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/generate_in_line_report/?$', 'courses.reports.views.generate_in_line_report'),
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/summary_report/(?P<exam_slug>[a-zA-Z0-9_-]+)/?$', 'courses.reports.views.summary_report'),
@@ -322,7 +322,7 @@ urlpatterns = patterns('',
     #Chat
     # FIXME: this should be replaced with a widget embedded in other pages, but giving it its own page lets me get up and testing fast
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/chat/?$', 'courses.chat.views.prototype'),
-    
+
     #Current course redirects THIS SHOULD PROBABLY ALWAYS BE THE LAST ITEM THAT HAS TO DO WITH COURSES
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/?$', 'courses.views.current_redirects'),
 
@@ -336,4 +336,4 @@ if settings.DEBUG and settings.SITE_NAME_SHORT:
         url(r'^favicon.ico$', 'django.views.generic.simple.redirect_to',
         {'url': settings.STATIC_URL+'graphics/sites/%s/favicon.ico' % site})
     )
-   
+

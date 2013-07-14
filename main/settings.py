@@ -79,9 +79,9 @@ TIME_ZONE = 'America/Los_Angeles'
 LANGUAGE_CODE = 'en-us'
 
 
-# These site variables are used for display in the product and can 
+# These site variables are used for display in the product and can
 # drive any conditional changes (display, etc).
-# Override all four in your database.py file, otherwise they will 
+# Override all four in your database.py file, otherwise they will
 # default back to Stanford.
 try:
     SITE_ID
@@ -329,7 +329,7 @@ try:
 except NameError:
     # TODO: fail if not defined
     pass
-    
+
 try:
     AWS_SECURE_STORAGE_BUCKET_NAME
 except NameError:
