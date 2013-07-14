@@ -198,8 +198,12 @@ Setup instructors via the admin panel, and then create courses at
 *your-url-here*/courses/new. This will only work if you are logged in as
 the superuser.
 
+Make sure to run "pip install django-celery" or you will get import errors.
+
 Make sure you do the "workon class2go" command before trying to run the server,
-otherwise you will run into import errors. Run the server with "python manage.py runserver 8100".
+otherwise you will run into import errors.
+
+Run the server with "python manage.py runserver 8100".
 
 
 Deploying to Production (Added by Damian)
