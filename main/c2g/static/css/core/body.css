@@ -16,9 +16,9 @@ h1,h2,h3,h4 {margin:0;}
 h3 {margin-bottom:.5em;font-size:20px; line-height:1.2em;}
 h4 {margin-bottom:.5em;font-size:16px;}
 
-.attempts 
+.attempts
 {
-font-size:12; 
+font-size:12;
 float:right;
 }
 
@@ -91,17 +91,17 @@ a:hover {color:#820000;}
   text-align:center;
 }
 .upcoming table {
-  
+
 }
-.upcoming table th { 
+.upcoming table th {
   text-decoration:underline;
   text-align:left;
 }
-.upcoming table td, .upcoming table th { 
+.upcoming table td, .upcoming table th {
   padding: 4px 6px;
   border:0px;
 }
-.complete { 
+.complete {
   color:#090;
 }
 
@@ -160,7 +160,7 @@ a:hover [class^="icon-"] {
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     -khtml-border-radius: 10px;
-    -o-border-radius: 10px; 
+    -o-border-radius: 10px;
     background: #f4f4e0;
     background: -moz-linear-gradient(top, #f4f4e0, #ffffff);
     background: -webkit-gradient(linear, left top, left bottom, from(#f4f4e0), to(#ffffff));
@@ -224,8 +224,8 @@ a.thumbnail:hover {
   font-weight: normal;
 }
 
-.dropdown-menu li > a:hover, 
-.dropdown-menu li > a:focus, 
+.dropdown-menu li > a:hover,
+.dropdown-menu li > a:focus,
 .dropdown-submenu:hover > a {
   display: block;
   border-top:0;
@@ -298,7 +298,7 @@ body.home {
     display:none;
 }
 .home .hero-header {
-    background:url(../../graphics/core/bg-hero-header.jpg) no-repeat top center;
+    background: #fff url(/static/graphics/core/bg-hero-header-rpi.jpg) no-repeat top center;
 }
 .home .hero-header .hero {
     width:520px;
@@ -360,15 +360,15 @@ body.home {
     margin-bottom:0;
 }
 .databases {
-    background:#fff url(/static/graphics/core/dbLogo.jpg) no-repeat top left; 
+    background:#fff url(/static/graphics/core/dbLogo.jpg) no-repeat top left;
     padding:20px 20px 20px 320px;
 }
 .computernetworking {
-    background:#fff url(/static/graphics/core/computer-networking.jpg) no-repeat top left; 
+    background:#fff url(/static/graphics/core/computer-networking.jpg) no-repeat top left;
     padding:20px 20px 20px 320px;
 }
 .solarcells {
-    background: #fff url(/static/graphics/core/solarcells.jpg) no-repeat top left; 
+    background: #fff url(/static/graphics/core/solarcells.jpg) no-repeat top left;
     padding:20px 20px 20px 320px;
 }
 .home h3 a {
@@ -551,7 +551,7 @@ small.date {
     background: -moz-linear-gradient(top, #eee6cb, #aca68d); /* Firefox 3.6+ */
     background: -ms-linear-gradient(top, #eee6cb, #aca68d); /* IE 10 */
     background: -o-linear-gradient(top, #eee6cb, #aca68d); /* Opera 11.10+ */
-    
+
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
@@ -760,7 +760,7 @@ small.date {
 
 
 .profile-courses {
-    
+
 }
 .profile-courses .course {
     position: relative;
@@ -887,13 +887,13 @@ ul.unstyled.course-list {
 }
 
 h3.course-section-heading {
-    border-bottom:1px solid #eee; 
+    border-bottom:1px solid #eee;
 }
 
 .course-list-item {
   overflow:hidden;
   padding: 5px;
-  border-bottom: 0; 
+  border-bottom: 0;
   /* border-bottom: 1px solid #eee; */
 }
 
@@ -915,7 +915,7 @@ h3.course-section-heading {
 .course-list-item .icon-file,
 .course-list-item .icon-check,
 .course-list-item .icon-facetime-video {
-    font-size:24px; 
+    font-size:24px;
     color:#999;
     opacity:.3;
     padding-left:5px;
@@ -1196,13 +1196,13 @@ ul.ui-sortable li:hover {
     list-style-type:none;
 }
 
-.edit-button { 
+.edit-button {
     float:right;
     color:green;
     margin:5px;
 }
 
-.delete-button { 
+.delete-button {
     float:right;
     color:red;
     margin:5px;
