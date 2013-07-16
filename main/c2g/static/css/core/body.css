@@ -18,21 +18,19 @@ h4 {margin-bottom:.5em;font-size:16px;}
 
 .attempts
 {
-font-size:12;
-float:right;
+    font-size:12;
+    float:right;
 }
 
 .chevron
 {
-padding-left:7px;
+    padding-left:7px;
 }
 
 .rightmargin
 {
-margin-right:50px;
+    margin-right:50px;
 }
-
-
 
 .leftnav-subtitle {
     display:block;
@@ -40,20 +38,22 @@ margin-right:50px;
     color:#999999;
     margin-top:-5px;
 }
+
 .leftnav-title {
     display:block;
     color: #333;
 }
+
 #left-nav .accordion-group .nav-list.collapse {
     visibility: hidden;
 }
+
 #left-nav .accordion-group .nav-list.collapse.in {
     visibility: visible;
 }
 
-
-a {color:#820000;}
-a:hover {color:#820000;}
+a {color:#E3170D;}
+a:hover {color:#922222;}
 .modal form {margin-bottom:0;}
 .well {border-color:#bdb7a1;}
 .well.tight {padding:10px 0;background:#e9e6df;}
@@ -443,7 +443,7 @@ small.date {
 /* Header
 -------------------------------------------------- */
 #global-header {
-    background:#8C1515 url(../../graphics/core/shadow-header-bg.png) bottom center no-repeat;
+    background:#E3170D url(../../graphics/core/shadow-header-bg.png) bottom center no-repeat;
     width:100%;
 }
 .stanford-logo {
@@ -508,7 +508,7 @@ small.date {
 .top-nav li .btn {
     padding-left: 10px;
     padding-right: 10px;
-    background: rgb(100,0,0);
+    background: #8E2323;
     color:white;
     border:0;
     border-radius: 10px;
@@ -1037,7 +1037,7 @@ input[type="checkbox"] {
 -------------------------------------------------- */
 
 #global-footer {
-    background:#8C1515 url(../../graphics/core/shadow-footer-bg.png) top center no-repeat;
+    background:#000000 url(../../graphics/core/shadow-footer-bg.png) top center no-repeat;
     width:100%;
 }
 #bottom-logo {
