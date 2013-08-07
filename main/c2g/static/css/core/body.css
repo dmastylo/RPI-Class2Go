@@ -118,18 +118,18 @@ a:hover {color:#922222;}
 .nav-list .divider {background-color: #aca68d;}
 
 .btn-primary {
-    background-color: #8f2618;
-    *background-color: #8f2618;
-    background-image: -ms-linear-gradient(top, #8f2618, #66190f);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#8f2618), to(#66190f));
-    background-image: -webkit-linear-gradient(top, #8f2618, #66190f);
-    background-image: -o-linear-gradient(top, #8f2618, #66190f);
-    background-image: -moz-linear-gradient(top, #8f2618, #66190f);
-    background-image: linear-gradient(top, #8f2618, #66190f);
+    background-color: #D0150C;
+    *background-color: #D0150C;
+    background-image: -ms-linear-gradient(top, #D0150C, #A92919);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#D0150C), to(#A92919));
+    background-image: -webkit-linear-gradient(top, #D0150C, #A92919);
+    background-image: -o-linear-gradient(top, #D0150C, #A92919);
+    background-image: -moz-linear-gradient(top, #D0150C, #A92919);
+    background-image: linear-gradient(top, #D0150C, #A92919);
     background-repeat: repeat-x;
     border-color: #0055cc #0055cc #003580;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#8f2618', endColorstr='#66190f', GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#D0150C', endColorstr='#A92919', GradientType=0);
     filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 
@@ -138,13 +138,13 @@ a:hover {color:#922222;}
 .btn-primary.active,
 .btn-primary.disabled,
 .btn-primary[disabled] {
-    background-color: #66190f;
-    *background-color: #66190f;
+    background-color: #A92919;
+    *background-color: #A92919;
 }
 
 .btn-primary:active,
 .btn-primary.active {
-    background-color: #66190f \9;
+    background-color: #A92919 \9;
 }
 
 .btn [class^="icon-"], .nav-tabs [class^="icon-"], .btn [class*=" icon-"], .nav-tabs [class*=" icon-"] {
