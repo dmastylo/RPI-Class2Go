@@ -105,6 +105,7 @@ a:hover {color:#922222;}
   color:#090;
 }
 
+/* Buttons fixed to RPI Red */
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
 .btn-spaced {margin-right:5px;}
@@ -508,7 +509,7 @@ small.date {
 .top-nav li .btn {
     padding-left: 10px;
     padding-right: 10px;
-    background: #8E2323;
+    background: #A92919;
     color:white;
     border:0;
     border-radius: 10px;
@@ -518,7 +519,7 @@ small.date {
     -o-border-radius: 10px;
 }
 .top-nav li .btn:hover {
-    background: rgb(80,0,0);
+    background: #66190F;
 }
 .top-nav li span {
     color: white;
@@ -527,7 +528,7 @@ small.date {
 }
 
 .top-nav #clock #clockHours {
-    font-size: 20px;
+    font-size: 16px;
 }
 .top-nav #clock #clock-bubble {
     display: none;
