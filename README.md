@@ -1,6 +1,6 @@
 Class2Go 
 ========
-testing push permissions
+
 [![Build Status](https://travis-ci.org/Stanford-Online/class2go.png?branch=master)](https://travis-ci.org/Stanford-Online/class2go)
 
 Class2Go is Stanford's internal open-source platform for on-line
