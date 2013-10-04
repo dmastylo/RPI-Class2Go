@@ -211,11 +211,20 @@ Deploying to Production (Added by Damian)
 
 WIP
 
-Create ubuntu 12.04 64 bit EC2 instance.
-Add Elastic IP and associate to that instance.
-Follow instructions here http://adrian.org.ar/django-nginx-green-unicorn-in-an-ubuntu-11-10-ec2-instance/
-
 restart nginx with "sudo fuser -k 80/tcp ; sudo /etc/init.d/nginx restart"
+
+If you get errors like this:
+[ERROR] Connection in use: ('0.0.0.0', 80)
+[ERROR] Retrying in 1 second.
+[ERROR] Can't connect to ('0.0.0.0', 80)
+
+run this command:
+sudo fuser -n tcp 80
+
+collect the process IDs (PIDs)
+
+run this command with the collected PIDs:
+sudo kill -9 [PID] [PID] [PID] (insert the PIDS from the previous command)
 
 
 License
