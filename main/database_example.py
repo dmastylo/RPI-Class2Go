@@ -49,20 +49,20 @@ INSTANCE="dev"
 # Information about this site. Note that the short name here is used to
 # build paths to site assets, so is specific and case-sensitive.
 SITE_ID = 1
-SITE_NAME_SHORT = 'Stanford'
-SITE_NAME_LONG = 'Stanford University'
-SITE_TITLE = 'Stanford Class2Go'
-SITE_URL = 'https://class2go.stanford.edu'
+SITE_NAME_SHORT = 'RPI'
+SITE_NAME_LONG = 'Rensselaer Polytechnic Institute'
+SITE_TITLE = 'RPI Class2Go'
+SITE_URL = 'http://node03.cs.rpi.edu' # hopefully temporary before we switch to a better subdomain
 
 # Put your name and email address here, so Django serious errors can come to you
 # the trailing comma after the list is important so Python correctly interprets 
 # this as a list of lists
 ADMINS = (
-        ('Class2Go Dev', "YOURNAME@stanford.edu"),
+        ('Class2Go Dev', "YOURNAME@rpi.edu"),
         )
 
 # EMAIL ERROR PINGS
-ERROR_SNIPPET_EMAILS = ['YOURNAME@stanford.edu',]
+ERROR_SNIPPET_EMAILS = ['YOURNAME@rpi.edu',]
 
 #########
 # S3 Storage configuration. Read both stanzas so you understand what these do.
