@@ -16,23 +16,21 @@ h1,h2,h3,h4 {margin:0;}
 h3 {margin-bottom:.5em;font-size:20px; line-height:1.2em;}
 h4 {margin-bottom:.5em;font-size:16px;}
 
-.attempts 
+.attempts
 {
-font-size:12; 
-float:right;
+    font-size:12;
+    float:right;
 }
 
 .chevron
 {
-padding-left:7px;
+    padding-left:7px;
 }
 
 .rightmargin
 {
-margin-right:50px;
+    margin-right:50px;
 }
-
-
 
 .leftnav-subtitle {
     display:block;
@@ -40,20 +38,22 @@ margin-right:50px;
     color:#999999;
     margin-top:-5px;
 }
+
 .leftnav-title {
     display:block;
     color: #333;
 }
+
 #left-nav .accordion-group .nav-list.collapse {
     visibility: hidden;
 }
+
 #left-nav .accordion-group .nav-list.collapse.in {
     visibility: visible;
 }
 
-
-a {color:#820000;}
-a:hover {color:#820000;}
+a {color:#E3170D;}
+a:hover {color:#922222;}
 .modal form {margin-bottom:0;}
 .well {border-color:#bdb7a1;}
 .well.tight {padding:10px 0;background:#e9e6df;}
@@ -91,20 +91,21 @@ a:hover {color:#820000;}
   text-align:center;
 }
 .upcoming table {
-  
+
 }
-.upcoming table th { 
+.upcoming table th {
   text-decoration:underline;
   text-align:left;
 }
-.upcoming table td, .upcoming table th { 
+.upcoming table td, .upcoming table th {
   padding: 4px 6px;
   border:0px;
 }
-.complete { 
+.complete {
   color:#090;
 }
 
+/* Buttons fixed to RPI Red */
 .btn {font-weight:bold;}
 .btn-large {padding:8px 30px;}
 .btn-spaced {margin-right:5px;}
@@ -118,18 +119,18 @@ a:hover {color:#820000;}
 .nav-list .divider {background-color: #aca68d;}
 
 .btn-primary {
-    background-color: #8f2618;
-    *background-color: #8f2618;
-    background-image: -ms-linear-gradient(top, #8f2618, #66190f);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#8f2618), to(#66190f));
-    background-image: -webkit-linear-gradient(top, #8f2618, #66190f);
-    background-image: -o-linear-gradient(top, #8f2618, #66190f);
-    background-image: -moz-linear-gradient(top, #8f2618, #66190f);
-    background-image: linear-gradient(top, #8f2618, #66190f);
+    background-color: #D0150C;
+    *background-color: #D0150C;
+    background-image: -ms-linear-gradient(top, #D0150C, #A92919);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#D0150C), to(#A92919));
+    background-image: -webkit-linear-gradient(top, #D0150C, #A92919);
+    background-image: -o-linear-gradient(top, #D0150C, #A92919);
+    background-image: -moz-linear-gradient(top, #D0150C, #A92919);
+    background-image: linear-gradient(top, #D0150C, #A92919);
     background-repeat: repeat-x;
     border-color: #0055cc #0055cc #003580;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#8f2618', endColorstr='#66190f', GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#D0150C', endColorstr='#A92919', GradientType=0);
     filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 
@@ -138,13 +139,13 @@ a:hover {color:#820000;}
 .btn-primary.active,
 .btn-primary.disabled,
 .btn-primary[disabled] {
-    background-color: #66190f;
-    *background-color: #66190f;
+    background-color: #A92919;
+    *background-color: #A92919;
 }
 
 .btn-primary:active,
 .btn-primary.active {
-    background-color: #66190f \9;
+    background-color: #A92919 \9;
 }
 
 .btn [class^="icon-"], .nav-tabs [class^="icon-"], .btn [class*=" icon-"], .nav-tabs [class*=" icon-"] {
@@ -160,7 +161,7 @@ a:hover [class^="icon-"] {
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     -khtml-border-radius: 10px;
-    -o-border-radius: 10px; 
+    -o-border-radius: 10px;
     background: #f4f4e0;
     background: -moz-linear-gradient(top, #f4f4e0, #ffffff);
     background: -webkit-gradient(linear, left top, left bottom, from(#f4f4e0), to(#ffffff));
@@ -224,8 +225,8 @@ a.thumbnail:hover {
   font-weight: normal;
 }
 
-.dropdown-menu li > a:hover, 
-.dropdown-menu li > a:focus, 
+.dropdown-menu li > a:hover,
+.dropdown-menu li > a:focus,
 .dropdown-submenu:hover > a {
   display: block;
   border-top:0;
@@ -298,7 +299,7 @@ body.home {
     display:none;
 }
 .home .hero-header {
-    background:url(../../graphics/core/bg-hero-header.jpg) no-repeat top center;
+    background: #fff url(/static/graphics/core/bg-hero-header-rpi.jpg) no-repeat top center;
 }
 .home .hero-header .hero {
     width:520px;
@@ -360,15 +361,15 @@ body.home {
     margin-bottom:0;
 }
 .databases {
-    background:#fff url(/static/graphics/core/dbLogo.jpg) no-repeat top left; 
+    background:#fff url(/static/graphics/core/dbLogo.jpg) no-repeat top left;
     padding:20px 20px 20px 320px;
 }
 .computernetworking {
-    background:#fff url(/static/graphics/core/computer-networking.jpg) no-repeat top left; 
+    background:#fff url(/static/graphics/core/computer-networking.jpg) no-repeat top left;
     padding:20px 20px 20px 320px;
 }
 .solarcells {
-    background: #fff url(/static/graphics/core/solarcells.jpg) no-repeat top left; 
+    background: #fff url(/static/graphics/core/solarcells.jpg) no-repeat top left;
     padding:20px 20px 20px 320px;
 }
 .home h3 a {
@@ -443,7 +444,7 @@ small.date {
 /* Header
 -------------------------------------------------- */
 #global-header {
-    background:#8C1515 url(../../graphics/core/shadow-header-bg.png) bottom center no-repeat;
+    background:#E3170D url(../../graphics/core/shadow-header-bg.png) bottom center no-repeat;
     width:100%;
 }
 .stanford-logo {
@@ -508,7 +509,7 @@ small.date {
 .top-nav li .btn {
     padding-left: 10px;
     padding-right: 10px;
-    background: rgb(100,0,0);
+    background: #A92919;
     color:white;
     border:0;
     border-radius: 10px;
@@ -518,7 +519,7 @@ small.date {
     -o-border-radius: 10px;
 }
 .top-nav li .btn:hover {
-    background: rgb(80,0,0);
+    background: #66190F;
 }
 .top-nav li span {
     color: white;
@@ -527,7 +528,7 @@ small.date {
 }
 
 .top-nav #clock #clockHours {
-    font-size: 20px;
+    font-size: 16px;
 }
 .top-nav #clock #clock-bubble {
     display: none;
@@ -551,7 +552,7 @@ small.date {
     background: -moz-linear-gradient(top, #eee6cb, #aca68d); /* Firefox 3.6+ */
     background: -ms-linear-gradient(top, #eee6cb, #aca68d); /* IE 10 */
     background: -o-linear-gradient(top, #eee6cb, #aca68d); /* Opera 11.10+ */
-    
+
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
@@ -760,7 +761,7 @@ small.date {
 
 
 .profile-courses {
-    
+
 }
 .profile-courses .course {
     position: relative;
@@ -887,13 +888,13 @@ ul.unstyled.course-list {
 }
 
 h3.course-section-heading {
-    border-bottom:1px solid #eee; 
+    border-bottom:1px solid #eee;
 }
 
 .course-list-item {
   overflow:hidden;
   padding: 5px;
-  border-bottom: 0; 
+  border-bottom: 0;
   /* border-bottom: 1px solid #eee; */
 }
 
@@ -915,7 +916,7 @@ h3.course-section-heading {
 .course-list-item .icon-file,
 .course-list-item .icon-check,
 .course-list-item .icon-facetime-video {
-    font-size:24px; 
+    font-size:24px;
     color:#999;
     opacity:.3;
     padding-left:5px;
@@ -1037,7 +1038,7 @@ input[type="checkbox"] {
 -------------------------------------------------- */
 
 #global-footer {
-    background:#8C1515 url(../../graphics/core/shadow-footer-bg.png) top center no-repeat;
+    background:#000000 url(../../graphics/core/shadow-footer-bg.png) top center no-repeat;
     width:100%;
 }
 #bottom-logo {
@@ -1196,13 +1197,13 @@ ul.ui-sortable li:hover {
     list-style-type:none;
 }
 
-.edit-button { 
+.edit-button {
     float:right;
     color:green;
     margin:5px;
 }
 
-.delete-button { 
+.delete-button {
     float:right;
     color:red;
     margin:5px;

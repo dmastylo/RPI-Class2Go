@@ -295,7 +295,7 @@ urlpatterns = patterns('',
     url(r'^(?P<course_prefix>[a-zA-Z0-9_-]+)/(?P<course_suffix>[a-zA-Z0-9_-]+)/copy_course/send/?$', 'courses.content_sections.views.copy_course'),
 
     # Landing Page
-    url(r'^/?$', 'courses.landing.views.landing'),
+    url(r'^/?$', 'courses.landing.views.landing', name='landing'),
 
 
     # quizdown preview page
