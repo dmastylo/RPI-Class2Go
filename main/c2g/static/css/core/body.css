@@ -447,25 +447,25 @@ small.date {
     background:#E3170D url(../../graphics/core/shadow-header-bg.png) bottom center no-repeat;
     width:100%;
 }
-.stanford-logo {
-    /*
-    background:transparent url(../../graphics/core/header-stanford-logo.png) no-repeat 20px 10px;
+.rpi-logo {
+    
+    background:transparent url(../../graphics/core/header-rpi-logo.png) no-repeat 20px 10px;
     background-size: 160px 19px;
     padding:9px 20px;
     width:160px;
     height:19px;
-    */
+    
     text-indent: -999px;
     display:block;
     overflow:hidden;
 }
-.stanford-logo a {
+.rpi-logo a {
     display: block;
     padding:9px 20px;
     width:160px;
     height:19px;
 }
-.stanford-logo a img {
+.rpi-logo a img {
     display: block;
     margin-top: 1px;
 }

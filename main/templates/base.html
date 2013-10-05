@@ -12,14 +12,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel='shortcut icon' type='image/x-icon' href='{{ STATIC_URL }}graphics/sites/{{ SITE_NAME_SHORT }}/favicon.ico' />
     {% block top_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/bootstrap.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/responsive.css" />
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/body.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/font-awesome.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/divs.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/iconfont.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/analogclock.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/sites/{{ SITE_NAME_SHORT }}/styles.css" />
+    {% load compress %}
+    {% compress css %}
+    <link type="text/x-scss" rel="stylesheet" href="{{ STATIC_URL }}css/core/foundation.scss" />
+    <link type="text/x-scss" rel="stylesheet" href="{{ STATIC_URL }}css/sites/{{ SITE_NAME_SHORT }}/styles.scss" />
+    {% endcompress %}
 
     <!--[if IE 7]>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
@@ -34,6 +34,8 @@
         </script>
     <![endif]-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="//use.typekit.net/tyv1luk.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
     {% endblock top_scripts %}
     {% block addl_stylesheets %}{% endblock addl_stylesheets %}
     {% block addl_head_scripts %}{% endblock addl_head_scripts %}
@@ -44,11 +46,11 @@
     <div id="viewport">
       {% if not request.session.headless %}
         <div id="global-header">
-            <h1 class="stanford-logo">
-            	{% if SITE_NAME_SHORT == 'Stanford' %}
-                <a href="http://www.stanford.edu">
-                    <img src="/static/graphics/core/header-stanford-logo.png" width="160" alt="Stanford University">
-                    Stanford University
+            <h1 class="rpi-logo">
+            	{% if SITE_NAME_SHORT == 'rpi' %}
+                <a href="http://www.rpi.edu">
+                    <img src="/static/graphics/core/header-rpi-logo.png" width="160" alt="Rensselaer Polytechnic Institute">
+                    Rensselaer Polytechnic Institute
                 </a>
                 {% else %}
                 <a href="https://{{ SITE_NAME_LONG }}"</a>
@@ -81,7 +83,6 @@
                     {% endifequal %}
                 {% endblock navbar %}
             {% endif %}
-            
             <div class="row-fluid" style="position:relative;">
                 {% block page_title %}
                 <div class="pull-left page-title">
@@ -124,7 +125,7 @@
                             <li class="hidden-phone"><span> {% trans 'Welcome' %} <strong><a href="/accounts/profile"> {{ user.first_name }} {{ user.last_name }} </a></strong>!</span></li>
                         {% else %}
                             <li class="hidden-phone">
-                                {% if SITE_NAME_SHORT == 'Stanford' %}
+                                {% if SITE_NAME_SHORT == 'rpi' %}
                                     {% with login_course=common_page_data.ready_course login_link_id="login_button" login_link_class="btn" link_text=Login_trans %}
                                                 {% include "registration/login_link.html" %}
                                     {% endwith %}
@@ -158,6 +159,7 @@
         
         
         {% block content %}
+                    <h1><i class="rpilogo-02" style="font-size:10em"></i></h1>
         <div id="main-content" class="container-fluid body-content" role="main">
             <div class="row-fluid">
                 {% block l_column_content %}
@@ -322,21 +324,10 @@
         });
     </script>
     {% endblock bottom_scripts %}
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      {% if SITE_NAME_SHORT == 'Stanford' %}
-      _gaq.push(['_setAccount', 'UA-33859275-1']);
-      {% else %}
-      _gaq.push(['_setAccount', 'UA-38369706-1']);
-      {% endif %}
-      _gaq.push(['_trackPageview']);
 
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-    </script>
+    <!-- Need to re-add Google Analytics script -->
+
+    
     {% block addl_scripts %}
     {% endblock addl_scripts %}
 </body>

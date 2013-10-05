@@ -148,6 +148,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder'
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -306,6 +307,7 @@ INSTALLED_APPS = (
                        'tools',
                        'tools.aws',
                        'tools.certificates',
+                       'compressor'
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
@@ -314,6 +316,12 @@ if INSTANCE != "prod":
                         'django_coverage',
                        )
 
+COMPRESS_PRECOMPILERS = (
+    ('text/coffeescript', 'coffee --compile --stdio'),
+    ('text/less', 'lessc {infile} {outfile}'),
+    ('text/x-sass', 'sass {infile} {outfile}'),
+    ('text/x-scss', 'sass --scss {infile} {outfile}'),
+)
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
