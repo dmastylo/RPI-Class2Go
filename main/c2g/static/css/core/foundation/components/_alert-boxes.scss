@@ -71,7 +71,7 @@ $alert-radius: $global-radius !default;
 @mixin alert-close {
   font-size: $alert-close-font-size;
   padding: $alert-close-padding;
-  line-height: 0;
+  line-height: 0.25em;
   position: absolute;
   top: $alert-close-position + emCalc(2);
   #{$opposite-direction}: $alert-close-position;
