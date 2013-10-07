@@ -52,8 +52,8 @@ $em-base: 16 !default;
 $default-float: left;
 
 $body-bg: #FDFCFC;
-$body-font-color: #364244;
-$body-font-family: Helvetica, Arial, sans-serif;
+$body-font-color: rgba(39, 44, 54, 0.7);
+$body-font-family: "ff-meta-web-pro", "Myriad Pro", Helvetica, Arial, sans-serif;
 $body-font-weight: normal;
 $body-font-style: normal;
 
@@ -67,11 +67,17 @@ $body-font-style: normal;
 
 // Colors
 
+$brand-primary: #A11E22;
+$brand-secondary: #2C3136;
+$dark-color: #1a1514;
+$light-color: #FDFCFC;
+$dark-grey: #362e2c;
+$light-grey: #F1F4F1;
+
 $primary-color: #242C2D;
 $secondary-color: #FAF7F7;
 $alert-color: #D54E44;
 $success-color: #88d481;
-$dark-color: #1a1514;
 
 // Make sure border radius matches unless we want it different.
 
@@ -161,10 +167,10 @@ $portrait: "only screen and (orientation: portrait)";
 
 // Control header font styles
 
-$header-font-family: "pragmatica-web-condensed", "Myriad Pro", Helvetica, Arial, sans-serif;
+$header-font-family: "ff-meta-web-pro", "Myriad Pro", Helvetica, Arial, sans-serif;
 $header-font-weight: normal;
 // $header-font-style: normal;
-// $header-font-color: #222;
+$header-font-color: #364244;
 // $header-line-height: 1.4;
 // $header-top-margin: .2em;
 // $header-bottom-margin: .5em;
@@ -181,11 +187,11 @@ $header-font-weight: normal;
 
 // Control how subheaders are styled.
 
-// $subheader-line-height: 1.4;
-// $subheader-font-color: lighten($header-font-color, 30%);
-// $subheader-font-weight: 300;
-// $subheader-top-margin: -1em;
-// $subheader-bottom-margin: .5em;
+$subheader-line-height: 1.4;
+$subheader-font-color: lighten($header-font-color, 30%);
+$subheader-font-weight: 300;
+$subheader-top-margin: -0.8em;
+$subheader-bottom-margin: .5em;
 
 // A general <small> styling
 
@@ -194,15 +200,15 @@ $header-font-weight: normal;
 
 // Style paragraphs
 
-$paragraph-font-family: Helvetica, Arial, sans-serif;
-// $paragraph-font-weight: normal;
-// $paragraph-font-size: 1em;
-// $paragraph-line-height: 1.6;
-// $paragraph-margin-bottom: emCalc(20);
-// $paragraph-aside-font-size: emCalc(14);
-// $paragraph-aside-line-height: 1.35;
-// $paragraph-aside-font-style: italic;
-// $paragraph-text-rendering: optimizeLegibility;
+$paragraph-font-family: "kepler-std", Georgia, Times, serif;
+$paragraph-font-weight: normal;
+$paragraph-font-size: 1em;
+$paragraph-line-height: 1.6;
+$paragraph-margin-bottom: emCalc(20);
+$paragraph-aside-font-size: emCalc(14);
+$paragraph-aside-line-height: 1.35;
+$paragraph-aside-font-style: italic;
+$paragraph-text-rendering: optimizeLegibility;
 
 // Style <code> tags
 
