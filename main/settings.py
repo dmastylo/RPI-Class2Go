@@ -89,6 +89,8 @@ try:
     SITE_NAME_LONG
     SITE_TITLE
     SITE_URL
+    SITE_URL_SHORT
+    SITE_SUPPORT_EMAIL
 except NameError:
     SITE_ID = 1
     SITE_NAME_SHORT = 'Stanford'
