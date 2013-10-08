@@ -18,27 +18,30 @@
     </div>
 {% endif %}
 
-<div class="row-fluid">
-<div class="span3">
-</div>
-<div class="registration span5">
-	<div class="well">
-        <h2>{% trans 'Register for' %} {{ SITE_TITLE }}</h2>
-
-		<form action="{% url 'registration_register' %}" method="post" class="form-horizontal">
+<div class="modal-form">
+    <div class="form-info">
+        <h2>{% trans 'Register for' %} {{ SITE_TITLE }}</h2>            
+        <h6>Registration is free and gives you full access to online courses and content from anywhere in the world.</h6>
+    </div>
+    <div class="form-body">
+        <form action="{% url 'registration_register' %}" method="post" class="custom">
             <fieldset>
-		    {% include 'registration/regforminputs.html' %}
+            {% include 'registration/regforminputs.html' %}
             </fieldset>
-		    <div class="form-actions">
-                <label for="id_tos" style="width: 100%;">
+            <div class="form-actions">
+                <label for="id_tos" class="req-check" style="width: 100%;">
                  {% url 'c2g.views.tos' as tos_url %}
                  {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}'s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
-		</label>
-		    	<input type="submit" value="{% trans 'Register' %}" class="btn btn-primary btn-large" /> &nbsp; {% trans 'Already have an account?' %}  <a href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}"> {% trans 'Login instead' %}</a>
-			</div>
-		</form>        
-	</div>
-</div>
+                </label>
+                <input type="submit" value="{% trans 'Register' %}" id="submit"/>
+                <a id="alternative" href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}">
+                    {% trans 'Already have an account?' %} &nbsp;
+                    {% trans 'Login instead.' %}
+                </a>
+
+            </div>
+        </form>        
+    </div>
 </div>
 
 {% endif %}

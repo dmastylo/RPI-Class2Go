@@ -31,6 +31,7 @@
         </script>
     <![endif]-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
+    <script src="{{ STATIC_URL }}js/foundation/vendor/custom.modernizr.js"></script>
     <script type="text/javascript" src="//use.typekit.net/tyv1luk.js"></script>
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
     {% endblock top_scripts %}
@@ -294,5 +295,8 @@
     
     {% block addl_scripts %}
     {% endblock addl_scripts %}
+    <script>
+      $(document).foundation();
+    </script>
 </body>
 </html>

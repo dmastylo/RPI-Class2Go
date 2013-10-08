@@ -1,29 +1,30 @@
 {% csrf_token %}
 {{form.course_prefix}}{{form.course_suffix}}{{form.invite}}
 
+<div class="two-inputs">
+  <div class="control-group">
+    <label for="id_first_name" class="control-label">{{form.first_name.label}}:</label>
+    <div class="controls">
+      {{ form.first_name }}
+    </div>
+  </div>
+  <div class="control-group">
+    <label for="id_last_name" class="control-label">{{form.last_name.label}}:</label>
+    <div class="controls">
+      {{ form.last_name }}
+    </div>
+  </div>
+</div>
 <div class="control-group">
   <label for="id_username" class="control-label">{{form.username.label}}:</label>
     <div class="controls">
     {{ form.username }}
-    <span id="handle-text" class="help-block">Your username is your public identity on this site. You won't be able to change it, so choose a "handle" that you are comfortable with.</span>
   </div>
 </div>
 <div class="control-group">
   <label for="id_email" class="control-label">{{form.email.label}}:</label>
   <div class="controls">
     {{ form.email }}
-  </div>
-</div>
-<div class="control-group">
-  <label for="id_first_name" class="control-label">{{form.first_name.label}}:</label>
-  <div class="controls">
-    {{ form.first_name }}
-  </div>
-</div>
-<div class="control-group">
-  <label for="id_last_name" class="control-label">{{form.last_name.label}}:</label>
-  <div class="controls">
-    {{ form.last_name }}
   </div>
 </div>
 <div class="control-group">
