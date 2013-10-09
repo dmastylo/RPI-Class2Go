@@ -93,10 +93,10 @@ try:
     SITE_SUPPORT_EMAIL
 except NameError:
     SITE_ID = 1
-    SITE_NAME_SHORT = 'Stanford'
-    SITE_NAME_LONG = 'Stanford University'
-    SITE_TITLE = 'Stanford Class2Go'
-    SITE_URL = 'http://class2go.stanford.edu'
+    SITE_NAME_SHORT = 'Rensselaer'
+    SITE_NAME_LONG = 'Rensselaer Polytechnic Institute'
+    SITE_TITLE = 'Rensselaer Class2Go'
+    SITE_URL = 'http://class2go.rpi.edu'
 
 
 # If you set this to False, Django will make some optimizations so as not
