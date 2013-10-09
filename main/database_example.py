@@ -49,7 +49,7 @@ INSTANCE="dev"
 # Information about this site. Note that the short name here is used to
 # build paths to site assets, so is specific and case-sensitive.
 SITE_ID = 1
-SITE_NAME_SHORT = 'RPI'
+SITE_NAME_SHORT = 'Rensselaer'
 SITE_NAME_LONG = 'Rensselaer Polytechnic Institute'
 SITE_TITLE = 'RPI Class2Go'
 SITE_URL = 'http://node03.cs.rpi.edu' # hopefully temporary before we switch to a better subdomain
