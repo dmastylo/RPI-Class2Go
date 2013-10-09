@@ -96,12 +96,15 @@ your new `PATH` is loaded:
     www.sequelpro.com
 
 1. Set up a user account and database in MySQL:
+    In shell
+        mysql --user=root mysql
 
-        shell> mysql --user=root mysql
-        sql> create database class2go;
-        sql> grant all on class2go.* to class2go@'localhost' sql> identified by 'class2gopw';
-        sql> grant all on class2go.* to class2go@'127.0.0.1' 
-        sql> identified by 'class2gopw';
+    In SQL console
+        create database class2go;
+        grant all on class2go.* to class2go@'localhost'
+        identified by 'class2gopw';
+        grant all on class2go.* to class2go@'127.0.0.1' 
+        identified by 'class2gopw';
 
     [NB:] Remember these values, especially if you change them from these
 defaults, as you'll use them later when setting up Django.
