@@ -7,9 +7,9 @@
 {% block m_column_content %}
 
 {% if form.errors %}
-<div class="alert alert-error">
+<div class="alert-box alert-error">
     <button class="close" data-dismiss="alert">×</button>
-    {% blocktrans %}Your username or password didn't match a credential in our system. Please try again.{% endblocktrans %}<span class="alert-special-note"><strong>{% trans 'Remember' %}:</strong> {% trans 'Your username might not be your email address.' %}</span>
+    {% blocktrans %}Your username or password didn't match a credential in our system. Please try again.<br/>{% endblocktrans %}<span class="alert-special-note"><strong>{% trans 'Remember' %}:</strong> {% trans 'Your username might not be your email address.' %}</span>
 </div>
 {% endif %}
 
@@ -38,10 +38,10 @@
 <p>{% trans 'Welcome' %}, {{ user.username }}. {% trans 'Thanks for logging in.' %}</p>
 
 {% else %}
- <div class="row-fluid">
- <div class="span3"> </div>
+ <div class="row">
+ <div class="large-6">
        {% if login_form.errors %}
-       <div class="alert alert-error">
+       <div class="alert-box alert-error">
          <button class="close" data-dismiss="alert">×</button>
          {% blocktrans %}Uh-oh.  We couldn't find username and password you entered.{% endblocktrans %}  {% trans 'Try again?' %}
        </div>
@@ -67,7 +67,7 @@
 </tr>
 </table>
 
-<input type="submit" value="{% trans 'Login' %}" class="btn" />
+<input type="submit" value="{% trans 'Login' %}" class="button" />
 &nbsp; <a href="{% url 'auth_password_reset' %}">{% trans 'Forgot my username or password' %}</a>
 {% if next|stringformat:"s" == '/accounts/password/reset/complete/'  %}
 <input type="hidden" name="next" value='/' />
