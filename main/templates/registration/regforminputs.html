@@ -3,38 +3,56 @@
 
 <div class="two-inputs">
   <div class="control-group">
-    <label for="id_first_name" class="control-label">{{form.first_name.label}}:</label>
+    <label for="id_first_name" class="control-label">
+    {{form.first_name.label}}:<br/>
+     <span class="error-message">{{ form.first_name.errors.as_text }}</span>
+  </label>
     <div class="controls">
       {{ form.first_name }}
     </div>
   </div>
   <div class="control-group">
-    <label for="id_last_name" class="control-label">{{form.last_name.label}}:</label>
+    <label for="id_last_name" class="control-label">{{form.last_name.label}}:
+    <br/>
+       <span class="error-message">{{ form.first_name.errors.as_text }}</span>
+    </label>
     <div class="controls">
       {{ form.last_name }}
     </div>
   </div>
 </div>
 <div class="control-group">
-  <label for="id_username" class="control-label">{{form.username.label}}:</label>
+  <label for="id_username" class="control-label">
+    {{form.username.label}}:
+    <span class="error-message">{{ form.username.errors.as_text }}</span>
+  </label>
     <div class="controls">
     {{ form.username }}
   </div>
 </div>
 <div class="control-group">
-  <label for="id_email" class="control-label">{{form.email.label}}:</label>
+  <label for="id_email" class="control-label">
+    {{form.email.label}}:
+    <span class="error-message">{{ form.email.errors.as_text }}</span>
+  </label>
   <div class="controls">
     {{ form.email }}
   </div>
 </div>
 <div class="control-group">
-  <label for="id_password1" class="control-label">{{form.password1.label}}:</label>
+  <label for="id_password1" class="control-label">
+    {{form.password1.label}}:
+    <span class="error-message">{{ form.password1.errors.as_text }}</span>
+  </label>
   <div class="controls">
     {{ form.password1 }}
   </div>
 </div>
 <div class="control-group">
-  <label for="id_password2" class="control-label">{{form.password2.label}}:</label>
+  <label for="id_password2" class="control-label">
+    {{form.password2.label}}:
+    <span class="error-message">{{ form.password2.errors.as_text }}</span>
+  </label>
   <div class="controls">
     {{ form.password2 }}
   </div>
@@ -64,6 +82,7 @@
   </div>
 </div>
 
+<span class="error-message popover">{{ form.tos.errors.as_text }}</span>
 
 <script>
     

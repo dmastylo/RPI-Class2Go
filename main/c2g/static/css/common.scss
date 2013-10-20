@@ -293,6 +293,9 @@ footer .vcard {
 	}
 	.control-group {
 		@include grid-column(12);
+		span.error-message{
+			color:red;
+		}
 	}
 	input {
 		@include radius;		

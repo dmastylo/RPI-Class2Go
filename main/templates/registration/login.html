@@ -6,13 +6,6 @@
 {% block navbar %} {% endblock navbar %}
 {% block m_column_content %}
 
-{% if form.errors %}
-<div class="alert-box alert-error">
-    <button class="close" data-dismiss="alert">×</button>
-    {% blocktrans %}Your username or password didn't match a credential in our system. Please try again.<br/>{% endblocktrans %}<span class="alert-special-note"><strong>{% trans 'Remember' %}:</strong> {% trans 'Your username might not be your email address.' %}</span>
-</div>
-{% endif %}
-
 {% block messages %}
     {% if messages %}
         {% for message in messages %}
@@ -35,47 +28,54 @@
 
 {% if user.is_authenticated %}
 
-<p>{% trans 'Welcome' %}, {{ user.username }}. {% trans 'Thanks for logging in.' %}</p>
+    <p>{% trans 'Welcome' %}, {{ user.username }}. {% trans 'Thanks for logging in.' %}</p>
 
 {% else %}
- <div class="row">
- <div class="large-6">
-       {% if login_form.errors %}
-       <div class="alert-box alert-error">
-         <button class="close" data-dismiss="alert">×</button>
-         {% blocktrans %}Uh-oh.  We couldn't find username and password you entered.{% endblocktrans %}  {% trans 'Try again?' %}
-       </div>
-       {% endif %}
-       <div class="well preview-registration span5" style="margin-top:50px;">
-       <h3>{% trans 'Enter your login information:' %}</h3>
-    
-{% if SITE_NAME_SHORT == 'Stanford' %}
-<form method="post" action="{% url 'auth_login' %}?next={{ next }}" class="form-vertical">
-{% else %}
-<form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">
-{% endif %}
-{% csrf_token %}
 
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
+     <div class="row">
 
-<input type="submit" value="{% trans 'Login' %}" class="button" />
-&nbsp; <a href="{% url 'auth_password_reset' %}">{% trans 'Forgot my username or password' %}</a>
-{% if next|stringformat:"s" == '/accounts/password/reset/complete/'  %}
-<input type="hidden" name="next" value='/' />
-{% else %}
-<input type="hidden" name="next" value="{{ next }}" />
+         <div class="large-6 large-offset-3">
+
+            {% if form.errors %}
+                <div class="alert-box alert" style="margin-top:20px;">
+                    {% blocktrans %}
+                        Your username or password didn't match a credential in our system. Please try again.
+                    {% endblocktrans %}
+                </div>
+            {% endif %}
+
+            <div class="well preview-registration" style="margin-top:30px;">
+
+                <h3>{% trans 'Enter your login information:' %}</h3>
+                
+                <form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">
+
+                    {% csrf_token %}
+
+                    <table>
+                    <tr>
+                        <td>{{ form.username.label_tag }}</td>
+                        <td>{{ form.username }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form.password.label_tag }}</td>
+                        <td>{{ form.password }}</td>
+                    </tr>
+                    </table>
+
+                    <input type="submit" value="{% trans 'Login' %}" class="button" />
+                    &nbsp; <a href="{% url 'auth_password_reset' %}">{% trans 'Forgot my username or password' %}</a>
+                    {% if next|stringformat:"s" == '/accounts/password/reset/complete/'  %}
+                    <input type="hidden" name="next" value='/' />
+                    {% else %}
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    {% endif %}
+                </form>
+        </div>
+
+    </div>
+
 {% endif %}
-</form>
-</div></div>
-{% endif %}
+
 {% endblock %}
  

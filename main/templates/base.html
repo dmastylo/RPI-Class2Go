@@ -56,7 +56,7 @@
                     <div class="user-account">
                         {% if user.is_authenticated %}
                             <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
-                                <input type="submit" id="login_button" class="btn logout hidden-phone" value="{% trans 'Logout' %}" />
+                                <input type="submit" id="login_button" class="button logout hidden-phone" value="{% trans 'Logout' %}" />
                                     {% csrf_token %}
                             </form>
                             <span>{% trans 'Welcome' %} <strong><a href="/accounts/profile"> {{ user.first_name }} </a></strong>!</span></li>
