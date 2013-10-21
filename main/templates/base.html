@@ -48,18 +48,28 @@
         {% if not request.session.headless %}
             <section class="cross-bar">
                 <header id="global-header">
+                    <!--
+                        Temporarily commented out
+                        until an RPI c2g logo is made
                     <div class="school-brand">
                         <a href="https://{{ SITE_URL_SHORT }}">
-                            <i id="school-logo" class="rpilogo-02"></i>
+                                <i id="school-logo" class="rpi"></i>
                         </a>
                     </div>
+                    -->
+                    <ul class="left">
+                     <a href="{% url 'courses.landing.views.landing' %}">{{ SITE_TITLE }}</a>
+                    </ul>
                     <div class="user-account">
                         {% if user.is_authenticated %}
-                            <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
-                                <input type="submit" id="login_button" class="button logout hidden-phone" value="{% trans 'Logout' %}" />
-                                    {% csrf_token %}
-                            </form>
-                            <span>{% trans 'Welcome' %} <strong><a href="/accounts/profile"> {{ user.first_name }} </a></strong>!</span></li>
+                        
+                            <span>
+                                {% trans 'Welcome' %},
+                                <strong><a href="/accounts/profile">{{ user.first_name }}</a></strong>
+                            </span>
+
+                            <a href="{% url 'auth_logout' %}" class="button">Logout</a>
+
                         {% else %}
                             {% if not common_page_data.ready_course.institution_only and not common_page_data.ready_course.preenroll_only %}
                                 <a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" >{% trans 'Register' %}</a>
@@ -69,6 +79,16 @@
                     </div>
                 </header>
             </section>
+            {% if user.is_authenticated and user.is_staff %}
+                <div class="admin-bar-container">
+                    <nav class="top-bar admin-bar">
+                        <header>
+                            <span>Administration</span>
+                            <a href="{% url 'courses.admin_views.new' %}">Create Course</a>
+                        </header>
+                    </nav>
+                </div>
+            {% endif %}
             {% block topcontent %}
                 <div id="top-content"></div>
             {% endblock topcontent %}
@@ -79,11 +99,13 @@
 
         {% block topbar %}
             <div id="c2g_layout_topbar">
-        {% endblock topbar %}        
+        {% endblock topbar %}     
 
         {% if not request.session.headless %}
             {% block navbar %}
-                {% ifequal user.is_staff True %}
+                {% if user.is_staff %}
+
+                    <!--
                     <div class="navbar">
                         <div class="navbar-inner">
                             <div class="container-fluid">
@@ -94,7 +116,9 @@
                             </div>
                         </div>
                     </div>
-                {% endifequal %}
+                    -->
+
+                {% endif %}
             {% endblock navbar %}
         {% endif %}
         <div class="row-fluid" style="position:relative;">

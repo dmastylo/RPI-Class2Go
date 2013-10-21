@@ -35,18 +35,22 @@ section {
 
 #global-header {
 	@include grid-row;
-	.school-brand {
-		@include grid-column(10);
+	ul{
+		margin-bottom: 0px;
+		font-size: 1.4em;
+		@extend .serif;
+		a{
+			color:white;
+		}
 	}
 	.user-account {
-		@include grid-column(12);
 		text-align: right;
-		a {
+		a, span{
 			letter-spacing: 1px;
 			margin-bottom: 0;
-			margin-left: 1em;
-			font-size: 0.8rem;
 			color: white;
+			font-size: .8rem;
+			margin-right: .5em;
 			&.button {
 				background-color: rgba(255, 255, 255, 0.2);
 				border: none;
@@ -61,13 +65,31 @@ section {
 	}
 }
 
+.admin-bar-container, nav.admin-bar{
+	background-color:#1e1e1e;
+}
+nav.admin-bar{
+	margin-bottom:0px;
+	color:white;
+	@include grid-row;
+	header > span, a{
+		margin-right:15px;
+	}
+	a:link, a:visited{
+		color:#ddd;
+	}
+	a:hover{
+		color:#fff;
+		border-bottom:1px solid #999;
+	}
+}
+
 #school-logo {
 	color: white;
 	font-size: 6em;
 	line-height: 1.5rem;
 	vertical-align: middle;
 }
-
 
 /*************** HERO **************/
 .hero {
