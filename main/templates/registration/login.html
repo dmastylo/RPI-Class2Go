@@ -6,25 +6,14 @@
 {% block navbar %} {% endblock navbar %}
 {% block m_column_content %}
 
-{% block messages %}
-    {% if messages %}
-        {% for message in messages %}
-            {% if 'success' in message.tags %}
-                <div class="alert alert-success"><em class="icon-ok"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
-            {% endif %}
-            {% if 'error' in message.tags %}
-                <div class="alert alert-error"><em class="icon-fire"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
-            {% endif %}
-            {% if 'warning' in message.tags %}
-                <div class="alert alert-warning"><em class="icon-warning-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
-            {% endif %}
-            {% if 'info' in message.tags %}
-                <div class="alert alert-info"><em class="icon-info-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endblock messages %}
 
+{% if login_form.errors %}
+    <div class="cross-bar-alert">
+        <h1>
+            {% trans "Uh-oh.  We couldn't find username and password you entered." %}
+        </h1>
+    </div>
+{% endif %}
 
 {% if user.is_authenticated %}
 
@@ -32,49 +21,40 @@
 
 {% else %}
 
-     <div class="row">
-
-         <div class="large-6 large-offset-3">
-
-            {% if form.errors %}
-                <div class="alert-box alert" style="margin-top:20px;">
-                    {% blocktrans %}
-                        Your username or password didn't match a credential in our system. Please try again.
-                    {% endblocktrans %}
-                </div>
-            {% endif %}
-
-            <div class="well preview-registration" style="margin-top:30px;">
-
-                <h3>{% trans 'Enter your login information:' %}</h3>
-                
-                <form method="post" action="{% url 'default_login' %}?next={{ next }}" class="form-vertical">
-
-                    {% csrf_token %}
-
-                    <table>
-                    <tr>
-                        <td>{{ form.username.label_tag }}</td>
-                        <td>{{ form.username }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ form.password.label_tag }}</td>
-                        <td>{{ form.password }}</td>
-                    </tr>
-                    </table>
-
-                    <input type="submit" value="{% trans 'Login' %}" class="button" />
-                    &nbsp; <a href="{% url 'auth_password_reset' %}">{% trans 'Forgot my username or password' %}</a>
-                    {% if next|stringformat:"s" == '/accounts/password/reset/complete/'  %}
-                    <input type="hidden" name="next" value='/' />
-                    {% else %}
-                    <input type="hidden" name="next" value="{{ next }}" />
-                    {% endif %}
-                </form>
-        </div>
-
+<div class="modal-form">
+    <div class="form-info">
+        <h2>{% trans 'Sign in to ' %} {{ SITE_TITLE }}</h2>            
+        <h6>Welcome back! Enter your username and password to get started.</h6>
     </div>
-
+    <div class="form-body">
+        <form action="{% url 'default_login' %}?next={{ next }}" method="post" class="custom">
+            {% csrf_token %}
+            <fieldset>
+                <div class="control-group">
+                  <label for="id_username" class="control-label">{{ form.username.label_tag }}</label>
+                    <div class="controls">
+                    {{ form.username }}
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label for="id_username" class="control-label">{{ form.password.label_tag }}</label>
+                    <div class="controls">
+                    {{ form.password }}
+                  </div>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <input type="submit" value="{% trans 'Sign In' %}" id="submit"/>
+                <a id="alternative" href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}">
+                    {% trans 'Need to register for an account?' %}
+                </a>
+                <a id="alternative" href="{% url 'auth_password_reset' %}">
+                    {% trans 'Forgot your username or password?' %}
+                </a>
+            </div>
+        </form>        
+    </div>
+</div>
 {% endif %}
 
 {% endblock %}
