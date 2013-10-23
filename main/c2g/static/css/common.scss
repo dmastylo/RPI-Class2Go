@@ -22,6 +22,37 @@
 /********************/
 
 
+/******** SPECIAL PAGES ******/
+.dead-end {
+	@include grid-row;
+	padding-top: 3em;
+	padding-bottom: 3em;
+	#{$all-text} {
+		@extend .sans;
+	}
+	&>div {
+		@include grid-column(8, $center: true, $last-column: true);
+	}
+	.dead-end-title h1 {
+		@extend .bold;
+		text-align: center;
+	}
+	.dead-end-info {
+		margin-top: 2em;
+		.subheader {
+			margin-bottom: 0;
+		}
+		@include radius;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		padding: 2em;
+		padding-bottom: 1em;
+	}
+	.dead-end-description {
+		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+		margin-bottom: 2em;
+	}
+}
+
 
 /*** TEMPLATES STYLES ***/
 section {
@@ -47,6 +78,9 @@ section {
 		text-align: right;
 		a, span{
 			letter-spacing: 1px;
+			font-size: 0.5rem;
+		}
+		a {
 			margin-bottom: 0;
 			color: white;
 			font-size: .8rem;
@@ -57,11 +91,21 @@ section {
 				box-shadow: none;
 				border-radius:3px;
 				font-weight: 600;
+				margin-left: 1em;
 			}
 			&:hover.button{
 				background-color: rgba(255, 255, 255, 0.4);
+
 			}
 		}
+		form {
+			display: inline-block;
+		}
+		span {
+			color: white;
+			font-size: 0.5em;
+		}
+		
 	}
 }
 
@@ -81,6 +125,20 @@ nav.admin-bar{
 	a:hover{
 		color:#fff;
 		border-bottom:1px solid #999;
+	}
+}
+
+#logged-in {
+	form, input {margin: 0;}
+	input {
+		@extend .button;
+		background-color: rgba(255, 255, 255, 0.2);
+		border: none;
+		box-shadow: none;
+		margin-left: 1em;
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.25);
+		}
 	}
 }
 
@@ -360,3 +418,5 @@ footer .vcard {
 		font-weight: lighter;
 	}
 }
+
+/********* USER ACCOUNT ********/
