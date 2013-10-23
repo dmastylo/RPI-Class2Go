@@ -70,10 +70,19 @@
 
                             <a href="{% url 'auth_logout' %}" class="button">Logout</a>
 
+                            <div id="logged-in">
+                                <a href="/accounts/profile"> {% trans 'Welcome, '%} {{ user.first_name }} </a>
+                                <form action="{% url 'auth_logout' %}?next=/{{common_page_data.course_prefix}}/{{common_page_data.course_suffix}}" method="POST">
+                                    <input type="submit" id="login_button" class="btn logout hidden-phone" value="{% trans 'Logout' %}" />
+                                        {% csrf_token %}
+                                </form>
+                            </div>
                         {% else %}
                             {% if not common_page_data.ready_course.institution_only and not common_page_data.ready_course.preenroll_only %}
-                                <a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" >{% trans 'Register' %}</a>
-                                <a href="{% url 'default_login' %}?next={{ request.get_full_path }}" class="button">{% trans 'Sign In' %}</a>
+                                <div id="logged-out">
+                                    <a href="{% url 'registration_register' %}?pre={{common_page_data.course_prefix}}&post={{common_page_data.course_suffix}}" >{% trans 'Register' %}</a>
+                                    <a href="{% url 'default_login' %}?next={{ request.get_full_path }}" class="button">{% trans 'Sign In' %}</a>
+                                </div>
                             {% endif %}
                         {% endif %}                        
                     </div>
@@ -209,109 +218,9 @@
     {% block jabber_block %}{% endblock %}
 
     {% block bottom_scripts %}
-    <script type="text/javascript" src="{{ STATIC_URL }}js/core/jquery-ui-timepicker-addon.js"></script>
+<!--
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
-    <script type="text/javascript">
-        //alert(navigator.userAgent);
-        var getServerTime = function() {
-            $.ajax("{% url 'c2g.views.server_time' %}", {
-                cache:false,
-                success:function(data){
-                    var serverTime = JSON.parse(data);
-                    var serverHours = serverTime.hour;
-                    var serverMinutes = serverTime.minute;
-                    if (serverHours >= 12) { ampm = "PM" } else { ampm = "AM" }
-                    displayTime(serverHours, serverMinutes, ampm);
-                }, 
-                error:function(data){
-                    return;
-                }
-            });
-        };
-        
-        var displayTime = function(h, m, ap) {
-            if (m < 10) {
-                m = '0' + m;
-            }
-            if (h > 12) {
-                h = h - 12;
-            }
-            else if (h == 0) h = 12; //0 a.m. -> 12 a.m.
-            
-            $('#clockHours').removeClass().addClass('hour-' + h);
-            $('#clockMinutes').removeClass().addClass('minute-' + m);
-            $('#clock #clock-bubble .hours').text(h);
-            $('#clock #clock-bubble .minutes').text(m);
-            $('#clock #clock-bubble .ampm').text(ap);
-        };
-
-        // increments time passed in by 1 minute
-        var adjustLocalTime = function(){
-            var h = parseInt($('#clock #clock-bubble .hours').text()); 
-            var m = parseInt($('#clock #clock-bubble .minutes').text()); 
-            var ap = $('#clock #clock-bubble .ampm').text();
-                    
-            var localM, localH, localAP;
-
-            // only major changes are when flipping over :59 to :00
-            if (m >= 59) {
-                localM = 0;
-                // hours not displayed in 24 hour format, so no need to subtract 12;
-                // just handle 12:59 to 1:00, >= is for safety 
-                localH = (h >= 12) ? 1 : (h + 1);
-                if (localH == 12 && ap.toUpperCase() == "AM") {
-                    localAP = "PM";
-                } else if (localH == 12 && ap.toUpperCase() == "PM") {
-                    localAP = "AM";
-                } else {
-                    localAP = ap;
-                } 
-            } else {
-                localM = m + 1;
-                localH = h;
-                localAP = ap;
-            }
-
-            displayTime(localH, localM, localAP);
-        };
-        
-        $(function(){
-            getServerTime();
-            setInterval(function(){
-                $('#clock #clock-bubble').fadeOut();
-                adjustLocalTime();
-            }, 60000);
-            
-            $('#clock').hover(function(){
-                $(this).css('cursor', 'pointer');
-                getServerTime();
-                $('#clock #clock-bubble').fadeIn();
-            });
-        });
-        
-    /*******************************************************************************************
-	Accessibility toggle
-	*/
-        
-        $(document).ready(function (){
-            var expanded = ", expanded, click to collapse";
-            var collapsed = ", collapsed, click to expand";
-            
-            $('.dropdown a, .accordion-heading a').keydown(function(event){
-                if ($(this).hasClass('closed')) {
-                    $('.hidden-accessible', this).text(expanded);
-                } else {
-                    $('.hidden-accessible', this).text(collapsed);
-                }
-                $(this).toggleClass('closed');
-            });
-            
-            $('.dropdown a, .accordion-heading a').blur(function(){
-                $('.hidden-accessible', this).text(collapsed);
-                $(this).addClass('closed');
-            });
-        });
-    </script>
+-->
     {% endblock bottom_scripts %}
 
     <!-- Need to re-add Google Analytics script -->
@@ -320,7 +229,7 @@
     {% block addl_scripts %}
     {% endblock addl_scripts %}
     <script>
-      $(document).foundation();
+      // $(document).foundation();
     </script>
 </body>
 </html>
