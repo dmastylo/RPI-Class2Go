@@ -8,22 +8,168 @@
 {% block m_column_content %}
 {% if user.is_authenticated %}
     <div class="dashboard">
-        <div class="dashboard-info">
-            <div class="dashboard-title">
+        <div class="page-info">
+            <div class="title">
                 <h1>
                     {% trans 'My Profile' %}
-                </h1>
+                </h1>                
             </div>
-            <div class="dashboard-description">
-                {% trans 'Control your public-facing profile as well as security options such as email associations and your password.' %}
+            <div class="description">
+                <p>
+                    {% trans 'Control your public-facing profile as well as security options such as email associations and your password.' %}
+                </p>
+                
             </div>
         </div>
+
+        
+        <div class="page-section">
+
+            <div class="dashboard-module--6">
+
+                <h1 class="dashboard-module-name">
+                    {% trans 'Current Courses' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    {% if courses %}
+                        <ul class="course-list">
+                            {% for course in courses %}
+                                <li class="course-list-course">
+                                    <h1 class="course-name">{{ course.title }}</h1>
+                                    <h2 class="course-grade">95%</h2>
+                                    <span class="course-instructor">
+                                        {{ course.contact }}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <h2 class="empty-state">No courses found!</h2>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <div class="dashboard-module">
+                <h1 class="dashboard-module-name">
+                    {% trans 'Personal Profile' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    <ul class="key-value">
+                        <li>
+                            <span class="key">
+                                {% trans 'First and Last Name' %}
+                            </span>
+                            <span class="value">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Year of Birth' %}
+                            </span>
+                            <span class="value">
+                                {{ user_profile.birth_year }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Gender' %}
+                            </span>
+                            <span class="value">
+                                {{user_profile.gender }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Education' %}
+                            </span>
+                            <span class="value">
+                                {{user_profile.education }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Current Status' %}
+                            </span>
+                            <span class="value">
+                                {{user_profile.work }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dashboard-module">
+                <h1 class="dashboard-module-name">
+                    {% trans 'Account Information' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    <ul class="key-value">
+                        <li>
+                            <span class="key">
+                                {% trans 'Username' %}
+                            </span>
+                            <span class="value">
+                                {{ user.username }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'E-mail' %}
+                            </span>
+                            <span class="value">
+                                {{ user.email }}
+                            </span>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="dashboard-module">
+                <h1 class="dashboard-module-name">
+                    {% trans 'User Settings' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    <ul class="key-value">
+                        <li>
+                            <span class="key">
+                                {% trans 'Piazza Username' %}
+                            </span>
+                            <span class="value">
+                                {{ user_profile.piazza_name }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Piazza Email' %}
+                            </span>
+                            <span class="value">
+                                {{ user_profile.piazza_email }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Receive Email' %}
+                            </span>
+                            <span class="value">
+                                {% if user_profile.email_me %} {% trans 'Yes' %} {% else %} {% trans 'No' %} {% endif %}
+                            </span>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
     </div>
 
     <div class="row-fluid page-header">
-        <div class="pull-left">
-            <h2>{% trans 'My Profile' %}</h2>
-        </div>
         <div class="pull-right">
             <a href="{% url 'accounts.views.edit' %}" class="btn">{% trans 'Edit Info' %}</a>
           {% if not has_webauth %}
@@ -32,19 +178,10 @@
         </div>
     </div>
     
-    <hr />
-    <ul style="overflow:hidden" class="unstyled profile-info">
-        <div class="span5">
-            <li><strong>{% trans 'Username' %}:</strong> {{ user.username }}</li>
-            <li><strong>{% trans 'First Name' %}:</strong> {{ user.first_name }}</li>
-            <li><strong>{% trans 'Last Name' %}:</strong> {{ user.last_name }}</li>
-            <li><strong>{% trans 'E-mail' %}:</strong> {{ user.email }}</li>
-            <li><strong>{% trans 'Year of Birth' %}:</strong> {{ user_profile.birth_year }}</li>
-            <li><strong>{% trans 'Gender' %}:</strong> {{user_profile.gender }}</li>
-        </div>
-        <div class="span5">
-            <li><strong>{% trans 'Education' %}:</strong> {{user_profile.education }}</li>
-            <li><strong>{% trans 'Work' %}:</strong> {{user_profile.work }}</li>
+
+
+
+
             <li><strong>{% trans 'Piazza handle' %}:</strong> {{user_profile.piazza_name }}</li>
             <li><strong>{% trans 'Piazza email' %}:</strong> {{user_profile.piazza_email }}</li>
             <li><strong>{% trans 'Receive emails' %}:</strong> {% if user_profile.email_me %} {% trans 'Yes' %} {% else %} {% trans 'No' %} {% endif %} </li>
