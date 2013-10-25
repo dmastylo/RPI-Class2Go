@@ -19,6 +19,9 @@ urlpatterns = patterns('',
     url(r'^_throw500$', 'c2g.views.throw500'),
     url(r'^_throw404$', 'c2g.views.throw404'),
 
+    # Style guide for site-wide CSS, HTML elements
+    url(r'^styleguide$', 'c2g.views.styleguide'),
+
     # REST Class2Go API
     url(r'^rest/login', 'rest.views.rest_login'),
     url(r'^rest/problemactivities', views.ProblemActivities.as_view()),

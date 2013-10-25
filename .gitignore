@@ -29,4 +29,6 @@ nohup.out
 class2go-venv/
 sophi-venv
 
+.sass-cache/
+
 .idea

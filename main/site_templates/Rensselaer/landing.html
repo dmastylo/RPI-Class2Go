@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Available Courses | RPI Online{% endblock title %}
+{% load url from future %}
+
+{% block bodytag %}
+<body class="home">
+{% endblock bodytag %}
+
+
+{% block hero %}
+  <section class="hero">
+    <img src="http://24.media.tumblr.com/2ded2500a66d3999e4435b13b5729181/tumblr_mopq69jlcS1st5lhmo1_1280.jpg" alt="" class="hero-background">
+    <div class="hero-content">
+      <div class="hero-content--left">
+        <h1>Learn at Rensselaer. <br><strong>Anywhere.</strong></h1>
+      </div>
+    </div>
+  </section>
+{% endblock hero %}
+
+{% block topcontent %}
+  {% block topnav %}
+   
+  {% endblock topnav %}
+{% endblock topcontent %}
+
+{% block m_column_content %}
+<section class="intro-block">
+  <div class="intro-content">
+    <h4 class="greeting">
+      Welcome to Class2Go
+    </h4>
+    <h6 class="description">
+       We're RPI Online's internal platform, designed to be an open platform for online learning and research.
+    </h6>
+    <h5 id="important-tag">
+      Summer 2014
+    </h5>
+  </div>
+</section>
+
+<section class="featured-courses">
+  <div class="section-information">
+    <div class="section-title">
+      <h6 class="light">Featured Courses</h6>
+    </div>
+  </div>
+  <div class="course-grid">
+    <div class="course-container">
+      <a href="{% url 'courses.views.main' 'db' 'Winter2013' %}">
+        <h4 class="course-name">
+          Introduction to Databases
+        </h4>
+        <h6 class="course-instructor">
+          Jennifer Widom
+        </h6>
+        <p class="course-description">
+          This course covers database design and the use of database management systems for applications via XML, SQL, relational algebra, and more.
+        </p>
+        <ul class="course-technical">
+          <li class="course-prefix">CSCI</li>
+          <li class="course-number">2600</li>
+          <li class="course-credits">4 Cr</li>
+        </ul>
+      </a>
+    </div>
+    <div class="course-container">
+      <a href="{% url 'courses.views.main' 'db' 'Winter2013' %}">
+        <h4 class="course-name">
+          Computer Networking
+        </h4>
+        <h6 class="course-instructor">
+          David Wetherall
+        </h6>
+        <p class="course-description">
+          This course introduces the fundamental problems of computer networking, from sending bits over wires to running distributed applications.
+        </p>
+        <ul class="course-technical">
+          <li class="course-prefix">ITWS</li>
+          <li class="course-number">3940</li>
+          <li class="course-credits">3 Cr</li>
+        </ul>
+      </a>
+    </div>
+    <div class="course-container">
+      <a href="{% url 'courses.views.main' 'db' 'Winter2013' %}">
+        <h4 class="course-name">
+          Solar Power and Batteries
+        </h4>
+        <h6 class="course-instructor">
+          Bruce Clemens
+        </h6>
+        <p class="course-description">
+          This course focuses on the operating principles and applications of emerging technological solutions to the energy demands of the world.
+        </p>
+        <ul class="course-technical">
+          <li class="course-prefix">EENG</li>
+          <li class="course-number">2420</li>
+          <li class="course-credits">4 Cr</li>
+        </ul>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="about-class2go">
+
+  <div class="section-information">
+    <div class="section-title">
+      <h6 class="light">Things You'll Love as a Student</h6>
+    </div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-container">
+      <div class="feature-image">
+        <img src="http://placehold.it/500x200" alt="">
+      </div>
+      <div class="feature-information">
+        <h4 class="feature-name">Learn from your own professors</h4>
+        <p class="feature-description">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Hic, doloribus, id expedita numquam ipsum et atque inventore impedit eos eligendi voluptatum itaque cum fugit quaerat tempore repellendus illum repudiandae. Cum.
+        </p>
+      </div>
+    </div>
+    <div class="feature-container">
+      <div class="feature-image">
+        <img src="http://placehold.it/500x200" alt="">
+      </div>
+      <div class="feature-information">
+        <h4 class="feature-name">Share with your own peers</h4>
+        <p class="feature-description">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Hic, doloribus, id expedita numquam ipsum et atque inventore impedit eos eligendi voluptatum itaque cum fugit quaerat tempore repellendus illum repudiandae. Cum.
+        </p>
+      </div>
+    </div>
+    <hr>
+  </div>
+
+
+  <div class="section-information">
+      <div class="section-title">
+      <h6 class="light">Things You'll Love Even More as an Instructor</h6>
+    </div>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-container">
+      <div class="feature-image">
+        <img src="http://placehold.it/500x200" alt="">
+      </div>
+      <div class="feature-information">
+        <h4 class="feature-name">Easily create and grade assignments</h4>
+        <p class="feature-description">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Hic, doloribus, id expedita numquam ipsum et atque inventore impedit eos eligendi voluptatum itaque cum fugit quaerat tempore repellendus illum repudiandae. Cum.
+        </p>
+      </div>
+    </div>
+    <div class="feature-container">
+      <div class="feature-image">
+        <img src="http://placehold.it/500x200" alt="">
+      </div>
+      <div class="feature-information">
+        <h4 class="feature-name">Identify gaps in knowledge</h4>
+        <p class="feature-description">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Hic, doloribus, id expedita numquam ipsum et atque inventore impedit eos eligendi voluptatum itaque cum fugit quaerat tempore repellendus illum repudiandae. Cum.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</section>
+{% endblock m_column_content %}

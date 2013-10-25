@@ -6,40 +6,60 @@
 {% block navbar %} {% endblock navbar %}
 
 {% block m_column_content %}
+
 {% if user.is_authenticated %}
-
-<p>{% trans 'Welcome' %}, {{ user.username }}. {% blocktrans %}You are already logged in and therefore you already have an account.  Please {% endblocktrans %}<a href="{% url 'auth_logout' %}?next={% url 'registration_register' %}">{% blocktrans %}log out</a> to register for a new account. {% endblocktrans %}</p>
-
-{% else %}
-{% if form.errors %}
-    <div class="alert alert-error">
-    <button class="close" data-dismiss="alert">×</button>
-    {% trans 'Please correct the errors below.' %}
+    <div class="dead-end">
+        <div class="dead-end-title">
+            <h1>
+                {% trans "Oops, you're already logged in." %}
+            </h1>
+        </div>
+        <div class="dead-end-info">
+            <div class="dead-end-description">
+                <h6 class="subheader">PROBLEM</h6>
+                <p>{% trans "You're currently logged in as " %}<b>{{ user.username }}</b>.</p>
+            </div>
+            <div class="dead-end-solutions">
+                <h6 class="subheader">SOLUTION</h6>
+                <p>
+                    {% blocktrans %}Please {% endblocktrans %}<a href="{% url 'auth_logout' %}?next={% url 'registration_register' %}">{% blocktrans %}log out</a> to register for a new account. {% endblocktrans %}</p>                    
+                </p>
+            </div>
+        </div>
+         
+        
     </div>
-{% endif %}
+{% else %}
+    <div class="modal-form">
+        <div class="form-info">
+            {% if form.errors %}
+                <div class="alert-box alert">
+                {% trans 'Please correct the errors below.' %}
+                </div>
+            {% endif %}
+            <h2>{% trans 'Register for' %} {{ SITE_TITLE }}</h2>            
+            <h6>Registration is free and gives you full access to online courses and content from anywhere in the world.</h6>
+        </div>
+        <div class="form-body">
+            <form action="{% url 'registration_register' %}" method="post" class="custom">
+                <fieldset>
+                {% include 'registration/regforminputs.html' %}
+                </fieldset>
+                <div class="form-actions">
+                    <label for="id_tos" class="req-check" style="width: 100%;">
+                     {% url 'c2g.views.tos' as tos_url %}
+                     {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}'s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
+                    </label>
+                    <input type="submit" value="{% trans 'Register' %}" id="submit"/>
+                    <a id="alternative" href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}">
+                        {% trans 'Already have an account?' %} &nbsp;
+                        {% trans 'Login instead.' %}
+                    </a>
 
-<div class="row-fluid">
-<div class="span3">
-</div>
-<div class="registration span5">
-	<div class="well">
-        <h2>{% trans 'Register for' %} {{ SITE_TITLE }}</h2>
-
-		<form action="{% url 'registration_register' %}" method="post" class="form-horizontal">
-            <fieldset>
-		    {% include 'registration/regforminputs.html' %}
-            </fieldset>
-		    <div class="form-actions">
-                <label for="id_tos" style="width: 100%;">
-                 {% url 'c2g.views.tos' as tos_url %}
-                 {{form.tos}} {% blocktrans %}I agree to {{ SITE_TITLE }}'s <a href="{{tos_url}}" target="_blank">Terms of Service</a>, <a href="{{tos_url}}#honor" target="_blank" >Honor Code</a>, and <a href="{{tos_url}}#privacy" target="_blank">Privacy Policy</a>{% endblocktrans %}
-		</label>
-		    	<input type="submit" value="{% trans 'Register' %}" class="btn btn-primary btn-large" /> &nbsp; {% trans 'Already have an account?' %}  <a href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}"> {% trans 'Login instead' %}</a>
-			</div>
-		</form>        
-	</div>
-</div>
-</div>
+                </div>
+            </form>        
+        </div>
+    </div>
 
 {% endif %}
 {% endblock m_column_content %}

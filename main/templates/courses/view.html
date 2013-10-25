@@ -3,15 +3,22 @@
 {% load i18n %}
 {% load template_utils %}
 {% block title %}{{ SITE_TITLE }} | {{ common_page_data.course.title }}{% endblock title %}
+
 {% block home_link_class %}class="active"{% endblock home_link_class %}
 
 {% block course_notification %}
 {% if user.is_authenticated and not common_page_data.is_course_member and not common_page_data.ready_course.preenroll_only %}
-<div class="alert alert-info inline">
-    <em class="icon-info-sign"></em>{% trans 'You are not yet a member in this course.' %} <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}{% if request.GET.join_next %}?redirect_to={{ request.GET.join_next }}{% endif %}" method="POST">
-        <input type="submit" id="login_button" class="btn" value="Join" />
-        {% csrf_token %}
-    </form>
+<div class="alert-area">
+	<div class="alert-box status">
+
+	    {% trans "You're not enrolled in this course." %}
+
+	    <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}{% if request.GET.join_next %}?redirect_to={{ request.GET.join_next }}{% endif %}" method="POST">
+	        <input type="submit" id="login_button" class="button" value="Enroll today" />
+	        {% csrf_token %}
+	    </form>
+	</div>
+	
 </div>
 {% endif %}
 {% if user.is_authenticated and not common_page_data.is_course_member and common_page_data.ready_course.preenroll_only %}
@@ -22,109 +29,36 @@
 
 {% endblock %}
 
+
+{% block m_column_content %}
+<div class="course-homepage">
+	<div class="page-info">
+		<div class="title">
+		    <h1>
+		    	{{ course.title }}
+		    </h1>                
+		</div>
+		<div class="description">
+		    <p>
+		    	{{ course.description }}
+		    </p>
+		    
+		</div>
+	</div>
+
+
+	
+
+</div>
+{% endblock %}
+
 {% block l_column_content %}
 <div id="c2g_layout_l_column" class="span3">
     <!--Skeleton Div to be filled in by leftnav ajax -->
 </div>
 {% endblock l_column_content %}
 
-{% block m_column_content %}
-<div id="c2g_layout_m_column" class="span6">
-
-    {% if course_cert%}
-	<div class="well statement">
-	    <h2>{% trans "Congratulations!" %}</h2>
-	    <p><br />{% trans 'You have successfully completed a free online offering of' %} <strong>{{ course.title }}</strong>, {% trans 'offered from' %} <strong>{{ course.calendar_start }}</strong> {% trans 'to' %} <strong>{{ course.calendar_end }}</strong>.</p>
-        {% if course_cert.1 %}
-            <p>{% trans 'Download your "Statement of Accomplishment" below' %}:</p>
-            <p style="text-align: right;">
-              <a class="btn btn-primary" href="{{ course_cert.1 }}">{% trans 'Download Statement' %}
-                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-              </a></p>
-        {% else %}
-            <p>{% trans 'Statement earned - statement generation in progress. Check back soon!' %}</p>
-            <p style="text-align: right;">
-              <a class="btn disabled">{% trans 'Generation in Progress' %}
-                <em class="{% if course_cert.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-              </a></p>
-        {% endif %}
-	</div>
-    {% endif %}
-
-    <h3 class="section-title pull-left" style="clear: both;">{% trans 'Recent Announcements' %}</h3>
-    {% if common_page_data.is_course_admin and common_page_data.course_mode == 'draft' %}
-	<div class="pull-right">
-            <button class="btn" onclick="document.getElementById('new_announcement_div').style.display='block';">{% trans 'New announcement' %}</button>
-            <!--a class="btn" href="{% url 'courses.announcements.views.admin' common_page_data.course_prefix common_page_data.course_suffix %}">Manage Announcements</a-->
-            {% include "announcements/delete_announcement_form.html" %}
-	</div>
-    {% endif %}
-    
-    {% if common_page_data.is_course_admin %}
-        {% include "announcements/new_announcement.html" %}
-    {% endif %}
-    
-    {% for announcement in announcement_list %}
-        {% include "announcements/announcement.html" %}
-    {% empty %}
-        <p style="margin:20px;">{% trans 'No announcements to display.' %}</p>
-    {% endfor %}
-    
-    <a class="btn pull-right" id="showHideAll" style="margin-left: 10px;">Expand All</a>
-    {% if many_announcements %}
-        <a class="btn pull-right" href="{% url 'courses.announcements.views.list' common_page_data.course_prefix common_page_data.course_suffix %}">{% trans 'View all announcements' %}  {% if announcement_overflow != 0 %} ({{announcement_overflow}} {% trans 'more' %}) {% endif %}</a>
-    {% endif %}
-</div>
-{% endblock m_column_content %}
-
 {% block r_column_content %}
-<div id="c2g_layout_r_column" class="span3">
-    
-    <div id="share_wrapper">
-	{% if share_block_type == 'standard' %}<a class="show_hide_share share_visible" href="#">Hide</a>{% endif %}
-	{% include "courses/sharing.html" %}
-    </div>
-
-    
-    <div class="right_nav_wrapper">
-	<!--Skeleton Div to be filled in by rightnav ajax -->
-    </div>
-    
-    {% if course.twitter_tag %}
-	<div id="twitterWidget">
-	    <script src="http://widgets.twimg.com/j/2/widget.js"></script>
-	    <script>
-		new TWTR.Widget({
-		    version: 2,
-		    type: 'search',
-		    search: '{{ course.twitter_tag|cut:'#'|cut:'@' }}',
-		    title: 'Recent Tweets',
-		    interval: 1000,
-		    width: 'auto',
-		    height: 300,
-		    theme: {
-			shell: {
-			    background: '#e9e6df',
-			    color: '#333333'
-			},
-			tweets: {
-			    background: '#e9e6df',
-			    color: '#333333',
-			    links: '#820000'
-			}
-		    },
-		    features: {
-			scrollbar: false,
-			loop: true,
-			live: true,
-			hashtags: true,
-			avatars: true,
-			behavior: 'default'
-		    }
-		}).render().start();
-	    </script>
-	</div>
-    {% endif %}
     
 {% endblock r_column_content %}
 

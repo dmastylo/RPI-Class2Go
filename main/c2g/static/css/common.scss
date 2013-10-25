@@ -1,0 +1,571 @@
+@import "core/foundation";
+
+/**** UTILITIES ****/
+	/** Variables **/ 
+		$serif-face: "kepler-std", Georgia, Times, serif;
+		$sans-face: "ff-meta-web-pro", "Myriad Pro", Helvetica, Arial, sans-serif;
+
+	/** Selectors **/
+		$all-headings: "h1, h2, h3, h4, h5, h6";
+		$all-paragraphs: "p, span, li, em";
+		$all-text: $all-headings + ", " + $all-paragraphs + ", a, a:hover";
+
+	/** Overrides **/
+		.bold {font-weight: bold;}
+		.light {font-weight: lighter;}
+		.white {color: $light-color;}
+		.black {color: $dark-color;}
+		.serif {font-family: $serif-face;}
+		.sans {font-family: $sans-face;}
+		.italic {font-style: italic;}
+
+/********************/
+
+
+/******** SPECIAL PAGES ******/
+.dead-end {
+	@include grid-row;
+	padding-top: 3em;
+	padding-bottom: 3em;
+	#{$all-text} {
+		@extend .sans;
+	}
+	&>div {
+		@include grid-column(8, $center: true, $last-column: true);
+	}
+	.dead-end-title h1 {
+		@extend .bold;
+		text-align: center;
+	}
+	.dead-end-info {
+		margin-top: 2em;
+		.subheader {
+			margin-bottom: 0;
+		}
+		@include radius;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		padding: 2em;
+		padding-bottom: 1em;
+	}
+	.dead-end-description {
+		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+		margin-bottom: 2em;
+	}
+}
+
+
+/*** TEMPLATES STYLES ***/
+section {
+	width: 100%;
+	padding: 2em 0;
+}
+.cross-bar {
+	background-color: $brand-primary;
+	padding: 1em 0;
+}
+
+#global-header {
+	@include grid-row;
+	ul{
+		margin-bottom: 0px;
+		font-size: 1.4em;
+		@extend .serif;
+		a{
+			color:white;
+		}
+	}
+	.school-brand {
+		@include grid-column(6);
+		display: inline-block;
+		margin-top: 1rem;
+		a {
+			font-family: #{$serif-face};
+			color: white;
+			font-size: 1rem;
+		}
+	}
+	.user-account {
+		@include grid-column(6);		
+		text-align: right;
+		a, span{
+			letter-spacing: 1px;
+			font-size: 0.5rem;
+		}
+		a {
+			margin-bottom: 0;
+			color: white;
+			font-size: .8rem;
+			margin-right: .5em;
+			&.button {
+				background-color: rgba(255, 255, 255, 0.2);
+				border: none;
+				box-shadow: none;
+				border-radius:3px;
+				font-weight: 600;
+				margin-left: 1em;
+			}
+			&:hover.button{
+				background-color: rgba(255, 255, 255, 0.4);
+
+			}
+		}
+		form {
+			display: inline-block;
+		}
+		span {
+			color: white;
+			font-size: 0.5em;
+		}
+		
+	}
+}
+
+
+
+
+.subpage-navbar-container, nav.subpage-navbar {
+	background-color: $brand-secondary;
+}
+
+nav.subpage-navbar {
+	margin-bottom:0px;
+	color:white;
+	@include grid-row;
+	ul {
+		@include grid-column(12);
+		margin-bottom: 0;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+	}
+	& > span, li {
+		display: inline-block;
+		margin-right:15px;
+		margin-bottom: 0;
+	}
+	a:link, a:visited{
+		margin-bottom: 0;
+		color:#ddd;
+		@extend .sans;
+		@extend .light;
+	}
+	a:hover{
+		color:#fff;
+		border-bottom:1px solid #999;
+	}
+}
+
+#logged-in {
+	form, input {margin: 0;}
+	input {
+		@extend .button;
+		background-color: rgba(255, 255, 255, 0.2);
+		border: none;
+		box-shadow: none;
+		margin-left: 1em;
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.25);
+		}
+	}
+}
+
+#school-logo {
+	color: white;
+	font-size: 6em;
+	line-height: 1.5rem;
+	vertical-align: middle;
+}
+
+
+.page-section {@include grid-row();}
+
+
+.page-info {
+	@include grid-row();
+	padding-bottom: 1rem;
+	margin-bottom: 2rem;
+	.title {
+		@include grid-column(8);
+	}
+	.description {
+		@include grid-column(6);
+		p {
+			@extend .subheader;
+			@extend .sans;		
+		}
+	}
+}
+
+
+
+
+.subpage-navbar {
+	@include grid-row();
+}
+
+.subpage-navbar-sections li {
+	display: inline-block;
+}
+
+
+.empty-state {
+	color: #bfbfbf;
+	text-transform: uppercase;
+	font-size: 0.2rem;
+	text-align: center;
+}
+
+.alert-box.status {
+	border: none;
+	background-color: transparent;
+	color: $dark-grey;
+	margin-bottom: 0;
+	@extend .light;
+}
+
+.alert-area {
+	background-color: $light-grey;
+	@include grid-row();
+	font-size: 1rem;
+	padding: 0.7rem;
+}
+
+
+
+
+/*************** HERO **************/
+.hero {
+	position: relative;  // Necessary to position background image absolutely
+	height: 20rem;
+	overflow: hidden;
+	padding: 5rem 0;
+}
+.hero-background {
+	// Locking background image to be centered both axes in all cases, see http://codepen.io/shshaw/full/gEiDt
+	position: absolute;
+	top: 0; right: 0; left: 0; bottom: 0;
+	margin: auto;
+	width: 100%;
+}
+.hero-content {
+	@include grid-row;
+	position: relative;
+	height: auto;
+	vertical-align: middle;
+	#{$all-headings} {color: $brand-secondary;}
+	& > div {
+		@include grid-column(9);
+	}
+	& > div[class*="--right"] {
+		@include grid-column(9, $offset: 3, $last-column: true);		
+		text-align: right;
+	}
+}
+
+/*********** INTRO-BLOCK ***********/
+// Use this block for exciting announcements,
+// but not for security risks, urgent alerts, etc.
+
+.intro-block {
+	@include grid-row;
+	background-color: $light-grey;
+	margin-top: -0.7em; // TEMPORARY FIX UNTIL WE FIGURE OUT WHAT WE CAN AND CANNOT REMOVE FROM TEMPLATES
+}
+.intro-content {
+	@include grid-column(6, $last-column: true, $center: true);
+	padding-top: 2.5em;
+	padding-bottom: 2.5em;
+	#{$all-text}{
+		text-align: center;
+		color: $brand-secondary;
+	}
+	.greeting {
+		@extend .italic;
+	}
+	.description {
+		opacity: 0.8;
+	}
+	#important-tag {
+		margin-top: 1em;
+		color: lighten($primary-color, 70%);
+		font-weight: lighter;
+		text-transform: uppercase;
+		font-size: 80%;
+		letter-spacing: 2px;
+		background-color: $primary-color;
+		padding: 0.5em;
+		border-radius: 5px;
+		width: 50%;
+		display: inline-block;
+		margin-left: 25%;
+		text-align: center;
+	}
+}
+
+.section-information {
+	@include grid-row;
+	.section-title {
+		@include grid-column(12);
+		opacity: 0.4;
+	}
+}
+
+
+
+.featured-courses {
+	margin-top: 3em;
+}
+.course-grid {@include grid-row;}
+.course-container {
+	@include grid-column(4);
+}
+.course-name {
+	font-weight: bold;
+}
+.course-instructor {
+	@extend .subheader;
+	@extend .italic;
+	color: $brand-primary;
+}
+.course-technical {
+	list-style: none;
+	@include grid-row;
+	background-color: $light-grey;
+	li {
+		@include grid-column(4);
+		@extend .sans;
+		color: $dark-grey;
+		text-align: center;
+	}
+}
+
+.about-class2go {
+	background-color: #F2F5F7;
+	margin-top: 3em;
+}
+
+.feature-grid {
+	@include grid-row();
+	& > div:nth-child(odd) {
+		.feature-image {
+			@include grid-column(7);
+		}
+		.feature-information {
+			@include grid-column(5);
+		}
+	}
+	& > div:nth-child(even) {
+		.feature-image {
+			@include grid-column(7, $push: 5);
+		}
+		.feature-information {
+			@include grid-column(5, $pull: 7);
+		}
+	}
+	.feature-container {
+		@include grid-row($behavior: nested);
+		margin-top: 1em;
+		margin-bottom: 4em;
+	}
+}
+
+/********** FOOTER *****/
+.powered-by-class2go {
+	background-color: $brand-primary;
+	padding: 0.5em;
+	a {display: inline-block}
+	h6 {
+		@include grid-column(12);
+		color: white;
+		@extend .light;
+		font-size: .8rem;
+		margin:0px;
+	}
+}
+
+footer {
+	background-color: $brand-secondary;
+	padding-top: 2em;
+	padding-bottom: 2em;
+	font-size:1.3em;
+	.brand {
+		@include grid-row();
+	}
+	.logo {
+		@include grid-column(12);
+		span {
+			@extend .serif;
+			@extend .italic;
+			@extend .light;
+		}
+	}
+	.school-info {
+		opacity: 0.5;
+		@include grid-row();
+		#{$all-text} {
+			font-size: 0.8em;
+			color: white;
+		}
+	}
+	.addr-card {
+		@include grid-column(4);
+	}
+	.important-links {
+		@include grid-column(4);
+		ul {list-style: none}
+		li {@extend .sans;}
+	}
+}
+
+#school-footer-logo {
+	font-size: 10em;
+	color: white;
+	line-height: 0.4em;
+	display: inline-block;
+}
+
+footer .vcard {
+	border: none;
+	padding: 0;
+}
+
+
+
+
+
+
+
+/******************* FORMS ****************/
+.modal-form {
+	// Use this layout for forms that are
+	// required to proceed. Log-in, Registration
+	// and User Acknowledgements. 
+	// Should be a single-column form, though
+	// related fields can be side-by-side.
+	// See registration page for example.
+	@include grid-row();
+	padding-top: 3em;
+	padding-bottom: 3em;
+	.form-info {
+		@include grid-column(7, $last-column: true, $center: true);
+		h6 {@extend .subheader;}
+		text-align: center;
+	}
+	.form-body {
+		@include grid-column(6, $last-column: true, $center: true);
+		margin-top: 2em;
+	}
+	.control-group {
+		@include grid-column(12);
+		span.error-message{
+			color: #D33737;
+			display: inline-block;
+			width: 100%;
+			font-size: 0.7rem;
+		}
+	}
+	input {
+		@include radius;		
+	}
+	fieldset {
+		@include grid-row();
+		@include radius;
+	}
+	.two-inputs .control-group {
+			@include grid-column(6);
+	}
+	.req-check {
+		@extend .button;
+		@extend button.secondary;
+		font-size: 0.5em;
+		padding-top: 1.4em;
+		padding-bottom: 1.4em;
+		input {
+			margin-right: 0.5em;
+			margin-bottom: 0;
+		}
+	}
+	#submit {
+		border: none;
+		@extend .button;
+		@extend .button.success;
+		width: 100%;
+		padding: 1em;
+		text-transform: uppercase;
+		font-size: 0.7em;
+		display: inline-block;
+	}
+	#alternative {
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		@include radius;
+		padding: 1em;
+		display: inline-block;
+		margin-top: 1em;
+		font-size: 0.6em;
+		font-weight: lighter;
+	}
+}
+
+/********* USER ACCOUNT ********/
+.dashboard {
+	margin-top: 1rem;
+}
+
+.dashboard .page-section .dashboard-module {
+	@include grid-column(3);
+	margin-bottom: 2rem;
+}
+.dashboard .page-section {
+	.dashboard-module--1 {@include grid-column(1);}
+	.dashboard-module--2 {@include grid-column(2);}
+	.dashboard-module--3 {@include grid-column(3);}
+	.dashboard-module--4 {@include grid-column(4);}
+	.dashboard-module--5 {@include grid-column(5);}
+	.dashboard-module--6 {@include grid-column(6);}
+	.dashboard-module--7 {@include grid-column(7);}
+	.dashboard-module--8 {@include grid-column(8);}
+	.dashboard-module--9 {@include grid-column(9);}
+	.dashboard-module--10 {@include grid-column(10);}
+	.dashboard-module--11 {@include grid-column(11);}
+	.dashboard-module--12 {@include grid-column(12);}
+}
+
+.dashboard-module-name {
+	border-radius: 2px 2px 0 0;
+	padding: 0.5rem;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: none;
+	color: #a3a3a3;
+	width: 100%;
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	margin-bottom: 0;
+}
+
+.dashboard-module-content {
+	padding: 1rem;
+	padding-top: 1.5rem;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 0 0 2px 2px;
+}
+
+.dashboard-module-content .key-value {
+	@extend .sans;
+	list-style: none;
+	margin-bottom: 0;
+	li {
+		margin-bottom: 1rem;
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+	.key {
+		@extend .subheader;
+		display: block;
+		font-size: 0.4rem;
+		margin-bottom: -0.2rem;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+}
+
