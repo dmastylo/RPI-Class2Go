@@ -129,9 +129,10 @@ def new(request):
     else:
         now = datetime.datetime.now()
         date = "%02d-%02d-%04d" %(now.month, now.day, now.year)
+        current_year = now.year
         
         # List of institutions
         institutions = Institution.objects.all()
         
-        return render_to_response('courses/new.html', {'request': request, 'date': date, 'institutions': institutions }, context_instance=RequestContext(request))
+        return render_to_response('courses/new.html', {'request': request, 'date': date, 'institutions': institutions, 'current_year': current_year}, context_instance=RequestContext(request))
     

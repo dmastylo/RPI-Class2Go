@@ -1,4 +1,5 @@
 @import "core/foundation";
+@import "datepicker";
 
 /**** UTILITIES ****/
 	/** Variables **/ 
@@ -21,9 +22,12 @@
 
 /********************/
 
-
-
 /*** TEMPLATES STYLES ***/
+.main-column{
+	h1, h2, h3{
+		margin-top:.8em;
+	}
+}
 section {
 	width: 100%;
 	padding: 2em 0;
@@ -65,23 +69,58 @@ section {
 	}
 }
 
-.admin-bar-container, nav.admin-bar{
-	background-color:#1e1e1e;
-}
-nav.admin-bar{
-	margin-bottom:0px;
-	color:white;
+/**
+	general link bar styles
+**/
+nav.top-bar{
+
+	color: #fff;
+
 	@include grid-row;
-	header > span, a{
-		margin-right:15px;
+
+	header > span{
+		text-shadow: 1px -1px #000;margin-right:15px;
 	}
-	a:link, a:visited{
-		color:#ddd;
-	}
-	a:hover{
+
+	a{
+		display:inline-block;
+		padding:0em 1em 0em 1em;
 		color:#fff;
-		border-bottom:1px solid #999;
+		&.active{
+			color:#fff;pointer-events:none; cursor:default;
+		}
 	}
+}
+
+div.red-bar-container, nav.red-bar{
+	background-color:#5B0000;
+}
+nav.red-bar{
+
+	a{
+		color:#ddd;
+
+		&:hover{
+			background-color: #761E1E;
+		}
+
+		&.active{
+			border-bottom: 6px solid #666;background-color:#470000;
+		}
+
+	}
+}
+div.grey-bar-container, nav.grey-bar{
+	background-color: #222;
+}
+nav.grey-bar{
+
+	a{
+		&:hover{
+			background-color: #444;
+		}
+	}
+
 }
 
 #school-logo {
@@ -242,10 +281,12 @@ nav.admin-bar{
 }
 
 footer {
+
 	background-color: $brand-secondary;
 	padding-top: 2em;
 	padding-bottom: 2em;
-	font-size:1.3em;
+	font-size: 1em;
+
 	.brand {
 		@include grid-row();
 	}
@@ -258,20 +299,26 @@ footer {
 		}
 	}
 	.school-info {
-		opacity: 0.5;
 		@include grid-row();
-		#{$all-text} {
-			font-size: 0.8em;
-			color: white;
-		}
 	}
 	.addr-card {
 		@include grid-column(4);
+		p.vcard{
+			color: white;
+			border: none;
+			padding: 0;
+		}
 	}
 	.important-links {
 		@include grid-column(4);
 		ul {list-style: none}
 		li {@extend .sans;}
+		a{
+			color: #ccc;
+			&:hover{
+				color: #fff;
+			}
+		}
 	}
 }
 
@@ -282,81 +329,5 @@ footer {
 	display: inline-block;
 }
 
-footer .vcard {
-	border: none;
-	padding: 0;
-}
-
-
-
-
-
-
-
 /******************* FORMS ****************/
-.modal-form {
-	// Use this layout for forms that are
-	// required to proceed. Log-in, Registration
-	// and User Acknowledgements. 
-	// Should be a single-column form, though
-	// related fields can be side-by-side.
-	// See registration page for example.
-	@include grid-row();
-	padding-top: 3em;
-	padding-bottom: 3em;
-	.form-info {
-		@include grid-column(7, $last-column: true, $center: true);
-		h6 {@extend .subheader;}
-		text-align: center;
-	}
-	.form-body {
-		@include grid-column(6, $last-column: true, $center: true);
-		margin-top: 2em;
-	}
-	.control-group {
-		@include grid-column(12);
-		span.error-message{
-			color:red;
-		}
-	}
-	input {
-		@include radius;		
-	}
-	fieldset {
-		@include grid-row();
-		@include radius;
-	}
-	.two-inputs .control-group {
-			@include grid-column(6);
-	}
-	.req-check {
-		@extend .button;
-		@extend button.secondary;
-		font-size: 0.5em;
-		padding-top: 1.4em;
-		padding-bottom: 1.4em;
-		input {
-			margin-right: 0.5em;
-			margin-bottom: 0;
-		}
-	}
-	#submit {
-		border: none;
-		@extend .button;
-		@extend .button.success;
-		width: 100%;
-		padding: 1em;
-		text-transform: uppercase;
-		font-size: 0.7em;
-		display: inline-block;
-	}
-	#alternative {
-		border: 1px solid rgba(0, 0, 0, 0.2);
-		@include radius;
-		padding: 1em;
-		display: inline-block;
-		margin-top: 1em;
-		font-size: 0.6em;
-		font-weight: lighter;
-	}
-}
+@import "forms";

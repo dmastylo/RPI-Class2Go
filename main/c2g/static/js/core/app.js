@@ -5,6 +5,18 @@
 
     window.c2g = window.c2g || {};
 
+    c2g.onLoad = function(){
+
+      // if we have a form element to focus on page load,
+      // we should go ahead and do so
+      var onload_focus_el = $(".onload-focus");
+      if(onload_focus_el.length)
+        onload_focus_el.focus();
+
+      // datepicker
+      $(".datepicker").fdatepicker();
+      
+    }
  
     c2g.installLeftNavChevron = function () {
          $('.nav-list.collapse').on("hidden shown", function(e){
@@ -125,9 +137,9 @@
 
 
     // Datepicker
-    $('[data-datetimepicker]').datetimepicker({
+    /*$('[data-datetimepicker]').datetimepicker({
         ampm: false
-    });
+    });*/
 
     // Exercise list drag and drop
     function updateExerciseOrder(itemIndex, order, $container) {
@@ -139,7 +151,7 @@
       .val(itemIndex);
     }
 
-    $("[data-sortablecontainer]")
+/*    $("[data-sortablecontainer]")
     .sortable({
       placeholder: "ui-state-highlight",
       update: function(event, ui) {
@@ -153,10 +165,10 @@
 
       }
     })
-    .disableSelection();
+    .disableSelection();*/
 
     // Tooltip config
-    $("[data-c2g-tooltip]").tooltip();
+    //$("[data-c2g-tooltip]").tooltip();
 
     // Toggler
     $("[data-toggler-target]").change(function(e){
@@ -173,3 +185,8 @@
 
 
 })(document);
+
+$(window).load(function(){
+      // Run startup functions
+      c2g.onLoad();
+});

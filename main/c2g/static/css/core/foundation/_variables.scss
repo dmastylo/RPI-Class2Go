@@ -298,14 +298,14 @@ $microformat-border-color: #ddd;
 // $input-font-color: rgba(0,0,0,0.75);
 // $input-font-size: emCalc(14);
 // $input-bg-color: #fff;
-// $input-focus-bg-color: darken(#fff, 2%);
+   $input-focus-bg-color: input-bg-color;
 // $input-border-color: darken(#fff, 20%);
 // $input-focus-border-color: darken(#fff, 40%);
 // $input-border-style: solid;
 // $input-border-width: 1px;
 // $input-disabled-bg: #ddd;
-// $input-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-// $input-include-glowing-effect: true;
+   $input-box-shadow: none;
+   $input-include-glowing-effect: false;
 
 // We use these to style the fieldset border and spacing.
 
@@ -379,7 +379,7 @@ $microformat-border-color: #ddd;
 
 // We use these to control button border styles.
 
-// $button-border-width: 1px;
+$button-border-width: 0px;
 // $button-border-style: solid;
 
 // We use this to set the default radius used throughout the core.
