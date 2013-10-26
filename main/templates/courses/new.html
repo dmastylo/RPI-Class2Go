@@ -166,45 +166,6 @@
 
     </div>
 
-<!--
-
-            <table>
-                <tr>
-                    <td style="padding: 10px;">{% trans 'Term' %}</td>
-                    <td style="padding: 10px;">
-                        <select name='term'>
-                            <option value="fall">{% trans 'Fall' %}</option>
-                            <option value="winter">{% trans 'Winter' %}</option>
-                            <option value="spring">{% trans 'Spring' %}</option>
-                            <option value="summer">{% trans 'Summer' %}</option>
-                        </select>
-                    </td>
-                    <td style="padding: 10px;">{% trans 'Year' %}</td>
-                    <td style="padding: 10px;"><input type='text' name='year' id='id_year' value='{{ current_year }}'></td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px;">{% trans 'Start date' %}</td>
-                    <td style="padding: 10px;"></td>
-                    <td style="padding: 10px;">{% trans 'End date' %}</td>
-                    <td style="padding: 10px;"></td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px;">{% trans 'Twitter tag' %}</td>
-                    <td style="padding: 10px;"><input type='text' id='id_twitter_tag' name='twitter_tag' /></td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px;">{% trans 'Logo filename' %}</td>
-                    <td style="padding: 10px;"><input type='text' id='id_logo_filename', name='logo_filename' /></td>
-                <tr>
-                    <td style="padding: 10px;">{% trans 'Institution only' %}</td>
-                    <td style="padding: 10px;"><input type='checkbox' id='id_institution_only' name='institution_only' /></td>
-                    <td style="padding: 10px;">{% trans 'Pre-enroll only' %}</td>
-                    <td style="padding: 10px;"><input type='checkbox' id='id_pre_enroll_only' name='pre_enroll_only' /></td>
-                    <td style="padding: 10px;">{% trans 'Preview only' %}</td>
-                    <td style="padding: 10px;"><input type='checkbox' id='id_preview_only' name='preview_only' /></td>
-                </tr>
-            </table>-->
-
         <div class="row">
 
             <div class="large-7 columns">
@@ -264,7 +225,7 @@
                         <!-- TODO: wtf is this? thanks, stanford -->
                         <input type="hidden" name="institution" value="2" />
                         
-                        <input type="button" class="button large" onclick="ValidateAndSubmit()" value="{% trans 'Create Course' %}"/>
+                        &nbsp;&nbsp;&nbsp;<input type="button" class="button large" onclick="ValidateAndSubmit()" value="{% trans 'Create Course' %}"/>
 
                     </div>
 

@@ -135,7 +135,8 @@ nav.grey-bar{
 	position: relative;  // Necessary to position background image absolutely
 	height: 20rem;
 	overflow: hidden;
-	padding: 5rem 0;
+	//padding: 5rem 0;
+	padding-top: 1em;	
 }
 .hero-background {
 	// Locking background image to be centered both axes in all cases, see http://codepen.io/shshaw/full/gEiDt
@@ -148,7 +149,7 @@ nav.grey-bar{
 	@include grid-row;
 	position: relative;
 	height: auto;
-	vertical-align: middle;
+	//vertical-align: middle;
 	#{$all-headings} {color: $brand-secondary;}
 	& > div {
 		@include grid-column(9);
@@ -166,7 +167,6 @@ nav.grey-bar{
 .intro-block {
 	@include grid-row;
 	background-color: $light-grey;
-	margin-top: -0.7em; // TEMPORARY FIX UNTIL WE FIGURE OUT WHAT WE CAN AND CANNOT REMOVE FROM TEMPLATES
 }
 .intro-content {
 	@include grid-column(6, $last-column: true, $center: true);
