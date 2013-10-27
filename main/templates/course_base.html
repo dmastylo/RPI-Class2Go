@@ -148,21 +148,23 @@
 {% block content %}
 {% block messages %}
 {% if messages %}
+    <div class="alert-area">
     {% for message in messages %}
         {% if 'success' in message.tags %}
-         <div class="alert alert-success"><em class="icon-ok"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+         <div class="alert-box success">{{ message }}</div>
         {% endif %}
         {% if 'error' in message.tags %}
-        <div class="alert alert-error"><em class="icon-fire"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert-box alert">{{ message }}</div>
         {% endif %}
         {% if 'warning' in message.tags %}
-        <div class="alert alert-warning"><em class="icon-warning-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert-box secondary">{{ message }}</div>
         {% endif %}
         {% if 'info' in message.tags %}
-        <div class="alert alert-info"><em class="icon-info-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert-box secondary">{{ message }}</div>
         {% endif %}
 
     {% endfor %}
+    </div>
 
 {% endif %}
 {% endblock messages %}

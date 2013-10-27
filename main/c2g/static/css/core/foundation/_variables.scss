@@ -79,6 +79,8 @@ $secondary-color: #FAF7F7;
 $alert-color: #D54E44;
 $success-color: #88d481;
 
+$button-color: #FAF8F7;
+
 // Make sure border radius matches unless we want it different.
 
 $global-radius: 3px;
@@ -86,9 +88,9 @@ $global-rounded: 1000px;
 
 // Inset shadow shiny edges and depressions.
 
-$shiny-edge-size: 0 -1px 0;
-$shiny-edge-color: rgba(#000, .5);
-$shiny-edge-active-color: rgba(#fff, .2);
+// $shiny-edge-size: 0 -1px 0;
+// $shiny-edge-color: rgba(#000, .5);
+// $shiny-edge-active-color: rgba(#fff, .2);
 
 // Control whether or not CSS classes come through in the CSS files.
 
@@ -351,45 +353,45 @@ $microformat-border-color: #ddd;
 
 // We use these to build padding for buttons.
 
-// $button-med: emCalc(12);
-// $button-tny: emCalc(7);
-// $button-sml: emCalc(9);
-// $button-lrg: emCalc(16);
+$button-med: emCalc(12);
+$button-tny: emCalc(7);
+$button-sml: emCalc(9);
+$button-lrg: emCalc(16);
 
 // We use this to control the display property.
 
-// $button-display: inline-block;
-// $button-margin-bottom: emCalc(20);
+$button-display: inline-block;
+$button-margin-bottom: emCalc(20);
 
 // We use these to control button text styles.
 
-// $button-font-family: inherit;
-// $button-font-color: #fff;
-// $button-font-color-alt: #333;
-// $button-font-med: emCalc(16);
-// $button-font-tny: emCalc(11);
-// $button-font-sml: emCalc(13);
-// $button-font-lrg: emCalc(20);
-// $button-font-weight: bold;
-// $button-font-align: center;
+$button-font-family: inherit;
+$button-font-color: #fff;
+$button-font-color-alt: #333;
+$button-font-med: emCalc(16);
+$button-font-tny: emCalc(11);
+$button-font-sml: emCalc(13);
+$button-font-lrg: emCalc(20);
+$button-font-weight: normal;
+$button-font-align: center;
 
 // We use these to control various hover effects.
 
-// $button-function-factor: 10%;
+$button-function-factor: 10%;
 
 // We use these to control button border styles.
 
-// $button-border-width: 1px;
-// $button-border-style: solid;
+$button-border-width: 1px;
+$button-border-style: solid;
 
 // We use this to set the default radius used throughout the core.
 
-// $button-radius: $global-radius;
-// $button-round: $global-rounded;
+$button-radius: $global-radius;
+$button-round: $global-rounded;
 
 // We use this to set default opacity for disabled buttons.
 
-// $button-disabled-opacity: 0.6;
+$button-disabled-opacity: 0.6;
 
 //
 // Button Groups
@@ -397,7 +399,7 @@ $microformat-border-color: #ddd;
 
 // Sets the margin for the right side by default, and the left margin if right-to-left direction is used
 
-// $button-bar-margin-opposite: emCalc(10);
+$button-bar-margin-opposite: emCalc(10);
 
 //
 // Dropdown Button Variables

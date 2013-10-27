@@ -21,12 +21,8 @@
                 
             </div>
         </div>
-
-        
         <div class="page-section">
-
             <div class="dashboard-module--6">
-
                 <h1 class="dashboard-module-name">
                     {% trans 'Current Courses' %}
                 </h1>
@@ -34,13 +30,15 @@
                     {% if courses %}
                         <ul class="course-list">
                             {% for course in courses %}
-                                <li class="course-list-course">
-                                    <h1 class="course-name">{{ course.title }}</h1>
-                                    <h2 class="course-grade">95%</h2>
-                                    <span class="course-instructor">
-                                        {{ course.contact }}
-                                    </span>
-                                </li>
+                            <li class="course-list-course">
+                                <a href="{% url 'courses.views.main' course.prefix course.suffix %}">
+                                    <h4 class="course-name">{{ course.title }}</h4>
+                                <h4 class="course-grade">95%</h4>
+                                <span class="course-instructor">
+                                    {{ course.contact }}
+                                </span>
+                                </a>
+                            </li>
                             {% endfor %}
                         </ul>
                     {% else %}
@@ -169,24 +167,18 @@
 
     </div>
 
-    <div class="row-fluid page-header">
-        <div class="pull-right">
-            <a href="{% url 'accounts.views.edit' %}" class="btn">{% trans 'Edit Info' %}</a>
-          {% if not has_webauth %}
-            <a href="{% url 'auth_password_change' %}" class="btn">{% trans 'Change Password' %}</a>
-          {% endif %}
+    <div class="page-section">
+        <div class="dashboard-control-bar">
+            <div class="dashboard-control-content">
+                  <a href="{% url 'accounts.views.edit' %}" class="button small">{% trans 'Edit Info' %}</a>
+                {% if not has_webauth %}
+                  <a href="{% url 'auth_password_change' %}" class="button small">{% trans 'Change Password' %}</a>
+                {% endif %}            
+            </div>
         </div>
     </div>
-    
 
-
-
-
-            <li><strong>{% trans 'Piazza handle' %}:</strong> {{user_profile.piazza_name }}</li>
-            <li><strong>{% trans 'Piazza email' %}:</strong> {{user_profile.piazza_email }}</li>
-            <li><strong>{% trans 'Receive emails' %}:</strong> {% if user_profile.email_me %} {% trans 'Yes' %} {% else %} {% trans 'No' %} {% endif %} </li>
-        </div>
-    </ul>
+<!-- 
     {% if courses %}
         <hr />
         <span><strong>{% trans 'Courses' %}:</strong></span>
@@ -220,7 +212,7 @@
                     <div class="profile-progress-wrapper">
                         <div class="profile-progress-endticks">
                             <div class="profile-progress-line"></div>
-                            <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> <!-- '%' after django tag is necessary for width attribute...-->
+                            <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> 
                         </div>
                     </div>
                     <div class="buttons">
@@ -254,33 +246,34 @@
                 </div>
             {% endfor %}
         </div>
-    {% endif %}
+    {% endif %} -->
     
 
 
 {% else %}
-<h3> {% trans 'Please login to see profile information' %}: </h3>
-    <p>
-        <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">{% trans 'Stanford WebAuth' %}</a>
-        <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">{% trans 'Class2Go Login (Public course students)' %}</a>
-    </p>
+<div class="dead-end">
+    <div class="dead-end-title">
+        <h1>
+            {% trans "You must be logged in to see this profile." %}
+        </h1>
+    </div>
+    <div class="dead-end-info">
+        <div class="dead-end-description">
+            <h6 class="subheader">PROBLEM</h6>
+            <p>{% trans "This information is only available to users." %}</b></p>
+        </div>
+        <div class="dead-end-solutions">
+            <h6 class="subheader">SOLUTION</h6>
+            <p>
+                {% trans "Log in to your user account." %}
+            </p>
+        </div>
+    </div>    
+</div>
+
+
+
+
 {% endif %}
 
-
-<script>
-    $(document).ready(function() {
-        $('.btn.score').click(function() {
-            if ($(this).hasClass('shown')) {
-                $('.text', this).text('Show Scores');
-                $(this).closest('.course').find('.image').find('.score_overlay').hide().siblings('img').fadeTo('fast', 1);
-            } else {
-                $(this).closest('.course').find('.image').find('img').fadeTo('fast', .05, function() {
-                    $(this).siblings('.score_overlay').show();
-                });
-                $('.text', this).text('Hide Scores');
-            }
-            $(this).toggleClass('shown');
-        });
-    });
-</script>
 {% endblock m_column_content %}

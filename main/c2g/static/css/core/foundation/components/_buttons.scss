@@ -153,7 +153,7 @@ $button-disabled-opacity: 0.6 !default;
 }
 
 // We use this to quickly create buttons with a single mixin. As @jaredhardy puts it, "the kitchen sink mixin"
-@mixin button($padding:$button-med, $bg:$primary-color, $radius:false, $full-width:false, $disabled:false, $is-input:false, $is-prefix:false) {
+@mixin button($padding:$button-med, $bg:$button-color, $radius:false, $full-width:false, $disabled:false, $is-input:false, $is-prefix:false) {
   @include button-base;
   @include button-size($padding, $full-width, $is-input);
   @include button-style($bg, $radius, $disabled);
@@ -169,9 +169,9 @@ $button-disabled-opacity: 0.6 !default;
 
   // Default styles applied outside of media query
   button, .button {
-    @include button-base;
-    @include button-size;
-    @include button-style;
+    @include button;
+
+    &.no-bottom-margin {margin-bottom: 0;}
 
     &.secondary { @include button-style($bg:$secondary-color); }
     &.success   { @include button-style($bg:$success-color); }

@@ -13,8 +13,8 @@
 
 	    {% trans "You're not enrolled in this course." %}
 
-	    <form style="display:inline" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}{% if request.GET.join_next %}?redirect_to={{ request.GET.join_next }}{% endif %}" method="POST">
-	        <input type="submit" id="login_button" class="button" value="Enroll today" />
+	    <form style="display:inline; margin-left: 1rem;" action="{% url 'courses.actions.signup_with_course' common_page_data.course_prefix common_page_data.course_suffix %}{% if request.GET.join_next %}?redirect_to={{ request.GET.join_next }}{% endif %}" method="POST">
+	        <input type="submit" id="login_button" class="button success small no-bottom-margin" value="Enroll now" />
 	        {% csrf_token %}
 	    </form>
 	</div>

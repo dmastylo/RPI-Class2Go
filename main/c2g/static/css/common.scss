@@ -77,7 +77,7 @@ section {
 	.school-brand {
 		@include grid-column(6);
 		display: inline-block;
-		margin-top: 1rem;
+		margin-top: 0.5rem;
 		a {
 			font-family: #{$serif-face};
 			color: white;
@@ -214,12 +214,11 @@ nav.subpage-navbar {
 	text-align: center;
 }
 
+.alert-box {@extend .light; margin-bottom: 0;}
 .alert-box.status {
 	border: none;
 	background-color: transparent;
 	color: $dark-grey;
-	margin-bottom: 0;
-	@extend .light;
 }
 
 .alert-area {
@@ -314,6 +313,31 @@ nav.subpage-navbar {
 .featured-courses {
 	margin-top: 3em;
 }
+
+.course-list {list-style: none;}
+.course-list-course {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	margin-bottom: 1rem;
+ 	&:last-child {
+		border-bottom: 0;
+		margin-bottom: 0;
+	}
+	.course-name, .course-grade {
+		display: inline-block;
+		margin-bottom: 0;
+	}
+	.course-grade {float: right;}
+	.course-instructor {
+		@extend .subheader;
+		@extend .sans;
+		display: block;
+		width: 100%;
+		margin-top: -0.2rem;
+	}
+}
+
+
+
 .course-grid {@include grid-row;}
 .course-container {
 	@include grid-column(4);
@@ -475,7 +499,7 @@ footer .vcard {
 	}
 	.req-check {
 		@extend .button;
-		@extend button.secondary;
+		@extend .button.secondary;
 		font-size: 0.5em;
 		padding-top: 1.4em;
 		padding-bottom: 1.4em;
@@ -566,6 +590,19 @@ footer .vcard {
 		margin-bottom: -0.2rem;
 		text-transform: uppercase;
 		letter-spacing: 1px;
+	}
+}
+
+.dashboard-control-bar {
+	@extend .dashboard-module;
+	@include grid-column(12);
+	.dashboard-control-name {
+		@extend .dashboard-module-name;
+	}
+	.dashboard-control-content {
+		border-top: 1px solid rgba(0,0,0, 0.1);
+		@extend .dashboard-module-content;
+		a {margin-bottom: 0;}
 	}
 }
 
