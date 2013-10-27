@@ -96,7 +96,7 @@ except NameError:
     SITE_NAME_SHORT = 'Rensselaer'
     SITE_NAME_LONG = 'Rensselaer Polytechnic Institute'
     SITE_TITLE = 'Rensselaer Class2Go'
-    SITE_URL = 'http://class2go.rpi.edu'
+    SITE_URL = 'http://node03.cs.rpi.edu'
 
 
 # If you set this to False, Django will make some optimizations so as not

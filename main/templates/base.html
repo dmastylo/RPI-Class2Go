@@ -6,12 +6,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, target-densitydpi=device-dpi">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel='shortcut icon' type='image/x-icon' href='{{ STATIC_URL }}graphics/sites/{{ SITE_NAME_SHORT }}/favicon.ico' />
     {% block top_scripts %}
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/themes/ui-lightness/jquery-ui.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/iconfont.css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/core/analogclock.css" />
     {% load compress %}
     {% compress css %}
@@ -21,7 +19,9 @@
     <!--[if IE 7]>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/2.0/css/font-awesome-ie7.css">
     <![endif]-->
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    
     <!--[if lte IE 8]>
         <script type="text/javascript" src="{{ STATIC_URL }}js/core/respond.min.js"></script>
         <script type="text/javascript">
@@ -30,8 +30,7 @@
             });
         </script>
     <![endif]-->
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.22/jquery-ui.min.js"></script>
-    <script src="{{ STATIC_URL }}js/foundation/vendor/custom.modernizr.js"></script>
+
     <script type="text/javascript" src="//use.typekit.net/tyv1luk.js"></script>
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
     {% endblock top_scripts %}
@@ -72,6 +71,8 @@
                     </div>
                 </header>
             </section>
+
+            <!-- Administration bar for staff -->
             {% if user.is_authenticated and user.is_staff %}
                 <div class="subpage-navbar-container">
                     <nav class="subpage-navbar">
@@ -84,6 +85,7 @@
                     </nav>
                 </div>
             {% endif %}
+
             {% block topcontent %}
                 <div id="top-content"></div>
             {% endblock topcontent %}
@@ -95,22 +97,6 @@
 
         {% if not request.session.headless %}
             {% block navbar %}
-                {% if user.is_staff %}
-
-                    <!--
-                    <div class="navbar">
-                        <div class="navbar-inner">
-                            <div class="container-fluid">
-                                <h2 id="main-nav-heading" class="hidden-accessible">{% trans 'Course Sections' %}</h2>
-                                <ul class="nav" role="navigation" aria-labelledby="main-nav-heading">
-                                    <li {% block new_course_link %}{% endblock new_course_link %}><a href="{% url 'courses.admin_views.new' %}">{% trans 'Create Course' %}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    -->
-
-                {% endif %}
             {% endblock navbar %}
         {% endif %}
         <div class="row-fluid" style="position:relative;">
@@ -138,7 +124,6 @@
 
             
             {% block topnav %}
-                
             {% endblock topnav %}
         </div>
         
@@ -159,8 +144,12 @@
                 	{% endfor %}
                 {% endblock %}
                 
-                {% block m_column_content %}{% endblock %}
-                
+                <div class="row">
+                    <div class="large-12 main-column">
+                    {% block m_column_content %}{% endblock %}
+                    </div>
+                </div>
+
                 {% block r_column_content %}{% endblock %}
         {% endblock content %}
         
@@ -171,9 +160,9 @@
     {% block jabber_block %}{% endblock %}
 
     {% block bottom_scripts %}
-<!--
+    <script type="text/javascript" src="{{ STATIC_URL }}js/core/foundation-datepicker.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/core/app.js"></script>
--->
+
     {% endblock bottom_scripts %}
 
     <!-- Need to re-add Google Analytics script -->
@@ -181,8 +170,5 @@
     
     {% block addl_scripts %}
     {% endblock addl_scripts %}
-    <script>
-      // $(document).foundation();
-    </script>
 </body>
 </html>

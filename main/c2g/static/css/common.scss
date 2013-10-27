@@ -1,4 +1,5 @@
 @import "core/foundation";
+@import "datepicker";
 
 /**** UTILITIES ****/
 	/** Variables **/ 
@@ -20,8 +21,6 @@
 		.italic {font-style: italic;}
 
 /********************/
-
-
 /******** SPECIAL PAGES ******/
 .dead-end {
 	@include grid-row;
@@ -53,8 +52,12 @@
 	}
 }
 
-
 /*** TEMPLATES STYLES ***/
+.main-column{
+	h1, h2, h3{
+		margin-top:.8em;
+	}
+}
 section {
 	width: 100%;
 	padding: 2em 0;
@@ -120,9 +123,6 @@ section {
 	}
 }
 
-
-
-
 .subpage-navbar-container, nav.subpage-navbar {
 	background-color: $brand-secondary;
 }
@@ -148,10 +148,58 @@ nav.subpage-navbar {
 		@extend .sans;
 		@extend .light;
 	}
-	a:hover{
-		color:#fff;
-		border-bottom:1px solid #999;
+/**
+	general link bar styles
+**/
+nav.top-bar{
+
+	color: #fff;
+
+	@include grid-row;
+
+	header > span{
+		text-shadow: 1px -1px #000;margin-right:15px;
 	}
+
+	a{
+		display:inline-block;
+		padding:0em 1em 0em 1em;
+		color:#fff;
+		&.active{
+			color:#fff;pointer-events:none; cursor:default;
+		}
+	}
+}
+
+div.red-bar-container, nav.red-bar{
+	background-color:#5B0000;
+}
+nav.red-bar{
+
+	a{
+		color:#ddd;
+
+		&:hover{
+			background-color: #761E1E;
+		}
+
+		&.active{
+			border-bottom: 6px solid #666;background-color:#470000;
+		}
+
+	}
+}
+div.grey-bar-container, nav.grey-bar{
+	background-color: #222;
+}
+nav.grey-bar{
+
+	a{
+		&:hover{
+			background-color: #444;
+		}
+	}
+
 }
 
 #logged-in {
@@ -236,7 +284,8 @@ nav.subpage-navbar {
 	position: relative;  // Necessary to position background image absolutely
 	height: 20rem;
 	overflow: hidden;
-	padding: 5rem 0;
+	//padding: 5rem 0;
+	padding-top: 1em;	
 }
 .hero-background {
 	// Locking background image to be centered both axes in all cases, see http://codepen.io/shshaw/full/gEiDt
@@ -249,7 +298,7 @@ nav.subpage-navbar {
 	@include grid-row;
 	position: relative;
 	height: auto;
-	vertical-align: middle;
+	//vertical-align: middle;
 	#{$all-headings} {color: $brand-secondary;}
 	& > div {
 		@include grid-column(9);
@@ -267,7 +316,6 @@ nav.subpage-navbar {
 .intro-block {
 	@include grid-row;
 	background-color: $light-grey;
-	margin-top: -0.7em; // TEMPORARY FIX UNTIL WE FIGURE OUT WHAT WE CAN AND CANNOT REMOVE FROM TEMPLATES
 }
 .intro-content {
 	@include grid-column(6, $last-column: true, $center: true);
@@ -407,10 +455,12 @@ nav.subpage-navbar {
 }
 
 footer {
+
 	background-color: $brand-secondary;
 	padding-top: 2em;
 	padding-bottom: 2em;
-	font-size:1.3em;
+	font-size: 1em;
+
 	.brand {
 		@include grid-row();
 	}
@@ -423,20 +473,26 @@ footer {
 		}
 	}
 	.school-info {
-		opacity: 0.5;
 		@include grid-row();
-		#{$all-text} {
-			font-size: 0.8em;
-			color: white;
-		}
 	}
 	.addr-card {
 		@include grid-column(4);
+		p.vcard{
+			color: white;
+			border: none;
+			padding: 0;
+		}
 	}
 	.important-links {
 		@include grid-column(4);
 		ul {list-style: none}
 		li {@extend .sans;}
+		a{
+			color: #ccc;
+			&:hover{
+				color: #fff;
+			}
+		}
 	}
 }
 
@@ -446,17 +502,6 @@ footer {
 	line-height: 0.4em;
 	display: inline-block;
 }
-
-footer .vcard {
-	border: none;
-	padding: 0;
-}
-
-
-
-
-
-
 
 /******************* FORMS ****************/
 .modal-form {
@@ -606,3 +651,4 @@ footer .vcard {
 	}
 }
 
+@import "forms";
