@@ -1,5 +1,4 @@
 @import "core/foundation";
-@import "datepicker";
 
 /**** UTILITIES ****/
 	/** Variables **/ 
@@ -148,58 +147,53 @@ nav.subpage-navbar {
 		@extend .sans;
 		@extend .light;
 	}
-/**
-	general link bar styles
-**/
+}
+
+/** general link bar styles **/
 nav.top-bar{
-
 	color: #fff;
-
 	@include grid-row;
-
 	header > span{
-		text-shadow: 1px -1px #000;margin-right:15px;
+		text-shadow: 1px -1px #000;
+		margin-right:15px;
 	}
-
-	a{
+	a {
 		display:inline-block;
 		padding:0em 1em 0em 1em;
 		color:#fff;
 		&.active{
-			color:#fff;pointer-events:none; cursor:default;
+			color:#fff;
+			pointer-events:none;
+			cursor:default;
 		}
 	}
 }
 
 div.red-bar-container, nav.red-bar{
-	background-color:#5B0000;
+	background-color: #5B0000;
 }
 nav.red-bar{
-
-	a{
+	a {
 		color:#ddd;
-
 		&:hover{
 			background-color: #761E1E;
 		}
-
 		&.active{
-			border-bottom: 6px solid #666;background-color:#470000;
+			border-bottom: 6px solid #666;
+			background-color:#470000;
 		}
-
 	}
 }
+
 div.grey-bar-container, nav.grey-bar{
 	background-color: #222;
 }
 nav.grey-bar{
-
-	a{
+	a {
 		&:hover{
 			background-color: #444;
 		}
 	}
-
 }
 
 #logged-in {
@@ -455,12 +449,10 @@ nav.grey-bar{
 }
 
 footer {
-
 	background-color: $brand-secondary;
 	padding-top: 2em;
 	padding-bottom: 2em;
 	font-size: 1em;
-
 	.brand {
 		@include grid-row();
 	}
@@ -650,5 +642,3 @@ footer {
 		a {margin-bottom: 0;}
 	}
 }
-
-@import "forms";

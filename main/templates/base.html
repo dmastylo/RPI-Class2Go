@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel='shortcut icon' type='image/x-icon' href='{{ STATIC_URL }}graphics/sites/{{ SITE_NAME_SHORT }}/favicon.ico' />
     {% block top_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/core/analogclock.css" />
     {% load compress %}
     {% compress css %}
     <link type="text/x-scss" rel="stylesheet" href="{{ STATIC_URL }}css/common.scss" />
@@ -144,11 +143,7 @@
                 	{% endfor %}
                 {% endblock %}
                 
-                <div class="row">
-                    <div class="large-12 main-column">
-                    {% block m_column_content %}{% endblock %}
-                    </div>
-                </div>
+                {% block m_column_content %}{% endblock %}
 
                 {% block r_column_content %}{% endblock %}
         {% endblock content %}
