@@ -10,3 +10,4 @@ chromedriver.log*
 selenium-server.log*
 db-dumps
 logs/
+static/CACHE

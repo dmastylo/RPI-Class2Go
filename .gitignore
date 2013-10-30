@@ -32,3 +32,5 @@ sophi-venv
 .sass-cache/
 
 .idea
+
+database.py
