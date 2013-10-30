@@ -150,16 +150,19 @@ nav.subpage-navbar {
 }
 
 /** general link bar styles **/
-nav.top-bar{
+nav.subpage-navbar{
 	color: #fff;
 	@include grid-row;
-	header > span{
-		text-shadow: 1px -1px #000;
-		margin-right:15px;
+	ul{
+		padding: 0px;
+		span{
+			text-shadow: 1px -1px #000;
+			margin-right:15px;
+		}
 	}
 	a {
 		display:inline-block;
-		padding:0em 1em 0em 1em;
+		padding:.7em 1em;
 		color:#fff;
 		&.active{
 			color:#fff;
@@ -169,10 +172,10 @@ nav.top-bar{
 	}
 }
 
-div.red-bar-container, nav.red-bar{
+div.subpage-navbar-container, nav.subpage-navbar{
 	background-color: #5B0000;
 }
-nav.red-bar{
+nav.subpage-navbar{
 	a {
 		color:#ddd;
 		&:hover{
@@ -185,10 +188,10 @@ nav.red-bar{
 	}
 }
 
-div.grey-bar-container, nav.grey-bar{
+div.secondary-subpage-navbar-container, nav.secondary-subpage-navbar{
 	background-color: #222;
 }
-nav.grey-bar{
+nav.secondary-subpage-navbar{
 	a {
 		&:hover{
 			background-color: #444;
@@ -203,9 +206,12 @@ nav.grey-bar{
 		background-color: rgba(255, 255, 255, 0.2);
 		border: none;
 		box-shadow: none;
+		border-radius: 3px;
 		margin-left: 1em;
+		color: #fff;
 		&:hover {
 			background-color: rgba(255, 255, 255, 0.25);
+			color: #fff;
 		}
 	}
 }
