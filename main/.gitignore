@@ -9,6 +9,4 @@ coverage-report
 chromedriver.log*
 selenium-server.log*
 db-dumps
-static/
-!static/css/core/foundation/_variables.scss
 logs/
