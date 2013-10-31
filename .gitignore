@@ -1,5 +1,6 @@
 db-dumps/
 main/database.py
+main/cache-default
 venv_c2g
 
 django-class2go
