@@ -12,9 +12,6 @@
 
 {% block m_column_content %}
 
-<h2>{% trans 'Create New Course' %}</h2>
-<p>Creates a new course in the {{ SITE_TITLE }} system.</p>
-
 <form name="form_new_course" method="POST" action="{% url 'courses.admin_views.new' %}">
 
     <div class="row">
@@ -24,6 +21,9 @@
             <div class="row">
 
                 <div class="large-9 columns large-offset-3">
+
+                    <h2>{% trans 'Create New Course' %}</h2>
+                    <p>Creates a new course in the {{ SITE_TITLE }} system.</p>
 
                     <label class='header'>{% trans 'Course Information' %}</label>
 

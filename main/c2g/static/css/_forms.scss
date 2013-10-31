@@ -1,0 +1,101 @@
+form{
+    label{
+        cursor: default;
+    }
+    label.header{
+        font-size: 1.1em;padding: 1em 0em;
+    }
+    label.explanation{
+        color: #777;
+    }
+    span.prefix{
+        /* annoying hack because foundation input prefixes don't work as they should */
+        padding-right: $block-grid-default-spacing * 1.5;
+        padding-left: $block-grid-default-spacing * 1.2;
+    }
+    label.inline, input.inline{
+        display: inline-block;
+    }
+    label.inline{
+        padding-left: 1em;
+    }
+    input.datepicker{
+        width: 6em;    
+    }
+}
+
+a.button, input.button{
+    box-shadow: none;
+    -webkit-transition: none;
+    transition: none;
+}
+
+.modal-form {
+    // Use this layout for forms that are
+    // required to proceed. Log-in, Registration
+    // and User Acknowledgements. 
+    // Should be a single-column form, though
+    // related fields can be side-by-side.
+    // See registration page for example.
+    @include grid-row();
+    padding-top: 3em;
+    padding-bottom: 3em;
+    .form-info {
+        @include grid-column(7, $last-column: true, $center: true);
+        h6 {@extend .subheader;}
+        text-align: center;
+    }
+    .form-body {
+        @include grid-column(6, $last-column: true, $center: true);
+        margin-top: 2em;
+    }
+    .control-group {
+        @include grid-column(12);
+        span.error-message{
+            color: #D33737;
+            display: inline-block;
+            width: 100%;
+            font-size: 0.7rem;
+        }
+    }
+    input {
+        @include radius;        
+    }
+    fieldset {
+        @include grid-row();
+        @include radius;
+    }
+    .two-inputs .control-group {
+            @include grid-column(6);
+    }
+    .req-check {
+        @extend .button;
+        @extend .button.secondary;
+        font-size: 0.5em;
+        padding-top: 1.4em;
+        padding-bottom: 1.4em;
+        input {
+            margin-right: 0.5em;
+            margin-bottom: 0;
+        }
+    }
+    #submit {
+        border: none;
+        @extend .button;
+        @extend .button.success;
+        width: 100%;
+        padding: 1em;
+        text-transform: uppercase;
+        font-size: 0.7em;
+        display: inline-block;
+    }
+    #alternative {
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        @include radius;
+        padding: 1em;
+        display: inline-block;
+        margin-top: 1em;
+        font-size: 0.6em;
+        font-weight: lighter;
+    }
+}

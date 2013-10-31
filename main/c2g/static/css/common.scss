@@ -1,5 +1,8 @@
 @import "core/foundation";
 
+// Third party
+@import "core/datepicker";
+
 /**** UTILITIES ****/
 	/** Variables **/ 
 		$serif-face: "kepler-std", Georgia, Times, serif;
@@ -80,10 +83,11 @@ section {
 		@include grid-column(6);
 		display: inline-block;
 		margin-top: 0.5rem;
+		padding-left: 0em;
 		a {
 			font-family: #{$serif-face};
 			color: white;
-			font-size: 1rem;
+			font-size: 1.3rem;
 		}
 	}
 	.user-account {
@@ -501,77 +505,6 @@ footer {
 	display: inline-block;
 }
 
-/******************* FORMS ****************/
-.modal-form {
-	// Use this layout for forms that are
-	// required to proceed. Log-in, Registration
-	// and User Acknowledgements. 
-	// Should be a single-column form, though
-	// related fields can be side-by-side.
-	// See registration page for example.
-	@include grid-row();
-	padding-top: 3em;
-	padding-bottom: 3em;
-	.form-info {
-		@include grid-column(7, $last-column: true, $center: true);
-		h6 {@extend .subheader;}
-		text-align: center;
-	}
-	.form-body {
-		@include grid-column(6, $last-column: true, $center: true);
-		margin-top: 2em;
-	}
-	.control-group {
-		@include grid-column(12);
-		span.error-message{
-			color: #D33737;
-			display: inline-block;
-			width: 100%;
-			font-size: 0.7rem;
-		}
-	}
-	input {
-		@include radius;		
-	}
-	fieldset {
-		@include grid-row();
-		@include radius;
-	}
-	.two-inputs .control-group {
-			@include grid-column(6);
-	}
-	.req-check {
-		@extend .button;
-		@extend .button.secondary;
-		font-size: 0.5em;
-		padding-top: 1.4em;
-		padding-bottom: 1.4em;
-		input {
-			margin-right: 0.5em;
-			margin-bottom: 0;
-		}
-	}
-	#submit {
-		border: none;
-		@extend .button;
-		@extend .button.success;
-		width: 100%;
-		padding: 1em;
-		text-transform: uppercase;
-		font-size: 0.7em;
-		display: inline-block;
-	}
-	#alternative {
-		border: 1px solid rgba(0, 0, 0, 0.2);
-		@include radius;
-		padding: 1em;
-		display: inline-block;
-		margin-top: 1em;
-		font-size: 0.6em;
-		font-weight: lighter;
-	}
-}
-
 /********* USER ACCOUNT ********/
 .dashboard {
 	margin-top: 1rem;
@@ -648,3 +581,6 @@ footer {
 		a {margin-bottom: 0;}
 	}
 }
+
+/* Forms */
+@import "forms";
