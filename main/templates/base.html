@@ -43,22 +43,9 @@
 {% endblock bodytag %}
 
     <div id="viewport">
-<<<<<<< HEAD
+
       {% if not request.session.headless %}
-        <div id="global-header">
-            <h1 class="stanford-logo">
-            	{% if SITE_NAME_SHORT == 'Stanford' %}
-                <a href="http://www.stanford.edu">
-                    <img src="/static/graphics/core/header-stanford-logo.png" width="160" alt="Stanford University">
-                    Stanford University
-                </a>
-                {% else %}
-                <a href="http://{{ request.get_host }}"</a>
-                {% endif %}
-            </h1>
-            <p id="skip-nav"><a href="#main-content" class="hidden-accessible">{% trans 'Jump to content' %}</a></p>
-        </div>
-        {% block topcontent %}<div id="top-content"></div>{% endblock topcontent %}
+        
       {% endif %}
         {% block topbar %}<div id="c2g_layout_topbar">{% endblock topbar %}        
             {% if not request.session.headless %}
@@ -113,10 +100,7 @@
                 {% endblock mode_switcher %}
             </div>
             
-            {% block topnav %}
-                <div class="top-nav">
-                    <ul class="unstyled">
-=======
+
         {% if not request.session.headless %}
             <section class="cross-bar">
                 <header id="global-header">
@@ -125,7 +109,7 @@
                         <a href="{% url 'courses.landing.views.landing' %}">{{ SITE_TITLE }}</a>
                     </div>
                     <div class="user-account">
->>>>>>> gui
+
                         {% if user.is_authenticated %}
                             <div id="logged-in">
                                 <a href="/accounts/profile"> {% trans 'Welcome, '%} {{ user.first_name }} </a>
@@ -167,38 +151,8 @@
 
         {% block hero %}
         {% endblock hero %}
- 
-
-        {% if not request.session.headless %}
-            {% block navbar %}
-            {% endblock navbar %}
-        {% endif %}
-        <div class="row-fluid" style="position:relative;">
-            {% block mode_switcher %}
-                {% if common_page_data.can_switch_mode or common_page_data.is_course_admin %}
-                    <div class="hidden-phone" style="position:absolute;top:0;right:0;">
-                    {% if common_page_data.can_switch_mode %}
-                        <form data-c2g-tooltip class="toggle-views" name="course_mode_switch_form" action="{%url 'courses.actions.switch_mode' %}" method="POST" data-placement="left" title="{% trans 'Choosing EDIT mode lets you edit the course site. Choosing LIVE mode lets you view the site as students will.' %}">
-                            <p>
-                                {% trans 'You are currently viewing:' %}
-                            </p>
-                            <div class="btn-group btn-views-toggle">
-                                <button type="submit" name="to_mode" value="draft" class="btn btn-mini{% ifequal common_page_data.course_mode 'draft' %} active{% endifequal %}">{% trans 'Edit' %}</button>
-                                <button type="submit" name="to_mode" value="ready" class="btn btn-mini{% ifequal common_page_data.course_mode 'ready' %} active{% endifequal %}">{% trans 'Live' %}</button>
-                            </div>
-                            <input type="hidden" name="course_prefix" value="{{common_page_data.course_prefix}}"/>
-                            <input type="hidden" name="course_suffix" value="{{common_page_data.course_suffix}}"/>
-                            {% csrf_token %}
-                        </form>
-                    {% endif %}
-                    </div>
-                {% endif %}
-            {% endblock mode_switcher %}
-            </div>
 
             
-            {% block topnav %}
-            {% endblock topnav %}
         </div>
         
         
