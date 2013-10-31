@@ -6,131 +6,274 @@
 {% load template_utils %}
 
 {% block m_column_content %}
-    <div id="c2g_layout_m_column" class="span12">
-        {% if user.is_authenticated %}
-            <div class="row-fluid page-header">
-                <div class="pull-left">
-                    <h2>{% trans 'My Profile' %}</h2>
-                </div>
-                <div class="pull-right">
-                    <a href="{% url 'accounts.views.edit' %}" class="btn">{% trans 'Edit Info' %}</a>
-                  {% if not has_webauth %}
-                    <a href="{% url 'auth_password_change' %}" class="btn">{% trans 'Change Password' %}</a>
-                  {% endif %}
+{% if user.is_authenticated %}
+    <div class="dashboard">
+        <div class="page-info">
+            <div class="title">
+                <h1>
+                    {% trans 'My Profile' %}
+                </h1>                
+            </div>
+            <div class="description">
+                <p>
+                    {% trans 'Control your public-facing profile as well as security options such as email associations and your password.' %}
+                </p>
+                
+            </div>
+        </div>
+        <div class="page-section">
+            <div class="dashboard-module--6">
+                <h1 class="dashboard-module-name">
+                    {% trans 'Current Courses' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    {% if courses %}
+                        <ul class="course-list">
+                            {% for course in courses %}
+                            <li class="course-list-course">
+                                <a href="{% url 'courses.views.main' course.prefix course.suffix %}">
+                                    <h4 class="course-name">{{ course.title }}</h4>
+                                <h4 class="course-grade">95%</h4>
+                                <span class="course-instructor">
+                                    {{ course.contact }}
+                                </span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <h2 class="empty-state">No courses found!</h2>
+                    {% endif %}
                 </div>
             </div>
-            
-            <hr />
-            <ul style="overflow:hidden" class="unstyled profile-info">
-                <div class="span5">
-                    <li><strong>{% trans 'Username' %}:</strong> {{ user.username }}</li>
-                    <li><strong>{% trans 'First Name' %}:</strong> {{ user.first_name }}</li>
-                    <li><strong>{% trans 'Last Name' %}:</strong> {{ user.last_name }}</li>
-                    <li><strong>{% trans 'E-mail' %}:</strong> {{ user.email }}</li>
-                    <li><strong>{% trans 'Year of Birth' %}:</strong> {{ user_profile.birth_year }}</li>
-                    <li><strong>{% trans 'Gender' %}:</strong> {{user_profile.gender }}</li>
+
+
+            <div class="dashboard-module">
+                <h1 class="dashboard-module-name">
+                    {% trans 'Personal Profile' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    <ul class="key-value">
+                        <li>
+                            <span class="key">
+                                {% trans 'First and Last Name' %}
+                            </span>
+                            <span class="value">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Year of Birth' %}
+                            </span>
+                            <span class="value">
+                                {{ user_profile.birth_year }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Gender' %}
+                            </span>
+                            <span class="value">
+                                {{user_profile.gender }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Education' %}
+                            </span>
+                            <span class="value">
+                                {{user_profile.education }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Current Status' %}
+                            </span>
+                            <span class="value">
+                                {{user_profile.work }}
+                            </span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="span5">
-                    <li><strong>{% trans 'Education' %}:</strong> {{user_profile.education }}</li>
-                    <li><strong>{% trans 'Work' %}:</strong> {{user_profile.work }}</li>
-                    <li><strong>{% trans 'Piazza handle' %}:</strong> {{user_profile.piazza_name }}</li>
-                    <li><strong>{% trans 'Piazza email' %}:</strong> {{user_profile.piazza_email }}</li>
-                    <li><strong>{% trans 'Receive emails' %}:</strong> {% if user_profile.email_me %} {% trans 'Yes' %} {% else %} {% trans 'No' %} {% endif %} </li>
+            </div>
+
+            <div class="dashboard-module">
+                <h1 class="dashboard-module-name">
+                    {% trans 'Account Information' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    <ul class="key-value">
+                        <li>
+                            <span class="key">
+                                {% trans 'Username' %}
+                            </span>
+                            <span class="value">
+                                {{ user.username }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'E-mail' %}
+                            </span>
+                            <span class="value">
+                                {{ user.email }}
+                            </span>
+                        </li>
+
+                    </ul>
                 </div>
-            </ul>
-            {% if courses %}
-                <hr />
-                <span><strong>{% trans 'Courses' %}:</strong></span>
-                <div class="profile-courses">
-                    {% for course in courses %}
-                        <div class="course">
-                            <div class="image">
-                                <img alt="Course Image" height="200" width="200" src="{{course.logo_dl_link}}" />
-                                <div class="score_overlay">
-                                    {% if scores|byKey:course.id %}
-                                        <p><strong>Scores:</strong></p>
-                                        <ul>
-                                            {% for score in scores|byKey:course.id %}
-                                                {% if score.0 != 'accomplishment' %}
-                                                    <li>{{ score.0|dash2space|title }}: <strong>{{ score.1|floatformat:"0" }}/{{ score.2|floatformat:"0" }}</strong></li>
-                                                {% endif %}
-                                            {% endfor %}
-                                            </ul>
-                                            {% for score in scores|byKey:course.id %}
-                                                {% if score.0 == 'accomplishment' %}
-                                                    <p>Scaled Total: <strong>{{ score.1|floatformat:"0" }}/{{ score.2|floatformat:"0" }}</strong></p>
-                                                {% endif %}
-                                            {% endfor %}
-                                    {% else %}
-                                        <p><strong>{% trans 'No scores were found...' %}</strong></p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <h3><a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></h3>
-                            <p class="dates"><strong>{{ course.calendar_start|date:"M. j, Y" }} - {{ course.calendar_end|date:"M. j, Y" }}</strong></p>
-                            <div class="profile-progress-wrapper">
-                                <div class="profile-progress-endticks">
-                                    <div class="profile-progress-line"></div>
-                                    <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> <!-- '%' after django tag is necessary for width attribute...-->
-                                </div>
-                            </div>
-                            <div class="buttons">
-                                {% if course.calendar_end < today %}
-                                    <div class="score btn">
-                                        <span class="text">{% trans 'Show Scores' %}</span> <em class="icon-tasks"></em>
-                                    </div>
-                                    {% if certifications|byKey:course.id %}
-                                        {% for certinfo in certifications|byKey:course.id %}
-                                            {% if certinfo.1 %}
-                                                <a class="btn" href="{{certinfo.1}}">
-                                                    {% trans 'Download Statement' %}
-                                                    <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
-                                                </a>
-                                            {% else %}
-                                                <a class="btn disabled">{% trans 'Generation in progress. Check back soon!' %} <em class="icon-refresh"></em></a>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                {% else %}
-                                    {% if course in is_student_list %}
-                                        <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
-                                            {% csrf_token %}
-                                            <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick='return confirm("{% trans 'Do you really want to unenroll?' %}")' />
-                                        </form>
-                                    {% else %}
-                                        <a class="btn disabled">{% trans 'Staff Member' %}</a>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
+            </div>
+            <div class="dashboard-module">
+                <h1 class="dashboard-module-name">
+                    {% trans 'User Settings' %}
+                </h1>
+                <div class="dashboard-module-content">
+                    <ul class="key-value">
+                        <li>
+                            <span class="key">
+                                {% trans 'Piazza Username' %}
+                            </span>
+                            <span class="value">
+                                {{ user_profile.piazza_name }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Piazza Email' %}
+                            </span>
+                            <span class="value">
+                                {{ user_profile.piazza_email }}
+                            </span>
+                        </li>
+                        <li>
+                            <span class="key">
+                                {% trans 'Receive Email' %}
+                            </span>
+                            <span class="value">
+                                {% if user_profile.email_me %} {% trans 'Yes' %} {% else %} {% trans 'No' %} {% endif %}
+                            </span>
+                        </li>
+
+                    </ul>
                 </div>
-            {% endif %}
-            
-        {% else %}
-        <h3> {% trans 'Please login to see profile information' %}: </h3>
-            <p>
-                <a class="btn" href="{% url 'shib_login' %}?next={{ request.get_full_path }}">{% trans 'Stanford WebAuth' %}</a>
-                <a class="btn" href="{% url 'auth_login' %}?next={{ request.get_full_path }}">{% trans 'Class2Go Login (Public course students)' %}</a>
-            </p>
-        {% endif %}
-    
+            </div>
+
+
+        </div>
+
+
+
+
     </div>
+
+    <div class="page-section">
+        <div class="dashboard-control-bar">
+            <div class="dashboard-control-content">
+                  <a href="{% url 'accounts.views.edit' %}" class="button small">{% trans 'Edit Info' %}</a>
+                {% if not has_webauth %}
+                  <a href="{% url 'auth_password_change' %}" class="button small">{% trans 'Change Password' %}</a>
+                {% endif %}            
+            </div>
+        </div>
+    </div>
+
+<!-- 
+    {% if courses %}
+        <hr />
+        <span><strong>{% trans 'Courses' %}:</strong></span>
+        <div class="profile-courses">
+            {% for course in courses %}
+                <div class="course">
+                    <div class="image">
+                        <img alt="Course Image" height="200" width="200" src="{{course.logo_dl_link}}" />
+                        <div class="score_overlay">
+                            {% if scores|byKey:course.id %}
+                                <p><strong>Scores:</strong></p>
+                                <ul>
+                                    {% for score in scores|byKey:course.id %}
+                                        {% if score.0 != 'accomplishment' %}
+                                            <li>{{ score.0|dash2space|title }}: <strong>{{ score.1|floatformat:"0" }}/{{ score.2|floatformat:"0" }}</strong></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </ul>
+                                    {% for score in scores|byKey:course.id %}
+                                        {% if score.0 == 'accomplishment' %}
+                                            <p>Scaled Total: <strong>{{ score.1|floatformat:"0" }}/{{ score.2|floatformat:"0" }}</strong></p>
+                                        {% endif %}
+                                    {% endfor %}
+                            {% else %}
+                                <p><strong>{% trans 'No scores were found...' %}</strong></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <h3><a href="{% url 'courses.views.main' course.prefix course.suffix %}">{{course.title}}</a></h3>
+                    <p class="dates"><strong>{{ course.calendar_start|date:"M. j, Y" }} - {{ course.calendar_end|date:"M. j, Y" }}</strong></p>
+                    <div class="profile-progress-wrapper">
+                        <div class="profile-progress-endticks">
+                            <div class="profile-progress-line"></div>
+                            <div class="profile-progress-bar" style="width: {{ course_completions|byKey:course.id }}%"></div> 
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        {% if course.calendar_end < today %}
+                            <div class="score btn">
+                                <span class="text">{% trans 'Show Scores' %}</span> <em class="icon-tasks"></em>
+                            </div>
+                            {% if certifications|byKey:course.id %}
+                                {% for certinfo in certifications|byKey:course.id %}
+                                    {% if certinfo.1 %}
+                                        <a class="btn" href="{{certinfo.1}}">
+                                            {% trans 'Download Statement' %}
+                                            <em class="{% if certinfo.0|uscore2space|title == 'Distinction' %}icon-trophy{% else %}icon-star{% endif %}"></em>
+                                        </a>
+                                    {% else %}
+                                        <a class="btn disabled">{% trans 'Generation in progress. Check back soon!' %} <em class="icon-refresh"></em></a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% else %}
+                            {% if course in is_student_list %}
+                                <form style="display:inline" method="POST" action="{% url 'courses.views.unenroll' course.prefix course.suffix %}">
+                                    {% csrf_token %}
+                                    <input class="btn" type="Submit"  value="{% trans 'Unenroll as Student' %}" onclick='return confirm("{% trans 'Do you really want to unenroll?' %}")' />
+                                </form>
+                            {% else %}
+                                <a class="btn disabled">{% trans 'Staff Member' %}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %} -->
     
-    <script>
-        $(document).ready(function() {
-            $('.btn.score').click(function() {
-                if ($(this).hasClass('shown')) {
-                    $('.text', this).text('Show Scores');
-                    $(this).closest('.course').find('.image').find('.score_overlay').hide().siblings('img').fadeTo('fast', 1);
-                } else {
-                    $(this).closest('.course').find('.image').find('img').fadeTo('fast', .05, function() {
-                        $(this).siblings('.score_overlay').show();
-                    });
-                    $('.text', this).text('Hide Scores');
-                }
-                $(this).toggleClass('shown');
-            });
-        });
-    </script>
+
+
+{% else %}
+<div class="dead-end">
+    <div class="dead-end-title">
+        <h1>
+            {% trans "You must be logged in to see this profile." %}
+        </h1>
+    </div>
+    <div class="dead-end-info">
+        <div class="dead-end-description">
+            <h6 class="subheader">PROBLEM</h6>
+            <p>{% trans "This information is only available to users." %}</b></p>
+        </div>
+        <div class="dead-end-solutions">
+            <h6 class="subheader">SOLUTION</h6>
+            <p>
+                {% trans "Log in to your user account." %}
+            </p>
+        </div>
+    </div>    
+</div>
+
+
+
+
+{% endif %}
+
 {% endblock m_column_content %}

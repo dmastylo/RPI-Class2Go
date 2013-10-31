@@ -1,0 +1,37 @@
+{% load url from future %}
+
+<section class="powered-by-class2go">
+    <a href="https://github.com/dmastylo/RPI-Class2Go"><h6>Powered by Class2Go</h6></a>
+</section>
+
+{% if not request.session.headless %}
+<footer id="global-footer">
+    <div class="brand">
+        <div class="logo">
+            <i id="school-footer-logo" class="rpilogo-02"></i>
+        </div>
+    </div>
+    <div class="school-info">
+        <div class="important-links">
+            <ul>
+                <li><a href="http://www.rpi.edu">Rensselaer Polytechnic Institute Home</a></li>
+                <li><a href="http://admissions.rpi.edu/undergraduate/visit/map.html">Maps &amp; Directions</a></li>
+                <li><a href="{% url 'c2g.views.tos' %}">Terms of Use</a></li>
+                <li><a href="{% url 'c2g.views.tos' %}#copyright">Copyright Complaints</a></li>
+                <li><a href="{% url 'c2g.views.contactus' %}">Technical Support</a></li>
+            </ul>
+        </div>
+        <div class="addr-card">
+            <p class="vcard">
+                <span class="">Rensselaer Polytechnic Institute</span><br>
+                <span class="adr">
+                    <span class="locality">Troy</span>,
+                    <span class="region">New York</span>
+                    <span class="postal-code">12180</span>
+                </span>
+            </p>
+        </div>
+    </div>
+</footer>
+
+{% endif %}

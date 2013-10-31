@@ -5,13 +5,26 @@
 {% block title %}{{ SITE_TITLE }} | {{common_page_data.course.title}}{% endblock %}
 {% load url from future %}
 
-{% block page_title %}
-<div class="pull-left page-title">
-    <h2>{% block course_page_title %}{{common_page_data.course.title}}{% endblock course_page_title %}</h2>
-</div>
-{% endblock page_title %}
 
 {% block navbar %}
+<div class="subpage-navbar-container">    
+    <nav class="subpage-navbar">
+        <ul class="subpage-navbar-sections">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Announcements</a></li>
+            <li><a href="#">Assignments</a></li>
+            <li><a href="#">Practice Problems</a></li>
+            <li><a href="#">Extra Materials</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </nav>
+</div>
+{% endblock %}
+
+
+
+
 <div class="navbar">
     <div class="navbar-inner nav-collapse collapse">
         <div class="container-fluid">
@@ -127,33 +140,34 @@
                     {% endif %}
                 {% endif %}
             </ul>
-            <!-- <div id="PacTime" class="pull-right">{% now "jS M, Y - g:i A T" %}</div>-->
         </div>
     </div>
 </div>
-{% endblock navbar %}
 
 {% block content %}
 {% block messages %}
 {% if messages %}
+    <div class="alert-area">
     {% for message in messages %}
         {% if 'success' in message.tags %}
-         <div class="alert alert-success"><em class="icon-ok"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+         <div class="alert-box success">{{ message }}</div>
         {% endif %}
         {% if 'error' in message.tags %}
-        <div class="alert alert-error"><em class="icon-fire"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert-box alert">{{ message }}</div>
         {% endif %}
         {% if 'warning' in message.tags %}
-        <div class="alert alert-warning"><em class="icon-warning-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert-box secondary">{{ message }}</div>
         {% endif %}
         {% if 'info' in message.tags %}
-        <div class="alert alert-info"><em class="icon-info-sign"></em><button class="close" data-dismiss="alert">×</button>{{ message }}</div>
+        <div class="alert-box secondary">{{ message }}</div>
         {% endif %}
 
     {% endfor %}
+    </div>
 
 {% endif %}
 {% endblock messages %}
+
 {% block course_notification %}{% endblock course_notification %}
 
 <div id="main-content" class="container-fluid body-content" role="main">

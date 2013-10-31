@@ -42,6 +42,9 @@ def home(request):
 def healthcheck(request):
     return HttpResponse("I'm alive!")
 
+def styleguide(request):
+    return render_to_response('styleguide.html',{},RequestContext(request))
+
 def maintenance(request):
     return render_to_response('landing/static_landing.html',{},RequestContext(request))
 

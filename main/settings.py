@@ -89,12 +89,14 @@ try:
     SITE_NAME_LONG
     SITE_TITLE
     SITE_URL
+    SITE_URL_SHORT
+    SITE_SUPPORT_EMAIL
 except NameError:
     SITE_ID = 1
-    SITE_NAME_SHORT = 'Stanford'
-    SITE_NAME_LONG = 'Stanford University'
-    SITE_TITLE = 'Stanford Class2Go'
-    SITE_URL = 'http://class2go.stanford.edu'
+    SITE_NAME_SHORT = 'Rensselaer'
+    SITE_NAME_LONG = 'Rensselaer Polytechnic Institute'
+    SITE_TITLE = 'Rensselaer Class2Go'
+    SITE_URL = 'http://node03.cs.rpi.edu'
 
 
 # If you set this to False, Django will make some optimizations so as not
@@ -148,6 +150,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder'
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -306,6 +309,7 @@ INSTALLED_APPS = (
                        'tools',
                        'tools.aws',
                        'tools.certificates',
+                       'compressor'
                       )
 if INSTANCE != "prod":
     INSTALLED_APPS += (
@@ -314,6 +318,12 @@ if INSTANCE != "prod":
                         'django_coverage',
                        )
 
+COMPRESS_PRECOMPILERS = (
+    ('text/coffeescript', 'coffee --compile --stdio'),
+    ('text/less', 'lessc {infile} {outfile}'),
+    ('text/x-sass', 'sass {infile} {outfile}'),
+    ('text/x-scss', 'sass --scss {infile} {outfile}'),
+)
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
