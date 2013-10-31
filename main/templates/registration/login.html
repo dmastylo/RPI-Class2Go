@@ -7,13 +7,7 @@
 {% block m_column_content %}
 
 
-{% if login_form.errors %}
-    <div class="cross-bar-alert">
-        <h1>
-            {% trans "Uh-oh.  We couldn't find username and password you entered." %}
-        </h1>
-    </div>
-{% endif %}
+
 
 {% if user.is_authenticated %}
 
@@ -25,13 +19,18 @@
     <div class="form-info">
         <h2>{% trans 'Sign in to ' %} {{ SITE_TITLE }}</h2>            
         <h6>Welcome back! Enter your username and password to get started.</h6>
+        {% if form.errors %}
+            <div class="alert-box secondary">
+                {% trans "Uh-oh.  We couldn't find username and password you entered." %}
+            </div>
+        {% endif %}
     </div>
     <div class="form-body">
-        <form action="{% url 'default_login' %}?next={{ next }}" method="post" class="custom">
+        <form action="{% url 'default_login' %}?next={{ next }}" method="post" class="custom form_login">
             {% csrf_token %}
             <fieldset>
                 <div class="control-group">
-                  <label for="id_username" class="control-label">{{ form.username.label_tag }}</label>
+                  <label for="id_username" class="control-label onload-focus">{{ form.username.label_tag }}</label>
                     <div class="controls">
                     {{ form.username }}
                   </div>
@@ -45,7 +44,7 @@
             </fieldset>
             <div class="form-actions">
                 <input type="submit" value="{% trans 'Sign In' %}" id="submit"/>
-                <a id="alternative" href="{% url 'auth_login' %}?next=/{{request.GET.pre}}/{{request.GET.post}}">
+                <a id="alternative" href="{% url 'registration_register' %}?next=/{{request.GET.pre}}/{{request.GET.post}}">
                     {% trans 'Need to register for an account?' %}
                 </a>
                 <a id="alternative" href="{% url 'auth_password_reset' %}">
